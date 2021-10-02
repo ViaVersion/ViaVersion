@@ -20,26 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data;
+package com.viaversion.viaversion.api.minecraft.chunks;
 
-public interface Mappings {
+public enum PaletteType {
+    BLOCKS(ChunkSection.SIZE, 8),
+    BIOMES(4 * 4 * 4, 2);
 
-    /**
-     * Returns the mapped id from the given id, or -1 if invalid/out of bounds.
-     *
-     * @param id unmapped id
-     * @return mapped id, or -1 if invalid/out of bounds
-     */
-    int getNewId(int id);
+    private final int maxSize;
+    private final int highestBitsPerValue;
 
-    /**
-     * Manually maps a specific id.
-     *
-     * @param id    unmapped id
-     * @param newId mapped id
-     * @throws IndexOutOfBoundsException if the unmapped id is invalid
-     */
-    void setNewId(int id, int newId);
+    PaletteType(final int maxSize, final int highestBitsPerValue) {
+        this.maxSize = maxSize;
+        this.highestBitsPerValue = highestBitsPerValue;
+    }
 
-    int size();
+    public int maxSize() {
+        return maxSize;
+    }
+
+    public int highestBitsPerValue() {
+        return highestBitsPerValue;
+    }
 }

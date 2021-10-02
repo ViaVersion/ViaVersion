@@ -20,26 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data;
+package com.viaversion.viaversion.api.minecraft.blockentity;
 
-public interface Mappings {
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-    /**
-     * Returns the mapped id from the given id, or -1 if invalid/out of bounds.
-     *
-     * @param id unmapped id
-     * @return mapped id, or -1 if invalid/out of bounds
-     */
-    int getNewId(int id);
+public interface BlockEntity {
 
-    /**
-     * Manually maps a specific id.
-     *
-     * @param id    unmapped id
-     * @param newId mapped id
-     * @throws IndexOutOfBoundsException if the unmapped id is invalid
-     */
-    void setNewId(int id, int newId);
+    default byte sectionX() {
+        return (byte) ((packedXZ() >> 4) & 15);
+    }
 
-    int size();
+    default byte sectionZ() {
+        return (byte) (packedXZ() & 15);
+    }
+
+    byte packedXZ();
+
+    short y();
+
+    int typeId();
+
+    @Nullable CompoundTag tag();
 }

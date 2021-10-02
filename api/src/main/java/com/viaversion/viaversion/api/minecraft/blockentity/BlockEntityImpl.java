@@ -20,26 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data;
+package com.viaversion.viaversion.api.minecraft.blockentity;
 
-public interface Mappings {
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 
-    /**
-     * Returns the mapped id from the given id, or -1 if invalid/out of bounds.
-     *
-     * @param id unmapped id
-     * @return mapped id, or -1 if invalid/out of bounds
-     */
-    int getNewId(int id);
+public final class BlockEntityImpl implements BlockEntity {
+    private final byte packedXZ;
+    private final short y;
+    private final int typeId;
+    private final CompoundTag tag;
 
-    /**
-     * Manually maps a specific id.
-     *
-     * @param id    unmapped id
-     * @param newId mapped id
-     * @throws IndexOutOfBoundsException if the unmapped id is invalid
-     */
-    void setNewId(int id, int newId);
+    public BlockEntityImpl(final byte packedXZ, final short y, final int typeId, final CompoundTag tag) {
+        this.packedXZ = packedXZ;
+        this.y = y;
+        this.typeId = typeId;
+        this.tag = tag;
+    }
 
-    int size();
+    @Override
+    public byte packedXZ() {
+        return packedXZ;
+    }
+
+    @Override
+    public short y() {
+        return y;
+    }
+
+    @Override
+    public int typeId() {
+        return typeId;
+    }
+
+    @Override
+    public CompoundTag tag() {
+        return tag;
+    }
 }

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
@@ -394,6 +395,15 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
                 tracker.clearEntities();
             }
             tracker.setCurrentWorld(world);
+        };
+    }
+
+    public PacketHandler biomeSizeTracker() {
+        return wrapper -> {
+            final CompoundTag registry = wrapper.get(Type.NBT, 0);
+            final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
+            final ListTag biomes = biomeRegistry.get("value");
+            tracker(wrapper.user()).setBiomesSent(biomes.size());
         };
     }
 

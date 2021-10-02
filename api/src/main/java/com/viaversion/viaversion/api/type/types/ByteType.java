@@ -31,16 +31,25 @@ public class ByteType extends Type<Byte> implements TypeConverter<Byte> {
         super(Byte.class);
     }
 
+    public byte readPrimitive(ByteBuf buffer) {
+        return buffer.readByte();
+    }
+
+    public void writePrimitive(ByteBuf buffer, byte object) {
+        buffer.writeByte(object);
+    }
+
     @Override
+    @Deprecated
     public Byte read(ByteBuf buffer) {
         return buffer.readByte();
     }
 
     @Override
+    @Deprecated
     public void write(ByteBuf buffer, Byte object) {
         buffer.writeByte(object);
     }
-
 
     @Override
     public Byte from(Object o) {

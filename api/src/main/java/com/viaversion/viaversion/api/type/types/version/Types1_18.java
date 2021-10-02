@@ -20,26 +20,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data;
+package com.viaversion.viaversion.api.type.types.version;
 
-public interface Mappings {
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
+import com.viaversion.viaversion.api.type.Type;
 
-    /**
-     * Returns the mapped id from the given id, or -1 if invalid/out of bounds.
-     *
-     * @param id unmapped id
-     * @return mapped id, or -1 if invalid/out of bounds
-     */
-    int getNewId(int id);
+public final class Types1_18 {
 
-    /**
-     * Manually maps a specific id.
-     *
-     * @param id    unmapped id
-     * @param newId mapped id
-     * @throws IndexOutOfBoundsException if the unmapped id is invalid
-     */
-    void setNewId(int id, int newId);
-
-    int size();
+    public static final Type<BlockEntity> BLOCK_ENTITY = new BlockEntityType1_18();
 }

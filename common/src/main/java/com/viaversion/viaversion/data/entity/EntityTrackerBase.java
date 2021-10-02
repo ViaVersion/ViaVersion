@@ -38,6 +38,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     private int currentWorldSectionHeight = 16;
     private int currentMinY;
     private String currentWorld;
+    private int biomesSent = -1;
 
     public EntityTrackerBase(UserConnection connection, @Nullable EntityType playerType) {
         this(connection, playerType, false);
@@ -146,5 +147,15 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     @Override
     public void setCurrentWorld(final String currentWorld) {
         this.currentWorld = currentWorld;
+    }
+
+    @Override
+    public int biomesSent() {
+        return biomesSent;
+    }
+
+    @Override
+    public void setBiomesSent(int biomesSent) {
+        this.biomesSent = biomesSent;
     }
 }

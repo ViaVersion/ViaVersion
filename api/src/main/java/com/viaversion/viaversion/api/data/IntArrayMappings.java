@@ -116,6 +116,11 @@ public class IntArrayMappings implements Mappings {
         oldToNew[id] = newId;
     }
 
+    @Override
+    public int size() {
+        return oldToNew.length;
+    }
+
     public int[] getOldToNew() {
         return oldToNew;
     }

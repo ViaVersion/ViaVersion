@@ -47,6 +47,7 @@ public class MappingDataBase implements MappingData {
     protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
+    protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
     protected Map<RegistryType, List<TagData>> tags;
@@ -71,6 +72,7 @@ public class MappingDataBase implements MappingData {
 
         blockMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blocks");
         blockStateMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blockstates");
+        blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
 
@@ -167,6 +169,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getBlockMappings() {
         return blockMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getBlockEntityMappings() {
+        return blockEntityMappings;
     }
 
     @Override
