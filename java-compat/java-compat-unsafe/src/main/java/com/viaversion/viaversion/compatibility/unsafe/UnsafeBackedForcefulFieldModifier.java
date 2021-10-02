@@ -22,10 +22,14 @@ import com.viaversion.viaversion.compatibility.ForcefulFieldModifier;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+/**
+ * @deprecated usage of sun.misc.Unsafe is discouraged and can stop working in future Java releases.
+ */
 @SuppressWarnings({
         "java:S1191", // SonarLint/-Qube/-Cloud: We need Unsafe for the modifier implementation.
         "java:S3011", // ^: We need to circumvent the access restrictions of fields.
 })
+@Deprecated
 public final class UnsafeBackedForcefulFieldModifier implements ForcefulFieldModifier {
     private final sun.misc.Unsafe unsafe;
 
