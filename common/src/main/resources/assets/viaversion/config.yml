@@ -13,8 +13,12 @@
 checkforupdates: true
 # Send the supported versions with the Status (Ping) response packet
 send-supported-versions: false
-# Block specific Minecraft protocols that ViaVersion allows
-# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers or use a generator: https://via.krusic22.com
+# Easier to configure alternative to 'block-protocols'. Uses readable version strings with possible '<' and '>' prefixes.
+# An example to block 1.16.4, everything below 1.16, as well as everything above 1.17.1 would be: ["<1.16", "1.16.4", ">1.17.1"]
+# You can use both this and the block-protocols option at the same time as well.
+block-versions: []
+# Block specific Minecraft protocol version numbers.
+# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers, or use a generator: https://via.krusic22.com
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
@@ -72,7 +76,7 @@ velocity-servers: {}
 #----------------------------------------------------------#
 #                  GLOBAL PACKET LIMITER                   #
 #----------------------------------------------------------#
-#
+# THIS FEATURE IS DISABLED ON 1.17.1+ PAPER SERVERS, SINCE IT HAS A BETTER PACKET-LIMITER INBUILT
 #
 # Packets Per Second (PPS) limiter (Use -1 on max-pps and tracking-period to disable)
 # Clients by default send around 20-90 packets per second.
@@ -153,6 +157,8 @@ ignore-long-1_16-channel-names: true
 #
 # Force 1.17+ client to accept the server resource pack; they will automatically disconnect if they decline.
 forced-use-1_17-resource-pack: false
+# The message to be displayed at the prompt when the 1.17+ client receives the server resource pack.
+resource-pack-1_17-prompt: ''
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
@@ -195,9 +201,16 @@ anti-xray-patch: true
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)
 replacement-piston-id: 0
+# Fix 1.9+ clients not rendering the far away chunks and improve chunk rendering when moving fast (Increases network usage and decreases client fps slightly)
+chunk-border-fix: false
 # Force the string -> json transform
 force-json-transform: false
 # Minimize the cooldown animation in 1.8 servers
 minimize-cooldown: true
-# Left handed handling on 1.8 servers
+# Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
+# Get the world names which should be returned for each vanilla dimension
+map-1_16-world-names:
+  overworld: "minecraft:overworld"
+  nether: "minecraft:the_nether"
+  end: "minecraft:the_end"

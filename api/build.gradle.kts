@@ -1,5 +1,6 @@
 plugins {
     id("net.kyori.blossom")
+    id("via.shadow-conventions")
 }
 
 blossom {
@@ -19,4 +20,8 @@ dependencies {
     compileOnlyApi(libs.netty)
     compileOnlyApi(libs.guava)
     compileOnlyApi(libs.checkerQual)
+}
+
+java {
+    withJavadocJar()
 }

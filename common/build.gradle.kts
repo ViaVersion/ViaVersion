@@ -9,4 +9,9 @@ blossom {
 
 dependencies {
     api(projects.viaversionApi)
+    api(projects.viaversionApiLegacy)
+}
+
+java {
+    withJavadocJar()
 }

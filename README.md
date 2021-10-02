@@ -49,7 +49,7 @@ You can find official dev builds here:
 **API-artifact:**
 ```xml
 <dependency>
-    <groupId>us.myles</groupId>
+    <groupId>com.viaversion</groupId>
     <artifactId>viaversion-api</artifactId>
     <version>LATEST</version>
     <scope>provided</scope>
@@ -64,13 +64,13 @@ Please note the [differences in licensing](#license).
 
 Building:
 --------
-After cloning this repository, build the project with Gradle by running `/gradlew build` and take the created jar out of
+After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out of
 the `build/libs` directory.
 
 
 License:
 --------
-The entirety of the [API directory](api) is licensed under the MIT License; see [licenses/MIT.md](licenses/MIT.md) for
+The entirety of the [API directory](api) (including the legacy API directory) is licensed under the MIT License; see [licenses/MIT.md](licenses/MIT.md) for
 details.
 
 Everything else, unless explicitly stated otherwise, is licensed under the GNU General Public License, including the end
