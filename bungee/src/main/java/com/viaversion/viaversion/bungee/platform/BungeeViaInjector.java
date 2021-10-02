@@ -38,16 +38,22 @@ import java.util.Set;
 
 public class BungeeViaInjector implements ViaInjector {
 
+    private static final Field LISTENERS_FIELD;
     private final List<Channel> injectedChannels = new ArrayList<>();
-    private Field listenersField;
+
+    static {
+        try {
+            LISTENERS_FIELD = ProxyServer.getInstance().getClass().getDeclaredField("listeners");
+            LISTENERS_FIELD.setAccessible(true);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Unable to access listeners field.", e);
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public void inject() throws ReflectiveOperationException {
-        ProxyServer server = ProxyServer.getInstance();
-        this.listenersField = server.getClass().getDeclaredField("listeners");
-        this.listenersField.setAccessible(true);
-        Set<Channel> listeners = (Set<Channel>) this.listenersField.get(server);
+        Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
 
         // Inject the list
         Set<Channel> wrapper = new SetWrapper<>(listeners, channel -> {
@@ -58,13 +64,11 @@ public class BungeeViaInjector implements ViaInjector {
             }
         });
 
-        this.listenersField.set(server, wrapper);
+        LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
 
         // Iterate through current list
-        synchronized (wrapper) {
-            for (Channel channel : listeners) {
-                injectChannel(channel);
-            }
+        for (Channel channel : listeners) {
+            injectChannel(channel);
         }
     }
 
@@ -166,16 +170,14 @@ public class BungeeViaInjector implements ViaInjector {
 
         data.add("injectedChannelInitializers", injectedChannelInitializers);
 
-        if (this.listenersField != null) {
-            try {
-                Object list = this.listenersField.get(ProxyServer.getInstance());
-                data.addProperty("currentList", list.getClass().getName());
-                if (list instanceof SetWrapper) {
-                    data.addProperty("wrappedList", ((SetWrapper<?>) list).originalSet().getClass().getName());
-                }
-            } catch (ReflectiveOperationException ignored) {
-                // Ignored
+        try {
+            Object list = LISTENERS_FIELD.get(ProxyServer.getInstance());
+            data.addProperty("currentList", list.getClass().getName());
+            if (list instanceof SetWrapper) {
+                data.addProperty("wrappedList", ((SetWrapper<?>) list).originalSet().getClass().getName());
             }
+        } catch (ReflectiveOperationException ignored) {
+            // Ignored
         }
 
         return data;
