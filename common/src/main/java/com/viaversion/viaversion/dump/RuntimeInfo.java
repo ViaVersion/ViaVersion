@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package us.myles.ViaVersion.dump;
+package com.viaversion.viaversion.dump;
 
 public class RuntimeInfo {
 

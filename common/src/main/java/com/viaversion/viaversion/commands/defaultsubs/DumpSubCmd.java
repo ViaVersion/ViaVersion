@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.dump.DumpTemplate;
+import com.viaversion.viaversion.dump.RuntimeInfo;
 import com.viaversion.viaversion.dump.VersionInfo;
 import com.viaversion.viaversion.util.GsonUtil;
 
