@@ -93,7 +93,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
             if (plugin.getConf().isItemCache()) {
                 handItemCache = new HandItemCache();
-                tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 2L, 2L)); // Updates player's items :)
+                tasks.add(handItemCache.runTaskTimerAsynchronously(plugin, 1L, 1L)); // Updates player's items :)
             }
         }
 
