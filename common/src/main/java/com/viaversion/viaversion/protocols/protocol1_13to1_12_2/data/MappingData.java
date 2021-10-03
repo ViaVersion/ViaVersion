@@ -137,15 +137,17 @@ public class MappingData extends MappingDataBase {
             return null; // Not valid
         }
         int separatorIndex = newId.indexOf(':');
-        // Vanilla parses ``:`` and ```` as ``minecraft:`` (also ensure there's enough space)
-        if ((separatorIndex == -1 || separatorIndex == 0) && newId.length() <= 10) {
+        // Vanilla parses an empty and a missing namespace as the minecraft namespace
+        if (separatorIndex == -1) {
             newId = "minecraft:" + newId;
+        } else if (separatorIndex == 0) {
+            newId = "minecraft" + newId;
         }
         return newId;
     }
 
     public static boolean isValid1_13Channel(String channelId) {
-        return channelId.matches("([0-9a-z_.-]+):([0-9a-z_/.-]+)");
+        return channelId.matches("([0-9a-z_.-]+:)?[0-9a-z_/.-]+");
     }
 
     private void loadTags(Map<String, Integer[]> output, JsonObject newTags) {

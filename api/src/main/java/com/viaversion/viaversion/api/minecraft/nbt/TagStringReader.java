@@ -264,12 +264,14 @@ final class TagStringReader {
                     Tag result = null;
                     try {
                         switch (Character.toLowerCase(current)) { // try to read and return as a number
-                            // case Tokens.TYPE_INTEGER: // handled below, ints are ~special~
                             case Tokens.TYPE_BYTE:
                                 result = new ByteTag(Byte.parseByte(builder.toString()));
                                 break;
                             case Tokens.TYPE_SHORT:
                                 result = new ShortTag(Short.parseShort(builder.toString()));
+                                break;
+                            case Tokens.TYPE_INT:
+                                result = new IntTag(Integer.parseInt(builder.toString()));
                                 break;
                             case Tokens.TYPE_LONG:
                                 result = new LongTag(Long.parseLong(builder.toString()));

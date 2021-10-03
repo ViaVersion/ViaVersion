@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -30,6 +31,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
+
+import java.util.Collections;
 
 public class PlayerPackets {
 
@@ -58,19 +61,24 @@ public class PlayerPackets {
                         Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
                         protocol.getItemRewriter().handleItemToServer(item);
 
+                        if (item == null) return;
+
+                        CompoundTag tag = item.tag();
+                        if (tag == null) return;
+
+                        Tag pages = tag.get("pages");
+
+                        // Fix for https://github.com/ViaVersion/ViaVersion/issues/2660
+                        if (pages == null) {
+                            tag.put("pages", new ListTag(Collections.singletonList(new StringTag())));
+                        }
+
                         // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
-                        if (Via.getConfig().isTruncate1_14Books()) {
-                            if (item == null) return;
-                            CompoundTag tag = item.tag();
-
-                            if (tag == null) return;
-                            Tag pages = tag.get("pages");
-
-                            if (!(pages instanceof ListTag)) return;
-
+                        if (Via.getConfig().isTruncate1_14Books() && pages instanceof ListTag) {
                             ListTag listTag = (ListTag) pages;
-                            if (listTag.size() <= 50) return;
-                            listTag.setValue(listTag.getValue().subList(0, 50));
+                            if (listTag.size() > 50) {
+                                listTag.setValue(listTag.getValue().subList(0, 50));
+                            }
                         }
                     }
                 });
