@@ -147,7 +147,7 @@ public class MappingData extends MappingDataBase {
     }
 
     public static boolean isValid1_13Channel(String channelId) {
-        return channelId.matches("[0-9a-z_.-]*:?[0-9a-z_/.-]*");
+        return channelId.matches("([0-9a-z_.-]+:)?[0-9a-z_/.-]+");
     }
 
     private void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
