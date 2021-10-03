@@ -41,16 +41,13 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRew
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
+    public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
+    public static final String DRAGON_TRANSLATABLE = "{\"translate\":\"entity.EnderDragon.name\"}";
     private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
     private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
     private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
@@ -254,7 +251,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     if (metadata.id() == 2) {
                         BossBar bar = bossBarMap.get(entityId);
                         String title = (String) metadata.getValue();
-                        title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither") : title;
+                        title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE) : title;
                         if (bar == null) {
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
@@ -272,7 +269,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                         float maxHealth = type == EntityType.ENDER_DRAGON ? 200.0f : 300.0f;
                         float health = Math.max(0.0f, Math.min(((float) metadata.getValue()) / maxHealth, 1.0f));
                         if (bar == null) {
-                            String title = type == EntityType.ENDER_DRAGON ? "Ender Dragon" : "Wither";
+                            String title = type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE;
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, health, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
                             bar.addConnection(user());
