@@ -17,46 +17,58 @@
  */
 package com.viaversion.viaversion.bungee.platform;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.bungee.handlers.BungeeChannelInitializer;
-import com.viaversion.viaversion.compatibility.ForcefulFieldModifier;
-import com.viaversion.viaversion.compatibility.unsafe.UnsafeBackedForcefulFieldModifier;
 import com.viaversion.viaversion.util.ReflectionUtil;
+import com.viaversion.viaversion.util.SetWrapper;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class BungeeViaInjector implements ViaInjector {
 
-    private final ForcefulFieldModifier forcefulFieldModifier;
+    private static final Field LISTENERS_FIELD;
+    private final List<Channel> injectedChannels = new ArrayList<>();
 
-    public BungeeViaInjector() {
+    static {
         try {
-            this.forcefulFieldModifier = new UnsafeBackedForcefulFieldModifier();
-        } catch (final ReflectiveOperationException ex) {
-            throw new IllegalStateException("Cannot create a modifier accessor", ex);
+            LISTENERS_FIELD = ProxyServer.getInstance().getClass().getDeclaredField("listeners");
+            LISTENERS_FIELD.setAccessible(true);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Unable to access listeners field.", e);
         }
     }
 
     @Override
-    public void inject() throws Exception {
-        try {
-            Class<?> pipelineUtils = Class.forName("net.md_5.bungee.netty.PipelineUtils");
-            Field field = pipelineUtils.getDeclaredField("SERVER_CHILD");
-            field.setAccessible(true);
+    @SuppressWarnings("unchecked")
+    public void inject() throws ReflectiveOperationException {
+        Set<Channel> listeners = (Set<Channel>) LISTENERS_FIELD.get(ProxyServer.getInstance());
 
-            BungeeChannelInitializer newInit = new BungeeChannelInitializer((ChannelInitializer<Channel>) field.get(null));
+        // Inject the list
+        Set<Channel> wrapper = new SetWrapper<>(listeners, channel -> {
+            try {
+                injectChannel(channel);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-            this.forcefulFieldModifier.setField(field, null, newInit);
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("Unable to inject ViaVersion, please post these details on our GitHub and ensure you're using a compatible server version.");
-            throw e;
+        LISTENERS_FIELD.set(ProxyServer.getInstance(), wrapper);
+
+        // Iterate through current list
+        for (Channel channel : listeners) {
+            injectChannel(channel);
         }
     }
 
@@ -65,6 +77,40 @@ public class BungeeViaInjector implements ViaInjector {
         Via.getPlatform().getLogger().severe("ViaVersion cannot remove itself from Bungee without a reboot!");
     }
 
+    @SuppressWarnings("unchecked")
+    private void injectChannel(Channel channel) throws ReflectiveOperationException {
+        List<String> names = channel.pipeline().names();
+        ChannelHandler bootstrapAcceptor = null;
+
+        for (String name : names) {
+            ChannelHandler handler = channel.pipeline().get(name);
+            try {
+                ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class);
+                bootstrapAcceptor = handler;
+            } catch (Exception e) {
+                // Not this one
+            }
+        }
+
+        // Default to first
+        if (bootstrapAcceptor == null) {
+            bootstrapAcceptor = channel.pipeline().first();
+        }
+
+        if (bootstrapAcceptor.getClass().getName().equals("net.md_5.bungee.query.QueryHandler")) {
+            return;
+        }
+
+        try {
+            ChannelInitializer<Channel> oldInit = ReflectionUtil.get(bootstrapAcceptor, "childHandler", ChannelInitializer.class);
+            ChannelInitializer<Channel> newInit = new BungeeChannelInitializer(oldInit);
+
+            ReflectionUtil.set(bootstrapAcceptor, "childHandler", newInit);
+            this.injectedChannels.add(channel);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("Unable to find core component 'childHandler', please check your plugins. issue: " + bootstrapAcceptor.getClass().getName());
+        }
+    }
 
     @Override
     public int getServerProtocolVersion() throws Exception {
@@ -76,29 +122,64 @@ public class BungeeViaInjector implements ViaInjector {
         return new IntLinkedOpenHashSet(getBungeeSupportedVersions());
     }
 
+    @SuppressWarnings("unchecked")
     private List<Integer> getBungeeSupportedVersions() throws Exception {
         return ReflectionUtil.getStatic(Class.forName("net.md_5.bungee.protocol.ProtocolConstants"), "SUPPORTED_VERSION_IDS", List.class);
-    }
-
-    private ChannelInitializer<Channel> getChannelInitializer() throws Exception {
-        Class<?> pipelineUtils = Class.forName("net.md_5.bungee.netty.PipelineUtils");
-        Field field = pipelineUtils.getDeclaredField("SERVER_CHILD");
-        field.setAccessible(true);
-        return (ChannelInitializer<Channel>) field.get(null);
     }
 
     @Override
     public JsonObject getDump() {
         JsonObject data = new JsonObject();
-        try {
-            ChannelInitializer<Channel> initializer = getChannelInitializer();
-            data.addProperty("currentInitializer", initializer.getClass().getName());
-            if (initializer instanceof BungeeChannelInitializer) {
-                data.addProperty("originalInitializer", ((BungeeChannelInitializer) initializer).getOriginal().getClass().getName());
+
+        // Generate information about current injections
+        JsonArray injectedChannelInitializers = new JsonArray();
+        for (Channel channel : this.injectedChannels) {
+            JsonObject channelInfo = new JsonObject();
+            channelInfo.addProperty("channelClass", channel.getClass().getName());
+
+            // Get information about the pipes for this channel
+            JsonArray pipeline = new JsonArray();
+            for (String pipeName : channel.pipeline().names()) {
+                JsonObject handlerInfo = new JsonObject();
+                handlerInfo.addProperty("name", pipeName);
+
+                ChannelHandler channelHandler = channel.pipeline().get(pipeName);
+                if (channelHandler == null) {
+                    handlerInfo.addProperty("status", "INVALID");
+                    continue;
+                }
+
+                handlerInfo.addProperty("class", channelHandler.getClass().getName());
+
+                try {
+                    Object child = ReflectionUtil.get(channelHandler, "childHandler", ChannelInitializer.class);
+                    handlerInfo.addProperty("childClass", child.getClass().getName());
+                    if (child instanceof BungeeChannelInitializer) {
+                        handlerInfo.addProperty("oldInit", ((BungeeChannelInitializer) child).getOriginal().getClass().getName());
+                    }
+                } catch (ReflectiveOperationException e) {
+                    // Don't display
+                }
+
+                pipeline.add(handlerInfo);
             }
-        } catch (Exception e) {
-            // Ignored, not printed in the dump
+            channelInfo.add("pipeline", pipeline);
+
+            injectedChannelInitializers.add(channelInfo);
         }
+
+        data.add("injectedChannelInitializers", injectedChannelInitializers);
+
+        try {
+            Object list = LISTENERS_FIELD.get(ProxyServer.getInstance());
+            data.addProperty("currentList", list.getClass().getName());
+            if (list instanceof SetWrapper) {
+                data.addProperty("wrappedList", ((SetWrapper<?>) list).originalSet().getClass().getName());
+            }
+        } catch (ReflectiveOperationException ignored) {
+            // Ignored
+        }
+
         return data;
     }
 }
