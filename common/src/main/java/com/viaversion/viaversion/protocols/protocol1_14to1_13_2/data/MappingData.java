@@ -47,7 +47,7 @@ public class MappingData extends MappingDataBase {
 
         JsonObject heightMapData = MappingDataLoader.loadData("heightMapData-1.14.json");
         JsonArray motionBlocking = heightMapData.getAsJsonArray("MOTION_BLOCKING");
-        this.motionBlocking = new IntOpenHashSet(motionBlocking.size(), 1F);
+        this.motionBlocking = new IntOpenHashSet(motionBlocking.size(), .99F);
         for (JsonElement blockState : motionBlocking) {
             String key = blockState.getAsString();
             Integer id = blockStateMap.get(key);
@@ -59,7 +59,7 @@ public class MappingData extends MappingDataBase {
         }
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            nonFullBlocks = new IntOpenHashSet(1611, 1F);
+            nonFullBlocks = new IntOpenHashSet(1611, .99F);
             for (Map.Entry<String, JsonElement> blockstates : oldMappings.getAsJsonObject("blockstates").entrySet()) {
                 final String state = blockstates.getValue().getAsString();
                 if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall[")) {
