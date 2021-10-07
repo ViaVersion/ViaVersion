@@ -21,14 +21,15 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import space.vectrix.flare.SyncMap;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
-    private static final IntSet WHITELIST = new IntOpenHashSet(46, 1F);
-    private final Map<Position, ReplacementData> blocks = new ConcurrentHashMap<>();
+    private static final IntSet WHITELIST = new IntOpenHashSet(46, .99F);
+    private final Map<Position, ReplacementData> blocks = SyncMap.hashmap();
 
     static {
         // Flower pots

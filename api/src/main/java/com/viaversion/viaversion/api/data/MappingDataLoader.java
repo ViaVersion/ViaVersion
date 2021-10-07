@@ -217,7 +217,7 @@ public class MappingDataLoader {
      * @return map with indexes hashed by their id value
      */
     public static Object2IntMap<String> indexedObjectToMap(JsonObject object) {
-        Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), 1F);
+        Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), .99F);
         map.defaultReturnValue(-1);
         for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
             map.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
@@ -232,7 +232,7 @@ public class MappingDataLoader {
      * @return map with indexes hashed by their id value
      */
     public static Object2IntMap<String> arrayToMap(JsonArray array) {
-        Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), 1F);
+        Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), .99F);
         map.defaultReturnValue(-1);
         for (int i = 0; i < array.size(); i++) {
             map.put(array.get(i).getAsString(), i);

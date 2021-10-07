@@ -17,15 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 
-import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-
-import java.util.Set;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
 
 public class EntityTracker1_11 extends EntityTrackerBase {
-    private final Set<Integer> holograms = Sets.newConcurrentHashSet();
+    private final IntSet holograms = Int2ObjectSyncMap.hashset();
 
     public EntityTracker1_11(UserConnection user) {
         super(user, EntityType.PLAYER);
@@ -35,12 +34,11 @@ public class EntityTracker1_11 extends EntityTrackerBase {
     public void removeEntity(int entityId) {
         super.removeEntity(entityId);
 
-        if (isHologram(entityId))
-            removeHologram(entityId);
+        removeHologram(entityId);
     }
 
-    public void addHologram(int entId) {
-        holograms.add(entId);
+    public boolean addHologram(int entId) {
+        return holograms.add(entId);
     }
 
     public boolean isHologram(int entId) {

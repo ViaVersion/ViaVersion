@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class WorldPackets {
-    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, 1F);
+    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, .99F);
 
     static {
         // Client will crash if it receives a invalid biome id
