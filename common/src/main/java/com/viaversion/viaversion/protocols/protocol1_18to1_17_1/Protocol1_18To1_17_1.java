@@ -32,13 +32,13 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
-public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPackets1_17_1, ClientboundPackets1_17_1, ServerboundPackets1_17, ServerboundPackets1_17> {
+public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPackets1_17_1, ClientboundPackets1_18, ServerboundPackets1_17, ServerboundPackets1_17> {
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter<Protocol1_18To1_17_1> entityRewriter = new EntityPackets(this);
 
     public Protocol1_18To1_17_1() {
-        super(ClientboundPackets1_17_1.class, ClientboundPackets1_17_1.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
+        super(ClientboundPackets1_17_1.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);

@@ -53,6 +53,12 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
                 map(Type.NBT); // Registry
                 map(Type.NBT); // Current dimension data
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.VAR_INT); // Max players
+                handler(wrapper -> {
+                    int chunkRadius = wrapper.passthrough(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, chunkRadius); // Simulation distance
+                });
                 handler(worldDataTrackerHandler(1));
                 handler(biomeSizeTracker());
             }
