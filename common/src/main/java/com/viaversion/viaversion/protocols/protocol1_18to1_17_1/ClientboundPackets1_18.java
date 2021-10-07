@@ -108,23 +108,23 @@ public enum ClientboundPackets1_18 implements ClientboundPacketType {
     SET_PASSENGERS, // 0x54
     TEAMS, // 0x55
     UPDATE_SCORE, // 0x56
-    SET_SIMULATION_DISTANCE,
-    TITLE_SUBTITLE, // 0x57
-    TIME_UPDATE, // 0x58
-    TITLE_TEXT, // 0x59
-    TITLE_TIMES, // 0x5A
-    ENTITY_SOUND, // 0x5B
-    SOUND, // 0x5C
-    STOP_SOUND, // 0x5D
-    TAB_LIST, // 0x5E
-    NBT_QUERY, // 0x5F
-    COLLECT_ITEM, // 0x60
-    ENTITY_TELEPORT, // 0x61
-    ADVANCEMENTS, // 0x62
-    ENTITY_PROPERTIES, // 0x63
-    ENTITY_EFFECT, // 0x64
-    DECLARE_RECIPES, // 0x65
-    TAGS; // 0x66
+    SET_SIMULATION_DISTANCE, // 0x57
+    TITLE_SUBTITLE, // 0x58
+    TIME_UPDATE, // 0x59
+    TITLE_TEXT, // 0x5A
+    TITLE_TIMES, // 0x5B
+    ENTITY_SOUND, // 0x5C
+    SOUND, // 0x5D
+    STOP_SOUND, // 0x5E
+    TAB_LIST, // 0x5F
+    NBT_QUERY, // 0x60
+    COLLECT_ITEM, // 0x61
+    ENTITY_TELEPORT, // 0x62
+    ADVANCEMENTS, // 0x63
+    ENTITY_PROPERTIES, // 0x64
+    ENTITY_EFFECT, // 0x65
+    DECLARE_RECIPES, // 0x66
+    TAGS; // 0x67
 
     @Override
     public int getId() {
