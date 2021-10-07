@@ -126,8 +126,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
                 if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
                         && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
                     EntityTracker1_11 tracker = tracker(connection);
-                    if (!tracker.isHologram(entityId)) {
-                        tracker.addHologram(entityId);
+                    if (tracker.addHologram(entityId)) {
                         try {
                             // Send movement
                             PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, connection);

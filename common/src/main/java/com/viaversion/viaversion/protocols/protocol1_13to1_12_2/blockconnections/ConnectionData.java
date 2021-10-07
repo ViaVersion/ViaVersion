@@ -38,22 +38,22 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 
 public class ConnectionData {
     private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, 1F);
-    static Map<String, Integer> keyToId = new HashMap<>(8582, 1F);
+    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, .99F);
+    static Object2IntMap<String> keyToId = new Object2IntOpenHashMap<>(8582, .99F);
     static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>(1);
     static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
-    static IntSet occludingStates = new IntOpenHashSet(377, 1F);
+    static IntSet occludingStates = new IntOpenHashSet(377, .99F);
 
     public static void update(UserConnection user, Position position) {
         for (BlockFace face : BlockFace.values()) {
@@ -231,10 +231,10 @@ public class ConnectionData {
             keyToId.put(key, id);
         }
 
-        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, 1F);
+        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, .99F);
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            blockConnectionData = new Int2ObjectOpenHashMap<>(1146, 1F);
+            blockConnectionData = new Int2ObjectOpenHashMap<>(1146, .99F);
             JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
                 int id = keyToId.get(entry.getKey());

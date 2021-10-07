@@ -4,7 +4,8 @@ metadata.format.version = "1.1"
 
 adventure = "4.9.1"
 gson = "2.8.8"
-fastutil = "8.3.1"
+fastutil = "8.5.6"
+flare = "1.0.0"
 openNBT = "2.0-SNAPSHOT"
 javassist = "3.28.0-GA"
 
@@ -34,6 +35,8 @@ adventureTextSerializerLegacy = { group = "net.kyori", name = "adventure-text-se
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
+flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
+flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
 openNBT = { group = "com.viaversion", name = "opennbt", version.ref = "openNBT" }
 javassist = { group = "org.javassist", name = "javassist", version.ref = "javassist" }
 
