@@ -463,44 +463,4 @@ public class WorldPackets {
         });
     }
 
-    public static final class ChunkBulkSection {
-        private final int x;
-        private final int z;
-        private final int bitMask;
-        private final int length;
-        private byte[] data;
-
-        public ChunkBulkSection(PacketWrapper wrapper, boolean skylight) throws Exception {
-            x = wrapper.read(Type.INT);
-            z = wrapper.read(Type.INT);
-            bitMask = wrapper.read(Type.UNSIGNED_SHORT);
-
-            int bitCount = Integer.bitCount(bitMask);
-            length = (bitCount * ((4096 * 2) + 2048)) + (skylight ? bitCount * 2048 : 0) + 256; // Thanks MCProtocolLib
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getZ() {
-            return z;
-        }
-
-        public int getBitMask() {
-            return bitMask;
-        }
-
-        public int getLength() {
-            return length;
-        }
-
-        public byte @Nullable [] getData() {
-            return data;
-        }
-
-        public void setData(byte[] data) {
-            this.data = data;
-        }
-    }
 }
