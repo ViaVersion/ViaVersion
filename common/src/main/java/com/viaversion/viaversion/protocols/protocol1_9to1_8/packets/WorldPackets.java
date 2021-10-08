@@ -141,8 +141,11 @@ public class WorldPackets {
                         ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
                         Chunk chunk = wrapper.read(new Chunk1_8Type(clientWorld));
 
+                        long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
+
                         // Check if the chunk should be handled as an unload packet
-                        if (chunk.isFullChunk() && chunk.getBitmask() == 0) {
+                        if (chunk.isFullChunk() && chunk.getBitmask() == 0
+                                && clientChunks.getLoadedChunks().remove(chunkHash)) {
                             wrapper.setPacketType(ClientboundPackets1_9.UNLOAD_CHUNK);
                             wrapper.write(Type.INT, chunk.getX());
                             wrapper.write(Type.INT, chunk.getZ());
@@ -150,8 +153,6 @@ public class WorldPackets {
                             // Remove commandBlocks on chunk unload
                             CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                             provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
-
-                            clientChunks.getLoadedChunks().remove(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
 
                             // Unload the empty chunks
                             if (Via.getConfig().isChunkBorderFix()) {
@@ -167,9 +168,10 @@ public class WorldPackets {
                                 }
                             }
                         } else {
-                            wrapper.write(new Chunk1_9_1_2Type(clientWorld), chunk);
+                            Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+                            wrapper.write(chunkType, chunk);
 
-                            clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+                            clientChunks.getLoadedChunks().add(chunkHash);
 
                             // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                             if (Via.getConfig().isChunkBorderFix()) {
@@ -179,7 +181,7 @@ public class WorldPackets {
                                     if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
                                         PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
                                         Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
-                                        emptyChunk.write(new Chunk1_9_1_2Type(wrapper.user().get(ClientWorld.class)), c);
+                                        emptyChunk.write(chunkType, c);
                                         emptyChunk.send(Protocol1_9To1_8.class);
                                     }
                                 }
@@ -199,10 +201,11 @@ public class WorldPackets {
                     ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
                     Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(clientWorld));
 
+                    Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
                     // Split into multiple chunk packets
                     for (Chunk chunk : chunks) {
                         PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
-                        chunkData.write(new Chunk1_9_1_2Type(clientWorld), chunk);
+                        chunkData.write(chunkType, chunk);
                         chunkData.send(Protocol1_9To1_8.class);
 
                         clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
@@ -215,7 +218,7 @@ public class WorldPackets {
                                 if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
                                     PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
                                     Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
-                                    emptyChunk.write(new Chunk1_9_1_2Type(wrapper.user().get(ClientWorld.class)), c);
+                                    emptyChunk.write(chunkType, c);
                                     emptyChunk.send(Protocol1_9To1_8.class);
                                 }
                             }
