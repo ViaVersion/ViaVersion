@@ -139,9 +139,9 @@ public class MappingData extends MappingDataBase {
         int separatorIndex = newId.indexOf(':');
         // Vanilla parses an empty and a missing namespace as the minecraft namespace
         if (separatorIndex == -1) {
-            newId = "minecraft:" + newId;
+            return "minecraft:" + newId;
         } else if (separatorIndex == 0) {
-            newId = "minecraft" + newId;
+            return "minecraft" + newId;
         }
         return newId;
     }

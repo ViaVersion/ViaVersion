@@ -483,7 +483,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
             default:
                 String mappedChannel = Protocol1_13To1_12_2.MAPPINGS.getChannelMappings().get(old);
                 if (mappedChannel != null) return mappedChannel;
-                return MappingData.isValid1_13Channel(old) ? old : null;
+                return MappingData.validateNewChannel(old);
         }
     }
 
