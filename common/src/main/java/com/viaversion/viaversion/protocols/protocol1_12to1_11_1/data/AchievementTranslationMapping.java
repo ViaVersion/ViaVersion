@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class AchievementTranslationMapping {
 
-    private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150, 1.0f);
+    private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150, 0.99f);
     private static final Set<String> SPECIAL_ACHIEVEMENTS = new HashSet<>(10);
 
     static {
