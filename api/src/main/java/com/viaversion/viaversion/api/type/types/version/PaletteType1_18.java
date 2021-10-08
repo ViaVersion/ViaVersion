@@ -52,7 +52,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         final DataPaletteImpl palette;
         if (bitsPerValue == 0) {
             //TODO Create proper singleton palette Object
-            palette = new DataPaletteImpl(1);
+            palette = new DataPaletteImpl(type.size(), 1);
             palette.addId(Type.VAR_INT.readPrimitive(buffer));
             Type.VAR_INT.readPrimitive(buffer); // 0 values length
             return palette;
@@ -60,19 +60,19 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
         if (bitsPerValue != globalPaletteBits) {
             final int paletteLength = Type.VAR_INT.readPrimitive(buffer);
-            palette = new DataPaletteImpl(paletteLength);
+            palette = new DataPaletteImpl(type.size(), paletteLength);
             for (int i = 0; i < paletteLength; i++) {
                 palette.addId(Type.VAR_INT.readPrimitive(buffer));
             }
         } else {
-            palette = new DataPaletteImpl();
+            palette = new DataPaletteImpl(type.size());
         }
 
         // Read values
         final long[] values = new long[Type.VAR_INT.readPrimitive(buffer)];
         if (values.length > 0) {
             final char valuesPerLong = (char) (64 / bitsPerValue);
-            final int expectedLength = (type.maxSize() + valuesPerLong - 1) / valuesPerLong;
+            final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
             if (values.length != expectedLength) {
                 throw new IllegalStateException("Palette data length (" + values.length + ") does not match expected length (" + expectedLength + ")! bitsPerValue=" + bitsPerValue + ", originalBitsPerValue=" + originalBitsPerValue);
             }
@@ -80,7 +80,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             for (int i = 0; i < values.length; i++) {
                 values[i] = buffer.readLong();
             }
-            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.maxSize(), values,
+            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
                     bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
         }
         return palette;
@@ -120,7 +120,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             }
         }
 
-        final long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.maxSize(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt);
+        final long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt);
         Type.VAR_INT.writePrimitive(buffer, data.length);
         for (final long l : data) {
             buffer.writeLong(l);

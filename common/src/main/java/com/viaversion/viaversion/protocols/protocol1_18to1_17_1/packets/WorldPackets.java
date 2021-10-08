@@ -47,7 +47,6 @@ public final class WorldPackets {
 
     private static final int WIDTH_BITS = 2;
     private static final int HORIZONTAL_MASK = 3;
-    private static final int BIOMES_PER_CHUNK = 4 * 4 * 4;
 
     public static void register(final Protocol1_18To1_17_1 protocol) {
         protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
@@ -137,7 +136,7 @@ public final class WorldPackets {
                             sections[i] = section;
                             section.setNonAirBlocksCount(0);
 
-                            final DataPaletteImpl blockPalette = new DataPaletteImpl();
+                            final DataPaletteImpl blockPalette = new DataPaletteImpl(ChunkSection.SIZE);
                             blockPalette.addId(0);
                             section.addPalette(PaletteType.BLOCKS, blockPalette);
                         } else {
@@ -149,20 +148,12 @@ public final class WorldPackets {
                         }
 
                         // Fill biome palette
-                        final DataPaletteImpl biomePalette = new DataPaletteImpl();
+                        final DataPaletteImpl biomePalette = new DataPaletteImpl(ChunkSection.BIOME_SIZE);
                         section.addPalette(PaletteType.BIOMES, biomePalette);
-                        for (int biomeIndex = i * BIOMES_PER_CHUNK; biomeIndex < (i * BIOMES_PER_CHUNK) + BIOMES_PER_CHUNK; biomeIndex++) {
-                            final int biome = biomeData[biomeIndex];
-                            final int minX = (biomeIndex & HORIZONTAL_MASK) << 2;
-                            final int minY = ((biomeIndex >> WIDTH_BITS + WIDTH_BITS) << 2) & 15;
-                            final int minZ = (biomeIndex >> WIDTH_BITS & HORIZONTAL_MASK) << 2;
-                            for (int x = minX; x < minX + 4; x++) {
-                                for (int y = minY; y < minY + 4; y++) {
-                                    for (int z = minZ; z < minZ + 4; z++) {
-                                        biomePalette.setIdAt(x, y, z, biome);
-                                    }
-                                }
-                            }
+
+                        final int offset = i * ChunkSection.BIOME_SIZE;
+                        for (int biomeIndex = 0; biomeIndex < ChunkSection.BIOME_SIZE; biomeIndex++) {
+                            biomePalette.setIdAt(biomeIndex, biomeData[offset + biomeIndex]);
                         }
                     }
 

@@ -32,20 +32,24 @@ public final class DataPaletteImpl implements DataPalette {
     private final IntList palette;
     private final Int2IntMap inversePalette;
     private final int[] values;
+    private final int sizeBits;
 
-    public DataPaletteImpl() {
-        this.values = new int[ChunkSection.SIZE];
-        palette = new IntArrayList();
-        inversePalette = new Int2IntOpenHashMap();
-        inversePalette.defaultReturnValue(-1);
+    public DataPaletteImpl(final int valuesLength) {
+        this(valuesLength, 8);
     }
 
-    public DataPaletteImpl(final int expectedPaletteLength) {
-        this.values = new int[ChunkSection.SIZE];
+    public DataPaletteImpl(final int valuesLength, final int expectedPaletteLength) {
+        this.values = new int[valuesLength];
+        sizeBits = Integer.numberOfTrailingZeros(valuesLength) / 3;
         // Pre-size the palette array/map
         palette = new IntArrayList(expectedPaletteLength);
         inversePalette = new Int2IntOpenHashMap(expectedPaletteLength);
         inversePalette.defaultReturnValue(-1);
+    }
+
+    @Override
+    public int index(final int x, final int y, final int z) {
+        return (y << this.sizeBits | z) << this.sizeBits | x;
     }
 
     @Override

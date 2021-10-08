@@ -25,10 +25,20 @@ package com.viaversion.viaversion.api.minecraft.chunks;
 public interface DataPalette {
 
     /**
+     * Returns the packet section index of the given coordinates.
+     *
+     * @param x x
+     * @param y y
+     * @param z z
+     * @return packed section index of the given coordinates
+     */
+    int index(final int x, final int y, final int z);
+
+    /**
      * Returns the value of the given chunk coordinate.
      *
-     * @param sectionCoordinate block index within the section
-     * @return block state of the given index
+     * @param sectionCoordinate section index within the section
+     * @return section state of the given index
      */
     int idAt(int sectionCoordinate);
 
@@ -38,17 +48,17 @@ public interface DataPalette {
      * @param sectionX section x
      * @param sectionY section y
      * @param sectionZ section z
-     * @return block state of the given section coordinate
+     * @return id of the given section coordinate
      */
     default int idAt(final int sectionX, final int sectionY, final int sectionZ) {
-        return idAt(ChunkSection.index(sectionX, sectionY, sectionZ));
+        return idAt(index(sectionX, sectionY, sectionZ));
     }
 
     /**
      * Set a value in the chunk section.
      * This method does not update non-air blocks count.
      *
-     * @param sectionCoordinate block index within the section
+     * @param sectionCoordinate section index within the section
      * @param id                id value
      */
     void setIdAt(int sectionCoordinate, int id);
@@ -63,7 +73,7 @@ public interface DataPalette {
      * @param id       id value
      */
     default void setIdAt(final int sectionX, final int sectionY, final int sectionZ, final int id) {
-        setIdAt(ChunkSection.index(sectionX, sectionY, sectionZ), id);
+        setIdAt(index(sectionX, sectionY, sectionZ), id);
     }
 
     /**
@@ -83,17 +93,17 @@ public interface DataPalette {
     void setIdByIndex(int index, int id);
 
     /**
-     * Returns the palette index of the given block index.
+     * Returns the palette index of the given section index.
      *
-     * @param packedCoordinate block index
-     * @return palette index of the given block index
+     * @param packedCoordinate section index
+     * @return palette index of the given section index
      */
     int paletteIndexAt(int packedCoordinate);
 
     /**
      * Sets the index of the given section coordinate.
      *
-     * @param sectionCoordinate block index
+     * @param sectionCoordinate section index
      * @param index             palette index
      */
     void setPaletteIndexAt(int sectionCoordinate, int index);

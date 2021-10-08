@@ -31,6 +31,11 @@ public interface ChunkSection {
      */
     int SIZE = 16 * 16 * 16; // width * depth * height
 
+    /**
+     * Size (dimensions) of biomes in a chunks section.
+     */
+    int BIOME_SIZE = 4 * 4 * 4;
+
     static int index(int x, int y, int z) {
         return y << 8 | z << 4 | x;
     }
