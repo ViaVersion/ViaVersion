@@ -35,7 +35,7 @@ public final class ChunkLightStorage implements StorableObject {
     }
 
     public @Nullable ChunkLight removeLight(final int x, final int z) {
-        return lightPackets.get(getChunkSectionIndex(x, z));
+        return lightPackets.remove(getChunkSectionIndex(x, z));
     }
 
     public void addLoadedChunk(final int x, final int z) {
