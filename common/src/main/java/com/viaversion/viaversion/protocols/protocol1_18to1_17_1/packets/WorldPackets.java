@@ -41,6 +41,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18T
 import com.viaversion.viaversion.util.MathUtil;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 public final class WorldPackets {
@@ -162,30 +163,40 @@ public final class WorldPackets {
                             MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
                             MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
-                    // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
-                    final ChunkLightStorage.ChunkLight light = lightStorage.removeLight(chunk.getX(), chunk.getZ());
-                    if (light == null) {
-                        Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ());
-                        wrapper.cancel();
-                        return;
-                    }
-
+                    // Mark chunk as loaded
+                    boolean alreadyLoaded = lightStorage.isLoaded(chunk.getX(), chunk.getZ());
                     lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
+                    // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     // Append light data to chunk packet
-                    wrapper.write(Type.BOOLEAN, light.trustEdges());
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.skyLightMask());
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.blockLightMask());
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptySkyLightMask());
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptyBlockLightMask());
-                    wrapper.write(Type.VAR_INT, light.skyLight().length);
-                    for (final byte[] skyLight : light.skyLight()) {
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, skyLight);
-                    }
-                    wrapper.write(Type.VAR_INT, light.blockLight().length);
-                    for (final byte[] blockLight : light.blockLight()) {
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, blockLight);
+                    final ChunkLightStorage.ChunkLight light = lightStorage.removeLight(chunk.getX(), chunk.getZ());
+                    if (light == null) {
+                        Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
+
+                        BitSet emptyLightMask = new BitSet();
+                        emptyLightMask.set(0, tracker.currentWorldSectionHeight() + 2);
+                        wrapper.write(Type.BOOLEAN, false);
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, new long[0]);
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, new long[0]);
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
+                        wrapper.write(Type.VAR_INT, 0);
+                        wrapper.write(Type.VAR_INT, 0);
+                    } else {
+                        wrapper.write(Type.BOOLEAN, light.trustEdges());
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.skyLightMask());
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.blockLightMask());
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptySkyLightMask());
+                        wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptyBlockLightMask());
+                        wrapper.write(Type.VAR_INT, light.skyLight().length);
+                        for (final byte[] skyLight : light.skyLight()) {
+                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, skyLight);
+                        }
+                        wrapper.write(Type.VAR_INT, light.blockLight().length);
+                        for (final byte[] blockLight : light.blockLight()) {
+                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, blockLight);
+                        }
                     }
                 });
             }
