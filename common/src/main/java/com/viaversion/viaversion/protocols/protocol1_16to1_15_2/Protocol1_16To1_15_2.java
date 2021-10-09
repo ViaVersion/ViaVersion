@@ -58,6 +58,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
     private final ItemRewriter itemRewriter = new InventoryPackets(this);
+    private final ComponentRewriter componentRewriter = new TranslationMappings(this);
     private TagRewriter tagRewriter;
 
     public Protocol1_16To1_15_2() {
@@ -129,7 +130,6 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        ComponentRewriter componentRewriter = new TranslationMappings(this);
         // Handle (relevant) component cases for translatable and score changes
         registerClientbound(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
             @Override
@@ -292,5 +292,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemRewriter getItemRewriter() {
         return itemRewriter;
+    }
+
+    public ComponentRewriter getComponentRewriter() {
+        return componentRewriter;
     }
 }
