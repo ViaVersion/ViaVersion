@@ -38,8 +38,8 @@ public final class ChunkLightStorage implements StorableObject {
         return lightPackets.remove(getChunkSectionIndex(x, z));
     }
 
-    public void addLoadedChunk(final int x, final int z) {
-        loadedChunks.add(getChunkSectionIndex(x, z));
+    public boolean addLoadedChunk(final int x, final int z) {
+        return loadedChunks.add(getChunkSectionIndex(x, z));
     }
 
     public boolean isLoaded(final int x, final int z) {

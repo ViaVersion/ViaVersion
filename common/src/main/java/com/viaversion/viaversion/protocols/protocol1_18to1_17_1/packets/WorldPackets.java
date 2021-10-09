@@ -165,8 +165,7 @@ public final class WorldPackets {
 
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
                     // Mark chunk as loaded
-                    boolean alreadyLoaded = lightStorage.isLoaded(chunk.getX(), chunk.getZ());
-                    lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
+                    boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
                     // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     // Append light data to chunk packet
