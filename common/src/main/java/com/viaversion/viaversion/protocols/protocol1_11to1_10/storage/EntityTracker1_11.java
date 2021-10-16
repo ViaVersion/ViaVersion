@@ -17,14 +17,15 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 
+import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
+
+import java.util.Set;
 
 public class EntityTracker1_11 extends EntityTrackerBase {
-    private final IntSet holograms = Int2ObjectSyncMap.hashset();
+    private final Set<Integer> holograms = Sets.newConcurrentHashSet();
 
     public EntityTracker1_11(UserConnection user) {
         super(user, EntityType.PLAYER);

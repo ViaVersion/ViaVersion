@@ -13,8 +13,6 @@ dependencies {
         targetConfiguration = "shadow"
     }
     api(libs.fastutil)
-    api(libs.flare)
-    api(libs.flareFastutil)
     api(libs.openNBT)
     api(libs.gson)
 
