@@ -474,7 +474,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
         /**
          * Returns the unmapped packet type, or null if mapped over ids.
-         * This is NOT the same as calling {@link #getOldId()} (think of unmapped vs. old in 1.17->1.16).
+         * This is NOT the same as calling {@link #getOldId()} (think of unmapped vs. old in 1.17→1.16).
          *
          * @return unmapped packet type, or null if mapped over ids
          */
@@ -485,7 +485,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
         /**
          * Returns the mapped packet type, or null if mapped over ids or mapped to no packet type.
-         * This is NOT the same as calling {@link #getNewId()} (think of mapped vs. new in 1.17->1.16).
+         * This is NOT the same as calling {@link #getNewId()} (think of mapped vs. new in 1.17→1.16).
          *
          * @return new packet type, or null if mapped over ids or mapped to no packet type
          */

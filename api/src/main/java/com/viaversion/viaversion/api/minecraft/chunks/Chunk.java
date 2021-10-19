@@ -28,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.BitSet;
 import java.util.List;
 
+// TODO specialized sub interfaces
 public interface Chunk {
 
     /**
