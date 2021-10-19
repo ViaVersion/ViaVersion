@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
@@ -40,25 +39,22 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
     public static final String DRAGON_TRANSLATABLE = "{\"translate\":\"entity.EnderDragon.name\"}";
-    private final Map<Integer, UUID> uuidMap = new ConcurrentHashMap<>();
-    private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
-    private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
-    private final Map<Integer, BossBar> bossBarMap = new ConcurrentHashMap<>();
-    private final Set<Integer> validBlocking = Sets.newConcurrentHashSet();
-    private final Set<Integer> knownHolograms = Sets.newConcurrentHashSet();
+    private final Int2ObjectMap<UUID> uuidMap = Int2ObjectSyncMap.hashmap();
+    private final Int2ObjectMap<List<Metadata>> metadataBuffer = Int2ObjectSyncMap.hashmap();
+    private final Int2ObjectMap<Integer> vehicleMap = Int2ObjectSyncMap.hashmap();
+    private final Int2ObjectMap<BossBar> bossBarMap = Int2ObjectSyncMap.hashmap();
+    private final IntSet validBlocking = Int2ObjectSyncMap.hashset();
+    private final Set<Integer> knownHolograms = Int2ObjectSyncMap.hashset();
     private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(250, TimeUnit.MILLISECONDS)
