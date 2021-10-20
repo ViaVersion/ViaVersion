@@ -163,12 +163,17 @@ public class EntityPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(Type.VAR_INT);
+                    byte type = wrapper.read(Type.BYTE);
+                    if (type != 1) {
+                        // Cancel if not lightning/invalid id
+                        wrapper.cancel();
+                        return;
+                    }
+
                     wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
 
                     wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
                     wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
-
-                    wrapper.read(Type.BYTE); // remove type
 
                     wrapper.passthrough(Type.DOUBLE); // x
                     wrapper.passthrough(Type.DOUBLE); // y
