@@ -26,9 +26,11 @@ import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
@@ -36,6 +38,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityRewriter<Protocol1_18To1_17_1> entityRewriter = new EntityPackets(this);
+    private final ItemRewriter<Protocol1_18To1_17_1> itemRewriter = new InventoryPackets(this);
 
     public Protocol1_18To1_17_1() {
         super(ClientboundPackets1_17_1.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
@@ -52,6 +55,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
     @Override
     protected void registerPackets() {
         entityRewriter.register();
+        itemRewriter.register();
         WorldPackets.register(this);
     }
 
@@ -69,5 +73,10 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
     @Override
     public EntityRewriter<Protocol1_18To1_17_1> getEntityRewriter() {
         return entityRewriter;
+    }
+
+    @Override
+    public ItemRewriter<Protocol1_18To1_17_1> getItemRewriter() {
+        return itemRewriter;
     }
 }

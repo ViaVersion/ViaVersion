@@ -58,10 +58,29 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(type); // 1 - Window Values
-
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(type); // Items
                 handler(itemArrayHandler(type));
+            }
+        });
+    }
+
+    public void registerWindowItems1_17_1(ClientboundPacketType packetType, Type<Item[]> itemsType, Type<Item> carriedItemType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.VAR_INT); // State id
+                map(itemsType); // Items
+                map(carriedItemType); // Carried item
+                handler(wrapper -> {
+                    Item[] items = wrapper.get(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, 0);
+                    for (Item item : items) {
+                        handleItemToClient(item);
+                    }
+
+                    handleItemToClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
+                });
             }
         });
     }
@@ -70,10 +89,22 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(type); // 2 - Slot Value
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.SHORT); // Slot id
+                map(type); // Item
+                handler(itemToClientHandler(type));
+            }
+        });
+    }
 
+    public void registerSetSlot1_17_1(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window id
+                map(Type.VAR_INT); // State id
+                map(Type.SHORT); // Slot id
+                map(type); // Item
                 handler(itemToClientHandler(type));
             }
         });
@@ -145,6 +176,31 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window Id
+                map(Type.SHORT); // Slot
+                map(Type.BYTE); // Button
+                map(Type.VAR_INT); // Mode
+
+                handler(wrapper -> {
+                    // Affected items
+                    int length = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < length; i++) {
+                        wrapper.passthrough(Type.SHORT); // Slot
+                        handleItemToServer(wrapper.passthrough(type));
+                    }
+
+                    // Carried item
+                    handleItemToServer(wrapper.passthrough(type));
+                });
+            }
+        });
+    }
+
+    public void registerClickWindow1_17_1(ServerboundPacketType packetType, Type<Item> type) {
+        protocol.registerServerbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Window Id
+                map(Type.VAR_INT); // State id
                 map(Type.SHORT); // Slot
                 map(Type.BYTE); // Button
                 map(Type.VAR_INT); // Mode

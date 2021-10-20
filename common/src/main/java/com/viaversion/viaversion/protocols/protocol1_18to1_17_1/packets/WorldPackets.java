@@ -46,9 +46,6 @@ import java.util.List;
 
 public final class WorldPackets {
 
-    private static final int WIDTH_BITS = 2;
-    private static final int HORIZONTAL_MASK = 3;
-
     public static void register(final Protocol1_18To1_17_1 protocol) {
         protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
             @Override

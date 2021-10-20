@@ -29,7 +29,7 @@ public final class MappingData extends MappingDataBase {
     private final Object2IntMap<String> blockEntityIds = new Object2IntOpenHashMap<>();
 
     public MappingData() {
-        super("1.17", "1.18");
+        super("1.17", "1.18", true);
         blockEntityIds.defaultReturnValue(-1);
     }
 

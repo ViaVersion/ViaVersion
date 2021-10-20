@@ -42,6 +42,8 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
         registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_17_1.REMOVE_ENTITIES);*/
 
+        //TODO NEW METATYPE FOR PARTICLE CHANGE
+
         protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
