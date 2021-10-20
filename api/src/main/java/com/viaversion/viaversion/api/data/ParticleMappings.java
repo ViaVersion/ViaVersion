@@ -29,6 +29,7 @@ public class ParticleMappings {
     private final Mappings mappings;
     private final int blockId;
     private final int fallingDustId;
+    private final int blockMarkerId;
     private final int itemId;
 
     public ParticleMappings(JsonArray oldMappings, Mappings mappings) {
@@ -37,6 +38,7 @@ public class ParticleMappings {
         Object2IntMap<String> map = MappingDataLoader.arrayToMap(oldMappings);
         blockId = map.getInt("block");
         fallingDustId = map.getInt("falling_dust");
+        blockMarkerId = map.getInt("block_marker");
         itemId = map.getInt("item");
     }
 
@@ -50,6 +52,10 @@ public class ParticleMappings {
 
     public int getFallingDustId() {
         return fallingDustId;
+    }
+
+    public int getBlockmarkerid() {
+        return blockMarkerId;
     }
 
     public int getItemId() {

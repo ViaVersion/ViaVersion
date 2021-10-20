@@ -479,7 +479,8 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     protected void rewriteParticle(Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.getId();
-        if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
+        if (id == mappings.getBlockId() || id == mappings.getFallingDustId()
+                || (mappings.getBlockmarkerid() != -1 && id == mappings.getBlockmarkerid())) {
             Particle.ParticleData data = particle.getArguments().get(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.get()));
         } else if (id == mappings.getItemId()) {
