@@ -20,21 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
-import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
-import com.viaversion.viaversion.api.type.types.minecraft.Particle1_18Type;
 
-import java.util.List;
+public class Particle1_18Type extends AbstractParticleType {
 
-public final class Types1_18 {
-
-    public static final Type<BlockEntity> BLOCK_ENTITY = new BlockEntityType1_18();
-    public static final Type<Metadata> METADATA = new Metadata1_18Type();
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
-    public static final Type<Particle> PARTICLE = new Particle1_18Type();
+    public Particle1_18Type() {
+        readers.put(2, blockHandler());
+        readers.put(3, blockHandler());
+        readers.put(24, blockHandler());
+        readers.put(14, dustHandler());
+        readers.put(15, dustTransitionHandler());
+        readers.put(35, itemHandler(Type.FLAT_VAR_INT_ITEM));
+        readers.put(36, vibrationHandler(Type.POSITION1_14));
+    }
 }
+

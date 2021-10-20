@@ -20,8 +20,11 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_18;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_17;
+import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
@@ -39,10 +42,8 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
         /*registerTrackerWithData(ClientboundPackets1_17_1.SPAWN_ENTITY, Entity1_18Types.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_17_1.SPAWN_MOB);
         registerTracker(ClientboundPackets1_17_1.SPAWN_PLAYER, Entity1_18Types.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_17_1.REMOVE_ENTITIES);*/
-
-        //TODO NEW METATYPE FOR PARTICLE CHANGE
+        registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketRemapper() {
             @Override
@@ -85,7 +86,8 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
 
     @Override
     protected void registerRewrites() {
-        //registerMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE); //TODO with nulls if needed
+        filter().handler((event, meta) -> meta.setMetaType(MetaType1_18.byId(meta.metaType().typeId())));
+        registerMetaTypeHandler(MetaType1_18.ITEM, null, MetaType1_18.PARTICLE);
 
         /*filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> { //TODO check id
             // Convert to new block id
