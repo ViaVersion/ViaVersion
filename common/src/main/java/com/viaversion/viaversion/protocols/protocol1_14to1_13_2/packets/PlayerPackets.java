@@ -88,9 +88,8 @@ public class PlayerPackets {
         protocol.registerServerbound(ServerboundPackets1_14.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT);
-                map(Type.POSITION1_14, Type.POSITION);
-                map(Type.BYTE);
+                map(Type.VAR_INT); // Action
+                map(Type.POSITION1_14, Type.POSITION); // Position
             }
         });
 

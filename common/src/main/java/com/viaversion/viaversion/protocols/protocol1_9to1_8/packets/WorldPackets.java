@@ -282,13 +282,12 @@ public class WorldPackets {
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 0 - Status
-                map(Type.POSITION); // 1 - Position
-                map(Type.BYTE); // 2 - Face
+                map(Type.VAR_INT); // Action
+                map(Type.POSITION); // Position
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        int status = wrapper.get(Type.VAR_INT, 0);
                         if (status == 6)
                             wrapper.cancel();
                     }
@@ -297,7 +296,7 @@ public class WorldPackets {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        int status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                        int status = wrapper.get(Type.VAR_INT, 0);
                         if (status == 5 || status == 4 || status == 3) {
                             EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                             if (entityTracker.isBlocking()) {
