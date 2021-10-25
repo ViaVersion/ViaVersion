@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_18;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
@@ -86,8 +87,22 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> meta.setMetaType(MetaType1_18.byId(meta.metaType().typeId())));
-        registerMetaTypeHandler(MetaType1_18.ITEM, null, MetaType1_18.PARTICLE);
+        filter().handler((event, meta) -> {
+            meta.setMetaType(MetaType1_18.byId(meta.metaType().typeId()));
+            if (meta.metaType() == MetaType1_18.PARTICLE) {
+                Particle particle = (Particle) meta.getValue();
+                if (particle.getId() == 2) { // Barrier
+                    particle.setId(3); // Block marker
+                    particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, 7754)); // Barrier state
+                } else if (particle.getId() == 3) { // Light block
+                    particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, 7786)); // Light block state
+                } else {
+                    rewriteParticle(particle);
+                }
+            }
+        });
+
+        registerMetaTypeHandler(MetaType1_18.ITEM, null, null);
 
         /*filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> { //TODO check id
             // Convert to new block id
