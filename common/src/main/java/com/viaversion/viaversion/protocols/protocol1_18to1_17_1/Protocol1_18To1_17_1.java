@@ -49,7 +49,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
         final TagRewriter tagRewriter = new TagRewriter(this);
         tagRewriter.registerGeneric(ClientboundPackets1_17_1.TAGS);
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace", "minecraft:big_dripleaf_placeable");
     }
 
     @Override
