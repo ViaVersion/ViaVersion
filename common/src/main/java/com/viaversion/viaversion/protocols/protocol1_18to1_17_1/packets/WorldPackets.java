@@ -106,22 +106,22 @@ public final class WorldPackets {
 
                     final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
                     for (final CompoundTag tag : oldChunk.getBlockEntities()) {
-                        if (!tag.contains("x") || !tag.contains("y") || !tag.contains("z") || !tag.contains("id")) {
+                        final NumberTag xTag = tag.get("x");
+                        final NumberTag yTag = tag.get("y");
+                        final NumberTag zTag = tag.get("z");
+                        final StringTag idTag = tag.get("id");
+                        if (xTag == null || yTag == null || zTag == null || idTag == null) {
                             continue;
                         }
 
-                        final int x = ((NumberTag) tag.get("x")).asInt();
-                        final int z = ((NumberTag) tag.get("z")).asInt();
-                        final byte packedXZ = (byte) ((x & 15) << 4 | (z & 15));
-
-                        final short y = ((NumberTag) tag.get("y")).asShort();
-                        final String id = ((StringTag) tag.get("id")).getValue();
+                        final String id = idTag.getValue();
                         final int typeId = protocol.getMappingData().blockEntityIds().getInt(id.replace("minecraft:", ""));
                         if (typeId == -1) {
                             Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
                         }
 
-                        blockEntities.add(new BlockEntityImpl(packedXZ, y, typeId, tag));
+                        final byte packedXZ = (byte) ((xTag.asInt() & 15) << 4 | (zTag.asInt() & 15));
+                        blockEntities.add(new BlockEntityImpl(packedXZ, yTag.asShort(), typeId, tag));
                     }
 
                     final int[] biomeData = oldChunk.getBiomeData();
@@ -150,8 +150,8 @@ public final class WorldPackets {
                         section.addPalette(PaletteType.BIOMES, biomePalette);
 
                         final int offset = i * ChunkSection.BIOME_SIZE;
-                        for (int biomeIndex = 0; biomeIndex < ChunkSection.BIOME_SIZE; biomeIndex++) {
-                            biomePalette.setIdAt(biomeIndex, biomeData[offset + biomeIndex]);
+                        for (int biomeIndex = 0, biomeArrayIndex = offset; biomeIndex < ChunkSection.BIOME_SIZE; biomeIndex++, biomeArrayIndex++) {
+                            biomePalette.setIdAt(biomeIndex, biomeData[biomeArrayIndex]);
                         }
                     }
 
@@ -161,8 +161,7 @@ public final class WorldPackets {
                             MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
-                    // Mark chunk as loaded
-                    boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
+                    final boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
                     // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     // Append light data to chunk packet
@@ -170,7 +169,7 @@ public final class WorldPackets {
                     if (light == null) {
                         Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
 
-                        BitSet emptyLightMask = new BitSet();
+                        final BitSet emptyLightMask = new BitSet();
                         emptyLightMask.set(0, tracker.currentWorldSectionHeight() + 2);
                         wrapper.write(Type.BOOLEAN, false);
                         wrapper.write(Type.LONG_ARRAY_PRIMITIVE, new long[0]);
