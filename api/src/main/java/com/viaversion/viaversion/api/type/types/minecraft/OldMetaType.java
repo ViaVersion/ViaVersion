@@ -22,40 +22,31 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public abstract class AbstractMetaListType extends MetaListTypeTemplate {
-    protected abstract Type<Metadata> getType();
+public abstract class OldMetaType extends MetaTypeTemplate {
+    private static final int END = 127;
 
     @Override
-    public List<Metadata> read(final ByteBuf buffer) throws Exception {
-        final Type<Metadata> type = this.getType();
-        final List<Metadata> list = new ArrayList<>();
-        Metadata meta;
-        do {
-            meta = type.read(buffer);
-            if (meta != null) {
-                list.add(meta);
-            }
-        } while (meta != null);
-        return list;
+    public Metadata read(final ByteBuf buffer) throws Exception {
+        final byte index = buffer.readByte();
+        if (index == END) return null; // End of metadata
+        final MetaType type = this.getType((index & 224) >> 5);
+        return new Metadata(index & 31, type, type.type().read(buffer));
     }
 
-    @Override
-    public void write(final ByteBuf buffer, final List<Metadata> object) throws Exception {
-        final Type<Metadata> type = this.getType();
+    protected abstract MetaType getType(final int index);
 
-        for (final Metadata metadata : object) {
-            type.write(buffer, metadata);
+    @Override
+    public void write(final ByteBuf buffer, final Metadata object) throws Exception {
+        if (object == null) {
+            buffer.writeByte(END);
+        } else {
+            final int index = (object.metaType().typeId() << 5 | object.id() & 31) & 255;
+            buffer.writeByte(index);
+            object.metaType().type().write(buffer, object.getValue());
         }
-
-        this.writeEnd(type, buffer);
     }
-
-    protected abstract void writeEnd(final Type<Metadata> type, final ByteBuf buffer) throws Exception;
 }
