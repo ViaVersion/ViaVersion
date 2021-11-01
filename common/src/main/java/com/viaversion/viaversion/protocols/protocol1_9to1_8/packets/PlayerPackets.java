@@ -350,10 +350,13 @@ public class PlayerPackets {
                 map(Type.FLOAT); //1 - Value
 
                 handler(wrapper -> {
-                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) { //Change gamemode
+                    short reason = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    if (reason == 3) { //Change gamemode
                         int gamemode = wrapper.get(Type.FLOAT, 0).intValue();
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         tracker.setGameMode(GameMode.getById(gamemode));
+                    } else if (reason == 4) { //Open credits screen
+                        wrapper.set(Type.FLOAT, 0, 1F);
                     }
                 });
             }
