@@ -277,10 +277,16 @@ final class TagStringReader {
                                 result = new LongTag(Long.parseLong(builder.toString()));
                                 break;
                             case Tokens.TYPE_FLOAT:
-                                result = new FloatTag(Float.parseFloat(builder.toString()));
+                                final float floatValue = Float.parseFloat(builder.toString());
+                                if (!Float.isNaN(floatValue)) {
+                                    result = new FloatTag(floatValue);
+                                }
                                 break;
                             case Tokens.TYPE_DOUBLE:
-                                result = new DoubleTag(Double.parseDouble(builder.toString()));
+                                final double doubleValue = Double.parseDouble(builder.toString());
+                                if (!Double.isNaN(doubleValue)) {
+                                    result = new DoubleTag(doubleValue);
+                                }
                                 break;
                         }
                     } catch (final NumberFormatException ex) {

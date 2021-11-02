@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.common.nbt;
 
+import com.github.steveice10.opennbt.tag.builtin.FloatTag;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +43,7 @@ public class NBTTagTest {
         readString("{id:[I;1,2,3,]}");
         readString("{id:[1,2,3,]}");
 
+        Assertions.assertEquals("NaNd", readString("{id:NaNd}").get("id").getValue());
         Assertions.assertEquals("2147483649", readString("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
         Assertions.assertEquals((byte) 1, readString("{thisisabyte:true}").get("thisisabyte").getValue());
         Assertions.assertEquals((byte) 0, readString("{thisisabyte:false}").get("thisisabyte").getValue());
