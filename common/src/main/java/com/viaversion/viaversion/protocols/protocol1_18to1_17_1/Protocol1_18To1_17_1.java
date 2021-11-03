@@ -21,6 +21,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
@@ -49,7 +51,23 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
         final TagRewriter tagRewriter = new TagRewriter(this);
         tagRewriter.registerGeneric(ClientboundPackets1_17_1.TAGS);
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace", "minecraft:big_dripleaf_placeable");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace", "minecraft:big_dripleaf_placeable",
+                "minecraft:wolves_spawnable_on", "minecraft:rabbits_spawnable_on", "minecraft:polar_bears_spawnable_on_in_frozen_ocean", "minecraft:parrots_spawnable_on",
+                "minecraft:mooshrooms_spawnable_on", "minecraft:goats_spawnable_on", "minecraft:foxes_spawnable_on", "minecraft:axolotls_spawnable_on", "minecraft:animals_spawnable_on");
+
+        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Language
+                map(Type.BYTE); // View distance
+                map(Type.VAR_INT); // Chat visibility
+                map(Type.BOOLEAN); // Chat colors
+                map(Type.BYTE); // Model customization
+                map(Type.VAR_INT); // Main hand
+                map(Type.BOOLEAN); // Text filtering enabled
+                read(Type.BOOLEAN); // Allow listing in server list preview
+            }
+        });
     }
 
     @Override
