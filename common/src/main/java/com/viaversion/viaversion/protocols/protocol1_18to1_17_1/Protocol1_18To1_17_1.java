@@ -62,7 +62,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 map(Type.BYTE); // View distance
                 map(Type.VAR_INT); // Chat visibility
                 map(Type.BOOLEAN); // Chat colors
-                map(Type.BYTE); // Model customization
+                map(Type.UNSIGNED_BYTE); // Model customization
                 map(Type.VAR_INT); // Main hand
                 map(Type.BOOLEAN); // Text filtering enabled
                 read(Type.BOOLEAN); // Allow listing in server list preview
