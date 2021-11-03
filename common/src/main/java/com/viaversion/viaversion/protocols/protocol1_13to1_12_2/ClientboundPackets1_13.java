@@ -97,8 +97,8 @@ public enum ClientboundPackets1_13 implements ClientboundPacketType {
     SPAWN_POSITION, // 0x49
     TIME_UPDATE, // 0x4A
     TITLE, // 0x4B
-    STOP_SOUND, // 0x4D
-    SOUND, // 0x4C
+    STOP_SOUND, // 0x4C
+    SOUND, // 0x4D
     TAB_LIST, // 0x4E
     COLLECT_ITEM, // 0x4F
     ENTITY_TELEPORT, // 0x50
