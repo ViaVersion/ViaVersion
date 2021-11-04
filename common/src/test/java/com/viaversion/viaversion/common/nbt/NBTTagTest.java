@@ -43,7 +43,9 @@ public class NBTTagTest {
         readString("{id:[I;1,2,3,]}");
         readString("{id:[1,2,3,]}");
 
+        Assertions.assertEquals("0da", readString("{id:0da}").get("id").getValue());
         Assertions.assertEquals("NaNd", readString("{id:NaNd}").get("id").getValue());
+        Assertions.assertEquals("Infinityd", readString("{id:Infinityd}").get("id").getValue());
         Assertions.assertEquals("2147483649", readString("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
         Assertions.assertEquals((byte) 1, readString("{thisisabyte:true}").get("thisisabyte").getValue());
         Assertions.assertEquals((byte) 0, readString("{thisisabyte:false}").get("thisisabyte").getValue());

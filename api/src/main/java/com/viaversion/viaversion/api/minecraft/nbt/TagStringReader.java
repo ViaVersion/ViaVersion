@@ -256,64 +256,57 @@ final class TagStringReader {
      */
     private Tag scalar() {
         final StringBuilder builder = new StringBuilder();
-        boolean possiblyNumeric = true;
+        int noLongerNumericAt = -1;
         while (this.buffer.hasMore()) {
-            final char current = this.buffer.peek();
-            if (possiblyNumeric && !Tokens.numeric(current)) {
-                if (builder.length() != 0) {
-                    Tag result = null;
-                    try {
-                        switch (Character.toLowerCase(current)) { // try to read and return as a number
-                            case Tokens.TYPE_BYTE:
-                                result = new ByteTag(Byte.parseByte(builder.toString()));
-                                break;
-                            case Tokens.TYPE_SHORT:
-                                result = new ShortTag(Short.parseShort(builder.toString()));
-                                break;
-                            case Tokens.TYPE_INT:
-                                result = new IntTag(Integer.parseInt(builder.toString()));
-                                break;
-                            case Tokens.TYPE_LONG:
-                                result = new LongTag(Long.parseLong(builder.toString()));
-                                break;
-                            case Tokens.TYPE_FLOAT:
-                                final float floatValue = Float.parseFloat(builder.toString());
-                                if (!Float.isNaN(floatValue)) {
-                                    result = new FloatTag(floatValue);
-                                }
-                                break;
-                            case Tokens.TYPE_DOUBLE:
-                                final double doubleValue = Double.parseDouble(builder.toString());
-                                if (!Double.isNaN(doubleValue)) {
-                                    result = new DoubleTag(doubleValue);
-                                }
-                                break;
-                        }
-                    } catch (final NumberFormatException ex) {
-                        possiblyNumeric = false; // fallback to treating as a String
-                    }
-                    if (result != null) {
-                        this.buffer.take();
-                        return result;
-                    }
-                }
-            }
+            char current = this.buffer.peek();
             if (current == '\\') { // escape -- we are significantly more lenient than original format at the moment
                 this.buffer.advance();
-                builder.append(this.buffer.take());
+                current = this.buffer.take();
             } else if (Tokens.id(current)) {
-                builder.append(this.buffer.take());
+                this.buffer.advance();
             } else { // end of value
                 break;
             }
+            builder.append(current);
+            if (noLongerNumericAt == -1 && !Tokens.numeric(current)) {
+                noLongerNumericAt = builder.length();
+            }
         }
-        // if we run out of content without an explicit value separator, then we're either an integer or string tag -- all others have a character at the end
+
+        final int length = builder.length();
         final String built = builder.toString();
-        if (possiblyNumeric) {
+        if (noLongerNumericAt == length) {
+            final char last = built.charAt(length - 1);
+            try {
+                switch (Character.toLowerCase(last)) { // try to read and return as a number
+                    case Tokens.TYPE_BYTE:
+                        return new ByteTag(Byte.parseByte(built.substring(0, length - 1)));
+                    case Tokens.TYPE_SHORT:
+                        return new ShortTag(Short.parseShort(built.substring(0, length - 1)));
+                    case Tokens.TYPE_INT:
+                        return new IntTag(Integer.parseInt(built.substring(0, length - 1)));
+                    case Tokens.TYPE_LONG:
+                        return new LongTag(Long.parseLong(built.substring(0, length - 1)));
+                    case Tokens.TYPE_FLOAT:
+                        final float floatValue = Float.parseFloat(built.substring(0, length - 1));
+                        if (Float.isFinite(floatValue)) { // don't accept NaN and Infinity
+                            return new FloatTag(floatValue);
+                        }
+                        break;
+                    case Tokens.TYPE_DOUBLE:
+                        final double doubleValue = Double.parseDouble(built.substring(0, length - 1));
+                        if (Double.isFinite(doubleValue)) { // don't accept NaN and Infinity
+                            return new DoubleTag(doubleValue);
+                        }
+                        break;
+                }
+            } catch (final NumberFormatException ignored) {
+            }
+        } else if (noLongerNumericAt == -1) { // if we run out of content without an explicit value separator, then we're either an integer or string tag -- all others have a character at the end
             try {
                 return new IntTag(Integer.parseInt(built));
-            } catch (final NumberFormatException ignored) {
-                // Via - don't try to parse as DoubleTag here
+            } catch (final NumberFormatException ex) {
+                // Via - don't try to parse as DoubleTag her
             }
         }
 
