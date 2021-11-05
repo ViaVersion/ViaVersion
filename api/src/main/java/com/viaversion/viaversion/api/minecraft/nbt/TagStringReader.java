@@ -47,7 +47,6 @@ import java.util.stream.LongStream;
 // - Use OpenNBT tags
 // - Small byteArray() optimization
 // - acceptLegacy = true by default
-// - Don't parse value as DoubleTag when possiblyNumeric
 final class TagStringReader {
     private static final int MAX_DEPTH = 512;
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
@@ -306,7 +305,13 @@ final class TagStringReader {
             try {
                 return new IntTag(Integer.parseInt(built));
             } catch (final NumberFormatException ex) {
-                // Via - don't try to parse as DoubleTag her
+                if (built.indexOf('.') != -1) {
+                    try {
+                        return new DoubleTag(Double.parseDouble(built));
+                    } catch (final NumberFormatException ex2) {
+                        // ignore
+                    }
+                }
             }
         }
 
