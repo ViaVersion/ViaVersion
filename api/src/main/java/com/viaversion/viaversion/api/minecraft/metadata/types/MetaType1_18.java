@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.version.Types1_17;
+import com.viaversion.viaversion.api.type.types.version.Types1_18;
 
 public enum MetaType1_18 implements MetaType {
     BYTE(0, Type.BYTE),
@@ -42,7 +42,7 @@ public enum MetaType1_18 implements MetaType {
     OPT_UUID(12, Type.OPTIONAL_UUID),
     BLOCK_STATE(13, Type.VAR_INT),
     NBT(14, Type.NBT),
-    PARTICLE(15, Types1_17.PARTICLE),
+    PARTICLE(15, Types1_18.PARTICLE),
     VILLAGER_DATA(16, Type.VILLAGER_DATA),
     OPT_VAR_INT(17, Type.OPTIONAL_VAR_INT),
     POSE(18, Type.VAR_INT);
