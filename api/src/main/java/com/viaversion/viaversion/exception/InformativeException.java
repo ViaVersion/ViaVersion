@@ -43,25 +43,21 @@ public class InformativeException extends Exception {
     }
 
     private String getSource(Class<?> sourceClazz) {
-        if (sourceClazz.isAnonymousClass()) {
-            return sourceClazz.getName() + " (Anonymous)";
-        } else {
-            return sourceClazz.getName();
-        }
+        return sourceClazz.isAnonymousClass() ? sourceClazz.getName() + " (Anonymous)" : sourceClazz.getName();
     }
 
     @Override
     public String getMessage() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Please post this error to https://github.com/ViaVersion/ViaVersion/issues and follow the issue template\n{");
-        int i = 0;
+        StringBuilder builder = new StringBuilder("Please post this error to https://github.com/ViaVersion/ViaVersion/issues and follow the issue template\n{");
+        boolean first = true;
         for (Map.Entry<String, Object> entry : info.entrySet()) {
-            builder.append(i == 0 ? "" : ", ").append(entry.getKey()).append(": ").append(entry.getValue().toString());
-            i++;
+            if (!first) {
+                builder.append(", ");
+            }
+            builder.append(entry.getKey()).append(": ").append(entry.getValue());
+            first = false;
         }
-        builder.append("}\nActual Error: ");
-
-        return builder.toString();
+        return builder.append("}\nActual Error: ").toString();
     }
 
     @Override
