@@ -53,7 +53,10 @@ public final class WorldPackets {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
                     final short id = wrapper.read(Type.UNSIGNED_BYTE);
-                    wrapper.write(Type.VAR_INT, BlockEntityIds.newId(id));
+                    final int newId = BlockEntityIds.newId(id);
+                    wrapper.write(Type.VAR_INT, newId);
+
+                    handleSpawners(newId, wrapper.passthrough(Type.NBT));
                 });
             }
         });
@@ -119,6 +122,8 @@ public final class WorldPackets {
                         if (typeId == -1) {
                             Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
                         }
+
+                        handleSpawners(typeId, tag);
 
                         final byte packedXZ = (byte) ((xTag.asInt() & 15) << 4 | (zTag.asInt() & 15));
                         blockEntities.add(new BlockEntityImpl(packedXZ, yTag.asShort(), typeId, tag));
@@ -207,5 +212,16 @@ public final class WorldPackets {
                 });
             }
         });
+    }
+
+    private static void handleSpawners(int typeId, final CompoundTag tag) {
+        if (typeId == 8) {
+            final CompoundTag entity = tag.get("SpawnData");
+            if (entity != null) {
+                final CompoundTag spawnData = new CompoundTag();
+                tag.put("SpawnData", spawnData);
+                spawnData.put("entity", entity);
+            }
+        }
     }
 }
