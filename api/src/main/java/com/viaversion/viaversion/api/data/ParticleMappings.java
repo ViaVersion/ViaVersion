@@ -23,42 +23,71 @@
 package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonArray;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 public class ParticleMappings {
+    private final Object2IntMap<String> stringToId;
     private final Mappings mappings;
-    private final int blockId;
-    private final int fallingDustId;
-    private final int blockMarkerId;
-    private final int itemId;
+    private final IntList itemParticleIds = new IntArrayList(2);
+    private final IntList blockParticleIds = new IntArrayList(4);
 
     public ParticleMappings(JsonArray oldMappings, Mappings mappings) {
         this.mappings = mappings;
 
-        Object2IntMap<String> map = MappingDataLoader.arrayToMap(oldMappings);
-        blockId = map.getInt("block");
-        fallingDustId = map.getInt("falling_dust");
-        blockMarkerId = map.getInt("block_marker");
-        itemId = map.getInt("item");
+        stringToId = MappingDataLoader.arrayToMap(oldMappings);
+        stringToId.defaultReturnValue(-1);
+        addBlockParticle("block");
+        addBlockParticle("falling_dust");
+        addBlockParticle("block_marker");
+        addItemParticle("item");
+    }
+
+    /**
+     * Returns the unmapped integer id for the given identifier, or -1 if not found.
+     *
+     * @param identifier unmapped string identifier
+     * @return unmapped int id, or -1 if not found
+     */
+    public int id(String identifier) {
+        return stringToId.getInt(identifier);
     }
 
     public Mappings getMappings() {
         return mappings;
     }
 
+    public boolean addItemParticle(final String identifier) {
+        final int id = id(identifier);
+        return id != -1 && itemParticleIds.add(id);
+    }
+
+    public boolean addBlockParticle(final String identifier) {
+        final int id = id(identifier);
+        return id != -1 && blockParticleIds.add(id);
+    }
+
+    public boolean isBlockParticle(final int id) {
+        return blockParticleIds.contains(id);
+    }
+
+    public boolean isItemParticle(final int id) {
+        return itemParticleIds.contains(id);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public int getBlockId() {
-        return blockId;
+        return id("block");
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public int getFallingDustId() {
-        return fallingDustId;
+        return id("falling_dust");
     }
 
-    public int getBlockmarkerid() {
-        return blockMarkerId;
-    }
-
+    @Deprecated/*(forRemoval = true)*/
     public int getItemId() {
-        return itemId;
+        return id("item");
     }
 }

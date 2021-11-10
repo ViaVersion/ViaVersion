@@ -22,8 +22,8 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
@@ -43,17 +43,17 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
         // Handle new MetaTypes
         if (metadata.metaType().typeId() > 4) {
-            metadata.setMetaType(MetaType1_13.byId(metadata.metaType().typeId() + 1));
+            metadata.setMetaType(Types1_13.META_TYPES.byId(metadata.metaType().typeId() + 1));
         } else {
-            metadata.setMetaType(MetaType1_13.byId(metadata.metaType().typeId()));
+            metadata.setMetaType(Types1_13.META_TYPES.byId(metadata.metaType().typeId()));
         }
 
         // Handle String -> Chat DisplayName
         if (metadata.id() == 2) {
             if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                metadata.setTypeAndValue(MetaType1_13.OptChat, ChatRewriter.legacyTextToJson((String) metadata.getValue()));
+                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ChatRewriter.legacyTextToJson((String) metadata.getValue()));
             } else {
-                metadata.setTypeAndValue(MetaType1_13.OptChat, null);
+                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
             }
         }
 
@@ -66,10 +66,10 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
         }
 
         // 1.13 changed item to flat item (no data)
-        if (metadata.metaType() == MetaType1_13.Slot) {
-            metadata.setMetaType(MetaType1_13.Slot);
+        if (metadata.metaType() == Types1_13.META_TYPES.itemType) {
+            metadata.setMetaType(Types1_13.META_TYPES.itemType);
             protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == MetaType1_13.BlockID) {
+        } else if (metadata.metaType() == Types1_13.META_TYPES.blockStateType) {
             // Convert to new block id
             metadata.setValue(WorldPackets.toNewId((int) metadata.getValue()));
         }
@@ -108,7 +108,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1
 
                 Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.getId() != -1) {
-                    metadatas.add(new Metadata(9, MetaType1_13.PARTICLE, particle));
+                    metadatas.add(new Metadata(9, Types1_13.META_TYPES.particleType, particle));
                 }
             }
 

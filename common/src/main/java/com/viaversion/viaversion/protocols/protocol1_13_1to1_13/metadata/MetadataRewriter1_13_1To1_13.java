@@ -22,8 +22,8 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_13;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -38,13 +38,13 @@ public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<Protocol1_13_1T
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
         // 1.13 changed item to flat item (no data)
-        if (metadata.metaType() == MetaType1_13.Slot) {
+        if (metadata.metaType() == Types1_13.META_TYPES.itemType) {
             protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == MetaType1_13.BlockID) {
+        } else if (metadata.metaType() == Types1_13.META_TYPES.blockStateType) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.metaType() == MetaType1_13.PARTICLE) {
+        } else if (metadata.metaType() == Types1_13.META_TYPES.particleType) {
             rewriteParticle((Particle) metadata.getValue());
         }
 

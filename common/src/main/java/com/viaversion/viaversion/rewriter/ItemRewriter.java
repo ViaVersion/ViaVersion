@@ -329,10 +329,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
             if (id == -1) return;
 
             ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-            if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
+            if (mappings.isBlockParticle(id)) {
                 int data = wrapper.passthrough(Type.VAR_INT);
                 wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-            } else if (id == mappings.getItemId()) {
+            } else if (mappings.isItemParticle(id)) {
                 handleItemToClient(wrapper.passthrough(itemType));
             }
 

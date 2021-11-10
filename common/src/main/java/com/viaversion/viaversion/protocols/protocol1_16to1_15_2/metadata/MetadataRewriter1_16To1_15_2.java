@@ -23,8 +23,8 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_16;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -40,13 +40,13 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1
 
     @Override
     public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        metadata.setMetaType(MetaType1_16.byId(metadata.metaType().typeId()));
-        if (metadata.metaType() == MetaType1_16.ITEM) {
+        metadata.setMetaType(Types1_16.META_TYPES.byId(metadata.metaType().typeId()));
+        if (metadata.metaType() == Types1_16.META_TYPES.itemType) {
             protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == MetaType1_16.BLOCK_STATE) {
+        } else if (metadata.metaType() == Types1_16.META_TYPES.blockStateType) {
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.metaType() == MetaType1_16.PARTICLE) {
+        } else if (metadata.metaType() == Types1_16.META_TYPES.particleType) {
             rewriteParticle((Particle) metadata.getValue());
         }
 
@@ -71,7 +71,7 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1
             if (metadata.id() == 16) {
                 byte mask = metadata.value();
                 int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
-                metadatas.add(new Metadata(20, MetaType1_16.VAR_INT, angerTime));
+                metadatas.add(new Metadata(20, Types1_16.META_TYPES.varIntType, angerTime));
             }
         }
     }

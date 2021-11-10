@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import io.netty.buffer.ByteBuf;
 
+@Deprecated/*(forRemoval = true)*/
 public class Particle1_13_2Type extends Type<Particle> {
 
     public Particle1_13_2Type() {

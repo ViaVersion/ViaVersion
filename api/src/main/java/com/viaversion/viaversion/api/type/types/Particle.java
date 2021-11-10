@@ -24,12 +24,13 @@ package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.type.Type;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Particle {
+    private List<ParticleData> arguments = new ArrayList<>(4);
     private int id;
-    private List<ParticleData> arguments = new LinkedList<>();
 
     public Particle(int id) {
         this.id = id;
@@ -47,8 +48,13 @@ public class Particle {
         return arguments;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public void setArguments(List<ParticleData> arguments) {
         this.arguments = arguments;
+    }
+
+    public <T> void add(Type<T> type, T value) {
+        arguments.add(new ParticleData(type, value));
     }
 
     public static class ParticleData {

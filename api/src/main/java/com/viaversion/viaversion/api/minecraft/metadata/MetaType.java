@@ -39,4 +39,44 @@ public interface MetaType {
      * @return Type id as an integer
      */
     int typeId();
+
+    static MetaType create(final int typeId, final Type<?> type) {
+        return new MetaTypeImpl(typeId, type);
+    }
+
+    final class MetaTypeImpl implements MetaType {
+        private final int typeId;
+        private final Type type;
+
+        MetaTypeImpl(final int typeId, final Type type) {
+            this.typeId = typeId;
+            this.type = type;
+        }
+
+        @Override
+        public int typeId() {
+            return typeId;
+        }
+
+        @Override
+        public Type type() {
+            return type;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final MetaTypeImpl metaType = (MetaTypeImpl) o;
+            if (typeId != metaType.typeId) return false;
+            return type.equals(metaType.type);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = typeId;
+            result = 31 * result + type.hashCode();
+            return result;
+        }
+    }
 }

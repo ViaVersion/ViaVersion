@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 
+@Deprecated/*(forRemoval = true)*/
 public enum MetaType1_16 implements MetaType {
     BYTE(0, Type.BYTE),
     VAR_INT(1, Type.VAR_INT),

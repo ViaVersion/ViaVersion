@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.viaversion.viaversion.api.type.Type;
 
+@Deprecated/*(forRemoval = true)*/
 public class Particle1_13Type extends AbstractParticleType {
 
     public Particle1_13Type() {

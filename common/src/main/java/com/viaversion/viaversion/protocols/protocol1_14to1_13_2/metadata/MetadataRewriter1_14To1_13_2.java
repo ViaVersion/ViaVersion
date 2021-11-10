@@ -26,10 +26,10 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
@@ -47,17 +47,17 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
 
     @Override
     protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        metadata.setMetaType(MetaType1_14.byId(metadata.metaType().typeId()));
+        metadata.setMetaType(Types1_14.META_TYPES.byId(metadata.metaType().typeId()));
 
         EntityTracker1_14 tracker = tracker(connection);
 
-        if (metadata.metaType() == MetaType1_14.Slot) {
+        if (metadata.metaType() == Types1_14.META_TYPES.itemType) {
             protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == MetaType1_14.BlockID) {
+        } else if (metadata.metaType() == Types1_14.META_TYPES.blockStateType) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.metaType() == MetaType1_14.PARTICLE) {
+        } else if (metadata.metaType() == Types1_14.META_TYPES.particleType) {
             rewriteParticle((Particle) metadata.getValue());
         }
 
@@ -97,7 +97,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                     tracker.setRiptide(entityId, (((Number) metadata.getValue()).byteValue() & 0x4) != 0);
                 }
                 if (metadata.id() == 0 || metadata.id() == 7) {
-                    metadatas.add(new Metadata(6, MetaType1_14.Pose, recalculatePlayerPose(entityId, tracker)));
+                    metadatas.add(new Metadata(6, Types1_14.META_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
         } else if (type.isOrHasParent(Entity1_14Types.ZOMBIE)) {
@@ -105,7 +105,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Are hands held up"
-                metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
+                metadatas.add(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
             } else if (metadata.id() > 16) {
                 metadata.setId(metadata.id() - 1);
             }
@@ -140,12 +140,12 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
         } else if (type.is(Entity1_14Types.VILLAGER)) {
             if (metadata.id() == 15) {
                 // plains
-                metadata.setTypeAndValue(MetaType1_14.VillagerData, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
+                metadata.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.is(Entity1_14Types.ZOMBIE_VILLAGER)) {
             if (metadata.id() == 18) {
                 // plains
-                metadata.setTypeAndValue(MetaType1_14.VillagerData, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
+                metadata.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
         } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
             if (metadata.id() >= 9) { // New piercing
@@ -153,7 +153,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
             }
         } else if (type.is(Entity1_14Types.FIREWORK_ROCKET)) {
             if (metadata.id() == 8) {
-                metadata.setMetaType(MetaType1_14.OptVarInt);
+                metadata.setMetaType(Types1_14.META_TYPES.optionalVarIntType);
                 if (metadata.getValue().equals(0)) {
                     metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                 }
@@ -163,7 +163,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Is swinging arms"
-                metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
+                metadatas.add(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
             }
         }
 
@@ -172,7 +172,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<Protocol1_14To1
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
                 metadatas.remove(metadata);  // "Has target (aggressive state)"
-                metadatas.add(new Metadata(13, MetaType1_14.Byte, tracker.getInsentientData(entityId)));
+                metadatas.add(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
             }
         }
 

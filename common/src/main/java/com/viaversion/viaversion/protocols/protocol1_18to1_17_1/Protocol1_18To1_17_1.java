@@ -23,6 +23,8 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
@@ -68,6 +70,18 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 read(Type.BOOLEAN); // Allow listing in server list preview
             }
         });
+    }
+
+    @Override
+    protected void onMappingDataLoaded() {
+        Types1_18.PARTICLE.filler(this)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("block_marker", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.DUST)
+                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("vibration", ParticleType.Readers.VIBRATION);
     }
 
     @Override

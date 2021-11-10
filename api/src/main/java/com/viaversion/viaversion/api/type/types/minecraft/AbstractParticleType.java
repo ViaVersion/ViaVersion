@@ -31,6 +31,7 @@ import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+@Deprecated/*(forRemoval = true)*/
 public abstract class AbstractParticleType extends Type<Particle> {
 
     protected final Int2ObjectMap<ParticleReader> readers = new Int2ObjectOpenHashMap<>();

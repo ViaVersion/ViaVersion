@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_14;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -185,9 +184,9 @@ public class EntityPackets {
                             metadataPacket.write(Type.VAR_INT, entityId);
                             List<Metadata> metadataList = new LinkedList<>();
                             if (tracker.clientEntityId() != entityId) {
-                                metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
+                                metadataList.add(new Metadata(6, Types1_14.META_TYPES.poseType, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                             }
-                            metadataList.add(new Metadata(12, MetaType1_14.OptPosition, null));
+                            metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalPositionType, null));
                             metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
                             metadataPacket.scheduleSend(Protocol1_14To1_13_2.class);
                         }
@@ -209,9 +208,9 @@ public class EntityPackets {
 
                         Position position = wrapper.read(Type.POSITION);
                         List<Metadata> metadataList = new LinkedList<>();
-                        metadataList.add(new Metadata(12, MetaType1_14.OptPosition, position));
+                        metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalPositionType, position));
                         if (tracker.clientEntityId() != entityId) {
-                            metadataList.add(new Metadata(6, MetaType1_14.Pose, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
+                            metadataList.add(new Metadata(6, Types1_14.META_TYPES.poseType, MetadataRewriter1_14To1_13_2.recalculatePlayerPose(entityId, tracker)));
                         }
                         wrapper.write(Types1_14.METADATA_LIST, metadataList);
                     }

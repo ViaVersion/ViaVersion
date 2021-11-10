@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_17;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -128,9 +127,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_17To1_16_4> {
     @Override
     protected void registerRewrites() {
         filter().handler((event, meta) -> {
-            meta.setMetaType(MetaType1_17.byId(meta.metaType().typeId()));
+            meta.setMetaType(Types1_17.META_TYPES.byId(meta.metaType().typeId()));
 
-            if (meta.metaType() == MetaType1_17.POSE) {
+            if (meta.metaType() == Types1_17.META_TYPES.poseType) {
                 int pose = meta.value();
                 if (pose > 5) {
                     // Added LONG_JUMP at 6
@@ -138,7 +137,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_17To1_16_4> {
                 }
             }
         });
-        registerMetaTypeHandler(MetaType1_17.ITEM, MetaType1_17.BLOCK_STATE, MetaType1_17.PARTICLE);
+        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, Types1_17.META_TYPES.particleType);
 
         // Ticks frozen added with id 7
         filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);

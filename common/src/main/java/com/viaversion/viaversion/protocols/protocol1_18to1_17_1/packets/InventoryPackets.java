@@ -66,10 +66,10 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_18To1_17_1> {
                     }
 
                     ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-                    if (id == mappings.getBlockId() || id == mappings.getFallingDustId()) {
+                    if (mappings.isBlockParticle(id)) {
                         int data = wrapper.passthrough(Type.VAR_INT);
                         wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                    } else if (id == mappings.getItemId()) {
+                    } else if (mappings.isItemParticle(id)) {
                         handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                     }
 
