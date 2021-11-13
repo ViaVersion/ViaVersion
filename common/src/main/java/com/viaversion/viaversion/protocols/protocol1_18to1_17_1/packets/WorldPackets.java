@@ -142,12 +142,6 @@ public final class WorldPackets {
                             final DataPaletteImpl blockPalette = new DataPaletteImpl(ChunkSection.SIZE);
                             blockPalette.addId(0);
                             section.addPalette(PaletteType.BLOCKS, blockPalette);
-                        } else {
-                            /*final DataPalette blockpalette = section.palette(PaletteType.BLOCKS);
-                            for (int j = 0; j < blockpalette.size(); j++) {
-                                final int old = blockpalette.entry(j);
-                                blockpalette.setEntry(j, protocol.getMappingData().getNewBlockStateId(old));
-                            }*/
                         }
 
                         // Fill biome palette

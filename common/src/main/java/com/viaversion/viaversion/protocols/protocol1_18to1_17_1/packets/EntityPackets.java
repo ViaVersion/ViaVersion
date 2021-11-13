@@ -34,15 +34,10 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
 
     public EntityPackets(final Protocol1_18To1_17_1 protocol) {
         super(protocol);
-        //mapTypes(Entity1_17Types.values(), Entity1_18Types.class);
     }
 
     @Override
     public void registerPackets() {
-        /*registerTrackerWithData(ClientboundPackets1_17_1.SPAWN_ENTITY, Entity1_18Types.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_17_1.SPAWN_MOB);
-        registerTracker(ClientboundPackets1_17_1.SPAWN_PLAYER, Entity1_18Types.PLAYER);
-        registerRemoveEntities(ClientboundPackets1_17_1.REMOVE_ENTITIES);*/
         registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketRemapper() {
@@ -102,17 +97,10 @@ public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
         });
 
         registerMetaTypeHandler(Types1_18.META_TYPES.itemType, null, null);
-
-        /*filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> { //TODO check id
-            // Convert to new block id
-            int data = (int) meta.getValue();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        });*/
     }
 
     @Override
     public EntityType typeFromId(final int type) {
-        //TODO Entity1_18Types
         return Entity1_17Types.getTypeFromId(type);
     }
 }

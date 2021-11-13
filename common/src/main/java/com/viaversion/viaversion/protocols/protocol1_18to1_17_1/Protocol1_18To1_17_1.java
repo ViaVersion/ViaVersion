@@ -98,7 +98,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_17Types.PLAYER)); //TODO Entity1_18Types
+        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_17Types.PLAYER));
         connection.put(new ChunkLightStorage());
     }
 
