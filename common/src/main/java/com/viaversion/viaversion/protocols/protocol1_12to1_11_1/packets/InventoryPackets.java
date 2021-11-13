@@ -23,12 +23,12 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.BedRewriter;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.ServerboundPackets1_12;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
 
@@ -56,12 +56,12 @@ public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
 
                             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                             for (int i = 0; i < size; i++) {
-                                BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Input Item
-                                BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
+                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Input Item
+                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Output Item
 
                                 boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                                 if (secondItem) {
-                                    BedRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
+                                    handleItemToClient(wrapper.passthrough(Type.ITEM)); // Second Item
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -90,7 +90,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
                             public void handle(PacketWrapper wrapper) throws Exception {
                                 Item item = wrapper.get(Type.ITEM, 0);
                                 if (!Via.getConfig().is1_12QuickMoveActionFix()) {
-                                    BedRewriter.toServerItem(item);
+                                    handleItemToServer(item);
                                     return;
                                 }
                                 byte button = wrapper.get(Type.BYTE, 0);
@@ -107,7 +107,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
                                     }
                                     // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
                                 } else {
-                                    BedRewriter.toServerItem(item);
+                                    handleItemToServer(item);
                                 }
                             }
                         });
@@ -122,13 +122,25 @@ public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
     @Override
     public Item handleItemToServer(Item item) {
         if (item == null) return null;
-        BedRewriter.toServerItem(item);
+
+        if (item.identifier() == 355) { // Bed rewrite
+            item.setData((short) 0);
+        }
 
         boolean newItem = item.identifier() >= 235 && item.identifier() <= 252;
         newItem |= item.identifier() == 453;
         if (newItem) { // Replace server-side unknown items
             item.setIdentifier((short) 1);
             item.setData((short) 0);
+        }
+        return item;
+    }
+
+    @Override
+    public @Nullable Item handleItemToClient(@Nullable Item item) {
+        if (item == null) return null;
+        if (item.identifier() == 355) { // Bed rewrite
+            item.setData((short) 14);
         }
         return item;
     }
