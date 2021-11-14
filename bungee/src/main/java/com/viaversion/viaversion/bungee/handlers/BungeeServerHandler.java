@@ -49,16 +49,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BungeeServerHandler implements Listener {
     private static Method getHandshake;
-    private static Method getRelayMessages;
+    private static Method getRegisteredChannels;
+    private static Method getBrandMessage;
     private static Method setProtocol;
     private static Method getEntityMap = null;
     private static Method setVersion = null;
@@ -68,7 +65,8 @@ public class BungeeServerHandler implements Listener {
     static {
         try {
             getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
-            getRelayMessages = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRelayMessages");
+            getRegisteredChannels = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getRegisteredChannels");
+            getBrandMessage = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getBrandMessage");
             setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
             getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
             setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
@@ -203,38 +201,44 @@ public class BungeeServerHandler implements Listener {
                     pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(protocolId));
 
                     // Workaround 1.13 server change
-                    Object relayMessages = getRelayMessages.invoke(e.getPlayer().getPendingConnection());
-                    for (Object message : (List) relayMessages) {
-                        PluginMessage plMsg = (PluginMessage) message;
-                        String channel = plMsg.getTag();
-                        int id1_13 = ProtocolVersion.v1_13.getVersion();
-                        if (previousServerProtocol != -1) {
-                            String oldChannel = channel;
-                            if (previousServerProtocol < id1_13 && protocolId >= id1_13) {
-                                channel = InventoryPackets.getNewPluginChannelId(channel);
+                    int id1_13 = ProtocolVersion.v1_13.getVersion();
+                    boolean toNewId = previousServerProtocol < id1_13 && protocolId >= id1_13;
+                    boolean toOldId = previousServerProtocol >= id1_13 && protocolId < id1_13;
+                    if (previousServerProtocol != -1 && (toNewId || toOldId)) {
+                        Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(e.getPlayer().getPendingConnection());
+                        if (!registeredChannels.isEmpty()) {
+                            Collection<String> newChannels = new HashSet<>();
+                            for (Iterator<String> iterator = registeredChannels.iterator(); iterator.hasNext(); ) {
+                                String channel = iterator.next();
+                                String oldChannel = channel;
+                                if (toNewId) {
+                                    channel = InventoryPackets.getNewPluginChannelId(channel);
+                                } else {
+                                    channel = InventoryPackets.getOldPluginChannelId(channel);
+                                }
                                 if (channel == null) {
-                                    throw new RuntimeException(oldChannel + " found in relayMessages");
+                                    iterator.remove();
+                                    continue;
                                 }
-                                if (channel.equals("minecraft:register")) {
-                                    plMsg.setData(Arrays.stream(new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0"))
-                                            .map(InventoryPackets::getNewPluginChannelId)
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.joining("\0")).getBytes(StandardCharsets.UTF_8));
-                                }
-                            } else if (previousServerProtocol >= id1_13 && protocolId < id1_13) {
-                                channel = InventoryPackets.getOldPluginChannelId(channel);
-                                if (channel == null) {
-                                    throw new RuntimeException(oldChannel + " found in relayMessages");
-                                }
-                                if (channel.equals("REGISTER")) {
-                                    plMsg.setData(Arrays.stream(new String(plMsg.getData(), StandardCharsets.UTF_8).split("\0"))
-                                            .map(InventoryPackets::getOldPluginChannelId)
-                                            .filter(Objects::nonNull)
-                                            .collect(Collectors.joining("\0")).getBytes(StandardCharsets.UTF_8));
+                                if (!oldChannel.equals(channel)) {
+                                    iterator.remove();
+                                    newChannels.add(channel);
                                 }
                             }
+                            registeredChannels.addAll(newChannels);
                         }
-                        plMsg.setTag(channel);
+                        PluginMessage brandMessage = (PluginMessage) getBrandMessage.invoke(e.getPlayer().getPendingConnection());
+                        if (brandMessage != null) {
+                            String channel = brandMessage.getTag();
+                            if (toNewId) {
+                                channel = InventoryPackets.getNewPluginChannelId(channel);
+                            } else {
+                                channel = InventoryPackets.getOldPluginChannelId(channel);
+                            }
+                            if (channel != null) {
+                                brandMessage.setTag(channel);
+                            }
+                        }
                     }
 
                     user.put(storage);
