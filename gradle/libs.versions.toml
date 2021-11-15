@@ -20,7 +20,7 @@ checkerQual = "3.18.0"
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
-bungee = "1.16-R0.5-SNAPSHOT"
+bungee = "1.17-R0.1-SNAPSHOT"
 sponge = "5.0.0"
 legacySponge = "4.0.0"
 velocity = "3.0.0-SNAPSHOT"

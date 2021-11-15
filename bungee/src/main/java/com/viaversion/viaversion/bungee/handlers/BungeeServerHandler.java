@@ -75,6 +75,7 @@ public class BungeeServerHandler implements Listener {
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
             entityRewrite.setAccessible(true);
         } catch (Exception e) {
+            Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             e.printStackTrace();
         }
     }
