@@ -135,31 +135,36 @@ public class MappingDataLoader {
         }
     }
 
-    public static void mapIdentifiers(Int2IntBiMap output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(Int2IntBiMap output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
+            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers, warnOnMissing);
             if (value != -1) {
                 output.put(Integer.parseInt(entry.getKey()), value);
             }
         }
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        MappingDataLoader.mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
+        mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
     }
 
-    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
         for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers);
+            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers, warnOnMissing);
             if (value != -1) {
                 output[Integer.parseInt(entry.getKey())] = value;
             }
         }
     }
 
-    private static int mapIdentifierEntry(Map.Entry<String, JsonElement> entry, Object2IntMap newIdentifierMap, @Nullable JsonObject diffIdentifiers) {
+    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
+        mapIdentifiers(output, oldIdentifiers, newIdentifiers, diffIdentifiers, true);
+    }
+
+    private static int mapIdentifierEntry(Map.Entry<String, JsonElement> entry, Object2IntMap newIdentifierMap, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         int value = newIdentifierMap.getInt(entry.getValue().getAsString());
         if (value == -1) {
             // Search in diff mappings
@@ -170,7 +175,7 @@ public class MappingDataLoader {
                 }
             }
             if (value == -1) {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
                 }
                 return -1;
@@ -179,6 +184,7 @@ public class MappingDataLoader {
         return value;
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public static void mapIdentifiers(int[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
         mapIdentifiers(output, oldIdentifiers, newIdentifiers, null, warnOnMissing);
     }

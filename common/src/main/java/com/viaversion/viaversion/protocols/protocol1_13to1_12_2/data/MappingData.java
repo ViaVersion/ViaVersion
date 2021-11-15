@@ -60,7 +60,8 @@ public class MappingData extends MappingDataBase {
         loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
 
         loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("enchantments"));
-        enchantmentMappings = new IntArrayMappings(72, oldMappings.getAsJsonObject("enchantments"), newMappings.getAsJsonObject("enchantments"));
+        enchantmentMappings = IntArrayMappings.builder().customEntrySize(72)
+                .unmapped(oldMappings.getAsJsonObject("enchantments")).mapped(newMappings.getAsJsonObject("enchantments")).build();
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
         if (Via.getConfig().isSnowCollisionFix()) {
@@ -126,7 +127,8 @@ public class MappingData extends MappingDataBase {
     protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
         if (key.equals("blocks")) {
             // Need to use a custom size since there are larger gaps in ids
-            return new IntArrayMappings(4084, oldMappings.getAsJsonObject("blocks"), newMappings.getAsJsonObject("blockstates"));
+            return IntArrayMappings.builder().customEntrySize(4084)
+                    .unmapped(oldMappings.getAsJsonObject("blocks")).mapped(newMappings.getAsJsonObject("blockstates")).build();
         } else {
             return super.loadFromObject(oldMappings, newMappings, diffMappings, key);
         }

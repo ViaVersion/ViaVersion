@@ -22,6 +22,10 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 public interface Mappings {
 
     /**
@@ -41,5 +45,135 @@ public interface Mappings {
      */
     void setNewId(int id, int newId);
 
+    /**
+     * Returns amount of unmapped entries, being the size of the mapping.
+     *
+     * @return amount of unmapped entries
+     */
     int size();
+
+    /**
+     * Returns the amount of new ids total, even if it does not have a direct mapping.
+     * Returns -1 if unknown.
+     *
+     * @return amount of new ids, or -1 if unknown
+     */
+    int mappedSize();
+
+    static <T extends Mappings> Builder<T> builder(final MappingsSupplier<T> supplier) {
+        return new Builder(supplier);
+    }
+
+    @FunctionalInterface
+    interface MappingsSupplier<T extends Mappings> {
+
+        T supply(int[] mappings, int mappedIds);
+    }
+
+    final class Builder<T extends Mappings> {
+
+        private final MappingsSupplier<T> supplier;
+        private JsonElement unmapped;
+        private JsonElement mapped;
+        private JsonObject diffMappings;
+        private int mappedSize = -1;
+        private int size = -1;
+        private boolean warnOnMissing = true;
+
+        private Builder(final MappingsSupplier<T> supplier) {
+            this.supplier = supplier;
+        }
+
+        /**
+         * Sets a custom entry size different to the size of the unmapped collection.
+         *
+         * @param size custom entry size
+         * @return self
+         */
+        public Builder<T> customEntrySize(final int size) {
+            this.size = size;
+            return this;
+        }
+
+        /**
+         * Sets a custom entry mapped ids count different to the size of the mapped collection.
+         *
+         * @param size custom mapped id count
+         * @return self
+         */
+        public Builder<T> customMappedSize(final int size) {
+            this.mappedSize = size;
+            return this;
+        }
+
+        /**
+         * Sets whether warnings should be logged for missing mapped ids.
+         *
+         * @param warnOnMissing whether warnings should be logged for missing mapped ids
+         * @return self
+         */
+        public Builder<T> warnOnMissing(final boolean warnOnMissing) {
+            this.warnOnMissing = warnOnMissing;
+            return this;
+        }
+
+        public Builder<T> unmapped(final JsonArray unmappedArray) {
+            this.unmapped = unmappedArray;
+            return this;
+        }
+
+        public Builder<T> unmapped(final JsonObject unmappedObject) {
+            this.unmapped = unmappedObject;
+            return this;
+        }
+
+        public Builder<T> mapped(final JsonArray mappedArray) {
+            this.mapped = mappedArray;
+            return this;
+        }
+
+        public Builder<T> mapped(final JsonObject mappedObject) {
+            this.mapped = mappedObject;
+            return this;
+        }
+
+        public Builder<T> diffMappings(final JsonObject diffMappings) {
+            this.diffMappings = diffMappings;
+            return this;
+        }
+
+        public T build() {
+            final int size = this.size != -1 ? this.size : size(unmapped);
+            final int mappedSize = this.mappedSize != -1 ? this.mappedSize : size(mapped);
+            final int[] mappings = new int[size];
+
+            // Do conversion if one is an array and the other an object, otherwise directly map
+            if (unmapped.isJsonArray()) {
+                if (mapped.isJsonObject()) {
+                    MappingDataLoader.mapIdentifiers(mappings, toJsonObject(unmapped.getAsJsonArray()), mapped.getAsJsonObject(), diffMappings, warnOnMissing);
+                } else {
+                    MappingDataLoader.mapIdentifiers(mappings, unmapped.getAsJsonArray(), mapped.getAsJsonArray(), diffMappings, warnOnMissing);
+                }
+            } else if (mapped.isJsonArray()) {
+                MappingDataLoader.mapIdentifiers(mappings, unmapped.getAsJsonObject(), toJsonObject(mapped.getAsJsonArray()), diffMappings, warnOnMissing);
+            } else {
+                MappingDataLoader.mapIdentifiers(mappings, unmapped.getAsJsonObject(), mapped.getAsJsonObject(), diffMappings, warnOnMissing);
+            }
+
+            return supplier.supply(mappings, mappedSize);
+        }
+
+        private int size(final JsonElement element) {
+            return element.isJsonObject() ? element.getAsJsonObject().size() : element.getAsJsonArray().size();
+        }
+
+        private JsonObject toJsonObject(final JsonArray array) {
+            final JsonObject object = new JsonObject();
+            for (int i = 0; i < array.size(); i++) {
+                final JsonElement element = array.get(i);
+                object.add(Integer.toString(i), element);
+            }
+            return object;
+        }
+    }
 }

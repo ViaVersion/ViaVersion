@@ -29,79 +29,78 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Arrays;
 
 public class IntArrayMappings implements Mappings {
-    protected final int[] oldToNew;
+    private final int[] oldToNew;
+    private final int mappedIds;
 
-    public IntArrayMappings(int[] oldToNew) {
+    private IntArrayMappings(int[] oldToNew, int mappedIds) {
         this.oldToNew = oldToNew;
+        this.mappedIds = mappedIds;
     }
 
-    /**
-     * Maps old identifiers to the new ones.
-     * If an old value cannot be found in the new mappings, the diffmapping will be checked for the given entry.
-     *
-     * @param size        set size of the underlying short array
-     * @param oldMapping  mappings to map from
-     * @param newMapping  mappings to map to
-     * @param diffMapping extra mappings that will be used/scanned when an entry cannot be found
-     */
+    public static Builder<IntArrayMappings> builder() {
+        return Mappings.builder(IntArrayMappings::new);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    public IntArrayMappings(int[] oldToNew) {
+        this(oldToNew, -1);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(int size, JsonObject oldMapping, JsonObject newMapping, @Nullable JsonObject diffMapping) {
         oldToNew = new int[size];
         Arrays.fill(oldToNew, -1);
+        this.mappedIds = newMapping.size();
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, diffMapping);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(JsonObject oldMapping, JsonObject newMapping, @Nullable JsonObject diffMapping) {
         this(oldMapping.entrySet().size(), oldMapping, newMapping, diffMapping);
     }
 
-    /**
-     * Maps old identifiers to the new ones.
-     *
-     * @param size       set size of the underlying short array
-     * @param oldMapping mappings to map from
-     * @param newMapping mappings to map to
-     */
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(int size, JsonObject oldMapping, JsonObject newMapping) {
         oldToNew = new int[size];
         Arrays.fill(oldToNew, -1);
+        mappedIds = -1;
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(JsonObject oldMapping, JsonObject newMapping) {
         this(oldMapping.entrySet().size(), oldMapping, newMapping);
     }
 
-    /**
-     * Maps old identifiers to the new ones.
-     *
-     * @param size          set size of the underlying short array
-     * @param oldMapping    mappings to map from
-     * @param newMapping    mappings to map to
-     * @param diffMapping   extra mappings that will be used/scanned when an entry cannot be found
-     * @param warnOnMissing should "No key for x" be printed if there is no matching identifier
-     */
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(int size, JsonArray oldMapping, JsonArray newMapping, JsonObject diffMapping, boolean warnOnMissing) {
         oldToNew = new int[size];
         Arrays.fill(oldToNew, -1);
+        mappedIds = -1;
         MappingDataLoader.mapIdentifiers(oldToNew, oldMapping, newMapping, diffMapping, warnOnMissing);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(int size, JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
         this(size, oldMapping, newMapping, null, warnOnMissing);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(JsonArray oldMapping, JsonArray newMapping, boolean warnOnMissing) {
         this(oldMapping.size(), oldMapping, newMapping, warnOnMissing);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(int size, JsonArray oldMapping, JsonArray newMapping) {
         this(size, oldMapping, newMapping, true);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(JsonArray oldMapping, JsonArray newMapping, JsonObject diffMapping) {
         this(oldMapping.size(), oldMapping, newMapping, diffMapping, true);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public IntArrayMappings(JsonArray oldMapping, JsonArray newMapping) {
         this(oldMapping.size(), oldMapping, newMapping, true);
     }
@@ -119,6 +118,11 @@ public class IntArrayMappings implements Mappings {
     @Override
     public int size() {
         return oldToNew.length;
+    }
+
+    @Override
+    public int mappedSize() {
+        return mappedIds;
     }
 
     public int[] getOldToNew() {

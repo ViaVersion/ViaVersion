@@ -36,6 +36,7 @@ public class MappingData extends MappingDataBase {
         }
 
         // Ignore removed sounds
-        return new IntArrayMappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), false);
+        return IntArrayMappings.builder().warnOnMissing(false)
+                .unmapped(oldMappings.getAsJsonArray(key)).mapped(newMappings.getAsJsonArray(key)).build();
     }
 }

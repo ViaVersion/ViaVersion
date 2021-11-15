@@ -156,7 +156,7 @@ public final class WorldPackets {
 
                     final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), oldChunk.getSections(), oldChunk.getHeightMap(), blockEntities);
                     wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight(),
-                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
+                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                             MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);

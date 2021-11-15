@@ -85,7 +85,7 @@ public class MappingDataBase implements MappingData {
             itemMappings = new Int2IntBiHashMap();
             itemMappings.defaultReturnValue(-1);
             MappingDataLoader.mapIdentifiers(itemMappings, oldMappings.getAsJsonObject("items"), newMappings.getAsJsonObject("items"),
-                    diffmapping != null ? diffmapping.getAsJsonObject("items") : null);
+                    diffmapping != null ? diffmapping.getAsJsonObject("items") : null, true);
         }
 
         if (diffmapping != null && diffmapping.has("tags")) {
@@ -195,14 +195,16 @@ public class MappingDataBase implements MappingData {
         if (!oldMappings.has(key) || !newMappings.has(key)) return null;
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return new IntArrayMappings(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), diff);
+        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonArray(key))
+                .mapped(newMappings.getAsJsonArray(key)).diffMappings(diff).build();
     }
 
     protected @Nullable Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
         if (!oldMappings.has(key) || !newMappings.has(key)) return null;
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return new IntArrayMappings(oldMappings.getAsJsonObject(key), newMappings.getAsJsonObject(key), diff);
+        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonObject(key))
+                .mapped(newMappings.getAsJsonObject(key)).diffMappings(diff).build();
     }
 
     protected @Nullable JsonObject loadDiffFile() {
