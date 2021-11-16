@@ -32,9 +32,13 @@ public class IntArrayMappings implements Mappings {
     private final int[] oldToNew;
     private final int mappedIds;
 
-    private IntArrayMappings(int[] oldToNew, int mappedIds) {
+    protected IntArrayMappings(final int[] oldToNew, final int mappedIds) {
         this.oldToNew = oldToNew;
         this.mappedIds = mappedIds;
+    }
+
+    public static IntArrayMappings of(final int[] oldToNew, final int mappedIds) {
+        return new IntArrayMappings(oldToNew, mappedIds);
     }
 
     public static Builder<IntArrayMappings> builder() {

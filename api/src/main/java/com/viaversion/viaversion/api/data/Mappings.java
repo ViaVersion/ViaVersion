@@ -70,7 +70,7 @@ public interface Mappings {
         T supply(int[] mappings, int mappedIds);
     }
 
-    final class Builder<T extends Mappings> {
+    class Builder<T extends Mappings> {
 
         private final MappingsSupplier<T> supplier;
         private JsonElement unmapped;
@@ -80,7 +80,7 @@ public interface Mappings {
         private int size = -1;
         private boolean warnOnMissing = true;
 
-        private Builder(final MappingsSupplier<T> supplier) {
+        protected Builder(final MappingsSupplier<T> supplier) {
             this.supplier = supplier;
         }
 
@@ -163,11 +163,11 @@ public interface Mappings {
             return supplier.supply(mappings, mappedSize);
         }
 
-        private int size(final JsonElement element) {
+        protected int size(final JsonElement element) {
             return element.isJsonObject() ? element.getAsJsonObject().size() : element.getAsJsonArray().size();
         }
 
-        private JsonObject toJsonObject(final JsonArray array) {
+        protected JsonObject toJsonObject(final JsonArray array) {
             final JsonObject object = new JsonObject();
             for (int i = 0; i < array.size(); i++) {
                 final JsonElement element = array.get(i);
