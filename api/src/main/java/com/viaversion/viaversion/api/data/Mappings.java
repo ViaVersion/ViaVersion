@@ -72,13 +72,13 @@ public interface Mappings {
 
     class Builder<T extends Mappings> {
 
-        private final MappingsSupplier<T> supplier;
-        private JsonElement unmapped;
-        private JsonElement mapped;
-        private JsonObject diffMappings;
-        private int mappedSize = -1;
-        private int size = -1;
-        private boolean warnOnMissing = true;
+        protected final MappingsSupplier<T> supplier;
+        protected JsonElement unmapped;
+        protected JsonElement mapped;
+        protected JsonObject diffMappings;
+        protected int mappedSize = -1;
+        protected int size = -1;
+        protected boolean warnOnMissing = true;
 
         protected Builder(final MappingsSupplier<T> supplier) {
             this.supplier = supplier;
