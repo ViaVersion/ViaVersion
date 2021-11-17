@@ -26,6 +26,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.Arrays;
+
 public interface Mappings {
 
     /**
@@ -146,6 +148,7 @@ public interface Mappings {
             final int size = this.size != -1 ? this.size : size(unmapped);
             final int mappedSize = this.mappedSize != -1 ? this.mappedSize : size(mapped);
             final int[] mappings = new int[size];
+            Arrays.fill(mappings, -1);
 
             // Do conversion if one is an array and the other an object, otherwise directly map
             if (unmapped.isJsonArray()) {
