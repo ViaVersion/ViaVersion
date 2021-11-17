@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.chunks;
 
 public enum PaletteType {
     BLOCKS(ChunkSection.SIZE, 8),
-    BIOMES(ChunkSection.BIOME_SIZE, 2);
+    BIOMES(ChunkSection.BIOME_SIZE, 3);
 
     private final int size;
     private final int highestBitsPerValue;
