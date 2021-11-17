@@ -26,9 +26,8 @@ import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 
-public final class MetaTypes1_14 implements MetaTypes {
+public final class MetaTypes1_14 extends AbstractMetaTypes {
 
-    private final MetaType[] values = new MetaType[19];
     public final MetaType byteType = add(0, Type.BYTE);
     public final MetaType varIntType = add(1, Type.VAR_INT);
     public final MetaType floatType = add(2, Type.FLOAT);
@@ -50,22 +49,7 @@ public final class MetaTypes1_14 implements MetaTypes {
     public final MetaType poseType = add(18, Type.VAR_INT);
 
     public MetaTypes1_14(final ParticleType particleType) {
+        super(19);
         this.particleType = add(15, particleType);
-    }
-
-    @Override
-    public MetaType byId(final int id) {
-        return values[id];
-    }
-
-    @Override
-    public MetaType[] values() {
-        return values;
-    }
-
-    private MetaType add(final int typeId, final Type type) {
-        final MetaType metaType = MetaType.create(typeId, type);
-        values[typeId] = metaType;
-        return metaType;
     }
 }

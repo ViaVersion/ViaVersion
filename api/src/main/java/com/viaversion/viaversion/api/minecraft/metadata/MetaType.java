@@ -46,9 +46,9 @@ public interface MetaType {
 
     final class MetaTypeImpl implements MetaType {
         private final int typeId;
-        private final Type type;
+        private final Type<?> type;
 
-        MetaTypeImpl(final int typeId, final Type type) {
+        MetaTypeImpl(final int typeId, final Type<?> type) {
             this.typeId = typeId;
             this.type = type;
         }
@@ -59,7 +59,7 @@ public interface MetaType {
         }
 
         @Override
-        public Type type() {
+        public Type<?> type() {
             return type;
         }
 
