@@ -67,12 +67,17 @@ public final class WorldPackets {
                 handler(wrapper -> {
                     final int chunkX = wrapper.passthrough(Type.VAR_INT);
                     final int chunkZ = wrapper.passthrough(Type.VAR_INT);
-                    if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
-                        // Light packets updating already sent chunks are the same as before
-                        return;
-                    }
 
-                    wrapper.cancel();
+                    if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
+                        if (!Via.getConfig().cache1_17Light()) {
+                            // Light packets updating already sent chunks are the same as before
+                            return;
+                        }
+                        // Pass through and cache light data
+                    } else {
+                        // Cancel and cache the light data
+                        wrapper.cancel();
+                    }
 
                     final boolean trustEdges = wrapper.read(Type.BOOLEAN);
                     final long[] skyLightMask = wrapper.read(Type.LONG_ARRAY_PRIMITIVE);
