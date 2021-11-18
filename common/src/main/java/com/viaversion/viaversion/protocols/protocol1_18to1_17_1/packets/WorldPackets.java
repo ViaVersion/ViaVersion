@@ -67,7 +67,7 @@ public final class WorldPackets {
                 handler(wrapper -> {
                     final int chunkX = wrapper.passthrough(Type.VAR_INT);
                     final int chunkZ = wrapper.passthrough(Type.VAR_INT);
-                    if (!Via.getConfig().cache1_17Light() && wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
+                    if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
                         // Light packets updating already sent chunks are the same as before
                         return;
                     }
