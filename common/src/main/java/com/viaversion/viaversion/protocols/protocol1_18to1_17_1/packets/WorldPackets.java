@@ -67,7 +67,7 @@ public final class WorldPackets {
                 handler(wrapper -> {
                     final int chunkX = wrapper.passthrough(Type.VAR_INT);
                     final int chunkZ = wrapper.passthrough(Type.VAR_INT);
-                    if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
+                    if (!Via.getConfig().cache1_17Light() && wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
                         // Light packets updating already sent chunks are the same as before
                         return;
                     }
@@ -162,9 +162,9 @@ public final class WorldPackets {
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
                     final boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
-                    // Get and remove light stored, there's only full chunk packets //TODO Only get, not remove if we find out people re-send full chunk packets without re-sending light
                     // Append light data to chunk packet
-                    final ChunkLightStorage.ChunkLight light = lightStorage.removeLight(chunk.getX(), chunk.getZ());
+                    final ChunkLightStorage.ChunkLight light = Via.getConfig().cache1_17Light() ?
+                            lightStorage.getLight(chunk.getX(), chunk.getZ()) : lightStorage.removeLight(chunk.getX(), chunk.getZ());
                     if (light == null) {
                         Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
 

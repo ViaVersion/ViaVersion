@@ -160,6 +160,10 @@ forced-use-1_17-resource-pack: false
 # The message to be displayed at the prompt when the 1.17+ client receives the server resource pack.
 resource-pack-1_17-prompt: ''
 #
+# Caches light until chunks are unloaded to allow subsequent chunk update packets as opposed to instantly uncaching when the first chunk data is sent.
+# Only disable this if you know what you are doing.
+cache-1_17-light: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

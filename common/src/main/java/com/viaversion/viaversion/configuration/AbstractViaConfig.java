@@ -88,6 +88,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean forcedUse1_17ResourcePack;
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
+    private boolean cache1_17Light;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -155,6 +156,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.OVERWORLD_DEFAULT),
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
+        cache1_17Light = getBoolean("cache-1_17-light", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -515,5 +517,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public WorldIdentifiers get1_16WorldNamesMap() {
         return map1_16WorldNames;
+    }
+
+    @Override
+    public boolean cache1_17Light() {
+        return cache1_17Light;
     }
 }

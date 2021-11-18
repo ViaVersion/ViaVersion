@@ -453,4 +453,6 @@ public interface ViaVersionConfig {
      * @return the global map from vanilla dimensions to world name
      */
     WorldIdentifiers get1_16WorldNamesMap();
+
+    boolean cache1_17Light();
 }
