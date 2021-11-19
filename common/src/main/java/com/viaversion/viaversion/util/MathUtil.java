@@ -26,6 +26,6 @@ public final class MathUtil {
      * @return ceiled log2 of the given number
      */
     public static int ceilLog2(final int i) {
-        return i > 0 ? 31 - Integer.numberOfLeadingZeros(i) : 0;
+        return i > 0 ? 32 - Integer.numberOfLeadingZeros(i - 1) : 0;
     }
 }
