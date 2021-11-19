@@ -79,22 +79,22 @@ public final class WorldPackets {
                         wrapper.cancel();
                     }
 
-                    final boolean trustEdges = wrapper.read(Type.BOOLEAN);
-                    final long[] skyLightMask = wrapper.read(Type.LONG_ARRAY_PRIMITIVE);
-                    final long[] blockLightMask = wrapper.read(Type.LONG_ARRAY_PRIMITIVE);
-                    final long[] emptySkyLightMask = wrapper.read(Type.LONG_ARRAY_PRIMITIVE);
-                    final long[] emptyBlockLightMask = wrapper.read(Type.LONG_ARRAY_PRIMITIVE);
+                    final boolean trustEdges = wrapper.passthrough(Type.BOOLEAN);
+                    final long[] skyLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
+                    final long[] blockLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
+                    final long[] emptySkyLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
+                    final long[] emptyBlockLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
 
-                    final int skyLightLenght = wrapper.read(Type.VAR_INT);
+                    final int skyLightLenght = wrapper.passthrough(Type.VAR_INT);
                     final byte[][] skyLight = new byte[skyLightLenght][];
                     for (int i = 0; i < skyLightLenght; i++) {
-                        skyLight[i] = wrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
+                        skyLight[i] = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     }
 
-                    final int blockLightLength = wrapper.read(Type.VAR_INT);
+                    final int blockLightLength = wrapper.passthrough(Type.VAR_INT);
                     final byte[][] blockLight = new byte[blockLightLength][];
                     for (int i = 0; i < blockLightLength; i++) {
-                        blockLight[i] = wrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
+                        blockLight[i] = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     }
 
                     final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);

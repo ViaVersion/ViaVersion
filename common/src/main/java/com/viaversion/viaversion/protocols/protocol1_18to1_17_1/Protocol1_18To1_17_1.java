@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLig
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPackets1_17_1, ClientboundPackets1_18, ServerboundPackets1_17, ServerboundPackets1_17> {
@@ -65,6 +66,8 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 "minecraft:mooshrooms_spawnable_on", "minecraft:goats_spawnable_on", "minecraft:foxes_spawnable_on", "minecraft:axolotls_spawnable_on", "minecraft:animals_spawnable_on",
                 "minecraft:azalea_grows_on", "minecraft:azalea_root_replaceable", "minecraft:replaceable_plants", "minecraft:terracotta");
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:dirt", "minecraft:terracotta");
+
+        new StatisticsRewriter(this).register(ClientboundPackets1_17_1.STATISTICS);
 
         registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
             @Override
