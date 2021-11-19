@@ -20,18 +20,12 @@ package com.viaversion.viaversion.util;
 public final class MathUtil {
 
     /**
-     * Primitive method to return the ceiled log to the base of 2 for the given number.
+     * Returns the ceiled log to the base of 2 for the given number.
      *
-     * @param i number to ceillog
+     * @param i positive number to ceillog
      * @return ceiled log2 of the given number
      */
     public static int ceilLog2(final int i) {
-        int j = 1;
-        int k = 0;
-        while (j < i) {
-            j *= 2;
-            k++;
-        }
-        return k;
+        return i > 0 ? 31 - Integer.numberOfLeadingZeros(i) : 0;
     }
 }

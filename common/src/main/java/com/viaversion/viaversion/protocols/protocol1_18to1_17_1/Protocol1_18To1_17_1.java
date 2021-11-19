@@ -46,6 +46,13 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
     public Protocol1_18To1_17_1() {
         super(ClientboundPackets1_17_1.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
+    }
+
+    @Override
+    protected void registerPackets() {
+        entityRewriter.register();
+        itemRewriter.register();
+        WorldPackets.register(this);
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);
@@ -82,13 +89,6 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
                 .reader("item", ParticleType.Readers.VAR_INT_ITEM)
                 .reader("vibration", ParticleType.Readers.VIBRATION);
-    }
-
-    @Override
-    protected void registerPackets() {
-        entityRewriter.register();
-        itemRewriter.register();
-        WorldPackets.register(this);
     }
 
     @Override
