@@ -46,6 +46,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.BlockIdData;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ComponentRewriter1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.StatisticData;
@@ -60,6 +61,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockCon
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -78,6 +80,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
     private final EntityRewriter entityRewriter = new MetadataRewriter1_13To1_12_2(this);
     private final ItemRewriter itemRewriter = new InventoryPackets(this);
+    private final ComponentRewriter componentRewriter = new ComponentRewriter1_13(this);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
@@ -170,7 +173,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(State.LOGIN, 0x0, 0x0, new PacketRemapper() {
             @Override
             public void registerMap() {
-                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
+                handler(wrapper -> componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)));
             }
         });
 
@@ -267,28 +270,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.BOSSBAR, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UUID);
-                map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.VAR_INT, 0);
-                        if (action == 0 || action == 3) {
-                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
-                        }
-                    }
-                });
-            }
-        });
-        registerClientbound(ClientboundPackets1_12_1.CHAT_MESSAGE, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
-            }
-        });
+
+        componentRewriter.registerBossBar(ClientboundPackets1_12_1.BOSSBAR);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT_MESSAGE);
+
         registerClientbound(ClientboundPackets1_12_1.TAB_COMPLETE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -335,7 +320,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Id
                 map(Type.STRING); // Window type
-                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT))); // Title
+                handler(wrapper -> componentRewriter.processText(wrapper.passthrough(Type.COMPONENT))); // Title
             }
         });
 
@@ -378,12 +363,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.DISCONNECT, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)));
-            }
-        });
+        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.DISCONNECT);
 
         registerClientbound(ClientboundPackets1_12_1.EFFECT, new PacketRemapper() {
             @Override
@@ -439,22 +419,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 handler(wrapper -> wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT)));
             }
         });
-        registerClientbound(ClientboundPackets1_12_1.COMBAT_EVENT, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Event
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.VAR_INT, 0) == 2) { // Entity dead
-                            wrapper.passthrough(Type.VAR_INT); // Player id
-                            wrapper.passthrough(Type.INT); // Entity id
-                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
-                        }
-                    }
-                });
-            }
-        });
+
+        componentRewriter.registerCombatEvent(ClientboundPackets1_12_1.COMBAT_EVENT);
+
         registerClientbound(ClientboundPackets1_12_1.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -682,21 +649,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.TITLE, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Action
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.VAR_INT, 0);
-                        if (action >= 0 && action <= 2) {
-                            ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
-                        }
-                    }
-                });
-            }
-        });
+        componentRewriter.registerTitle(ClientboundPackets1_12_1.TITLE);
+
         // New 0x4C - Stop Sound
 
         new SoundRewriter(this).registerSound(ClientboundPackets1_12_1.SOUND);
@@ -707,8 +661,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
-                        ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
-                        ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT));
+                        componentRewriter.processText(wrapper.passthrough(Type.COMPONENT));
+                        componentRewriter.processText(wrapper.passthrough(Type.COMPONENT));
                     }
                 });
             }
@@ -732,8 +686,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
                             // Display data
                             if (wrapper.passthrough(Type.BOOLEAN)) {
-                                ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Title
-                                ChatRewriter.processTranslate(wrapper.passthrough(Type.COMPONENT)); // Description
+                                componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Title
+                                componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Description
                                 Item icon = wrapper.read(Type.ITEM);
                                 itemRewriter.handleItemToClient(icon);
                                 wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
@@ -1122,5 +1076,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemRewriter getItemRewriter() {
         return itemRewriter;
+    }
+
+    public ComponentRewriter getComponentRewriter() {
+        return componentRewriter;
     }
 }

@@ -39,10 +39,6 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
         super(protocol);
     }
 
-    public ComponentRewriter1_13() {
-        super(Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class));
-    }
-
     @Override
     protected void handleHoverEvent(JsonObject hoverEvent) {
         super.handleHoverEvent(hoverEvent);
