@@ -20,6 +20,7 @@ package com.viaversion.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaInjector;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
+import com.viaversion.viaversion.debug.DebugHandlerImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
@@ -50,6 +52,7 @@ import java.util.regex.Pattern;
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
     private final ConnectionManager connectionManager = new ConnectionManagerImpl();
+    private final DebugHandler debugHandler = new DebugHandlerImpl();
     private final ViaProviders providers = new ViaProviders();
     private final ViaPlatform<?> platform;
     private final ViaInjector injector;
@@ -279,13 +282,8 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     @Override
-    public boolean isDebug() {
-        return debug;
-    }
-
-    @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
+    public DebugHandler debugHandler() {
+        return debugHandler;
     }
 
     @Override

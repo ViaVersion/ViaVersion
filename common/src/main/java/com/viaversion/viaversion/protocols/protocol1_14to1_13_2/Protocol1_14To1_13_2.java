@@ -67,7 +67,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter(this).register(ClientboundPackets1_13.STATISTICS);
 
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
-        componentRewriter.registerChatMessage(ClientboundPackets1_13.CHAT_MESSAGE);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT_MESSAGE);
 
         CommandRewriter1_14 commandRewriter = new CommandRewriter1_14(this);
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);

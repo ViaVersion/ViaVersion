@@ -491,7 +491,7 @@ public class PacketWrapperImpl implements PacketWrapper {
                 "packetValues=" + packetValues +
                 ", readableObjects=" + readableObjects +
                 ", id=" + id +
-                ", packetType" + packetType +
+                ", packetType=" + packetType +
                 '}';
     }
 }

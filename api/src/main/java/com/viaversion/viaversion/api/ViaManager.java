@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api;
 
 import com.viaversion.viaversion.api.command.ViaVersionCommand;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
@@ -88,14 +89,27 @@ public interface ViaManager {
      *
      * @return true if enabled
      */
-    boolean isDebug();
+    @Deprecated
+    default boolean isDebug() {
+        return debugHandler().enabled();
+    }
 
     /**
      * Sets the debug mode. If enabled, packets and other otherwise suppressed warnings will be logged.
      *
      * @param debug whether debug should be enabled
      */
-    void setDebug(boolean debug);
+    @Deprecated
+    default void setDebug(boolean debug) {
+        debugHandler().setEnabled(debug);
+    }
+
+    /**
+     * Returns the debug handler.
+     *
+     * @return debug handler
+     */
+    DebugHandler debugHandler();
 
     /**
      * Returns a mutable set of self-added subplatform version strings.

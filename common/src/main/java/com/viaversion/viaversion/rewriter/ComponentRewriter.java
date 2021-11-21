@@ -61,6 +61,7 @@ public class ComponentRewriter {
         });
     }
 
+    @Deprecated/*(forRemoval = true)**/
     public void registerChatMessage(ClientboundPacketType packetType) {
         registerComponentPacket(packetType);
     }

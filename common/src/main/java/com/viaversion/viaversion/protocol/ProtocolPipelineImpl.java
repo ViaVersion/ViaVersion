@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocol;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -117,7 +118,8 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.CLIENTBOUND);
         super.transform(direction, state, packetWrapper);
 
-        if (Via.getManager().isDebug()) {
+        DebugHandler debugHandler = Via.getManager().debugHandler();
+        if (debugHandler.enabled() && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper)) {
             logPacket(direction, state, packetWrapper, originalID);
         }
     }
