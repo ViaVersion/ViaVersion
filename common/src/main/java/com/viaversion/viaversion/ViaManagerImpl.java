@@ -229,8 +229,8 @@ public class ViaManagerImpl implements ViaManager {
             return;
         }
 
-        if (version < 16) {
-            platform.getLogger().warning("You are running an outdated Java version, please consider updating it to at least Java 16 (your version is " + javaVersion + "). "
+        if (version < 17) {
+            platform.getLogger().warning("You are running an outdated Java version, please consider updating it to at least Java 17 (your version is " + javaVersion + "). "
                     + "At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
         }
     }
