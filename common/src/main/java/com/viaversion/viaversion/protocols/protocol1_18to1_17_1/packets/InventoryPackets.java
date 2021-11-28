@@ -41,6 +41,22 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_18To1_17_1> {
         registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
+        protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect id
+                map(Type.POSITION1_14); // Location
+                map(Type.INT); // Data
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    int data = wrapper.get(Type.INT, 1);
+                    if (id == 1010) { // Play record
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                    }
+                });
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_17_1.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
