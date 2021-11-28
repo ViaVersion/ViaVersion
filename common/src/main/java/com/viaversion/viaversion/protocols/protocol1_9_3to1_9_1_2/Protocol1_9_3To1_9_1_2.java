@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
@@ -99,8 +100,10 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_9_1_2Type type = new Chunk1_9_1_2Type(clientWorld);
-                        Chunk chunk = wrapper.passthrough(type);
+                        Chunk1_9_1_2Type oldType = new Chunk1_9_1_2Type(clientWorld);
+                        Chunk1_9_3_4Type newType = new Chunk1_9_3_4Type(clientWorld);
+                        Chunk chunk = wrapper.read(oldType);
+                        wrapper.write(newType, chunk);
 
                         List<CompoundTag> tags = chunk.getBlockEntities();
                         for (int i = 0; i < chunk.getSections().length; i++) {
@@ -119,9 +122,6 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                                 }
                             }
                         }
-
-                        // Send (for clients on this version)
-                        wrapper.write(Type.NBT_ARRAY, chunk.getBlockEntities().toArray(new CompoundTag[0]));
                     }
                 });
             }
