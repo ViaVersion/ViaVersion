@@ -37,6 +37,7 @@ public final class BlockEntityIds {
         IDS[7] = 19; // Structure block
         IDS[8] = 20; // End gateway
         IDS[9] = 7; // Sign
+        IDS[10] = 22; // Shulker box
         IDS[11] = 23; // Bed
         IDS[12] = 30; // Jigsaw
         IDS[13] = 31; // Campfire

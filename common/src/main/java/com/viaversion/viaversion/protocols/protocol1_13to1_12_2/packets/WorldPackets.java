@@ -19,6 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -46,6 +48,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.Client
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,8 +125,9 @@ public class WorldPackets {
                             }
                         }
 
-                        if (action == 5) // Set type of flower in flower pot
+                        if (action == 5) { // Set type of flower in flower pot
                             wrapper.cancel(); // Removed
+                        }
                     }
                 });
             }
@@ -442,7 +446,9 @@ public class WorldPackets {
 
                         // Rewrite BlockEntities to normal blocks
                         BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
-                        for (CompoundTag tag : chunk.getBlockEntities()) {
+                        final Iterator<CompoundTag> iterator = chunk.getBlockEntities().iterator();
+                        while (iterator.hasNext()) {
+                            CompoundTag tag = iterator.next();
                             int newId = provider.transform(wrapper.user(), null, tag, false);
                             if (newId != -1) {
                                 int x = ((NumberTag) tag.get("x")).asInt();
@@ -457,6 +463,15 @@ public class WorldPackets {
                                 }
 
                                 chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
+                            }
+
+                            final Tag idTag = tag.get("id");
+                            if (idTag instanceof StringTag) {
+                                // No longer block entities
+                                final String id = ((StringTag) idTag).getValue();
+                                if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
+                                    iterator.remove();
+                                }
                             }
                         }
 
