@@ -118,11 +118,24 @@ public final class WorldPackets {
                         final NumberTag yTag = tag.get("y");
                         final NumberTag zTag = tag.get("z");
                         final StringTag idTag = tag.get("id");
-                        if (xTag == null || yTag == null || zTag == null || idTag == null) {
+                        if (xTag == null || yTag == null || zTag == null) {
                             continue;
                         }
 
-                        final String id = idTag.getValue();
+                        final String id;
+                        if (idTag == null) {
+                            // Thank you 1.8, very cool (might have to be moved somewhere else)
+                            if (tag.get("Chest") instanceof StringTag) {
+                                id = "minecraft:chest";
+                            } else if (tag.get("EnderChest") instanceof StringTag) {
+                                id = "minecraft:ender_chest";
+                            } else {
+                                continue;
+                            }
+                        } else {
+                            id = idTag.getValue();
+                        }
+
                         final int typeId = protocol.getMappingData().blockEntityIds().getInt(id.replace("minecraft:", ""));
                         if (typeId == -1) {
                             Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
