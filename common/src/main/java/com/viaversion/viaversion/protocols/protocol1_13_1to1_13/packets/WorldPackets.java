@@ -57,7 +57,46 @@ public class WorldPackets {
         blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_CHANGE);
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_13.EFFECT, 1010, 2001);
+
+        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    if (id == 2000) { // Smoke
+                        int data = wrapper.get(Type.INT, 1);
+                        switch (data) {
+                            case 1: // North
+                                wrapper.set(Type.INT, 1, 2); // North
+                                break;
+                            case 0: // North-West
+                            case 3: // West
+                            case 6: // South-West
+                                wrapper.set(Type.INT, 1, 4); // West
+                                break;
+                            case 2: // North-East
+                            case 5: // East
+                            case 8: // South-East
+                                wrapper.set(Type.INT, 1, 5); // East
+                                break;
+                            case 7: // South
+                                wrapper.set(Type.INT, 1, 3); // South
+                                break;
+                            default: // Self and other directions
+                                wrapper.set(Type.INT, 1, 0); // Down
+                                break;
+                        }
+                    } else if (id == 1010) { // Play record
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(wrapper.get(Type.INT, 1)));
+                    } else if (id == 2001) { // Block break + block break sound
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.INT, 1)));
+                    }
+                });
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
             @Override

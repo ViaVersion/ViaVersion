@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_1to1_13;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -38,7 +39,6 @@ import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.WorldPac
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
@@ -138,45 +138,6 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                             short flags = wrapper.read(Type.BYTE);
                             if ((flags & 0x02) != 0) flags |= 0x04;
                             wrapper.write(Type.UNSIGNED_BYTE, flags);
-                        }
-                    }
-                });
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION); // Location
-                map(Type.INT); // Data
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
-                        if (id == 2000) { // Smoke
-                            int data = wrapper.get(Type.INT, 1);
-                            switch (data) {
-                                case 1: // North
-                                    wrapper.set(Type.INT, 1, 2); // North
-                                    break;
-                                case 0: // North-West
-                                case 3: // West
-                                case 6: // South-West
-                                    wrapper.set(Type.INT, 1, 4); // West
-                                    break;
-                                case 2: // North-East
-                                case 5: // East
-                                case 8: // South-East
-                                    wrapper.set(Type.INT, 1, 5); // East
-                                    break;
-                                case 7: // South
-                                    wrapper.set(Type.INT, 1, 3); // South
-                                    break;
-                                default: // Self and other directions
-                                    wrapper.set(Type.INT, 1, 0); // Down
-                                    break;
-                            }
                         }
                     }
                 });
