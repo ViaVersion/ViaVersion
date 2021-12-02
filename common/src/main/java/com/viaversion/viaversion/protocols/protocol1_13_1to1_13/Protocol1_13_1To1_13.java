@@ -144,6 +144,45 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
+        registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        if (id == 2000) { // Smoke
+                            int data = wrapper.get(Type.INT, 1);
+                            switch (data) {
+                                case 1: // North
+                                    wrapper.set(Type.INT, 1, 2); // North
+                                    break;
+                                case 0: // North-West
+                                case 3: // West
+                                case 6: // South-West
+                                    wrapper.set(Type.INT, 1, 4); // West
+                                    break;
+                                case 2: // North-East
+                                case 5: // East
+                                case 8: // South-East
+                                    wrapper.set(Type.INT, 1, 5); // East
+                                    break;
+                                case 7: // South
+                                    wrapper.set(Type.INT, 1, 3); // South
+                                    break;
+                                default: // Self and other directions
+                                    wrapper.set(Type.INT, 1, 0); // Down
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         new TagRewriter(this).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
         new StatisticsRewriter(this).register(ClientboundPackets1_13.STATISTICS);
     }
