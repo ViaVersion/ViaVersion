@@ -158,19 +158,23 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                             int data = wrapper.get(Type.INT, 1);
                             switch (data) {
                                 case 1: // North
-                                    wrapper.set(Type.INT, 1, 2);
+                                    wrapper.set(Type.INT, 1, 2); // North
                                     break;
+                                case 0: // North-West
                                 case 3: // West
-                                    wrapper.set(Type.INT, 1, 4);
+                                case 6: // South-West
+                                    wrapper.set(Type.INT, 1, 4); // West
                                     break;
+                                case 2: // North-East
                                 case 5: // East
-                                    //No-op - Data is the same
+                                case 8: // South-East
+                                    wrapper.set(Type.INT, 1, 5); // East
                                     break;
                                 case 7: // South
-                                    wrapper.set(Type.INT, 1, 3);
+                                    wrapper.set(Type.INT, 1, 3); // South
                                     break;
-                                default: // Everything else is unsupported, falls back to Down
-                                    wrapper.set(Type.INT, 1, 0);
+                                default: // Self and other directions
+                                    wrapper.set(Type.INT, 1, 0); // Down
                                     break;
                             }
                         }
