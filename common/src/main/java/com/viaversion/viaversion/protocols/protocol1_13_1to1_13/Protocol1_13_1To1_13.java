@@ -154,8 +154,8 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int id = wrapper.get(Type.INT, 0);
-                        int data = wrapper.get(Type.INT, 1);
                         if (id == 2000) { // Smoke
+                            int data = wrapper.get(Type.INT, 1);
                             switch (data) {
                                 case 1: // North
                                     wrapper.set(Type.INT, 1, 2);
