@@ -29,15 +29,17 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 public class ParticleMappings {
     private final Object2IntMap<String> stringToId;
+    private final Object2IntMap<String> mappedStringToId;
     private final Mappings mappings;
     private final IntList itemParticleIds = new IntArrayList(2);
     private final IntList blockParticleIds = new IntArrayList(4);
 
-    public ParticleMappings(JsonArray oldMappings, Mappings mappings) {
+    public ParticleMappings(JsonArray oldMappings, JsonArray newMappings, Mappings mappings) {
         this.mappings = mappings;
-
         stringToId = MappingDataLoader.arrayToMap(oldMappings);
+        mappedStringToId = MappingDataLoader.arrayToMap(newMappings);
         stringToId.defaultReturnValue(-1);
+        mappedStringToId.defaultReturnValue(-1);
         addBlockParticle("block");
         addBlockParticle("falling_dust");
         addBlockParticle("block_marker");
@@ -52,6 +54,16 @@ public class ParticleMappings {
      */
     public int id(String identifier) {
         return stringToId.getInt(identifier);
+    }
+
+    /**
+     * Returns the mapped integer id for the given mapped identifier, or -1 if not found.
+     *
+     * @param mappedIdentifier mapped string identifier
+     * @return mapped int id, or -1 if not found
+     */
+    public int mappedId(String mappedIdentifier) {
+        return mappedStringToId.getInt(mappedIdentifier);
     }
 
     public Mappings getMappings() {

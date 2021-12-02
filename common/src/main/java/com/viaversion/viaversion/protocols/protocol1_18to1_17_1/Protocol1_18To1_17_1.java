@@ -90,7 +90,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
                 .reader("item", ParticleType.Readers.VAR_INT_ITEM)
                 .reader("vibration", ParticleType.Readers.VIBRATION);

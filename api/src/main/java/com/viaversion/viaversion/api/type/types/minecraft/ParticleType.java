@@ -46,7 +46,11 @@ public class ParticleType extends Type<Particle> {
     }
 
     public ParticleTypeFiller filler(final Protocol<?, ?, ?, ?> protocol) {
-        return this.new ParticleTypeFiller(protocol);
+        return filler(protocol, true);
+    }
+
+    public ParticleTypeFiller filler(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
+        return this.new ParticleTypeFiller(protocol, useMappedNames);
     }
 
     @Override
@@ -97,7 +101,13 @@ public class ParticleType extends Type<Particle> {
         };
         public static final ParticleReader VIBRATION = (buf, particle) -> {
             particle.add(Type.POSITION1_14, Type.POSITION1_14.read(buf)); // From block pos
-            final String resourceLocation = Type.STRING.read(buf);
+
+            String resourceLocation = Type.STRING.read(buf);
+            particle.add(Type.STRING, resourceLocation);
+            if (resourceLocation.startsWith("minecraft:")) {
+                resourceLocation = resourceLocation.substring(10);
+            }
+
             if (resourceLocation.equals("block")) {
                 particle.add(Type.POSITION1_14, Type.POSITION1_14.read(buf)); // Target block pos
             } else if (resourceLocation.equals("entity")) {
@@ -112,13 +122,15 @@ public class ParticleType extends Type<Particle> {
     public final class ParticleTypeFiller {
 
         private final ParticleMappings mappings;
+        private final boolean useMappedNames;
 
-        private ParticleTypeFiller(final Protocol<?, ?, ?, ?> protocol) {
+        private ParticleTypeFiller(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
             this.mappings = protocol.getMappingData().getParticleMappings();
+            this.useMappedNames = useMappedNames;
         }
 
         public ParticleTypeFiller reader(final String identifier, final ParticleReader reader) {
-            readers.put(mappings.id(identifier), reader);
+            readers.put(useMappedNames ? mappings.mappedId(identifier) : mappings.id(identifier), reader);
             return this;
         }
 

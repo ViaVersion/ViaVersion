@@ -78,7 +78,7 @@ public class MappingDataBase implements MappingData {
 
         Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
         if (particles != null) {
-            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), particles);
+            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), newMappings.getAsJsonArray("particles"), particles);
         }
 
         if (loadItems && newMappings.has("items")) {
