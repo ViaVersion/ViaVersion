@@ -144,6 +144,41 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
+        registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION); // Location
+                map(Type.INT); // Data
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        int id = wrapper.get(Type.INT, 0);
+                        int data = wrapper.get(Type.INT, 1);
+                        if (id == 2000) { // Smoke
+                            switch (data) {
+                                case 1: // North
+                                    wrapper.set(Type.INT, 1, 2);
+                                    break;
+                                case 3: // West
+                                    wrapper.set(Type.INT, 1, 4);
+                                    break;
+                                case 5: // East
+                                    //No-op - Data is the same
+                                    break;
+                                case 7: // South
+                                    wrapper.set(Type.INT, 1, 3);
+                                    break;
+                                default: // Everything else is unsupported, falls back to Down
+                                    wrapper.set(Type.INT, 1, 0);
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
         new TagRewriter(this).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
         new StatisticsRewriter(this).register(ClientboundPackets1_13.STATISTICS);
     }
