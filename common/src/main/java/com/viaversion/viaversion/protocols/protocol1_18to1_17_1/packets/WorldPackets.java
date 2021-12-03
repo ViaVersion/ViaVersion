@@ -168,11 +168,13 @@ public final class WorldPackets {
 
                         final int offset = i * ChunkSection.BIOME_SIZE;
                         for (int biomeIndex = 0, biomeArrayIndex = offset; biomeIndex < ChunkSection.BIOME_SIZE; biomeIndex++, biomeArrayIndex++) {
-                            biomePalette.setIdAt(biomeIndex, biomeData[biomeArrayIndex]);
+                            // Also catch invalid biomes with id -1
+                            final int biome = biomeData[biomeArrayIndex];
+                            biomePalette.setIdAt(biomeIndex, biome != -1 ? biome : 0);
                         }
                     }
 
-                    final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), oldChunk.getSections(), oldChunk.getHeightMap(), blockEntities);
+                    final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), sections, oldChunk.getHeightMap(), blockEntities);
                     wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight(),
                             MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                             MathUtil.ceilLog2(tracker.biomesSent())), chunk);
