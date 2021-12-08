@@ -114,7 +114,7 @@ public class SpawnPackets {
                         int typeID = wrapper.get(Type.BYTE, 0);
                         if (Entity1_10Types.getTypeFromId(typeID, true) == Entity1_10Types.EntityType.SPLASH_POTION) {
                             // Convert this to meta data, woo!
-                            PacketWrapper metaPacket = wrapper.create(0x39, new PacketHandler() {
+                            PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.ENTITY_METADATA, new PacketHandler() {
                                 @Override
                                 public void handle(PacketWrapper wrapper) throws Exception {
                                     wrapper.write(Type.VAR_INT, entityID);
@@ -127,7 +127,10 @@ public class SpawnPackets {
                                     wrapper.write(Types1_9.METADATA_LIST, meta);
                                 }
                             });
-                            metaPacket.scheduleSend(Protocol1_9To1_8.class);
+                            // Fix packet order
+                            wrapper.send(Protocol1_9To1_8.class);
+                            metaPacket.send(Protocol1_9To1_8.class);
+                            wrapper.cancel();
                         }
                     }
                 });
