@@ -89,7 +89,6 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
     @Override
     public void write(final ByteBuf buffer, final DataPalette palette) throws Exception {
-        final int bitsPerValue;
         if (palette.size() == 1) {
             // Single value palette
             buffer.writeByte(0); // 0 bit storage
@@ -102,7 +101,11 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
         // 1, 2, and 3 bit linear block palettes can't be read by the client
         final int min = type == PaletteType.BLOCKS ? 4 : 1;
-        bitsPerValue = MathUtil.clamp(MathUtil.ceilLog2(palette.size()), min, type.highestBitsPerValue());
+        int bitsPerValue = Math.max(min, MathUtil.ceilLog2(palette.size()));
+        if (bitsPerValue > type.highestBitsPerValue()) {
+            bitsPerValue = globalPaletteBits;
+        }
+
         buffer.writeByte(bitsPerValue);
 
         if (bitsPerValue != globalPaletteBits) {
