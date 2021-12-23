@@ -18,53 +18,55 @@
 package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.commands.ViaCommandHandler;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.CommandCallable;
-import org.spongepowered.api.command.CommandException;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.parameter.ArgumentReader;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class SpongeCommandHandler extends ViaCommandHandler implements CommandCallable {
+public class SpongeCommandHandler extends ViaCommandHandler implements Command.Raw {
 
     @Override
-    public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        String[] args = arguments.length() > 0 ? arguments.split(" ") : new String[0];
-        onCommand(new SpongeCommandSender(source), args);
+    public CommandResult process(CommandCause cause, ArgumentReader.Mutable arguments) {
+        String[] args = arguments.input().length() > 0 ? arguments.input().split(" ") : new String[0];
+        onCommand(new SpongeCommandSender(cause), args);
         return CommandResult.success();
     }
 
-    public List<String> getSuggestions(CommandSource commandSource, String s, @Nullable Location<World> location) throws CommandException {
-        return getSuggestions(commandSource, s);
-    }
-
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        String[] args = arguments.split(" ", -1); // ViaCommandHandler handles empty String in array. -1: do not discard empty strings
-        return onTabComplete(new SpongeCommandSender(source), args);
+    @Override
+    public List<CommandCompletion> complete(CommandCause cause, ArgumentReader.Mutable arguments) {
+        String[] args = arguments.input().split(" ", -1); // ViaCommandHandler handles empty String in array. -1: do not discard empty strings
+        return onTabComplete(new SpongeCommandSender(cause), args).stream().map(CommandCompletion::of).collect(Collectors.toList());
     }
 
     @Override
-    public boolean testPermission(CommandSource source) {
-        return source.hasPermission("viaversion.admin");
+    public boolean canExecute(CommandCause cause) {
+        return cause.hasPermission("viaversion.admin");
     }
 
     @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("Shows ViaVersion Version and more."));
+    public Optional<Component> shortDescription(CommandCause cause) {
+        return Optional.of(Component.text("Shows ViaVersion Version and more."));
     }
 
     @Override
-    public Optional<Text> getHelp(CommandSource source) {
+    public Optional<Component> extendedDescription(CommandCause cause) {
+        return shortDescription(cause);
+    }
+
+    @Override
+    public Optional<Component> help(@NotNull CommandCause cause) {
         return Optional.empty();
     }
 
     @Override
-    public Text getUsage(CommandSource source) {
-        return Text.of("Usage /viaversion");
+    public Component usage(CommandCause cause) {
+        return Component.text("Usage /viaversion");
     }
 }

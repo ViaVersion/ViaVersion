@@ -33,7 +33,7 @@ public class SpongeViaInjector extends LegacyViaInjector {
 
     @Override
     public int getServerProtocolVersion() throws ReflectiveOperationException {
-        MinecraftVersion version = Sponge.getPlatform().getMinecraftVersion();
+        MinecraftVersion version = Sponge.platform().minecraftVersion();
         return (int) version.getClass().getDeclaredMethod("getProtocol").invoke(version);
     }
 
@@ -42,7 +42,7 @@ public class SpongeViaInjector extends LegacyViaInjector {
         Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
         for (Method method : serverClazz.getDeclaredMethods()) {
             if (method.getReturnType().getSimpleName().equals("NetworkSystem") && method.getParameterTypes().length == 0) {
-                Object connection = method.invoke(Sponge.getServer());
+                Object connection = method.invoke(Sponge.server());
                 if (connection != null) {
                     return connection;
                 }

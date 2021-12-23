@@ -25,11 +25,11 @@ public class SpongeViaAPI extends ViaAPIBase<Player> {
 
     @Override
     public int getPlayerVersion(Player player) {
-        return getPlayerVersion(player.getUniqueId());
+        return getPlayerVersion(player.uniqueId());
     }
 
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
-        sendRawPacket(player.getUniqueId(), packet);
+        sendRawPacket(player.uniqueId(), packet);
     }
 }

@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.sponge.util;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.text.MessageFormat;
 import java.util.logging.Level;

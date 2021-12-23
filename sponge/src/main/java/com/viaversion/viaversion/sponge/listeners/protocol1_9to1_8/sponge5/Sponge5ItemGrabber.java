@@ -25,6 +25,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 public class Sponge5ItemGrabber implements ItemGrabber {
     @Override
     public ItemStack getItem(Player player) {
-        return player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
+        return player.itemInHand(HandTypes.MAIN_HAND);
     }
 }

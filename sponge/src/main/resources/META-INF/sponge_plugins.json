@@ -1,0 +1,48 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GNU GPLv3",
+  "plugins": [
+    {
+      "id": "viaversion",
+      "name": "ViaVersion",
+      "version": "${version}",
+      "description": "${description}",
+      "entrypoint": "com.viaversion.viaversion.SpongePlugin",
+      "branding": {
+        "logo": "assets/viaversion/textures/logo.png",
+        "icon": "assets/viaversion/textures/logo.png"
+      },
+      "links": {
+        "homepage": "https://www.spigotmc.org/resources/viaversion.19254/",
+        "source": "https://github.com/ViaVersion/ViaVersion",
+        "issues": "https://github.com/ViaVersion/ViaVersion"
+      },
+      "contributors": [
+        {
+          "name": "_MylesC"
+        },
+        {
+          "name": "creeper123123321"
+        },
+        {
+          "name": "Gerrygames"
+        },
+        {
+          "name": "kennytv"
+        },
+        {
+          "name": "Matsv"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "spongeapi",
+          "version": "8.0.0"
+        }
+      ]
+    }
+  ]
+}

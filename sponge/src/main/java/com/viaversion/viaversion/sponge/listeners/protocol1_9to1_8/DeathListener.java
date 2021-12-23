@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.sponge.listeners.ViaSpongeListener;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -39,17 +40,17 @@ public class DeathListener extends ViaSpongeListener {
 
     @Listener(order = Order.LAST)
     public void onDeath(DestructEntityEvent.Death e) {
-        if (!(e.getTargetEntity() instanceof Player))
+        if (!(e.entity() instanceof Player))
             return;
 
-        Player p = (Player) e.getTargetEntity();
-        if (isOnPipe(p.getUniqueId()) && Via.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld())) {
-            sendPacket(p, e.getMessage().toPlain());
+        Player p = (Player) e.entity();
+        if (isOnPipe(p.uniqueId()) && Via.getConfig().isShowNewDeathMessages() && checkGamerule(p.getWorld())) {
+            sendPacket(p, PlainTextComponentSerializer.plainText().serialize(e.message()));
         }
     }
 
     public boolean checkGamerule(World w) {
-        Optional<String> gamerule = w.getGameRule("showDeathMessages");
+        Optional<String> gamerule = w.gameRule("showDeathMessages");
 
         if (gamerule.isPresent()) {
             try {

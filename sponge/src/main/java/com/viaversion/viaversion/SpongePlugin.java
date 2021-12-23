@@ -37,31 +37,32 @@ import com.viaversion.viaversion.sponge.platform.SpongeViaLoader;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
-import com.viaversion.viaversion.util.VersionInfo;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
+import org.spongepowered.plugin.metadata.PluginMetadata;
+import org.spongepowered.plugin.metadata.model.PluginContributor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-@Plugin(id = "viaversion",
-        name = "ViaVersion",
-        version = VersionInfo.VERSION,
-        authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv"},
-        description = "Allow newer Minecraft versions to connect to an older server version."
-)
+@Plugin("viaversion")
 public class SpongePlugin implements ViaPlatform<Player> {
     @Inject
     private Game game;
@@ -79,7 +80,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Listener
     public void onGameStart(GameInitializationEvent event) {
         // Setup Logger
-        logger = new LoggerWrapper(container.getLogger());
+        logger = new LoggerWrapper(container.logger());
         // Setup Plugin
         conf = new SpongeViaConfig(container, spongeConfig.getParentFile());
         SpongeCommandHandler commandHandler = new SpongeCommandHandler();
@@ -97,7 +98,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Listener
     public void onServerStart(GameAboutToStartServerEvent event) {
-        if (game.getPluginManager().getPlugin("viabackwards").isPresent()) {
+        if (game.pluginManager().plugin("viabackwards").isPresent()) {
             MappingDataLoader.enableMappingsCache();
         }
 
@@ -107,23 +108,30 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Listener
-    public void onServerStop(GameStoppingServerEvent event) {
+    public void onServerStop(StoppingEngineEvent<?> event) {
         ((ViaManagerImpl) Via.getManager()).destroy();
     }
 
     @Override
     public String getPlatformName() {
-        return game.getPlatform().getImplementation().getName();
+        return game.platform().container(Platform.Component.IMPLEMENTATION).metadata().name().orElse("unknown");
     }
 
     @Override
     public String getPlatformVersion() {
-        return game.getPlatform().getImplementation().getVersion().orElse("Unknown Version");
+        return readVersion(game.platform().container(Platform.Component.IMPLEMENTATION).metadata().version());
     }
 
     @Override
     public String getPluginVersion() {
-        return container.getVersion().orElse("Unknown Version");
+        return readVersion(container.metadata().version());
+    }
+
+    private static String readVersion(ArtifactVersion version) {
+        String qualifier = version.getQualifier();
+        qualifier = (qualifier == null || qualifier.isEmpty()) ? "" : "-" + qualifier;
+
+        return version.getMajorVersion() + "." + version.getMinorVersion() + "." + version.getIncrementalVersion() + qualifier;
     }
 
     @Override
@@ -167,9 +175,9 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public ViaCommandSender[] getOnlinePlayers() {
-        ViaCommandSender[] array = new ViaCommandSender[game.getServer().getOnlinePlayers().size()];
+        ViaCommandSender[] array = new ViaCommandSender[game.server().onlinePlayers().size()];
         int i = 0;
-        for (Player player : game.getServer().getOnlinePlayers()) {
+        for (Player player : game.server().onlinePlayers()) {
             array[i++] = new SpongeCommandSender(player);
         }
         return array;
@@ -178,12 +186,12 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public void sendMessage(UUID uuid, String message) {
         String serialized = SpongePlugin.COMPONENT_SERIALIZER.serialize(SpongePlugin.COMPONENT_SERIALIZER.deserialize(message));
-        game.getServer().getPlayer(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links
+        game.server().player(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
-        return game.getServer().getPlayer(uuid).map(player -> {
+        return game.server().player(uuid).map(player -> {
             player.kick(TextSerializers.formattingCode(ChatColorUtil.COLOR_CHAR).deserialize(message));
             return true;
         }).orElse(false);
@@ -214,13 +222,14 @@ public class SpongePlugin implements ViaPlatform<Player> {
         JsonObject platformSpecific = new JsonObject();
 
         List<PluginInfo> plugins = new ArrayList<>();
-        for (PluginContainer p : game.getPluginManager().getPlugins()) {
+        for (PluginContainer p : game.pluginManager().plugins()) {
+            PluginMetadata meta = p.metadata();
             plugins.add(new PluginInfo(
                     true,
-                    p.getName(),
-                    p.getVersion().orElse("Unknown Version"),
-                    p.getInstance().isPresent() ? p.getInstance().get().getClass().getCanonicalName() : "Unknown",
-                    p.getAuthors()
+                    meta.name().orElse("Unknown"),
+                    readVersion(meta.version()),
+                    p.instance() != null ? p.instance().getClass().getCanonicalName() : "Unknown",
+                    meta.contributors().stream().map(PluginContributor::name).collect(Collectors.toList())
             ));
         }
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
@@ -247,4 +256,9 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public Logger getLogger() {
         return logger;
     }
+
+    public PluginContainer getPluginContainer() {
+        return container;
+    }
+
 }

@@ -19,7 +19,7 @@ package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.File;
 import java.net.URL;
@@ -46,7 +46,7 @@ public class SpongeViaConfig extends AbstractViaConfig {
         if (!config.isPresent()) {
             throw new IllegalArgumentException("Default config is missing from jar");
         }
-        return config.get().getUrl();
+        return config.get().url();
     }
 
     @Override

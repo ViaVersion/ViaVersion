@@ -29,15 +29,15 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
+import org.spongepowered.api.event.cause.entity.MovementTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.item.inventory.container.ClickContainerEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public class Sponge5ArmorListener extends ViaSpongeListener {
@@ -50,14 +50,14 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
     //
     public void sendArmorUpdate(Player player) {
         // Ensure that the player is on our pipe
-        if (!isOnPipe(player.getUniqueId())) return;
+        if (!isOnPipe(player.uniqueId())) return;
 
 
         int armor = 0;
-        armor += calculate(player.getHelmet());
-        armor += calculate(player.getChestplate());
-        armor += calculate(player.getLeggings());
-        armor += calculate(player.getBoots());
+        armor += calculate(player.head());
+        armor += calculate(player.chest());
+        armor += calculate(player.legs());
+        armor += calculate(player.feet());
 
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_PROPERTIES, null, getUserConnection(player.getUniqueId()));
         try {
@@ -76,18 +76,19 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
         }
     }
 
-    private int calculate(Optional<ItemStack> itemStack) {
-        if (itemStack.isPresent())
-            return ArmorType.findByType(itemStack.get().getItem().getType().getId()).getArmorPoints();
-
+    private int calculate(ItemStack itemStack) {
+        if (itemStack != null) {
+            // todo
+            return ArmorType.findByType(itemStack.type()).getArmorPoints();
+        }
         return 0;
     }
 
     @Listener
-    public void onInventoryClick(ClickInventoryEvent e, @Root Player player) {
-        for (SlotTransaction transaction : e.getTransactions()) {
-            if (ArmorType.isArmor(transaction.getFinal().getType().getId()) ||
-                    ArmorType.isArmor(e.getCursorTransaction().getFinal().getType().getId())) {
+    public void onContainerClick(ClickContainerEvent e, @Root Player player) {
+        for (SlotTransaction transaction : e.transactions()) {
+            if (ArmorType.isArmor(transaction.finalReplacement().type()) ||
+                    ArmorType.isArmor(e.cursorTransaction().finalReplacement().type())) {
                 sendDelayedArmorUpdate(player);
                 break;
             }
@@ -96,32 +97,34 @@ public class Sponge5ArmorListener extends ViaSpongeListener {
 
     @Listener
     public void onInteract(InteractEvent event, @Root Player player) {
-        if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-            if (ArmorType.isArmor(player.getItemInHand(HandTypes.MAIN_HAND).get().getItem().getId()))
+        if (player.itemInHand(HandTypes.MAIN_HAND) != null) {
+            if (ArmorType.isArmor(player.itemInHand(HandTypes.MAIN_HAND).type()))
                 sendDelayedArmorUpdate(player);
         }
     }
 
     @Listener
-    public void onJoin(ClientConnectionEvent.Join e) {
-        sendArmorUpdate(e.getTargetEntity());
+    public void onJoin(ServerSideConnectionEvent.Join e) {
+        sendArmorUpdate(e.player());
     }
 
     @Listener
     public void onRespawn(RespawnPlayerEvent e) {
-        sendDelayedArmorUpdate(e.getTargetEntity());
+        sendDelayedArmorUpdate(e.entity());
     }
 
     @Listener
-    public void onWorldChange(MoveEntityEvent.Teleport e) {
-        if (!(e.getTargetEntity() instanceof Player)) return;
-        if (!e.getFromTransform().getExtent().getUniqueId().equals(e.getToTransform().getExtent().getUniqueId())) {
-            sendArmorUpdate((Player) e.getTargetEntity());
+    public void onWorldChange(MoveEntityEvent e) {
+        if (!(e.entity() instanceof Player)) return;
+        if (!e.cause().contains(MovementTypes.ENTITY_TELEPORT)) return; //todo: probably doesn't work
+
+        if (!e.originalDestinationPosition().getExtent().getUniqueId().equals(e.destinationPosition().getExtent().getUniqueId())) {
+            sendArmorUpdate((Player) e.entity());
         }
     }
 
     public void sendDelayedArmorUpdate(final Player player) {
-        if (!isOnPipe(player.getUniqueId())) return; // Don't start a task if the player is not on the pipe
+        if (!isOnPipe(player.uniqueId())) return; // Don't start a task if the player is not on the pipe
         Via.getPlatform().runSync(new Runnable() {
             @Override
             public void run() {

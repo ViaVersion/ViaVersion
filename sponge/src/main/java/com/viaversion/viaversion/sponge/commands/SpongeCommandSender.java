@@ -19,16 +19,15 @@ package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.util.Identifiable;
 
 import java.util.UUID;
 
 public class SpongeCommandSender implements ViaCommandSender {
-    private final CommandSource source;
+    private final CommandCause source;
 
-    public SpongeCommandSender(CommandSource source) {
+    public SpongeCommandSender(CommandCause source) {
         this.source = source;
     }
 
@@ -46,7 +45,7 @@ public class SpongeCommandSender implements ViaCommandSender {
     @Override
     public UUID getUUID() {
         if (source instanceof Identifiable) {
-            return ((Identifiable) source).getUniqueId();
+            return ((Identifiable) source).uniqueId();
         } else {
             return UUID.fromString(getName());
         }
@@ -55,6 +54,6 @@ public class SpongeCommandSender implements ViaCommandSender {
 
     @Override
     public String getName() {
-        return source.getName();
+        return source.friendlyIdentifier().orElse(source.identifier());
     }
 }

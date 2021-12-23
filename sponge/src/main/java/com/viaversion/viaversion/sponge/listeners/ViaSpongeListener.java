@@ -40,7 +40,7 @@ public class ViaSpongeListener extends ViaListener {
     public void register() {
         if (isRegistered()) return;
 
-        Sponge.getEventManager().registerListeners(plugin, this);
+        Sponge.eventManager().registerListeners(plugin.getPluginContainer(), this);
         setRegistered(true);
     }
 
@@ -60,9 +60,5 @@ public class ViaSpongeListener extends ViaListener {
 
         Via.getPlatform().getLogger().severe("Could not get the entity id, please report this on our Github");
         return -1;
-    }
-
-    public SpongePlugin getPlugin() {
-        return plugin;
     }
 }

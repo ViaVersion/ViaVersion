@@ -58,9 +58,9 @@ public class HandItemCache implements Runnable {
     public void run() {
         List<UUID> players = new ArrayList<>(handCache.keySet());
 
-        for (Player p : Sponge.getServer().getOnlinePlayers()) {
-            handCache.put(p.getUniqueId(), convert(grabber.getItem(p)));
-            players.remove(p.getUniqueId());
+        for (Player p : Sponge.server().onlinePlayers()) {
+            handCache.put(p.uniqueId(), convert(grabber.getItem(p)));
+            players.remove(p.uniqueId());
         }
         // Remove offline players
         for (UUID uuid : players) {
@@ -105,7 +105,7 @@ public class HandItemCache implements Runnable {
                 e.printStackTrace();
             }
         }
-        return new DataItem(id, (byte) itemInHand.getQuantity(), (short) damage, null);
+        return new DataItem(id, (byte) itemInHand.quantity(), (short) damage, null);
     }
 }
 
