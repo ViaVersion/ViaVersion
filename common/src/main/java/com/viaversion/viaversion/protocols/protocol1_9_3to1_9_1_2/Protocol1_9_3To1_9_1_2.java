@@ -100,23 +100,20 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                     public void handle(PacketWrapper wrapper) throws Exception {
                         ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_9_1_2Type oldType = new Chunk1_9_1_2Type(clientWorld);
-                        Chunk1_9_3_4Type newType = new Chunk1_9_3_4Type(clientWorld);
-                        Chunk chunk = wrapper.read(oldType);
-                        wrapper.write(newType, chunk);
+                        Chunk chunk = wrapper.read(new Chunk1_9_1_2Type(clientWorld));
+                        wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
 
                         List<CompoundTag> tags = chunk.getBlockEntities();
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
-                            if (section == null)
-                                continue;
+                            if (section == null) continue;
 
                             for (int y = 0; y < 16; y++) {
                                 for (int z = 0; z < 16; z++) {
                                     for (int x = 0; x < 16; x++) {
                                         int block = section.getBlockWithoutData(x, y, z);
-                                        if (FakeTileEntity.hasBlock(block)) {
-                                            tags.add(FakeTileEntity.getFromBlock(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
+                                        if (FakeTileEntity.isTileEntity(block)) {
+                                            tags.add(FakeTileEntity.createTileEntity(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
                                         }
                                     }
                                 }
