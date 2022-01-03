@@ -18,11 +18,11 @@
 package com.viaversion.viaversion.classgenerator.generated;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 public interface HandlerConstructor {
     public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder);
 
-    public ByteToMessageDecoder newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder);
+    public ChannelInboundHandler newDecodeHandler(UserConnection info, ChannelInboundHandler minecraftDecoder);
 }
