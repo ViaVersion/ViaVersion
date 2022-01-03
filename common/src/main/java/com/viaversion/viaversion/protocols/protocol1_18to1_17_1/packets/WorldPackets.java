@@ -24,12 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
-import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
-import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
+import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
@@ -118,24 +113,11 @@ public final class WorldPackets {
                         final NumberTag yTag = tag.get("y");
                         final NumberTag zTag = tag.get("z");
                         final StringTag idTag = tag.get("id");
-                        if (xTag == null || yTag == null || zTag == null) {
+                        if (xTag == null || yTag == null || zTag == null || idTag == null) {
                             continue;
                         }
 
-                        final String id;
-                        if (idTag == null) {
-                            // Thank you 1.8, very cool (might have to be moved somewhere else)
-                            if (tag.get("Chest") instanceof StringTag) {
-                                id = "minecraft:chest";
-                            } else if (tag.get("EnderChest") instanceof StringTag) {
-                                id = "minecraft:ender_chest";
-                            } else {
-                                continue;
-                            }
-                        } else {
-                            id = idTag.getValue();
-                        }
-
+                        final String id = idTag.getValue();
                         final int typeId = protocol.getMappingData().blockEntityIds().getInt(id.replace("minecraft:", ""));
                         if (typeId == -1) {
                             Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
