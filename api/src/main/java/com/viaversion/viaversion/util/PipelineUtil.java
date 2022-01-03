@@ -25,7 +25,7 @@ package com.viaversion.viaversion.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
@@ -41,7 +41,7 @@ public class PipelineUtil {
 
     static {
         try {
-            DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
+            DECODE_METHOD = ChannelInboundHandler.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
             DECODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -61,7 +61,7 @@ public class PipelineUtil {
     }
 
     /**
-     * Call the decode method on a netty ByteToMessageDecoder
+     * Call the decode method on a netty ChannelInboundHandler
      *
      * @param decoder The decoder
      * @param ctx     The current context
@@ -69,7 +69,7 @@ public class PipelineUtil {
      * @return A list of the decoders output
      * @throws InvocationTargetException If an exception happens while executing
      */
-    public static List<Object> callDecode(ByteToMessageDecoder decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
+    public static List<Object> callDecode(ChannelInboundHandler decoder, ChannelHandlerContext ctx, Object input) throws InvocationTargetException {
         List<Object> output = new ArrayList<>();
         try {
             PipelineUtil.DECODE_METHOD.invoke(decoder, ctx, input, output);
