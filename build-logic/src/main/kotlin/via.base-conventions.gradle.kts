@@ -15,6 +15,7 @@ tasks {
         (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
     }
     compileJava {
+        //options.release.set(8)
         options.encoding = Charsets.UTF_8.name()
         options.compilerArgs.addAll(listOf("-nowarn", "-Xlint:-unchecked", "-Xlint:-deprecation"))
     }

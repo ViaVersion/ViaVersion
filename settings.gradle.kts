@@ -7,7 +7,6 @@ dependencyResolutionManagement {
         maven("https://repo.viaversion.com")
         maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/")
         maven("https://repo.spongepowered.org/repository/maven-public/")
         maven("https://libraries.minecraft.net")
         mavenCentral()
@@ -20,7 +19,7 @@ pluginManagement {
     // default plugin versions
     plugins {
         id("net.kyori.blossom") version "1.2.0"
-        id("com.github.johnrengelman.shadow") version "7.1.1"
+        id("com.github.johnrengelman.shadow") version "7.1.2"
     }
 }
 

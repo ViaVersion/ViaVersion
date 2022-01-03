@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -363,9 +364,10 @@ public class SpawnPackets {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
                         int[] entities = wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0);
+                        EntityTracker tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         for (int entity : entities) {
                             // EntityTracker
-                            wrapper.user().getEntityTracker(Protocol1_9To1_8.class).removeEntity(entity);
+                            tracker.removeEntity(entity);
                         }
                     }
                 });
