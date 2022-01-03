@@ -26,7 +26,7 @@ import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.lang.reflect.Method;
@@ -72,7 +72,7 @@ public class BukkitChannelInitializer extends ChannelInitializer<Channel> implem
         // Add our transformers
         HandlerConstructor constructor = ClassGenerator.getConstructor();
         MessageToByteEncoder encoder = constructor.newEncodeHandler(connection, (MessageToByteEncoder) channel.pipeline().get("encoder"));
-        ByteToMessageDecoder decoder = constructor.newDecodeHandler(connection, (ByteToMessageDecoder) channel.pipeline().get("decoder"));
+        ChannelInboundHandler decoder = constructor.newDecodeHandler(connection, (ChannelInboundHandler) channel.pipeline().get("decoder"));
 
         channel.pipeline().replace("encoder", "encoder", encoder);
         channel.pipeline().replace("decoder", "decoder", decoder);
