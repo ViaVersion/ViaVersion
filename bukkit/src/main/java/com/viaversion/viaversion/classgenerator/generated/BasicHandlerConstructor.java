@@ -20,7 +20,7 @@ package com.viaversion.viaversion.classgenerator.generated;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.ChannelInboundHandler;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 public class BasicHandlerConstructor implements HandlerConstructor {
@@ -30,7 +30,7 @@ public class BasicHandlerConstructor implements HandlerConstructor {
     }
 
     @Override
-    public BukkitDecodeHandler newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
+    public BukkitDecodeHandler newDecodeHandler(UserConnection info, ChannelInboundHandler minecraftDecoder) {
         return new BukkitDecodeHandler(info, minecraftDecoder);
     }
 }
