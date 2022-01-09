@@ -168,7 +168,9 @@ public final class WorldPackets {
                     final ChunkLightStorage.ChunkLight light = Via.getConfig().cache1_17Light() ?
                             lightStorage.getLight(chunk.getX(), chunk.getZ()) : lightStorage.removeLight(chunk.getX(), chunk.getZ());
                     if (light == null) {
-                        Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            Via.getPlatform().getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
+                        }
 
                         final BitSet emptyLightMask = new BitSet();
                         emptyLightMask.set(0, tracker.currentWorldSectionHeight() + 2);
