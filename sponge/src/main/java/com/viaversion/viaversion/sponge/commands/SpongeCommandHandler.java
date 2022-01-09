@@ -21,9 +21,9 @@ import com.viaversion.viaversion.commands.ViaCommandHandler;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 
 import java.util.List;

@@ -23,6 +23,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class UpdateListener {
+
     @Listener
     public void onJoin(ServerSideConnectionEvent.Join join) {
         if (join.player().hasPermission("viaversion.update") && Via.getConfig().isCheckForUpdates()) {

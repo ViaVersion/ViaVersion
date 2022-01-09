@@ -22,7 +22,6 @@ import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,11 +45,6 @@ public class BungeeViaConfig extends AbstractViaConfig {
         bungeePingInterval = getInt("bungee-ping-interval", 60);
         bungeePingSave = getBoolean("bungee-ping-save", true);
         bungeeServerProtocols = get("bungee-servers", Map.class, new HashMap<>());
-    }
-
-    @Override
-    public URL getDefaultConfigURL() {
-        return BungeeViaConfig.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override

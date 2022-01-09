@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,11 +44,6 @@ public class VelocityViaConfig extends AbstractViaConfig {
         velocityPingInterval = getInt("velocity-ping-interval", 60);
         velocityPingSave = getBoolean("velocity-ping-save", true);
         velocityServerProtocols = get("velocity-servers", Map.class, new HashMap<>());
-    }
-
-    @Override
-    public URL getDefaultConfigURL() {
-        return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override

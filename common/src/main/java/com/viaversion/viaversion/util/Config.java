@@ -61,7 +61,9 @@ public abstract class Config implements ConfigurationProvider {
         this.configFile = configFile;
     }
 
-    public abstract URL getDefaultConfigURL();
+    public URL getDefaultConfigURL() {
+        return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
+    }
 
     public synchronized Map<String, Object> loadConfig(File location) {
         List<String> unsupported = getUnsupportedOptions();

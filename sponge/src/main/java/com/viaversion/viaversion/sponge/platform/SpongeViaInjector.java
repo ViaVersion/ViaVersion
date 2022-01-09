@@ -27,8 +27,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 
-import java.lang.reflect.Method;
-
 public class SpongeViaInjector extends LegacyViaInjector {
 
     @Override
@@ -40,15 +38,7 @@ public class SpongeViaInjector extends LegacyViaInjector {
     @Override
     protected @Nullable Object getServerConnection() throws ReflectiveOperationException {
         Class<?> serverClazz = Class.forName("net.minecraft.server.MinecraftServer");
-        for (Method method : serverClazz.getDeclaredMethods()) {
-            if (method.getReturnType().getSimpleName().equals("NetworkSystem") && method.getParameterTypes().length == 0) {
-                Object connection = method.invoke(Sponge.server());
-                if (connection != null) {
-                    return connection;
-                }
-            }
-        }
-        return null;
+        return serverClazz.getDeclaredMethod("getConnection").invoke(Sponge.server());
     }
 
     @Override

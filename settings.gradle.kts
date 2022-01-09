@@ -38,7 +38,6 @@ setupViaSubproject("bukkit-legacy")
 setupViaSubproject("bungee")
 setupViaSubproject("velocity")
 setupViaSubproject("sponge")
-setupViaSubproject("sponge-legacy")
 setupViaSubproject("fabric")
 
 setupSubproject("viaversion") {

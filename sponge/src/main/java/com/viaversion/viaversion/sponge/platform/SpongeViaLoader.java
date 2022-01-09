@@ -18,21 +18,9 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.SpongePlugin;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.sponge.listeners.UpdateListener;
-import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.BlockListener;
-import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.DeathListener;
-import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.HandItemCache;
-import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge4.Sponge4ArmorListener;
-import com.viaversion.viaversion.sponge.listeners.protocol1_9to1_8.sponge5.Sponge5ArmorListener;
-import com.viaversion.viaversion.sponge.providers.SpongeViaMovementTransmitter;
 import org.spongepowered.api.Sponge;
 
 import java.util.HashSet;
@@ -50,7 +38,7 @@ public class SpongeViaLoader implements ViaPlatformLoader {
     }
 
     private void registerListener(Object listener) {
-        Sponge.getEventManager().registerListeners(plugin, storeListener(listener));
+        Sponge.eventManager().registerListeners(plugin.container(), storeListener(listener));
     }
 
     private <T> T storeListener(T listener) {
@@ -62,43 +50,11 @@ public class SpongeViaLoader implements ViaPlatformLoader {
     public void load() {
         // Update Listener
         registerListener(new UpdateListener());
-
-        /* 1.9 client to 1.8 server */
-        if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
-            try {
-                Class.forName("org.spongepowered.api.event.entity.DisplaceEntityEvent");
-                storeListener(new Sponge4ArmorListener()).register();
-            } catch (ClassNotFoundException e) {
-                storeListener(new Sponge5ArmorListener(plugin)).register();
-            }
-            storeListener(new DeathListener(plugin)).register();
-            storeListener(new BlockListener(plugin)).register();
-
-            if (plugin.getConf().isItemCache()) {
-                tasks.add(Via.getPlatform().runRepeatingSync(new HandItemCache(), 2L)); // Updates players items :)
-                HandItemCache.CACHE = true;
-            }
-        }
-
-        /* Providers */
-        if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
-            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new SpongeViaMovementTransmitter());
-
-            Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
-                @Override
-                public Item getHandItem(final UserConnection info) {
-                    if (HandItemCache.CACHE) {
-                        return HandItemCache.getHandItem(info.getProtocolInfo().getUuid());
-                    } else {
-                        return super.getHandItem(info);
-                    }
-                }
-            });
-        }
     }
 
+    @Override
     public void unload() {
-        listeners.forEach(Sponge.getEventManager()::unregisterListeners);
+        listeners.forEach(Sponge.eventManager()::unregisterListeners);
         listeners.clear();
         tasks.forEach(PlatformTask::cancel);
         tasks.clear();

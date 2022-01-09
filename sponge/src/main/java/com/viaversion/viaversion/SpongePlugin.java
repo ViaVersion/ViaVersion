@@ -26,37 +26,39 @@ import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import com.viaversion.viaversion.sponge.commands.SpongeCommandHandler;
-import com.viaversion.viaversion.sponge.commands.SpongeCommandSender;
-import com.viaversion.viaversion.sponge.platform.SpongeViaTask;
+import com.viaversion.viaversion.sponge.commands.SpongePlayer;
 import com.viaversion.viaversion.sponge.platform.SpongeViaAPI;
 import com.viaversion.viaversion.sponge.platform.SpongeViaConfig;
 import com.viaversion.viaversion.sponge.platform.SpongeViaInjector;
 import com.viaversion.viaversion.sponge.platform.SpongeViaLoader;
+import com.viaversion.viaversion.sponge.platform.SpongeViaTask;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
-import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
-import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
-import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 import org.spongepowered.plugin.metadata.PluginMetadata;
 import org.spongepowered.plugin.metadata.model.PluginContributor;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -64,40 +66,46 @@ import java.util.stream.Collectors;
 
 @Plugin("viaversion")
 public class SpongePlugin implements ViaPlatform<Player> {
-    @Inject
-    private Game game;
-    @Inject
-    private PluginContainer container;
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    private File spongeConfig;
 
-    public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character(ChatColorUtil.COLOR_CHAR).extractUrls().build();
+    public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.builder().extractUrls().build();
     private final SpongeViaAPI api = new SpongeViaAPI();
+    private final PluginContainer container;
+    private final Game game;
+    @SuppressWarnings("SpongeLogging")
+    private final Logger logger;
     private SpongeViaConfig conf;
-    private Logger logger;
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private Path configDir;
+
+    @SuppressWarnings("SpongeInjection")
+    @Inject
+    SpongePlugin(final PluginContainer container, final Game game, final org.apache.logging.log4j.Logger logger) {
+        this.container = container;
+        this.game = game;
+        this.logger = new LoggerWrapper(logger);
+    }
 
     @Listener
-    public void onGameStart(GameInitializationEvent event) {
-        // Setup Logger
-        logger = new LoggerWrapper(container.logger());
+    public void constructPlugin(ConstructPluginEvent event) {
         // Setup Plugin
-        conf = new SpongeViaConfig(container, spongeConfig.getParentFile());
-        SpongeCommandHandler commandHandler = new SpongeCommandHandler();
-        game.getCommandManager().register(this, commandHandler, "viaversion", "viaver", "vvsponge");
+        conf = new SpongeViaConfig(configDir.toFile());
         logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
                 .platform(this)
-                .commandHandler(commandHandler)
+                .commandHandler(new SpongeCommandHandler())
                 .injector(new SpongeViaInjector())
                 .loader(new SpongeViaLoader(this))
                 .build());
     }
 
     @Listener
-    public void onServerStart(GameAboutToStartServerEvent event) {
+    public void onServerStart(StartingEngineEvent<Server> event) {
+        // Can't use the command register event for raw commands...
+        Sponge.server().commandManager().registrar(Command.Raw.class).get().register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
+
         if (game.pluginManager().plugin("viabackwards").isPresent()) {
             MappingDataLoader.enableMappingsCache();
         }
@@ -108,7 +116,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Listener
-    public void onServerStop(StoppingEngineEvent<?> event) {
+    public void onServerStop(StoppingEngineEvent<Server> event) {
         ((ViaManagerImpl) Via.getManager()).destroy();
     }
 
@@ -119,80 +127,58 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public String getPlatformVersion() {
-        return readVersion(game.platform().container(Platform.Component.IMPLEMENTATION).metadata().version());
+        return game.platform().container(Platform.Component.IMPLEMENTATION).metadata().version().toString();
     }
 
     @Override
     public String getPluginVersion() {
-        return readVersion(container.metadata().version());
-    }
-
-    private static String readVersion(ArtifactVersion version) {
-        String qualifier = version.getQualifier();
-        qualifier = (qualifier == null || qualifier.isEmpty()) ? "" : "-" + qualifier;
-
-        return version.getMajorVersion() + "." + version.getMinorVersion() + "." + version.getIncrementalVersion() + qualifier;
+        return container.metadata().version().toString();
     }
 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
-        return new SpongeViaTask(
-                Task.builder()
-                        .execute(runnable)
-                        .async()
-                        .submit(this)
-        );
+        final Task task = Task.builder().plugin(container).execute(runnable).build();
+        return new SpongeViaTask(game.asyncScheduler().submit(task));
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable) {
-        return new SpongeViaTask(
-                Task.builder()
-                        .execute(runnable)
-                        .submit(this)
-        );
+        final Task task = Task.builder().plugin(container).execute(runnable).build();
+        return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new SpongeViaTask(
-                Task.builder()
-                        .execute(runnable)
-                        .delayTicks(ticks)
-                        .submit(this)
-        );
+        final Task task = Task.builder().plugin(container).execute(runnable).delay(Ticks.of(ticks)).build();
+        return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new SpongeViaTask(
-                Task.builder()
-                        .execute(runnable)
-                        .intervalTicks(ticks)
-                        .submit(this)
-        );
+        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(ticks)).build();
+        return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
     public ViaCommandSender[] getOnlinePlayers() {
-        ViaCommandSender[] array = new ViaCommandSender[game.server().onlinePlayers().size()];
+        Collection<ServerPlayer> players = game.server().onlinePlayers();
+        ViaCommandSender[] array = new ViaCommandSender[players.size()];
         int i = 0;
-        for (Player player : game.server().onlinePlayers()) {
-            array[i++] = new SpongeCommandSender(player);
+        for (ServerPlayer player : players) {
+            array[i++] = new SpongePlayer(player);
         }
         return array;
     }
 
     @Override
     public void sendMessage(UUID uuid, String message) {
-        String serialized = SpongePlugin.COMPONENT_SERIALIZER.serialize(SpongePlugin.COMPONENT_SERIALIZER.deserialize(message));
-        game.server().player(uuid).ifPresent(player -> player.sendMessage(TextSerializers.JSON.deserialize(serialized))); // Hacky way to fix links
+        game.server().player(uuid).ifPresent(player -> player.sendMessage(LEGACY_SERIALIZER.deserialize(message)));
     }
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
         return game.server().player(uuid).map(player -> {
-            player.kick(TextSerializers.formattingCode(ChatColorUtil.COLOR_CHAR).deserialize(message));
+            player.kick(LegacyComponentSerializer.legacySection().deserialize(message));
             return true;
         }).orElse(false);
     }
@@ -209,12 +195,12 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Override
     public File getDataFolder() {
-        return spongeConfig.getParentFile();
+        return configDir.toFile();
     }
 
     @Override
     public void onReload() {
-        getLogger().severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
+        logger.severe("ViaVersion is already loaded, this should work fine. If you get any console errors, try rebooting.");
     }
 
     @Override
@@ -222,14 +208,14 @@ public class SpongePlugin implements ViaPlatform<Player> {
         JsonObject platformSpecific = new JsonObject();
 
         List<PluginInfo> plugins = new ArrayList<>();
-        for (PluginContainer p : game.pluginManager().plugins()) {
-            PluginMetadata meta = p.metadata();
+        for (PluginContainer plugin : game.pluginManager().plugins()) {
+            PluginMetadata metadata = plugin.metadata();
             plugins.add(new PluginInfo(
                     true,
-                    meta.name().orElse("Unknown"),
-                    readVersion(meta.version()),
-                    p.instance() != null ? p.instance().getClass().getCanonicalName() : "Unknown",
-                    meta.contributors().stream().map(PluginContributor::name).collect(Collectors.toList())
+                    metadata.name().orElse("Unknown"),
+                    metadata.version().toString(),
+                    plugin.instance().getClass().getCanonicalName(),
+                    metadata.contributors().stream().map(PluginContributor::name).collect(Collectors.toList())
             ));
         }
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
@@ -257,7 +243,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
         return logger;
     }
 
-    public PluginContainer getPluginContainer() {
+    public PluginContainer container() {
         return container;
     }
 

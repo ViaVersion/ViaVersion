@@ -19,41 +19,34 @@ package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import net.kyori.adventure.identity.Identity;
-import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.UUID;
 
-public class SpongeCommandSender implements ViaCommandSender {
-    private final CommandCause source;
+public class SpongePlayer implements ViaCommandSender {
+    private final ServerPlayer player;
 
-    public SpongeCommandSender(CommandCause source) {
-        this.source = source;
+    public SpongePlayer(ServerPlayer player) {
+        this.player = player;
     }
 
     @Override
     public boolean hasPermission(String permission) {
-        return source.hasPermission(permission);
+        return player.hasPermission(permission);
     }
 
     @Override
     public void sendMessage(String msg) {
-        source.sendMessage(Identity.nil(), SpongePlugin.LEGACY_SERIALIZER.deserialize(msg));
+        player.sendMessage(SpongePlugin.LEGACY_SERIALIZER.deserialize(msg));
     }
 
     @Override
     public UUID getUUID() {
-        if (source instanceof Identifiable) {
-            return ((Identifiable) source).uniqueId();
-        } else {
-            return UUID.fromString(getName());
-        }
-
+        return player.uniqueId();
     }
 
     @Override
     public String getName() {
-        return source.friendlyIdentifier().orElse(source.identifier());
+        return player.friendlyIdentifier().orElse(player.identifier());
     }
 }

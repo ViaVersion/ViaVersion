@@ -22,7 +22,6 @@ import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +47,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
         blockConnectionMethod = getString("blockconnection-method", "packet");
-    }
-
-    @Override
-    public URL getDefaultConfigURL() {
-        return BukkitViaConfig.class.getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
     @Override
