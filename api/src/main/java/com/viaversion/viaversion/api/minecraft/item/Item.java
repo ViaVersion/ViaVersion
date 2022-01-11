@@ -87,4 +87,11 @@ public interface Item {
      * @param tag item tag
      */
     void setTag(@Nullable CompoundTag tag);
+
+    /**
+     * Returns a copy of the item.
+     *
+     * @return copy of the item
+     */
+    Item copy();
 }
