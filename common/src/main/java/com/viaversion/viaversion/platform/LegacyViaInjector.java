@@ -28,6 +28,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Field;
@@ -110,11 +111,22 @@ public abstract class LegacyViaInjector implements ViaInjector {
     public void uninject() throws ReflectiveOperationException {
         //TODO uninject connections
         for (ChannelFuture future : injectedFutures) {
-            List<String> names = future.channel().pipeline().names();
-            ChannelHandler bootstrapAcceptor = null;
+            // Default to first
+            ChannelPipeline pipeline = future.channel().pipeline();
+            ChannelHandler bootstrapAcceptor = pipeline.first();
+            if (bootstrapAcceptor == null) {
+                Via.getPlatform().getLogger().info("Empty pipeline, nothing to uninject");
+                continue;
+            }
+
             // Pick best
-            for (String name : names) {
-                ChannelHandler handler = future.channel().pipeline().get(name);
+            for (String name : pipeline.names()) {
+                ChannelHandler handler = pipeline.get(name);
+                if (handler == null) {
+                    Via.getPlatform().getLogger().warning("Could not get handler " + name);
+                    continue;
+                }
+
                 try {
                     if (ReflectionUtil.get(handler, "childHandler", ChannelInitializer.class) instanceof WrappedChannelInitializer) {
                         bootstrapAcceptor = handler;
@@ -122,11 +134,6 @@ public abstract class LegacyViaInjector implements ViaInjector {
                     }
                 } catch (ReflectiveOperationException ignored) {
                 }
-            }
-
-            if (bootstrapAcceptor == null) {
-                // Default to first
-                bootstrapAcceptor = future.channel().pipeline().first();
             }
 
             try {
