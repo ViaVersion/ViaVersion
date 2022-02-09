@@ -17,8 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_18_2to1_18;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -34,5 +40,37 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
         final TagRewriter tagRewriter = new TagRewriter(this);
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting");
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
+
+        registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Entity ID
+                map(Type.BOOLEAN); // Hardcore
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous Gamemode
+                map(Type.STRING_ARRAY); // World List
+                map(Type.NBT); // Registry
+                map(Type.NBT); // Current dimension data
+                handler(wrapper -> {
+                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag dimensionsHolder = registry.get("minecraft:dimension_type");
+                    final ListTag dimensions = dimensionsHolder.get("value");
+                    for (final Tag dimension : dimensions) {
+                        addTagPrefix(((CompoundTag) dimension).get("element"));
+                    }
+
+                    addTagPrefix(wrapper.get(Type.NBT, 1));
+                });
+            }
+        });
+
+    }
+
+    private void addTagPrefix(CompoundTag tag) {
+        final Tag infiniburnTag = tag.get("infiniburn");
+        if (infiniburnTag instanceof StringTag) {
+            final StringTag infiniburn = (StringTag) infiniburnTag;
+            infiniburn.setValue("#" + infiniburn.getValue());
+        }
     }
 }
