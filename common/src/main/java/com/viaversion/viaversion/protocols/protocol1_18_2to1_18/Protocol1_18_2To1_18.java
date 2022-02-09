@@ -64,6 +64,12 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
             }
         });
 
+        registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> addTagPrefix(wrapper.passthrough(Type.NBT)));
+            }
+        });
     }
 
     private void addTagPrefix(CompoundTag tag) {
