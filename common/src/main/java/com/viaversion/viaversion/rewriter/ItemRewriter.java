@@ -171,30 +171,6 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow1_17(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerServerbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // Window Id
-                map(Type.SHORT); // Slot
-                map(Type.BYTE); // Button
-                map(Type.VAR_INT); // Mode
-
-                handler(wrapper -> {
-                    // Affected items
-                    int length = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < length; i++) {
-                        wrapper.passthrough(Type.SHORT); // Slot
-                        handleItemToServer(wrapper.passthrough(type));
-                    }
-
-                    // Carried item
-                    handleItemToServer(wrapper.passthrough(type));
-                });
-            }
-        });
-    }
-
     public void registerClickWindow1_17_1(ServerboundPacketType packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override

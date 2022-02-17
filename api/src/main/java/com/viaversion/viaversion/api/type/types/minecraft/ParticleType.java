@@ -117,6 +117,12 @@ public class ParticleType extends Type<Particle> {
             }
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
+        public static final ParticleReader SCULK_CHARGE = (buf, particle) -> {
+            particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Roll
+        };
+        public static final ParticleReader SHRIEK = (buf, particle) -> {
+            particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Delay
+        };
     }
 
     public final class ParticleTypeFiller {
