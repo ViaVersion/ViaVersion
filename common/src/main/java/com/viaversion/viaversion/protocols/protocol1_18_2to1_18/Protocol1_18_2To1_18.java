@@ -41,6 +41,22 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting");
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
 
+        registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.BYTE, Type.VAR_INT); // Effect id
+            }
+        });
+
+        registerClientbound(ClientboundPackets1_18.REMOVE_ENTITY_EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.BYTE, Type.VAR_INT); // Effect id
+            }
+        });
+
         registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
