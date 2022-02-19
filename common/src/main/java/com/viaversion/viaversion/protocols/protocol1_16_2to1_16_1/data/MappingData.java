@@ -63,6 +63,6 @@ public class MappingData extends MappingDataBase {
     }
 
     public CompoundTag getDimensionRegistry() {
-        return dimensionRegistry;
+        return dimensionRegistry.clone();
     }
 }

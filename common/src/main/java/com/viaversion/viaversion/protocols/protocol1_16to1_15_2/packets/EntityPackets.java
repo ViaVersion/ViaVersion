@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class EntityPackets {
@@ -218,8 +219,8 @@ public class EntityPackets {
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 handler(wrapper -> {
                     wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
-                    wrapper.write(Type.STRING_ARRAY, WORLD_NAMES); // World list - only used for command completion
-                    wrapper.write(Type.NBT, DIMENSIONS_TAG); // Dimension registry
+                    wrapper.write(Type.STRING_ARRAY, Arrays.copyOf(WORLD_NAMES, WORLD_NAMES.length)); // World list - only used for command completion
+                    wrapper.write(Type.NBT, DIMENSIONS_TAG.clone()); // Dimension registry
                 });
                 handler(DIMENSION_HANDLER); // Dimension
                 map(Type.LONG); // Seed
