@@ -30,14 +30,11 @@ public final class ChatRewriter {
     public static final GsonComponentSerializer HOVER_GSON_SERIALIZER = GsonComponentSerializer.builder().emitLegacyHoverEvent().legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get()).build();
 
     public static String legacyTextToJsonString(String message, boolean itemData) {
-        Component component = Component.text(builder -> {
-            if (itemData) {
-                builder.decoration(TextDecoration.ITALIC, false);
-            }
-
-            // Not used for chat messages, so no need for url extraction
-            builder.append(LegacyComponentSerializer.legacySection().deserialize(message));
-        });
+        // Not used for chat messages, so no need for url extraction
+        Component component = LegacyComponentSerializer.legacySection().deserialize(message);
+        if (itemData) {
+            component = Component.text().decoration(TextDecoration.ITALIC, false).append(component).build();
+        }
         return GsonComponentSerializer.gson().serialize(component);
     }
 
