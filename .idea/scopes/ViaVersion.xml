@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="ViaVersion" pattern="com.viaversion.viaversion..*&amp;&amp;!src[viaversion-parent.viaversion-api*]:*..*" />
+</component>

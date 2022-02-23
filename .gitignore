@@ -18,6 +18,8 @@ hs_err_pid*
 
 # Ignore IDEA directory
 .idea/*
+!.idea/copyright/*
+!.idea/scopes/*
 
 # Include the project's dictionary
 !.idea/dictionaries/
