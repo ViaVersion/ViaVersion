@@ -67,6 +67,12 @@ public abstract class CommandRewriter {
         this.parserHandlers.put("minecraft:score_holder", wrapper -> {
             wrapper.passthrough(Type.BYTE); // Flags
         });
+        this.parserHandlers.put("minecraft:resource", wrapper -> {
+            wrapper.passthrough(Type.STRING); // Resource location
+        });
+        this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> {
+            wrapper.passthrough(Type.STRING); // Resource location/tag
+        });
     }
 
     public void handleArgument(PacketWrapper wrapper, String argumentType) throws Exception {
