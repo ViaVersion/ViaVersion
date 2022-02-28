@@ -86,6 +86,6 @@ public class EntityPackets {
             Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
             throw new NullPointerException("Dimension data for " + dimensionType + " is null!");
         }
-        return tag;
+        return tag.clone();
     }
 }
