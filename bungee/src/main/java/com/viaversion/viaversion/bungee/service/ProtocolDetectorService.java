@@ -22,9 +22,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +42,20 @@ public class ProtocolDetectorService implements Runnable {
     }
 
     public static Integer getProtocolId(String serverName) {
+
+        // Start omni
+        if(ProxyServer.getInstance().getPluginManager().getPlugin("MineProxy") != null) {
+            try {
+                Class<?> BungeeServer = Class.forName("us.omniverse.MineProxy.utils.BungeeServer");
+                Method m = BungeeServer.getMethod("getServerVersion", String.class);
+                m.setAccessible(true);
+                return (int)m.invoke(null, serverName);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // End omni
+
         // Step 1. Check Config
         Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
         Integer protocol = servers.get(serverName);

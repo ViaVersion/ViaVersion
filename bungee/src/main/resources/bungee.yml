@@ -3,3 +3,5 @@ main: com.viaversion.viaversion.BungeePlugin
 description: ${description}
 author: _MylesC, creeper123123321, Gerrygames, kennytv, Matsv
 version: ${version}
+depends:
+  - MineProxy

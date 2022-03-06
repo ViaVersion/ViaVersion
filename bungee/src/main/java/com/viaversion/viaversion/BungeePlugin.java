@@ -67,10 +67,11 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
             getLogger().warning("/_____________\\");
         }
 
+        getLogger().info("\n\n--------------\nOmniverse ViaVersion Fork has loaded\n--------------\n\n");
+
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
         BungeeCommandHandler commandHandler = new BungeeCommandHandler();
-        ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
