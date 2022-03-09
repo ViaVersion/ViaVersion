@@ -23,6 +23,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class ProtocolLibEnableListener implements Listener {
 
@@ -30,7 +32,7 @@ public class ProtocolLibEnableListener implements Listener {
     public void onPluginEnable(PluginEnableEvent e) {
         // Will likely never happen, but try to account for hacky plugin loading systems anyways
         if (e.getPlugin().getName().equals("ProtocolLib")) {
-            ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(true);
+            checkCompat(e.getPlugin());
         }
     }
 
@@ -39,5 +41,22 @@ public class ProtocolLibEnableListener implements Listener {
         if (e.getPlugin().getName().equals("ProtocolLib")) {
             ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(false);
         }
+    }
+
+    public static void checkCompat(@Nullable Plugin protocolLib) {
+        if (protocolLib != null) {
+            String version = protocolLib.getDescription().getVersion();
+            String majorVersion = version.split("\\.", 2)[0];
+            try {
+                // Only need the compat check for version < 5
+                if (Integer.parseInt(majorVersion) < 5) {
+                    ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(true);
+                    return;
+                }
+            } catch (NumberFormatException ignored) {
+                Via.getPlatform().getLogger().warning("ProtocolLib version check failed for version " + version);
+            }
+        }
+        ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(false);
     }
 }

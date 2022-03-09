@@ -89,8 +89,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public void onLoad() {
         // Via should load before PL, so we can't check for it in the constructor
-        boolean hasProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
-        ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(hasProtocolLib);
+        Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
+        ProtocolLibEnableListener.checkCompat(protocolLib);
 
         // Spigot detector
         try {
