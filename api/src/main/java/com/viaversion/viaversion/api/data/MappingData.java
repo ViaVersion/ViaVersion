@@ -103,5 +103,5 @@ public interface MappingData {
 
     @Nullable Mappings getStatisticsMappings();
 
-    @Nullable Mappings getArgumentTypeMappings();
+    @Nullable FullMappingData getArgumentTypeMappings();
 }

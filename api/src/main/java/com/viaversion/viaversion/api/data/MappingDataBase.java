@@ -44,13 +44,13 @@ public class MappingDataBase implements MappingData {
     protected final String newVersion;
     protected final boolean hasDiffFile;
     protected Int2IntBiMap itemMappings;
+    protected FullMappingData argumentTypeMappings;
     protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
-    protected Mappings argumentTypeMappings;
     protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
@@ -76,7 +76,12 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
-        argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
+
+        Mappings argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
+        if (argumentTypeMappings != null) {
+            this.argumentTypeMappings = new FullMappingDataBase(oldMappings.getAsJsonArray("argumenttypes"),
+                    newMappings.getAsJsonArray("argumenttypes"), argumentTypeMappings);
+        }
 
         Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
         if (particles != null) {
@@ -150,7 +155,7 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getNewParticleId(int id) {
-        return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
+        return checkValidity(id, particleMappings.mappings().getNewId(id), "particles");
     }
 
     @Override
@@ -194,7 +199,7 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public @Nullable Mappings getArgumentTypeMappings() {
+    public @Nullable FullMappingData getArgumentTypeMappings() {
         return argumentTypeMappings;
     }
 

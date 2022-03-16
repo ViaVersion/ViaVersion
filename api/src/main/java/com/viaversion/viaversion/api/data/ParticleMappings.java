@@ -25,49 +25,17 @@ package com.viaversion.viaversion.api.data;
 import com.google.gson.JsonArray;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
-public class ParticleMappings {
-    private final Object2IntMap<String> stringToId;
-    private final Object2IntMap<String> mappedStringToId;
-    private final Mappings mappings;
+public class ParticleMappings extends FullMappingDataBase {
     private final IntList itemParticleIds = new IntArrayList(2);
     private final IntList blockParticleIds = new IntArrayList(4);
 
     public ParticleMappings(JsonArray oldMappings, JsonArray newMappings, Mappings mappings) {
-        this.mappings = mappings;
-        stringToId = MappingDataLoader.arrayToMap(oldMappings);
-        mappedStringToId = MappingDataLoader.arrayToMap(newMappings);
-        stringToId.defaultReturnValue(-1);
-        mappedStringToId.defaultReturnValue(-1);
+        super(oldMappings, newMappings, mappings);
         addBlockParticle("block");
         addBlockParticle("falling_dust");
         addBlockParticle("block_marker");
         addItemParticle("item");
-    }
-
-    /**
-     * Returns the unmapped integer id for the given identifier, or -1 if not found.
-     *
-     * @param identifier unmapped string identifier
-     * @return unmapped int id, or -1 if not found
-     */
-    public int id(String identifier) {
-        return stringToId.getInt(identifier);
-    }
-
-    /**
-     * Returns the mapped integer id for the given mapped identifier, or -1 if not found.
-     *
-     * @param mappedIdentifier mapped string identifier
-     * @return mapped int id, or -1 if not found
-     */
-    public int mappedId(String mappedIdentifier) {
-        return mappedStringToId.getInt(mappedIdentifier);
-    }
-
-    public Mappings getMappings() {
-        return mappings;
     }
 
     public boolean addItemParticle(final String identifier) {

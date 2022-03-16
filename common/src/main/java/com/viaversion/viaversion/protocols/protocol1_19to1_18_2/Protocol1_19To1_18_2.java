@@ -19,6 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -30,7 +32,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
@@ -41,7 +42,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_17> {
 
-    public static final MappingData MAPPINGS = new MappingData();
+    public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19");
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -52,10 +53,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     @Override
     protected void registerPackets() {
         final TagRewriter tagRewriter = new TagRewriter(this);
-        /*tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting"); //TODO check if needed
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:fall_damage_resetting", "minecraft:sculk_replaceable",
-                "minecraft:ancient_city_replaceables", "minecraft:deepslate_blocks", "minecraft:sculk_replaceable_world_gen", "minecraft:skip_occlude_vibration_when_above");
-        tagRewriter.addEmptyTag(RegistryType.GAME_EVENT, "minecraft:warden_events_can_listen");*/
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
 
         entityRewriter.register();
@@ -88,7 +85,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
                         if (nodeType == 2) { // Argument node
                             final String argumentType = wrapper.read(Type.STRING);
-                            final int argumentTypeId = MAPPINGS.argumentTypeIds().getInt(argumentType.replace("minecraft:", ""));
+                            final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
                             if (argumentTypeId == -1) {
                                 Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
                             }
