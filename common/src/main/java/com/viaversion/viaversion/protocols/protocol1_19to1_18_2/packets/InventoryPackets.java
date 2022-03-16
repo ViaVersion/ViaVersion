@@ -17,11 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
@@ -38,11 +41,63 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
         registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
-        registerSpawnParticle(ClientboundPackets1_18.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT, Type.INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(Type.DOUBLE); // 2 - X
+                map(Type.DOUBLE); // 3 - Y
+                map(Type.DOUBLE); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
+                handler(getSpawnParticleHandler(Type.FLAT_VAR_INT_ITEM));
+            }
+        });
 
         registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
+        protocol.registerServerbound(ServerboundPackets1_17.PLAYER_DIGGING, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Action
+                map(Type.POSITION1_14); // Block position
+                map(Type.UNSIGNED_BYTE); // Direction
+                handler(sequenceHandler());
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_17.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Hand
+                map(Type.POSITION1_14); // Block position
+                map(Type.VAR_INT); // Direction
+                map(Type.FLOAT); // X
+                map(Type.FLOAT); // Y
+                map(Type.FLOAT); // Z
+                map(Type.BOOLEAN); // Inside
+                handler(sequenceHandler());
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_17.USE_ITEM, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Hand
+                handler(sequenceHandler());
+            }
+        });
+
         new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_18.DECLARE_RECIPES);
+    }
+
+    private PacketHandler sequenceHandler() {
+        return wrapper -> {
+            final int sequence = wrapper.read(Type.VAR_INT);
+            wrapper.user().get(SequenceStorage.class).setSequence(sequence);
+        };
     }
 }

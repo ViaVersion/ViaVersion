@@ -299,6 +299,25 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
+    public void registerSpawnParticle1_19(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(coordType); // 2 - X
+                map(coordType); // 3 - Y
+                map(coordType); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
+                handler(getSpawnParticleHandler(itemType));
+            }
+        });
+    }
+
     public PacketHandler getSpawnParticleHandler(Type<Item> itemType) {
         return wrapper -> {
             int id = wrapper.get(Type.INT, 0);

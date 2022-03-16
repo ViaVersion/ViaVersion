@@ -50,6 +50,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
+    protected Mappings argumentTypeMappings;
     protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
@@ -75,6 +76,7 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
+        argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
 
         Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
         if (particles != null) {
@@ -189,6 +191,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getStatisticsMappings() {
         return statisticsMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getArgumentTypeMappings() {
+        return argumentTypeMappings;
     }
 
     protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {

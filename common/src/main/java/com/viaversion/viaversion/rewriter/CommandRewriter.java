@@ -30,11 +30,11 @@ import java.util.Map;
 /**
  * Abstract rewriter for the declare commands packet to handle argument type name and content changes.
  */
-public abstract class CommandRewriter {
+public class CommandRewriter {
     protected final Protocol protocol;
     protected final Map<String, CommandArgumentConsumer> parserHandlers = new HashMap<>();
 
-    protected CommandRewriter(Protocol protocol) {
+    public CommandRewriter(Protocol protocol) {
         this.protocol = protocol;
 
         // Register default parsers

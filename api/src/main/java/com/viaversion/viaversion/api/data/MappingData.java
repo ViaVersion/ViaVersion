@@ -102,4 +102,6 @@ public interface MappingData {
     @Nullable Mappings getSoundMappings();
 
     @Nullable Mappings getStatisticsMappings();
+
+    @Nullable Mappings getArgumentTypeMappings();
 }

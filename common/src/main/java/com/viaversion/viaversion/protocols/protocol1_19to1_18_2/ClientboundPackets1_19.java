@@ -26,9 +26,10 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     SPAWN_MOB, // 0x02
     SPAWN_PAINTING, // 0x03
     SPAWN_PLAYER, // 0x04
+    ADD_VIBRATION_SIGNAL, // 0x05
     ENTITY_ANIMATION, // 0x06
     STATISTICS, // 0x07
-    ACKNOWLEDGE_PLAYER_DIGGING, // 0x08
+    BLOCK_CHANGED_ACK, // 0x08
     BLOCK_BREAK_ANIMATION, // 0x09
     BLOCK_ENTITY_DATA, // 0x0A
     BLOCK_ACTION, // 0x0B
