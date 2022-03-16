@@ -18,17 +18,17 @@
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 public final class InventoryAcknowledgements implements StorableObject {
-    private final IntSet ids = new IntOpenHashSet();
+    private final IntList ids = new IntArrayList();
 
     public void addId(int id) {
         ids.add(id);
     }
 
     public boolean removeId(int id) {
-        return ids.remove(id);
+        return ids.rem(id);
     }
 }
