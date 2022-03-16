@@ -44,7 +44,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
         protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.VAR_INT, Type.INT); // 0 - Particle ID
+                map(Type.INT, Type.VAR_INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
                 map(Type.DOUBLE); // 2 - X
                 map(Type.DOUBLE); // 3 - Y
