@@ -37,16 +37,17 @@ public class ConnectionManagerImpl implements ConnectionManager {
     @Override
     public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
-        connections.add(connection);
+        boolean newlyAdded = connections.add(connection);
 
         if (isFrontEnd(connection)) {
             UUID id = connection.getProtocolInfo().getUuid();
-            if (clients.put(id, connection) != null) {
+            UserConnection previous = clients.put(id, connection);
+            if (previous != null && previous != connection) {
                 Via.getPlatform().getLogger().warning("Duplicate UUID on frontend connection! (" + id + ")");
             }
         }
 
-        if (connection.getChannel() != null) {
+        if (newlyAdded && connection.getChannel() != null) {
             connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
         }
     }
