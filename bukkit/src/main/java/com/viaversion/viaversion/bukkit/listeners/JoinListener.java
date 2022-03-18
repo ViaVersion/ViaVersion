@@ -27,21 +27,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 
-public class LoginListener implements Listener {
+public class JoinListener implements Listener {
 
     private final Method getHandle;
     private final Field connection;
     private final Field networkManager;
     private final Field channel;
 
-    public LoginListener() {
+    public JoinListener() {
         try {
             getHandle = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
@@ -65,7 +65,7 @@ public class LoginListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onLogin(PlayerLoginEvent e) {
+    public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
         UserConnection user = getUserConnection(player);

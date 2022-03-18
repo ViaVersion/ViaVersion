@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
-import com.viaversion.viaversion.bukkit.listeners.LoginListener;
+import com.viaversion.viaversion.bukkit.listeners.JoinListener;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
@@ -82,7 +82,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         registerListener(new UpdateListener());
 
         // Login listener
-        registerListener(new LoginListener());
+        registerListener(new JoinListener());
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
