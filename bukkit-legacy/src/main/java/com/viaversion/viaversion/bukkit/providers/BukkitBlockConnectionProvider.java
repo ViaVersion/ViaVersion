@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.bukkit.providers;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 
 import java.util.UUID;
 
@@ -48,7 +48,7 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
     }
 
     public Chunk getChunk(World world, int x, int z) {
-        if (lastChunk != null && lastChunk.getX() == x && lastChunk.getZ() == z) {
+        if (lastChunk != null && lastChunk.getWorld().equals(world) && lastChunk.getX() == x && lastChunk.getZ() == z) {
             return lastChunk;
         }
         return lastChunk = world.getChunkAt(x, z);
