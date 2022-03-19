@@ -54,7 +54,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(Type.FLAT_VAR_INT_ITEM));
+                handler(getSpawnParticleHandler(Type.VAR_INT, Type.FLAT_VAR_INT_ITEM));
             }
         });
 

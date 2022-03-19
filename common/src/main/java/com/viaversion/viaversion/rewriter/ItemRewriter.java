@@ -313,27 +313,31 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(itemType));
+                handler(getSpawnParticleHandler(Type.VAR_INT, itemType));
             }
         });
     }
 
     public PacketHandler getSpawnParticleHandler(Type<Item> itemType) {
+        return getSpawnParticleHandler(Type.INT, itemType);
+    }
+
+    public PacketHandler getSpawnParticleHandler(Type<Integer> idType, Type<Item> itemType) {
         return wrapper -> {
-            int id = wrapper.get(Type.INT, 0);
+            int id = wrapper.get(idType, 0);
             if (id == -1) return;
 
             ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             if (mappings.isBlockParticle(id)) {
-                int data = wrapper.passthrough(Type.VAR_INT);
-                wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                int data = wrapper.read(Type.VAR_INT);
+                wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
             } else if (mappings.isItemParticle(id)) {
                 handleItemToClient(wrapper.passthrough(itemType));
             }
 
             int newId = protocol.getMappingData().getNewParticleId(id);
             if (newId != id) {
-                wrapper.set(Type.INT, 0, newId);
+                wrapper.set(idType, 0, newId);
             }
         };
     }
