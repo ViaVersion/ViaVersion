@@ -20,6 +20,7 @@ package com.viaversion.viaversion.connection;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -35,8 +36,13 @@ public class ConnectionManagerImpl implements ConnectionManager {
     protected final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
-    public synchronized void onLoginSuccess(UserConnection connection) {
+    public void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
+        Channel channel = connection.getChannel();
+
+        // This user has already disconnected...
+        if (channel != null && !channel.isOpen()) return;
+
         boolean newlyAdded = connections.add(connection);
 
         if (isFrontEnd(connection)) {
@@ -47,13 +53,19 @@ public class ConnectionManagerImpl implements ConnectionManager {
             }
         }
 
-        if (newlyAdded && connection.getChannel() != null) {
-            connection.getChannel().closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
+        if (channel != null) {
+            // We managed to add a user that had already disconnected!
+            // Let's clean up the mess here and now
+            if (!channel.isOpen()) {
+                onDisconnect(connection);
+            } else if (newlyAdded) { // Setup to clean-up on disconnect
+                channel.closeFuture().addListener((ChannelFutureListener) future -> onDisconnect(connection));
+            }
         }
     }
 
     @Override
-    public synchronized void onDisconnect(UserConnection connection) {
+    public void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
         connections.remove(connection);
 
