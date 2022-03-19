@@ -30,42 +30,57 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 public class JoinListener implements Listener {
 
-    private final Method getHandle;
-    private final Field connection;
-    private final Field networkManager;
-    private final Field channel;
+    private static final Method getHandle;
+    private static final Field connection;
+    private static final Field networkManager;
+    private static final Field channel;
+    private static final boolean enabled;
 
-    public JoinListener() {
+    static {
+        Method gh;
+        Field conn, nm, ch;
+        boolean en = true;
         try {
-            getHandle = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find CraftPlayer", e);
+            gh = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
+            conn = findField(gh.getReturnType(), "PlayerConnection");
+            nm = findField(conn.getType(), "NetworkManager");
+            ch = findField(nm.getType(), "Channel");
+        } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
+            en = false;
+            gh = null;
+            conn = nm = ch = null;
+
+            Via.getPlatform().getLogger().log(
+                    Level.WARNING,
+                    "Couldn't find reflection methods/fields to access Channel from player.\n" +
+                            "Login race condition fixer will be disabled.\n" +
+                            " Some plugins that use ViaAPI on join event may work incorrectly.", e);
         }
-        try {
-            connection = NMSUtil.nms("EntityPlayer").getDeclaredField("playerConnection");
-        } catch (NoSuchFieldException | ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find Player Connection", e);
+
+        getHandle = gh;
+        connection = conn;
+        networkManager = nm;
+        channel = ch;
+        enabled = en;
+    }
+
+    // Loosely search a field with any name, as long as it matches the type
+    private static Field findField(Class<?> cl, String type) throws NoSuchFieldException {
+        for (Field field : cl.getDeclaredFields()) {
+            if (field.getType().getSimpleName().equals(type))
+                return field;
         }
-        try {
-            networkManager = NMSUtil.nms("PlayerConnection").getDeclaredField("networkManager");
-        } catch (NoSuchFieldException | ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find Network Manager", e);
-        }
-        try {
-            channel = NMSUtil.nms("NetworkManager").getDeclaredField("channel");
-        } catch (NoSuchFieldException | ClassNotFoundException e) {
-            throw new RuntimeException("Couldn't find Channel", e);
-        }
+        throw new NoSuchFieldException(type);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
+        if (!enabled) return;
         Player player = e.getPlayer();
 
         UserConnection user = getUserConnection(player);
@@ -84,9 +99,10 @@ public class JoinListener implements Listener {
 
     private UserConnection getUserConnection(Player player) {
         Channel channel = getChannel(player);
-        if (channel == null) return null;
-        BukkitEncodeHandler encoder = channel.pipeline().get(BukkitEncodeHandler.class);
-        return encoder != null ? encoder.getInfo() : null;
+        BukkitEncodeHandler encoder;
+        if (channel != null && (encoder = channel.pipeline().get(BukkitEncodeHandler.class)) != null)
+            return encoder.getInfo();
+        return null;
     }
 
     private Channel getChannel(Player player) {
@@ -95,7 +111,7 @@ public class JoinListener implements Listener {
             Object pc = connection.get(entityPlayer);
             Object nm = networkManager.get(pc);
             return (Channel) channel.get(nm);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) { // Wildcard-catch everything
             e.printStackTrace();
         }
         return null;
