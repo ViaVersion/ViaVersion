@@ -53,7 +53,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     }
 
     @Override
-    public void onDisconnect(UserConnection connection) {
+    public synchronized void onDisconnect(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
         connections.remove(connection);
 
