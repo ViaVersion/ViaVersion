@@ -35,7 +35,7 @@ public class ConnectionManagerImpl implements ConnectionManager {
     protected final Set<UserConnection> connections = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
-    public void onLoginSuccess(UserConnection connection) {
+    public synchronized void onLoginSuccess(UserConnection connection) {
         Objects.requireNonNull(connection, "connection is null!");
         boolean newlyAdded = connections.add(connection);
 

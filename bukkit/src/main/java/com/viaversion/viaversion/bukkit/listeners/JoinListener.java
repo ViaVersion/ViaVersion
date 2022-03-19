@@ -35,38 +35,30 @@ import java.util.logging.Level;
 
 public class JoinListener implements Listener {
 
-    private static final Method getHandle;
-    private static final Field connection;
-    private static final Field networkManager;
-    private static final Field channel;
-    private static final boolean enabled;
+    private static final Method GET_HANDLE;
+    private static final Field CONNECTION;
+    private static final Field NETWORK_MANAGER;
+    private static final Field CHANNEL;
 
     static {
-        Method gh;
-        Field conn, nm, ch;
-        boolean en = true;
+        Method gh = null;
+        Field conn = null, nm = null, ch = null;
         try {
             gh = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
             conn = findField(gh.getReturnType(), "PlayerConnection");
             nm = findField(conn.getType(), "NetworkManager");
             ch = findField(nm.getType(), "Channel");
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
-            en = false;
-            gh = null;
-            conn = nm = ch = null;
-
             Via.getPlatform().getLogger().log(
                     Level.WARNING,
                     "Couldn't find reflection methods/fields to access Channel from player.\n" +
                             "Login race condition fixer will be disabled.\n" +
                             " Some plugins that use ViaAPI on join event may work incorrectly.", e);
         }
-
-        getHandle = gh;
-        connection = conn;
-        networkManager = nm;
-        channel = ch;
-        enabled = en;
+        GET_HANDLE = gh;
+        CONNECTION = conn;
+        NETWORK_MANAGER = nm;
+        CHANNEL = ch;
     }
 
     // Loosely search a field with any name, as long as it matches the type
@@ -80,37 +72,43 @@ public class JoinListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
-        if (!enabled) return;
+        if (CHANNEL == null) return;
         Player player = e.getPlayer();
 
-        UserConnection user = getUserConnection(player);
+        Channel channel = getChannel(player);
+        if (channel == null) {
+            Via.getPlatform().getLogger().log(Level.WARNING,
+                    "Could not find Channel for logging-in player {0}",
+                    player.getUniqueId());
+            return;
+        }
+        // The connection has already closed, that was a quick leave
+        if (!channel.isOpen()) return;
+
+        UserConnection user = getUserConnection(channel);
         if (user == null) {
             Via.getPlatform().getLogger().log(Level.WARNING,
                     "Could not find UserConnection for logging-in player {0}",
                     player.getUniqueId());
             return;
         }
-
         ProtocolInfo info = user.getProtocolInfo();
         info.setUuid(player.getUniqueId());
         info.setUsername(player.getName());
         Via.getManager().getConnectionManager().onLoginSuccess(user);
     }
 
-    private UserConnection getUserConnection(Player player) {
-        Channel channel = getChannel(player);
-        BukkitEncodeHandler encoder;
-        if (channel != null && (encoder = channel.pipeline().get(BukkitEncodeHandler.class)) != null)
-            return encoder.getInfo();
-        return null;
+    private UserConnection getUserConnection(Channel channel) {
+        BukkitEncodeHandler encoder = channel.pipeline().get(BukkitEncodeHandler.class);
+        return encoder != null ? encoder.getInfo() : null;
     }
 
     private Channel getChannel(Player player) {
         try {
-            Object entityPlayer = getHandle.invoke(player);
-            Object pc = connection.get(entityPlayer);
-            Object nm = networkManager.get(pc);
-            return (Channel) channel.get(nm);
+            Object entityPlayer = GET_HANDLE.invoke(player);
+            Object pc = CONNECTION.get(entityPlayer);
+            Object nm = NETWORK_MANAGER.get(pc);
+            return (Channel) CHANNEL.get(nm);
         } catch (Exception e) { // Wildcard-catch everything
             e.printStackTrace();
         }
