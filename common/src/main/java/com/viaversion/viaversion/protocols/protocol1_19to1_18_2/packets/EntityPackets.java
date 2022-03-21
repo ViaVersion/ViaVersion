@@ -43,17 +43,17 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
+        /*protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // Entity id
-                map(Type.BYTE); // Effect id
+                map(Type.VAR_INT); // Effect id
                 map(Type.BYTE); // Amplifier
                 map(Type.VAR_INT); // Duration
                 map(Type.BYTE); // Flags
                 create(Type.BOOLEAN, false); // No factor data
             }
-        });
+        });*/ // TODO experimental snapshot
 
         protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
             @Override
