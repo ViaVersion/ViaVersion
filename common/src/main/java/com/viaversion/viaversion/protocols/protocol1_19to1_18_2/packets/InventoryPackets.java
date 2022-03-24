@@ -61,6 +61,8 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
         registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
+        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
+
         protocol.registerServerbound(ServerboundPackets1_17.PLAYER_DIGGING, new PacketRemapper() {
             @Override
             public void registerMap() {

@@ -42,7 +42,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_17> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19");
+    public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19", true);
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -59,7 +59,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         itemRewriter.register();
         WorldPackets.register(this);
 
-        //cancelClientbound(ClientboundPackets1_18.ADD_VIBRATION_SIGNAL); //TODO experimental snapshot
+        cancelClientbound(ClientboundPackets1_18.ADD_VIBRATION_SIGNAL);
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
         soundRewriter.registerSound(ClientboundPackets1_18.SOUND);

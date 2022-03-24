@@ -58,7 +58,7 @@ public final class WorldPackets {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
                     final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
-                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
+                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                             MathUtil.ceilLog2(tracker.biomesSent()));
                     final Chunk chunk = wrapper.passthrough(chunkType);
                     for (final ChunkSection section : chunk.getSections()) {

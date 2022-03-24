@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -273,6 +274,23 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                         for (int array = 0; array < arrayLength; array++) {
                             wrapper.passthrough(Type.STRING_ARRAY); // String array
                         }
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerWindowPropertyEnchantmentHandler(ClientboundPacketType packetType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Container id
+                handler(wrapper -> {
+                    short property = wrapper.passthrough(Type.SHORT);
+                    if (property >= 4 && property <= 6) { // Enchantment id
+                        Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+                        short enchantmentId = (short) mappings.getNewId(wrapper.read(Type.SHORT));
+                        wrapper.write(Type.SHORT, enchantmentId);
                     }
                 });
             }

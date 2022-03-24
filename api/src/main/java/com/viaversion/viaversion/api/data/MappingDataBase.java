@@ -51,6 +51,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
+    protected Mappings enchantmentMappings;
     protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
@@ -76,6 +77,7 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
+        enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
 
         Mappings argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
         if (argumentTypeMappings != null) {
@@ -196,6 +198,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getStatisticsMappings() {
         return statisticsMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getEnchantmentMappings() {
+        return enchantmentMappings;
     }
 
     @Override
