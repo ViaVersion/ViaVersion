@@ -24,7 +24,10 @@ package com.viaversion.viaversion.api.data;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface FullMappingData {
+/**
+ * Mappings containing the full string identifier mappings.
+ */
+public interface FullMappings {
 
     Mappings mappings();
 

@@ -26,7 +26,7 @@ import com.google.gson.JsonArray;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
-public class ParticleMappings extends FullMappingDataBase {
+public class ParticleMappings extends FullMappingsBase {
     private final IntList itemParticleIds = new IntArrayList(2);
     private final IntList blockParticleIds = new IntArrayList(4);
 

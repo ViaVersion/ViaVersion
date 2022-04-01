@@ -24,6 +24,8 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.Int2IntMapMappings;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
@@ -41,8 +43,6 @@ import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
-    protected Int2IntMap typeMappings;
+    protected Mappings typeMappings;
 
     protected EntityRewriter(T protocol) {
         this(protocol, true);
@@ -167,7 +167,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     @Override
     public int newEntityId(int id) {
-        return typeMappings != null ? typeMappings.getOrDefault(id, id) : id;
+        return typeMappings != null ? typeMappings.getNewIdOrDefault(id, id) : id;
     }
 
     /**
@@ -184,10 +184,9 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     protected void mapEntityType(int id, int mappedId) {
         if (typeMappings == null) {
-            typeMappings = new Int2IntOpenHashMap();
-            typeMappings.defaultReturnValue(-1);
+            typeMappings = Int2IntMapMappings.of();
         }
-        typeMappings.put(id, mappedId);
+        typeMappings.setNewId(id, mappedId);
     }
 
     /**
@@ -199,20 +198,28 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      */
     public <E extends Enum<E> & EntityType> void mapTypes(EntityType[] oldTypes, Class<E> newTypeClass) {
         if (typeMappings == null) {
-            typeMappings = new Int2IntOpenHashMap(oldTypes.length, .99F);
-            typeMappings.defaultReturnValue(-1);
+            typeMappings = Int2IntMapMappings.of();
         }
         for (EntityType oldType : oldTypes) {
             try {
                 E newType = Enum.valueOf(newTypeClass, oldType.name());
-                typeMappings.put(oldType.getId(), newType.getId());
+                typeMappings.setNewId(oldType.getId(), newType.getId());
             } catch (IllegalArgumentException notFound) {
-                if (!typeMappings.containsKey(oldType.getId())) {
+                if (!typeMappings.contains(oldType.getId())) {
                     Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
                             "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
                 }
             }
         }
+    }
+
+    /**
+     * Maps entity ids based on the protocol's mapping data.
+     */
+    public void mapTypes() {
+        Preconditions.checkArgument(typeMappings == null, "Type mappings have already been set - manual type mappings should be set *after* this");
+        Preconditions.checkNotNull(protocol.getMappingData().getEntityMappings(), "Protocol does not have entity mappings");
+        typeMappings = protocol.getMappingData().getEntityMappings().mappings();
     }
 
     /**

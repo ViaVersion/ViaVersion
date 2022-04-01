@@ -44,7 +44,8 @@ public class MappingDataBase implements MappingData {
     protected final String newVersion;
     protected final boolean hasDiffFile;
     protected Int2IntBiMap itemMappings;
-    protected FullMappingData argumentTypeMappings;
+    protected FullMappings argumentTypeMappings;
+    protected FullMappings entityMappings;
     protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
@@ -81,11 +82,8 @@ public class MappingDataBase implements MappingData {
         enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
         paintingMappings = loadFromArray(oldMappings, newMappings, diffmapping, "paintings");
 
-        Mappings argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
-        if (argumentTypeMappings != null) {
-            this.argumentTypeMappings = new FullMappingDataBase(oldMappings.getAsJsonArray("argumenttypes"),
-                    newMappings.getAsJsonArray("argumenttypes"), argumentTypeMappings);
-        }
+        entityMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "entities");
+        argumentTypeMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "argumenttypes");
 
         Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
         if (particles != null) {
@@ -111,6 +109,11 @@ public class MappingDataBase implements MappingData {
         }
 
         loadExtras(oldMappings, newMappings, diffmapping);
+    }
+
+    protected FullMappings loadFullMappings(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+        Mappings mappings = loadFromArray(oldMappings, newMappings, diffMappings, key);
+        return mappings != null ? new FullMappingsBase(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), mappings) : null;
     }
 
     private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
@@ -208,7 +211,12 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public @Nullable FullMappingData getArgumentTypeMappings() {
+    public @Nullable FullMappings getEntityMappings() {
+        return entityMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getArgumentTypeMappings() {
         return argumentTypeMappings;
     }
 

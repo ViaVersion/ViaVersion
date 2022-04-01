@@ -279,6 +279,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 .reader("vibration", ParticleType.Readers.VIBRATION)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
+        Entity1_19Types.initialize(this);
+        entityRewriter.onMappingDataLoaded();
     }
 
     @Override

@@ -37,9 +37,9 @@ public class EntityTypeUtil {
      * @param values entity types
      * @return ordered array with each index representing the actual entity id
      */
-    public static EntityType[] toOrderedArray(EntityType[] values) {
-        List<EntityType> types = new ArrayList<>();
-        for (EntityType type : values) {
+    public static EntityType[] toOrderedArray(final EntityType[] values) {
+        final List<EntityType> types = new ArrayList<>();
+        for (final EntityType type : values) {
             if (type.getId() != -1) {
                 types.add(type);
             }
@@ -47,6 +47,24 @@ public class EntityTypeUtil {
 
         types.sort(Comparator.comparingInt(EntityType::getId));
         return types.toArray(new EntityType[0]);
+    }
+
+    public static EntityType[] createSizedArray(final EntityType[] values) {
+        int count = 0;
+        for (final EntityType type : values) {
+            if (!type.isAbstractType()) {
+                count++;
+            }
+        }
+        return new EntityType[(int) count];
+    }
+
+    public static void fill(final EntityType[] values, final EntityType[] toFill) {
+        for (final EntityType type : values) {
+            if (!type.isAbstractType()) {
+                toFill[type.getId()] = type;
+            }
+        }
     }
 
     /**
@@ -57,8 +75,8 @@ public class EntityTypeUtil {
      * @param fallback fallback/base entity type
      * @return entity type from id
      */
-    public static EntityType getTypeFromId(EntityType[] values, int typeId, EntityType fallback) {
-        EntityType type;
+    public static EntityType getTypeFromId(final EntityType[] values, final int typeId, final EntityType fallback) {
+        final EntityType type;
         if (typeId < 0 || typeId >= values.length || (type = values[typeId]) == null) {
             Via.getPlatform().getLogger().severe("Could not find " + fallback.getClass().getSimpleName() + " type id " + typeId);
             return fallback;

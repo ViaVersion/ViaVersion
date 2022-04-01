@@ -20,40 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.rewriter;
+package com.viaversion.viaversion.api.data;
 
-import com.viaversion.viaversion.api.protocol.Protocol;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
-    protected final T protocol;
+public class Int2IntMapMappings implements Mappings {
+    private final Int2IntMap mappings;
+    private final int mappedIds;
 
-    protected RewriterBase(T protocol) {
-        this.protocol = protocol;
+    protected Int2IntMapMappings(final Int2IntMap mappings, final int mappedIds) {
+        this.mappings = mappings;
+        this.mappedIds = mappedIds;
+        mappings.defaultReturnValue(-1);
+    }
+
+    public static Int2IntMapMappings of(final Int2IntMap mappings, final int mappedIds) {
+        return new Int2IntMapMappings(mappings, mappedIds);
+    }
+
+    public static Int2IntMapMappings of() {
+
+        return new Int2IntMapMappings(new Int2IntOpenHashMap(), -1);
     }
 
     @Override
-    public final void register() {
-        registerPackets();
-        registerRewrites();
-    }
-
-    /**
-     * To be overriden. Called when registering the rewriter.
-     */
-    protected void registerPackets() {
-    }
-
-    /**
-     * To be overriden. Called when registering the rewriter.
-     */
-    protected void registerRewrites() {
-    }
-
-    public void onMappingDataLoaded() {
+    public int getNewId(final int id) {
+        return mappings.get(id);
     }
 
     @Override
-    public T protocol() {
-        return protocol;
+    public void setNewId(final int id, final int newId) {
+        mappings.put(id, newId);
+    }
+
+    @Override
+    public int size() {
+        return mappings.size();
+    }
+
+    @Override
+    public int mappedSize() {
+        return mappedIds;
     }
 }

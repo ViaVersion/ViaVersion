@@ -26,14 +26,14 @@ import com.google.gson.JsonArray;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class FullMappingDataBase implements FullMappingData {
+public class FullMappingsBase implements FullMappings {
     private final Object2IntMap<String> stringToId;
     private final Object2IntMap<String> mappedStringToId;
     private final String[] idToString;
     private final String[] mappedIdToString;
     private final Mappings mappings;
 
-    public FullMappingDataBase(final JsonArray oldMappings, final JsonArray newMappings, final Mappings mappings) {
+    public FullMappingsBase(final JsonArray oldMappings, final JsonArray newMappings, final Mappings mappings) {
         this.mappings = mappings;
         stringToId = MappingDataLoader.arrayToMap(oldMappings);
         mappedStringToId = MappingDataLoader.arrayToMap(newMappings);
