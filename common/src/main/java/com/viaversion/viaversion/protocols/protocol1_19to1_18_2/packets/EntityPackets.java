@@ -141,6 +141,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
         });
 
         filter().type(Entity1_19Types.PLAYER).addIndex(19); // Last death location
+        filter().type(Entity1_19Types.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
     }
 
     @Override

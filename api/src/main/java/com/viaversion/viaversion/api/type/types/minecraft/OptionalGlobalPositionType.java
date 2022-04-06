@@ -20,20 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_19;
+import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import io.netty.buffer.ByteBuf;
 
-import java.util.List;
+public class OptionalGlobalPositionType extends Type<GlobalPosition> {
 
-public final class Types1_19 {
+    public OptionalGlobalPositionType() {
+        super(GlobalPosition.class);
+    }
 
-    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
-    public static final MetaTypes1_19 META_TYPES = new MetaTypes1_19(PARTICLE);
-    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
+    @Override
+    public GlobalPosition read(ByteBuf buffer) throws Exception {
+        boolean present = buffer.readBoolean();
+        return present ? Type.OPTIONAL_GLOBAL_POSITION.read(buffer) : null;
+    }
+
+    @Override
+    public void write(ByteBuf buffer, GlobalPosition object) throws Exception {
+        buffer.writeBoolean(object != null);
+        if (object != null) {
+            Type.OPTIONAL_GLOBAL_POSITION.write(buffer, object);
+        }
+    }
 }
