@@ -80,7 +80,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_17_1 = register(756, "1.17.1");
     public static final ProtocolVersion v1_18 = register(757, "1.18/1.18.1", new VersionRange("1.18", 0, 1));
     public static final ProtocolVersion v1_18_2 = register(758, "1.18.2");
-    public static final ProtocolVersion v1_19 = register(759, 76, "1.19");
+    public static final ProtocolVersion v1_19 = register(759, 78, "1.19");
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
     public static ProtocolVersion register(int version, String name) {

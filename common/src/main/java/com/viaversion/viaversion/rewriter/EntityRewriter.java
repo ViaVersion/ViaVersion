@@ -271,6 +271,32 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
+    public void registerTrackerWithData1_19(ClientboundPacketType packetType, EntityType fallingBlockType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Yaw
+                map(Type.BYTE); // Head yaw
+                map(Type.VAR_INT); // Data
+                handler(trackerHandler());
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == fallingBlockType) {
+                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
+                    }
+                });
+            }
+        });
+    }
+
     /**
      * Registers an entity tracker for the extra spawn packets like player, painting, or xp orb spawns.
      *
@@ -362,6 +388,13 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     public PacketHandler trackerHandler() {
         return trackerAndRewriterHandler(null);
+    }
+
+    public PacketHandler playerTrackerHandler() {
+        return wrapper -> {
+            final EntityTracker tracker = tracker(wrapper.user());
+            tracker.addEntity(wrapper.get(Type.INT, 0), tracker.playerType());
+        };
     }
 
     /**

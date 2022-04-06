@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -37,11 +38,53 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_18.SPAWN_ENTITY, Entity1_19Types.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_18.SPAWN_MOB);
         registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, Entity1_19Types.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Yaw
+                create(Type.BYTE, (byte) 0); // Head yaw (moved over from mob spawn packet)
+                map(Type.INT, Type.VAR_INT); // Data
+                handler(trackerHandler());
+                handler(wrapper -> {
+                    final int entityId = wrapper.get(Type.VAR_INT, 0);
+                    final EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == Entity1_19Types.FALLING_BLOCK) {
+                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
+                    }
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity ID
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity Type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Yaw
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Head yaw
+                create(Type.VAR_INT, 0); // Data
+                map(Type.SHORT); // Velocity x
+                map(Type.SHORT); // Velocity y
+                map(Type.SHORT); // Velocity z
+                handler(trackerHandler());
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
             @Override
@@ -70,6 +113,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.VAR_INT); // Max players
                 map(Type.VAR_INT); // Chunk radius
                 map(Type.VAR_INT); // Simulation distance
+                handler(playerTrackerHandler());
                 handler(worldDataTrackerHandler(1));
                 handler(biomeSizeTracker());
             }
@@ -90,11 +134,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, Types1_19.META_TYPES.particleType);
 
-        filter().filterFamily(Entity1_17Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(Entity1_19Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
+
+        filter().type(Entity1_19Types.PLAYER).addIndex(19); // Last death location
     }
 
     @Override

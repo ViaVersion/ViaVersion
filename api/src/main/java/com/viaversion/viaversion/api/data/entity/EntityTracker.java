@@ -151,4 +151,6 @@ public interface EntityTracker {
     int biomesSent();
 
     void setBiomesSent(int biomesSent);
+
+    EntityType playerType();
 }

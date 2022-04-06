@@ -157,4 +157,9 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     public void setBiomesSent(int biomesSent) {
         this.biomesSent = biomesSent;
     }
+
+    @Override
+    public EntityType playerType() {
+        return playerType;
+    }
 }

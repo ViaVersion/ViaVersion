@@ -62,8 +62,45 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         cancelClientbound(ClientboundPackets1_18.ADD_VIBRATION_SIGNAL);
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
-        soundRewriter.registerSound(ClientboundPackets1_18.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_18.ENTITY_SOUND);
+        registerClientbound(ClientboundPackets1_18.SOUND, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Sound id
+                map(Type.VAR_INT); // Source
+                map(Type.INT); // X
+                map(Type.INT); // Y
+                map(Type.INT); // Z
+                map(Type.FLOAT); // Volume
+                map(Type.FLOAT); // Pitch
+                create(Type.LONG, 0L); // Seed
+                handler(soundRewriter.getSoundHandler());
+            }
+        });
+        registerClientbound(ClientboundPackets1_18.ENTITY_SOUND, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Sound id
+                map(Type.VAR_INT); // Source
+                map(Type.VAR_INT); // Entity id
+                map(Type.FLOAT); // Volume
+                map(Type.FLOAT); // Pitch
+                create(Type.LONG, 0L); // Seed
+                handler(soundRewriter.getSoundHandler());
+            }
+        });
+        registerClientbound(ClientboundPackets1_18.NAMED_SOUND, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Sound name
+                map(Type.VAR_INT); // Source
+                map(Type.INT); // X
+                map(Type.INT); // Y
+                map(Type.INT); // Z
+                map(Type.FLOAT); // Volume
+                map(Type.FLOAT); // Pitch
+                create(Type.LONG, 0L); // Seed
+            }
+        });
 
         final CommandRewriter commandRewriter = new CommandRewriter(this);
         registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, new PacketRemapper() {
