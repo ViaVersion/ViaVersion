@@ -22,6 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
@@ -34,15 +37,25 @@ public class OptionalGlobalPositionType extends Type<GlobalPosition> {
 
     @Override
     public GlobalPosition read(ByteBuf buffer) throws Exception {
-        boolean present = buffer.readBoolean();
-        return present ? Type.OPTIONAL_GLOBAL_POSITION.read(buffer) : null;
+        if (buffer.readBoolean()) {
+            // ♨︎_♨︎
+            final CompoundTag compound = Type.NBT.read(buffer);
+            final String dimension = (String) compound.get("dimension").getValue();
+            final IntArrayTag positionFields = compound.get("pos");
+            return new GlobalPosition(dimension, positionFields.getValue(0), positionFields.getValue(1), positionFields.getValue(2));
+        }
+        return null;
     }
 
     @Override
     public void write(ByteBuf buffer, GlobalPosition object) throws Exception {
         buffer.writeBoolean(object != null);
         if (object != null) {
-            Type.OPTIONAL_GLOBAL_POSITION.write(buffer, object);
+            final CompoundTag compound = new CompoundTag();
+            compound.put("dimension", new StringTag(object.dimension()));
+            final int[] positionFields = {object.x(), object.y(), object.z()};
+            compound.put("pos", new IntArrayTag(positionFields));
+            Type.NBT.write(buffer, compound);
         }
     }
 }
