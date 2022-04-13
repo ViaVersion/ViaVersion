@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
@@ -67,6 +68,27 @@ public final class WorldPackets {
                             final int id = blockPalette.idByIndex(i);
                             blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
                         }
+                    }
+                });
+            }
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_17.SET_BEACON_EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Primary effect
+                    if (wrapper.read(Type.BOOLEAN)) {
+                        wrapper.passthrough(Type.VAR_INT);
+                    } else {
+                        wrapper.write(Type.VAR_INT, -1);
+                    }
+
+                    // Secondary effect
+                    if (wrapper.read(Type.BOOLEAN)) {
+                        wrapper.passthrough(Type.VAR_INT);
+                    } else {
+                        wrapper.write(Type.VAR_INT, -1);
                     }
                 });
             }
