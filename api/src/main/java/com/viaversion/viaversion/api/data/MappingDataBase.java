@@ -52,6 +52,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
     protected Mappings enchantmentMappings;
+    protected Mappings paintingMappings;
     protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
@@ -78,6 +79,7 @@ public class MappingDataBase implements MappingData {
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
         enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
+        paintingMappings = loadFromArray(oldMappings, newMappings, diffmapping, "paintings");
 
         Mappings argumentTypeMappings = loadFromArray(oldMappings, newMappings, diffmapping, "argumenttypes");
         if (argumentTypeMappings != null) {
@@ -208,6 +210,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable FullMappingData getArgumentTypeMappings() {
         return argumentTypeMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getPaintingMappings() {
+        return paintingMappings;
     }
 
     protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {

@@ -106,4 +106,6 @@ public interface MappingData {
     @Nullable Mappings getEnchantmentMappings();
 
     @Nullable FullMappingData getArgumentTypeMappings();
+
+    @Nullable Mappings getPaintingMappings();
 }

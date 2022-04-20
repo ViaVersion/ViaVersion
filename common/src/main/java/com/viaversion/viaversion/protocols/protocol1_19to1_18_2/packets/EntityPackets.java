@@ -17,9 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.Position3d;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
@@ -27,7 +31,11 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.util.PaintingOffsetUtil;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
@@ -62,6 +70,43 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     if (entityType == Entity1_19Types.FALLING_BLOCK) {
                         wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
                     }
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                create(Type.VAR_INT, Entity1_19Types.PAINTING.getId());
+                handler(wrapper -> {
+                    final int motive = wrapper.read(Type.VAR_INT);
+                    final Position blockPosition = wrapper.read(Type.POSITION1_14);
+                    final byte direction = wrapper.read(Type.BYTE);
+
+                    final Position3d position = PaintingOffsetUtil.fixOffset(blockPosition, motive, direction); //TODO no worky? teleportation needed...?
+                    wrapper.write(Type.DOUBLE, position.x());
+                    wrapper.write(Type.DOUBLE, position.y());
+                    wrapper.write(Type.DOUBLE, position.z());
+                    wrapper.write(Type.BYTE, (byte) 0); // Pitch
+                    wrapper.write(Type.BYTE, (byte) 0); // Yaw
+                    wrapper.write(Type.BYTE, (byte) 0); // Head yaw
+                    wrapper.write(Type.VAR_INT, to3dId(direction)); // Data
+                    wrapper.write(Type.SHORT, (short) 0); // Velocity x
+                    wrapper.write(Type.SHORT, (short) 0); // Velocity y
+                    wrapper.write(Type.SHORT, (short) 0); // Velocity z
+
+                    wrapper.send(Protocol1_19To1_18_2.class);
+                    wrapper.cancel();
+
+                    // Send motive in metadata
+                    final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.ENTITY_METADATA);
+                    metaPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0)); // Entity id
+                    final List<Metadata> metadata = new ArrayList<>();
+                    metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewId(motive)));
+                    metaPacket.write(Types1_19.METADATA_LIST, metadata);
+                    metaPacket.send(Protocol1_19To1_18_2.class);
                 });
             }
         });
@@ -126,6 +171,22 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 handler(worldDataTrackerHandler(0));
             }
         });
+    }
+
+    private static int to3dId(final int id) {
+        switch (id) {
+            case -1: // Both up and down
+                return 1; // Up
+            case 2: // North
+                return 2;
+            case 0: // South
+                return 3;
+            case 1: // West
+                return 4;
+            case 3: // East
+                return 5;
+        }
+        throw new IllegalArgumentException("Unknown 2d id: " + id);
     }
 
     @Override

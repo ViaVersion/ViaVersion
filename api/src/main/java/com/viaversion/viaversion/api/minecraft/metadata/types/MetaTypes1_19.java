@@ -50,9 +50,10 @@ public final class MetaTypes1_19 extends AbstractMetaTypes {
     public final MetaType catVariantType = add(19, Type.VAR_INT);
     public final MetaType frogVariantType = add(20, Type.VAR_INT);
     public final MetaType optionalGlobalPosition = add(21, Type.OPTIONAL_GLOBAL_POSITION);
+    public final MetaType paintingVariantType = add(22, Type.VAR_INT);
 
     public MetaTypes1_19(final ParticleType particleType) {
-        super(22);
+        super(23);
         this.particleType = add(15, particleType);
     }
 }
