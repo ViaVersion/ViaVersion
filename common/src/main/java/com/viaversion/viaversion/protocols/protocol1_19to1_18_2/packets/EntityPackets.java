@@ -85,7 +85,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     final Position blockPosition = wrapper.read(Type.POSITION1_14);
                     final byte direction = wrapper.read(Type.BYTE);
 
-                    final Position3d position = PaintingOffsetUtil.fixOffset(blockPosition, motive, direction); //TODO no worky? teleportation needed...?
+                    final Position3d position = PaintingOffsetUtil.fixOffset(blockPosition, motive, direction); //TODO currently broken on servers; can probably remove the offsetting
                     wrapper.write(Type.DOUBLE, position.x());
                     wrapper.write(Type.DOUBLE, position.y());
                     wrapper.write(Type.DOUBLE, position.z());
