@@ -52,6 +52,15 @@ public interface StoredEntityData {
     @Nullable <T> T get(Class<T> objectClass);
 
     /**
+     * Removes and returns an object from the storage if present.
+     *
+     * @param objectClass class of the object to remove
+     * @param <T>         object type
+     * @return removed object if present
+     */
+    @Nullable <T> T remove(Class<T> objectClass);
+
+    /**
      * Stores an object based on its class.
      *
      * @param object object to store
