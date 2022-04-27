@@ -94,6 +94,11 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
+    public <T extends StorableObject> @Nullable T remove(Class<T> objectClass) {
+        return (T) storedObjects.remove(objectClass);
+    }
+
+    @Override
     public void put(StorableObject object) {
         storedObjects.put(object.getClass(), object);
     }

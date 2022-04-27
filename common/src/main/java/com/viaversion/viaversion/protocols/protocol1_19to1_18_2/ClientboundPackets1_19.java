@@ -33,7 +33,6 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     BLOCK_CHANGE, // 0x09
     BOSSBAR, // 0x0A
     SERVER_DIFFICULTY, // 0x0B
-    CHAT_MESSAGE, // 0x0C
     CLEAR_TITLES, // 0x0D
     TAB_COMPLETE, // 0x0E
     DECLARE_COMMANDS, // 0x0F
@@ -69,6 +68,7 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     PING, // 0x2D
     CRAFT_RECIPE_RESPONSE, // 0x2E
     PLAYER_ABILITIES, // 0x2F
+    PLAYER_CHAT,
     COMBAT_END, // 0x30
     COMBAT_ENTER, // 0x31
     COMBAT_KILL, // 0x32
@@ -113,6 +113,7 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     ENTITY_SOUND, // 0x59
     SOUND, // 0x5A
     STOP_SOUND, // 0x5B
+    SYSTEM_CHAT,
     TAB_LIST, // 0x5C
     NBT_QUERY, // 0x5D
     COLLECT_ITEM, // 0x5E

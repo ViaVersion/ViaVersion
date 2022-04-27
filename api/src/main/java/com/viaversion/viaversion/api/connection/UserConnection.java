@@ -59,6 +59,15 @@ public interface UserConnection {
     boolean has(Class<? extends StorableObject> objectClass);
 
     /**
+     * Removes and returns an object from the storage.
+     *
+     * @param objectClass class of the object to get
+     * @param <T>         type of the class you want to get
+     * @return removed storable object if present
+     */
+    @Nullable <T extends StorableObject> T remove(Class<T> objectClass);
+
+    /**
      * Put an object into the stored objects based on class.
      *
      * @param object The object to store.
