@@ -84,9 +84,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Transform string to int array
+                    // Transform string to a uuid
                     UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
-                    wrapper.write(Type.UUID_INT_ARRAY, uuid);
+                    wrapper.write(Type.UUID, uuid);
                 });
             }
         });

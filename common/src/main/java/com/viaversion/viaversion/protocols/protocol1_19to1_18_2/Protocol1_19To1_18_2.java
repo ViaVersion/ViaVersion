@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2;
 
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -55,9 +54,7 @@ import java.security.spec.X509EncodedKeySpec;
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_17> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19", true);
-    private static final JsonObject EMPTY_COMPONENT = new JsonObject();
     private static final KeyFactory RSA_FACTORY;
-
 
     static {
         try {
@@ -65,10 +62,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         } catch (final NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        EMPTY_COMPONENT.addProperty("text", "");
     }
 
-    private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -191,7 +186,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.UUID_INT_ARRAY, Type.UUID); // UUID
+                map(Type.UUID); // UUID
                 map(Type.STRING); // Name
                 handler(wrapper -> {
                     // No properties

@@ -33,42 +33,42 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     BLOCK_CHANGE, // 0x09
     BOSSBAR, // 0x0A
     SERVER_DIFFICULTY, // 0x0B
-    CLEAR_TITLES, // 0x0D
-    TAB_COMPLETE, // 0x0E
-    DECLARE_COMMANDS, // 0x0F
-    CLOSE_WINDOW, // 0x10
-    WINDOW_ITEMS, // 0x11
-    WINDOW_PROPERTY, // 0x12
-    SET_SLOT, // 0x13
-    COOLDOWN, // 0x14
-    PLUGIN_MESSAGE, // 0x15
-    NAMED_SOUND, // 0x16
-    DISCONNECT, // 0x17
-    ENTITY_STATUS, // 0x18
-    EXPLOSION, // 0x19
-    UNLOAD_CHUNK, // 0x1A
-    GAME_EVENT, // 0x1B
-    OPEN_HORSE_WINDOW, // 0x1C
-    WORLD_BORDER_INIT, // 0x1D
-    KEEP_ALIVE, // 0x1E
-    CHUNK_DATA, // 0x1F
-    EFFECT, // 0x20
-    SPAWN_PARTICLE, // 0x21
-    UPDATE_LIGHT, // 0x22
-    JOIN_GAME, // 0x23
-    MAP_DATA, // 0x24
-    TRADE_LIST, // 0x25
-    ENTITY_POSITION, // 0x26
-    ENTITY_POSITION_AND_ROTATION, // 0x27
-    ENTITY_ROTATION, // 0x28
-    VEHICLE_MOVE, // 0x29
-    OPEN_BOOK, // 0x2A
-    OPEN_WINDOW, // 0x2B
-    OPEN_SIGN_EDITOR, // 0x2C
-    PING, // 0x2D
-    CRAFT_RECIPE_RESPONSE, // 0x2E
-    PLAYER_ABILITIES, // 0x2F
-    PLAYER_CHAT,
+    CLEAR_TITLES, // 0x0C
+    TAB_COMPLETE, // 0x0D
+    DECLARE_COMMANDS, // 0x0E
+    CLOSE_WINDOW, // 0x0F
+    WINDOW_ITEMS, // 0x10
+    WINDOW_PROPERTY, // 0x11
+    SET_SLOT, // 0x12
+    COOLDOWN, // 0x13
+    PLUGIN_MESSAGE, // 0x14
+    NAMED_SOUND, // 0x15
+    DISCONNECT, // 0x16
+    ENTITY_STATUS, // 0x17
+    EXPLOSION, // 0x18
+    UNLOAD_CHUNK, // 0x19
+    GAME_EVENT, // 0x1A
+    OPEN_HORSE_WINDOW, // 0x1B
+    WORLD_BORDER_INIT, // 0x1C
+    KEEP_ALIVE, // 0x1D
+    CHUNK_DATA, // 0x1E
+    EFFECT, // 0x1F
+    SPAWN_PARTICLE, // 0x20
+    UPDATE_LIGHT, // 0x21
+    JOIN_GAME, // 0x22
+    MAP_DATA, // 0x23
+    TRADE_LIST, // 0x24
+    ENTITY_POSITION, // 0x25
+    ENTITY_POSITION_AND_ROTATION, // 0x26
+    ENTITY_ROTATION, // 0x27
+    VEHICLE_MOVE, // 0x28
+    OPEN_BOOK, // 0x29
+    OPEN_WINDOW, // 0x2A
+    OPEN_SIGN_EDITOR, // 0x2B
+    PING, // 0x2C
+    CRAFT_RECIPE_RESPONSE, // 0x2D
+    PLAYER_ABILITIES, // 0x2E
+    PLAYER_CHAT, // 0x2F
     COMBAT_END, // 0x30
     COMBAT_ENTER, // 0x31
     COMBAT_KILL, // 0x32
@@ -113,16 +113,16 @@ public enum ClientboundPackets1_19 implements ClientboundPacketType {
     ENTITY_SOUND, // 0x59
     SOUND, // 0x5A
     STOP_SOUND, // 0x5B
-    SYSTEM_CHAT,
-    TAB_LIST, // 0x5C
-    NBT_QUERY, // 0x5D
-    COLLECT_ITEM, // 0x5E
-    ENTITY_TELEPORT, // 0x5F
-    ADVANCEMENTS, // 0x60
-    ENTITY_PROPERTIES, // 0x61
-    ENTITY_EFFECT, // 0x62
-    DECLARE_RECIPES, // 0x63
-    TAGS; // 0x64
+    SYSTEM_CHAT, // 0x5C
+    TAB_LIST, // 0x5D
+    NBT_QUERY, // 0x5E
+    COLLECT_ITEM, // 0x5F
+    ENTITY_TELEPORT, // 0x60
+    ADVANCEMENTS, // 0x61
+    ENTITY_PROPERTIES, // 0x62
+    ENTITY_EFFECT, // 0x63
+    DECLARE_RECIPES, // 0x64
+    TAGS; // 0x65
 
     @Override
     public int getId() {

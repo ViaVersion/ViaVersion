@@ -26,6 +26,6 @@ public class BaseProtocol1_16 extends BaseProtocol1_7 {
 
     @Override
     protected UUID passthroughLoginUUID(final PacketWrapper wrapper) throws Exception {
-        return wrapper.passthrough(Type.UUID_INT_ARRAY);
+        return wrapper.passthrough(Type.UUID);
     }
 }
