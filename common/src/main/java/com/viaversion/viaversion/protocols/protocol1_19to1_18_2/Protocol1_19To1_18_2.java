@@ -51,7 +51,7 @@ import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_17> {
+public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19", true);
     private static final KeyFactory RSA_FACTORY;
@@ -68,7 +68,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
     public Protocol1_19To1_18_2() {
-        super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
+        super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_19.class);
     }
 
     @Override
@@ -167,18 +167,36 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 map(Type.COMPONENT); // Message
-                map(Type.BYTE); // Type
+                map(Type.BYTE, Type.VAR_INT); // Type
                 read(Type.UUID); // Sender
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CHAT_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
-                read(Type.LONG); // Timestamp
                 map(Type.STRING); // Message
+                read(Type.LONG); // Timestamp
                 read(Type.LONG); // Salt
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+            }
+        });
+        registerServerbound(ServerboundPackets1_19.CHAT_COMMAND, ServerboundPackets1_17.CHAT_MESSAGE, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Command
+                read(Type.LONG); // Timestamp
+                read(Type.LONG); // Salt
+                handler(wrapper -> {
+                    final String command = wrapper.get(Type.STRING, 0);
+                    wrapper.set(Type.STRING, 0, "/" + command);
+
+                    final int signatures = wrapper.read(Type.VAR_INT);
+                    for (int i = 0; i < signatures; i++) {
+                        wrapper.read(Type.STRING); // Argument name
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                    }
+                });
             }
         });
 
