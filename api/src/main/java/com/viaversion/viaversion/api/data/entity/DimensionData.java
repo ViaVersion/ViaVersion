@@ -20,33 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.data.entity;
 
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+public interface DimensionData {
 
-public class OptionalGlobalPositionType extends Type<GlobalPosition> {
+    int minY();
 
-    public OptionalGlobalPositionType() {
-        super(GlobalPosition.class);
-    }
-
-    @Override
-    public GlobalPosition read(ByteBuf buffer) throws Exception {
-        if (buffer.readBoolean()) {
-            final String dimension = Type.STRING.read(buffer);
-            return Type.POSITION1_14.read(buffer).withDimension(dimension);
-        }
-        return null;
-    }
-
-    @Override
-    public void write(ByteBuf buffer, GlobalPosition object) throws Exception {
-        buffer.writeBoolean(object != null);
-        if (object != null) {
-            Type.STRING.write(buffer, object.dimension());
-            Type.POSITION1_14.write(buffer, object);
-        }
-    }
+    int height();
 }

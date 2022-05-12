@@ -17,27 +17,104 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.Position3d;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
+import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.util.PaintingOffsetUtil;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
+
+    private static final String CHAT_REGISTRY_SNBT = "{\n" +
+            "   \"minecraft:chat_type\":{\n" +
+            "      \"type\":\"minecraft:chat_type\",\n" +
+            "      \"value\":[\n" +
+            "         {\n" +
+            "            \"name\":\"minecraft:chat\",\n" +
+            "            \"id\":0,\n" +
+            "            \"element\":{\n" +
+            "               \"chat\":{\n" +
+            "                  \"decoration\":{\n" +
+            "                     \"translation_key\":\"chat.type.text\",\n" +
+            "                     \"style\":{\n" +
+            "                        \n" +
+            "                     },\n" +
+            "                     \"parameters\":[\n" +
+            "                        \"sender\",\n" +
+            "                        \"content\"\n" +
+            "                     ]\n" +
+            "                  }\n" +
+            "               },\n" +
+            "               \"narration\":{\n" +
+            "                  \"priority\":\"chat\",\n" +
+            "                  \"decoration\":{\n" +
+            "                     \"translation_key\":\"chat.type.text.narrate\",\n" +
+            "                     \"style\":{\n" +
+            "                        \n" +
+            "                     },\n" +
+            "                     \"parameters\":[\n" +
+            "                        \"sender\",\n" +
+            "                        \"content\"\n" +
+            "                     ]\n" +
+            "                  }\n" +
+            "               }\n" +
+            "            }\n" +
+            "         },\n" +
+            "         {\n" +
+            "            \"name\":\"minecraft:system\",\n" +
+            "            \"id\":1,\n" +
+            "            \"element\":{\n" +
+            "               \"chat\":{\n" +
+            "                  \n" +
+            "               },\n" +
+            "               \"narration\":{\n" +
+            "                  \"priority\":\"system\"\n" +
+            "               }\n" +
+            "            }\n" +
+            "         },\n" +
+            "         {\n" +
+            "            \"name\":\"minecraft:game_info\",\n" +
+            "            \"id\":2,\n" +
+            "            \"element\":{\n" +
+            "               \"overlay\":{\n" +
+            "                  \n" +
+            "               }\n" +
+            "            }\n" +
+            "         },\n" +
+            "      ]\n" +
+            "   },\n" +
+            "}";
+    private static final CompoundTag CHAT_REGISTRY;
+
+    static {
+        try {
+            CHAT_REGISTRY = BinaryTagIO.readString(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public EntityPackets(final Protocol1_19To1_18_2 protocol) {
         super(protocol);
@@ -84,11 +161,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     final int motive = wrapper.read(Type.VAR_INT);
                     final Position blockPosition = wrapper.read(Type.POSITION1_14);
                     final byte direction = wrapper.read(Type.BYTE);
-
-                    final Position3d position = PaintingOffsetUtil.fixOffset(blockPosition, motive, direction); //TODO currently broken on servers; can probably remove the offsetting
-                    wrapper.write(Type.DOUBLE, position.x());
-                    wrapper.write(Type.DOUBLE, position.y());
-                    wrapper.write(Type.DOUBLE, position.z());
+                    wrapper.write(Type.DOUBLE, blockPosition.x() + 0.5d);
+                    wrapper.write(Type.DOUBLE, blockPosition.y() + 0.5d);
+                    wrapper.write(Type.DOUBLE, blockPosition.z() + 0.5d);
                     wrapper.write(Type.BYTE, (byte) 0); // Pitch
                     wrapper.write(Type.BYTE, (byte) 0); // Yaw
                     wrapper.write(Type.BYTE, (byte) 0); // Head yaw
@@ -152,23 +227,45 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NBT); // Registry
-                map(Type.NBT); // Current dimension data
+                handler(wrapper -> {
+                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
+
+                    // Add necessary chat types
+                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+
+                    // Cache a whole lot of data
+                    final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
+                    final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
+                    final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
+                    for (final Tag dimension : dimensions) {
+                        final CompoundTag dimensionCompound = (CompoundTag) dimension;
+                        final CompoundTag element = dimensionCompound.get("element");
+                        final String name = (String) dimensionCompound.get("name").getValue();
+                        dimensionDataMap.put(name, new DimensionDataImpl(element));
+                        dimensionsMap.put(element, name);
+                    }
+                    tracker(wrapper.user()).setDimensions(dimensionDataMap);
+
+                    final DimensionRegistryStorage registryStorage = wrapper.user().get(DimensionRegistryStorage.class);
+                    registryStorage.setDimensions(dimensionsMap);
+                    writeDimensionKey(wrapper, registryStorage);
+                });
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
                 map(Type.VAR_INT); // Max players
                 map(Type.VAR_INT); // Chunk radius
                 map(Type.VAR_INT); // Simulation distance
                 handler(playerTrackerHandler());
-                handler(worldDataTrackerHandler(1));
+                handler(worldDataTrackerHandlerByKey());
                 handler(biomeSizeTracker());
             }
         });
         protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.NBT); // Current dimension data
+                handler(wrapper -> writeDimensionKey(wrapper, wrapper.user().get(DimensionRegistryStorage.class)));
                 map(Type.STRING); // World
-                handler(worldDataTrackerHandler(0));
+                handler(worldDataTrackerHandlerByKey());
             }
         });
 
@@ -211,6 +308,17 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 });
             }
         });
+    }
+
+    private static void writeDimensionKey(PacketWrapper wrapper, DimensionRegistryStorage registryStorage) throws Exception {
+        // Find dimension key by data
+        final CompoundTag currentDimension = wrapper.read(Type.NBT);
+        final String dimensionKey = registryStorage.dimensionKey(currentDimension);
+        if (dimensionKey == null) {
+            throw new IllegalArgumentException("Unknown dimension sent on join: " + currentDimension);
+        }
+
+        wrapper.write(Type.STRING, dimensionKey);
     }
 
     private static int to3dId(final int id) {

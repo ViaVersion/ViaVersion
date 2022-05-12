@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -423,6 +424,28 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             } else {
                 Via.getPlatform().getLogger().warning("Min Y missing in dimension data: " + registryData);
             }
+
+            String world = wrapper.get(Type.STRING, 0);
+            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+                tracker.clearEntities();
+            }
+            tracker.setCurrentWorld(world);
+        };
+    }
+
+    public PacketHandler worldDataTrackerHandlerByKey() {
+        return wrapper -> {
+            EntityTracker tracker = tracker(wrapper.user());
+            String key = wrapper.get(Type.STRING, 0);
+            DimensionData dimensionData = tracker.dimensionData(key);
+            if (dimensionData == null) {
+                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + key + ", falling back to overworld");
+                dimensionData = tracker.dimensionData("minecraft:overworld");
+                Preconditions.checkNotNull(dimensionData, "Overworld data missing");
+            }
+
+            tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
+            tracker.setCurrentMinY(dimensionData.minY());
 
             String world = wrapper.get(Type.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {

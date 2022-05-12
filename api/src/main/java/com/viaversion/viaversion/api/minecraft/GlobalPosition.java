@@ -22,29 +22,12 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public final class GlobalPosition {
+public final class GlobalPosition extends Position {
     private final String dimension;
-    private final int x;
-    private final int y;
-    private final int z;
 
     public GlobalPosition(final String dimension, final int x, final int y, final int z) {
+        super(x, y, z);
         this.dimension = dimension;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public int x() {
-        return x;
-    }
-
-    public int y() {
-        return y;
-    }
-
-    public int z() {
-        return z;
     }
 
     public String dimension() {

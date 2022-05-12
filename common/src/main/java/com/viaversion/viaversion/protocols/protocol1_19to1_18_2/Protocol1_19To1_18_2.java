@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
@@ -179,6 +180,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 read(Type.LONG); // Timestamp
                 read(Type.LONG); // Salt
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                read(Type.BOOLEAN); // Signed preview
             }
         });
         registerServerbound(ServerboundPackets1_19.CHAT_COMMAND, ServerboundPackets1_17.CHAT_MESSAGE, new PacketRemapper() {
@@ -199,6 +201,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+        cancelServerbound(ServerboundPackets1_19.CHAT_PREVIEW);
 
         // Login changes
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketRemapper() {
@@ -206,10 +209,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.UUID); // UUID
                 map(Type.STRING); // Name
-                handler(wrapper -> {
-                    // No properties
-                    wrapper.write(Type.VAR_INT, 0);
-                });
+                create(Type.VAR_INT, 0); // No properties
             }
         });
 
@@ -217,11 +217,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 map(Type.STRING); // Server id
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Public key
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Nonce
                 handler(wrapper -> {
-                    final byte[] pubKey = wrapper.get(Type.BYTE_ARRAY_PRIMITIVE, 0);
-                    final byte[] nonce = wrapper.get(Type.BYTE_ARRAY_PRIMITIVE, 1);
+                    final byte[] pubKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     final EncodedKeySpec keySpec = new X509EncodedKeySpec(pubKey);
                     final PublicKey key = RSA_FACTORY.generatePublic(keySpec);
                     final Cipher cipher = Cipher.getInstance(key.getAlgorithm());
@@ -236,9 +234,10 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.STRING); // Name
                 handler(wrapper -> {
-                    // Read the public key
                     if (wrapper.read(Type.BOOLEAN)) {
-                        wrapper.read(Type.NBT);
+                        wrapper.read(Type.LONG); // Timestamp
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Key
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
                     }
                 });
             }
@@ -285,6 +284,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection user) {
         user.put(new SequenceStorage());
+        user.put(new DimensionRegistryStorage());
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
     }
 

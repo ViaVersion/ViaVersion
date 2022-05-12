@@ -26,6 +26,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Map;
+
 public interface EntityTracker {
 
     /**
@@ -153,4 +155,8 @@ public interface EntityTracker {
     void setBiomesSent(int biomesSent);
 
     EntityType playerType();
+
+    @Nullable DimensionData dimensionData(String dimension);
+
+    void setDimensions(Map<String, DimensionData> dimensions);
 }

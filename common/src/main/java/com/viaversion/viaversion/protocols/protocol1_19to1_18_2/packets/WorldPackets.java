@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -58,6 +59,8 @@ public final class WorldPackets {
             public void registerMap() {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+                    Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
+                    Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
                     final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
                             MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                             MathUtil.ceilLog2(tracker.biomesSent()));
