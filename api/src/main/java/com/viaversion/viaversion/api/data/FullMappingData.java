@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface FullMappingData {
 
     Mappings mappings();
@@ -41,4 +43,28 @@ public interface FullMappingData {
      * @return mapped int id, or -1 if not found
      */
     int mappedId(String mappedIdentifier);
+
+    /**
+     * Returns the unmapped string identifier for the given mapped id.
+     *
+     * @param id unmapped id
+     * @return unmapped string identifier
+     */
+    String identifier(int id);
+
+    /**
+     * Returns the mapped string identifier for the given mapped id.
+     *
+     * @param mappedId mapped id
+     * @return mapped string identifier
+     */
+    String mappedIdentifier(int mappedId);
+
+    /**
+     * Returns the mapped string identifier for the given unmapped identifier.
+     *
+     * @param identifier unmapped identifier
+     * @return mapped string identifier, or null if not found
+     */
+    @Nullable String mappedIdentifier(String identifier);
 }

@@ -112,7 +112,6 @@
     "257": "minecraft:flowering_azalea_leaves[distance=6,persistent=false,waterlogged=false]",
     "258": "minecraft:flowering_azalea_leaves[distance=7,persistent=true,waterlogged=false]",
     "259": "minecraft:flowering_azalea_leaves[distance=7,persistent=false,waterlogged=false]",
-
     "1416": "minecraft:piston_head[type=normal,facing=north,short=true]",
     "1417": "minecraft:piston_head[type=sticky,facing=north,short=true]",
     "1418": "minecraft:piston_head[type=normal,facing=north,short=false]",

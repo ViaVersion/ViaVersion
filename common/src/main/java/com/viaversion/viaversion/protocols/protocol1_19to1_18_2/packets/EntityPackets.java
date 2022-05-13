@@ -47,6 +47,7 @@ import java.util.Map;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
+    //TODO move to compressed nbt file
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
             "   \"minecraft:chat_type\":{\n" +
             "      \"type\":\"minecraft:chat_type\",\n" +

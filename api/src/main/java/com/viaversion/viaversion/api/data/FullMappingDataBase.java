@@ -24,10 +24,13 @@ package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonArray;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class FullMappingDataBase implements FullMappingData {
     private final Object2IntMap<String> stringToId;
     private final Object2IntMap<String> mappedStringToId;
+    private final String[] idToString;
+    private final String[] mappedIdToString;
     private final Mappings mappings;
 
     public FullMappingDataBase(final JsonArray oldMappings, final JsonArray newMappings, final Mappings mappings) {
@@ -36,6 +39,16 @@ public class FullMappingDataBase implements FullMappingData {
         mappedStringToId = MappingDataLoader.arrayToMap(newMappings);
         stringToId.defaultReturnValue(-1);
         mappedStringToId.defaultReturnValue(-1);
+
+        idToString = new String[oldMappings.size()];
+        for (int i = 0; i < oldMappings.size(); i++) {
+            idToString[i] = oldMappings.get(i).getAsString();
+        }
+
+        mappedIdToString = new String[newMappings.size()];
+        for (int i = 0; i < newMappings.size(); i++) {
+            mappedIdToString[i] = newMappings.get(i).getAsString();
+        }
     }
 
     @Override
@@ -51,5 +64,26 @@ public class FullMappingDataBase implements FullMappingData {
     @Override
     public int mappedId(final String mappedIdentifier) {
         return mappedStringToId.getInt(mappedIdentifier);
+    }
+
+    @Override
+    public String identifier(final int id) {
+        return idToString[id];
+    }
+
+    @Override
+    public String mappedIdentifier(final int mappedId) {
+        return mappedIdToString[mappedId];
+    }
+
+    @Override
+    public @Nullable String mappedIdentifier(final String identifier) {
+        final int id = id(identifier);
+        if (id == -1) {
+            return null;
+        }
+
+        final int mappedId = mappings.getNewId(id);
+        return mappedId != -1 ? mappedIdentifier(mappedId) : null;
     }
 }
