@@ -170,7 +170,7 @@ public class CommandRewriter {
      * @return new argument type, or null if it should be removed
      */
     public @Nullable String handleArgumentType(String argumentType) {
-        if (protocol.getMappingData().getArgumentTypeMappings() != null) {
+        if (protocol.getMappingData() != null && protocol.getMappingData().getArgumentTypeMappings() != null) {
             return protocol.getMappingData().getArgumentTypeMappings().mappedIdentifier(argumentType);
         }
         return argumentType;
