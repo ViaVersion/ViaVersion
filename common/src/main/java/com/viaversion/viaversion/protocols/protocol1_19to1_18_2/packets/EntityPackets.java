@@ -18,11 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -138,7 +138,10 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.DOUBLE); // Z
                 map(Type.BYTE); // Pitch
                 map(Type.BYTE); // Yaw
-                create(Type.BYTE, (byte) 0); // Head yaw (moved over from mob spawn packet)
+                handler(wrapper -> {
+                    final byte yaw = wrapper.get(Type.BYTE, 1);
+                    wrapper.write(Type.BYTE, yaw); // Head yaw
+                });
                 map(Type.INT, Type.VAR_INT); // Data
                 handler(trackerHandler());
                 handler(wrapper -> {
@@ -240,6 +243,8 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     for (final Tag dimension : dimensions) {
                         final CompoundTag dimensionCompound = (CompoundTag) dimension;
                         final CompoundTag element = dimensionCompound.get("element");
+                        addMonsterSpawnData(element);
+
                         final String name = (String) dimensionCompound.get("name").getValue();
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
                         dimensionsMap.put(element, name);
@@ -258,6 +263,12 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 handler(playerTrackerHandler());
                 handler(worldDataTrackerHandlerByKey());
                 handler(biomeSizeTracker());
+                handler(wrapper -> {
+                    // Disable the chat preview
+                    final PacketWrapper displayPreviewPacket = wrapper.create(ClientboundPackets1_19.SET_DISPLAY_CHAT_PREVIEW);
+                    displayPreviewPacket.write(Type.BOOLEAN, false);
+                    displayPreviewPacket.send(Protocol1_19To1_18_2.class);
+                });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
@@ -313,6 +324,8 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
     private static void writeDimensionKey(PacketWrapper wrapper, DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Type.NBT);
+        addMonsterSpawnData(currentDimension);
+
         final String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
             throw new IllegalArgumentException("Unknown dimension sent on join: " + currentDimension);
@@ -335,6 +348,12 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 return 5;
         }
         throw new IllegalArgumentException("Unknown 2d id: " + id);
+    }
+
+    private static void addMonsterSpawnData(final CompoundTag dimension) {
+        // The actual values here don't matter
+        dimension.put("monster_spawn_block_light_limit", new IntTag(0));
+        dimension.put("monster_spawn_light_level", new IntTag(11));
     }
 
     @Override

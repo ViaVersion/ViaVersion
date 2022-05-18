@@ -199,6 +199,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                         wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
                     }
                 });
+                read(Type.BOOLEAN); // Signed preview
             }
         });
         cancelServerbound(ServerboundPackets1_19.CHAT_PREVIEW);
