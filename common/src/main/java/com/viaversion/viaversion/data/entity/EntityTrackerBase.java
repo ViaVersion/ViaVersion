@@ -124,6 +124,15 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
+    public boolean trackClientEntity() {
+        if (clientEntityId != -1) {
+            entityTypes.put(clientEntityId, playerType);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int currentWorldSectionHeight() {
         return currentWorldSectionHeight;
     }

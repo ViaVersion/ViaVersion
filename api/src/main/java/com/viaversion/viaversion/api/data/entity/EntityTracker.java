@@ -159,4 +159,12 @@ public interface EntityTracker {
     @Nullable DimensionData dimensionData(String dimension);
 
     void setDimensions(Map<String, DimensionData> dimensions);
+
+    /**
+     * Adds the client player entity to the tracker.
+     * If the client entity has not been set yet, this will return false.
+     *
+     * @return whether the client has been tracked
+     */
+    boolean trackClientEntity();
 }

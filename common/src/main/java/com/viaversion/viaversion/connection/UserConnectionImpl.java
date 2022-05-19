@@ -126,6 +126,7 @@ public class UserConnectionImpl implements UserConnection {
             storedObjects.values().removeIf(StorableObject::clearOnServerSwitch);
             for (EntityTracker tracker : entityTrackers.values()) {
                 tracker.clearEntities();
+                tracker.trackClientEntity();
             }
         } else {
             storedObjects.clear();

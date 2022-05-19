@@ -401,7 +401,11 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     public PacketHandler playerTrackerHandler() {
         return wrapper -> {
             final EntityTracker tracker = tracker(wrapper.user());
-            tracker.addEntity(wrapper.get(Type.INT, 0), tracker.playerType());
+            final int entityId = wrapper.get(Type.INT, 0);
+            if (tracker.clientEntityId() == -1) {
+                tracker.setClientEntityId(entityId);
+            }
+            tracker.addEntity(entityId, tracker.playerType());
         };
     }
 
@@ -435,6 +439,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             String world = wrapper.get(Type.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
+                tracker.trackClientEntity();
             }
             tracker.setCurrentWorld(world);
         };
@@ -457,6 +462,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             String world = wrapper.get(Type.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
+                tracker.trackClientEntity();
             }
             tracker.setCurrentWorld(world);
         };
