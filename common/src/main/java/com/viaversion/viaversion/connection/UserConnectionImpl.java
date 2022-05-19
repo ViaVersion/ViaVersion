@@ -115,13 +115,22 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker) {
-        entityTrackers.put(protocolClass, tracker);
+        if (!entityTrackers.containsKey(protocolClass)) {
+            entityTrackers.put(protocolClass, tracker);
+        }
     }
 
     @Override
-    public void clearStoredObjects() {
-        storedObjects.clear();
-        entityTrackers.clear();
+    public void clearStoredObjects(boolean isServerSwitch) {
+        if (isServerSwitch) {
+            storedObjects.values().removeIf(StorableObject::clearOnServerSwitch);
+            for (EntityTracker tracker : entityTrackers.values()) {
+                tracker.clearEntities();
+            }
+        } else {
+            storedObjects.clear();
+            entityTrackers.clear();
+        }
     }
 
     @Override

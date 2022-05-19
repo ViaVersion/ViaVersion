@@ -184,7 +184,7 @@ public class BungeeServerHandler implements Listener {
                     // Refresh the pipes
                     List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
                     ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
-                    user.clearStoredObjects();
+                    user.clearStoredObjects(true);
                     pipeline.cleanPipes();
                     if (protocolPath == null) {
                         // TODO Check Bungee Supported Protocols? *shrugs*

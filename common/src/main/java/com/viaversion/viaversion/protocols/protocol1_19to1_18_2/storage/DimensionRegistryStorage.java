@@ -34,4 +34,9 @@ public final class DimensionRegistryStorage implements StorableObject {
     public void setDimensions(final Map<CompoundTag, String> dimensions) {
         this.dimensions = dimensions;
     }
+
+    @Override
+    public boolean clearOnServerSwitch() {
+        return false;
+    }
 }

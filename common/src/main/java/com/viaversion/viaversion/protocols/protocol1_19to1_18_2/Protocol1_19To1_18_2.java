@@ -287,7 +287,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection user) {
         user.put(new SequenceStorage());
-        user.put(new DimensionRegistryStorage());
+        if (!user.has(DimensionRegistryStorage.class)) {
+            user.put(new DimensionRegistryStorage());
+        }
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
     }
 
