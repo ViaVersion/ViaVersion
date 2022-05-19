@@ -159,8 +159,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             public void registerMap() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
-                create(Type.VAR_INT, Entity1_19Types.PAINTING.getId());
                 handler(wrapper -> {
+                    wrapper.write(Type.VAR_INT, Entity1_19Types.PAINTING.getId());
+
                     final int motive = wrapper.read(Type.VAR_INT);
                     final Position blockPosition = wrapper.read(Type.POSITION1_14);
                     final byte direction = wrapper.read(Type.BYTE);

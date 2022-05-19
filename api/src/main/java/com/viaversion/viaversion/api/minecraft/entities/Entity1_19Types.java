@@ -228,7 +228,7 @@ public enum Entity1_19Types implements EntityType {
     private static final EntityType[] TYPES = EntityTypeUtil.createSizedArray(values());
     private final EntityType parent;
     private final String identifier;
-    private int id;
+    private int id = -1;
 
     Entity1_19Types(final EntityType parent) {
         this.parent = parent;
@@ -243,7 +243,7 @@ public enum Entity1_19Types implements EntityType {
     @Override
     public int getId() {
         if (id == -1) {
-            throw new IllegalStateException("Ids have not been initialized yet");
+            throw new IllegalStateException("Ids have not been initialized yet (type " + name() + ")");
         }
         return id;
     }
