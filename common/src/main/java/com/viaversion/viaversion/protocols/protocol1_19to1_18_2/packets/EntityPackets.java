@@ -199,8 +199,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.DOUBLE); // X
                 map(Type.DOUBLE); // Y
                 map(Type.DOUBLE); // Z
-                map(Type.BYTE); // Yaw
-                map(Type.BYTE); // Pitch
+                handler(wrapper -> {
+                    // Change order
+                    final byte yaw = wrapper.read(Type.BYTE);
+                    final byte pitch = wrapper.read(Type.BYTE);
+                    wrapper.write(Type.BYTE, pitch);
+                    wrapper.write(Type.BYTE, yaw);
+                });
                 map(Type.BYTE); // Head yaw
                 create(Type.VAR_INT, 0); // Data
                 map(Type.SHORT); // Velocity x
