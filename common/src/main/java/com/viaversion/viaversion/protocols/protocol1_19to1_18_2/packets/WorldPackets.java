@@ -27,10 +27,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.MathUtil;
 
@@ -43,16 +41,7 @@ public final class WorldPackets {
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_18.EFFECT, 1010, 2001);
 
-        protocol.registerClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING, ClientboundPackets1_19.BLOCK_CHANGED_ACK, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                read(Type.POSITION1_14);
-                read(Type.VAR_INT);
-                read(Type.VAR_INT);
-                read(Type.BOOLEAN);
-                handler(wrapper -> wrapper.write(Type.VAR_INT, wrapper.user().get(SequenceStorage.class).sequence()));
-            }
-        });
+        protocol.cancelClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, new PacketRemapper() {
             @Override

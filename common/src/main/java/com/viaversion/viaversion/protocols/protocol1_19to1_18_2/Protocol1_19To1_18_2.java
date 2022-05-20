@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.NonceStorage;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -286,7 +285,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection user) {
-        user.put(new SequenceStorage());
         if (!user.has(DimensionRegistryStorage.class)) {
             user.put(new DimensionRegistryStorage());
         }

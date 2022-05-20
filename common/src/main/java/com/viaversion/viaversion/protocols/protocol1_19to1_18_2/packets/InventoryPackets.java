@@ -17,14 +17,15 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
@@ -98,8 +99,14 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
 
     private PacketHandler sequenceHandler() {
         return wrapper -> {
+            // Manually send and follow up with an acknowledgement
             final int sequence = wrapper.read(Type.VAR_INT);
-            wrapper.user().get(SequenceStorage.class).setSequence(sequence);
+            wrapper.sendToServer(Protocol1_19To1_18_2.class);
+            wrapper.cancel();
+
+            final PacketWrapper ackPacket = wrapper.create(ClientboundPackets1_19.BLOCK_CHANGED_ACK);
+            ackPacket.write(Type.VAR_INT, sequence);
+            ackPacket.scheduleSend(Protocol1_19To1_18_2.class);
         };
     }
 }
