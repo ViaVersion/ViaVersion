@@ -17,16 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_16_2;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -164,44 +158,6 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
-                map(Type.NBT); // Current dimension
-                handler(wrapper -> {
-                    // Add new dimension fields
-                    CompoundTag dimensionRegistry = wrapper.get(Type.NBT, 0).get("minecraft:dimension_type");
-                    ListTag dimensions = dimensionRegistry.get("value");
-                    for (Tag dimension : dimensions) {
-                        CompoundTag dimensionCompound = ((CompoundTag) dimension).get("element");
-                        addNewDimensionData(dimensionCompound);
-                    }
-
-                    CompoundTag currentDimensionTag = wrapper.get(Type.NBT, 1);
-                    addNewDimensionData(currentDimensionTag);
-
-                    UserConnection user = wrapper.user();
-                    user.getEntityTracker(Protocol1_17To1_16_4.class).addEntity(wrapper.get(Type.INT, 0), Entity1_17Types.PLAYER);
-                });
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
-                    addNewDimensionData(dimensionData);
-                });
-            }
-        });
-
         blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
     }
 
@@ -233,10 +189,5 @@ public final class WorldPackets {
             blockChangePacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, blockChangeRecords);
             blockChangePacket.send(Protocol1_17To1_16_4.class);
         }
-    }
-
-    private static void addNewDimensionData(CompoundTag tag) {
-        tag.put("min_y", new IntTag(0));
-        tag.put("height", new IntTag(256));
     }
 }

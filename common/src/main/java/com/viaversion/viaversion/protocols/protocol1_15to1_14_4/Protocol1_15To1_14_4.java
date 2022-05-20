@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -31,9 +32,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data.MappingData
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.WorldPackets;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -55,7 +54,6 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
         itemRewriter.register();
 
         EntityPackets.register(this);
-        PlayerPackets.register(this);
         WorldPackets.register(this);
 
         SoundRewriter soundRewriter = new SoundRewriter(this);

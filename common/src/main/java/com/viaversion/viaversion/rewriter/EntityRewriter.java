@@ -402,9 +402,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         return wrapper -> {
             final EntityTracker tracker = tracker(wrapper.user());
             final int entityId = wrapper.get(Type.INT, 0);
-            if (tracker.clientEntityId() == -1) {
-                tracker.setClientEntityId(entityId);
-            }
+            tracker.setClientEntityId(entityId);
             tracker.addEntity(entityId, tracker.playerType());
         };
     }

@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -76,6 +77,32 @@ public class EntityPackets {
 
                     sendMetadataPacket(wrapper, entityId, metadataRewriter);
                 });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_14.RESPAWN, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT);
+                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_14.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+                handler(metadataRewriter.playerTrackerHandler());
+                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+
+                map(Type.UNSIGNED_BYTE); // 3 - Max Players
+                map(Type.STRING); // 4 - Level Type
+                map(Type.VAR_INT); // 5 - View Distance
+                map(Type.BOOLEAN); // 6 - Reduce Debug Info
+
+                handler(wrapper -> wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
             }
         });
 
