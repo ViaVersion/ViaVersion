@@ -22,8 +22,12 @@
  */
 package com.viaversion.viaversion.api.debug;
 
+import com.google.common.annotations.Beta;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 
+@Beta
 public interface DebugHandler {
 
     /**
@@ -46,6 +50,14 @@ public interface DebugHandler {
      * @param packetTypeName packet type name
      */
     void addPacketTypeNameToLog(String packetTypeName);
+
+    /**
+     * Adds a packet id to the list of packet types to log.
+     * Packets will be checked on each protocol transformer, so this is best used on single protocol pipes.
+     *
+     * @param packetType packet type
+     */
+    void addPacketTypeToLog(PacketType packetType);
 
     /**
      * Removes a packet type name from the list of packet types to log.
@@ -78,8 +90,16 @@ public interface DebugHandler {
      * Returns whether the given packet should be logged.
      * If no specific packet type has been added, all packet types will be logged.
      *
-     * @param wrapper packet wrapper
+     * @param wrapper   packet wrapper
+     * @param direction packet direction
      * @return whether the packet should be logged
      */
-    boolean shouldLog(PacketWrapper wrapper);
+    boolean shouldLog(PacketWrapper wrapper, Direction direction);
+
+    default void enableAndLogIds(final PacketType... packetTypes) {
+        setEnabled(true);
+        for (final PacketType packetType : packetTypes) {
+            addPacketTypeToLog(packetType);
+        }
+    }
 }

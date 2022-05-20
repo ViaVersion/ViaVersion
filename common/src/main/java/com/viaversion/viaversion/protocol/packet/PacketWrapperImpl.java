@@ -488,10 +488,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public String toString() {
         return "PacketWrapper{" +
-                "packetValues=" + packetValues +
-                ", readableObjects=" + readableObjects +
+                "packetType=" + packetType +
                 ", id=" + id +
-                ", packetType=" + packetType +
+                ", packetValues=" + packetValues +
+                ", readableObjects=" + readableObjects +
                 '}';
     }
 }

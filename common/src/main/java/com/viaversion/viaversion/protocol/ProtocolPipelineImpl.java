@@ -114,12 +114,16 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
         int originalID = packetWrapper.getId();
 
+        DebugHandler debugHandler = Via.getManager().debugHandler();
+        if (debugHandler.enabled() && !debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
+            logPacket(direction, state, packetWrapper, originalID);
+        }
+
         // Apply protocols
         packetWrapper.apply(direction, state, 0, protocolList, direction == Direction.CLIENTBOUND);
         super.transform(direction, state, packetWrapper);
 
-        DebugHandler debugHandler = Via.getManager().debugHandler();
-        if (debugHandler.enabled() && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper)) {
+        if (debugHandler.enabled() && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
             logPacket(direction, state, packetWrapper, originalID);
         }
     }
@@ -127,20 +131,20 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID) {
         // Debug packet
         int clientProtocol = userConnection.getProtocolInfo().getProtocolVersion();
-        ViaPlatform platform = Via.getPlatform();
+        ViaPlatform<?> platform = Via.getPlatform();
 
         String actualUsername = packetWrapper.user().getProtocolInfo().getUsername();
         String username = actualUsername != null ? actualUsername + " " : "";
 
-        platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} (0x{4}) -> {5} (0x{6}) [{7}] {8}",
+        platform.getLogger().log(Level.INFO, "{0}{1} {2}: {3} ({4}) -> {5} ({6}) [{7}] {8}",
                 new Object[]{
                         username,
                         direction,
                         state,
                         originalID,
-                        Integer.toHexString(originalID),
+                        AbstractSimpleProtocol.toNiceHex(originalID),
                         packetWrapper.getId(),
-                        Integer.toHexString(packetWrapper.getId()),
+                        AbstractSimpleProtocol.toNiceHex(packetWrapper.getId()),
                         Integer.toString(clientProtocol),
                         packetWrapper
                 });

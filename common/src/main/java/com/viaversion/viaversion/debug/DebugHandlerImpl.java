@@ -18,7 +18,11 @@
 package com.viaversion.viaversion.debug;
 
 import com.viaversion.viaversion.api.debug.DebugHandler;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +30,9 @@ import java.util.Set;
 public final class DebugHandlerImpl implements DebugHandler {
 
     private final Set<String> packetTypesToLog = new HashSet<>();
-    private boolean logPostPacketTransform = true;
+    private final IntSet clientboundPacketIdsToLog = new IntOpenHashSet();
+    private final IntSet serverboundPacketIdsToLog = new IntOpenHashSet();
+    private boolean logPostPacketTransform;
     private boolean enabled;
 
     @Override
@@ -42,6 +48,11 @@ public final class DebugHandlerImpl implements DebugHandler {
     @Override
     public void addPacketTypeNameToLog(final String packetTypeName) {
         packetTypesToLog.add(packetTypeName);
+    }
+
+    @Override
+    public void addPacketTypeToLog(PacketType packetType) {
+        (packetType.direction() == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).add(packetType.getId());
     }
 
     @Override
@@ -65,7 +76,9 @@ public final class DebugHandlerImpl implements DebugHandler {
     }
 
     @Override
-    public boolean shouldLog(final PacketWrapper wrapper) {
-        return packetTypesToLog.isEmpty() || (wrapper.getPacketType() != null && packetTypesToLog.contains(wrapper.getPacketType().getName()));
+    public boolean shouldLog(final PacketWrapper wrapper, final Direction direction) {
+        return packetTypesToLog.isEmpty() && serverboundPacketIdsToLog.isEmpty() && clientboundPacketIdsToLog.isEmpty()
+                || (wrapper.getPacketType() != null && packetTypesToLog.contains(wrapper.getPacketType().getName()))
+                || (direction == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).contains(wrapper.getId());
     }
 }

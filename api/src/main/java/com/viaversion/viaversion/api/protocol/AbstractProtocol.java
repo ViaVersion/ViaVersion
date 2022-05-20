@@ -351,7 +351,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         throw e;
     }
 
-    private String toNiceHex(int id) {
+    public static String toNiceHex(int id) {
         String hex = Integer.toHexString(id).toUpperCase();
         return (hex.length() == 1 ? "0x0" : "0x") + hex;
     }
