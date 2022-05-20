@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.QueuedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
@@ -274,6 +276,28 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     final PacketWrapper displayPreviewPacket = wrapper.create(ClientboundPackets1_19.SET_DISPLAY_CHAT_PREVIEW);
                     displayPreviewPacket.write(Type.BOOLEAN, false);
                     displayPreviewPacket.send(Protocol1_19To1_18_2.class);
+
+                    final QueuedMessagesStorage messagesStorage = wrapper.user().remove(QueuedMessagesStorage.class);
+                    if (messagesStorage == null) {
+                        return;
+                    }
+
+                    final Queue<QueuedMessagesStorage.Message> messages = messagesStorage.messages();
+                    if (messages.isEmpty()) {
+                        return;
+                    }
+
+                    // Manually send off and send queued messages
+                    wrapper.send(Protocol1_19To1_18_2.class);
+                    wrapper.cancel();
+
+                    QueuedMessagesStorage.Message message;
+                    while ((message = messages.poll()) != null) {
+                        final PacketWrapper chatPacket = wrapper.create(ClientboundPackets1_19.SYSTEM_CHAT);
+                        chatPacket.write(Type.COMPONENT, message.content());
+                        chatPacket.write(Type.VAR_INT, message.chatType());
+                        chatPacket.send(Protocol1_19To1_18_2.class);
+                    }
                 });
             }
         });

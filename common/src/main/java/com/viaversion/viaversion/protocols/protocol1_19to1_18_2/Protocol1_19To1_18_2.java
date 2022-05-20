@@ -40,6 +40,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.NonceStorage;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.QueuedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -169,6 +170,15 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.COMPONENT); // Message
                 map(Type.BYTE, Type.VAR_INT); // Type
                 read(Type.UUID); // Sender
+                handler(wrapper -> {
+                    // We can't send chat messages before the chat type registry has been sent in the join packet
+                    final QueuedMessagesStorage messagesStorage = wrapper.user().get(QueuedMessagesStorage.class);
+                    if (messagesStorage != null) {
+                        final QueuedMessagesStorage.Message message = new QueuedMessagesStorage.Message(wrapper.get(Type.COMPONENT, 0), wrapper.get(Type.VAR_INT, 0));
+                        messagesStorage.messages().add(message);
+                        wrapper.cancel();
+                    }
+                });
             }
         });
 
@@ -285,6 +295,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection user) {
+        if (!user.has(QueuedMessagesStorage.class)) {
+            user.put(new QueuedMessagesStorage());
+        }
         if (!user.has(DimensionRegistryStorage.class)) {
             user.put(new DimensionRegistryStorage());
         }
