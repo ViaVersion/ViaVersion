@@ -277,12 +277,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     displayPreviewPacket.write(Type.BOOLEAN, false);
                     displayPreviewPacket.send(Protocol1_19To1_18_2.class);
 
-                    final QueuedMessagesStorage messagesStorage = wrapper.user().remove(QueuedMessagesStorage.class);
-                    if (messagesStorage == null) {
+                    final QueuedMessagesStorage messagesStorage = wrapper.user().get(QueuedMessagesStorage.class);
+                    if (messagesStorage.hasSent()) {
                         return;
                     }
 
                     final Queue<QueuedMessagesStorage.Message> messages = messagesStorage.messages();
+                    messagesStorage.setSent();
                     if (messages.isEmpty()) {
                         return;
                     }

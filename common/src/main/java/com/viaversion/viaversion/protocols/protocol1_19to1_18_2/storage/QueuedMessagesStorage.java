@@ -19,16 +19,25 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.StorableObject;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
 public final class QueuedMessagesStorage implements StorableObject {
 
-    private final Queue<Message> messages = new ArrayDeque<>();
+    private Queue<Message> messages = new ArrayDeque<>();
 
-    public Queue<Message> messages() {
+    public @Nullable Queue<Message> messages() {
         return messages;
+    }
+
+    public boolean hasSent() {
+        return messages == null;
+    }
+
+    public void setSent() {
+        messages = null;
     }
 
     @Override
