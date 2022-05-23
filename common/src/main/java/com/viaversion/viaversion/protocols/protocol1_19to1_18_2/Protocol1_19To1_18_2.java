@@ -173,7 +173,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 handler(wrapper -> {
                     // We can't send chat messages before the chat type registry has been sent in the join packet
                     final QueuedMessagesStorage messagesStorage = wrapper.user().get(QueuedMessagesStorage.class);
-                    if (messagesStorage != null) {
+                    if (!messagesStorage.hasSent()) {
                         final QueuedMessagesStorage.Message message = new QueuedMessagesStorage.Message(wrapper.get(Type.COMPONENT, 0), wrapper.get(Type.VAR_INT, 0));
                         messagesStorage.messages().add(message);
                         wrapper.cancel();

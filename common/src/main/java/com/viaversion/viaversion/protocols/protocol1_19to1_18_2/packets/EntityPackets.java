@@ -268,6 +268,10 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.VAR_INT); // Max players
                 map(Type.VAR_INT); // Chunk radius
                 map(Type.VAR_INT); // Simulation distance
+                map(Type.BOOLEAN); // Reduced debug info
+                map(Type.BOOLEAN); // Show death screen
+                map(Type.BOOLEAN); // Flat
+                create(Type.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(playerTrackerHandler());
                 handler(worldDataTrackerHandlerByKey());
                 handler(biomeSizeTracker());
@@ -307,6 +311,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             public void registerMap() {
                 handler(wrapper -> writeDimensionKey(wrapper, wrapper.user().get(DimensionRegistryStorage.class)));
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous gamemode
+                map(Type.BOOLEAN); // Debug
+                map(Type.BOOLEAN); // Flat
+                map(Type.BOOLEAN); // Keep player data
+                create(Type.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(worldDataTrackerHandlerByKey());
             }
         });
@@ -399,7 +410,6 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(Entity1_19Types.PLAYER).addIndex(19); // Last death location
         filter().type(Entity1_19Types.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
     }
 
