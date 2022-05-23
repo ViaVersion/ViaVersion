@@ -253,7 +253,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
                         final String name = (String) dimensionCompound.get("name").getValue();
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
-                        dimensionsMap.put(element, name);
+                        dimensionsMap.put(element.clone(), name);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);
 
@@ -268,6 +268,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 map(Type.VAR_INT); // Simulation distance
                 map(Type.BOOLEAN); // Reduced debug info
                 map(Type.BOOLEAN); // Show death screen
+                map(Type.BOOLEAN); // Debug
                 map(Type.BOOLEAN); // Flat
                 create(Type.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(playerTrackerHandler());
