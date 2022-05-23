@@ -84,14 +84,14 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
     public Object getFlyingPacket() {
         if (idlePacket == null)
             throw new NullPointerException("Could not locate flying packet");
-        return idlePacket2;
+        return idlePacket;
     }
 
     @Override
     public Object getGroundPacket() {
         if (idlePacket == null)
             throw new NullPointerException("Could not locate flying packet");
-        return idlePacket;
+        return idlePacket2;
     }
 
     @Override
