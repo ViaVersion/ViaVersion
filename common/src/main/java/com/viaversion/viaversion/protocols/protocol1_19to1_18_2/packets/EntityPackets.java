@@ -49,63 +49,28 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
     //TODO move to compressed nbt file
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
-            "   \"minecraft:chat_type\":{\n" +
-            "      \"type\":\"minecraft:chat_type\",\n" +
-            "      \"value\":[\n" +
-            "         {\n" +
-            "            \"name\":\"minecraft:chat\",\n" +
-            "            \"id\":0,\n" +
-            "            \"element\":{\n" +
-            "               \"chat\":{\n" +
-            "                  \"decoration\":{\n" +
-            "                     \"translation_key\":\"chat.type.text\",\n" +
-            "                     \"style\":{\n" +
-            "                        \n" +
-            "                     },\n" +
-            "                     \"parameters\":[\n" +
-            "                        \"sender\",\n" +
-            "                        \"content\"\n" +
-            "                     ]\n" +
-            "                  }\n" +
-            "               },\n" +
-            "               \"narration\":{\n" +
-            "                  \"priority\":\"chat\",\n" +
-            "                  \"decoration\":{\n" +
-            "                     \"translation_key\":\"chat.type.text.narrate\",\n" +
-            "                     \"style\":{\n" +
-            "                        \n" +
-            "                     },\n" +
-            "                     \"parameters\":[\n" +
-            "                        \"sender\",\n" +
-            "                        \"content\"\n" +
-            "                     ]\n" +
-            "                  }\n" +
-            "               }\n" +
-            "            }\n" +
-            "         },\n" +
-            "         {\n" +
-            "            \"name\":\"minecraft:system\",\n" +
-            "            \"id\":1,\n" +
-            "            \"element\":{\n" +
-            "               \"chat\":{\n" +
-            "                  \n" +
-            "               },\n" +
-            "               \"narration\":{\n" +
-            "                  \"priority\":\"system\"\n" +
-            "               }\n" +
-            "            }\n" +
-            "         },\n" +
-            "         {\n" +
-            "            \"name\":\"minecraft:game_info\",\n" +
-            "            \"id\":2,\n" +
-            "            \"element\":{\n" +
-            "               \"overlay\":{\n" +
-            "                  \n" +
-            "               }\n" +
-            "            }\n" +
-            "         },\n" +
-            "      ]\n" +
-            "   },\n" +
+            "  \"minecraft:chat_type\": {\n" +
+            "    \"type\": \"minecraft:chat_type\",\n" +
+            "    \"value\": [\n" +
+            "      {\n" +
+            "        \"name\": \"minecraft:system\",\n" +
+            "        \"id\": 0,\n" +
+            "        \"element\": {\n" +
+            "          \"chat\": {},\n" +
+            "          \"narration\": {\n" +
+            "            \"priority\": \"system\"\n" +
+            "          }\n" +
+            "        }\n" +
+            "      },\n" +
+            "      {\n" +
+            "        \"name\": \"minecraft:game_info\",\n" +
+            "        \"id\": 1,\n" +
+            "        \"element\": {\n" +
+            "          \"overlay\": {}\n" +
+            "        }\n" +
+            "      }\n" +
+            "    ]\n" +
+            "  }\n" +
             "}";
     private static final CompoundTag CHAT_REGISTRY;
 

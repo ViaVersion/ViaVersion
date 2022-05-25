@@ -167,7 +167,10 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 map(Type.COMPONENT); // Message
-                map(Type.BYTE, Type.VAR_INT); // Type
+                handler(wrapper -> {
+                    int type = wrapper.read(Type.BYTE);
+                    wrapper.write(Type.VAR_INT, type == 2 ? 1 : 0);
+                });
                 read(Type.UUID); // Sender
             }
         });
