@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
@@ -77,7 +78,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
     static {
         try {
             CHAT_REGISTRY = BinaryTagIO.readString(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -214,11 +215,11 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     for (final Tag dimension : dimensions) {
                         final CompoundTag dimensionCompound = (CompoundTag) dimension;
                         final CompoundTag element = dimensionCompound.get("element");
-                        addMonsterSpawnData(element);
-
                         final String name = (String) dimensionCompound.get("name").getValue();
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
                         dimensionsMap.put(element.clone(), name);
+
+                        addMonsterSpawnData(element);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);
 
@@ -304,14 +305,18 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
         });
     }
 
-    private static void writeDimensionKey(PacketWrapper wrapper, DimensionRegistryStorage registryStorage) throws Exception {
+    private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Type.NBT);
-        addMonsterSpawnData(currentDimension);
-
         final String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
-            throw new IllegalArgumentException("Unknown dimension sent on join: " + currentDimension);
+            Via.getPlatform().getLogger().severe("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
+                    "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
+                    " Known dimensions:");
+            for (final Map.Entry<CompoundTag, String> entry : registryStorage.dimensions().entrySet()) {
+                Via.getPlatform().getLogger().severe(entry.getValue() + ": " + entry.getKey());
+            }
+            throw new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension);
         }
 
         wrapper.write(Type.STRING, dimensionKey);
