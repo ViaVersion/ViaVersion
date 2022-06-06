@@ -51,7 +51,7 @@ You can find official dev builds here:
 <dependency>
     <groupId>com.viaversion</groupId>
     <artifactId>viaversion-api</artifactId>
-    <version>LATEST</version>
+    <version>[4.0.0,5.0.0)</version>
     <scope>provided</scope>
 </dependency>
 ```
