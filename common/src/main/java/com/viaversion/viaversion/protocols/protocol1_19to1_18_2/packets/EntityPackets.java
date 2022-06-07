@@ -244,7 +244,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     // Disable the chat preview
                     final PacketWrapper displayPreviewPacket = wrapper.create(ClientboundPackets1_19.SET_DISPLAY_CHAT_PREVIEW);
                     displayPreviewPacket.write(Type.BOOLEAN, false);
-                    displayPreviewPacket.send(Protocol1_19To1_18_2.class);
+                    displayPreviewPacket.scheduleSend(Protocol1_19To1_18_2.class);
                 });
             }
         });
