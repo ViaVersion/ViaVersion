@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2;
 
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -24,6 +25,7 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -31,6 +33,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
@@ -120,6 +124,27 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
                 create(Type.LONG, 0L); // Seed
+            }
+        });
+
+        final PacketHandler titleHandler = wrapper -> {
+            final JsonElement component = wrapper.read(Type.COMPONENT);
+            if (!component.isJsonNull()) {
+                wrapper.write(Type.COMPONENT, component);
+            } else {
+                wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(Component.empty()));
+            }
+        };
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(titleHandler);
+            }
+        });
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(titleHandler);
             }
         });
 
