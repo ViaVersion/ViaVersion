@@ -240,6 +240,32 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
+    public void registerTradeList1_19(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.VAR_INT); // Container id
+                    int size = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < size; i++) {
+                        handleItemToClient(wrapper.passthrough(type)); // Input
+                        handleItemToClient(wrapper.passthrough(type)); // Output
+                        handleItemToClient(wrapper.passthrough(type)); // Second Item
+
+                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                        wrapper.passthrough(Type.INT); // Number of tools uses
+                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                        wrapper.passthrough(Type.INT); // XP
+                        wrapper.passthrough(Type.INT); // Special price
+                        wrapper.passthrough(Type.FLOAT); // Price multiplier
+                        wrapper.passthrough(Type.INT); // Demand
+                    }
+                });
+            }
+        });
+    }
+
     public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override

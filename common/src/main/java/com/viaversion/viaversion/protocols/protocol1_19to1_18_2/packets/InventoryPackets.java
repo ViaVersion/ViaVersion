@@ -38,7 +38,6 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, Type.FLAT_VAR_INT_ITEM);
-        registerTradeList(ClientboundPackets1_18.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
         registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
@@ -63,6 +62,35 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
         registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
+
+        protocol.registerClientbound(ClientboundPackets1_18.TRADE_LIST, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Container id
+                handler(wrapper -> {
+                    final int size = wrapper.read(Type.UNSIGNED_BYTE);
+                    wrapper.write(Type.VAR_INT, size);
+                    for (int i = 0; i < size; i++) {
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // First item
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+
+                        if (wrapper.read(Type.BOOLEAN)) {
+                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                        } else {
+                            wrapper.write(Type.FLAT_VAR_INT_ITEM, null);
+                        }
+
+                        wrapper.passthrough(Type.BOOLEAN); // Out of stock
+                        wrapper.passthrough(Type.INT); // Uses
+                        wrapper.passthrough(Type.INT); // Max uses
+                        wrapper.passthrough(Type.INT); // Xp
+                        wrapper.passthrough(Type.INT); // Special price diff
+                        wrapper.passthrough(Type.FLOAT); // Price multiplier
+                        wrapper.passthrough(Type.INT); //Demand
+                    }
+                });
+            }
+        });
 
         protocol.registerServerbound(ServerboundPackets1_19.PLAYER_DIGGING, new PacketRemapper() {
             @Override
