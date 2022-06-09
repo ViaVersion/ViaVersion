@@ -194,7 +194,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.COMPONENT); // Message
                 handler(wrapper -> {
                     int type = wrapper.read(Type.BYTE);
-                    wrapper.write(Type.VAR_INT, type == 2 ? 1 : 0);
+                    wrapper.write(Type.VAR_INT, type == 0 ? 1 : type);
                 });
                 read(Type.UUID); // Sender
             }
