@@ -55,7 +55,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             "    \"value\": [\n" +
             "      {\n" +
             "        \"name\": \"minecraft:system\",\n" +
-            "        \"id\": 0,\n" +
+            "        \"id\": 1,\n" +
             "        \"element\": {\n" +
             "          \"chat\": {},\n" +
             "          \"narration\": {\n" +
@@ -65,7 +65,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             "      },\n" +
             "      {\n" +
             "        \"name\": \"minecraft:game_info\",\n" +
-            "        \"id\": 1,\n" +
+            "        \"id\": 2,\n" +
             "        \"element\": {\n" +
             "          \"overlay\": {}\n" +
             "        }\n" +
