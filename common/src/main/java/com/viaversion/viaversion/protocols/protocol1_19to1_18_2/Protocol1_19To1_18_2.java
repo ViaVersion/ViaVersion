@@ -54,6 +54,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
 
@@ -97,7 +98,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, 0L); // Seed
+                create(Type.LONG, randomLong()); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -109,7 +110,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.VAR_INT); // Entity id
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, 0L); // Seed
+                create(Type.LONG, randomLong()); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -123,7 +124,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, 0L); // Seed
+                create(Type.LONG, randomLong()); // Seed
             }
         });
 
@@ -293,6 +294,10 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+    }
+
+    private static long randomLong() {
+        return ThreadLocalRandom.current().nextLong();
     }
 
     @Override
