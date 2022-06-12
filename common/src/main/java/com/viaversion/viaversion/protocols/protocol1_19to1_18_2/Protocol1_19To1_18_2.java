@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -42,8 +43,10 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.NonceStorage;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -317,10 +320,16 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
+    public void register(final ViaProviders providers) {
+        providers.register(AckSequenceProvider.class, new AckSequenceProvider());
+    }
+
+    @Override
     public void init(final UserConnection user) {
         if (!user.has(DimensionRegistryStorage.class)) {
             user.put(new DimensionRegistryStorage());
         }
+        user.put(new SequenceStorage());
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
     }
 
