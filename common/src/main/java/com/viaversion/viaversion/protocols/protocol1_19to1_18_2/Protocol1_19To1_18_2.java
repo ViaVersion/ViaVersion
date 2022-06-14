@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.NonceSto
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
 import javax.crypto.Cipher;
@@ -130,6 +131,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 create(Type.LONG, randomLong()); // Seed
             }
         });
+
+        new StatisticsRewriter(this).register(ClientboundPackets1_18.STATISTICS);
 
         final PacketHandler titleHandler = wrapper -> {
             final JsonElement component = wrapper.read(Type.COMPONENT);
