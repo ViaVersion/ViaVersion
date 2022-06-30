@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.common.collect.Maps;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -39,12 +40,10 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.Pair;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
@@ -308,15 +307,19 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
     private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Type.NBT);
-        final String dimensionKey = registryStorage.dimensionKey(currentDimension);
+        String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
             Via.getPlatform().getLogger().severe("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
                     "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
-                    " Known dimensions:");
-            for (final Map.Entry<CompoundTag, String> entry : registryStorage.dimensions().entrySet()) {
-                Via.getPlatform().getLogger().severe(entry.getValue() + ": " + entry.getKey());
-            }
-            throw new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension);
+                    " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+            // Try to find the most similar dimension
+            dimensionKey = registryStorage.dimensions().entrySet().stream()
+                    .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
+                    .filter(it -> it.value().containsKey("min_y"))
+                    .filter(it -> it.value().containsKey("height"))
+                    .map(it -> new Pair<>(it.key(), it.value().size()))
+                    .max(Comparator.comparingInt(Pair::value))
+                    .get().key().getValue();
         }
 
         wrapper.write(Type.STRING, dimensionKey);
