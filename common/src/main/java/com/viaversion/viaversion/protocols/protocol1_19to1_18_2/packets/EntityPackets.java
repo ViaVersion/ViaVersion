@@ -314,9 +314,12 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()
-                    .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue())
-                            .entriesInCommon().size()))
-                    .max(Comparator.comparingInt(Pair::value)).get().key().getValue();
+                    .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
+                    .filter(it -> it.value().containsKey("min_y"))
+                    .filter(it -> it.value().containsKey("height"))
+                    .map(it -> new Pair<>(it.key(), it.value().size()))
+                    .max(Comparator.comparingInt(Pair::value))
+                    .get().key().getValue();
         }
 
         wrapper.write(Type.STRING, dimensionKey);
