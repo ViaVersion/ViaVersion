@@ -200,9 +200,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.COMPONENT); // Message
                 handler(wrapper -> {
-                    //TODO handle game info
-                    wrapper.read(Type.BYTE);
-                    wrapper.write(Type.VAR_INT, 1);
+                    final int type = wrapper.read(Type.BYTE);
+                    wrapper.write(Type.VAR_INT, type == 0 ? 1 : type);
                 });
                 read(Type.UUID); // Sender
             }
