@@ -309,17 +309,19 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
         final CompoundTag currentDimension = wrapper.read(Type.NBT);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
-            Via.getPlatform().getLogger().severe("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
-                    "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
-                    " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Via.getPlatform().getLogger().warning("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
+                        "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
+                        " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+            }
+
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()
                     .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
-                    .filter(it -> it.value().containsKey("min_y"))
-                    .filter(it -> it.value().containsKey("height"))
-                    .map(it -> new Pair<>(it.key(), it.value().size()))
-                    .max(Comparator.comparingInt(Pair::value))
-                    .get().key().getValue();
+                    .filter(it -> it.value().containsKey("min_y") && it.value().containsKey("height"))
+                    .max(Comparator.comparingInt(it -> it.value().size()))
+                    .orElseThrow(() -> new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension))
+                    .key().getValue();
         }
 
         wrapper.write(Type.STRING, dimensionKey);
