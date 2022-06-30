@@ -18,8 +18,36 @@
 package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19, ServerboundPackets1_19, ServerboundPackets1_19> {
+
+    @Override
+    protected void registerPackets() {
+        // Skip 1.19 and assume 1.18.2->1.19.1 translation
+        registerClientbound(ClientboundPackets1_19.SYSTEM_CHAT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.COMPONENT);
+                handler(wrapper -> {
+                    wrapper.read(Type.VAR_INT); // Chat type
+                    wrapper.write(Type.BOOLEAN, false); // Overlay
+                });
+            }
+        });
+
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Name
+                map(Type.OPTIONAL_PROFILE_KEY); // Public profile key
+                read(Type.OPTIONAL_UUID); // Profile uuid
+            }
+        });
+    }
 }

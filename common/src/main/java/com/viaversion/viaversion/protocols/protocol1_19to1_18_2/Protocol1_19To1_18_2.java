@@ -200,8 +200,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.COMPONENT); // Message
                 handler(wrapper -> {
-                    int type = wrapper.read(Type.BYTE);
-                    wrapper.write(Type.VAR_INT, type == 0 ? 1 : type);
+                    //TODO handle game info
+                    wrapper.read(Type.BYTE);
+                    wrapper.write(Type.VAR_INT, 1);
                 });
                 read(Type.UUID); // Sender
             }
@@ -268,13 +269,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 map(Type.STRING); // Name
-                handler(wrapper -> {
-                    if (wrapper.read(Type.BOOLEAN)) {
-                        wrapper.read(Type.LONG); // Timestamp
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Key
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                    }
-                });
+                read(Type.OPTIONAL_PROFILE_KEY); // Public profile key
             }
         });
 

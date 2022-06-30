@@ -43,7 +43,11 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Pair;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
 
@@ -52,23 +56,26 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             "  \"minecraft:chat_type\": {\n" +
             "    \"type\": \"minecraft:chat_type\",\n" +
             "    \"value\": [\n" +
-            "      {\n" +
-            "        \"name\": \"minecraft:system\",\n" +
-            "        \"id\": 1,\n" +
-            "        \"element\": {\n" +
-            "          \"chat\": {},\n" +
-            "          \"narration\": {\n" +
-            "            \"priority\": \"system\"\n" +
-            "          }\n" +
-            "        }\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"name\": \"minecraft:game_info\",\n" +
-            "        \"id\": 2,\n" +
-            "        \"element\": {\n" +
-            "          \"overlay\": {}\n" +
-            "        }\n" +
-            "      }\n" +
+            "         {\n" +
+            "            \"name\":\"minecraft:chat\",\n" +
+            "            \"id\":1,\n" +
+            "            \"element\":{\n" +
+            "               \"chat\":{\n" +
+            "                  \"translation_key\":\"chat.type.text\",\n" +
+            "                  \"parameters\":[\n" +
+            "                     \"sender\",\n" +
+            "                     \"content\"\n" +
+            "                  ]\n" +
+            "               },\n" +
+            "               \"narration\":{\n" +
+            "                  \"translation_key\":\"chat.type.text.narrate\",\n" +
+            "                  \"parameters\":[\n" +
+            "                     \"sender\",\n" +
+            "                     \"content\"\n" +
+            "                  ]\n" +
+            "               }\n" +
+            "            }\n" +
+            "         }" +
             "    ]\n" +
             "  }\n" +
             "}";

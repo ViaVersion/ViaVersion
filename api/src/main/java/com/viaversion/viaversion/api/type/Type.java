@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -68,9 +69,11 @@ import com.viaversion.viaversion.api.type.types.minecraft.OptPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptUUIDType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalComponentType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalGlobalPositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.OptionalProfileKeyType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalVarIntType;
 import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
 import com.viaversion.viaversion.api.type.types.minecraft.PositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.minecraft.VarLongBlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.minecraft.VectorType;
 import com.viaversion.viaversion.api.type.types.minecraft.VillagerDataType;
@@ -168,6 +171,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<Item> ITEM = new ItemType();
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
+
+    public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
+    public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new OptionalProfileKeyType();
 
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();
