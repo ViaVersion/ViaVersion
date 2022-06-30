@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -26,11 +27,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.representer.Representer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -212,6 +209,23 @@ public abstract class Config implements ConfigurationProvider {
     public List<String> getStringList(String key) {
         Object o = this.config.get(key);
         return o != null ? (List<String>) o : new ArrayList<>();
+    }
+
+    public <T> List<T> getListSafe(String key, Class<T> type, String invalidValueMessage) {
+        Object o = this.config.get(key);
+        if (o instanceof List) {
+            List<?> list = (List<?>) o;
+            List<T> filteredValues = new ArrayList<>();
+            for (Object o1 : list) {
+                if (type.isInstance(o1)) {
+                    filteredValues.add(type.cast(o1));
+                } else if (invalidValueMessage != null) {
+                    Via.getPlatform().getLogger().warning(String.format(invalidValueMessage, o1));
+                }
+            }
+            return filteredValues;
+        }
+        return new ArrayList<>();
     }
 
     public @Nullable JsonElement getSerializedComponent(String key) {

@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.IntPredicate;
 
@@ -160,10 +161,12 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
-        IntSet blockedProtocols = new IntOpenHashSet(getIntegerList("block-protocols"));
+        List<Integer> blockProtocols = getListSafe("block-protocols", Integer.class, "Invalid blocked version protocol found in config: '%s'");
+        List<String> blockVersions = getListSafe("block-versions", String.class, "Invalid blocked version found in config: '%s'");
+        IntSet blockedProtocols = new IntOpenHashSet(blockProtocols);
         int lowerBound = -1;
         int upperBound = -1;
-        for (String s : getStringList("block-versions")) {
+        for (String s : blockVersions) {
             if (s.isEmpty()) {
                 continue;
             }

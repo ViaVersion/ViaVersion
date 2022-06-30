@@ -36,7 +36,7 @@ public final class BukkitAckSequenceProvider extends AckSequenceProvider {
         final SequenceStorage sequenceStorage = connection.get(SequenceStorage.class);
         final int previousSequence = sequenceStorage.setSequenceId(sequence);
         if (previousSequence == -1) {
-            plugin.getServer().getScheduler().runTask(plugin, new AckSequenceTask(connection, sequenceStorage));
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new AckSequenceTask(connection, sequenceStorage), 1);
         }
     }
 }
