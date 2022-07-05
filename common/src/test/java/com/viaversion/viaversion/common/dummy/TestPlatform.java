@@ -137,4 +137,9 @@ public final class TestPlatform implements ViaPlatform {
     public boolean isOldClientsAllowed() {
         return false;
     }
+
+    @Override
+    public boolean hasPlugin(final String name) {
+        return false;
+    }
 }

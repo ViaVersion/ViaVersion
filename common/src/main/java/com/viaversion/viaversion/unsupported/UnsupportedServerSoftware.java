@@ -26,14 +26,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-public final class UnsupportedSoftwareImpl implements UnsupportedSoftware {
+public final class UnsupportedServerSoftware implements UnsupportedSoftware {
 
     private final String name;
     private final List<String> classNames;
     private final List<UnsupportedMethods> methods;
     private final String reason;
 
-    public UnsupportedSoftwareImpl(String name, List<String> classNames, List<UnsupportedMethods> methods, String reason) {
+    public UnsupportedServerSoftware(String name, List<String> classNames, List<UnsupportedMethods> methods, String reason) {
+        Preconditions.checkNotNull(name);
+        Preconditions.checkNotNull(reason);
+        Preconditions.checkArgument(!classNames.isEmpty() || !methods.isEmpty());
         this.name = name;
         this.classNames = Collections.unmodifiableList(classNames);
         this.methods = Collections.unmodifiableList(methods);
@@ -51,7 +54,7 @@ public final class UnsupportedSoftwareImpl implements UnsupportedSoftware {
     }
 
     @Override
-    public boolean findMatch() {
+    public final boolean findMatch() {
         for (String className : classNames) {
             try {
                 Class.forName(className);
@@ -100,9 +103,7 @@ public final class UnsupportedSoftwareImpl implements UnsupportedSoftware {
         }
 
         public UnsupportedSoftware build() {
-            Preconditions.checkNotNull(name);
-            Preconditions.checkNotNull(reason);
-            return new UnsupportedSoftwareImpl(name, classNames, methods, reason);
+            return new UnsupportedServerSoftware(name, classNames, methods, reason);
         }
     }
 

@@ -240,6 +240,11 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     }
 
     @Override
+    public boolean hasPlugin(final String name) {
+        return proxy.getPluginManager().getPlugin(name).isPresent();
+    }
+
+    @Override
     public java.util.logging.Logger getLogger() {
         return logger;
     }

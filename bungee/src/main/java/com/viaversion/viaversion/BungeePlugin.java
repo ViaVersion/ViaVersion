@@ -205,4 +205,9 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     public boolean isOldClientsAllowed() {
         return true;
     }
+
+    @Override
+    public boolean hasPlugin(final String name) {
+        return getProxy().getPluginManager().getPlugin(name) != null;
+    }
 }
