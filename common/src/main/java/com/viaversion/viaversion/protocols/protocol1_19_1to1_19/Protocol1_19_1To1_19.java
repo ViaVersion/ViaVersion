@@ -31,7 +31,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 
 import java.io.IOException;
 
-public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19, ServerboundPackets1_19, ServerboundPackets1_19> {
+public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19> {
 
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
             "  \"minecraft:chat_type\": {\n" +
@@ -68,6 +68,10 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Protocol1_19_1To1_19() {
+        super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19.class);
     }
 
     @Override
