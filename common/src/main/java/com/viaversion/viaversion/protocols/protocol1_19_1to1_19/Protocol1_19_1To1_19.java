@@ -21,7 +21,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -88,30 +87,26 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, new PacketRemapper() {
+
+        // Back to system caht
+        registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, ClientboundPackets1_19_1.SYSTEM_CHAT, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(Type.COMPONENT); // Signed content
-                map(Type.OPTIONAL_COMPONENT); // Unsigned content
                 handler(wrapper -> {
+                    final JsonElement signedContnet = wrapper.read(Type.COMPONENT);
+                    final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
+                    wrapper.write(Type.COMPONENT, unsignedContent != null ? unsignedContent : signedContnet);
+
                     // Can only be 1 (chat) or 2 (game info) as per 1.18.2->1.19.0 transformer
                     final int type = wrapper.read(Type.VAR_INT);
-                    if (type == 1) {
-                        return;
-                    }
-
-                    // Send as system message to allow overlay
-                    wrapper.cancel();
-
-                    final PacketWrapper systemChatPacket = wrapper.create(ClientboundPackets1_19.SYSTEM_CHAT);
-                    JsonElement content = wrapper.get(Type.OPTIONAL_COMPONENT, 0);
-                    if (content == null) {
-                        content = wrapper.get(Type.COMPONENT, 0);
-                    }
-                    systemChatPacket.write(Type.COMPONENT, content);
-                    systemChatPacket.write(Type.BOOLEAN, true); // Overlay
-                    systemChatPacket.send(Protocol1_19_1To1_19.class);
+                    wrapper.write(Type.BOOLEAN, type == 1); // Overlay
                 });
+                read(Type.UUID); // Sender uuid
+                read(Type.COMPONENT); // Sender display name
+                read(Type.OPTIONAL_COMPONENT); // Team display name
+                read(Type.LONG); // Timestamp
+                read(Type.LONG); // Salt
+                read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
             }
         });
 
