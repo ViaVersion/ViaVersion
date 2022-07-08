@@ -88,7 +88,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        // Back to system caht
+        // Back to system chat
         registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, ClientboundPackets1_19_1.SYSTEM_CHAT, new PacketRemapper() {
             @Override
             public void registerMap() {
