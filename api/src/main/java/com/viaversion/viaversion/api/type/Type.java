@@ -114,6 +114,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<UUID> UUID = new UUIDType();
     public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
+    @Deprecated/*(forRemoval = true)*/
     public static final Type<UUID> UUID_INT_ARRAY = new UUIDIntArrayType();
     public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
 
@@ -151,14 +152,14 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     /* MC Types */
     public static final Type<Position> POSITION = new PositionType();
+    public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
     public static final Type<Position> POSITION1_14 = new Position1_14Type();
+    public static final Type<Position> OPTIONAL_POSITION_1_14 = new OptPosition1_14Type();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
-    public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
-    public static final Type<Position> OPTIONAL_POSITION_1_14 = new OptPosition1_14Type();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new OptionalGlobalPositionType();
 
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();

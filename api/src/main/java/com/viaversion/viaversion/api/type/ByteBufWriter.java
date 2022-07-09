@@ -24,13 +24,15 @@ package com.viaversion.viaversion.api.type;
 
 import io.netty.buffer.ByteBuf;
 
+@FunctionalInterface
 public interface ByteBufWriter<T> {
+
     /**
-     * Write an object to a type to a ByteBuf
+     * Writes an object to a type to a ByteBuf.
      *
-     * @param buffer The buffer to write to
-     * @param object The object to write
-     * @throws Exception Throws if it failed to write
+     * @param buffer buffer to write to
+     * @param value  value to write
+     * @throws Exception if it failed to write
      */
-    void write(ByteBuf buffer, T object) throws Exception;
+    void write(ByteBuf buffer, T value) throws Exception;
 }

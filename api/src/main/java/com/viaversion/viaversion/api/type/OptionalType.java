@@ -20,16 +20,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type;
 
-import com.viaversion.viaversion.api.type.OptionalType;
-import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.UUID;
+public abstract class OptionalType<T> extends Type<T> {
+    private final Type<T> type;
 
-public class OptUUIDType extends OptionalType<UUID> {
+    protected OptionalType(final Type<T> type) {
+        super(type.getOutputClass());
+        this.type = type;
+    }
 
-    public OptUUIDType() {
-        super(Type.UUID);
+    @Override
+    public @Nullable T read(ByteBuf buffer) throws Exception {
+        return buffer.readBoolean() ? type.read(buffer) : null;
+    }
+
+    @Override
+    public void write(final ByteBuf buffer, @Nullable final T value) throws Exception {
+        if (value == null) {
+            buffer.writeBoolean(false);
+        } else {
+            buffer.writeBoolean(true);
+            type.write(buffer, value);
+        }
     }
 }

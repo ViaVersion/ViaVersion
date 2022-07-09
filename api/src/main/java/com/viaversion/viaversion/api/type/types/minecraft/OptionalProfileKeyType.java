@@ -23,29 +23,12 @@
 package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-//TODO generify optional types
-public class OptionalProfileKeyType extends Type<ProfileKey> {
+public class OptionalProfileKeyType extends OptionalType<ProfileKey> {
 
     public OptionalProfileKeyType() {
-        super(ProfileKey.class);
-    }
-
-    @Override
-    public @Nullable ProfileKey read(final ByteBuf buffer) throws Exception {
-        return buffer.readBoolean() ? Type.PROFILE_KEY.read(buffer) : null;
-    }
-
-    @Override
-    public void write(final ByteBuf buffer, @Nullable final ProfileKey object) throws Exception {
-        if (object != null) {
-            buffer.writeBoolean(true);
-            Type.PROFILE_KEY.write(buffer, object);
-        } else {
-            buffer.writeBoolean(false);
-        }
+        super(Type.PROFILE_KEY);
     }
 }
