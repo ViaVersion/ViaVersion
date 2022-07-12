@@ -8,5 +8,6 @@ loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer]
 softdepend: [ProtocolSupport, PacketListenerApi]
 commands:
   viaversion:
+    permission: viaversion.admin # The permission is also referenced here to filter root suggestions (/via<tab>)
     description: Shows ViaVersion Version and more.
     aliases: [viaver, vvbukkit]
