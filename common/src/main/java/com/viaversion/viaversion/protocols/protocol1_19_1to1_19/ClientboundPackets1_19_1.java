@@ -71,8 +71,8 @@ public enum ClientboundPackets1_19_1 implements ClientboundPacketType {
     PING, // 0x2F
     CRAFT_RECIPE_RESPONSE, // 0x30
     PLAYER_ABILITIES, // 0x31
-    PLAYER_CHAT_HEADER, // 0x32
-    PLAYER_CHAT, // 0x33
+    PLAYER_CHAT, // 0x32
+    PLAYER_CHAT_HEADER, // 0x33
     COMBAT_END, // 0x34
     COMBAT_ENTER, // 0x35
     COMBAT_KILL, // 0x36
