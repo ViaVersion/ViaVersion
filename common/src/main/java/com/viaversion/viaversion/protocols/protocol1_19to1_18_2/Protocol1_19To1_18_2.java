@@ -240,7 +240,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 handler(wrapper -> {
                     final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    wrapper.user().put(new NonceStorage(CipherUtil.signNonce(publicKey, nonce)));
+                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
         });

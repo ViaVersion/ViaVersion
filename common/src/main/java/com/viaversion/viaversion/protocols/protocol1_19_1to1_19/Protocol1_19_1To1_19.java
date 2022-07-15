@@ -94,14 +94,14 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Back to system chat
-                    final JsonElement signedContnet = wrapper.read(Type.COMPONENT);
+                    // Back to system chat - bye bye chat formats for 1.19.0 players
+                    // ... not that big of a deal since the majority of modded servers only has Vanilla /say command and the alike sent as proper player chat
+                    final JsonElement signedContent = wrapper.read(Type.COMPONENT);
                     final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    wrapper.write(Type.COMPONENT, unsignedContent != null ? unsignedContent : signedContnet);
+                    wrapper.write(Type.COMPONENT, unsignedContent != null ? unsignedContent : signedContent);
 
-                    // Can only be 1 (chat) or 2 (game info) as per 1.18.2->1.19 transformer
                     final int type = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.BOOLEAN, type == 1); // Overlay
+                    wrapper.write(Type.BOOLEAN, type == 2); // Overlay, going by the default 1.19 chat type registry
                 });
                 read(Type.UUID); // Sender uuid
                 read(Type.COMPONENT); // Sender display name
@@ -187,7 +187,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
 
                     final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    wrapper.user().put(new NonceStorage(CipherUtil.signNonce(publicKey, nonce)));
+                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
         });

@@ -36,7 +36,7 @@ public final class CipherUtil {
         }
     }
 
-    public static byte[] signNonce(final byte[] publicKeyBytes, final byte[] nonceBytes) throws Exception {
+    public static byte[] encryptNonce(final byte[] publicKeyBytes, final byte[] nonceBytes) throws Exception {
         final EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
         final PublicKey key = RSA_FACTORY.generatePublic(keySpec);
         final Cipher cipher = Cipher.getInstance(key.getAlgorithm());
