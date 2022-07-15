@@ -51,28 +51,13 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.CipherUtil;
 
-import javax.crypto.Cipher;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.18", "1.19", true);
-    private static final KeyFactory RSA_FACTORY;
-
-    static {
-        try {
-            RSA_FACTORY = KeyFactory.getInstance("RSA");
-        } catch (final NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -253,13 +238,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.STRING); // Server id
                 handler(wrapper -> {
-                    final byte[] pubKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
                     final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    final EncodedKeySpec keySpec = new X509EncodedKeySpec(pubKey);
-                    final PublicKey key = RSA_FACTORY.generatePublic(keySpec);
-                    final Cipher cipher = Cipher.getInstance(key.getAlgorithm());
-                    cipher.init(Cipher.ENCRYPT_MODE, key);
-                    wrapper.user().put(new NonceStorage(cipher.doFinal(nonce)));
+                    wrapper.user().put(new NonceStorage(CipherUtil.signNonce(publicKey, nonce)));
                 });
             }
         });

@@ -293,8 +293,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
                 .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
                 .addMethod("org.bukkit.Server", "getLastTickTime").build());
         list.add(new UnsupportedPlugin.Builder().name("software to mess with message signing").reason(UnsupportedPlugin.Reason.SECURE_CHAT_BYPASS)
-                .addPlugin("NoEncryption")
-                .addPlugin("NoChatReports").build());
+                .addPlugin("NoEncryption").addPlugin("NoReport")
+                .addPlugin("NoChatReports").addPlugin("NoChatReport").build());
         return Collections.unmodifiableList(list);
     }
 

@@ -19,14 +19,18 @@ package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
+import com.viaversion.viaversion.util.CipherUtil;
 
 import java.io.IOException;
 
@@ -75,7 +79,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        // Skip 1.19 and assume 1.18.2->1.19.1 translation
         registerClientbound(ClientboundPackets1_19.SYSTEM_CHAT, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -87,17 +90,16 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-
-        // Back to system chat
         registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, ClientboundPackets1_19_1.SYSTEM_CHAT, new PacketRemapper() {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
+                    // Back to system chat
                     final JsonElement signedContnet = wrapper.read(Type.COMPONENT);
                     final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
                     wrapper.write(Type.COMPONENT, unsignedContent != null ? unsignedContent : signedContnet);
 
-                    // Can only be 1 (chat) or 2 (game info) as per 1.18.2->1.19.0 transformer
+                    // Can only be 1 (chat) or 2 (game info) as per 1.18.2->1.19 transformer
                     final int type = wrapper.read(Type.VAR_INT);
                     wrapper.write(Type.BOOLEAN, type == 1); // Overlay
                 });
@@ -109,33 +111,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
             }
         });
-
-        registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
-                handler(wrapper -> {
-                    // Replace chat types
-                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
-                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
-                });
-            }
-        });
-
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.STRING); // Name
-                map(Type.OPTIONAL_PROFILE_KEY); // Public profile key
-                read(Type.OPTIONAL_UUID); // Profile uuid
-            }
-        });
-
         registerServerbound(ServerboundPackets1_19_1.CHAT_MESSAGE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -148,7 +123,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
-
         registerServerbound(ServerboundPackets1_19_1.CHAT_COMMAND, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -167,7 +141,75 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
-
         cancelServerbound(ServerboundPackets1_19_1.CHAT_ACK);
+
+        registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // Entity ID
+                map(Type.BOOLEAN); // Hardcore
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous Gamemode
+                map(Type.STRING_ARRAY); // World List
+                map(Type.NBT); // Registry
+                handler(wrapper -> {
+                    // Replace chat types - not worth the effort of handling them properly
+                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                });
+            }
+        });
+
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Name
+                handler(wrapper -> {
+                    // Profile keys are not compatible; replace it with an empty one
+                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                    if (profileKey == null) {
+                        // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
+                        wrapper.user().put(new NonceStorage(null));
+                    }
+                });
+                read(Type.OPTIONAL_UUID); // Profile uuid
+            }
+        });
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Server id
+                handler(wrapper -> {
+                    if (wrapper.user().has(NonceStorage.class)) {
+                        return;
+                    }
+
+                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    wrapper.user().put(new NonceStorage(CipherUtil.signNonce(publicKey, nonce)));
+                });
+            }
+        });
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
+                handler(wrapper -> {
+                    final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
+                    if (nonceStorage.nonce() == null) {
+                        return;
+                    }
+
+                    final boolean isNonce = wrapper.read(Type.BOOLEAN);
+                    wrapper.write(Type.BOOLEAN, true);
+                    if (!isNonce) { // Should never be true at this point, but /shrug otherwise
+                        wrapper.read(Type.LONG); // Salt
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
+                    }
+                });
+            }
+        });
     }
 }
