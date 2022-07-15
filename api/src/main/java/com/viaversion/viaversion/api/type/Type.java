@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Vector;
@@ -69,8 +70,10 @@ import com.viaversion.viaversion.api.type.types.minecraft.OptPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptUUIDType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalComponentType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalGlobalPositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.OptionalPlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalProfileKeyType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalVarIntType;
+import com.viaversion.viaversion.api.type.types.minecraft.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
 import com.viaversion.viaversion.api.type.types.minecraft.PositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.ProfileKeyType;
@@ -175,6 +178,10 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
     public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new OptionalProfileKeyType();
+
+    public static final Type<PlayerMessageSignature> PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType();
+    public static final Type<PlayerMessageSignature> OPTIONAL_PLAYER_MESSAGE_SIGNATURE = new OptionalPlayerMessageSignatureType();
+    public static final Type<PlayerMessageSignature[]> PLAYER_MESSAGE_SIGNATURE_ARRAY = new ArrayType<>(PLAYER_MESSAGE_SIGNATURE);
 
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();

@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 
 import java.io.IOException;
 
-public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19> {
+public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
             "  \"minecraft:chat_type\": {\n" +
@@ -70,7 +70,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
     }
 
     public Protocol1_19_1To1_19() {
-        super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19.class);
+        super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19_1.class);
     }
 
     @Override
@@ -110,15 +110,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.STRING); // Name
-                map(Type.OPTIONAL_PROFILE_KEY); // Public profile key
-                read(Type.OPTIONAL_UUID); // Profile uuid
-            }
-        });
-
         registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -135,5 +126,48 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Name
+                map(Type.OPTIONAL_PROFILE_KEY); // Public profile key
+                read(Type.OPTIONAL_UUID); // Profile uuid
+            }
+        });
+
+        registerServerbound(ServerboundPackets1_19_1.CHAT_MESSAGE, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Message
+                map(Type.LONG); // Timestamp
+                map(Type.LONG); // Salt
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                map(Type.BOOLEAN); // Signed preview
+                read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
+            }
+        });
+
+        registerServerbound(ServerboundPackets1_19_1.CHAT_COMMAND, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Command
+                map(Type.LONG); // Timestamp
+                map(Type.LONG); // Salt
+                handler(wrapper -> {
+                    final int signatures = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < signatures; i++) {
+                        wrapper.passthrough(Type.STRING); // Argument name
+                        wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                    }
+                });
+                map(Type.BOOLEAN); // Signed preview
+                read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
+            }
+        });
+
+        cancelServerbound(ServerboundPackets1_19_1.CHAT_ACK);
     }
 }
