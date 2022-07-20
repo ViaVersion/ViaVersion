@@ -293,7 +293,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                             }
 
                             // No public profile signature
-                            wrapper.write(Type.BOOLEAN, false);
+                            wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
                         } else if (action == 1 || action == 2) { // Update gamemode/update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // Update display name

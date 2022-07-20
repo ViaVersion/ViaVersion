@@ -142,10 +142,7 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
                         + "You will still be able to run Via on this Minecraft version, but we are unlikely to provide any further fixes or help with problems specific to legacy Minecraft versions. "
                         + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
-            } else if (protocolVersion.highestSupportedVersion() == ProtocolVersion.v1_19.getVersion()) {
-                platform.getLogger().warning("Due to technical limitations, ViaVersion does not support 1.19.1+ clients on 1.19.0 servers. Please update your server to a newer version.");
             }
-
         }
 
         checkJavaVersion();
