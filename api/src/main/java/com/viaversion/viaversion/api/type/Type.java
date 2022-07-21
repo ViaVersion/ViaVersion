@@ -113,6 +113,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<JsonElement> OPTIONAL_COMPONENT = new OptionalComponentType();
 
     public static final Type<String> STRING = new StringType();
+    public static final Type<String> OPTIONAL_STRING = new StringType.OptionalStringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 
     public static final Type<UUID> UUID = new UUIDType();

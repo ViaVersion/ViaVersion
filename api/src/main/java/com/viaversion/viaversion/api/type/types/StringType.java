@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -66,5 +67,12 @@ public class StringType extends Type<String> {
         byte[] b = object.getBytes(StandardCharsets.UTF_8);
         Type.VAR_INT.writePrimitive(buffer, b.length);
         buffer.writeBytes(b);
+    }
+
+    public static final class OptionalStringType extends OptionalType<String> {
+
+        public OptionalStringType() {
+            super(Type.STRING);
+        }
     }
 }

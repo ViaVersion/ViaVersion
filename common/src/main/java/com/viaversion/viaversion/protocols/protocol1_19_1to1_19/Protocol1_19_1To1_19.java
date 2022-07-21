@@ -94,7 +94,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Back to system chat - bye bye chat formats for 1.19.0 players
+                    // Back to system chat - bye bye chat formats for 1.19.0 servers
                     // ... not that big of a deal since the majority of modded servers only has Vanilla /say command and the alike sent as proper player chat
                     final JsonElement signedContent = wrapper.read(Type.COMPONENT);
                     final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
@@ -105,7 +105,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
                 read(Type.UUID); // Sender uuid
                 read(Type.COMPONENT); // Sender display name
-                read(Type.OPTIONAL_COMPONENT); // Team display name
+                read(Type.OPTIONAL_COMPONENT); // Target display name
                 read(Type.LONG); // Timestamp
                 read(Type.LONG); // Salt
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
@@ -157,6 +157,16 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     final CompoundTag tag = wrapper.get(Type.NBT, 0);
                     tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
                 });
+            }
+        });
+
+        registerClientbound(ClientboundPackets1_19.SERVER_DATA, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.OPTIONAL_COMPONENT); // Motd
+                map(Type.OPTIONAL_STRING); // Encoded icon
+                map(Type.BOOLEAN); // Previews chat
+                create(Type.BOOLEAN, false); // Enforces secure chat
             }
         });
 
