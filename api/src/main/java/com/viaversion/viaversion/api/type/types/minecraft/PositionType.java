@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -47,5 +48,12 @@ public class PositionType extends Type<Position> {
         buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
                 | ((((long) object.y()) & 0xfff) << 26)
                 | (object.z() & 0x3ffffff));
+    }
+
+    public static final class OptionalPositionType extends OptionalType<Position> {
+
+        public OptionalPositionType() {
+            super(Type.POSITION);
+        }
     }
 }

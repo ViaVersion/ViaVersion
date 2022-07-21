@@ -62,16 +62,10 @@ import com.viaversion.viaversion.api.type.types.minecraft.FlatItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatItemType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatVarIntItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatVarIntItemType;
+import com.viaversion.viaversion.api.type.types.minecraft.GlobalPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.ItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.ItemType;
 import com.viaversion.viaversion.api.type.types.minecraft.NBTType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptPosition1_14Type;
-import com.viaversion.viaversion.api.type.types.minecraft.OptPositionType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptUUIDType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptionalComponentType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptionalGlobalPositionType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptionalPlayerMessageSignatureType;
-import com.viaversion.viaversion.api.type.types.minecraft.OptionalProfileKeyType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalVarIntType;
 import com.viaversion.viaversion.api.type.types.minecraft.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
@@ -110,17 +104,17 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     /* Other Types */
     public static final Type<JsonElement> COMPONENT = new ComponentType();
-    public static final Type<JsonElement> OPTIONAL_COMPONENT = new OptionalComponentType();
+    public static final Type<JsonElement> OPTIONAL_COMPONENT = new ComponentType.OptionalComponentType();
 
     public static final Type<String> STRING = new StringType();
     public static final Type<String> OPTIONAL_STRING = new StringType.OptionalStringType();
     public static final Type<String[]> STRING_ARRAY = new ArrayType<>(Type.STRING);
 
     public static final Type<UUID> UUID = new UUIDType();
-    public static final Type<UUID> OPTIONAL_UUID = new OptUUIDType();
+    public static final Type<UUID> OPTIONAL_UUID = new UUIDType.OptionalUUIDType();
+    public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
     @Deprecated/*(forRemoval = true)*/
     public static final Type<UUID> UUID_INT_ARRAY = new UUIDIntArrayType();
-    public static final Type<UUID[]> UUID_ARRAY = new ArrayType<>(Type.UUID);
 
     public static final VarIntType VAR_INT = new VarIntType();
     public static final OptionalVarIntType OPTIONAL_VAR_INT = new OptionalVarIntType();
@@ -156,15 +150,16 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     /* MC Types */
     public static final Type<Position> POSITION = new PositionType();
-    public static final Type<Position> OPTIONAL_POSITION = new OptPositionType();
+    public static final Type<Position> OPTIONAL_POSITION = new PositionType.OptionalPositionType();
     public static final Type<Position> POSITION1_14 = new Position1_14Type();
-    public static final Type<Position> OPTIONAL_POSITION_1_14 = new OptPosition1_14Type();
+    public static final Type<Position> OPTIONAL_POSITION_1_14 = new Position1_14Type.OptionalPosition1_14Type();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
-    public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new OptionalGlobalPositionType();
+    public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
+    public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
 
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
@@ -178,10 +173,10 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType();
 
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
-    public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new OptionalProfileKeyType();
+    public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new ProfileKeyType.OptionalProfileKeyType();
 
     public static final Type<PlayerMessageSignature> PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType();
-    public static final Type<PlayerMessageSignature> OPTIONAL_PLAYER_MESSAGE_SIGNATURE = new OptionalPlayerMessageSignatureType();
+    public static final Type<PlayerMessageSignature> OPTIONAL_PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType.OptionalPlayerMessageSignatureType();
     public static final Type<PlayerMessageSignature[]> PLAYER_MESSAGE_SIGNATURE_ARRAY = new ArrayType<>(PLAYER_MESSAGE_SIGNATURE);
 
     /* 1.13 Flat Item (no data) */
