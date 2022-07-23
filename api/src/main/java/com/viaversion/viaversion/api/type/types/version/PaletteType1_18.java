@@ -42,12 +42,8 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
     @Override
     public DataPalette read(final ByteBuf buffer) throws Exception {
-        int bitsPerValue = buffer.readByte();
-        final int originalBitsPerValue = bitsPerValue;
-
-        if (bitsPerValue > type.highestBitsPerValue()) {
-            bitsPerValue = globalPaletteBits;
-        }
+        final int originalBitsPerValue = buffer.readByte();
+        int bitsPerValue = originalBitsPerValue;
 
         // Read palette
         final DataPaletteImpl palette;
@@ -57,6 +53,12 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             palette.addId(Type.VAR_INT.readPrimitive(buffer));
             Type.VAR_INT.readPrimitive(buffer); // 0 values length
             return palette;
+        }
+
+        if (bitsPerValue < 0 || bitsPerValue > type.highestBitsPerValue()) {
+            bitsPerValue = globalPaletteBits;
+        } else if (type == PaletteType.BLOCKS && bitsPerValue < 4) {
+            bitsPerValue = 4; // Linear block palette values are always 4 bits
         }
 
         if (bitsPerValue != globalPaletteBits) {
@@ -70,14 +72,15 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         }
 
         // Read values
-        final long[] values = new long[Type.VAR_INT.readPrimitive(buffer)];
-        if (values.length > 0) {
-            final char valuesPerLong = (char) (64 / bitsPerValue);
+        final int valuesLength = Type.VAR_INT.readPrimitive(buffer);
+        if (valuesLength > 0) {
+            final int valuesPerLong = (char) (64 / bitsPerValue);
             final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
-            if (values.length != expectedLength) {
-                throw new IllegalStateException("Palette data length (" + values.length + ") does not match expected length (" + expectedLength + ")! bitsPerValue=" + bitsPerValue + ", originalBitsPerValue=" + originalBitsPerValue);
+            if (valuesLength != expectedLength) {
+                throw new IllegalStateException("Palette data length (" + valuesLength + ") does not match expected length (" + expectedLength + ")! bitsPerValue=" + bitsPerValue + ", originalBitsPerValue=" + originalBitsPerValue);
             }
 
+            final long[] values = new long[valuesLength];
             for (int i = 0; i < values.length; i++) {
                 values[i] = buffer.readLong();
             }
