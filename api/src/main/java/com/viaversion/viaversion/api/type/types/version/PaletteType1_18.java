@@ -51,7 +51,12 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             //TODO Create proper singleton palette Object
             palette = new DataPaletteImpl(type.size(), 1);
             palette.addId(Type.VAR_INT.readPrimitive(buffer));
-            Type.VAR_INT.readPrimitive(buffer); // 0 values length
+
+            // Just eat it if not 0 - thanks, Hypixel
+            final int valuesLength = Type.VAR_INT.readPrimitive(buffer);
+            for (int i = 0; i < valuesLength; i++) {
+                buffer.readLong();
+            }
             return palette;
         }
 
@@ -74,18 +79,17 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         // Read values
         final int valuesLength = Type.VAR_INT.readPrimitive(buffer);
         if (valuesLength > 0) {
-            final int valuesPerLong = (char) (64 / bitsPerValue);
-            final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
-            if (valuesLength != expectedLength) {
-                throw new IllegalStateException("Palette data length (" + valuesLength + ") does not match expected length (" + expectedLength + ")! bitsPerValue=" + bitsPerValue + ", originalBitsPerValue=" + originalBitsPerValue);
-            }
-
             final long[] values = new long[valuesLength];
-            for (int i = 0; i < values.length; i++) {
+            for (int i = 0; i < valuesLength; i++) {
                 values[i] = buffer.readLong();
             }
-            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
-                    bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
+
+            final int valuesPerLong = (char) (64 / bitsPerValue);
+            final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
+            if (valuesLength == expectedLength) { // Thanks, Hypixel
+                CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
+                        bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
+            }
         }
         return palette;
     }
