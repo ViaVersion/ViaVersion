@@ -41,8 +41,10 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         int bitsPerBlock = buffer.readUnsignedByte();
         int originalBitsPerBlock = bitsPerBlock;
 
-        if (bitsPerBlock == 0 || bitsPerBlock > 8) {
+        if (bitsPerBlock > 8) {
             bitsPerBlock = GLOBAL_PALETTE;
+        } else if (bitsPerBlock < 4) {
+            bitsPerBlock = 4;
         }
 
         // Read palette
@@ -58,19 +60,14 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         }
 
         // Read blocks
-        long[] blockData = new long[Type.VAR_INT.readPrimitive(buffer)];
+        long[] blockData = Type.LONG_ARRAY_PRIMITIVE.read(buffer);
         if (blockData.length > 0) {
             char valuesPerLong = (char) (64 / bitsPerBlock);
             int expectedLength = (ChunkSection.SIZE + valuesPerLong - 1) / valuesPerLong;
-            if (blockData.length != expectedLength) {
-                throw new IllegalStateException("Block data length (" + blockData.length + ") does not match expected length (" + expectedLength + ")! bitsPerBlock=" + bitsPerBlock + ", originalBitsPerBlock=" + originalBitsPerBlock);
+            if (blockData.length == expectedLength) {
+                CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerBlock, ChunkSection.SIZE, blockData,
+                        bitsPerBlock == GLOBAL_PALETTE ? chunkSection::setFlatBlock : chunkSection::setPaletteIndex);
             }
-
-            for (int i = 0; i < blockData.length; i++) {
-                blockData[i] = buffer.readLong();
-            }
-            CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerBlock, ChunkSection.SIZE, blockData,
-                    bitsPerBlock == GLOBAL_PALETTE ? chunkSection::setFlatBlock : chunkSection::setPaletteIndex);
         }
 
         return chunkSection;
@@ -89,7 +86,7 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
 
         buffer.writeByte(bitsPerBlock);
 
-        // Write pallet (or not)
+        // Write palette
         if (bitsPerBlock != GLOBAL_PALETTE) {
             Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteSize());
             for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
@@ -99,9 +96,6 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
 
         long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerBlock, ChunkSection.SIZE,
                 bitsPerBlock == GLOBAL_PALETTE ? chunkSection::getFlatBlock : chunkSection::getPaletteIndex);
-        Type.VAR_INT.writePrimitive(buffer, data.length);
-        for (long l : data) {
-            buffer.writeLong(l);
-        }
+        Type.LONG_ARRAY_PRIMITIVE.write(buffer, data);
     }
 }
