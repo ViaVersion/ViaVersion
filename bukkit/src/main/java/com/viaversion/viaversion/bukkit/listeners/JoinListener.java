@@ -103,7 +103,7 @@ public class JoinListener implements Listener {
 
     private @Nullable UserConnection getUserConnection(Channel channel) {
         BukkitEncodeHandler encoder = channel.pipeline().get(BukkitEncodeHandler.class);
-        return encoder != null ? encoder.getInfo() : null;
+        return encoder != null ? encoder.connection() : null;
     }
 
     private Channel getChannel(Player player) throws Exception {

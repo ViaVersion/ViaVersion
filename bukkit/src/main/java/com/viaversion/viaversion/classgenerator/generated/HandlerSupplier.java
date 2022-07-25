@@ -20,17 +20,25 @@ package com.viaversion.viaversion.classgenerator.generated;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
-public class BasicHandlerConstructor implements HandlerConstructor {
-    @Override
-    public BukkitEncodeHandler newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
-        return new BukkitEncodeHandler(info, minecraftEncoder);
-    }
+public interface HandlerSupplier {
 
-    @Override
-    public BukkitDecodeHandler newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {
-        return new BukkitDecodeHandler(info, minecraftDecoder);
+    MessageToMessageEncoder<ByteBuf> newEncodeHandler(UserConnection connection);
+
+    MessageToMessageDecoder<ByteBuf> newDecodeHandler(UserConnection connection);
+
+    final class DefaultHandlerSupplier implements HandlerSupplier {
+        @Override
+        public MessageToMessageEncoder<ByteBuf> newEncodeHandler(final UserConnection connection) {
+            return new BukkitEncodeHandler(connection);
+        }
+
+        @Override
+        public MessageToMessageDecoder<ByteBuf> newDecodeHandler(final UserConnection connection) {
+            return new BukkitDecodeHandler(connection);
+        }
     }
 }

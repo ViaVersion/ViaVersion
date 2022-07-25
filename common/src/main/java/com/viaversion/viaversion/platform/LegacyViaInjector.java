@@ -235,16 +235,6 @@ public abstract class LegacyViaInjector implements ViaInjector {
         return data;
     }
 
-    @Override
-    public String getEncoderName() {
-        return "encoder";
-    }
-
-    @Override
-    public String getDecoderName() {
-        return "decoder";
-    }
-
     /**
      * Returns the Vanilla server connection object the channels to be injected should be searched in.
      *

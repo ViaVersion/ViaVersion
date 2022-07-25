@@ -34,29 +34,21 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PipelineUtil {
-    private static Method DECODE_METHOD;
-    private static Method ENCODE_METHOD;
-    private static Method MTM_DECODE;
+public final class PipelineUtil {
+    private static final Method DECODE_METHOD;
+    private static final Method ENCODE_METHOD;
+    private static final Method MTM_DECODE;
 
     static {
         try {
             DECODE_METHOD = ByteToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, ByteBuf.class, List.class);
             DECODE_METHOD.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
             ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
             MTM_DECODE = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
             MTM_DECODE.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
