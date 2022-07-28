@@ -218,10 +218,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                         final CompoundTag dimensionCompound = (CompoundTag) dimension;
                         final CompoundTag element = dimensionCompound.get("element");
                         final String name = (String) dimensionCompound.get("name").getValue();
+                        addMonsterSpawnData(element);
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
                         dimensionsMap.put(element.clone(), name);
-
-                        addMonsterSpawnData(element);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);
 
@@ -310,6 +309,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
     private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Type.NBT);
+        addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
