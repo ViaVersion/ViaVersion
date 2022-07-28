@@ -177,35 +177,49 @@ public interface ProtocolManager {
                                                                        @Nullable Class<S> serverboundPacketsClass);
 
     /**
-     * Returns whether protocol path calculation expects the path to come closer to the expected version with each entry, true by default.
+     * Sets the max delta the path calculation allows the distance to the target protocol version to increase.
      * <p>
-     * In practice, this means a path will never go to a protocol version that puts it farther from the desired
+     * If set to 0, protocol paths will have to come closer to the target protocol version with every entry,
+     * never going farther away from it (1→5→10 and 1→11→10 are ok, 1→20→10 is not ok).
+     * If set to -1, no distance checks will be applied (1→20→10 is ok).
+     *
+     * @param maxPathDeltaIncrease the max delta the path calculation allows the distance to the target protocol version to increase
+     * @see #onlyCheckLoweringPathEntries()
+     */
+    void setMaxPathDeltaIncrease(int maxPathDeltaIncrease);
+
+    /**
+     * Returns the max delta the path calculation allows the distance to the target protocol version to increase. 0 by default.
+     * <p>
+     * In practice, a value of 0 means a path will never go to a protocol version that puts it farther from the desired
      * server protocol version, even if a path existed.
-     * If this is set to false, *all* possible paths will be checked until a fitting one is found.
+     * If this is set to -1, *all* possible paths will be checked until a fitting one is found.
      * <p>
-     * Negative examples if this returns true:
+     * Negative examples if this returns 0:
      * <ul>
      *     A possible path from 3 to 5 in order of 3→10→5 will be dismissed.
      *     A possible path from 5 to 3 in order of 5→0→3 will be dismissed.
      * </ul>
      * <p>
-     * Negative examples if this returns false:
+     * Negative examples if this returns -1:
      * <ul>
      *     While searching for a path from 3 to 5, 3→2→1 could be checked first before 3→4→5 is found.
      *     While searching for a path from 5 to 3, 5→6→7 could be checked first before 5→4→3 is found.
      * </ul>
      *
-     * @return whether protocol path calculation expects the path to come closer to the expected version with each entry
+     * @return max delta the path calculation allows the distance to the target protocol version to increase
      */
-    boolean onlyCheckLoweringPathEntries();
+    int getMaxPathDeltaIncrease();
 
-    /**
-     * Sets whether protocol path calculation expects the path to come closer to the expected version with each entry.
-     *
-     * @param onlyCheckLoweringPathEntries whether protocol path calculation expects the path to come closer to the expected version with each entry
-     * @see #onlyCheckLoweringPathEntries()
-     */
-    void setOnlyCheckLoweringPathEntries(boolean onlyCheckLoweringPathEntries);
+    @Deprecated/*(forRemoval = true)*/
+    default void setOnlyCheckLoweringPathEntries(final boolean onlyCheckLoweringPathEntries) {
+        setMaxPathDeltaIncrease(onlyCheckLoweringPathEntries ? 0 : -1);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default boolean onlyCheckLoweringPathEntries() {
+        return getMaxPathDeltaIncrease() != -1;
+    }
 
     /**
      * Returns the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.

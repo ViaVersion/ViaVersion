@@ -119,7 +119,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private boolean mappingsLoaded;
 
     private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(-1);
-    private boolean onlyCheckLoweringPathEntries = true;
+    private int maxPathDeltaIncrease; // Only allow lowering path entries by default
     private int maxProtocolPathSize = 50;
 
     public ProtocolManagerImpl() {
@@ -317,7 +317,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
             if (current.containsKey(translatedToVersion)) continue;
 
             // Check if the new version is farther away than the current client version
-            if (onlyCheckLoweringPathEntries && Math.abs(serverVersion - translatedToVersion) > Math.abs(serverVersion - clientVersion)) {
+            if (maxPathDeltaIncrease != -1 && Math.abs(serverVersion - translatedToVersion) - Math.abs(serverVersion - clientVersion) > maxPathDeltaIncrease) {
                 continue;
             }
 
@@ -385,13 +385,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void setOnlyCheckLoweringPathEntries(boolean onlyCheckLoweringPathEntries) {
-        this.onlyCheckLoweringPathEntries = onlyCheckLoweringPathEntries;
+    public void setMaxPathDeltaIncrease(final int maxPathDeltaIncrease) {
+        this.maxPathDeltaIncrease = Math.max(-1, maxPathDeltaIncrease);
     }
 
     @Override
-    public boolean onlyCheckLoweringPathEntries() {
-        return onlyCheckLoweringPathEntries;
+    public int getMaxPathDeltaIncrease() {
+        return maxPathDeltaIncrease;
     }
 
     @Override
