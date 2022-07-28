@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceSto
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -255,7 +256,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         connection.put(new ChatTypeStorage());
     }
 
-    private boolean decorateChatMessage(final PacketWrapper wrapper, final int chatTypeId, final JsonElement senderName, final JsonElement teamName, final JsonElement message) {
+    private boolean decorateChatMessage(final PacketWrapper wrapper, final int chatTypeId, final JsonElement senderName, @Nullable final JsonElement teamName, final JsonElement message) {
         final CompoundTag chatType = wrapper.user().get(ChatTypeStorage.class).chatType(chatTypeId);
         if (chatType == null) {
             Via.getPlatform().getLogger().warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
@@ -285,9 +286,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         final TranslatableComponent.Builder componentBuilder = Component.translatable().key(translationKey);
 
         // Add the style
-        final Style.Builder styleBuilder = Style.style();
         final CompoundTag style = decoaration.get("style");
         if (style != null) {
+            final Style.Builder styleBuilder = Style.style();
             final StringTag color = style.get("color");
             if (color != null) {
                 final NamedTextColor textColor = NamedTextColor.NAMES.value(color.getValue());
@@ -301,33 +302,35 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     styleBuilder.decoration(TextDecoration.NAMES.value(key), style.<ByteTag>get(key).asByte() == 1);
                 }
             }
+            componentBuilder.style(styleBuilder.build());
         }
-        componentBuilder.style(styleBuilder.build());
 
         // Add the replacements
-        final List<Component> arguments = new ArrayList<>();
         final ListTag parameters = decoaration.get("parameters");
-        if (parameters != null) for (final Tag element : parameters) {
-            JsonElement argument = null;
-            switch ((String) element.getValue()) {
-                case "sender":
-                    argument = senderName;
-                    break;
-                case "content":
-                    argument = message;
-                    break;
-                case "team_name":
-                    Preconditions.checkNotNull(teamName, "Team name is null");
-                    argument = teamName;
-                    break;
-                default:
-                    Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
+        if (parameters != null) {
+            final List<Component> arguments = new ArrayList<>();
+            for (final Tag element : parameters) {
+                JsonElement argument = null;
+                switch ((String) element.getValue()) {
+                    case "sender":
+                        argument = senderName;
+                        break;
+                    case "content":
+                        argument = message;
+                        break;
+                    case "team_name":
+                        Preconditions.checkNotNull(teamName, "Team name is null");
+                        argument = teamName;
+                        break;
+                    default:
+                        Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
+                }
+                if (argument != null) {
+                    arguments.add(GsonComponentSerializer.gson().deserializeFromTree(argument));
+                }
             }
-            if (argument != null) {
-                arguments.add(GsonComponentSerializer.gson().deserializeFromTree(argument));
-            }
+            componentBuilder.args(arguments);
         }
-        componentBuilder.args(arguments);
 
         wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(componentBuilder.build()));
         wrapper.write(Type.BOOLEAN, overlay);
