@@ -17,16 +17,31 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
+import com.viaversion.viaversion.libs.kyori.adventure.text.TextReplacementConfig;
+import com.viaversion.viaversion.libs.kyori.adventure.text.format.NamedTextColor;
+import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.ChatTypeStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
@@ -94,18 +109,18 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Back to system chat - bye bye chat formats for 1.19.0 servers
-                    // ... not that big of a deal since the majority of modded servers only has Vanilla /say command and the alike sent as proper player chat
+                    // Back to system chat
                     final JsonElement signedContent = wrapper.read(Type.COMPONENT);
                     final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    wrapper.write(Type.COMPONENT, unsignedContent != null ? unsignedContent : signedContent);
+                    final int chatType = wrapper.read(Type.VAR_INT);
 
-                    final int type = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.BOOLEAN, type == 2); // Overlay, going by the default 1.19 chat type registry
+                    wrapper.read(Type.UUID); // Sender UUID
+                    final JsonElement senderName = wrapper.read(Type.COMPONENT);
+                    final JsonElement teamName = wrapper.read(Type.OPTIONAL_COMPONENT);
+                    if (!decorateChatMessage(wrapper, chatType, senderName, teamName, unsignedContent != null ? unsignedContent : signedContent)) {
+                        wrapper.cancel();
+                    }
                 });
-                read(Type.UUID); // Sender uuid
-                read(Type.COMPONENT); // Sender display name
-                read(Type.OPTIONAL_COMPONENT); // Target display name
                 read(Type.LONG); // Timestamp
                 read(Type.LONG); // Salt
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
@@ -151,11 +166,20 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
                 handler(wrapper -> {
-                    // Replace chat types - not worth the effort of handling them properly
-                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
-                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                    final ChatTypeStorage chatTypeStorage = wrapper.user().get(ChatTypeStorage.class);
+                    chatTypeStorage.clear();
+
+                    final CompoundTag registry = wrapper.passthrough(Type.NBT);
+                    final ListTag chatTypes = ((CompoundTag) registry.get("minecraft:chat_type")).get("value");
+                    for (final Tag chatType : chatTypes) {
+                        final CompoundTag chatTypeCompound = (CompoundTag) chatType;
+                        final NumberTag idTag = chatTypeCompound.get("id");
+                        chatTypeStorage.addChatType(idTag.asInt(), chatTypeCompound);
+                    }
+
+                    // Replace chat types - they won't actually be used
+                    registry.put("minecraft:chat_type", CHAT_REGISTRY.clone());
                 });
             }
         });
@@ -221,5 +245,84 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+    }
+
+    @Override
+    public void init(final UserConnection connection) {
+        connection.put(new ChatTypeStorage());
+    }
+
+    private TextReplacementConfig replace(final JsonElement replacement) {
+        return TextReplacementConfig.builder().matchLiteral("%s").replacement(GsonComponentSerializer.gson().deserializeFromTree(replacement)).once().build();
+    }
+
+    private boolean decorateChatMessage(final PacketWrapper wrapper, final int chatTypeId, final JsonElement senderName, final JsonElement teamName, final JsonElement message) {
+        final CompoundTag chatType = wrapper.user().get(ChatTypeStorage.class).chatType(chatTypeId);
+        if (chatType == null) {
+            Via.getPlatform().getLogger().warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
+            return false;
+        }
+
+        CompoundTag chatData = chatType.<CompoundTag>get("element").get("chat");
+        boolean overlay = false;
+        if (chatData == null) {
+            chatData = chatType.<CompoundTag>get("element").get("overlay");
+            if (chatData == null) {
+                // Either narration or something we don't know
+                return false;
+            }
+
+            overlay = true;
+        }
+
+        final CompoundTag decoaration = chatData.get("decoration");
+        if (decoaration == null) {
+            wrapper.write(Type.COMPONENT, message);
+            wrapper.write(Type.BOOLEAN, overlay);
+            return true;
+        }
+
+        final String translationKey = (String) decoaration.get("translation_key").getValue();
+        final String rawTranslation = Via.getConfig().chatTypeFormat(translationKey);
+        if (rawTranslation == null) {
+            Via.getPlatform().getLogger().warning("Missing chat type translation for key " + translationKey);
+            return false;
+        }
+
+        Component component = Component.text(rawTranslation);
+        final CompoundTag style = decoaration.get("style");
+        if (style != null) {
+            final StringTag color = style.get("color");
+            if (color != null && NamedTextColor.NAMES.value(color.getValue()) != null) {
+                component = component.color(NamedTextColor.NAMES.value(color.getValue()));
+            }
+            for (final String key : TextDecoration.NAMES.keys()) {
+                if (style.contains(key) && style.<ByteTag>get(key).asByte() == 1) {
+                    component = component.decorate(TextDecoration.NAMES.value(key));
+                }
+            }
+        }
+
+        final ListTag parameters = decoaration.get("parameters");
+        if (parameters != null) for (final Tag element : parameters) {
+            switch ((String) element.getValue()) {
+                case "sender":
+                    component = component.replaceText(replace(senderName));
+                    break;
+                case "content":
+                    component = component.replaceText(replace(message));
+                    break;
+                case "team_name":
+                    Preconditions.checkNotNull(teamName, "Team name is null");
+                    component = component.replaceText(replace(teamName));
+                    break;
+                default:
+                    Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
+            }
+        }
+
+        wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(component));
+        wrapper.write(Type.BOOLEAN, overlay);
+        return true;
     }
 }

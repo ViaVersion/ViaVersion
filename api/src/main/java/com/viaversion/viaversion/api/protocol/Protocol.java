@@ -302,7 +302,7 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @param userConnection The user to initialise
      */
-    default void init(UserConnection userConnection) {
+    default void init(UserConnection connection) {
     }
 
     /**
