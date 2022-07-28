@@ -35,8 +35,9 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.TextReplacementConfig;
+import com.viaversion.viaversion.libs.kyori.adventure.text.TranslatableComponent;
 import com.viaversion.viaversion.libs.kyori.adventure.text.format.NamedTextColor;
+import com.viaversion.viaversion.libs.kyori.adventure.text.format.Style;
 import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
@@ -48,6 +49,8 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 import com.viaversion.viaversion.util.CipherUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
@@ -252,10 +255,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         connection.put(new ChatTypeStorage());
     }
 
-    private TextReplacementConfig replace(final JsonElement replacement) {
-        return TextReplacementConfig.builder().matchLiteral("%s").replacement(GsonComponentSerializer.gson().deserializeFromTree(replacement)).once().build();
-    }
-
     private boolean decorateChatMessage(final PacketWrapper wrapper, final int chatTypeId, final JsonElement senderName, final JsonElement teamName, final JsonElement message) {
         final CompoundTag chatType = wrapper.user().get(ChatTypeStorage.class).chatType(chatTypeId);
         if (chatType == null) {
@@ -283,44 +282,54 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         final String translationKey = (String) decoaration.get("translation_key").getValue();
-        String rawTranslation = Via.getConfig().chatTypeFormat(translationKey);
-        if (rawTranslation == null) {
-            rawTranslation = translationKey;
-        }
+        final TranslatableComponent.Builder componentBuilder = Component.translatable().key(translationKey);
 
-        Component component = Component.text(rawTranslation);
+        // Add the style
+        final Style.Builder styleBuilder = Style.style();
         final CompoundTag style = decoaration.get("style");
         if (style != null) {
             final StringTag color = style.get("color");
-            if (color != null && NamedTextColor.NAMES.value(color.getValue()) != null) {
-                component = component.color(NamedTextColor.NAMES.value(color.getValue()));
+            if (color != null) {
+                final NamedTextColor textColor = NamedTextColor.NAMES.value(color.getValue());
+                if (textColor != null) {
+                    styleBuilder.color(NamedTextColor.NAMES.value(color.getValue()));
+                }
             }
+
             for (final String key : TextDecoration.NAMES.keys()) {
-                if (style.contains(key) && style.<ByteTag>get(key).asByte() == 1) {
-                    component = component.decorate(TextDecoration.NAMES.value(key));
+                if (style.contains(key)) {
+                    styleBuilder.decoration(TextDecoration.NAMES.value(key), style.<ByteTag>get(key).asByte() == 1);
                 }
             }
         }
+        componentBuilder.style(styleBuilder.build());
 
+        // Add the replacements
+        final List<Component> arguments = new ArrayList<>();
         final ListTag parameters = decoaration.get("parameters");
         if (parameters != null) for (final Tag element : parameters) {
+            JsonElement argument = null;
             switch ((String) element.getValue()) {
                 case "sender":
-                    component = component.replaceText(replace(senderName));
+                    argument = senderName;
                     break;
                 case "content":
-                    component = component.replaceText(replace(message));
+                    argument = message;
                     break;
                 case "team_name":
                     Preconditions.checkNotNull(teamName, "Team name is null");
-                    component = component.replaceText(replace(teamName));
+                    argument = teamName;
                     break;
                 default:
                     Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
             }
+            if (argument != null) {
+                arguments.add(GsonComponentSerializer.gson().deserializeFromTree(argument));
+            }
         }
+        componentBuilder.args(arguments);
 
-        wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(component));
+        wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(componentBuilder.build()));
         wrapper.write(Type.BOOLEAN, overlay);
         return true;
     }
