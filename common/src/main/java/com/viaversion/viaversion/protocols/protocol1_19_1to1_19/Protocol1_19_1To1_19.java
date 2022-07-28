@@ -283,10 +283,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         final String translationKey = (String) decoaration.get("translation_key").getValue();
-        final String rawTranslation = Via.getConfig().chatTypeFormat(translationKey);
+        String rawTranslation = Via.getConfig().chatTypeFormat(translationKey);
         if (rawTranslation == null) {
-            Via.getPlatform().getLogger().warning("Missing chat type translation for key " + translationKey);
-            return false;
+            rawTranslation = translationKey;
         }
 
         Component component = Component.text(rawTranslation);
