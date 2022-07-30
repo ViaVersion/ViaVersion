@@ -48,6 +48,11 @@ public class PacketBlockConnectionProvider extends BlockConnectionProvider {
     }
 
     @Override
+    public void unloadChunkSection(UserConnection connection, int chunkX, int chunkY, int chunkZ) {
+        connection.get(BlockConnectionStorage.class).unloadSection(chunkX, chunkY, chunkZ);
+    }
+
+    @Override
     public boolean storesBlocks() {
         return true;
     }
