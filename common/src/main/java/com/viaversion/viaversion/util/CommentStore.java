@@ -18,8 +18,6 @@
 package com.viaversion.viaversion.util;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 
@@ -28,19 +26,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class CommentStore {
-    private final Map<String, List<String>> headers = Maps.newConcurrentMap();
-    private final char pathSeperator;
+    private final Map<String, List<String>> headers = new HashMap<>();
+    private final String pathSeparator;
+    private final String pathSeparatorQuoted;
     private final int indents;
-    private List<String> mainHeader = Lists.newArrayList();
+    private List<String> mainHeader = new ArrayList<>();
 
-    public CommentStore(char pathSeperator, int indents) {
-        this.pathSeperator = pathSeperator;
+    public CommentStore(final char pathSeparator, final int indents) {
+        this.pathSeparator = Character.toString(pathSeparator);
+        this.pathSeparatorQuoted = Pattern.quote(this.pathSeparator);
         this.indents = indents;
     }
 
@@ -49,7 +51,7 @@ public class CommentStore {
      *
      * @param header header
      */
-    public void mainHeader(String... header) {
+    public void mainHeader(final String... header) {
         mainHeader = Arrays.asList(header);
     }
 
@@ -68,8 +70,7 @@ public class CommentStore {
      * @param key    of option (or section)
      * @param header of option (or section)
      */
-    public void header(String key, String... header) {
-//        String value = Joiner.on('\n').join(header);
+    public void header(final String key, final String... header) {
         headers.put(key, Arrays.asList(header));
     }
 
@@ -79,126 +80,181 @@ public class CommentStore {
      * @param key of option (or section)
      * @return Header
      */
-    public List<String> header(String key) {
+    public List<String> header(final String key) {
         return headers.get(key);
     }
 
-    public void storeComments(InputStream inputStream) throws IOException {
-        InputStreamReader reader = new InputStreamReader(inputStream);
-        String contents;
-        try {
-            contents = CharStreams.toString(reader);
-        } finally {
-            reader.close();
+    public void storeComments(final InputStream inputStream) throws IOException {
+        final String data;
+        try (final InputStreamReader reader = new InputStreamReader(inputStream)) {
+            data = CharStreams.toString(reader);
         }
-        StringBuilder memoryData = new StringBuilder();
-        // Parse headers
-        final String pathSeparator = Character.toString(this.pathSeperator);
+
+        final List<String> currentComments = new ArrayList<>();
+        boolean header = true;
+        boolean multiLineValue = false;
         int currentIndents = 0;
         String key = "";
-        List<String> headers = Lists.newArrayList();
-        for (String line : contents.split("\n")) {
-            if (line.isEmpty()) continue; // Skip empty lines
-            int indent = getSuccessiveCharCount(line, ' ');
-            String subline = indent > 0 ? line.substring(indent) : line;
-            if (subline.startsWith("#")) {
-                if (subline.startsWith("#>")) {
-                    String txt = subline.startsWith("#> ") ? subline.substring(3) : subline.substring(2);
-                    mainHeader.add(txt);
-                    continue; // Main header, handled by bukkit
-                }
-
-                // Add header to list
-                String txt = subline.startsWith("# ") ? subline.substring(2) : subline.substring(1);
-                headers.add(txt);
+        for (final String line : data.split("\n")) {
+            final String s = line.trim();
+            // It's a comment!
+            if (s.startsWith("#")) {
+                currentComments.add(s);
                 continue;
             }
 
-            int indents = indent / this.indents;
-            if (indents <= currentIndents) {
-                // Remove last section of key
-                String[] array = key.split(Pattern.quote(pathSeparator));
-                int backspace = currentIndents - indents + 1;
-                key = join(array, this.pathSeperator, 0, array.length - backspace);
+            // Header is over - save it!
+            if (header) {
+                if (!currentComments.isEmpty()) {
+                    currentComments.add("");
+                    mainHeader.addAll(currentComments);
+                    currentComments.clear();
+                }
+                header = false;
             }
 
-            // Add new section to key
-            String separator = key.length() > 0 ? pathSeparator : "";
-            String lineKey = line.contains(":") ? line.split(Pattern.quote(":"))[0] : line;
-            key += separator + lineKey.substring(indent);
+            // Save empty lines as well
+            if (s.isEmpty()) {
+                currentComments.add(s);
+                continue;
+            }
 
+            // Multi line values?
+            if (s.startsWith("- |")) {
+                multiLineValue = true;
+                continue;
+            }
+
+            final int indent = getIndents(line);
+            final int indents = indent / this.indents;
+            // Check if the multi line value is over
+            if (multiLineValue) {
+                if (indents > currentIndents) continue;
+
+                multiLineValue = false;
+            }
+
+            // Check if this is a level lower
+            if (indents <= currentIndents) {
+                final String[] array = key.split(pathSeparatorQuoted);
+                final int backspace = currentIndents - indents + 1;
+                final int delta = array.length - backspace;
+                key = delta >= 0 ? join(array, delta) : key;
+            }
+
+            // Finish current key
+            final String separator = key.isEmpty() ? "" : this.pathSeparator;
+            final String lineKey = line.indexOf(':') != -1 ? line.split(Pattern.quote(":"))[0] : line;
+            key += separator + lineKey.substring(indent);
             currentIndents = indents;
 
-            memoryData.append(line).append('\n');
-            if (!headers.isEmpty()) {
-                this.headers.put(key, headers);
-                headers = Lists.newArrayList();
+            if (!currentComments.isEmpty()) {
+                headers.put(key, new ArrayList<>(currentComments));
+                currentComments.clear();
             }
         }
     }
 
-    public void writeComments(String yaml, File output) throws IOException {
-        // Custom save
-        final int indentLength = this.indents;
-        final String pathSeparator = Character.toString(this.pathSeperator);
-        StringBuilder fileData = new StringBuilder();
-        int currentIndents = 0;
-        String key = "";
-        for (String h : mainHeader) {
-            // Append main header to top of file
-            fileData.append("#> ").append(h).append('\n');
+    public void writeComments(final String rawYaml, final File output) throws IOException {
+        final StringBuilder fileData = new StringBuilder();
+        for (final String mainHeaderLine : mainHeader) {
+            fileData.append(mainHeaderLine).append('\n');
         }
 
-        for (String line : yaml.split("\n")) {
-            if (line.isEmpty() || line.trim().charAt(0) == '-') {
+        // Remove last new line
+        fileData.deleteCharAt(fileData.length() - 1);
+
+        int currentKeyIndents = 0;
+        String key = "";
+        for (final String line : rawYaml.split("\n")) {
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            final int indent = getIndents(line);
+            final int indents = indent / this.indents;
+            final boolean keyLine;
+            final String substring = line.substring(indent);
+            if (substring.trim().isEmpty() || substring.charAt(0) == '-') {
+                keyLine = false;
+            } else if (indents <= currentKeyIndents) {
+                final String[] array = key.split(this.pathSeparatorQuoted);
+                final int backspace = currentKeyIndents - indents + 1;
+                key = join(array, array.length - backspace);
+                keyLine = true;
+            } else {
+                keyLine = line.indexOf(':') != -1;
+            }
+
+            if (!keyLine) {
+                // Nothing to do, go to next line
                 fileData.append(line).append('\n');
                 continue;
             }
 
-            int indent = getSuccessiveCharCount(line, ' ');
-            int indents = indent / indentLength;
-            String indentText = indent > 0 ? line.substring(0, indent) : "";
-            if (indents <= currentIndents) {
-                // Remove last section of key
-                String[] array = key.split(Pattern.quote(pathSeparator));
-                int backspace = currentIndents - indents + 1;
-                key = join(array, this.pathSeperator, 0, array.length - backspace);
+            final String newKey = substring.split(Pattern.quote(":"))[0]; // Not sure about the quote thing, so I'll just keep it :aaa:
+            if (!key.isEmpty()) {
+                key += this.pathSeparator;
+            }
+            key += newKey;
+
+            // Add comments
+            final List<String> strings = headers.get(key);
+            if (strings != null && !strings.isEmpty()) {
+                final String indentText = indent > 0 ? line.substring(0, indent) : "";
+                for (final String comment : strings) {
+                    if (comment.isEmpty()) {
+                        fileData.append('\n');
+                    } else {
+                        fileData.append(indentText).append(comment).append('\n');
+                    }
+                }
             }
 
-            // Add new section to key
-            String separator = !key.isEmpty() ? pathSeparator : "";
-            String lineKey = line.contains(":") ? line.split(Pattern.quote(":"))[0] : line;
-            key += separator + lineKey.substring(indent);
-
-            currentIndents = indents;
-
-            List<String> header = headers.get(key);
-            String headerText = header != null ? addHeaderTags(header, indentText) : "";
-            fileData.append(headerText).append(line).append('\n');
+            currentKeyIndents = indents;
+            fileData.append(line).append('\n');
         }
 
         // Write data to file
         Files.write(fileData.toString(), output, StandardCharsets.UTF_8);
     }
 
-    private String addHeaderTags(List<String> header, String indent) {
-        StringBuilder builder = new StringBuilder();
-        for (String line : header) {
+    private String addHeaderTags(final List<String> header, final String indent) {
+        final StringBuilder builder = new StringBuilder();
+        for (final String line : header) {
             builder.append(indent).append("# ").append(line).append('\n');
         }
         return builder.toString();
     }
 
-    private String join(String[] array, char joinChar, int start, int length) {
-        String[] copy = new String[length - start];
+    private String join(final String[] array, final char joinChar, final int start, final int length) {
+        final String[] copy = new String[length - start];
         System.arraycopy(array, start, copy, 0, length - start);
         return Joiner.on(joinChar).join(copy);
     }
 
-    private int getSuccessiveCharCount(String text, char key) {
+    private int getIndents(final String line) {
+        int count = 0;
+        for (int i = 0; i < line.length(); i++) {
+            if (line.charAt(i) != ' ') {
+                break;
+            }
+
+            count++;
+        }
+        return count;
+    }
+
+    private String join(final String[] array, final int length) {
+        final String[] copy = new String[length];
+        System.arraycopy(array, 0, copy, 0, length);
+        return String.join(this.pathSeparator, copy);
+    }
+
+    private int getSuccessiveSpaces(final String text) {
         int count = 0;
         for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == key) {
+            if (text.charAt(i) == ' ') {
                 count += 1;
             } else {
                 break;

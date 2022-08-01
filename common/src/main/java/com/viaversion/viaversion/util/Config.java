@@ -62,9 +62,12 @@ public abstract class Config implements ConfigurationProvider {
         return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
-    public synchronized Map<String, Object> loadConfig(File location) {
+    public Map<String, Object> loadConfig(File location) {
+        return loadConfig(location, getDefaultConfigURL());
+    }
+
+    public synchronized Map<String, Object> loadConfig(File location, URL jarConfigFile) {
         List<String> unsupported = getUnsupportedOptions();
-        URL jarConfigFile = getDefaultConfigURL();
         try {
             commentStore.storeComments(jarConfigFile.openStream());
             for (String option : unsupported) {
@@ -135,6 +138,10 @@ public abstract class Config implements ConfigurationProvider {
     public void saveConfig() {
         this.configFile.getParentFile().mkdirs();
         saveConfig(this.configFile, this.config);
+    }
+
+    public void saveConfig(final File file) {
+        saveConfig(file, this.config);
     }
 
     @Override

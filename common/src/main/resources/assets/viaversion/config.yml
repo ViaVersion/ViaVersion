@@ -166,11 +166,11 @@ cache-1_17-light: true
 #
 # 1.19 chat type formats used for 1.19.1+ clients.
 chat-types-1_19:
-  "chat.type.text": "<%s> %s"
-  "chat.type.announcement": "[%s] %s"
-  "commands.message.display.incoming": "%s whispers to you: %s"
-  "chat.type.team.text": "%s <%s> %s"
-  "chat.type.emote": "* %s %s"
+  chat.type.text: "<%s> %s"
+  chat.type.announcement: "[%s] %s"
+  commands.message.display.incoming: "%s whispers to you: %s"
+  chat.type.team.text: "%s <%s> %s"
+  chat.type.emote: "* %s %s"
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
