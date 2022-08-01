@@ -151,7 +151,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                     final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.ENTITY_METADATA);
                     metaPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0)); // Entity id
                     final List<Metadata> metadata = new ArrayList<>();
-                    metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewId(motive)));
+                    metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
                     metaPacket.write(Types1_19.METADATA_LIST, metadata);
                     metaPacket.send(Protocol1_19To1_18_2.class);
                 });
