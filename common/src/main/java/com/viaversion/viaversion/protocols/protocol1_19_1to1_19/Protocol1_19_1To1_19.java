@@ -249,6 +249,31 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.CUSTOM_QUERY.getId(), ClientboundLoginPackets.CUSTOM_QUERY.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT);
+                map(Type.STRING);
+                handler(wrapper -> {
+                    String identifier = wrapper.get(Type.STRING, 0);
+                    if (identifier.equals("velocity:player_info")) {
+                        byte[] data = wrapper.passthrough(Type.REMAINING_BYTES);
+                        // Velocity modern forwarding version above 1 include the players public key.
+                        // This is an issue because the server will expect a 1.19 key and receive a 1.19.1 key.
+                        // Velocity modern forwarding versions: https://github.com/PaperMC/Velocity/blob/1a3fba4250553702d9dcd05731d04347bfc24c9f/proxy/src/main/java/com/velocitypowered/proxy/connection/VelocityConstants.java#L27-L29
+                        // And the version can be specified with a single byte: https://github.com/PaperMC/Velocity/blob/1a3fba4250553702d9dcd05731d04347bfc24c9f/proxy/src/main/java/com/velocitypowered/proxy/connection/backend/LoginSessionHandler.java#L88
+                        if (data.length == 1 && data[0] > 1) {
+                            data[0] = 1;
+                        } else if (data.length == 0) { // Or the version is omitted (default version would be used)
+                            data = new byte[] { 1 };
+                            wrapper.set(Type.REMAINING_BYTES, 0, data);
+                        } else {
+                            Via.getPlatform().getLogger().warning("Received unexpected data in velocity:player_info (length=" + data.length + ")");
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
