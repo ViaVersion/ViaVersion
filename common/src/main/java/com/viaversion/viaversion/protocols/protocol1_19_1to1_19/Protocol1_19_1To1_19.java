@@ -258,7 +258,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     String identifier = wrapper.get(Type.STRING, 0);
                     if (identifier.equals("velocity:player_info")) {
                         byte[] data = wrapper.passthrough(Type.REMAINING_BYTES);
-                        // Velocity modern forwarding version above 1 include the players public key.
+                        // Velocity modern forwarding version above 1 includes the players public key.
                         // This is an issue because the server will expect a 1.19 key and receive a 1.19.1 key.
                         // Velocity modern forwarding versions: https://github.com/PaperMC/Velocity/blob/1a3fba4250553702d9dcd05731d04347bfc24c9f/proxy/src/main/java/com/velocitypowered/proxy/connection/VelocityConstants.java#L27-L29
                         // And the version can be specified with a single byte: https://github.com/PaperMC/Velocity/blob/1a3fba4250553702d9dcd05731d04347bfc24c9f/proxy/src/main/java/com/velocitypowered/proxy/connection/backend/LoginSessionHandler.java#L88
