@@ -27,6 +27,7 @@ import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_19to1_18_2.BlockBreakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.DeathListener;
@@ -177,6 +178,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
             Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
+            storeListener(new BlockBreakListener(plugin)).register();
         }
     }
 

@@ -86,7 +86,7 @@ public class CommentStore {
 
     public void storeComments(final InputStream inputStream) throws IOException {
         final String data;
-        try (final InputStreamReader reader = new InputStreamReader(inputStream)) {
+        try (final InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             data = CharStreams.toString(reader);
         }
 
