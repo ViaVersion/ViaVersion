@@ -110,5 +110,6 @@ public final class UnsupportedServerSoftware implements UnsupportedSoftware {
     public static final class Reason {
 
         public static final String DANGEROUS_SERVER_SOFTWARE = "You are using server software that - outside of possibly breaking ViaVersion - can also cause severe damage to your server's integrity as a whole.";
+        public static final String BREAKING_PROXY_SOFTWARE = "You are using proxy software that intentionally breaks ViaVersion. Please use another proxy software or move ViaVersion to each backend server instead of the proxy.";
     }
 }
