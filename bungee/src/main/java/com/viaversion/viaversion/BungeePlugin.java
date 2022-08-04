@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
@@ -24,6 +25,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bungee.commands.BungeeCommand;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandHandler;
@@ -35,6 +37,7 @@ import com.viaversion.viaversion.bungee.platform.BungeeViaInjector;
 import com.viaversion.viaversion.bungee.platform.BungeeViaLoader;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -56,7 +59,7 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     @Override
     public void onLoad() {
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_19");
+            ProtocolConstants.class.getField("MINECRAFT_1_19_1");
         } catch (NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
@@ -204,6 +207,17 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
+        final Collection<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
+        list.add(new UnsupportedServerSoftware.Builder()
+                .name("FlameCord")
+                .addClassName("dev._2lstudios.flamecord.FlameCord")
+                .reason(UnsupportedServerSoftware.Reason.BREAKING_PROXY_SOFTWARE)
+                .build());
+        return ImmutableList.copyOf(list);
     }
 
     @Override
