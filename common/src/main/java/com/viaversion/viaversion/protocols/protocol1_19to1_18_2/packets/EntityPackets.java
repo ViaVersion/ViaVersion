@@ -75,7 +75,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             "    ]\n" +
             "  }\n" +
             "}";
-    private static final CompoundTag CHAT_REGISTRY;
+    public static final CompoundTag CHAT_REGISTRY;
 
     static {
         try {
