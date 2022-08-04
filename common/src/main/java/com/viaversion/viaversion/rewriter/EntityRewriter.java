@@ -446,10 +446,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     public PacketHandler worldDataTrackerHandlerByKey() {
         return wrapper -> {
             EntityTracker tracker = tracker(wrapper.user());
-            String key = wrapper.get(Type.STRING, 0);
-            DimensionData dimensionData = tracker.dimensionData(key);
+            String dimensionKey = wrapper.get(Type.STRING, 0);
+            DimensionData dimensionData = tracker.dimensionData(dimensionKey);
             if (dimensionData == null) {
-                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + key + ", falling back to overworld");
+                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + dimensionKey + ", falling back to overworld");
                 dimensionData = tracker.dimensionData("minecraft:overworld");
                 Preconditions.checkNotNull(dimensionData, "Overworld data missing");
             }
@@ -457,7 +457,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
             tracker.setCurrentMinY(dimensionData.minY());
 
-            String world = wrapper.get(Type.STRING, 0);
+            String world = wrapper.get(Type.STRING, 1);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
                 tracker.trackClientEntity();

@@ -286,7 +286,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
-        List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
+        final List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
         list.add(new UnsupportedServerSoftware.Builder().name("Yatopia").reason(UnsupportedServerSoftware.Reason.DANGEROUS_SERVER_SOFTWARE)
                 .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
                 .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")

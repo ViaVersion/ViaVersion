@@ -237,7 +237,7 @@ public class ViaManagerImpl implements ViaManager {
 
     private void unsupportedSoftwareWarning() {
         boolean found = false;
-        for (UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
+        for (final UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
             if (!software.findMatch()) {
                 continue;
             }
