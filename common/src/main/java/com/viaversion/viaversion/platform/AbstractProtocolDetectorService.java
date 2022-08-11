@@ -29,6 +29,10 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
     protected final Object2IntMap<String> detectedProtocolIds = new Object2IntOpenHashMap<>();
     protected final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    protected AbstractProtocolDetectorService() {
+        detectedProtocolIds.defaultReturnValue(-1);
+    }
+
     @Override
     public int serverProtocolVersion(final String serverName) {
         // Step 1. Check detected
