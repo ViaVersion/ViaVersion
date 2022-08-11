@@ -33,13 +33,14 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
     public int serverProtocolVersion(final String serverName) {
         // Step 1. Check detected
         lock.readLock().lock();
+        final int detectedProtocol;
         try {
-            final int detectedProtocol = detectedProtocolIds.getInt(serverName);
-            if (detectedProtocol != -1) {
-                return detectedProtocol;
-            }
+            detectedProtocol = detectedProtocolIds.getInt(serverName);
         } finally {
             lock.readLock().unlock();
+        }
+        if (detectedProtocol != -1) {
+            return detectedProtocol;
         }
 
         // Step 2. Check config (CME moment?)
@@ -81,6 +82,7 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
 
     @Override
     public Object2IntMap<String> detectedProtocolVersions() {
+        lock.readLock().lock();
         try {
             return new Object2IntOpenHashMap<>(detectedProtocolIds);
         } finally {
