@@ -300,7 +300,7 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * <p>
      * To be overridden if needed.
      *
-     * @param userConnection The user to initialise
+     * @param connection user to initialise
      */
     default void init(UserConnection connection) {
     }

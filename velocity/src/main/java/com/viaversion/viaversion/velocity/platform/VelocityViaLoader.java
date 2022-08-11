@@ -29,9 +29,9 @@ import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
 import com.viaversion.viaversion.velocity.providers.VelocityMovementTransmitter;
 import com.viaversion.viaversion.velocity.providers.VelocityVersionProvider;
-import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 
 public class VelocityViaLoader implements ViaPlatformLoader {
+
     @Override
     public void load() {
         Object plugin = VelocityPlugin.PROXY.getPluginManager()
@@ -51,7 +51,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
         if (pingInterval > 0) {
             Via.getPlatform().runRepeatingSync(
-                    new ProtocolDetectorService(),
+                    () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
                     pingInterval * 20L);
         }
     }

@@ -32,7 +32,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit;
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )
-public class VelocityPlugin implements ViaPlatform<Player> {
+public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character(ChatColorUtil.COLOR_CHAR).extractUrls().build();
     public static ProxyServer PROXY;
 
@@ -76,6 +76,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @DataDirectory
     private Path configDir;
 
+    private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
     private VelocityViaAPI api;
     private java.util.logging.Logger logger;
     private VelocityViaConfig conf;
@@ -230,7 +231,7 @@ public class VelocityPlugin implements ViaPlatform<Player> {
             ));
         }
         extra.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
-        extra.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getDetectedIds()));
+        extra.add("servers", GsonUtil.getGson().toJsonTree(protocolDetectorService.detectedProtocolVersions()));
         return extra;
     }
 
@@ -247,6 +248,11 @@ public class VelocityPlugin implements ViaPlatform<Player> {
     @Override
     public java.util.logging.Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public ProtocolDetectorService protocolDetectorService() {
+        return protocolDetectorService;
     }
 
     private boolean hasConnectionEvent() {

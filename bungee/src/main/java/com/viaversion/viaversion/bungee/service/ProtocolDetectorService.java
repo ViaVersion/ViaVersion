@@ -17,93 +17,77 @@
  */
 package com.viaversion.viaversion.bungee.service;
 
-import com.viaversion.viaversion.BungeePlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
-import net.md_5.bungee.api.Callback;
-import net.md_5.bungee.api.ServerPing;
+import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
-public class ProtocolDetectorService implements Runnable {
-    private static final Map<String, Integer> detectedProtocolIds = new ConcurrentHashMap<>();
-    private static ProtocolDetectorService instance;
-    private final BungeePlugin plugin;
+public final class ProtocolDetectorService extends AbstractProtocolDetectorService {
 
-    public ProtocolDetectorService(BungeePlugin plugin) {
-        this.plugin = plugin;
-        instance = this;
-    }
+    public void probeServer(final ServerInfo serverInfo) {
+        final String serverName = serverInfo.getName();
+        serverInfo.ping((serverPing, throwable) -> {
+            // Ensure protocol is positive, some services will return -1
+            if (throwable != null || serverPing == null || serverPing.getVersion() == null || serverPing.getVersion().getProtocol() <= 0) {
+                return;
+            }
 
-    public static Integer getProtocolId(String serverName) {
-        // Step 1. Check Config
-        Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
-        Integer protocol = servers.get(serverName);
-        if (protocol != null) {
-            return protocol;
-        }
-        // Step 2. Check Detected
-        Integer detectedProtocol = detectedProtocolIds.get(serverName);
-        if (detectedProtocol != null) {
-            return detectedProtocol;
-        }
-        // Step 3. Use Default
-        Integer defaultProtocol = servers.get("default");
-        if (defaultProtocol != null) {
-            return defaultProtocol;
-        }
-        // Step 4: Use bungee lowest supported... *cries*
-        return BungeeVersionProvider.getLowestSupportedVersion();
-    }
+            final int oldProtocolVersion = serverProtocolVersion(serverName);
+            if (oldProtocolVersion == serverPing.getVersion().getProtocol()) {
+                // Same value as previously
+                return;
+            }
 
-    @Override
-    public void run() {
-        for (final Map.Entry<String, ServerInfo> lists : plugin.getProxy().getServers().entrySet()) {
-            probeServer(lists.getValue());
-        }
-    }
+            setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-    public static void probeServer(final ServerInfo serverInfo) {
-        final String key = serverInfo.getName();
-        serverInfo.ping(new Callback<ServerPing>() {
-            @Override
-            public void done(ServerPing serverPing, Throwable throwable) {
-                if (throwable == null && serverPing != null && serverPing.getVersion() != null) {
-                    // Ensure protocol is positive, some services will return -1
-                    if (serverPing.getVersion().getProtocol() > 0) {
-                        detectedProtocolIds.put(key, serverPing.getVersion().getProtocol());
-                        if (((BungeeViaConfig) Via.getConfig()).isBungeePingSave()) {
-                            Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
-                            Integer protocol = servers.get(key);
-                            if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
-                                return;
-                            }
-                            // Ensure we're the only ones writing to the config
-                            synchronized (Via.getPlatform().getConfigurationProvider()) {
-                                servers.put(key, serverPing.getVersion().getProtocol());
-                            }
-                            // Save
-                            Via.getPlatform().getConfigurationProvider().saveConfig();
-                        }
-                    }
+            if (((BungeeViaConfig) Via.getConfig()).isBungeePingSave()) {
+                final Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
+                final Integer protocol = servers.get(serverName);
+                if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
+                    return;
                 }
+
+                // Ensure we're the only ones writing to the config
+                synchronized (Via.getPlatform().getConfigurationProvider()) {
+                    servers.put(serverName, serverPing.getVersion().getProtocol());
+                }
+                Via.getPlatform().getConfigurationProvider().saveConfig();
             }
         });
     }
 
-    public static Map<String, Integer> getDetectedIds() {
-        return new HashMap<>(detectedProtocolIds);
+    @Override
+    public void probeAllServers() {
+        final Collection<ServerInfo> servers = ProxyServer.getInstance().getServers().values();
+        final Set<String> serverNames = new HashSet<>(servers.size());
+        for (final ServerInfo serverInfo : servers) {
+            probeServer(serverInfo);
+            serverNames.add(serverInfo.getName());
+        }
+
+        // Remove servers that aren't registered anymore
+        lock.writeLock().lock();
+        try {
+            detectedProtocolIds.keySet().retainAll(serverNames);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
-    public static ProtocolDetectorService getInstance() {
-        return instance;
+    @Override
+    protected Map<String, Integer> configuredServers() {
+        return ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
     }
 
-    public BungeePlugin getPlugin() {
-        return plugin;
+    @Override
+    protected int lowestSupportedProtocolVersion() {
+        return BungeeVersionProvider.getLowestSupportedVersion();
     }
 }

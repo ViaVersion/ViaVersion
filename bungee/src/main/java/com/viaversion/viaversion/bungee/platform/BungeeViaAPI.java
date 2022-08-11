@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.bungee.platform;
 
 import com.viaversion.viaversion.ViaAPIBase;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -41,6 +42,6 @@ public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
      * @param serverInfo The serverinfo to probe
      */
     public void probeServer(ServerInfo serverInfo) {
-        ProtocolDetectorService.probeServer(serverInfo);
+        ((ProtocolDetectorService) Via.proxyPlatform().protocolDetectorService()).probeServer(serverInfo);
     }
 }

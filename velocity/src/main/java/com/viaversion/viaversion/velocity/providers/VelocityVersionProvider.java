@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
 import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
-import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 import io.netty.channel.ChannelHandler;
 
 import java.lang.reflect.Method;
@@ -50,7 +49,7 @@ public class VelocityVersionProvider extends BaseVersionProvider {
     private int getBackProtocol(UserConnection user) throws Exception {
         //TODO use newly added Velocity netty event
         ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
-        return ProtocolDetectorService.getProtocolId(
+        return Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(
                 ((ServerConnection) getAssociation.invoke(mcHandler)).getServerInfo().getName());
     }
 

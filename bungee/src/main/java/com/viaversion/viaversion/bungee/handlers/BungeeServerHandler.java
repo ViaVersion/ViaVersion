@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
@@ -96,7 +95,7 @@ public class BungeeServerHandler implements Listener {
             user.put(new BungeeStorage(e.getPlayer()));
         }
 
-        int protocolId = ProtocolDetectorService.getProtocolId(e.getTarget().getName());
+        int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(e.getTarget().getName());
         List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
 
         // Check if ViaVersion can support that version
@@ -164,7 +163,7 @@ public class BungeeServerHandler implements Listener {
 
                     storage.setCurrentServer(serverName);
 
-                    int protocolId = ProtocolDetectorService.getProtocolId(serverName);
+                    int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
 
                     if (protocolId <= ProtocolVersion.v1_8.getVersion()) { // 1.8 doesn't have BossBar packet
                         if (storage.getBossbar() != null) {
