@@ -22,14 +22,18 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EntityTypeUtil {
+public final class EntityTypeUtil {
+
+    private static final EntityType[] EMPTY_ARRAY = new EntityType[0];
 
     /**
      * Returns an ordered array with each index representing the actual entity id.
@@ -46,7 +50,29 @@ public class EntityTypeUtil {
         }
 
         types.sort(Comparator.comparingInt(EntityType::getId));
-        return types.toArray(new EntityType[0]);
+        return types.toArray(EMPTY_ARRAY);
+    }
+
+    /**
+     * Sets entity type ids based on the protocol's mapping data and fills the given typesToFill array with the index corresponding to the id.
+     *
+     * @param values      full enum values
+     * @param typesToFill yet unfilled array to be filled with types ordered by id
+     * @param protocol    protocol to get entity types from
+     * @param idSetter    function to set the internal entity id
+     * @param <T>         entity type
+     */
+    public static <T extends EntityType> void initialize(final T[] values, final EntityType[] typesToFill, final Protocol<?, ?, ?, ?> protocol, final EntityIdSetter<T> idSetter) {
+        for (final T type : values) {
+            if (type.isAbstractType()) {
+                continue;
+            }
+
+            final int id = protocol.getMappingData().getEntityMappings().mappedId(type.identifier());
+            Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
+            idSetter.setId(type, id);
+            typesToFill[id] = type;
+        }
     }
 
     public static EntityType[] createSizedArray(final EntityType[] values) {
@@ -56,15 +82,7 @@ public class EntityTypeUtil {
                 count++;
             }
         }
-        return new EntityType[(int) count];
-    }
-
-    public static void fill(final EntityType[] values, final EntityType[] toFill) {
-        for (final EntityType type : values) {
-            if (!type.isAbstractType()) {
-                toFill[type.getId()] = type;
-            }
-        }
+        return new EntityType[count];
     }
 
     /**
@@ -82,5 +100,11 @@ public class EntityTypeUtil {
             return fallback;
         }
         return type;
+    }
+
+    @FunctionalInterface
+    public interface EntityIdSetter<T extends EntityType> {
+
+        void setId(T entityType, int id);
     }
 }

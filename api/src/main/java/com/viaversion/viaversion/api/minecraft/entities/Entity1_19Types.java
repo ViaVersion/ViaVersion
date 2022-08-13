@@ -269,15 +269,6 @@ public enum Entity1_19Types implements EntityType {
     }
 
     public static void initialize(final Protocol<?, ?, ?, ?> protocol) {
-        for (final Entity1_19Types type : values()) {
-            if (type.isAbstractType()) {
-                continue;
-            }
-
-            final int id = protocol.getMappingData().getEntityMappings().mappedId(type.identifier());
-            Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
-            type.id = id;
-        }
-        EntityTypeUtil.fill(values(), TYPES);
+        EntityTypeUtil.initialize(values(), TYPES, protocol, (type, id) -> type.id = id);
     }
 }
