@@ -379,7 +379,7 @@ public class WorldPackets {
                         save_connections:
                         {
                             if (!Via.getConfig().isServersideBlockConnections()
-                                    || ConnectionData.needStoreBlocks()) break save_connections;
+                                    || !ConnectionData.needStoreBlocks()) break save_connections;
 
                             if (!chunk.isFullChunk()) { // Update
                                 ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), i, chunk.getZ());
