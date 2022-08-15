@@ -111,9 +111,13 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     public void unloadChunk(int x, int z) {
-        for (int y = 0; y < 256; y += 16) {
-            blockStorage.remove(getChunkSectionIndex(x << 4, y, z << 4));
+        for (int y = 0; y < 16; y ++) {
+            unloadSection(x, y, z);
         }
+    }
+
+    public void unloadSection(int x, int y, int z) {
+        blockStorage.remove(getChunkSectionIndex(x << 4, y << 4, z << 4));
     }
 
     private Pair<byte[], NibbleArray> getChunkSection(long index, boolean requireNibbleArray) {
