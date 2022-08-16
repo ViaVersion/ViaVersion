@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.minecraft;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemType extends BaseItemType {
     public ItemType() {
@@ -32,7 +33,7 @@ public class ItemType extends BaseItemType {
     }
 
     @Override
-    public Item read(ByteBuf buffer) throws Exception {
+    public @Nullable Item read(ByteBuf buffer) throws Exception {
         short id = buffer.readShort();
         if (id < 0) {
             return null;
@@ -47,7 +48,7 @@ public class ItemType extends BaseItemType {
     }
 
     @Override
-    public void write(ByteBuf buffer, Item object) throws Exception {
+    public void write(ByteBuf buffer, @Nullable Item object) throws Exception {
         if (object == null) {
             buffer.writeShort(-1);
         } else {

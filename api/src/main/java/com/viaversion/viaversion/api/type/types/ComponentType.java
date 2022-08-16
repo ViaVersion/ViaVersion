@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -50,5 +51,12 @@ public class ComponentType extends Type<JsonElement> {
     @Override
     public void write(ByteBuf buffer, JsonElement object) throws Exception {
         STRING_TAG.write(buffer, object.toString());
+    }
+
+    public static final class OptionalComponentType extends OptionalType<JsonElement> {
+
+        public OptionalComponentType() {
+            super(Type.COMPONENT);
+        }
     }
 }

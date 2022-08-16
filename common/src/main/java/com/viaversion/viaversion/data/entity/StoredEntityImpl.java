@@ -43,6 +43,11 @@ public final class StoredEntityImpl implements StoredEntityData {
     }
 
     @Override
+    public <T> @Nullable T remove(Class<T> objectClass) {
+        return (T) storedObjects.remove(objectClass);
+    }
+
+    @Override
     public boolean has(Class<?> objectClass) {
         return storedObjects.containsKey(objectClass);
     }

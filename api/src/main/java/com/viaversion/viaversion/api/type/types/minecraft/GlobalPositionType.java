@@ -22,31 +22,33 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
+import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-import java.util.UUID;
+public class GlobalPositionType extends Type<GlobalPosition> {
 
-public class OptUUIDType extends Type<UUID> {
-    public OptUUIDType() {
-        super(UUID.class);
+    public GlobalPositionType() {
+        super(GlobalPosition.class);
     }
 
     @Override
-    public UUID read(ByteBuf buffer) {
-        boolean present = buffer.readBoolean();
-        if (!present) return null;
-        return new UUID(buffer.readLong(), buffer.readLong());
+    public GlobalPosition read(ByteBuf buffer) throws Exception {
+        final String dimension = Type.STRING.read(buffer);
+        return Type.POSITION1_14.read(buffer).withDimension(dimension);
     }
 
     @Override
-    public void write(ByteBuf buffer, UUID object) {
-        if (object == null) {
-            buffer.writeBoolean(false);
-        } else {
-            buffer.writeBoolean(true);
-            buffer.writeLong(object.getMostSignificantBits());
-            buffer.writeLong(object.getLeastSignificantBits());
+    public void write(ByteBuf buffer, GlobalPosition object) throws Exception {
+        Type.STRING.write(buffer, object.dimension());
+        Type.POSITION1_14.write(buffer, object);
+    }
+
+    public static final class OptionalGlobalPositionType extends OptionalType<GlobalPosition> {
+
+        public OptionalGlobalPositionType() {
+            super(Type.GLOBAL_POSITION);
         }
     }
 }

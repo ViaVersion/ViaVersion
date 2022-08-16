@@ -54,4 +54,12 @@ public class ProtocolPathEntryImpl implements ProtocolPathEntry {
         result = 31 * result + protocol.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ProtocolPathEntryImpl{" +
+                "outputProtocolVersion=" + outputProtocolVersion +
+                ", protocol=" + protocol +
+                '}';
+    }
 }

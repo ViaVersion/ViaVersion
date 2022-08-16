@@ -157,7 +157,7 @@ public class ViaManagerImpl implements ViaManager {
         loader.load();
         // Common tasks
         mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
-            if (protocolManager.checkForMappingCompletion()) {
+            if (protocolManager.checkForMappingCompletion() && mappingLoadingTask != null) {
                 mappingLoadingTask.cancel();
                 mappingLoadingTask = null;
             }
@@ -235,9 +235,9 @@ public class ViaManagerImpl implements ViaManager {
         }
     }
 
-    private final void unsupportedSoftwareWarning() {
+    private void unsupportedSoftwareWarning() {
         boolean found = false;
-        for (UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
+        for (final UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
             if (!software.findMatch()) {
                 continue;
             }

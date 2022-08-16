@@ -26,6 +26,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Map;
+
 public interface EntityTracker {
 
     /**
@@ -151,4 +153,18 @@ public interface EntityTracker {
     int biomesSent();
 
     void setBiomesSent(int biomesSent);
+
+    EntityType playerType();
+
+    @Nullable DimensionData dimensionData(String dimension);
+
+    void setDimensions(Map<String, DimensionData> dimensions);
+
+    /**
+     * Adds the client player entity to the tracker.
+     * If the client entity has not been set yet, this will return false.
+     *
+     * @return whether the client has been tracked
+     */
+    boolean trackClientEntity();
 }

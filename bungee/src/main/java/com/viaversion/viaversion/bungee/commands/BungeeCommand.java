@@ -25,7 +25,7 @@ public class BungeeCommand extends Command implements TabExecutor {
     private final BungeeCommandHandler handler;
 
     public BungeeCommand(BungeeCommandHandler handler) {
-        super("viaversion", "", "viaver", "vvbungee"); // The CommandHandler will handle the permission
+        super("viaversion", "viaversion.admin", "viaver", "vvbungee"); // The permission is also referenced here to filter root suggestions (/via<tab>)
         this.handler = handler;
     }
 

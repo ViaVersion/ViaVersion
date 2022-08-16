@@ -20,31 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+public final class ProfileKey {
+    private final long expiresAt;
+    private final byte[] publicKey;
+    private final byte[] keySignature;
 
-public class OptionalComponentType extends Type<JsonElement> {
-
-    public OptionalComponentType() {
-        super(JsonElement.class);
+    public ProfileKey(final long expiresAt, final byte[] publicKey, final byte[] keySignature) {
+        this.expiresAt = expiresAt;
+        this.publicKey = publicKey;
+        this.keySignature = keySignature;
     }
 
-    @Override
-    public JsonElement read(ByteBuf buffer) throws Exception {
-        boolean present = buffer.readBoolean();
-        return present ? Type.COMPONENT.read(buffer) : null;
+    public long expiresAt() {
+        return expiresAt;
     }
 
-    @Override
-    public void write(ByteBuf buffer, JsonElement object) throws Exception {
-        if (object == null) {
-            buffer.writeBoolean(false);
-        } else {
-            buffer.writeBoolean(true);
-            Type.COMPONENT.write(buffer, object);
-        }
+    public byte[] publicKey() {
+        return publicKey;
+    }
+
+    public byte[] keySignature() {
+        return keySignature;
     }
 }

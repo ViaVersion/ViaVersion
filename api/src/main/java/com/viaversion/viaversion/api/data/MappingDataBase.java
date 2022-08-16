@@ -44,12 +44,16 @@ public class MappingDataBase implements MappingData {
     protected final String newVersion;
     protected final boolean hasDiffFile;
     protected Int2IntBiMap itemMappings;
+    protected FullMappings argumentTypeMappings;
+    protected FullMappings entityMappings;
     protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
     protected Mappings statisticsMappings;
+    protected Mappings enchantmentMappings;
+    protected Mappings paintingMappings;
     protected Map<RegistryType, List<TagData>> tags;
     protected boolean loadItems = true;
 
@@ -75,6 +79,11 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
         soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
         statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
+        enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
+        paintingMappings = loadFromArray(oldMappings, newMappings, diffmapping, "paintings");
+
+        entityMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "entities");
+        argumentTypeMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "argumenttypes");
 
         Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
         if (particles != null) {
@@ -100,6 +109,11 @@ public class MappingDataBase implements MappingData {
         }
 
         loadExtras(oldMappings, newMappings, diffmapping);
+    }
+
+    protected FullMappings loadFullMappings(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+        Mappings mappings = loadFromArray(oldMappings, newMappings, diffMappings, key);
+        return mappings != null ? new FullMappingsBase(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), mappings) : null;
     }
 
     private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
@@ -148,7 +162,7 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getNewParticleId(int id) {
-        return checkValidity(id, particleMappings.getMappings().getNewId(id), "particles");
+        return checkValidity(id, particleMappings.mappings().getNewId(id), "particles");
     }
 
     @Override
@@ -189,6 +203,26 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getStatisticsMappings() {
         return statisticsMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getEnchantmentMappings() {
+        return enchantmentMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getEntityMappings() {
+        return entityMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getArgumentTypeMappings() {
+        return argumentTypeMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getPaintingMappings() {
+        return paintingMappings;
     }
 
     protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {

@@ -40,6 +40,7 @@ public class EntityTypesTest {
         testArrayOrder(Entity1_16Types.values(), Entity1_16Types::getTypeFromId);
         testArrayOrder(Entity1_16_2Types.values(), Entity1_16_2Types::getTypeFromId);
         testArrayOrder(Entity1_17Types.values(), Entity1_17Types::getTypeFromId);
+        // Newer type enums are automatically filled using mappings
     }
 
     private void testArrayOrder(EntityType[] types, Function<Integer, EntityType> returnFunction) {

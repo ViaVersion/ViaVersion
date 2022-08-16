@@ -24,13 +24,15 @@ package com.viaversion.viaversion.api.type;
 
 import io.netty.buffer.ByteBuf;
 
+@FunctionalInterface
 public interface ByteBufReader<T> {
+
     /**
-     * Read a value from a ByteBuf
+     * Reads a value from a ByteBuf.
      *
-     * @param buffer The buffer to read from.
-     * @return The type based on the class type.
-     * @throws Exception Throws exception if it failed reading.
+     * @param buffer buffer to read from
+     * @return type based on the class type
+     * @throws Exception if it failed reading
      */
     T read(ByteBuf buffer) throws Exception;
 }

@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class EntityPackets {
 
@@ -125,6 +126,23 @@ public class EntityPackets {
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 7 - Metadata
 
                 handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_12_1.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+
+                handler(wrapper -> {
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
+                });
+                handler(metadataRewriter.playerTrackerHandler());
+                handler(Protocol1_13To1_12_2.SEND_DECLARE_COMMANDS_AND_TAGS);
             }
         });
 

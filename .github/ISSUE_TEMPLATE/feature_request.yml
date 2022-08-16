@@ -1,5 +1,6 @@
 name: Feature Request
 description: Suggest a feature to be added
+labels: [Feature Request]
 
 body:
   - type: textarea

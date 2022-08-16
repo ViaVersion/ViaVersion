@@ -37,7 +37,8 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.dump.PluginInfo;
-import com.viaversion.viaversion.unsupported.UnsupportedSoftwareImpl;
+import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
+import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -89,8 +90,8 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public void onLoad() {
         // Via should load before PL, so we can't check for it in the constructor
-        boolean hasProtocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib") != null;
-        ((BukkitViaInjector) Via.getManager().getInjector()).setProtocolLib(hasProtocolLib);
+        Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
+        ProtocolLibEnableListener.checkCompat(protocolLib);
 
         // Spigot detector
         try {
@@ -285,13 +286,21 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
-        List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
-        list.add(new UnsupportedSoftwareImpl.Builder().name("Yatopia").reason(UnsupportedSoftwareImpl.Reason.DANGEROUS_SERVER_SOFTWARE)
+        final List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
+        list.add(new UnsupportedServerSoftware.Builder().name("Yatopia").reason(UnsupportedServerSoftware.Reason.DANGEROUS_SERVER_SOFTWARE)
                 .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
                 .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")
                 .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
                 .addMethod("org.bukkit.Server", "getLastTickTime").build());
+        list.add(new UnsupportedPlugin.Builder().name("software to mess with message signing").reason(UnsupportedPlugin.Reason.SECURE_CHAT_BYPASS)
+                .addPlugin("NoEncryption").addPlugin("NoReport")
+                .addPlugin("NoChatReports").addPlugin("NoChatReport").build());
         return Collections.unmodifiableList(list);
+    }
+
+    @Override
+    public boolean hasPlugin(final String name) {
+        return getServer().getPluginManager().getPlugin(name) != null;
     }
 
     public boolean isLateBind() {

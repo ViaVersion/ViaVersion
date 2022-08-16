@@ -118,7 +118,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         wrapper.write(Type.INT, position.z());
     };
 
-    private static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
+    public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
             w -> {
                 // Send fake declare commands
                 w.create(ClientboundPackets1_13.DECLARE_COMMANDS, wrapper -> {
@@ -387,30 +387,6 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-
-        registerClientbound(ClientboundPackets1_12_1.JOIN_GAME, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
-
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Store the player
-                        int entityId = wrapper.get(Type.INT, 0);
-                        wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, Entity1_13Types.EntityType.PLAYER);
-
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-                    }
-                });
-                handler(SEND_DECLARE_COMMANDS_AND_TAGS);
-            }
-        });
-
 
         registerClientbound(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketRemapper() {
             @Override

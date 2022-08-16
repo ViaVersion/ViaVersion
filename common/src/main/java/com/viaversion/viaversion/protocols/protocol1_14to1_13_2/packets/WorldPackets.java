@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -288,55 +287,6 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Store the player
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-
-                        int entityId = wrapper.get(Type.INT, 0);
-
-                        Entity1_14Types entType = Entity1_14Types.PLAYER;
-                        // Register Type ID
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
-                        tracker.addEntity(entityId, entType);
-                        tracker.setClientEntityId(entityId);
-                    }
-                });
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
-                        PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
-                        difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
-                        difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
-                        difficultyPacket.scheduleSend(protocol.getClass());
-
-                        wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
-                        wrapper.passthrough(Type.STRING); // Level Type
-
-                        wrapper.write(Type.VAR_INT, SERVERSIDE_VIEW_DISTANCE);  // Serverside view distance, added in 19w13a
-                    }
-                });
-                handler(wrapper -> {
-                    // Manually send the packet
-                    wrapper.send(Protocol1_14To1_13_2.class);
-                    wrapper.cancel();
-
-                    // View distance has to be sent after the join packet
-                    sendViewDistancePacket(wrapper.user());
-                });
-            }
-        });
-
         protocol.registerClientbound(ClientboundPackets1_13.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -394,7 +344,7 @@ public class WorldPackets {
         });
     }
 
-    private static void sendViewDistancePacket(UserConnection connection) throws Exception {
+    static void sendViewDistancePacket(UserConnection connection) throws Exception {
         PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, null, connection);
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_14To1_13_2.class);

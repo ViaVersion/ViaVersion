@@ -164,7 +164,7 @@ public class MappingDataLoader {
         mapIdentifiers(output, oldIdentifiers, newIdentifiers, diffIdentifiers, true);
     }
 
-    private static int mapIdentifierEntry(Map.Entry<String, JsonElement> entry, Object2IntMap newIdentifierMap, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+    private static int mapIdentifierEntry(Map.Entry<String, JsonElement> entry, Object2IntMap<String> newIdentifierMap, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
         int value = newIdentifierMap.getInt(entry.getValue().getAsString());
         if (value == -1) {
             // Search in diff mappings

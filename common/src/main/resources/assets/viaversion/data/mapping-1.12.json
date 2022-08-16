@@ -2378,7 +2378,7 @@
     "25100329": "minecraft:zombie_pigman_spawn_egg",
     "25100330": "minecraft:zombie_villager_spawn_egg"
   },
-  "enchantments": {
+  "legacy_enchantments": {
     "0": "minecraft:protection",
     "1": "minecraft:fire_protection",
     "2": "minecraft:feather_falling",

@@ -47,7 +47,6 @@ public class MappingData extends MappingDataBase {
     private final Map<String, String> translateMapping = new HashMap<>();
     private final Map<String, String> mojangTranslation = new HashMap<>();
     private final BiMap<String, String> channelMappings = HashBiMap.create(); // 1.12->1.13
-    private Mappings enchantmentMappings;
 
     public MappingData() {
         super("1.12", "1.13");
@@ -59,9 +58,9 @@ public class MappingData extends MappingDataBase {
         loadTags(itemTags, newMappings.getAsJsonObject("item_tags"));
         loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
 
-        loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("enchantments"));
+        loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("legacy_enchantments"));
         enchantmentMappings = IntArrayMappings.builder().customEntrySize(72)
-                .unmapped(oldMappings.getAsJsonObject("enchantments")).mapped(newMappings.getAsJsonObject("enchantments")).build();
+                .unmapped(oldMappings.getAsJsonObject("legacy_enchantments")).mapped(newMappings.getAsJsonArray("enchantments")).build();
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
         if (Via.getConfig().isSnowCollisionFix()) {
@@ -195,9 +194,5 @@ public class MappingData extends MappingDataBase {
 
     public BiMap<String, String> getChannelMappings() {
         return channelMappings;
-    }
-
-    public Mappings getEnchantmentMappings() {
-        return enchantmentMappings;
     }
 }

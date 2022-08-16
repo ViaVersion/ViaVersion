@@ -48,7 +48,7 @@ public class InformativeException extends Exception {
 
     @Override
     public String getMessage() {
-        StringBuilder builder = new StringBuilder("Please post this error to https://github.com/ViaVersion/ViaVersion/issues and follow the issue template\n{");
+        StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
         boolean first = true;
         for (Map.Entry<String, Object> entry : info.entrySet()) {
             if (!first) {
@@ -57,11 +57,11 @@ public class InformativeException extends Exception {
             builder.append(entry.getKey()).append(": ").append(entry.getValue());
             first = false;
         }
-        return builder.append("}\nActual Error: ").toString();
+        return builder.toString();
     }
 
     @Override
-    public synchronized Throwable fillInStackTrace() {
+    public Throwable fillInStackTrace() {
         // Don't record this stack
         return this;
     }

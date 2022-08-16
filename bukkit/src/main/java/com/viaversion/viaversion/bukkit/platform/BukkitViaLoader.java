@@ -27,17 +27,20 @@ import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_19to1_18_2.BlockBreakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.DeathListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.HandItemCache;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.PaperPatch;
+import com.viaversion.viaversion.bukkit.providers.BukkitAckSequenceProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitViaMovementTransmitter;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import org.bukkit.Bukkit;
@@ -47,7 +50,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -173,6 +175,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 Via.getManager().getProviders().use(BlockConnectionProvider.class, blockConnectionProvider);
                 ConnectionData.blockConnectionProvider = blockConnectionProvider;
             }
+        }
+        if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
+            Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
+            storeListener(new BlockBreakListener(plugin)).register();
         }
     }
 

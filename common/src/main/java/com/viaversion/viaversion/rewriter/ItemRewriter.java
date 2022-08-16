@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -171,30 +172,6 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow1_17(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerServerbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.UNSIGNED_BYTE); // Window Id
-                map(Type.SHORT); // Slot
-                map(Type.BYTE); // Button
-                map(Type.VAR_INT); // Mode
-
-                handler(wrapper -> {
-                    // Affected items
-                    int length = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < length; i++) {
-                        wrapper.passthrough(Type.SHORT); // Slot
-                        handleItemToServer(wrapper.passthrough(type));
-                    }
-
-                    // Carried item
-                    handleItemToServer(wrapper.passthrough(type));
-                });
-            }
-        });
-    }
-
     public void registerClickWindow1_17_1(ServerboundPacketType packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
@@ -263,6 +240,32 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
+    public void registerTradeList1_19(ClientboundPacketType packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    wrapper.passthrough(Type.VAR_INT); // Container id
+                    int size = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < size; i++) {
+                        handleItemToClient(wrapper.passthrough(type)); // Input
+                        handleItemToClient(wrapper.passthrough(type)); // Output
+                        handleItemToClient(wrapper.passthrough(type)); // Second Item
+
+                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                        wrapper.passthrough(Type.INT); // Number of tools uses
+                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                        wrapper.passthrough(Type.INT); // XP
+                        wrapper.passthrough(Type.INT); // Special price
+                        wrapper.passthrough(Type.FLOAT); // Price multiplier
+                        wrapper.passthrough(Type.INT); // Demand
+                    }
+                });
+            }
+        });
+    }
+
     public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
@@ -303,6 +306,23 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
+    public void registerWindowPropertyEnchantmentHandler(ClientboundPacketType packetType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.UNSIGNED_BYTE); // Container id
+                handler(wrapper -> {
+                    short property = wrapper.passthrough(Type.SHORT);
+                    if (property >= 4 && property <= 6) { // Enchantment id
+                        Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+                        short enchantmentId = (short) mappings.getNewId(wrapper.read(Type.SHORT));
+                        wrapper.write(Type.SHORT, enchantmentId);
+                    }
+                });
+            }
+        });
+    }
+
     // Not the very best place for this, but has to stay here until *everything* is abstracted
     public void registerSpawnParticle(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
@@ -323,22 +343,45 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
+    public void registerSpawnParticle1_19(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(coordType); // 2 - X
+                map(coordType); // 3 - Y
+                map(coordType); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
+                handler(getSpawnParticleHandler(Type.VAR_INT, itemType));
+            }
+        });
+    }
+
     public PacketHandler getSpawnParticleHandler(Type<Item> itemType) {
+        return getSpawnParticleHandler(Type.INT, itemType);
+    }
+
+    public PacketHandler getSpawnParticleHandler(Type<Integer> idType, Type<Item> itemType) {
         return wrapper -> {
-            int id = wrapper.get(Type.INT, 0);
+            int id = wrapper.get(idType, 0);
             if (id == -1) return;
 
             ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             if (mappings.isBlockParticle(id)) {
-                int data = wrapper.passthrough(Type.VAR_INT);
-                wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                int data = wrapper.read(Type.VAR_INT);
+                wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
             } else if (mappings.isItemParticle(id)) {
                 handleItemToClient(wrapper.passthrough(itemType));
             }
 
             int newId = protocol.getMappingData().getNewParticleId(id);
             if (newId != id) {
-                wrapper.set(Type.INT, 0, newId);
+                wrapper.set(idType, 0, newId);
             }
         };
     }

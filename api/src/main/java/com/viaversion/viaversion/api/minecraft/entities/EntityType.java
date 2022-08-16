@@ -30,6 +30,7 @@ public interface EntityType {
      * Returns the entity id.
      *
      * @return entity id
+     * @throws IllegalStateException if ids have not been loaded yet
      */
     int getId();
 
@@ -47,6 +48,22 @@ public interface EntityType {
      */
     String name();
 
+    /**
+     * Returns the entity's Vanilla identifier.
+     *
+     * @return entity identifier
+     * @throws IllegalArgumentException if {@link #isAbstractType()} returns true
+     */
+    String identifier();
+
+    /**
+     * Returns whether the type does not represent an actual entity, e.g. animal or monster.
+     *
+     * @return whether the type does not represent an actual entity
+     */
+    boolean isAbstractType();
+
+    @Deprecated/*(forRemoval = true)*/
     default boolean is(EntityType... types) {
         for (EntityType type : types) {
             if (this == type) {

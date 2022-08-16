@@ -23,9 +23,9 @@
 package com.viaversion.viaversion.api.minecraft;
 
 public class Position {
-    private final int x;
-    private final int y;
-    private final int z;
+    protected final int x;
+    protected final int y;
+    protected final int z;
 
     public Position(int x, int y, int z) {
         this.x = x;
@@ -57,6 +57,10 @@ public class Position {
 
     public int z() {
         return z;
+    }
+
+    public GlobalPosition withDimension(String dimension) {
+        return new GlobalPosition(dimension, x, y, z);
     }
 
     @Deprecated/*(forRemoval=true)*/

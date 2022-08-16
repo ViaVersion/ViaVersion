@@ -170,6 +170,16 @@ public class Entity1_10Types {
         public EntityType getParent() {
             return parent;
         }
+
+        @Override
+        public String identifier() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isAbstractType() {
+            return id != -1;
+        }
     }
 
     public enum ObjectType implements com.viaversion.viaversion.api.minecraft.entities.ObjectType {
