@@ -240,6 +240,16 @@ public class Entity1_13Types {
             return parent;
         }
 
+        @Override
+        public String identifier() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isAbstractType() {
+            return id != -1;
+        }
+
         static {
             for (EntityType type : EntityType.values()) {
                 TYPES.put(type.id, type);

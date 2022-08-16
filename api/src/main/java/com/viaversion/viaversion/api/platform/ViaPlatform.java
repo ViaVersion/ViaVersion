@@ -218,4 +218,12 @@ public interface ViaPlatform<T> {
     default Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
         return Collections.emptyList();
     }
+
+    /**
+     * Returns whether the platform has a plugin/mod with the given name (even if disabled).
+     *
+     * @param name plugin or identifier
+     * @return whether the platform has a plugin/mod with the given name
+     */
+    boolean hasPlugin(String name);
 }

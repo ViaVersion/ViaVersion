@@ -24,7 +24,10 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.Int2IntMapMappings;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -40,8 +43,6 @@ import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
-    protected Int2IntMap typeMappings;
+    protected Mappings typeMappings;
 
     protected EntityRewriter(T protocol) {
         this(protocol, true);
@@ -166,7 +167,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     @Override
     public int newEntityId(int id) {
-        return typeMappings != null ? typeMappings.getOrDefault(id, id) : id;
+        return typeMappings != null ? typeMappings.getNewIdOrDefault(id, id) : id;
     }
 
     /**
@@ -183,10 +184,9 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     protected void mapEntityType(int id, int mappedId) {
         if (typeMappings == null) {
-            typeMappings = new Int2IntOpenHashMap();
-            typeMappings.defaultReturnValue(-1);
+            typeMappings = Int2IntMapMappings.of();
         }
-        typeMappings.put(id, mappedId);
+        typeMappings.setNewId(id, mappedId);
     }
 
     /**
@@ -198,20 +198,28 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      */
     public <E extends Enum<E> & EntityType> void mapTypes(EntityType[] oldTypes, Class<E> newTypeClass) {
         if (typeMappings == null) {
-            typeMappings = new Int2IntOpenHashMap(oldTypes.length, .99F);
-            typeMappings.defaultReturnValue(-1);
+            typeMappings = Int2IntMapMappings.of();
         }
         for (EntityType oldType : oldTypes) {
             try {
                 E newType = Enum.valueOf(newTypeClass, oldType.name());
-                typeMappings.put(oldType.getId(), newType.getId());
+                typeMappings.setNewId(oldType.getId(), newType.getId());
             } catch (IllegalArgumentException notFound) {
-                if (!typeMappings.containsKey(oldType.getId())) {
+                if (!typeMappings.contains(oldType.getId())) {
                     Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
                             "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
                 }
             }
         }
+    }
+
+    /**
+     * Maps entity ids based on the protocol's mapping data.
+     */
+    public void mapTypes() {
+        Preconditions.checkArgument(typeMappings == null, "Type mappings have already been set - manual type mappings should be set *after* this");
+        Preconditions.checkNotNull(protocol.getMappingData().getEntityMappings(), "Protocol does not have entity mappings");
+        typeMappings = protocol.getMappingData().getEntityMappings().mappings();
     }
 
     /**
@@ -265,6 +273,32 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
                     EntityType entityType = tracker(wrapper.user()).entityType(entityId);
                     if (entityType == fallingBlockType) {
                         wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.INT, 0)));
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerTrackerWithData1_19(ClientboundPacketType packetType, EntityType fallingBlockType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Yaw
+                map(Type.BYTE); // Head yaw
+                map(Type.VAR_INT); // Data
+                handler(trackerHandler());
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == fallingBlockType) {
+                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
                     }
                 });
             }
@@ -364,6 +398,15 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         return trackerAndRewriterHandler(null);
     }
 
+    public PacketHandler playerTrackerHandler() {
+        return wrapper -> {
+            final EntityTracker tracker = tracker(wrapper.user());
+            final int entityId = wrapper.get(Type.INT, 0);
+            tracker.setClientEntityId(entityId);
+            tracker.addEntity(entityId, tracker.playerType());
+        };
+    }
+
     /**
      * Returns a packet handler storing height, min_y, and name of the current world.
      * If the client changes to a new world, the stored entity data will be cleared.
@@ -394,6 +437,30 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
             String world = wrapper.get(Type.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
+                tracker.trackClientEntity();
+            }
+            tracker.setCurrentWorld(world);
+        };
+    }
+
+    public PacketHandler worldDataTrackerHandlerByKey() {
+        return wrapper -> {
+            EntityTracker tracker = tracker(wrapper.user());
+            String dimensionKey = wrapper.get(Type.STRING, 0);
+            DimensionData dimensionData = tracker.dimensionData(dimensionKey);
+            if (dimensionData == null) {
+                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + dimensionKey + ", falling back to overworld");
+                dimensionData = tracker.dimensionData("minecraft:overworld");
+                Preconditions.checkNotNull(dimensionData, "Overworld data missing");
+            }
+
+            tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
+            tracker.setCurrentMinY(dimensionData.minY());
+
+            String world = wrapper.get(Type.STRING, 1);
+            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+                tracker.clearEntities();
+                tracker.trackClientEntity();
             }
             tracker.setCurrentWorld(world);
         };

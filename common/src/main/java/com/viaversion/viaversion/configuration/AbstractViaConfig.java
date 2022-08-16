@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.IntPredicate;
 
@@ -89,6 +90,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
+    private Map<String, String> chatTypeFormats;
 
     protected AbstractViaConfig(File configFile) {
         super(configFile);
@@ -157,13 +159,16 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
+        chatTypeFormats = get("chat-types-1_19", Map.class, new HashMap<String, String>());
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
-        IntSet blockedProtocols = new IntOpenHashSet(getIntegerList("block-protocols"));
+        List<Integer> blockProtocols = getListSafe("block-protocols", Integer.class, "Invalid blocked version protocol found in config: '%s'");
+        List<String> blockVersions = getListSafe("block-versions", String.class, "Invalid blocked version found in config: '%s'");
+        IntSet blockedProtocols = new IntOpenHashSet(blockProtocols);
         int lowerBound = -1;
         int upperBound = -1;
-        for (String s : getStringList("block-versions")) {
+        for (String s : blockVersions) {
             if (s.isEmpty()) {
                 continue;
             }
@@ -522,5 +527,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean cache1_17Light() {
         return cache1_17Light;
+    }
+
+    @Override
+    public @Nullable String chatTypeFormat(final String translationKey) {
+        return chatTypeFormats.get(translationKey);
     }
 }

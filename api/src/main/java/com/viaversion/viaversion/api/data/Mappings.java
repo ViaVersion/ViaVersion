@@ -39,6 +39,28 @@ public interface Mappings {
     int getNewId(int id);
 
     /**
+     * Returns the mapped id from the given id, or the given default if unmapped/invalid.
+     *
+     * @param id  unmapped id
+     * @param def fallback return value
+     * @return mapped id, or -1 if invalid/out of bounds
+     */
+    default int getNewIdOrDefault(int id, int def) {
+        final int mappedId = getNewId(id);
+        return mappedId != -1 ? mappedId : def;
+    }
+
+    /**
+     * Returns whether the id has a mapping.
+     *
+     * @param id unmapped id
+     * @return whether the id has a mapped id
+     */
+    default boolean contains(int id) {
+        return getNewId(id) != -1;
+    }
+
+    /**
      * Manually maps a specific id.
      *
      * @param id    unmapped id

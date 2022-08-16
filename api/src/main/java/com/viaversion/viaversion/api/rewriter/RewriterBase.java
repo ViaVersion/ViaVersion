@@ -49,6 +49,9 @@ public abstract class RewriterBase<T extends Protocol> implements Rewriter<T> {
     protected void registerRewrites() {
     }
 
+    public void onMappingDataLoaded() {
+    }
+
     @Override
     public T protocol() {
         return protocol;

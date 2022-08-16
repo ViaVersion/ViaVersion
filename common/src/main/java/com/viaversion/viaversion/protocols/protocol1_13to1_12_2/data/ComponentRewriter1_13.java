@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -63,7 +64,7 @@ public class ComponentRewriter1_13 extends ComponentRewriter {
         }
 
         CompoundTag itemTag = tag.get("tag");
-        ShortTag damageTag = tag.get("Damage");
+        NumberTag damageTag = tag.get("Damage");
 
         // Call item converter
         short damage = damageTag != null ? damageTag.asShort() : 0;

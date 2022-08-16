@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 
 public final class Via {
     private static ViaManager manager;
@@ -61,6 +62,11 @@ public final class Via {
 
     public static ViaPlatform getPlatform() {
         return manager().getPlatform();
+    }
+
+    public static ViaServerProxyPlatform<?> proxyPlatform() {
+        Preconditions.checkArgument(manager().getPlatform() instanceof ViaServerProxyPlatform, "Platform is not proxying Minecraft servers!");
+        return (ViaServerProxyPlatform<?>) manager().getPlatform();
     }
 
     /**

@@ -69,7 +69,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
         }
 
         if (type.isOrHasParent(EntityType.ZOMBIE)) { // Zombie | Zombie Villager | Husk
-            if (type.is(EntityType.ZOMBIE, EntityType.HUSK) && metadata.id() == 14) {
+            if ((type == EntityType.ZOMBIE || type == EntityType.HUSK) && metadata.id() == 14) {
                 metadatas.remove(metadata);
             } else {
                 if (metadata.id() == 15) {
@@ -104,7 +104,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_1
                     metadatas.remove(metadata);
                 }
             }
-            if (type.is(EntityType.DONKEY, EntityType.MULE)) {
+            if (type == EntityType.DONKEY || type == EntityType.MULE) {
                 // Chested Horse
                 if (metadata.id() == 13) {
                     if ((((byte) metadata.getValue()) & 0x08) == 0x08) {

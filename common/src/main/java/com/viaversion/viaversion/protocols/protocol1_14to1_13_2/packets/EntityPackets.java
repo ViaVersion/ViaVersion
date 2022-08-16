@@ -33,6 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -191,6 +192,42 @@ public class EntityPackets {
                             metadataPacket.scheduleSend(Protocol1_14To1_13_2.class);
                         }
                     }
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.INT); // 0 - Entity ID
+                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Type.INT); // 2 - Dimension
+                handler(wrapper -> {
+                    // Store the player
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
+                });
+                handler(metadataRewriter.playerTrackerHandler());
+                handler(wrapper -> {
+                    short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
+                    PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
+                    difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
+                    difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
+                    difficultyPacket.scheduleSend(protocol.getClass());
+
+                    wrapper.passthrough(Type.UNSIGNED_BYTE); // Max Players
+                    wrapper.passthrough(Type.STRING); // Level Type
+
+                    wrapper.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);  // Serverside view distance, added in 19w13a
+                });
+                handler(wrapper -> {
+                    // Manually send the packet
+                    wrapper.send(Protocol1_14To1_13_2.class);
+                    wrapper.cancel();
+
+                    // View distance has to be sent after the join packet
+                    WorldPackets.sendViewDistancePacket(wrapper.user());
                 });
             }
         });

@@ -63,9 +63,7 @@ public class EntityPackets {
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE, Type.VAR_INT); // Max players
                 // ...
-                handler(wrapper -> {
-                    wrapper.user().getEntityTracker(Protocol1_16_2To1_16_1.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16_2Types.PLAYER);
-                });
+                handler(metadataRewriter.playerTrackerHandler());
             }
         });
 

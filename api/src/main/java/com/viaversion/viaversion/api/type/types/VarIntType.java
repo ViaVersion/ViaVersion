@@ -28,40 +28,37 @@ import io.netty.buffer.ByteBuf;
 
 public class VarIntType extends Type<Integer> implements TypeConverter<Integer> {
 
+    private static final int CONTINUE_BIT = 0x80;
+    private static final int VALUE_BITS = 0x7F;
+    private static final int MULTI_BYTE_BITS = ~VALUE_BITS;
+    private static final int MAX_BYTES = 5;
+
     public VarIntType() {
         super("VarInt", Integer.class);
     }
 
     public int readPrimitive(ByteBuf buffer) {
-        int out = 0;
+        int value = 0;
         int bytes = 0;
         byte in;
         do {
             in = buffer.readByte();
-
-            out |= (in & 0x7F) << (bytes++ * 7);
-
-            if (bytes > 5) { // 5 is maxBytes
+            value |= (in & VALUE_BITS) << (bytes++ * 7);
+            if (bytes > MAX_BYTES) {
                 throw new RuntimeException("VarInt too big");
             }
 
-        } while ((in & 0x80) == 0x80);
-        return out;
+        } while ((in & CONTINUE_BIT) == CONTINUE_BIT);
+        return value;
     }
 
-    public void writePrimitive(ByteBuf buffer, int object) {
-        int part;
-        do {
-            part = object & 0x7F;
+    public void writePrimitive(ByteBuf buffer, int value) {
+        while ((value & MULTI_BYTE_BITS) != 0) {
+            buffer.writeByte((value & VALUE_BITS) | CONTINUE_BIT);
+            value >>>= 7;
+        }
 
-            object >>>= 7;
-            if (object != 0) {
-                part |= 0x80;
-            }
-
-            buffer.writeByte(part);
-
-        } while (object != 0);
+        buffer.writeByte(value);
     }
 
     /**

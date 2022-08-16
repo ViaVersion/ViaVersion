@@ -22,14 +22,18 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EntityTypeUtil {
+public final class EntityTypeUtil {
+
+    private static final EntityType[] EMPTY_ARRAY = new EntityType[0];
 
     /**
      * Returns an ordered array with each index representing the actual entity id.
@@ -37,16 +41,48 @@ public class EntityTypeUtil {
      * @param values entity types
      * @return ordered array with each index representing the actual entity id
      */
-    public static EntityType[] toOrderedArray(EntityType[] values) {
-        List<EntityType> types = new ArrayList<>();
-        for (EntityType type : values) {
+    public static EntityType[] toOrderedArray(final EntityType[] values) {
+        final List<EntityType> types = new ArrayList<>();
+        for (final EntityType type : values) {
             if (type.getId() != -1) {
                 types.add(type);
             }
         }
 
         types.sort(Comparator.comparingInt(EntityType::getId));
-        return types.toArray(new EntityType[0]);
+        return types.toArray(EMPTY_ARRAY);
+    }
+
+    /**
+     * Sets entity type ids based on the protocol's mapping data and fills the given typesToFill array with the index corresponding to the id.
+     *
+     * @param values      full enum values
+     * @param typesToFill yet unfilled array to be filled with types ordered by id
+     * @param protocol    protocol to get entity types from
+     * @param idSetter    function to set the internal entity id
+     * @param <T>         entity type
+     */
+    public static <T extends EntityType> void initialize(final T[] values, final EntityType[] typesToFill, final Protocol<?, ?, ?, ?> protocol, final EntityIdSetter<T> idSetter) {
+        for (final T type : values) {
+            if (type.isAbstractType()) {
+                continue;
+            }
+
+            final int id = protocol.getMappingData().getEntityMappings().mappedId(type.identifier());
+            Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
+            idSetter.setId(type, id);
+            typesToFill[id] = type;
+        }
+    }
+
+    public static EntityType[] createSizedArray(final EntityType[] values) {
+        int count = 0;
+        for (final EntityType type : values) {
+            if (!type.isAbstractType()) {
+                count++;
+            }
+        }
+        return new EntityType[count];
     }
 
     /**
@@ -57,12 +93,18 @@ public class EntityTypeUtil {
      * @param fallback fallback/base entity type
      * @return entity type from id
      */
-    public static EntityType getTypeFromId(EntityType[] values, int typeId, EntityType fallback) {
-        EntityType type;
+    public static EntityType getTypeFromId(final EntityType[] values, final int typeId, final EntityType fallback) {
+        final EntityType type;
         if (typeId < 0 || typeId >= values.length || (type = values[typeId]) == null) {
             Via.getPlatform().getLogger().severe("Could not find " + fallback.getClass().getSimpleName() + " type id " + typeId);
             return fallback;
         }
         return type;
+    }
+
+    @FunctionalInterface
+    public interface EntityIdSetter<T extends EntityType> {
+
+        void setId(T entityType, int id);
     }
 }

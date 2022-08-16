@@ -33,13 +33,18 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
     private final Protocol protocol;
     private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
+    private final Map<RegistryType, Map<String, String>> toRename = new EnumMap<>(RegistryType.class);
+    private final Set<String> toRemove = new HashSet<>();
 
     public TagRewriter(Protocol protocol) {
         this.protocol = protocol;
@@ -55,6 +60,14 @@ public class TagRewriter {
                 getOrComputeNewTags(type).addAll(tags);
             }
         }
+    }
+
+    public void removeTags(final String registryKey) {
+        toRemove.add(registryKey);
+    }
+
+    public void renameTag(final RegistryType type, final String registryKey, final String renameTo) {
+        toRename.computeIfAbsent(type, t -> new HashMap<>()).put(registryKey, renameTo);
     }
 
     /**
@@ -77,7 +90,7 @@ public class TagRewriter {
     /**
      * Adds an entity tag type to be filled with the given entity type ids.
      *
-     * @param tagId          registry tag type
+     * @param tagId    registry tag type
      * @param entities mapped entity types
      */
     public void addEntityTag(String tagId, EntityType... entities) {
@@ -148,7 +161,7 @@ public class TagRewriter {
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {
         return wrapper -> {
             for (RegistryType type : RegistryType.getValues()) {
-                handle(wrapper, getRewriter(type), getNewTags(type));
+                handle(wrapper, getRewriter(type), getNewTags(type), toRename.get(type));
 
                 // Stop iterating
                 if (type == readUntilType) {
@@ -160,29 +173,53 @@ public class TagRewriter {
 
     public PacketHandler getGenericHandler() {
         return wrapper -> {
-            int length = wrapper.passthrough(Type.VAR_INT);
+            final int length = wrapper.passthrough(Type.VAR_INT);
+            int editedLength = length;
             for (int i = 0; i < length; i++) {
-                String registryKey = wrapper.passthrough(Type.STRING);
+                String registryKey = wrapper.read(Type.STRING);
+                if (toRemove.contains(registryKey)) {
+                    wrapper.set(Type.VAR_INT, 0, --editedLength);
+                    int tagsSize = wrapper.read(Type.VAR_INT);
+                    for (int j = 0; j < tagsSize; j++) {
+                        wrapper.read(Type.STRING);
+                        wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+                    }
+                    continue;
+                }
+
+                wrapper.write(Type.STRING, registryKey);
                 if (registryKey.startsWith("minecraft:")) {
                     registryKey = registryKey.substring(10);
                 }
 
                 RegistryType type = RegistryType.getByKey(registryKey);
                 if (type != null) {
-                    handle(wrapper, getRewriter(type), getNewTags(type));
+                    handle(wrapper, getRewriter(type), getNewTags(type), toRename.get(type));
                 } else {
-                    handle(wrapper, null, null);
+                    handle(wrapper, null, null, null);
                 }
             }
         };
     }
 
     public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags) throws Exception {
+        handle(wrapper, rewriteFunction, newTags, null);
+    }
+
+    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename) throws Exception {
         int tagsSize = wrapper.read(Type.VAR_INT);
         wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
         for (int i = 0; i < tagsSize; i++) {
-            wrapper.passthrough(Type.STRING);
+            String key = wrapper.read(Type.STRING);
+            if (tagsToRename != null) {
+                String renamedKey = tagsToRename.get(key);
+                if (renamedKey != null) {
+                    key = renamedKey;
+                }
+            }
+            wrapper.write(Type.STRING, key);
+
             int[] ids = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
             if (rewriteFunction != null) {
                 // Map ids and filter out new blocks

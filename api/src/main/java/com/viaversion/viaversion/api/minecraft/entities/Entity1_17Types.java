@@ -240,6 +240,16 @@ public enum Entity1_17Types implements EntityType {
         return parent;
     }
 
+    @Override
+    public String identifier() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isAbstractType() {
+        return id != -1;
+    }
+
     static {
         TYPES = EntityTypeUtil.toOrderedArray(values());
     }

@@ -21,12 +21,16 @@ package com.viaversion.viaversion.data.entity;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
+import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
+
+import java.util.Collections;
+import java.util.Map;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
     private final Int2ObjectMap<EntityType> entityTypes = Int2ObjectSyncMap.hashmap();
@@ -38,6 +42,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     private int currentMinY;
     private String currentWorld;
     private int biomesSent = -1;
+    private Map<String, DimensionData> dimensions = Collections.emptyMap();
 
     public EntityTrackerBase(UserConnection connection, @Nullable EntityType playerType) {
         this(connection, playerType, false);
@@ -119,6 +124,15 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
+    public boolean trackClientEntity() {
+        if (clientEntityId != -1) {
+            entityTypes.put(clientEntityId, playerType);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public int currentWorldSectionHeight() {
         return currentWorldSectionHeight;
     }
@@ -156,5 +170,20 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     @Override
     public void setBiomesSent(int biomesSent) {
         this.biomesSent = biomesSent;
+    }
+
+    @Override
+    public EntityType playerType() {
+        return playerType;
+    }
+
+    @Override
+    public @Nullable DimensionData dimensionData(String dimension) {
+        return dimensions.get(dimension);
+    }
+
+    @Override
+    public void setDimensions(Map<String, DimensionData> dimensions) {
+        this.dimensions = dimensions;
     }
 }

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ViaVersionConfig {
 
@@ -455,4 +456,6 @@ public interface ViaVersionConfig {
     WorldIdentifiers get1_16WorldNamesMap();
 
     boolean cache1_17Light();
+
+    @Nullable String chatTypeFormat(String translationKey);
 }

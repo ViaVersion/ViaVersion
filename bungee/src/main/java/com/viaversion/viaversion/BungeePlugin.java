@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
@@ -24,17 +25,19 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
-import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
+import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.bungee.commands.BungeeCommand;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandHandler;
 import com.viaversion.viaversion.bungee.commands.BungeeCommandSender;
-import com.viaversion.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.viaversion.bungee.platform.BungeeViaAPI;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.platform.BungeeViaInjector;
 import com.viaversion.viaversion.bungee.platform.BungeeViaLoader;
+import com.viaversion.viaversion.bungee.platform.BungeeViaTask;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.dump.PluginInfo;
+import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -49,14 +52,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, Listener {
+public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<ProxiedPlayer>, Listener {
+    private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
     private BungeeViaAPI api;
     private BungeeViaConfig config;
 
     @Override
     public void onLoad() {
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_18");
+            ProtocolConstants.class.getField("MINECRAFT_1_19_1");
         } catch (NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
@@ -198,12 +202,33 @@ public class BungeePlugin extends Plugin implements ViaPlatform<ProxiedPlayer>, 
             ));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
-        platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(ProtocolDetectorService.getDetectedIds()));
+        platformSpecific.add("servers", GsonUtil.getGson().toJsonTree(protocolDetectorService.detectedProtocolVersions()));
         return platformSpecific;
     }
 
     @Override
     public boolean isOldClientsAllowed() {
         return true;
+    }
+
+    @Override
+    public Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
+        final Collection<UnsupportedSoftware> list = new ArrayList<>(ViaServerProxyPlatform.super.getUnsupportedSoftwareClasses());
+        list.add(new UnsupportedServerSoftware.Builder()
+                .name("FlameCord")
+                .addClassName("dev._2lstudios.flamecord.FlameCord")
+                .reason(UnsupportedServerSoftware.Reason.BREAKING_PROXY_SOFTWARE)
+                .build());
+        return ImmutableList.copyOf(list);
+    }
+
+    @Override
+    public boolean hasPlugin(final String name) {
+        return getProxy().getPluginManager().getPlugin(name) != null;
+    }
+
+    @Override
+    public ProtocolDetectorService protocolDetectorService() {
+        return protocolDetectorService;
     }
 }

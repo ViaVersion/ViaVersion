@@ -41,4 +41,9 @@ public class VelocityCommandHandler extends ViaCommandHandler implements SimpleC
     public List<String> suggest(Invocation invocation) {
         return onTabComplete(new VelocityCommandSender(invocation.source()), invocation.arguments());
     }
+
+    @Override
+    public boolean hasPermission(Invocation invocation) {
+        return invocation.source().hasPermission("viaversion.admin"); // The permission is also referenced here to filter root suggestions (/via<tab>)
+    }
 }

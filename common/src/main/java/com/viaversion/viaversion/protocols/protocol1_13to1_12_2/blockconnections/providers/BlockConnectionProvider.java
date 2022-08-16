@@ -48,6 +48,10 @@ public class BlockConnectionProvider implements Provider {
 
     }
 
+    public void unloadChunkSection(UserConnection connection, int chunkX, int chunkY, int chunkZ) {
+
+    }
+
     public boolean storesBlocks() {
         return false;
     }

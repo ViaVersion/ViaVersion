@@ -229,6 +229,11 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
+    public boolean hasPlugin(final String name) {
+        return game.pluginManager().plugin(name).isPresent();
+    }
+
+    @Override
     public SpongeViaAPI getApi() {
         return api;
     }

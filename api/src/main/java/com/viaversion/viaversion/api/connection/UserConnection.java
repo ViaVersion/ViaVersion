@@ -59,6 +59,15 @@ public interface UserConnection {
     boolean has(Class<? extends StorableObject> objectClass);
 
     /**
+     * Removes and returns an object from the storage.
+     *
+     * @param objectClass class of the object to get
+     * @param <T>         type of the class you want to get
+     * @return removed storable object if present
+     */
+    @Nullable <T extends StorableObject> T remove(Class<T> objectClass);
+
+    /**
      * Put an object into the stored objects based on class.
      *
      * @param object The object to store.
@@ -83,6 +92,7 @@ public interface UserConnection {
 
     /**
      * Adds an entity tracker to the user connection.
+     * Does not override existing entity trackers.
      *
      * @param protocolClass protocol class
      * @param tracker       entity tracker
@@ -91,9 +101,18 @@ public interface UserConnection {
 
     /**
      * Clear stored objects and entity trackers.
-     * Used for Bungee when switching servers.
      */
-    void clearStoredObjects();
+    default void clearStoredObjects() {
+        clearStoredObjects(false);
+    }
+
+    /**
+     * Clear stored objects and entity trackers.
+     * If cleared for a proxy server switch, some stored objects and tracker data will be retained.
+     *
+     * @param isServerSwitch whether the clear is due to a server switch
+     */
+    void clearStoredObjects(boolean isServerSwitch);
 
     /**
      * Sends a raw packet to the connection on the current thread.

@@ -20,28 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+public final class GlobalPosition extends Position {
+    private final String dimension;
 
-public class OptPositionType extends Type<Position> {
-    public OptPositionType() {
-        super(Position.class);
+    public GlobalPosition(final String dimension, final int x, final int y, final int z) {
+        super(x, y, z);
+        this.dimension = dimension;
+    }
+
+    public String dimension() {
+        return dimension;
     }
 
     @Override
-    public Position read(ByteBuf buffer) throws Exception {
-        boolean present = buffer.readBoolean();
-        if (!present) return null;
-        return Type.POSITION.read(buffer);
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final GlobalPosition position = (GlobalPosition) o;
+        if (x != position.x) return false;
+        if (y != position.y) return false;
+        if (z != position.z) return false;
+        return dimension.equals(position.dimension);
     }
 
     @Override
-    public void write(ByteBuf buffer, Position object) throws Exception {
-        buffer.writeBoolean(object != null);
-        if (object != null)
-            Type.POSITION.write(buffer, object);
+    public int hashCode() {
+        int result = dimension.hashCode();
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + z;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "GlobalPosition{" +
+                "dimension='" + dimension + '\'' +
+                ", x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
     }
 }

@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
-import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 
 public class ProbeSubCmd extends ViaSubCommand {
     @Override
@@ -38,7 +37,7 @@ public class ProbeSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ProtocolDetectorService.getInstance().run();
+        Via.proxyPlatform().protocolDetectorService().probeAllServers();
         sendMessage(sender, "&6Started searching for protocol versions");
         return true;
     }
