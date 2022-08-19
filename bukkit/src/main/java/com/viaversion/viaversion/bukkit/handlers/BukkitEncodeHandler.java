@@ -100,4 +100,8 @@ public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaCode
             cause.printStackTrace(); // Print if CB doesn't already do it
         }
     }
+
+    public UserConnection getInfo() {
+        return info;
+    }
 }
