@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -45,8 +46,8 @@ public class JoinListener implements Listener {
         Field conn = null, nm = null, ch = null;
         try {
             gh = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
-            conn = findField(gh.getReturnType(), "PlayerConnection");
-            nm = findField(conn.getType(), "NetworkManager");
+            conn = findField(gh.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
+            nm = findField(conn.getType(), "NetworkManager", "Connection");
             ch = findField(nm.getType(), "Channel");
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
@@ -61,13 +62,14 @@ public class JoinListener implements Listener {
         CHANNEL = ch;
     }
 
-    // Loosely search a field with any name, as long as it matches the type
-    private static Field findField(Class<?> cl, String type) throws NoSuchFieldException {
+    // Loosely search a field with any name, as long as it matches a type name.
+    private static Field findField(Class<?> cl, String... types) throws NoSuchFieldException {
         for (Field field : cl.getDeclaredFields()) {
-            if (field.getType().getSimpleName().equals(type))
-                return field;
+            for (String type : types)
+                if (field.getType().getSimpleName().equals(type))
+                    return field;
         }
-        throw new NoSuchFieldException(type);
+        throw new NoSuchFieldException(types[0]);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -75,11 +77,12 @@ public class JoinListener implements Listener {
         if (CHANNEL == null) return;
         Player player = e.getPlayer();
 
-        Channel channel = getChannel(player);
-        if (channel == null) {
-            Via.getPlatform().getLogger().log(Level.WARNING,
-                    "Could not find Channel for logging-in player {0}",
-                    player.getUniqueId());
+        Channel channel;
+        try {
+          channel = getChannel(player);
+        } catch (Exception ex) {
+            Via.getPlatform().getLogger().log(Level.WARNING, ex,
+                    () -> "Could not find Channel for logging-in player " + player.getUniqueId());
             return;
         }
         // The connection has already closed, that was a quick leave
@@ -98,21 +101,16 @@ public class JoinListener implements Listener {
         Via.getManager().getConnectionManager().onLoginSuccess(user);
     }
 
-    private UserConnection getUserConnection(Channel channel) {
+    private @Nullable UserConnection getUserConnection(Channel channel) {
         BukkitEncodeHandler encoder = channel.pipeline().get(BukkitEncodeHandler.class);
         return encoder != null ? encoder.getInfo() : null;
     }
 
-    private Channel getChannel(Player player) {
-        try {
-            Object entityPlayer = GET_HANDLE.invoke(player);
-            Object pc = CONNECTION.get(entityPlayer);
-            Object nm = NETWORK_MANAGER.get(pc);
-            return (Channel) CHANNEL.get(nm);
-        } catch (Exception e) { // Wildcard-catch everything
-            e.printStackTrace();
-        }
-        return null;
+    private Channel getChannel(Player player) throws Exception {
+        Object entityPlayer = GET_HANDLE.invoke(player);
+        Object pc = CONNECTION.get(entityPlayer);
+        Object nm = NETWORK_MANAGER.get(pc);
+        return (Channel) CHANNEL.get(nm);
     }
 
 }
