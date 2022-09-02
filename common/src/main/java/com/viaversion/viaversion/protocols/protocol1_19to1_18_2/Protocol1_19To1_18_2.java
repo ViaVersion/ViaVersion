@@ -120,7 +120,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         final PacketHandler titleHandler = wrapper -> {
             final JsonElement component = wrapper.read(Type.COMPONENT);
-            if (!component.isJsonNull()) {
+            final boolean isEmpty = component.isJsonNull() || (component.isJsonArray() && component.getAsJsonArray().size() == 0);
+            if (!isEmpty) {
                 wrapper.write(Type.COMPONENT, component);
             } else {
                 wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(Component.empty()));
