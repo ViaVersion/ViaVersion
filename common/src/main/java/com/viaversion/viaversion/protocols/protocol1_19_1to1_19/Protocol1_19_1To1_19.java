@@ -29,8 +29,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -42,6 +42,7 @@ import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.provider.OldSignatureProvider;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.ChatTypeStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
@@ -209,12 +210,17 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             public void registerMap() {
                 map(Type.STRING); // Name
                 handler(wrapper -> {
-                    // Profile keys are not compatible; replace it with an empty one
-                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
-                    if (profileKey == null) {
-                        // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
-                        wrapper.user().put(new NonceStorage(null));
+                    // In case an implementation can "properly" trade the keys with Minecraft code
+                    if (Protocol1_19_1To1_19.this.platformSupportSignatures()) {
+                        this.map(Type.OPTIONAL_PROFILE_KEY);
+                    } else {
+                        // Profile keys are not compatible; replace it with an empty one
+                        final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
+                        wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                        if (profileKey == null) {
+                            // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
+                            wrapper.user().put(new NonceStorage(null));
+                        }
                     }
                 });
                 read(Type.OPTIONAL_UUID); // Profile uuid
@@ -223,6 +229,8 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
+                if (Protocol1_19_1To1_19.this.platformSupportSignatures()) return;
+
                 map(Type.STRING); // Server id
                 handler(wrapper -> {
                     if (wrapper.user().has(NonceStorage.class)) {
@@ -238,6 +246,8 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
+                if (Protocol1_19_1To1_19.this.platformSupportSignatures()) return;
+
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
                 handler(wrapper -> {
                     final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
@@ -280,6 +290,17 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+    }
+
+    private boolean platformSupportSignatures() {
+        return Via.getManager().getProviders().get(OldSignatureProvider.class).platformSpecificHandling();
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        super.register(providers);
+
+        providers.register(OldSignatureProvider.class, new OldSignatureProvider());
     }
 
     @Override
