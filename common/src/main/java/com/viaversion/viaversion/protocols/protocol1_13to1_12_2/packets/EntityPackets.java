@@ -159,7 +159,7 @@ public class EntityPackets {
                     byte flags = packetWrapper.read(Type.BYTE); // Input Flags
 
                     if (Via.getConfig().isNewEffectIndicator())
-                        flags += 2; // Since Minecraft 1.14.4, Minecraft has 2 Flags for rendering the particles, one for the Player Inventory, and one for the InGame HUD
+                        flags += 2;
 
                     packetWrapper.write(Type.BYTE, flags);
                 });
