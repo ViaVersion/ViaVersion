@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
