@@ -60,24 +60,5 @@ public class Protocol1_14_4To1_14_3 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-
-        this.registerClientbound(ClientboundPackets1_14.ENTITY_EFFECT, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.BYTE); // Effect id
-                map(Type.BYTE); // Amplifier
-                map(Type.VAR_INT); // Duration
-
-                handler(packetWrapper -> {
-                    byte flags = packetWrapper.read(Type.BYTE); // Input Flags
-
-                    if (Via.getConfig().isNewEffectIndicator())
-                        flags += 2; // Since Minecraft 1.14.4, Minecraft has 2 Flags for rendering the particles, one for the Player Inventory, and one for the InGame HUD
-
-                    packetWrapper.write(Type.BYTE, flags);
-                });
-            }
-        });
     }
 }
