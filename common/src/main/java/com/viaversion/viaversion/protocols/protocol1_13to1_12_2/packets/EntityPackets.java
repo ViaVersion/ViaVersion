@@ -159,7 +159,7 @@ public class EntityPackets {
                     byte flags = packetWrapper.read(Type.BYTE); // Input Flags
 
                     if (Via.getConfig().isNewEffectIndicator())
-                        flags += 2;
+                        flags |= 0x04;
 
                     packetWrapper.write(Type.BYTE, flags);
                 });
