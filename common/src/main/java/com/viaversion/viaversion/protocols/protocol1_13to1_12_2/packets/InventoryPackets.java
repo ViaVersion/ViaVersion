@@ -313,7 +313,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                                 if (c instanceof NumberTag) {
                                     // Invert color id
                                     ((CompoundTag) pattern).put("Color",
-                                            new IntTag(15 - ((IntTag) c).asInt()));
+                                            new IntTag(15 - ((NumberTag) c).asInt()));
                                 }
                             }
                         }
