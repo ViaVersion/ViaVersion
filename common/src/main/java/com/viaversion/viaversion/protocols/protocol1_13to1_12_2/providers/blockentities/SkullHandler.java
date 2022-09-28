@@ -43,11 +43,12 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         int id = storage.get(position).getOriginal();
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
             Tag skullType = tag.get("SkullType");
-            if (skullType != null) {
-                id += ((NumberTag) tag.get("SkullType")).asInt() * 20;
+            if (skullType instanceof NumberTag) {
+                id += ((NumberTag) skullType).asInt() * 20;
             }
-            if (tag.contains("Rot")) {
-                id += ((NumberTag) tag.get("Rot")).asInt();
+            Tag rot = tag.get("Rot");
+            if (rot instanceof NumberTag) {
+                id += ((NumberTag) rot).asInt();
             }
         } else {
             Via.getPlatform().getLogger().warning("Why does this block have the skull block entity? " + tag);

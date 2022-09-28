@@ -42,7 +42,7 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
         int blockId = storage.get(position).getOriginal() - 972 + 748;
 
         Tag color = tag.get("color");
-        if (color != null) {
+        if (color instanceof NumberTag) {
             blockId += (((NumberTag) color).asInt() * 16);
         }
 
