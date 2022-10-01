@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
@@ -212,8 +213,8 @@ public final class WorldPackets {
 
     private static void handleSpawners(int typeId, final CompoundTag tag) {
         if (typeId == 8) {
-            final CompoundTag entity = tag.get("SpawnData");
-            if (entity != null) {
+            final Tag entity = tag.get("SpawnData");
+            if (entity instanceof CompoundTag) {
                 final CompoundTag spawnData = new CompoundTag();
                 tag.put("SpawnData", spawnData);
                 spawnData.put("entity", entity);

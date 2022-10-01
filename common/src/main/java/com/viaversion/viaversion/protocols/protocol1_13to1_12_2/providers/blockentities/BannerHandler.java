@@ -51,8 +51,8 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         Tag base = tag.get("Base");
         int color = 0;
-        if (base != null) {
-            color = ((NumberTag) tag.get("Base")).asInt();
+        if (base instanceof NumberTag) {
+            color = ((NumberTag) base).asInt();
         }
         // Standing banner
         if (blockId >= BANNER_START && blockId <= BANNER_STOP) {
@@ -64,8 +64,9 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
             Via.getPlatform().getLogger().warning("Why does this block have the banner block entity? :(" + tag);
         }
 
-        if (tag.get("Patterns") instanceof ListTag) {
-            for (Tag pattern : (ListTag) tag.get("Patterns")) {
+        Tag patterns = tag.get("Patterns");
+        if (patterns instanceof ListTag) {
+            for (Tag pattern : (ListTag) patterns) {
                 if (pattern instanceof CompoundTag) {
                     Tag c = ((CompoundTag) pattern).get("Color");
                     if (c instanceof IntTag) {
