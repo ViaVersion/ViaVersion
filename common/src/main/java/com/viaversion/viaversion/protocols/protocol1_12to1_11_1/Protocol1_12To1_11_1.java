@@ -140,9 +140,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                                 //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
                                 CompoundTag tag = new CompoundTag();
                                 tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
-                                tag.put("x", new IntTag((idx & 0xF) + (chunk.getX() << 4)));
-                                tag.put("y", new IntTag((idx >> 8 & 0xF) + (s << 4)));
-                                tag.put("z", new IntTag((idx >> 4 & 0xF) + (chunk.getZ() << 4)));
+                                tag.put("x", new IntTag(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4)));
+                                tag.put("y", new IntTag(ChunkSection.yFromIndex(idx) + (s << 4)));
+                                tag.put("z", new IntTag(ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
                                 tag.put("id", new StringTag("minecraft:bed"));
 
                                 // Add a fake block entity

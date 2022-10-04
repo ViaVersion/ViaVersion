@@ -180,7 +180,7 @@ public class WorldPackets {
                                 nonAirBlockCount++;
 
                                 int xz = idx & 0xFF;
-                                int y = (idx >> 8) & 0xF;
+                                int y = ChunkSection.yFromIndex(idx);
                                 worldSurface[xz] = sy + y + 1; // +1 (top of the block)
 
                                 if (protocol.getMappingData().getMotionBlocking().contains(id)) {
@@ -189,8 +189,8 @@ public class WorldPackets {
 
                                 // Manually update light for non-full blocks (block light must not be sent)
                                 if (Via.getConfig().isNonFullBlockLightFix() && protocol.getMappingData().getNonFullBlocks().contains(id)) {
-                                    int x = idx & 0xF;
-                                    int z = (idx >> 4) & 0xF;
+                                    int x = ChunkSection.xFromIndex(idx);
+                                    int z = ChunkSection.zFromIndex(idx);
                                     setNonFullLight(chunk, section, s, x, y, z);
                                 }
                             }

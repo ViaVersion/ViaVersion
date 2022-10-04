@@ -362,9 +362,9 @@ public class WorldPackets {
                             for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                                 int id = blocks.idAt(idx);
                                 if (storage.isWelcome(id)) {
-                                    storage.store(new Position((idx & 0xF) + (chunk.getX() << 4), (idx >> 8 & 0xF) + (s << 4), (idx >> 4 & 0xF) + (chunk.getZ() << 4)), id);
+                                    storage.store(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)), id);
                                 } else if (!chunk.isFullChunk()) { // Update
-                                    storage.remove(new Position((idx & 0xF) + (chunk.getX() << 4), (idx >> 8 & 0xF) + (s << 4), (idx >> 4 & 0xF) + (chunk.getZ() << 4)));
+                                    storage.remove(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
                                 }
                             }
                         }
@@ -388,9 +388,9 @@ public class WorldPackets {
                             for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                                 int id = blocks.idAt(idx);
                                 if (ConnectionData.isWelcome(id)) {
-                                    int globalX = (idx & 0xF) + (chunk.getX() << 4);
-                                    int globalY = (idx >> 8 & 0xF) + (s << 4);
-                                    int globalZ = (idx >> 4 & 0xF) + (chunk.getZ() << 4);
+                                    int globalX = ChunkSection.xFromIndex(idx) + (chunk.getX() << 4);
+                                    int globalY = ChunkSection.yFromIndex(idx) + (s << 4);
+                                    int globalZ = ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4);
                                     ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), globalX, globalY, globalZ, id);
                                 }
                             }

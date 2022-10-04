@@ -106,15 +106,20 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                         wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
 
                         List<CompoundTag> tags = chunk.getBlockEntities();
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
+                        for (int s = 0; s < chunk.getSections().length; s++) {
+                            ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
                             DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
                             for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                                 int id = blocks.idAt(idx) >> 4;
                                 if (FakeTileEntity.isTileEntity(id)) {
-                                    tags.add(FakeTileEntity.createTileEntity((idx & 0xF) + (chunk.getX() << 4), (idx >> 8 & 0xF) + (i << 4), (idx >> 4 & 0xF) + (chunk.getZ() << 4), id));
+                                    tags.add(FakeTileEntity.createTileEntity(
+                                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                                            ChunkSection.yFromIndex(idx) + (s << 4),
+                                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                                            id
+                                    ));
                                 }
                             }
                         }

@@ -193,7 +193,7 @@ public class ConnectionData {
                 int id = blocks.idAt(idx);
                 ConnectionHandler handler = ConnectionData.getConnectionHandler(id);
                 if (handler == null) continue;
-                id = handler.connect(user, new Position(xOff + (idx & 0xF), yOff + (idx >> 8 & 0xF), zOff + (idx >> 4 & 0xF)), id);
+                id = handler.connect(user, new Position(xOff + ChunkSection.xFromIndex(idx), yOff + ChunkSection.yFromIndex(idx), zOff + ChunkSection.zFromIndex(idx)), id);
                 blocks.setIdAt(idx, id);
             }
         }
