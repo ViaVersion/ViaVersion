@@ -27,6 +27,8 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -334,77 +336,62 @@ public class WorldPackets {
                     Chunk chunk = wrapper.read(type);
                     wrapper.write(type1_13, chunk);
 
-                    for (int i = 0; i < chunk.getSections().length; i++) {
-                        ChunkSection section = chunk.getSections()[i];
-                        if (section == null)
-                            continue;
+                    for (int s = 0; s < chunk.getSections().length; s++) {
+                        ChunkSection section = chunk.getSections()[s];
+                        if (section == null) continue;
+                        DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                        for (int p = 0; p < section.getPaletteSize(); p++) {
-                            int old = section.getPaletteEntry(p);
+                        for (int p = 0; p < blocks.size(); p++) {
+                            int old = blocks.idByIndex(p);
                             int newId = toNewId(old);
-                            section.setPaletteEntry(p, newId);
+                            blocks.setIdByIndex(p, newId);
                         }
 
                         storage:
                         {
                             if (chunk.isFullChunk()) {
                                 boolean willSave = false;
-                                for (int j = 0; j < section.getPaletteSize(); j++) {
-                                    if (storage.isWelcome(section.getPaletteEntry(j))) {
+                                for (int p = 0; p < blocks.size(); p++) {
+                                    if (storage.isWelcome(blocks.idByIndex(p))) {
                                         willSave = true;
                                         break;
                                     }
                                 }
                                 if (!willSave) break storage;
                             }
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getFlatBlock(x, y, z);
-                                        Position pos = new Position(
-                                                (x + (chunk.getX() << 4)),
-                                                (y + (i << 4)),
-                                                (z + (chunk.getZ() << 4))
-                                        );
-                                        if (storage.isWelcome(block)) {
-                                            storage.store(pos, block);
-                                        } else if (!chunk.isFullChunk()) { // Update
-                                            storage.remove(pos);
-                                        }
-                                    }
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx);
+                                if (storage.isWelcome(id)) {
+                                    storage.store(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)), id);
+                                } else if (!chunk.isFullChunk()) { // Update
+                                    storage.remove(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
                                 }
                             }
                         }
 
                         save_connections:
                         {
-                            if (!Via.getConfig().isServersideBlockConnections()
-                                    || !ConnectionData.needStoreBlocks()) break save_connections;
+                            if (!Via.getConfig().isServersideBlockConnections() || !ConnectionData.needStoreBlocks()) break save_connections;
 
                             if (!chunk.isFullChunk()) { // Update
-                                ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), i, chunk.getZ());
+                                ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), s, chunk.getZ());
                             }
                             boolean willSave = false;
-                            for (int j = 0; j < section.getPaletteSize(); j++) {
-                                if (ConnectionData.isWelcome(section.getPaletteEntry(j))) {
+                            for (int p = 0; p < blocks.size(); p++) {
+                                if (ConnectionData.isWelcome(blocks.idByIndex(p))) {
                                     willSave = true;
                                     break;
                                 }
                             }
                             if (!willSave) break save_connections;
 
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getFlatBlock(x, y, z);
-                                        if (ConnectionData.isWelcome(block)) {
-                                            int globalX = x + (chunk.getX() << 4);
-                                            int globalY = y + (i << 4);
-                                            int globalZ = z + (chunk.getZ() << 4);
-                                            ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), globalX,
-                                                    globalY, globalZ, block);
-                                        }
-                                    }
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx);
+                                if (ConnectionData.isWelcome(id)) {
+                                    int globalX = ChunkSection.xFromIndex(idx) + (chunk.getX() << 4);
+                                    int globalY = ChunkSection.yFromIndex(idx) + (s << 4);
+                                    int globalZ = ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4);
+                                    ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), globalX, globalY, globalZ, id);
                                 }
                             }
                         }

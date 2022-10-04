@@ -24,6 +24,8 @@ package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -38,16 +40,14 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     @Override
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSectionImpl(true);
+        DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
+
         // 0 index needs to be air in 1.9
-        chunkSection.addPaletteEntry(0);
+        blocks.addId(0);
 
         ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);
-
-        for (int i = 0; i < ChunkSection.SIZE; i++) {
-            int mask = littleEndianView.readShort();
-            int type = mask >> 4;
-            int data = mask & 0xF;
-            chunkSection.setBlockWithData(i, type, data);
+        for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+            blocks.setIdAt(idx, littleEndianView.readShort());
         }
 
         return chunkSection;
@@ -55,15 +55,11 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
-        for (int y = 0; y < 16; y++) {
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++) {
-                    int block = chunkSection.getFlatBlock(x, y, z);
-                    buffer.writeByte(block);
-                    buffer.writeByte(block >> 8);
-                }
-            }
+        DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
+
+        ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);
+        for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+            littleEndianView.writeShort(blocks.idAt(idx));
         }
     }
-
 }
