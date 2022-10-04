@@ -24,7 +24,9 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -154,15 +156,17 @@ public class WorldPackets {
                         for (int s = 0; s < chunk.getSections().length; s++) {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
+                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+                            assert blocks != null;
 
                             boolean hasBlock = false;
-                            for (int i = 0; i < section.getPaletteSize(); i++) {
-                                int old = section.getPaletteEntry(i);
+                            for (int i = 0; i < blocks.size(); i++) {
+                                int old = blocks.idByIndex(i);
                                 int newId = protocol.getMappingData().getNewBlockStateId(old);
                                 if (!hasBlock && newId != air && newId != voidAir && newId != caveAir) { // air, void_air, cave_air
                                     hasBlock = true;
                                 }
-                                section.setPaletteEntry(i, newId);
+                                blocks.setIdByIndex(i, newId);
                             }
                             if (!hasBlock) {
                                 section.setNonAirBlocksCount(0);
@@ -170,23 +174,25 @@ public class WorldPackets {
                             }
 
                             int nonAirBlockCount = 0;
-                            for (int x = 0; x < 16; x++) {
-                                for (int y = 0; y < 16; y++) {
-                                    for (int z = 0; z < 16; z++) {
-                                        int id = section.getFlatBlock(x, y, z);
-                                        if (id != air && id != voidAir && id != caveAir) {
-                                            nonAirBlockCount++;
-                                            worldSurface[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
-                                        }
-                                        if (protocol.getMappingData().getMotionBlocking().contains(id)) {
-                                            motionBlocking[x + z * 16] = y + s * 16 + 1; // +1 (top of the block)
-                                        }
+                            int sy = s << 4;
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx);
+                                if (id == air || id == voidAir || id == caveAir) continue;
+                                nonAirBlockCount++;
 
-                                        // Manually update light for non full blocks (block light must not be sent)
-                                        if (Via.getConfig().isNonFullBlockLightFix() && protocol.getMappingData().getNonFullBlocks().contains(id)) {
-                                            setNonFullLight(chunk, section, s, x, y, z);
-                                        }
-                                    }
+                                int xz = idx & 0xFF;
+                                int y = (idx >> 8) & 0xF;
+                                worldSurface[xz] = sy + y + 1; // +1 (top of the block)
+
+                                if (protocol.getMappingData().getMotionBlocking().contains(id)) {
+                                    motionBlocking[xz] = sy + y + 1; // +1 (top of the block)
+                                }
+
+                                // Manually update light for non-full blocks (block light must not be sent)
+                                if (Via.getConfig().isNonFullBlockLightFix() && protocol.getMappingData().getNonFullBlocks().contains(id)) {
+                                    int x = idx & 0xF;
+                                    int z = (idx >> 4) & 0xF;
+                                    setNonFullLight(chunk, section, s, x, y, z);
                                 }
                             }
 

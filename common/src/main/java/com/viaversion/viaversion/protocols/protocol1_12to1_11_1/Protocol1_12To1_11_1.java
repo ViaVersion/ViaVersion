@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -125,33 +127,29 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk chunk = wrapper.passthrough(type);
 
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
-                            if (section == null)
-                                continue;
+                        for (int s = 0; s < chunk.getSections().length; s++) {
+                            ChunkSection section = chunk.getSections()[s];
+                            if (section == null) continue;
+                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+                            assert blocks != null;
 
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getBlockWithoutData(x, y, z);
-                                        // Is this a bed?
-                                        if (block == 26) {
-                                            //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
-                                            CompoundTag tag = new CompoundTag();
-                                            tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
-                                            tag.put("x", new IntTag(x + (chunk.getX() << 4)));
-                                            tag.put("y", new IntTag(y + (i << 4)));
-                                            tag.put("z", new IntTag(z + (chunk.getZ() << 4)));
-                                            tag.put("id", new StringTag("minecraft:bed"));
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx) >> 4;
+                                // Is this a bed?
+                                if (id != 26) continue;
 
-                                            // Add a fake block entity
-                                            chunk.getBlockEntities().add(tag);
-                                        }
-                                    }
-                                }
+                                //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
+                                CompoundTag tag = new CompoundTag();
+                                tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
+                                tag.put("x", new IntTag((idx & 0xF) + (chunk.getX() << 4)));
+                                tag.put("y", new IntTag((idx >> 8 & 0xF) + (s << 4)));
+                                tag.put("z", new IntTag((idx >> 4 & 0xF) + (chunk.getZ() << 4)));
+                                tag.put("id", new StringTag("minecraft:bed"));
+
+                                // Add a fake block entity
+                                chunk.getBlockEntities().add(tag);
                             }
                         }
-
                     }
                 });
             }

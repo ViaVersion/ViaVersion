@@ -28,6 +28,8 @@ import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -75,31 +77,25 @@ public class ConnectionData {
     }
 
     public static void updateChunkSectionNeighbours(UserConnection user, int chunkX, int chunkZ, int chunkSectionY) {
+        int chunkMinY = chunkSectionY << 4;
+        List<BlockChangeRecord1_8> updates = new ArrayList<>();
         for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {
             for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
-                if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 0) continue;
+                int distance = Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ);
+                if (distance == 0) continue;
 
-                List<BlockChangeRecord1_8> updates = new ArrayList<>();
-
-                if (Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ) == 2) { // Corner
-                    for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
+                int chunkMinX = (chunkX + chunkDeltaX) << 4;
+                int chunkMinZ = (chunkZ + chunkDeltaZ) << 4;
+                if (distance == 2) { // Corner
+                    for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
                         int blockPosX = chunkDeltaX == 1 ? 0 : 15;
                         int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
-                        updateBlock(user,
-                                new Position(
-                                        ((chunkX + chunkDeltaX) << 4) + blockPosX,
-                                        (short) blockY,
-                                        ((chunkZ + chunkDeltaZ) << 4) + blockPosZ
-                                ),
-                                updates
-                        );
+                        updateBlock(user, new Position(chunkMinX + blockPosX, blockY, chunkMinZ + blockPosZ), updates);
                     }
                 } else {
-                    for (int blockY = chunkSectionY * 16; blockY < chunkSectionY * 16 + 16; blockY++) {
-                        int xStart;
-                        int xEnd;
-                        int zStart;
-                        int zEnd;
+                    for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
+                        int xStart, xEnd;
+                        int zStart, zEnd;
                         if (chunkDeltaX == 1) {
                             xStart = 0;
                             xEnd = 2;
@@ -123,13 +119,7 @@ public class ConnectionData {
                         }
                         for (int blockX = xStart; blockX < xEnd; blockX++) {
                             for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
-                                updateBlock(user,
-                                        new Position(
-                                                ((chunkX + chunkDeltaX) << 4) + blockX,
-                                                (short) blockY,
-                                                ((chunkZ + chunkDeltaZ) << 4) + blockZ),
-                                        updates
-                                );
+                                updateBlock(user, new Position(chunkMinX + blockX, blockY, chunkMinZ + blockZ), updates);
                             }
                         }
                     }
@@ -145,6 +135,7 @@ public class ConnectionData {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    updates.clear();
                 }
             }
         }
@@ -178,17 +169,18 @@ public class ConnectionData {
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
-        long xOff = chunk.getX() << 4;
-        long zOff = chunk.getZ() << 4;
+        int xOff = chunk.getX() << 4;
+        int zOff = chunk.getZ() << 4;
 
-        for (int i = 0; i < chunk.getSections().length; i++) {
-            ChunkSection section = chunk.getSections()[i];
+        for (int s = 0; s < chunk.getSections().length; s++) {
+            ChunkSection section = chunk.getSections()[s];
             if (section == null) continue;
+            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+            assert blocks != null;
 
             boolean willConnect = false;
-
-            for (int p = 0; p < section.getPaletteSize(); p++) {
-                int id = section.getPaletteEntry(p);
+            for (int p = 0; p < blocks.size(); p++) {
+                int id = blocks.idByIndex(p);
                 if (ConnectionData.connects(id)) {
                     willConnect = true;
                     break;
@@ -196,24 +188,14 @@ public class ConnectionData {
             }
             if (!willConnect) continue;
 
-            long yOff = i << 4;
+            int yOff = s << 4;
 
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    for (int x = 0; x < 16; x++) {
-                        int block = section.getFlatBlock(x, y, z);
-
-                        ConnectionHandler handler = ConnectionData.getConnectionHandler(block);
-                        if (handler != null) {
-                            block = handler.connect(user, new Position(
-                                    (int) (xOff + x),
-                                    (short) (yOff + y),
-                                    (int) (zOff + z)
-                            ), block);
-                            section.setFlatBlock(x, y, z, block);
-                        }
-                    }
-                }
+            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                int id = blocks.idAt(idx);
+                ConnectionHandler handler = ConnectionData.getConnectionHandler(id);
+                if (handler == null) continue;
+                id = handler.connect(user, new Position(xOff + (idx & 0xF), yOff + (idx >> 8 & 0xF), zOff + (idx >> 4 & 0xF)), id);
+                blocks.setIdAt(idx, id);
             }
         }
     }

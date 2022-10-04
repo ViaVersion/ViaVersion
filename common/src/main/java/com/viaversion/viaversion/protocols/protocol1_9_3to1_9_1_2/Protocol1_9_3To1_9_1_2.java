@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -107,15 +109,13 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             ChunkSection section = chunk.getSections()[i];
                             if (section == null) continue;
+                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+                            assert blocks != null;
 
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getBlockWithoutData(x, y, z);
-                                        if (FakeTileEntity.isTileEntity(block)) {
-                                            tags.add(FakeTileEntity.createTileEntity(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
-                                        }
-                                    }
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx) >> 4;
+                                if (FakeTileEntity.isTileEntity(id)) {
+                                    tags.add(FakeTileEntity.createTileEntity((idx & 0xF) + (chunk.getX() << 4), (idx >> 8 & 0xF) + (i << 4), (idx >> 4 & 0xF) + (chunk.getZ() << 4), id));
                                 }
                             }
                         }
