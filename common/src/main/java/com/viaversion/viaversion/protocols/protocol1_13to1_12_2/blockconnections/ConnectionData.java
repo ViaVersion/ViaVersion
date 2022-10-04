@@ -176,7 +176,6 @@ public class ConnectionData {
             ChunkSection section = chunk.getSections()[s];
             if (section == null) continue;
             DataPalette blocks = section.palette(PaletteType.BLOCKS);
-            assert blocks != null;
 
             boolean willConnect = false;
             for (int p = 0; p < blocks.size(); p++) {

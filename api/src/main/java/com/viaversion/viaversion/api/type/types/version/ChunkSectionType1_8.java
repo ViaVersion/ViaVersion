@@ -41,7 +41,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     public ChunkSection read(ByteBuf buffer) throws Exception {
         ChunkSection chunkSection = new ChunkSectionImpl(true);
         DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
-        assert blocks != null;
+
         // 0 index needs to be air in 1.9
         blocks.addId(0);
 
@@ -56,7 +56,6 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
         DataPalette blocks = chunkSection.palette(PaletteType.BLOCKS);
-        assert blocks != null;
 
         ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);
         for (int idx = 0; idx < ChunkSection.SIZE; idx++) {

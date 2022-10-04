@@ -340,7 +340,6 @@ public class WorldPackets {
                         ChunkSection section = chunk.getSections()[s];
                         if (section == null) continue;
                         DataPalette blocks = section.palette(PaletteType.BLOCKS);
-                        assert blocks != null;
 
                         for (int p = 0; p < blocks.size(); p++) {
                             int old = blocks.idByIndex(p);

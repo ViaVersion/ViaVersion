@@ -157,7 +157,6 @@ public class WorldPackets {
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
                             DataPalette blocks = section.palette(PaletteType.BLOCKS);
-                            assert blocks != null;
 
                             boolean hasBlock = false;
                             for (int i = 0; i < blocks.size(); i++) {

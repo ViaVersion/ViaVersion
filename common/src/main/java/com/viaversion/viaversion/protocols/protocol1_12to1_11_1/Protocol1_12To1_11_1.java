@@ -131,7 +131,6 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                             ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
                             DataPalette blocks = section.palette(PaletteType.BLOCKS);
-                            assert blocks != null;
 
                             for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                                 int id = blocks.idAt(idx) >> 4;
