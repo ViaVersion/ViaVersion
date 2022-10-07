@@ -382,7 +382,7 @@ public class WorldPackets {
                         neighbourY = 15;
                     }
 
-                    if (ySection == 16 || ySection == -1) continue;
+                    if (ySection == chunk.getSections().length || ySection == -1) continue;
 
                     ChunkSection newSection = chunk.getSections()[ySection];
                     if (newSection == null) continue;
