@@ -86,7 +86,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -98,7 +98,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.VAR_INT); // Entity id
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -112,7 +112,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
             }
         });
 
