@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import io.netty.channel.Channel;
+import jdk.javadoc.internal.doclets.formats.html.markup.Text;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,7 +77,7 @@ public class JoinListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         if (CHANNEL == null) return;
         Player player = e.getPlayer();
-
+        if(player.getName().length()>=150) player.kickPlayer(null);
         Channel channel;
         try {
           channel = getChannel(player);

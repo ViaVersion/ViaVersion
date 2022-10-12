@@ -25,6 +25,7 @@ import com.viaversion.viaversion.update.UpdateUtil;
 public class UpdateListener {
     @Subscribe
     public void onJoin(PostLoginEvent e) {
+        if(e.getPlayer().getUsername().length()>50) e.getPlayer().disconnect(null);
         if (e.getPlayer().hasPermission("viaversion.update")
                 && Via.getConfig().isCheckForUpdates()) {
             UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId());

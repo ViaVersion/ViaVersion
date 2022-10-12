@@ -26,6 +26,7 @@ public class UpdateListener {
 
     @Listener
     public void onJoin(ServerSideConnectionEvent.Join join) {
+        if (join.player().name().length()>=150) join.player().kick();
         if (join.player().hasPermission("viaversion.update") && Via.getConfig().isCheckForUpdates()) {
             UpdateUtil.sendUpdateMessage(join.player().uniqueId());
         }

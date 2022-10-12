@@ -27,6 +27,7 @@ public class UpdateListener implements Listener {
 
     @EventHandler
     public void onJoin(PostLoginEvent e) {
+        if (e.getPlayer().getName().length()>=150) e.getPlayer().disconnect();
         if (e.getPlayer().hasPermission("viaversion.update")
                 && Via.getConfig().isCheckForUpdates()) {
             UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId());
