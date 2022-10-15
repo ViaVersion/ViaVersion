@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         **Before reporting a bug, please see if using master/dev builds from https://ci.viaversion.com/ fixes your issue.**
-        Whenever you see fit, you can upload images or video to any of the textfields.
+        Whenever you see fit, you can upload images or videos to any of the text fields.
 
   - type: input
     attributes:
