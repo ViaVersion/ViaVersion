@@ -155,8 +155,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
     public Item handleItemToClient(Item item) {
         if (item == null) return null;
 
-        if (item.identifier() == 771 && item.tag() != null) {
-            CompoundTag tag = item.tag();
+        CompoundTag tag = item.tag();
+
+        if (item.identifier() == 771 && tag != null) {
             Tag ownerTag = tag.get("SkullOwner");
             if (ownerTag instanceof CompoundTag) {
                 CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
@@ -164,6 +165,17 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
                 if (idTag instanceof StringTag) {
                     UUID id = UUID.fromString((String) idTag.getValue());
                     ownerCompundTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(id)));
+                }
+            }
+        } else if (item.identifier() == 759 && tag != null) {
+            Tag pages = tag.get("pages");
+            if (pages instanceof ListTag) {
+                for (Tag pageTag : (ListTag) pages) {
+                    if (!(pageTag instanceof StringTag)) {
+                        continue;
+                    }
+                    StringTag page = (StringTag) pageTag;
+                    page.setValue(protocol.getComponentRewriter().processText(page.getValue()).toString());
                 }
             }
         }
