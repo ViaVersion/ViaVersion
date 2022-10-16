@@ -20,45 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.blockentity;
+package com.viaversion.viaversion.api.type.types.version;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_19_3;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 
-public final class BlockEntityImpl implements BlockEntity {
-    private final byte packedXZ;
-    private final short y;
-    private final int typeId;
-    private final CompoundTag tag;
+import java.util.List;
 
-    public BlockEntityImpl(final byte packedXZ, final short y, final int typeId, final CompoundTag tag) {
-        this.packedXZ = packedXZ;
-        this.y = y;
-        this.typeId = typeId;
-        this.tag = tag;
-    }
+public final class Types1_19_3 {
 
-    @Override
-    public byte packedXZ() {
-        return packedXZ;
-    }
-
-    @Override
-    public short y() {
-        return y;
-    }
-
-    @Override
-    public int typeId() {
-        return typeId;
-    }
-
-    @Override
-    public CompoundTag tag() {
-        return tag;
-    }
-
-    @Override
-    public BlockEntity withTypeId(int typeId) {
-        return new BlockEntityImpl(packedXZ, y, typeId, tag);
-    }
+    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
+    public static final MetaTypes1_19_3 META_TYPES = new MetaTypes1_19_3(PARTICLE);
+    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
+    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
 }

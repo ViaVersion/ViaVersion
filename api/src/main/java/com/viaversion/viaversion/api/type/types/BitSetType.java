@@ -23,45 +23,34 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public class ByteArrayType extends Type<byte[]> {
+import java.util.Arrays;
+import java.util.BitSet;
+
+public class BitSetType extends Type<BitSet> {
 
     private final int length;
+    private final int bytesLength;
 
-    public ByteArrayType(final int length) {
-        super(byte[].class);
+    public BitSetType(final int length) {
+        super(BitSet.class);
         this.length = length;
-    }
-
-    public ByteArrayType() {
-        super(byte[].class);
-        this.length = -1;
+        this.bytesLength = -Math.floorDiv(-length, 8); // Ceiled quotient
     }
 
     @Override
-    public void write(ByteBuf buffer, byte[] object) throws Exception {
-        Preconditions.checkArgument(length == -1 || length == object.length, "Length does not match expected length");
-        Type.VAR_INT.writePrimitive(buffer, object.length);
-        buffer.writeBytes(object);
+    public BitSet read(ByteBuf buffer) {
+        final byte[] bytes = new byte[bytesLength];
+        buffer.readBytes(bytes);
+        return BitSet.valueOf(bytes);
     }
 
     @Override
-    public byte[] read(ByteBuf buffer) throws Exception {
-        int length = Type.VAR_INT.readPrimitive(buffer);
-        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
-        Preconditions.checkArgument(this.length == -1 || this.length == length, "Length does not match expected length");
-        byte[] array = new byte[length];
-        buffer.readBytes(array);
-        return array;
-    }
-
-    public static final class OptionalByteArrayType extends OptionalType<byte[]> {
-
-        public OptionalByteArrayType() {
-            super(Type.BYTE_ARRAY_PRIMITIVE);
-        }
+    public void write(ByteBuf buffer, BitSet object) {
+        Preconditions.checkArgument(object.length() <= length, "BitSet of length " + object.length() + " larger than max length " + length);
+        final byte[] bytes = object.toByteArray();
+        buffer.writeBytes(Arrays.copyOf(bytes, bytesLength));
     }
 }

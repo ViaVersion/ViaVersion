@@ -40,10 +40,10 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
         registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        registerTradeList(ClientboundPackets1_16_2.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerTradeList(ClientboundPackets1_16_2.TRADE_LIST);
         registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
-        registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
         registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
 
         new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);

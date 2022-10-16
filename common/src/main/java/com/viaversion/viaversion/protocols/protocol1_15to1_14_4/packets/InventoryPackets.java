@@ -34,7 +34,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_15To1_14_4> {
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_14.COOLDOWN);
         registerWindowItems(ClientboundPackets1_14.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        registerTradeList(ClientboundPackets1_14.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerTradeList(ClientboundPackets1_14.TRADE_LIST);
         registerSetSlot(ClientboundPackets1_14.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipment(ClientboundPackets1_14.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_14.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);

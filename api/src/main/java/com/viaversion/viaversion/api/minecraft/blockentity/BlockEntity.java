@@ -42,4 +42,6 @@ public interface BlockEntity {
     int typeId();
 
     @Nullable CompoundTag tag();
+
+    BlockEntity withTypeId(int typeId);
 }

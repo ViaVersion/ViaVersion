@@ -109,7 +109,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
 
         registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
         registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        registerTradeList(ClientboundPackets1_15.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
+        registerTradeList(ClientboundPackets1_15.TRADE_LIST);
         registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 

@@ -35,11 +35,11 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_18To1_17_1> {
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_17_1.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_17_1.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, Type.FLAT_VAR_INT_ITEM);
-        registerTradeList(ClientboundPackets1_17_1.TRADE_LIST, Type.FLAT_VAR_INT_ITEM);
-        registerSetSlot1_17_1(ClientboundPackets1_17_1.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerWindowItems1_17_1(ClientboundPackets1_17_1.WINDOW_ITEMS);
+        registerTradeList(ClientboundPackets1_17_1.TRADE_LIST);
+        registerSetSlot1_17_1(ClientboundPackets1_17_1.SET_SLOT);
         registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
-        registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketRemapper() {
             @Override
@@ -99,7 +99,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_18To1_17_1> {
 
         new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_17_1.DECLARE_RECIPES);
 
-        registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW);
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
     }
 }
