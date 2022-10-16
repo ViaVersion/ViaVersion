@@ -50,4 +50,14 @@ public class SpongeViaInjector extends LegacyViaInjector {
     protected void blame(ChannelHandler bootstrapAcceptor) {
         throw new RuntimeException("Unable to find core component 'childHandler', please check your plugins. Issue: " + bootstrapAcceptor.getClass().getName());
     }
+
+    @Override
+    public String getEncoderName() {
+        return "encoder";
+    }
+
+    @Override
+    public String getDecoderName() {
+        return "decoder";
+    }
 }

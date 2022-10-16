@@ -24,84 +24,99 @@ import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelEncoderException;
 import com.viaversion.viaversion.exception.InformativeException;
-import com.viaversion.viaversion.handlers.ChannelHandlerContextWrapper;
-import com.viaversion.viaversion.handlers.ViaCodecHandler;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.handler.codec.MessageToMessageEncoder;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
-public class BukkitEncodeHandler extends MessageToByteEncoder implements ViaCodecHandler {
-    private static Field versionField;
+@ChannelHandler.Sharable
+public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
+    private final UserConnection connection;
+    private boolean handledCompression = BukkitChannelInitializer.COMPRESSION_ENABLED_EVENT != null;
 
-    static {
-        try {
-            // Attempt to get any version info from the handler
-            versionField = NMSUtil.nms(
-                    "PacketEncoder",
-                    "net.minecraft.network.PacketEncoder"
-            ).getDeclaredField("version");
-
-            versionField.setAccessible(true);
-        } catch (Exception e) {
-            // Not compat version
-        }
-    }
-
-    private final UserConnection info;
-    private final MessageToByteEncoder minecraftEncoder;
-
-    public BukkitEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {
-        this.info = info;
-        this.minecraftEncoder = minecraftEncoder;
+    public BukkitEncodeHandler(final UserConnection connection) {
+        this.connection = connection;
     }
 
     @Override
-    protected void encode(final ChannelHandlerContext ctx, Object o, final ByteBuf bytebuf) throws Exception {
-        if (versionField != null) {
-            versionField.set(minecraftEncoder, versionField.get(this));
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf bytebuf, final List<Object> out) throws Exception {
+        if (!connection.checkClientboundPacket()) {
+            throw CancelEncoderException.generate(null);
         }
-        // handle the packet type
-        if (!(o instanceof ByteBuf)) {
-            // call minecraft encoder
-            try {
-                PipelineUtil.callEncode(this.minecraftEncoder, new ChannelHandlerContextWrapper(ctx, this), o, bytebuf);
-            } catch (InvocationTargetException e) {
-                if (e.getCause() instanceof Exception) {
-                    throw (Exception) e.getCause();
-                } else if (e.getCause() instanceof Error) {
-                    throw (Error) e.getCause();
-                }
+        if (!connection.shouldTransformPacket()) {
+            out.add(bytebuf.retain());
+            return;
+        }
+
+        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+        try {
+            final boolean needsCompression = !handledCompression && handleCompressionOrder(ctx, transformedBuf);
+            connection.transformClientbound(transformedBuf, CancelEncoderException::generate);
+            if (needsCompression) {
+                recompress(ctx, transformedBuf);
             }
 
-        } else {
-            bytebuf.writeBytes((ByteBuf) o);
+            out.add(transformedBuf.retain());
+        } finally {
+            transformedBuf.release();
         }
-        transform(bytebuf);
+    }
+
+    private boolean handleCompressionOrder(final ChannelHandlerContext ctx, final ByteBuf buf) throws Exception {
+        final ChannelPipeline pipeline = ctx.pipeline();
+        final List<String> names = pipeline.names();
+        final int compressorIndex = names.indexOf(BukkitChannelInitializer.MINECRAFT_COMPRESSOR);
+        if (compressorIndex == -1) {
+            return false;
+        }
+
+        handledCompression = true;
+        if (compressorIndex > names.indexOf(BukkitChannelInitializer.VIA_ENCODER)) {
+            // Need to decompress this packet due to bad order
+            final ByteBuf decompressed = (ByteBuf) PipelineUtil.callDecode((ByteToMessageDecoder) pipeline.get(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR), ctx, buf).get(0);
+            try {
+                buf.clear().writeBytes(decompressed);
+            } finally {
+                decompressed.release();
+            }
+
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_COMPRESSOR, BukkitChannelInitializer.VIA_ENCODER, pipeline.remove(BukkitChannelInitializer.VIA_ENCODER));
+            pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, BukkitChannelInitializer.VIA_DECODER, pipeline.remove(BukkitChannelInitializer.VIA_DECODER));
+            return true;
+        }
+        return true;
+    }
+
+    private void recompress(final ChannelHandlerContext ctx, final ByteBuf buf) throws Exception {
+        final ByteBuf compressed = ctx.alloc().buffer();
+        try {
+            PipelineUtil.callEncode((MessageToByteEncoder<ByteBuf>) ctx.pipeline().get(BukkitChannelInitializer.MINECRAFT_COMPRESSOR), ctx, buf, compressed);
+            buf.clear().writeBytes(compressed);
+        } finally {
+            compressed.release();
+        }
     }
 
     @Override
-    public void transform(ByteBuf bytebuf) throws Exception {
-        if (!info.checkClientboundPacket()) throw CancelEncoderException.generate(null);
-        if (!info.shouldTransformPacket()) return;
-        info.transformClientbound(bytebuf, CancelEncoderException::generate);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) return; // ProtocolLib compat
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+        if (PipelineUtil.containsCause(cause, CancelCodecException.class)) {
+            return;
+        }
 
         super.exceptionCaught(ctx, cause);
         if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
-                && (info.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
+                && (connection.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
             cause.printStackTrace(); // Print if CB doesn't already do it
         }
     }
 
-    public UserConnection getInfo() {
-        return info;
+    public UserConnection connection() {
+        return connection;
     }
 }

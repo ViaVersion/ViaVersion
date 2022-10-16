@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
-import com.viaversion.viaversion.bukkit.listeners.ProtocolLibEnableListener;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
@@ -89,10 +88,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onLoad() {
-        // Via should load before PL, so we can't check for it in the constructor
-        Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
-        ProtocolLibEnableListener.checkCompat(protocolLib);
-
         // Spigot detector
         try {
             Class.forName("org.spigotmc.SpigotConfig");
@@ -133,8 +128,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
-
-        getServer().getPluginManager().registerEvents(new ProtocolLibEnableListener(), this);
 
         // Warn them if they have anti-xray on and they aren't using spigot
         if (conf.isAntiXRay() && !spigot) {

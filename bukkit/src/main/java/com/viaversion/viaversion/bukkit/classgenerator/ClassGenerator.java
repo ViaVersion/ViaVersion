@@ -21,8 +21,7 @@ import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import com.viaversion.viaversion.classgenerator.generated.BasicHandlerConstructor;
-import com.viaversion.viaversion.classgenerator.generated.HandlerConstructor;
+import com.viaversion.viaversion.classgenerator.generated.HandlerSupplier;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -48,11 +47,11 @@ import java.lang.reflect.Method;
 //TODO maybe clean this up a bit 👀
 public final class ClassGenerator {
     private static final boolean useModules = hasModuleMethod();
-    private static HandlerConstructor constructor = new BasicHandlerConstructor();
+    private static HandlerSupplier constructor = new HandlerSupplier.DefaultHandlerSupplier();
     private static String psPackage;
     private static Class psConnectListener;
 
-    public static HandlerConstructor getConstructor() {
+    public static HandlerSupplier handlerSupplier() {
         return constructor;
     }
 
@@ -91,7 +90,7 @@ public final class ClassGenerator {
 
                 // Implement Constructor
                 CtClass generated = pool.makeClass("com.viaversion.viaversion.classgenerator.generated.GeneratedConstructor");
-                CtClass handlerInterface = pool.get(HandlerConstructor.class.getName());
+                CtClass handlerInterface = pool.get(HandlerSupplier.class.getName());
 
                 generated.setInterfaces(new CtClass[]{handlerInterface});
                 // Import required classes
@@ -107,7 +106,7 @@ public final class ClassGenerator {
                         "        return new BukkitDecodeHandler(info, minecraftDecoder);\n" +
                         "    }", generated));
 
-                constructor = (HandlerConstructor) toClass(generated).getConstructor().newInstance();
+                constructor = (HandlerSupplier) toClass(generated).getConstructor().newInstance();
             } catch (ReflectiveOperationException | CannotCompileException | NotFoundException e) {
                 e.printStackTrace();
             }
@@ -332,7 +331,7 @@ public final class ClassGenerator {
 
     @SuppressWarnings("deprecation")
     private static Class<?> toClass(CtClass ctClass) throws CannotCompileException {
-        return useModules ? ctClass.toClass(HandlerConstructor.class) : ctClass.toClass(HandlerConstructor.class.getClassLoader());
+        return useModules ? ctClass.toClass(HandlerSupplier.class) : ctClass.toClass(HandlerSupplier.class.getClassLoader());
     }
 
     private static boolean hasModuleMethod() {
