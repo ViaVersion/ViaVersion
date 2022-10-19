@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -34,6 +34,8 @@ import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -175,7 +177,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
                             final int gamemode = wrapper.read(Type.VAR_INT);
                             final int ping = wrapper.read(Type.VAR_INT);
-                            final JsonElement displayName = wrapper.passthrough(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
+                            final JsonElement displayName = wrapper.read(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
                             final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
 
                             // Salvage signed chat
@@ -222,7 +224,6 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     if (component == null) {
                         component = GsonComponentSerializer.gson().serializeToTree(Component.text(plainText));
                     }
-
 
                     // Store message signature for last seen
                     if (!signature.uuid().equals(ZERO_UUID) && signature.signatureBytes().length != 0) {
@@ -318,11 +319,22 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         entityRewriter.onMappingDataLoaded();
+        Types1_19_3.PARTICLE.filler(this)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("block_marker", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("vibration", ParticleType.Readers.VIBRATION)
+                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+                .reader("shriek", ParticleType.Readers.SHRIEK);
+        Entity1_19_3Types.initialize(this);
     }
 
     @Override
     public void init(final UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_3Types.PLAYER));
     }
 
     @Override

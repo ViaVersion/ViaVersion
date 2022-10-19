@@ -17,11 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
+import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -29,7 +32,9 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1> {
 
-    public InventoryPackets(Protocol1_19_3To1_19_1 protocol) {
+    private static final int MISC_CRAFTING_BOOK_CATEGORY = 0;
+
+    public InventoryPackets(final Protocol1_19_3To1_19_1 protocol) {
         super(protocol);
     }
 
@@ -54,7 +59,85 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1>
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_1.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_19_1.SPAWN_PARTICLE);
 
-        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_19_1.DECLARE_RECIPES);
+        final RecipeRewriter1_16 recipeRewriter = new RecipeRewriter1_16(protocol);
+        protocol.registerClientbound(ClientboundPackets1_19_1.DECLARE_RECIPES, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    // Also enable vanilla features
+                    final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
+                    enableFeaturesPacket.write(Type.VAR_INT, 1);
+                    enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
+                    enableFeaturesPacket.send(Protocol1_19_3To1_19_1.class);
+
+                    final int size = wrapper.passthrough(Type.VAR_INT);
+                    for (int i = 0; i < size; i++) {
+                        final String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                        wrapper.passthrough(Type.STRING); // Recipe Identifier
+                        switch (type) {
+                            case "crafting_shapeless": {
+                                wrapper.passthrough(Type.STRING); // Group
+                                wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                                final int ingredients = wrapper.passthrough(Type.VAR_INT);
+                                for (int j = 0; j < ingredients; j++) {
+                                    final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+                                    for (final Item item : items) {
+                                        handleItemToClient(item);
+                                    }
+                                }
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+                                break;
+                            }
+                            case "crafting_shaped": {
+                                final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
+                                wrapper.passthrough(Type.STRING); // Group
+                                wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                                for (int j = 0; j < ingredients; j++) {
+                                    final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+                                    for (final Item item : items) {
+                                        handleItemToClient(item);
+                                    }
+                                }
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+                                break;
+                            }
+                            case "smelting":
+                            case "campfire_cooking":
+                            case "blasting":
+                            case "smoking":
+                                wrapper.passthrough(Type.STRING); // Group
+                                wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                                final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
+                                for (final Item item : items) {
+                                    handleItemToClient(item);
+                                }
+                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+                                wrapper.passthrough(Type.FLOAT); // EXP
+                                wrapper.passthrough(Type.VAR_INT); // Cooking time
+                                break;
+                            case "crafting_special_armordye":
+                            case "crafting_special_bookcloning":
+                            case "crafting_special_mapcloning":
+                            case "crafting_special_mapextending":
+                            case "crafting_special_firework_rocket":
+                            case "crafting_special_firework_star":
+                            case "crafting_special_firework_star_fade":
+                            case "crafting_special_tippedarrow":
+                            case "crafting_special_bannerduplicate":
+                            case "crafting_special_shielddecoration":
+                            case "crafting_special_shulkerboxcoloring":
+                            case "crafting_special_suspiciousstew":
+                            case "crafting_special_repairitem":
+                                wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                                break;
+                            default:
+                                recipeRewriter.handle(wrapper, type);
+                                break;
+                        }
+                    }
+                });
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_19_1.EXPLOSION, new PacketRemapper() {
             @Override
