@@ -39,25 +39,26 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.CipherUtil;
 
-import java.util.BitSet;
 import java.util.UUID;
 
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3", true);
-    private static final BitSetType PROFILE_ACTIONS_ENUM_TYPE = new BitSetType(5);
-    private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
+    private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
@@ -69,9 +70,6 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        // TODO login probably fucked
-        // TODO entities
-        // TODO packet enum ids
         final TagRewriter tagRewriter = new TagRewriter(this);
         tagRewriter.registerGeneric(ClientboundPackets1_19_1.TAGS);
 
@@ -129,75 +127,12 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     }
 
                     wrapper.passthrough(Type.VAR_INT); // Root node index
+
+                    wrapper.cancel(); //TODO
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    final int action = wrapper.read(Type.VAR_INT);
-                    if (action == 4) { // Remove player
-                        // Write into new packet type
-                        final int entries = wrapper.passthrough(Type.VAR_INT);
-                        final UUID[] uuidsToRemove = new UUID[entries];
-                        for (int i = 0; i < entries; i++) {
-                            uuidsToRemove[i] = wrapper.read(Type.UUID);
-                        }
-                        wrapper.write(Type.UUID_ARRAY, uuidsToRemove);
-                        wrapper.setPacketType(ClientboundPackets1_19_3.PLAYER_INFO_REMOVE);
-                        return;
-                    }
-
-                    final BitSet set = new BitSet(5);
-                    if (action == 0) {
-                        // Includes profile key, gamemode, latency, and display name update - also update listed
-                        set.set(0, 5);
-                    } else {
-                        // Update listed added at 3, initialize chat added at index 1
-                        set.set(action > 2 ? action + 2 : action + 1);
-                    }
-
-                    wrapper.write(PROFILE_ACTIONS_ENUM_TYPE, set);
-                    final int entries = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < entries; i++) {
-                        wrapper.passthrough(Type.UUID); // UUID
-                        if (action == 0) { // Add player
-                            wrapper.passthrough(Type.STRING); // Player Name
-
-                            final int properties = wrapper.passthrough(Type.VAR_INT);
-                            for (int j = 0; j < properties; j++) {
-                                wrapper.passthrough(Type.STRING); // Name
-                                wrapper.passthrough(Type.STRING); // Value
-                                if (wrapper.passthrough(Type.BOOLEAN)) {
-                                    wrapper.passthrough(Type.STRING); // Signature
-                                }
-                            }
-
-                            final int gamemode = wrapper.read(Type.VAR_INT);
-                            final int ping = wrapper.read(Type.VAR_INT);
-                            final JsonElement displayName = wrapper.read(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
-                            final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-
-                            // Salvage signed chat
-                            wrapper.write(Type.UUID, UUID.randomUUID());
-                            wrapper.write(Type.OPTIONAL_PROFILE_KEY, profileKey);
-
-                            wrapper.write(Type.VAR_INT, gamemode);
-                            wrapper.write(Type.BOOLEAN, true); // Also update listed
-                            wrapper.write(Type.VAR_INT, ping);
-                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                        } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                            wrapper.passthrough(Type.VAR_INT);
-                        } else if (action == 3) { // Update display name
-                            final JsonElement displayName = wrapper.passthrough(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
-                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                        }
-                    }
-                });
-            }
-        });
         registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -215,16 +150,6 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 handler(wrapper -> {
                     final PlayerMessageSignature signature = wrapper.read(Type.PLAYER_MESSAGE_SIGNATURE);
 
-                    final String plainText = wrapper.read(Type.STRING);
-                    JsonElement component = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    final JsonElement unsignedComponent = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    if (unsignedComponent != null) {
-                        component = unsignedComponent;
-                    }
-                    if (component == null) {
-                        component = GsonComponentSerializer.gson().serializeToTree(Component.text(plainText));
-                    }
-
                     // Store message signature for last seen
                     if (!signature.uuid().equals(ZERO_UUID) && signature.signatureBytes().length != 0) {
                         final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
@@ -240,16 +165,27 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                         }
                     }
 
+                    final String plainMessage = wrapper.read(Type.STRING);
+                    JsonElement decoratedMessage = wrapper.read(Type.OPTIONAL_COMPONENT);
 
                     wrapper.read(Type.LONG); // Timestamp
                     wrapper.read(Type.LONG); // Salt
                     wrapper.read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen
+
+                    final JsonElement unsignedMessage = wrapper.read(Type.OPTIONAL_COMPONENT);
+                    if (unsignedMessage != null) {
+                        decoratedMessage = unsignedMessage;
+                    }
+                    if (decoratedMessage == null) {
+                        decoratedMessage = GsonComponentSerializer.gson().serializeToTree(Component.text(plainMessage));
+                    }
+
                     final int filterMaskType = wrapper.read(Type.VAR_INT);
                     if (filterMaskType == 2) { // Partially filtered
                         wrapper.read(Type.LONG_ARRAY_PRIMITIVE); // Mask
                     }
 
-                    wrapper.write(Type.COMPONENT, component);
+                    wrapper.write(Type.COMPONENT, decoratedMessage);
                     // Keep chat type at the end
                 });
             }
@@ -262,11 +198,11 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
                 handler(wrapper -> {
-                    final int signatures = wrapper.passthrough(Type.VAR_INT);
+                    final int signatures = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, 0);
                     for (int i = 0; i < signatures; i++) {
-                        wrapper.passthrough(Type.STRING); // Argument name
-                        final byte[] signature = wrapper.read(MESSAGE_SIGNATURE_BYTES_TYPE);
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature);
+                        wrapper.read(Type.STRING); // Argument name
+                        wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
                     }
 
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
@@ -285,10 +221,13 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             public void registerMap() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
-                map(Type.LONG); // Salt
+                // Salt
+                read(Type.LONG);
+                create(Type.LONG, 0L);
                 handler(wrapper -> {
-                    final byte[] signature = wrapper.read(Type.BOOLEAN) ? wrapper.read(MESSAGE_SIGNATURE_BYTES_TYPE) : null;
-                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature != null ? signature : EMPTY_BYTES);
+                    // Remove signature
+                    final byte[] signature = wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE);
+                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES);
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 
                     final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
@@ -301,11 +240,53 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             }
         });
 
+        // Remove the key once again
         registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.STRING); // Name
                 read(Type.UUID); // Session UUID
+                handler(wrapper -> {
+                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                    if (profileKey == null) {
+                        wrapper.user().put(new NonceStorage(null));
+                    }
+                });
+            }
+        });
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.STRING); // Server id
+                handler(wrapper -> {
+                    if (wrapper.user().has(NonceStorage.class)) {
+                        return;
+                    }
+                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
+                });
+            }
+        });
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
+                handler(wrapper -> {
+                    final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
+                    if (nonceStorage.nonce() == null) {
+                        return;
+                    }
+
+                    final boolean isNonce = wrapper.read(Type.BOOLEAN);
+                    wrapper.write(Type.BOOLEAN, true);
+                    if (!isNonce) { // Should never be true at this point, but /shrug otherwise
+                        wrapper.read(Type.LONG); // Salt
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
+                    }
+                });
             }
         });
 
@@ -334,6 +315,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     public void init(final UserConnection user) {
+        user.put(new ReceivedMessagesStorage());
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_3Types.PLAYER));
     }
 

@@ -42,18 +42,20 @@ public class ByteArrayType extends Type<byte[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, byte[] object) throws Exception {
-        Preconditions.checkArgument(length == -1 || length == object.length, "Length does not match expected length");
-        Type.VAR_INT.writePrimitive(buffer, object.length);
+    public void write(final ByteBuf buffer, final byte[] object) throws Exception {
+        if (this.length != -1) {
+            Preconditions.checkArgument(length == object.length, "Length does not match expected length");
+        } else {
+            Type.VAR_INT.writePrimitive(buffer, object.length);
+        }
         buffer.writeBytes(object);
     }
 
     @Override
-    public byte[] read(ByteBuf buffer) throws Exception {
-        int length = Type.VAR_INT.readPrimitive(buffer);
+    public byte[] read(final ByteBuf buffer) throws Exception {
+        final int length = this.length == -1 ? Type.VAR_INT.readPrimitive(buffer) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
-        Preconditions.checkArgument(this.length == -1 || this.length == length, "Length does not match expected length");
-        byte[] array = new byte[length];
+        final byte[] array = new byte[length];
         buffer.readBytes(array);
         return array;
     }
@@ -62,6 +64,10 @@ public class ByteArrayType extends Type<byte[]> {
 
         public OptionalByteArrayType() {
             super(Type.BYTE_ARRAY_PRIMITIVE);
+        }
+
+        public OptionalByteArrayType(final int length) {
+            super(new ByteArrayType(length));
         }
     }
 }

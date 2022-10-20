@@ -18,13 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
-import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -64,12 +62,6 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1>
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    // Also enable vanilla features
-                    final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
-                    enableFeaturesPacket.write(Type.VAR_INT, 1);
-                    enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.send(Protocol1_19_3To1_19_1.class);
-
                     final int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
                         final String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
