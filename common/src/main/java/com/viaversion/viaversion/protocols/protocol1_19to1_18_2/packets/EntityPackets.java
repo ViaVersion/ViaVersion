@@ -280,25 +280,19 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                             for (int j = 0; j < properties; j++) {
                                 wrapper.passthrough(Type.STRING); // Name
                                 wrapper.passthrough(Type.STRING); // Value
-                                if (wrapper.passthrough(Type.BOOLEAN)) {
-                                    wrapper.passthrough(Type.STRING); // Signature
-                                }
+                                    wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                             }
 
                             wrapper.passthrough(Type.VAR_INT); // Gamemode
                             wrapper.passthrough(Type.VAR_INT); // Ping
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.COMPONENT); // Display name
-                            }
+                            wrapper.passthrough(Type.OPTIONAL_COMPONENT); // Display name
 
                             // No public profile signature
                             wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
                         } else if (action == 1 || action == 2) { // Update gamemode/update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // Update display name
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.COMPONENT);
-                            }
+                                wrapper.passthrough(Type.OPTIONAL_COMPONENT);
                         }
                     }
                 });

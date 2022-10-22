@@ -30,7 +30,7 @@ public final class MetaTypes1_19_3 extends AbstractMetaTypes {
 
     public final MetaType byteType = add(0, Type.BYTE);
     public final MetaType varIntType = add(1, Type.VAR_INT);
-    public final MetaType longType = add(2, Type.LONG);
+    public final MetaType longType = add(2, Type.VAR_LONG);
     public final MetaType floatType = add(3, Type.FLOAT);
     public final MetaType stringType = add(4, Type.STRING);
     public final MetaType componentType = add(5, Type.COMPONENT);

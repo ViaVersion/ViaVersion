@@ -119,14 +119,12 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
                             for (int j = 0; j < properties; j++) {
                                 wrapper.passthrough(Type.STRING); // Name
                                 wrapper.passthrough(Type.STRING); // Value
-                                if (wrapper.passthrough(Type.BOOLEAN)) {
-                                    wrapper.passthrough(Type.STRING); // Signature
-                                }
+                                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                             }
 
                             final int gamemode = wrapper.read(Type.VAR_INT);
                             final int ping = wrapper.read(Type.VAR_INT);
-                            final JsonElement displayName = wrapper.read(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
+                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
                             final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
 
                             // Salvage signed chat
@@ -140,8 +138,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
                         } else if (action == 1 || action == 2) { // Update gamemode/update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // Update display name
-                            final JsonElement displayName = wrapper.passthrough(Type.BOOLEAN) ? wrapper.read(Type.COMPONENT) : null;
-                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                            wrapper.passthrough(Type.OPTIONAL_COMPONENT);
                         }
                     }
                 });

@@ -241,25 +241,20 @@ public class PlayerPackets {
                             for (int j = 0; j < properties; j++) {
                                 wrapper.passthrough(Type.STRING); // name
                                 wrapper.passthrough(Type.STRING); // value
-                                boolean isSigned = wrapper.passthrough(Type.BOOLEAN);
-                                if (isSigned) {
-                                    wrapper.passthrough(Type.STRING); // signature
-                                }
+                                wrapper.passthrough(Type.OPTIONAL_STRING); // signature
                             }
 
                             wrapper.passthrough(Type.VAR_INT); // gamemode
                             wrapper.passthrough(Type.VAR_INT); // ping
-                            boolean hasDisplayName = wrapper.passthrough(Type.BOOLEAN);
-                            if (hasDisplayName) {
-                                Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
-                            }
+                            String displayName = wrapper.read(Type.OPTIONAL_STRING);
+                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
+                                    Protocol1_9To1_8.FIX_JSON.transform(wrapper, displayName) : null);
                         } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // update display name
-                            boolean hasDisplayName = wrapper.passthrough(Type.BOOLEAN);
-                            if (hasDisplayName) {
-                                Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING)); // display name
-                            }
+                            String displayName = wrapper.read(Type.OPTIONAL_STRING);
+                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
+                                    Protocol1_9To1_8.FIX_JSON.transform(wrapper, displayName) : null);
                         } else if (action == 4) { // remove player
                             // no fields
                         }
