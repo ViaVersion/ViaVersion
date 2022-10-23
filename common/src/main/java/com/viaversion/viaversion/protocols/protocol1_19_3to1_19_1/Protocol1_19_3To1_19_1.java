@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1;
 
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -71,6 +71,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         final TagRewriter tagRewriter = new TagRewriter(this);
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:bookshelf_books", "minecraft:hanging_signs", "minecraft:stripped_logs");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:all_hanging_signs", "minecraft:ceiling_hanging_signs", "minecraft:invalid_spawn_inside",
+                "minecraft:stripped_logs", "minecraft:wall_hanging_signs");
         tagRewriter.registerGeneric(ClientboundPackets1_19_1.TAGS);
 
         entityRewriter.register();
@@ -82,56 +85,41 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
         new StatisticsRewriter(this).register(ClientboundPackets1_19_1.STATISTICS);
 
-        final CommandRewriter commandRewriter = new CommandRewriter(this);
-        registerClientbound(ClientboundPackets1_19_1.DECLARE_COMMANDS, new PacketRemapper() {
+        final CommandRewriter commandRewriter = new CommandRewriter(this) {
             @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    final int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        final byte flags = wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
-                        if ((flags & 0x08) != 0) {
-                            wrapper.passthrough(Type.VAR_INT); // Redirect node index
-                        }
-
-                        final int nodeType = flags & 0x03;
-                        if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                            wrapper.passthrough(Type.STRING); // Name
-                        }
-
-                        if (nodeType == 2) { // Argument node
-                            final int argumentTypeId = wrapper.read(Type.VAR_INT);
-                            final int mappedArgumentTypeId = MAPPINGS.getArgumentTypeMappings().mappings().getNewId(argumentTypeId);
-                            Preconditions.checkArgument(mappedArgumentTypeId != -1, "Unknown command argument type id: " + argumentTypeId);
-                            wrapper.write(Type.VAR_INT, mappedArgumentTypeId);
-
-                            final String identifier = MAPPINGS.getArgumentTypeMappings().identifier(argumentTypeId);
-                            commandRewriter.handleArgument(wrapper, identifier);
-                            switch (identifier) {
-                                case "minecraft:item_enchantment":
-                                    wrapper.write(Type.STRING, "minecraft:enchantment");
-                                    break;
-                                case "minecraft:mob_effect":
-                                    wrapper.write(Type.STRING, "minecraft:mob_effect");
-                                    break;
-                                case "minecraft:entity_summon":
-                                    wrapper.write(Type.STRING, "minecraft:entity_type");
-                                    break;
-                            }
-
-                            if ((flags & 0x10) != 0) {
-                                wrapper.passthrough(Type.STRING); // Suggestion type
-                            }
-                        }
-                    }
-
-                    wrapper.passthrough(Type.VAR_INT); // Root node index
-
-                    wrapper.cancel(); //TODO
-                });
+            public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
+                switch (argumentType) {
+                    case "minecraft:item_enchantment":
+                        wrapper.write(Type.STRING, "minecraft:enchantment");
+                        break;
+                    case "minecraft:mob_effect":
+                        wrapper.write(Type.STRING, "minecraft:mob_effect");
+                        break;
+                    case "minecraft:entity_summon":
+                        wrapper.write(Type.STRING, "minecraft:entity_type");
+                        break;
+                    default:
+                        super.handleArgument(wrapper, argumentType);
+                        break;
+                }
             }
-        });
+
+            @Override
+            public String handleArgumentType(final String argumentType) {
+                switch (argumentType) {
+                    case "minecraft:resource":
+                        return "minecraft:resource_key";
+                    case "minecraft:resource_or_tag":
+                        return "minecraft:resource_or_tag_key";
+                    case "minecraft:entity_summon":
+                    case "minecraft:item_enchantment":
+                    case "minecraft:mob_effect":
+                        return "minecraft:resource";
+                }
+                return argumentType;
+            }
+        };
+        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.DECLARE_COMMANDS);
 
         registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketRemapper() {
             @Override

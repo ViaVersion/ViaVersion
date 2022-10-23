@@ -1,7 +1,7 @@
 {
   "argumenttypes": {
-    "minecraft:item_enchantment": "minecraft:resource_or_tag_key",
-    "minecraft:mob_effect": "minecraft:resource_or_tag_key",
-    "minecraft:entity_summon": "minecraft:resource_or_tag_key"
+    "minecraft:item_enchantment": "minecraft:resource",
+    "minecraft:mob_effect": "minecraft:resource",
+    "minecraft:entity_summon": "minecraft:resource"
   }
 }
