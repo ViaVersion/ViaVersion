@@ -34,7 +34,6 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
-import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
 import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
@@ -50,6 +49,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static ViaVersionPlugin instance;
@@ -59,8 +59,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     private final List<Runnable> queuedTasks = new ArrayList<>();
     private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
     private final boolean protocolSupport;
-    private boolean compatSpigotBuild;
-    private boolean spigot = true;
     private boolean lateBind;
 
     public ViaVersionPlugin() {
@@ -88,33 +86,19 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onLoad() {
-        // Spigot detector
-        try {
-            Class.forName("org.spigotmc.SpigotConfig");
-        } catch (ClassNotFoundException e) {
-            spigot = false;
-        }
-
-        // Check if it's a spigot build with a protocol mod
-        try {
-            NMSUtil.nms(
-                    "PacketEncoder",
-                    "net.minecraft.network.PacketEncoder"
-            ).getDeclaredField("version");
-            compatSpigotBuild = true;
-        } catch (Exception e) {
-            compatSpigotBuild = false;
-        }
-
         if (getServer().getPluginManager().getPlugin("ViaBackwards") != null) {
             MappingDataLoader.enableMappingsCache();
         }
 
-        // Generate classes needed (only works if it's compat or ps)
-        ClassGenerator.generate();
+        try {
+            ClassGenerator.generate();
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Error generating classes for compatibility layer", e);
+        }
+
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + (compatSpigotBuild ? "compat" : "") + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
+        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
         if (!lateBind) {
             ((ViaManagerImpl) Via.getManager()).init();
         }
@@ -130,7 +114,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         getCommand("viaversion").setTabCompleter(commandHandler);
 
         // Warn them if they have anti-xray on and they aren't using spigot
-        if (conf.isAntiXRay() && !spigot) {
+        if (conf.isAntiXRay() && !isSpigot()) {
             getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
         }
 
@@ -300,16 +284,17 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return lateBind;
     }
 
-    public boolean isCompatSpigotBuild() {
-        return compatSpigotBuild;
-    }
-
-    public boolean isSpigot() {
-        return this.spigot;
-    }
-
     public boolean isProtocolSupport() {
         return protocolSupport;
+    }
+
+    private boolean isSpigot() {
+        try {
+            Class.forName("org.spigotmc.SpigotConfig");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
     public static ViaVersionPlugin getInstance() {

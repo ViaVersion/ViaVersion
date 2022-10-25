@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.bukkit.handlers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.platform.WrappedChannelInitializer;
@@ -87,8 +86,8 @@ public final class BukkitChannelInitializer extends ChannelInitializer<Channel> 
 
         // Add our transformers
         final ChannelPipeline pipeline = channel.pipeline();
-        pipeline.addBefore(MINECRAFT_ENCODER, VIA_ENCODER, ClassGenerator.handlerSupplier().newEncodeHandler(connection));
-        pipeline.addBefore(MINECRAFT_DECODER, VIA_DECODER, ClassGenerator.handlerSupplier().newDecodeHandler(connection));
+        pipeline.addBefore(MINECRAFT_ENCODER, VIA_ENCODER, new BukkitEncodeHandler(connection));
+        pipeline.addBefore(MINECRAFT_DECODER, VIA_DECODER, new BukkitDecodeHandler(connection));
     }
 
     @Override

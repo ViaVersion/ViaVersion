@@ -18,21 +18,16 @@
 package com.viaversion.viaversion.bukkit.classgenerator;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
-import com.viaversion.viaversion.bukkit.handlers.BukkitDecodeHandler;
-import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.classgenerator.generated.HandlerSupplier;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
-import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
-import javassist.NotFoundException;
-import javassist.expr.ConstructorCall;
-import javassist.expr.ExprEditor;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventException;
@@ -47,93 +42,18 @@ import java.lang.reflect.Method;
 //TODO maybe clean this up a bit 👀
 public final class ClassGenerator {
     private static final boolean useModules = hasModuleMethod();
-    private static HandlerSupplier constructor = new HandlerSupplier.DefaultHandlerSupplier();
     private static Class psConnectListener;
 
-    public static HandlerSupplier handlerSupplier() {
-        return constructor;
-    }
-
     public static void generate() {
-        if (ViaVersionPlugin.getInstance().isCompatSpigotBuild() || ViaVersionPlugin.getInstance().isProtocolSupport()) {
-            try {
-                ClassPool pool = ClassPool.getDefault();
-                pool.insertClassPath(new LoaderClassPath(Bukkit.class.getClassLoader()));
-                for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
-                    pool.insertClassPath(new LoaderClassPath(p.getClass().getClassLoader()));
-                }
-
-                if (ViaVersionPlugin.getInstance().isCompatSpigotBuild()) {
-                    Class decodeSuper = NMSUtil.nms("PacketDecoder", "net.minecraft.network.PacketDecoder");
-                    Class encodeSuper = NMSUtil.nms("PacketEncoder", "net.minecraft.network.PacketEncoder");
-                    // Generate the classes
-                    addSpigotCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
-                    addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
-                } else {
-                    // ProtocolSupport compatibility
-                    if (isMultiplatformPS()) {
-                        psConnectListener = makePSConnectListener(pool);
-                        return;
-                    }
-                }
-
-
-                // Implement Constructor
-                CtClass generated = pool.makeClass("com.viaversion.viaversion.classgenerator.generated.GeneratedConstructor");
-                CtClass handlerInterface = pool.get(HandlerSupplier.class.getName());
-
-                generated.setInterfaces(new CtClass[]{handlerInterface});
-                // Import required classes
-                pool.importPackage("com.viaversion.viaversion.classgenerator.generated");
-                pool.importPackage("com.viaversion.viaversion.classgenerator");
-                pool.importPackage("com.viaversion.viaversion.api.connection");
-                pool.importPackage("io.netty.handler.codec");
-                // Implement Methods
-                generated.addMethod(CtMethod.make("public MessageToMessageEncoder<ByteBuf> newEncodeHandler(UserConnection connection) {\n" +
-                        "        return new BukkitEncodeHandler(connection);\n" +
-                        "    }", generated));
-                generated.addMethod(CtMethod.make("public MessageToMessageDecoder<ByteBuf> newDecodeHandler(UserConnection connection) {\n" +
-                        "        return new BukkitDecodeHandler(connection);\n" +
-                        "    }", generated));
-
-                constructor = (HandlerSupplier) toClass(generated).getConstructor().newInstance();
-            } catch (ReflectiveOperationException | CannotCompileException | NotFoundException e) {
-                e.printStackTrace();
+        if (ViaVersionPlugin.getInstance().isProtocolSupport() && isMultiplatformPS()) {
+            ClassPool pool = ClassPool.getDefault();
+            pool.insertClassPath(new LoaderClassPath(Bukkit.class.getClassLoader()));
+            for (Plugin p : Bukkit.getPluginManager().getPlugins()) {
+                pool.insertClassPath(new LoaderClassPath(p.getClass().getClassLoader()));
             }
-        }
-    }
 
-    private static void addSpigotCompatibility(ClassPool pool, Class input, Class superclass) {
-        String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
-
-        try {
-            CtClass generated = pool.getAndRename(input.getName(), newName);
-            if (superclass != null) {
-                CtClass toExtend = pool.get(superclass.getName());
-                generated.setSuperclass(toExtend);
-
-                // If it's NMS satisfy constructor.
-                if (superclass.getName().startsWith("net.minecraft")) {
-                    // Modify constructor to call super
-                    if (generated.getConstructors().length != 0) {
-                        generated.getConstructors()[0].instrument(new ExprEditor() {
-                            @Override
-                            public void edit(ConstructorCall c) throws CannotCompileException {
-                                if (c.isSuper()) {
-                                    // Constructor for both has a stats thing.
-                                    c.replace("super(null);");
-                                }
-                                super.edit(c);
-                            }
-                        });
-                    }
-                }
-            }
-            toClass(generated);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        } catch (CannotCompileException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().info("Generating ProtocolSupport compatibility connect listener...");
+            psConnectListener = makePSConnectListener(pool);
         }
     }
 

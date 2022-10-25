@@ -59,16 +59,6 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     }
 
     /**
-     * Returns if this version is a compatibility build for spigot.
-     * Eg. 1.9.1 / 1.9.2 allow certain versions to connect
-     *
-     * @return true if compat Spigot build
-     */
-    public boolean isCompatSpigotBuild() {
-        return plugin.isCompatSpigotBuild();
-    }
-
-    /**
      * Returns if ProtocolSupport is also being used.
      *
      * @return true if ProtocolSupport is used
