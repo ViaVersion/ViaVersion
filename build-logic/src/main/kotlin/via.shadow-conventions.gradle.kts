@@ -25,7 +25,6 @@ tasks {
 publishShadowJar()
 
 fun ShadowJar.configureRelocations() {
-    relocate("javassist", "com.viaversion.viaversion.libs.javassist")
     relocate("com.google.gson", "com.viaversion.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "com.viaversion.viaversion.libs.opennbt")
     relocate("it.unimi.dsi.fastutil", "com.viaversion.viaversion.libs.fastutil")

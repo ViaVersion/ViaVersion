@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
+import com.viaversion.viaversion.bukkit.compat.ProtocolSupportCompat;
 import com.viaversion.viaversion.bukkit.listeners.JoinListener;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
@@ -88,7 +88,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
         // Add ProtocolSupport ConnectListener if necessary.
-        ClassGenerator.registerPSConnectListener(plugin);
+        if (plugin.isProtocolSupport()) {
+            ProtocolSupportCompat.registerPSConnectListener(plugin);
+        }
+
         int serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedVersion();
 
         /* 1.9 client to 1.8 server */

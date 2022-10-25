@@ -1,5 +1,5 @@
 dependencies {
     implementation(projects.viaversionCommon)
-    implementation(projects.javaCompat)
+    implementation(projects.compat)
     compileOnly(libs.bungee)
 }

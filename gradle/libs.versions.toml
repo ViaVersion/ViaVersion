@@ -7,7 +7,6 @@ gson = "2.8.8"
 fastutil = "8.5.6"
 flare = "2.0.0"
 openNBT = "2.1"
-javassist = "3.28.0-GA"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -38,7 +37,6 @@ fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil"
 flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
 flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
 openNBT = { group = "com.viaversion", name = "opennbt", version.ref = "openNBT" }
-javassist = { group = "org.javassist", name = "javassist", version.ref = "javassist" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }

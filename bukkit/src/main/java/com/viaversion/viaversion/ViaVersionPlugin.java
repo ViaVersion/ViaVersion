@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
-import com.viaversion.viaversion.bukkit.classgenerator.ClassGenerator;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandHandler;
 import com.viaversion.viaversion.bukkit.commands.BukkitCommandSender;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaAPI;
@@ -49,7 +48,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static ViaVersionPlugin instance;
@@ -88,12 +86,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     public void onLoad() {
         if (getServer().getPluginManager().getPlugin("ViaBackwards") != null) {
             MappingDataLoader.enableMappingsCache();
-        }
-
-        try {
-            ClassGenerator.generate();
-        } catch (Exception e) {
-            getLogger().log(Level.WARNING, "Error generating classes for compatibility layer", e);
         }
 
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
