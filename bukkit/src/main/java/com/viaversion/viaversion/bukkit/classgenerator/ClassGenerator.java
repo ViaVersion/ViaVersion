@@ -48,7 +48,6 @@ import java.lang.reflect.Method;
 public final class ClassGenerator {
     private static final boolean useModules = hasModuleMethod();
     private static HandlerSupplier constructor = new HandlerSupplier.DefaultHandlerSupplier();
-    private static String psPackage;
     private static Class psConnectListener;
 
     public static HandlerSupplier handlerSupplier() {
@@ -72,19 +71,10 @@ public final class ClassGenerator {
                     addSpigotCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 } else {
                     // ProtocolSupport compatibility
-                    Class encodeSuper;
-                    Class decodeSuper;
                     if (isMultiplatformPS()) {
                         psConnectListener = makePSConnectListener(pool);
                         return;
-                    } else {
-                        String psPackage = getOldPSPackage();
-                        decodeSuper = Class.forName(psPackage.equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketDecoder" : psPackage + ".wrapped.WrappedDecoder");
-                        encodeSuper = Class.forName(psPackage.equals("unknown") ? "protocolsupport.protocol.pipeline.common.PacketEncoder" : psPackage + ".wrapped.WrappedEncoder");
                     }
-                    // Generate the classes
-                    addPSCompatibility(pool, BukkitDecodeHandler.class, decodeSuper);
-                    addPSCompatibility(pool, BukkitEncodeHandler.class, encodeSuper);
                 }
 
 
@@ -99,11 +89,11 @@ public final class ClassGenerator {
                 pool.importPackage("com.viaversion.viaversion.api.connection");
                 pool.importPackage("io.netty.handler.codec");
                 // Implement Methods
-                generated.addMethod(CtMethod.make("public MessageToByteEncoder newEncodeHandler(UserConnection info, MessageToByteEncoder minecraftEncoder) {\n" +
-                        "        return new BukkitEncodeHandler(info, minecraftEncoder);\n" +
+                generated.addMethod(CtMethod.make("public MessageToMessageEncoder<ByteBuf> newEncodeHandler(UserConnection connection) {\n" +
+                        "        return new BukkitEncodeHandler(connection);\n" +
                         "    }", generated));
-                generated.addMethod(CtMethod.make("public ByteToMessageDecoder newDecodeHandler(UserConnection info, ByteToMessageDecoder minecraftDecoder) {\n" +
-                        "        return new BukkitDecodeHandler(info, minecraftDecoder);\n" +
+                generated.addMethod(CtMethod.make("public MessageToMessageDecoder<ByteBuf> newDecodeHandler(UserConnection connection) {\n" +
+                        "        return new BukkitDecodeHandler(connection);\n" +
                         "    }", generated));
 
                 constructor = (HandlerSupplier) toClass(generated).getConstructor().newInstance();
@@ -136,54 +126,6 @@ public final class ClassGenerator {
                                 super.edit(c);
                             }
                         });
-                    }
-                }
-            }
-            toClass(generated);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        } catch (CannotCompileException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void addPSCompatibility(ClassPool pool, Class input, Class superclass) {
-        boolean newPS = getOldPSPackage().equals("unknown");
-        String newName = "com.viaversion.viaversion.classgenerator.generated." + input.getSimpleName();
-
-        try {
-            CtClass generated = pool.getAndRename(input.getName(), newName);
-            if (superclass != null) {
-                CtClass toExtend = pool.get(superclass.getName());
-                generated.setSuperclass(toExtend);
-
-                if (!newPS) {
-                    // Override setRealEncoder / setRealDecoder
-                    pool.importPackage(getOldPSPackage());
-                    pool.importPackage(getOldPSPackage() + ".wrapped");
-                    if (superclass.getName().endsWith("Decoder")) {
-                        // Decoder
-                        generated.addMethod(CtMethod.make("public void setRealDecoder(IPacketDecoder dec) {\n" +
-                                "        ((WrappedDecoder) this.minecraftDecoder).setRealDecoder(dec);\n" +
-                                "    }", generated));
-                    } else {
-                        // Encoder
-                        pool.importPackage("protocolsupport.api");
-                        pool.importPackage("java.lang.reflect");
-                        generated.addMethod(CtMethod.make("public void setRealEncoder(IPacketEncoder enc) {\n" +
-                                "         try {\n" +
-                                // Tell ProtocolSupport to decode MINECRAFT_FUTURE packets using the default decoder (for 1.9.4)
-                                "             Field field = enc.getClass().getDeclaredField(\"version\");\n" +
-                                "             field.setAccessible(true);\n" +
-                                "             ProtocolVersion version = (ProtocolVersion) field.get(enc);\n" +
-
-                                "             if (version == ProtocolVersion.MINECRAFT_FUTURE) enc = enc.getClass().getConstructor(\n" +
-                                "                 new Class[]{ProtocolVersion.class}).newInstance(new Object[] {ProtocolVersion.getLatest()});\n" +
-                                "         } catch (Exception e) {\n" +
-                                // I guess we're not on 1.9.4
-                                "         }\n" +
-                                "        ((WrappedEncoder) this.minecraftEncoder).setRealEncoder(enc);\n" +
-                                "    }", generated));
                     }
                 }
             }
@@ -273,23 +215,6 @@ public final class ClassGenerator {
 
     public static Class getPSConnectListener() {
         return psConnectListener;
-    }
-
-    public static String getOldPSPackage() {
-        if (psPackage == null) {
-            try {
-                Class.forName("protocolsupport.protocol.core.IPacketDecoder");
-                psPackage = "protocolsupport.protocol.core";
-            } catch (ClassNotFoundException e) {
-                try {
-                    Class.forName("protocolsupport.protocol.pipeline.IPacketDecoder");
-                    psPackage = "protocolsupport.protocol.pipeline";
-                } catch (ClassNotFoundException e1) {
-                    psPackage = "unknown";
-                }
-            }
-        }
-        return psPackage;
     }
 
     public static boolean isMultiplatformPS() {

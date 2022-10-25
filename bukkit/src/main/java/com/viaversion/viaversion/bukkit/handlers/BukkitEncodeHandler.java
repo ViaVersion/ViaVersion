@@ -90,7 +90,7 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
             pipeline.addAfter(BukkitChannelInitializer.MINECRAFT_DECOMPRESSOR, BukkitChannelInitializer.VIA_DECODER, pipeline.remove(BukkitChannelInitializer.VIA_DECODER));
             return true;
         }
-        return true;
+        return false;
     }
 
     private void recompress(final ChannelHandlerContext ctx, final ByteBuf buf) throws Exception {
