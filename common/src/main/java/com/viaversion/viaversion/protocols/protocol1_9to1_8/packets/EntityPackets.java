@@ -61,12 +61,12 @@ public class EntityPackets {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.INT); // 1 - Vehicle
 
-                // Leash boolean is removed in new versions
-                map(Type.BOOLEAN, new ValueTransformer<Boolean, Void>(Type.NOTHING) {
+                // Leash state is removed in new versions
+                map(Type.UNSIGNED_BYTE, new ValueTransformer<Short, Void>(Type.NOTHING) {
                     @Override
-                    public Void transform(PacketWrapper wrapper, Boolean inputValue) throws Exception {
+                    public Void transform(PacketWrapper wrapper, Short inputValue) throws Exception {
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        if (!inputValue) {
+                        if (inputValue == 0) {
                             int passenger = wrapper.get(Type.INT, 0);
                             int vehicle = wrapper.get(Type.INT, 1);
 
