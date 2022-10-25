@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -280,19 +281,29 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                             for (int j = 0; j < properties; j++) {
                                 wrapper.passthrough(Type.STRING); // Name
                                 wrapper.passthrough(Type.STRING); // Value
-                                    wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
+                                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                             }
 
                             wrapper.passthrough(Type.VAR_INT); // Gamemode
                             wrapper.passthrough(Type.VAR_INT); // Ping
-                            wrapper.passthrough(Type.OPTIONAL_COMPONENT); // Display name
+                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                            } else {
+                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                            }
 
                             // No public profile signature
                             wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
                         } else if (action == 1 || action == 2) { // Update gamemode/update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // Update display name
-                                wrapper.passthrough(Type.OPTIONAL_COMPONENT);
+                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                            } else {
+                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                            }
                         }
                     }
                 });
