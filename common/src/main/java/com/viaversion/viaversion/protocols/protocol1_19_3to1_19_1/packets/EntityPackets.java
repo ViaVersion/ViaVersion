@@ -126,10 +126,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
                             final int ping = wrapper.read(Type.VAR_INT);
                             final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
                             final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-
-                            // Salvage signed chat
-                            wrapper.write(Type.UUID, UUID.randomUUID());
-                            wrapper.write(Type.OPTIONAL_PROFILE_KEY, profileKey);
+                            if (profileKey != null) {
+                                wrapper.write(Type.BOOLEAN, true);
+                                wrapper.write(Type.UUID, UUID.randomUUID());
+                                wrapper.write(Type.PROFILE_KEY, profileKey);
+                            } else {
+                                wrapper.write(Type.BOOLEAN, false);
+                            }
 
                             wrapper.write(Type.VAR_INT, gamemode);
                             wrapper.write(Type.BOOLEAN, true); // Also update listed

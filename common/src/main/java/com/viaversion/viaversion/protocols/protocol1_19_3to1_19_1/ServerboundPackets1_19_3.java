@@ -53,6 +53,7 @@ public enum ServerboundPackets1_19_3 implements ServerboundPacketType {
     ENTITY_ACTION, // 0x1D
     STEER_VEHICLE, // 0x1E
     PONG, // 0x1F
+    CHAT_SESSION_UPDATE,
     RECIPE_BOOK_DATA, // 0x20
     SEEN_RECIPE, // 0x21
     RENAME_ITEM, // 0x22

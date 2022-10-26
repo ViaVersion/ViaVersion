@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
-import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -39,19 +38,16 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.InventoryPackets;
-import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import com.viaversion.viaversion.util.CipherUtil;
 
 import java.util.UUID;
 
@@ -233,51 +229,19 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             @Override
             public void registerMap() {
                 map(Type.STRING); // Name
-                read(Type.UUID); // Session UUID
-                handler(wrapper -> {
-                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
-                    if (profileKey == null) {
-                        wrapper.user().put(new NonceStorage(null));
-                    }
-                });
-            }
-        });
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.STRING); // Server id
-                handler(wrapper -> {
-                    if (wrapper.user().has(NonceStorage.class)) {
-                        return;
-                    }
-                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
-                });
+                create(Type.OPTIONAL_PROFILE_KEY, null);
             }
         });
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
-                handler(wrapper -> {
-                    final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
-                    if (nonceStorage.nonce() == null) {
-                        return;
-                    }
-
-                    final boolean isNonce = wrapper.read(Type.BOOLEAN);
-                    wrapper.write(Type.BOOLEAN, true);
-                    if (!isNonce) { // Should never be true at this point, but /shrug otherwise
-                        wrapper.read(Type.LONG); // Salt
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
-                    }
-                });
+                create(Type.BOOLEAN, true); // Is nonce
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Encrypted challenge
             }
         });
 
+        cancelServerbound(ServerboundPackets1_19_3.CHAT_SESSION_UPDATE);
         cancelClientbound(ClientboundPackets1_19_1.DELETE_CHAT_MESSAGE);
         cancelClientbound(ClientboundPackets1_19_1.PLAYER_CHAT_HEADER);
         cancelClientbound(ClientboundPackets1_19_1.CHAT_PREVIEW);
