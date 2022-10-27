@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -143,6 +144,25 @@ public class EntityPackets {
                 });
                 handler(metadataRewriter.playerTrackerHandler());
                 handler(Protocol1_13To1_12_2.SEND_DECLARE_COMMANDS_AND_TAGS);
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_12_1.ENTITY_EFFECT, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.BYTE); // Effect id
+                map(Type.BYTE); // Amplifier
+                map(Type.VAR_INT); // Duration
+
+                handler(packetWrapper -> {
+                    byte flags = packetWrapper.read(Type.BYTE); // Input Flags
+
+                    if (Via.getConfig().isNewEffectIndicator())
+                        flags |= 0x04;
+
+                    packetWrapper.write(Type.BYTE, flags);
+                });
             }
         });
 
