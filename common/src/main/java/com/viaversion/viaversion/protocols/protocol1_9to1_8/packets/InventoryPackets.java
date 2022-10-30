@@ -29,6 +29,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 
@@ -110,6 +111,17 @@ public class InventoryPackets {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
+                handler(new PacketHandler() {
+                    @Override
+                    public void handle(PacketWrapper wrapper) throws Exception {
+                        Item stack = wrapper.get(Type.ITEM, 0);
+                        ItemRewriter.toClient(stack);
+                        short slotID = wrapper.get(Type.SHORT, 0);
+
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                        armorTracker.onSetSlot(slotID, stack == null ? 0 : stack.identifier(), wrapper.user());
+                    }
+                });
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

@@ -145,6 +145,8 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         userConnection.put(new InventoryTracker());
         // CommandBlock storage
         userConnection.put(new CommandBlockStorage());
+        // Armor Tracker
+        userConnection.put(new ArmorTracker());
 
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
