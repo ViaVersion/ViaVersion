@@ -181,6 +181,7 @@ public class InventoryPackets {
 
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
 
                         boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                                 && Via.getConfig().isShieldBlocking();
@@ -195,7 +196,6 @@ public class InventoryPackets {
 
                             ItemRewriter.toClient(stack);
 
-                            ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
                             armorTracker.onSetSlot(i, stack == null ? 0 : stack.identifier(), wrapper.user());
                         }
 

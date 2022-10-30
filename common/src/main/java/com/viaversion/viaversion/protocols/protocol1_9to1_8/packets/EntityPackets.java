@@ -178,9 +178,14 @@ public class EntityPackets {
                         Item stack = wrapper.get(Type.ITEM, 0);
                         ItemRewriter.toClient(stack);
 
-                        int slotID = wrapper.get(Type.VAR_INT, 0);
-                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
-                        armorTracker.onSetSlot((short) slotID, stack == null ? 0 : stack.identifier(), wrapper.user());
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        int entityId = wrapper.get(Type.VAR_INT, 0);
+
+                        if (entityId == entityTracker.getProvidedEntityId()) {
+                            int slotID = wrapper.get(Type.VAR_INT, 1);
+                            ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                            armorTracker.onSetSlot((short) slotID, stack == null ? 0 : stack.identifier(), wrapper.user());
+                        }
                     }
                 });
                 // Blocking
