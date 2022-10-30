@@ -396,6 +396,13 @@ public interface ViaVersionConfig {
     boolean isLeftHandedHandling();
 
     /**
+     * Emulates the armor hud on 1.8 servers for 1.9+ clients
+     *
+     * @return true if enabled
+     */
+    boolean isArmorHud1_8();
+
+    /**
      * Fixes velocity bugs due to different hitbox for 1.9-1.13 clients on 1.8 servers.
      *
      * @return true if enabled

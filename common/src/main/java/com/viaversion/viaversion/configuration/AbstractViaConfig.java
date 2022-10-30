@@ -82,6 +82,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private int tabCompleteDelay;
     private boolean truncate1_14Books;
     private boolean leftHandedHandling;
+    private boolean armorHud1_8;
     private boolean fullBlockLightFix;
     private boolean healthNaNFix;
     private boolean instantRespawn;
@@ -148,6 +149,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         tabCompleteDelay = getInt("1_13-tab-complete-delay", 0);
         truncate1_14Books = getBoolean("truncate-1_14-books", false);
         leftHandedHandling = getBoolean("left-handed-handling", true);
+        armorHud1_8 = getBoolean("armor-hud-1_8", true);
         fullBlockLightFix = getBoolean("fix-non-full-blocklight", false);
         healthNaNFix = getBoolean("fix-1_14-health-nan", true);
         instantRespawn = getBoolean("use-1_15-instant-respawn", false);
@@ -477,6 +479,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isLeftHandedHandling() {
         return leftHandedHandling;
+    }
+
+    @Override
+    public boolean isArmorHud1_8() {
+        return armorHud1_8;
     }
 
     @Override

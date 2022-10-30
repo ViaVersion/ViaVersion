@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -35,6 +36,8 @@ public class ArmorTracker implements StorableObject {
     private double armorPoints;
 
     public void onSetSlot(final short slotId, final int itemId, final UserConnection userConnection) {
+        if (!Via.getConfig().isArmorHud1_8()) return;
+
         if (slotId >= 5 && slotId <= 8) { // Armor slots
             if (!armorSlotsTracker.containsKey(slotId) && itemId != 0) {
                 armorSlotsTracker.put(slotId, itemId);

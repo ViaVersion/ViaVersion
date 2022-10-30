@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ArmorTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.Triple;
@@ -176,6 +177,10 @@ public class EntityPackets {
                     public void handle(PacketWrapper wrapper) throws Exception {
                         Item stack = wrapper.get(Type.ITEM, 0);
                         ItemRewriter.toClient(stack);
+
+                        int slotID = wrapper.get(Type.VAR_INT, 0);
+                        ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                        armorTracker.onSetSlot((short) slotID, stack == null ? 0 : stack.identifier(), wrapper.user());
                     }
                 });
                 // Blocking

@@ -221,6 +221,8 @@ force-json-transform: false
 minimize-cooldown: true
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
+# Emulates the armor hud on 1.8 servers for 1.9+ clients
+armor-hud-1_8: true
 # Get the world names which should be returned for each vanilla dimension
 map-1_16-world-names:
   overworld: "minecraft:overworld"

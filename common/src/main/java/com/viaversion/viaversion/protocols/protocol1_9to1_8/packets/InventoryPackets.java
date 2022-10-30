@@ -194,6 +194,9 @@ public class InventoryPackets {
                             }
 
                             ItemRewriter.toClient(stack);
+
+                            ArmorTracker armorTracker = wrapper.user().get(ArmorTracker.class);
+                            armorTracker.onSetSlot(i, stack == null ? 0 : stack.identifier(), wrapper.user());
                         }
 
                         // Sync shield item in offhand with main hand
