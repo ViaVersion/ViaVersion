@@ -70,12 +70,7 @@ final class ProtocolSupportConnectionListener extends Connection.PacketListener 
             // Check if we are getting handshake packet.
             if (HANDSHAKE_PACKET_CLASS.isInstance(event.getPacket()) && GET_VERSION_METHOD.invoke(connection) == PROTOCOL_VERSION_MINECRAFT_FUTURE) {
                 final Object packet = event.getPacket();
-                final int protocolVersion;
-                try {
-                    protocolVersion = (int) HANDSHAKE_PACKET_CLASS.getDeclaredMethod(ProtocolSupportCompat.handshakeVersionMethod().methodName()).invoke(packet);
-                } catch (final ReflectiveOperationException e) {
-                    throw new RuntimeException(e);
-                }
+                final int protocolVersion = (int) HANDSHAKE_PACKET_CLASS.getDeclaredMethod(ProtocolSupportCompat.handshakeVersionMethod().methodName()).invoke(packet);
 
                 // ViaVersion has at this point already spoofed the connectionversion. (Since it is higher up the pipeline)
                 // If via has put the protoVersion to the server we can spoof ProtocolSupport's version.

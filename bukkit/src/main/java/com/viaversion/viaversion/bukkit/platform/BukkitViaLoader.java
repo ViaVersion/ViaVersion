@@ -88,7 +88,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
         // Add ProtocolSupport ConnectListener if necessary.
-        if (plugin.isProtocolSupport()) {
+        if (plugin.isProtocolSupport() && ProtocolSupportCompat.isMultiplatformPS()) {
             ProtocolSupportCompat.registerPSConnectListener(plugin);
         }
 

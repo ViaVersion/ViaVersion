@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -125,15 +124,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
                             final int gamemode = wrapper.read(Type.VAR_INT);
                             final int ping = wrapper.read(Type.VAR_INT);
                             final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
-                            final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-                            if (profileKey != null) {
-                                wrapper.write(Type.BOOLEAN, true);
-                                wrapper.write(Type.UUID, UUID.randomUUID());
-                                wrapper.write(Type.PROFILE_KEY, profileKey);
-                            } else {
-                                wrapper.write(Type.BOOLEAN, false);
-                            }
+                            wrapper.read(Type.OPTIONAL_PROFILE_KEY);
 
+                            wrapper.write(Type.BOOLEAN, false); // No chat session data
                             wrapper.write(Type.VAR_INT, gamemode);
                             wrapper.write(Type.BOOLEAN, true); // Also update listed
                             wrapper.write(Type.VAR_INT, ping);

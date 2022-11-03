@@ -53,10 +53,6 @@ public class NMSUtil {
         return Class.forName(BASE + "." + className);
     }
 
-    public static String getVersion() {
-        return BASE.substring(BASE.lastIndexOf('.') + 1);
-    }
-
     /**
      * @return true if debug=true is set in the server.properties (added by CB)
      */

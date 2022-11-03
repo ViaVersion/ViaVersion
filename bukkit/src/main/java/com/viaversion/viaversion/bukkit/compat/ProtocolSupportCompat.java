@@ -30,24 +30,22 @@ import java.util.logging.Level;
 public final class ProtocolSupportCompat {
 
     public static void registerPSConnectListener(ViaVersionPlugin plugin) {
-        if (isMultiplatformPS()) {
-            Via.getPlatform().getLogger().info("Registering ProtocolSupport compat connection listener");
-            try {
-                //noinspection unchecked
-                Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
-                Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() {
-                }, EventPriority.HIGH, (listener, event) -> {
-                    try {
-                        Object connection = event.getClass().getMethod("getConnection").invoke(event);
-                        ProtocolSupportConnectionListener connectListener = new ProtocolSupportConnectionListener(connection);
-                        ProtocolSupportConnectionListener.ADD_PACKET_LISTENER_METHOD.invoke(connection, connectListener);
-                    } catch (Exception e) {
-                        Via.getPlatform().getLogger().log(Level.WARNING, "Error when handling ProtocolSupport event", e);
-                    }
-                }, plugin);
-            } catch (Exception e) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Unable to register ProtocolSupport listener", e);
-            }
+        Via.getPlatform().getLogger().info("Registering ProtocolSupport compat connection listener");
+        try {
+            //noinspection unchecked
+            Class<? extends Event> connectionOpenEvent = (Class<? extends Event>) Class.forName("protocolsupport.api.events.ConnectionOpenEvent");
+            Bukkit.getPluginManager().registerEvent(connectionOpenEvent, new Listener() {
+            }, EventPriority.HIGH, (listener, event) -> {
+                try {
+                    Object connection = event.getClass().getMethod("getConnection").invoke(event);
+                    ProtocolSupportConnectionListener connectListener = new ProtocolSupportConnectionListener(connection);
+                    ProtocolSupportConnectionListener.ADD_PACKET_LISTENER_METHOD.invoke(connection, connectListener);
+                } catch (ReflectiveOperationException e) {
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Error when handling ProtocolSupport event", e);
+                }
+            }, plugin);
+        } catch (ClassNotFoundException e) {
+            Via.getPlatform().getLogger().log(Level.WARNING, "Unable to register ProtocolSupport listener", e);
         }
     }
 
@@ -60,7 +58,7 @@ public final class ProtocolSupportCompat {
         }
     }
 
-    public static HandshakeProtocolType handshakeVersionMethod() {
+    static HandshakeProtocolType handshakeVersionMethod() {
         Class<?> clazz = null;
         // Check for the mapped method
         try {
@@ -88,7 +86,7 @@ public final class ProtocolSupportCompat {
         }
     }
 
-    public enum HandshakeProtocolType {
+    enum HandshakeProtocolType {
 
         MAPPED("getProtocolVersion"),
         OBFUSCATED_B("b"),
