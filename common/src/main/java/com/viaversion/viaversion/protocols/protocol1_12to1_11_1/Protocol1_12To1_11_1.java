@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -40,6 +41,8 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
@@ -164,9 +167,16 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 map(Type.UNSIGNED_BYTE);
                 map(Type.INT);
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    UserConnection user = wrapper.user();
+                    ClientWorld clientChunks = user.get(ClientWorld.class);
                     int dimensionId = wrapper.get(Type.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
+
+                    // Reset recipes
+                    if (user.getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_13.getVersion()) {
+                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
+                                .scheduleSend(Protocol1_13To1_12_2.class);
+                    }
                 });
             }
         });

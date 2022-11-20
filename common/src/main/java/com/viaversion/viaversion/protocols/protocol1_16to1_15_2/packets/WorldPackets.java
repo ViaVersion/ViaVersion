@@ -141,6 +141,17 @@ public class WorldPackets {
                     compoundTag.put("Text" + i, new StringTag(text.toString()));
                 }
             }
+        } else if (id.equals("minecraft:mob_spawner")) {
+            Tag spawnDataTag = compoundTag.get("SpawnData");
+            if (spawnDataTag instanceof CompoundTag) {
+                Tag spawnDataIdTag = ((CompoundTag) spawnDataTag).get("id");
+                if (spawnDataIdTag instanceof StringTag) {
+                    StringTag spawnDataIdStringTag = ((StringTag) spawnDataIdTag);
+                    if (spawnDataIdStringTag.getValue().equals("minecraft:zombie_pigman")) {
+                        spawnDataIdStringTag.setValue("minecraft:zombified_piglin");
+                    }
+                }
+            }
         }
     }
 }
