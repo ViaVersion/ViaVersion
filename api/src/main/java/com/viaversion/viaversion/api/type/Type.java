@@ -96,6 +96,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final IntType INT = new IntType();
     public static final FloatType FLOAT = new FloatType();
+    public static final FloatType.OptionalFloatType OPTIONAL_FLOAT = new FloatType.OptionalFloatType();
     public static final DoubleType DOUBLE = new DoubleType();
 
     public static final LongType LONG = new LongType();
