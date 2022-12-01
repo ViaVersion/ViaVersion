@@ -76,7 +76,18 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         itemRewriter.register();
 
         final SoundRewriter soundRewriter = new SoundRewriter(this);
-        soundRewriter.registerSound(ClientboundPackets1_19_1.ENTITY_SOUND);
+        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.VAR_INT); // Sound id
+                handler(soundRewriter.getSoundHandler());
+                handler(wrapper -> {
+                    // 0 means a resource location will be written
+                    final int soundId = wrapper.get(Type.VAR_INT, 0);
+                    wrapper.set(Type.VAR_INT, 0, soundId + 1);
+                });
+            }
+        });
         registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {

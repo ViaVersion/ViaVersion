@@ -48,7 +48,6 @@ public class SoundRewriter {
         });
     }
 
-    // Different to entity sounds now
     public void register1_19_3Sound(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
