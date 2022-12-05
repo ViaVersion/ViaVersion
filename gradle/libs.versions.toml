@@ -2,10 +2,10 @@ metadata.format.version = "1.1"
 
 [versions]
 
-adventure = "4.9.3"
-gson = "2.8.8"
+adventure = "4.12.0"
+gson = "2.10"
 fastutil = "8.5.6"
-flare = "2.0.0"
+flare = "2.0.1"
 openNBT = "2.1"
 
 # Common provided
@@ -14,7 +14,7 @@ guava = "17.0"
 snakeYaml = "1.18"
 
 junit = "5.7.2"
-checkerQual = "3.18.0"
+checkerQual = "3.27.0"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
