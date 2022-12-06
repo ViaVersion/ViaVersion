@@ -77,7 +77,20 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
             public void registerMap() {
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous gamemode
+                map(Type.BOOLEAN); // Debug
+                map(Type.BOOLEAN); // Flat
                 handler(worldDataTrackerHandlerByKey());
+                handler(wrapper -> {
+                    final boolean keepAttributes = wrapper.read(Type.BOOLEAN);
+                    byte keepDataMask = 0x02; // Always keep entity data
+                    if (keepAttributes) {
+                        keepDataMask |= 0x01;
+                    }
+                    wrapper.write(Type.BYTE, keepDataMask);
+                });
             }
         });
 
