@@ -67,7 +67,7 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
                     enableFeaturesPacket.write(Type.VAR_INT, 1);
                     enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.send(Protocol1_19_3To1_19_1.class);
+                    enableFeaturesPacket.scheduleSend(Protocol1_19_3To1_19_1.class);
                 });
             }
         });
