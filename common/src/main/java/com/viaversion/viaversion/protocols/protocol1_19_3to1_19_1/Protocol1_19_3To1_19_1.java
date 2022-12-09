@@ -55,6 +55,8 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3", true);
     private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
+    private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
+    private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
@@ -218,7 +220,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.VAR_INT, 0);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Type.STRING); // Argument name
-                        wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
+                        wrapper.read(MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
                     }
 
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
@@ -229,7 +231,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
                 });
                 read(Type.VAR_INT); // Offset
-                read(new BitSetType(20)); // Acknowledged
+                read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
             }
         });
         registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketRemapper() {
@@ -252,7 +254,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
                 });
                 read(Type.VAR_INT); // Offset
-                read(new BitSetType(20)); // Acknowledged
+                read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
             }
         });
 
