@@ -53,16 +53,14 @@ public class SoundRewriter {
             @Override
             public void registerMap() {
                 handler(wrapper -> {
-                    int soundId = wrapper.read(Type.VAR_INT);
+                    final int soundId = wrapper.read(Type.VAR_INT);
                     if (soundId == 0) {
                         // Is followed by the resource loation
                         wrapper.write(Type.VAR_INT, 0);
                         return;
                     }
 
-                    // The id needs to be normalized
-                    soundId--;
-                    final int mappedId = idRewriter.rewrite(soundId);
+                    final int mappedId = idRewriter.rewrite(soundId - 1); // Normalize sound id
                     if (mappedId == -1) {
                         wrapper.cancel();
                         return;
