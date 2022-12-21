@@ -163,6 +163,13 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
         });
         registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.blockStateType, Types1_19_3.META_TYPES.particleType);
 
+        filter().index(6).handler((event, meta) -> {
+            // Sitting pose added
+            final int pose = meta.value();
+            if (pose >= 10) {
+                meta.setValue(pose + 1);
+            }
+        });
         filter().filterFamily(Entity1_19_3Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
