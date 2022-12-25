@@ -69,6 +69,10 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         final TagRewriter tagRewriter = new TagRewriter(this);
+
+        // Flint and steel was hardcoded before 1.19.3 to ignite a creeper; has been moved to a tag - adding this ensures offhand doesn't trigger as well
+        tagRewriter.addTagRaw(RegistryType.ITEM, "minecraft:creeper_igniters", 733); // 733 = flint_and_steel 1.19.3
+
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:bookshelf_books", "minecraft:hanging_signs", "minecraft:stripped_logs");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:all_hanging_signs", "minecraft:ceiling_hanging_signs", "minecraft:invalid_spawn_inside",
                 "minecraft:stripped_logs", "minecraft:wall_hanging_signs");
