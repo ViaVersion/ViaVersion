@@ -28,6 +28,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -114,6 +115,25 @@ public final class PipelineUtil {
             t = t.getCause();
         }
         return false;
+    }
+
+    /**
+     * Check if a stack trace contains a certain exception and returns it if present.
+     *
+     * @param t throwable
+     * @param c the exception to look for
+     * @return contained exception of t if present
+     */
+    public static <T> @Nullable T getCause(Throwable t, Class<T> c) {
+        while (t != null) {
+            if (c.isAssignableFrom(t.getClass())) {
+                //noinspection unchecked
+                return (T) t;
+            }
+
+            t = t.getCause();
+        }
+        return null;
     }
 
     /**

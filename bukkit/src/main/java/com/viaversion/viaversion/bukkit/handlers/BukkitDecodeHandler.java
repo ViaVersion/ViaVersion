@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.handlers;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
@@ -67,9 +65,15 @@ public final class BukkitDecodeHandler extends MessageToMessageDecoder<ByteBuf> 
         }
 
         super.exceptionCaught(ctx, cause);
-        if (!NMSUtil.isDebugPropertySet() && PipelineUtil.containsCause(cause, InformativeException.class)
-                && (connection.getProtocolInfo().getState() != State.HANDSHAKE || Via.getManager().isDebug())) {
-            cause.printStackTrace(); // Print if CB doesn't already do it
+        if (NMSUtil.isDebugPropertySet()) {
+            return;
+        }
+
+        // Print if CB doesn't already do it
+        final InformativeException exception = PipelineUtil.getCause(cause, InformativeException.class);
+        if (exception != null && exception.shouldBePrinted()) {
+            cause.printStackTrace();
+            exception.setShouldBePrinted(false);
         }
     }
 

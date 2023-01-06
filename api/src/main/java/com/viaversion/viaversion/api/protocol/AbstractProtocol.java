@@ -334,8 +334,9 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     private void throwRemapError(Direction direction, State state, int oldId, int newId, InformativeException e) throws InformativeException {
-        // Don't print errors during handshake
-        if (state == State.HANDSHAKE) {
+        // Don't print errors during handshake/login/status
+        if (state != State.PLAY && direction == Direction.SERVERBOUND && !Via.getManager().debugHandler().enabled()) {
+            e.setShouldBePrinted(false);
             throw e;
         }
 
@@ -369,6 +370,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public @Nullable <T> T get(Class<T> objectClass) {
+        //noinspection unchecked
         return (T) storedObjects.get(objectClass);
     }
 
