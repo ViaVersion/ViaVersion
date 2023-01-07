@@ -33,20 +33,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
     @Override
     public void probeAllServers() {
-        final Collection<RegisteredServer> servers = VelocityPlugin.PROXY.getAllServers();
-        final Set<String> serverNames = new HashSet<>(servers.size());
-        for (final RegisteredServer server : servers) {
-            probeServer(server);
-            serverNames.add(server.getServerInfo().getName());
-        }
-
-        // Remove servers that aren't registered anymore
-        lock.writeLock().lock();
-        try {
-            detectedProtocolIds.keySet().retainAll(serverNames);
-        } finally {
-            lock.writeLock().unlock();
-        }
+        System.out.println("ViaVersion: Probing all servers for their protocol versions is not supported");
     }
 
     public void probeServer(final RegisteredServer server) {

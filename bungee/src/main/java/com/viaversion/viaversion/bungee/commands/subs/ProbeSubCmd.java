@@ -37,8 +37,7 @@ public class ProbeSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Via.proxyPlatform().protocolDetectorService().probeAllServers();
-        sendMessage(sender, "&6Started searching for protocol versions");
+        sendMessage(sender, "&cThis command is not supported on OmniDaemon servers.");
         return true;
     }
 }
