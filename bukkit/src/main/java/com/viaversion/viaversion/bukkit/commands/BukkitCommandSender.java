@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.commands;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 
 import java.util.UUID;
 
@@ -42,10 +42,10 @@ public class BukkitCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (sender instanceof Player) {
-            return ((Player) sender).getUniqueId();
+        if (sender instanceof Entity) {
+            return ((Entity) sender).getUniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
     }
 

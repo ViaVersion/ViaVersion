@@ -45,7 +45,7 @@ public class BungeeCommandSender implements ViaCommandSender {
         if (sender instanceof ProxiedPlayer) {
             return ((ProxiedPlayer) sender).getUniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
     }
 

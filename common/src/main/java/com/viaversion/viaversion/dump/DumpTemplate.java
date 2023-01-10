@@ -18,7 +18,9 @@
 package com.viaversion.viaversion.dump;
 
 import com.google.gson.JsonObject;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class DumpTemplate {
@@ -26,12 +28,14 @@ public class DumpTemplate {
     private final Map<String, Object> configuration;
     private final JsonObject platformDump;
     private final JsonObject injectionDump;
+    private final JsonObject playerSample;
 
-    public DumpTemplate(VersionInfo versionInfo, Map<String, Object> configuration, JsonObject platformDump, JsonObject injectionDump) {
+    public DumpTemplate(VersionInfo versionInfo, Map<String, Object> configuration, JsonObject platformDump, JsonObject injectionDump, JsonObject playerSample) {
         this.versionInfo = versionInfo;
         this.configuration = configuration;
         this.platformDump = platformDump;
         this.injectionDump = injectionDump;
+        this.playerSample = playerSample;
     }
 
     public VersionInfo getVersionInfo() {
@@ -48,5 +52,9 @@ public class DumpTemplate {
 
     public JsonObject getInjectionDump() {
         return injectionDump;
+    }
+
+    public JsonObject getPlayerSample() {
+        return playerSample;
     }
 }

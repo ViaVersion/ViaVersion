@@ -19,10 +19,13 @@ package com.viaversion.viaversion.commands.defaultsubs;
 
 import com.google.common.io.CharStreams;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.dump.DumpTemplate;
 import com.viaversion.viaversion.dump.VersionInfo;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -34,7 +37,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class DumpSubCmd extends ViaSubCommand {
@@ -64,14 +72,13 @@ public class DumpSubCmd extends ViaSubCommand {
         );
 
         Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
-
-        DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump());
+        DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(sender.getUUID()));
 
         Via.getPlatform().runAsync(new Runnable() {
             @Override
             public void run() {
 
-                HttpURLConnection con = null;
+                HttpURLConnection con;
                 try {
                     con = (HttpURLConnection) new URL("https://dump.viaversion.com/documents").openConnection();
                 } catch (IOException e) {
@@ -124,5 +131,51 @@ public class DumpSubCmd extends ViaSubCommand {
 
     private String getUrl(String id) {
         return String.format("https://dump.viaversion.com/%s", id);
+    }
+
+    private JsonObject getPlayerSample(UUID senderUuid) {
+        JsonObject playerSample = new JsonObject();
+        // Player versions
+        JsonObject versions = new JsonObject();
+        playerSample.add("versions", versions);
+        Map<ProtocolVersion, Integer> playerVersions = new TreeMap<>((o1, o2) -> ProtocolVersion.getIndex(o2) - ProtocolVersion.getIndex(o1));
+        for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+            ProtocolVersion protocolVersion = ProtocolVersion.getProtocol(connection.getProtocolInfo().getProtocolVersion());
+            playerVersions.compute(protocolVersion, (v, num) -> num != null ? num + 1 : 1);
+        }
+        for (Map.Entry<ProtocolVersion, Integer> entry : playerVersions.entrySet()) {
+            versions.addProperty(entry.getKey().getName(), entry.getValue());
+        }
+
+        // Pipeline of sender
+        Set<List<String>> pipelines = new HashSet<>();
+        UserConnection senderConnection = Via.getAPI().getConnection(senderUuid);
+        if (senderConnection != null && senderConnection.getChannel() != null) {
+            pipelines.add(senderConnection.getChannel().pipeline().names());
+        }
+
+        // Other pipelines if different ones are found (3 max)
+        for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+            if (connection.getChannel() == null) {
+                continue;
+            }
+
+            List<String> names = connection.getChannel().pipeline().names();
+            if (pipelines.add(names) && pipelines.size() == 3) {
+                break;
+            }
+        }
+
+        int i = 0;
+        for (List<String> pipeline : pipelines) {
+            JsonArray senderPipeline = new JsonArray(pipeline.size());
+            for (String name : pipeline) {
+                senderPipeline.add(name);
+            }
+
+            playerSample.add("pipeline-" + i++, senderPipeline);
+        }
+
+        return playerSample;
     }
 }

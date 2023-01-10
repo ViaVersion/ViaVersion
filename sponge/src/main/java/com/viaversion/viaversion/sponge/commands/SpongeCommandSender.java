@@ -47,7 +47,7 @@ public class SpongeCommandSender implements ViaCommandSender {
         if (source instanceof Identifiable) {
             return ((Identifiable) source).uniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
 
     }

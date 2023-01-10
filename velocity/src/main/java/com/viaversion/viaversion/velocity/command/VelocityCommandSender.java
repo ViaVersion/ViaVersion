@@ -46,7 +46,7 @@ public class VelocityCommandSender implements ViaCommandSender {
         if (source instanceof Player) {
             return ((Player) source).getUniqueId();
         }
-        return UUID.fromString(getName());
+        return new UUID(0, 0);
     }
 
     @Override
