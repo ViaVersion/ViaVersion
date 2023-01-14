@@ -3,8 +3,8 @@ metadata.format.version = "1.1"
 [versions]
 
 adventure = "4.12.0"
-gson = "2.10"
-fastutil = "8.5.6"
+gson = "2.10.1"
+fastutil = "8.5.11"
 flare = "2.0.1"
 openNBT = "2.1"
 
@@ -13,16 +13,16 @@ netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "1.18"
 
-junit = "5.7.2"
-checkerQual = "3.27.0"
+junit = "5.9.2"
+checkerQual = "3.29.0"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
-bungee = "1.17-R0.1-SNAPSHOT"
+bungee = "1.19-R0.1-SNAPSHOT"
 sponge = "8.0.0"
 legacySponge = "4.0.0"
-velocity = "3.0.0-SNAPSHOT"
+velocity = "3.1.1"
 
 
 [libraries]
