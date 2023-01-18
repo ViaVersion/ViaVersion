@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.CommandRewriter1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.ComponentRewriter1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
@@ -40,9 +39,11 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.PlayerPa
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
 
@@ -69,7 +70,15 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         ComponentRewriter componentRewriter = new ComponentRewriter1_14(this);
         componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT_MESSAGE);
 
-        CommandRewriter1_14 commandRewriter = new CommandRewriter1_14(this);
+        CommandRewriter commandRewriter = new CommandRewriter(this) {
+            @Override
+            public @Nullable String handleArgumentType(String argumentType) {
+                if (argumentType.equals("minecraft:nbt")) {
+                    return "minecraft:nbt_compound_tag";
+                }
+                return super.handleArgumentType(argumentType);
+            }
+        };
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
 
         registerClientbound(ClientboundPackets1_13.TAGS, new PacketRemapper() {

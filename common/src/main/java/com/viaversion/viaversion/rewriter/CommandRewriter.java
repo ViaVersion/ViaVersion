@@ -80,9 +80,6 @@ public class CommandRewriter {
         this.parserHandlers.put("minecraft:resource_key", wrapper -> {
             wrapper.passthrough(Type.STRING); // Resource location/tag
         });
-        this.parserHandlers.put("minecraft:time", wrapper -> {
-            wrapper.passthrough(Type.INT); // Minimum
-        });
     }
 
     public void handleArgument(PacketWrapper wrapper, String argumentType) throws Exception {

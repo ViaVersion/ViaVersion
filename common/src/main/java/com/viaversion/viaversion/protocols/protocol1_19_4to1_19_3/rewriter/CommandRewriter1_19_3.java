@@ -15,24 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
+package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class CommandRewriter1_14 extends CommandRewriter {
+public class CommandRewriter1_19_3 extends CommandRewriter {
 
-    public CommandRewriter1_14(Protocol protocol) {
+    public CommandRewriter1_19_3(Protocol protocol) {
         super(protocol);
+        this.parserHandlers.put("minecraft:time", wrapper -> wrapper.passthrough(Type.INT)); // Minimum
     }
-
-    @Override
-    public @Nullable String handleArgumentType(String argumentType) {
-        if (argumentType.equals("minecraft:nbt")) {
-            return "minecraft:nbt_compound_tag";
-        }
-        return super.handleArgumentType(argumentType);
-    }
-
 }
