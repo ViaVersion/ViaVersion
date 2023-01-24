@@ -23,7 +23,7 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 
 public class CommandRewriter1_19_3 extends CommandRewriter {
 
-    public CommandRewriter1_19_3(Protocol protocol) {
+    public CommandRewriter1_19_3(Protocol<?, ?, ?, ?> protocol) {
         super(protocol);
         this.parserHandlers.put("minecraft:time", wrapper -> wrapper.passthrough(Type.INT)); // Minimum
     }

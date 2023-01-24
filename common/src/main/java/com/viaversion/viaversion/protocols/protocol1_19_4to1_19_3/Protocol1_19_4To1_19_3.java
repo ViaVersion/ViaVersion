@@ -41,7 +41,6 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        // TODO fallback field in components
         entityRewriter.register();
 
         final CommandRewriter commandRewriter = new CommandRewriter(this) {
