@@ -458,4 +458,6 @@ public interface ViaVersionConfig {
     boolean cache1_17Light();
 
     @Nullable String chatTypeFormat(String translationKey);
+
+    boolean isArmorToggleFix();
 }

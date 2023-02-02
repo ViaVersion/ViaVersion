@@ -28,6 +28,7 @@ import com.viaversion.viaversion.bukkit.listeners.JoinListener;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_19_4To1_19_3.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_19to1_18_2.BlockBreakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.BlockListener;
@@ -140,6 +141,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             if (paper) {
                 storeListener(new PaperPatch(plugin)).register();
             }
+        }
+
+        if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix()) {
+            storeListener(new ArmorToggleListener(plugin)).register();
         }
 
         /* Providers */
