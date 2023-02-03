@@ -23,6 +23,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +34,7 @@ public final class ArmorToggleListener extends ViaBukkitListener {
         super(plugin, Protocol1_19_4To1_19_3.class);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void itemUse(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         if (!isOnPipe(player)) return;
