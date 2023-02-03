@@ -23,8 +23,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,13 +78,6 @@ public class CommandRewriter {
         this.parserHandlers.put("minecraft:resource_key", wrapper -> {
             wrapper.passthrough(Type.STRING); // Resource location/tag
         });
-    }
-
-    public void handleArgument(PacketWrapper wrapper, String argumentType) throws Exception {
-        CommandArgumentConsumer handler = parserHandlers.get(argumentType);
-        if (handler != null) {
-            handler.accept(wrapper);
-        }
     }
 
     public void registerDeclareCommands(ClientboundPacketType packetType) {
@@ -149,10 +140,10 @@ public class CommandRewriter {
 
                         if (nodeType == 2) { // Argument node
                             int argumentTypeId = wrapper.read(Type.VAR_INT);
-                            String argumentType = protocol.getMappingData().getArgumentTypeMappings().identifier(argumentTypeId);
+                            String argumentType = argumentType(argumentTypeId);
                             String newArgumentType = handleArgumentType(argumentType);
-                            Preconditions.checkArgument(newArgumentType != null, "No mapping for argument type " + argumentType);
-                            wrapper.write(Type.VAR_INT, protocol.getMappingData().getArgumentTypeMappings().mappedId(newArgumentType));
+                            Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
+                            wrapper.write(Type.VAR_INT, mappedArgumentTypeId(newArgumentType));
 
                             // Always call the handler using the previous name
                             handleArgument(wrapper, argumentType);
@@ -169,17 +160,32 @@ public class CommandRewriter {
         });
     }
 
+    public void handleArgument(PacketWrapper wrapper, String argumentType) throws Exception {
+        CommandArgumentConsumer handler = parserHandlers.get(argumentType);
+        if (handler != null) {
+            handler.accept(wrapper);
+        }
+    }
+
     /**
      * Can be overridden if needed.
      *
      * @param argumentType argument type
-     * @return new argument type, or null if it should be removed
+     * @return mapped argument type
      */
-    public @Nullable String handleArgumentType(String argumentType) {
+    public String handleArgumentType(String argumentType) {
         if (protocol.getMappingData() != null && protocol.getMappingData().getArgumentTypeMappings() != null) {
             return protocol.getMappingData().getArgumentTypeMappings().mappedIdentifier(argumentType);
         }
         return argumentType;
+    }
+
+    protected String argumentType(int argumentTypeId) {
+        return protocol.getMappingData().getArgumentTypeMappings().identifier(argumentTypeId);
+    }
+
+    protected int mappedArgumentTypeId(String mappedArgumentType) {
+        return protocol.getMappingData().getArgumentTypeMappings().mappedId(mappedArgumentType);
     }
 
     @FunctionalInterface
