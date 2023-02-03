@@ -533,4 +533,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     public @Nullable String chatTypeFormat(final String translationKey) {
         return chatTypeFormats.get(translationKey);
     }
+
+    @Override
+    public boolean isArmorToggleFix() {
+        return false;
+    }
 }

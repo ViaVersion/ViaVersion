@@ -172,6 +172,9 @@ chat-types-1_19:
   chat.type.team.text: "%s <%s> %s"
   chat.type.emote: "* %s %s"
 #
+# Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
+armor-toggle-fix: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
