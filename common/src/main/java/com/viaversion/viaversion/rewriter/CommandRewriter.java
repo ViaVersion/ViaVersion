@@ -29,11 +29,11 @@ import java.util.Map;
 /**
  * Abstract rewriter for the declare commands packet to handle argument type name and content changes.
  */
-public class CommandRewriter {
-    protected final Protocol protocol;
+public class CommandRewriter<C extends ClientboundPacketType> {
+    protected final Protocol<C, ?, ?, ?> protocol;
     protected final Map<String, CommandArgumentConsumer> parserHandlers = new HashMap<>();
 
-    public CommandRewriter(Protocol protocol) {
+    public CommandRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
 
         // Register default parsers
@@ -57,30 +57,16 @@ public class CommandRewriter {
             if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.LONG); // Min Value
             if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.LONG); // Max Value
         });
-        this.parserHandlers.put("brigadier:string", wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Flags
-        });
-        this.parserHandlers.put("minecraft:entity", wrapper -> {
-            wrapper.passthrough(Type.BYTE); // Flags
-        });
-        this.parserHandlers.put("minecraft:score_holder", wrapper -> {
-            wrapper.passthrough(Type.BYTE); // Flags
-        });
-        this.parserHandlers.put("minecraft:resource", wrapper -> {
-            wrapper.passthrough(Type.STRING); // Resource location
-        });
-        this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> {
-            wrapper.passthrough(Type.STRING); // Resource location/tag
-        });
-        this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> {
-            wrapper.passthrough(Type.STRING); // Resource location
-        });
-        this.parserHandlers.put("minecraft:resource_key", wrapper -> {
-            wrapper.passthrough(Type.STRING); // Resource location/tag
-        });
+        this.parserHandlers.put("brigadier:string", wrapper -> wrapper.passthrough(Type.VAR_INT)); // Flags
+        this.parserHandlers.put("minecraft:entity", wrapper -> wrapper.passthrough(Type.BYTE)); // Flags
+        this.parserHandlers.put("minecraft:score_holder", wrapper -> wrapper.passthrough(Type.BYTE)); // Flags
+        this.parserHandlers.put("minecraft:resource", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location
+        this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location/tag
+        this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location
+        this.parserHandlers.put("minecraft:resource_key", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location/tag
     }
 
-    public void registerDeclareCommands(ClientboundPacketType packetType) {
+    public void registerDeclareCommands(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -120,7 +106,7 @@ public class CommandRewriter {
         });
     }
 
-    public void registerDeclareCommands1_19(ClientboundPacketType packetType) {
+    public void registerDeclareCommands1_19(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

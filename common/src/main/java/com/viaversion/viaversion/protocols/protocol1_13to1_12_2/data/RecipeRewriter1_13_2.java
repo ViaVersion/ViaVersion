@@ -19,17 +19,17 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
 /**
  * For 1.13.2, not 1.13 (1.13 reads recipe type and id in swapped order)!
  */
-public class RecipeRewriter1_13_2 extends RecipeRewriter {
+public class RecipeRewriter1_13_2<C extends ClientboundPacketType> extends RecipeRewriter<C> {
 
-    public RecipeRewriter1_13_2(Protocol protocol) {
+    public RecipeRewriter1_13_2(Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
         recipeHandlers.put("crafting_shapeless", this::handleCraftingShapeless);
         recipeHandlers.put("crafting_shaped", this::handleCraftingShaped);

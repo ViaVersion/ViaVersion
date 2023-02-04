@@ -24,15 +24,15 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class StatisticsRewriter {
-    private final Protocol protocol;
-    private final int customStatsCategory = 8; // Make this changeable if it differs in a future version
+public class StatisticsRewriter<C extends ClientboundPacketType> {
+    private static final int CUSTOM_STATS_CATEGORY = 8; // Make this changeable if it differs in a future version
+    private final Protocol<C, ?, ?, ?> protocol;
 
-    public StatisticsRewriter(Protocol protocol) {
+    public StatisticsRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
-    public void register(ClientboundPacketType packetType) {
+    public void register(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -43,7 +43,7 @@ public class StatisticsRewriter {
                         int categoryId = wrapper.read(Type.VAR_INT);
                         int statisticId = wrapper.read(Type.VAR_INT);
                         int value = wrapper.read(Type.VAR_INT);
-                        if (categoryId == customStatsCategory && protocol.getMappingData().getStatisticsMappings() != null) {
+                        if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
                             // Rewrite custom statistics id
                             statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
                             if (statisticId == -1) {

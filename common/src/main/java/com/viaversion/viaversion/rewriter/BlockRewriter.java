@@ -35,16 +35,16 @@ import com.viaversion.viaversion.util.MathUtil;
 
 import java.util.List;
 
-public class BlockRewriter {
-    private final Protocol protocol;
+public class BlockRewriter<C extends ClientboundPacketType> {
+    private final Protocol<C, ?, ?, ?> protocol;
     private final Type<Position> positionType;
 
-    public BlockRewriter(Protocol protocol, Type<Position> positionType) {
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
         this.protocol = protocol;
         this.positionType = positionType;
     }
 
-    public void registerBlockAction(ClientboundPacketType packetType) {
+    public void registerBlockAction(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -67,7 +67,7 @@ public class BlockRewriter {
         });
     }
 
-    public void registerBlockChange(ClientboundPacketType packetType) {
+    public void registerBlockChange(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -78,7 +78,7 @@ public class BlockRewriter {
         });
     }
 
-    public void registerMultiBlockChange(ClientboundPacketType packetType) {
+    public void registerMultiBlockChange(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -93,7 +93,7 @@ public class BlockRewriter {
         });
     }
 
-    public void registerVarLongMultiBlockChange(ClientboundPacketType packetType) {
+    public void registerVarLongMultiBlockChange(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -108,12 +108,12 @@ public class BlockRewriter {
         });
     }
 
-    public void registerAcknowledgePlayerDigging(ClientboundPacketType packetType) {
+    public void registerAcknowledgePlayerDigging(C packetType) {
         // Same exact handler
         registerBlockChange(packetType);
     }
 
-    public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId) {
+    public void registerEffect(C packetType, int playRecordId, int blockBreakId) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -133,7 +133,7 @@ public class BlockRewriter {
         });
     }
 
-    public void registerChunkData1_19(ClientboundPacketType packetType, ChunkTypeSupplier chunkTypeSupplier) {
+    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -166,7 +166,7 @@ public class BlockRewriter {
         });
     }
 
-    public void registerBlockEntityData(ClientboundPacketType packetType) {
+    public void registerBlockEntityData(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

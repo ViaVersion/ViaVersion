@@ -28,12 +28,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class RecipeRewriter {
+public abstract class RecipeRewriter<C extends ClientboundPacketType> {
 
-    protected final Protocol protocol;
+    protected final Protocol<C, ?, ?, ?> protocol;
     protected final Map<String, RecipeConsumer> recipeHandlers = new HashMap<>();
 
-    protected RecipeRewriter(Protocol protocol) {
+    protected RecipeRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
@@ -44,7 +44,7 @@ public abstract class RecipeRewriter {
         }
     }
 
-    public void registerDefaultHandler(ClientboundPacketType packetType) {
+    public void registerDefaultHandler(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -52,7 +52,7 @@ public abstract class RecipeRewriter {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
                         String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
-                        String id = wrapper.passthrough(Type.STRING); // Recipe Identifier
+                        wrapper.passthrough(Type.STRING); // Recipe Identifier
                         handle(wrapper, type);
                     }
                 });

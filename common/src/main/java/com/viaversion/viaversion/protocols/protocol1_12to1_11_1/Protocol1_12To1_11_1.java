@@ -34,7 +34,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -48,13 +47,12 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
-    private final EntityRewriter metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
+    private final MetadataRewriter1_12To1_11_1 metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
     public Protocol1_12To1_11_1() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_12.class, ServerboundPackets1_9_3.class, ServerboundPackets1_12.class);
@@ -192,7 +190,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        new SoundRewriter(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
+        new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 
 
         // New packet at 0x01
@@ -273,12 +271,12 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_12To1_11_1 getEntityRewriter() {
         return metadataRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

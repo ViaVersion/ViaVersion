@@ -19,11 +19,11 @@ package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -31,8 +31,8 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public class WorldPackets {
 
-    public static void register(Protocol protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION);
+    public static void register(Protocol1_13_1To1_13 protocol) {
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION);
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
             @Override

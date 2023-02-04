@@ -26,8 +26,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -51,7 +49,6 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
@@ -70,7 +67,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        final TagRewriter tagRewriter = new TagRewriter(this);
+        final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
 
         entityRewriter.register();
@@ -79,7 +76,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         cancelClientbound(ClientboundPackets1_18.ADD_VIBRATION_SIGNAL);
 
-        final SoundRewriter soundRewriter = new SoundRewriter(this);
+        final SoundRewriter<ClientboundPackets1_18> soundRewriter = new SoundRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -120,7 +117,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_18.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
         final PacketHandler titleHandler = wrapper -> {
             final JsonElement component = wrapper.read(Type.COMPONENT);
@@ -143,7 +140,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        final CommandRewriter commandRewriter = new CommandRewriter(this);
+        final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -320,12 +317,12 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public EntityPackets getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

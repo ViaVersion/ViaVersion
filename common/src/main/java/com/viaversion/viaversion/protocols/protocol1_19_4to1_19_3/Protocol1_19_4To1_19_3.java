@@ -41,7 +41,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         entityRewriter.register();
 
-        final CommandRewriter commandRewriter = new CommandRewriter(this) {
+        final CommandRewriter<ClientboundPackets1_19_3> commandRewriter = new CommandRewriter<ClientboundPackets1_19_3>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 if (argumentType.equals("minecraft:time")) {

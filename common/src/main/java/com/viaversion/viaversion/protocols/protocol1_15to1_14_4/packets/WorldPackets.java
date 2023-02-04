@@ -32,7 +32,7 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 public class WorldPackets {
 
     public static void register(Protocol1_15To1_14_4 protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_14> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_14.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_14.BLOCK_CHANGE);

@@ -54,7 +54,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
+public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
+        extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
@@ -245,7 +246,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTracker(ClientboundPacketType packetType) {
+    public void registerTracker(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -257,7 +258,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTrackerWithData(ClientboundPacketType packetType, EntityType fallingBlockType) {
+    public void registerTrackerWithData(C packetType, EntityType fallingBlockType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -282,7 +283,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTrackerWithData1_19(ClientboundPacketType packetType, EntityType fallingBlockType) {
+    public void registerTrackerWithData1_19(C packetType, EntityType fallingBlockType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -315,7 +316,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param entityType entity type
      * @param intType    int type of the entity id
      */
-    public void registerTracker(ClientboundPacketType packetType, EntityType entityType, Type<Integer> intType) {
+    public void registerTracker(C packetType, EntityType entityType, Type<Integer> intType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -333,7 +334,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param packetType packet type
      * @param entityType entity type
      */
-    public void registerTracker(ClientboundPacketType packetType, EntityType entityType) {
+    public void registerTracker(C packetType, EntityType entityType) {
         registerTracker(packetType, entityType, Type.VAR_INT);
     }
 
@@ -342,7 +343,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      *
      * @param packetType remove entities packet type
      */
-    public void registerRemoveEntities(ClientboundPacketType packetType) {
+    public void registerRemoveEntities(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -362,7 +363,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      *
      * @param packetType remove entities packet type
      */
-    public void registerRemoveEntity(ClientboundPacketType packetType) {
+    public void registerRemoveEntity(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -374,7 +375,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerMetadataRewriter(ClientboundPacketType packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
+    public void registerMetadataRewriter(C packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -393,7 +394,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerMetadataRewriter(ClientboundPacketType packetType, Type<List<Metadata>> metaType) {
+    public void registerMetadataRewriter(C packetType, Type<List<Metadata>> metaType) {
         registerMetadataRewriter(packetType, null, metaType);
     }
 

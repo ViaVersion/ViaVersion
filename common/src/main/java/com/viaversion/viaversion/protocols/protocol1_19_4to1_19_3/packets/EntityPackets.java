@@ -31,7 +31,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_19_4To1_19_3> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3, Protocol1_19_4To1_19_3> {
 
     public EntityPackets(final Protocol1_19_4To1_19_3 protocol) {
         super(protocol);

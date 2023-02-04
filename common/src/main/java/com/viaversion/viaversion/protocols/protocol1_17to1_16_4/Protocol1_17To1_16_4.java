@@ -26,8 +26,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -46,9 +44,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17", true);
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
-    private final EntityRewriter entityRewriter = new EntityPackets(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private final TagRewriter tagRewriter = new TagRewriter(this);
+    private final EntityPackets entityRewriter = new EntityPackets(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_17To1_16_4() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
@@ -91,9 +89,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_16_2.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.STATISTICS);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this);
+        SoundRewriter<ClientboundPackets1_16_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
 
@@ -246,12 +244,12 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public EntityPackets getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

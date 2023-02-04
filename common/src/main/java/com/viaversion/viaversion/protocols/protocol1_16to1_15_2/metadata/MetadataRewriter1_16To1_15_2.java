@@ -25,12 +25,13 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 import java.util.List;
 
-public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<Protocol1_16To1_15_2> {
+public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<ClientboundPackets1_15, Protocol1_16To1_15_2> {
 
     public MetadataRewriter1_16To1_15_2(Protocol1_16To1_15_2 protocol) {
         super(protocol);

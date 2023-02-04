@@ -39,14 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TagRewriter {
+public class TagRewriter<C extends ClientboundPacketType> {
     private static final int[] EMPTY_ARRAY = {};
-    private final Protocol protocol;
+    private final Protocol<C, ?, ?, ?> protocol;
     private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
     private final Map<RegistryType, Map<String, String>> toRename = new EnumMap<>(RegistryType.class);
     private final Set<String> toRemove = new HashSet<>();
 
-    public TagRewriter(Protocol protocol) {
+    public TagRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
@@ -135,7 +135,7 @@ public class TagRewriter {
      * @param packetType    packet type
      * @param readUntilType read and process the types until (including) the given registry type
      */
-    public void register(ClientboundPacketType packetType, @Nullable RegistryType readUntilType) {
+    public void register(C packetType, @Nullable RegistryType readUntilType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -149,7 +149,7 @@ public class TagRewriter {
      *
      * @param packetType packet type
      */
-    public void registerGeneric(ClientboundPacketType packetType) {
+    public void registerGeneric(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

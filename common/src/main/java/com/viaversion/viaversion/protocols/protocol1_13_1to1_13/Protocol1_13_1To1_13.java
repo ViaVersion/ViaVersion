@@ -28,8 +28,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.metadata.MetadataRewriter1_13_1To1_13;
@@ -45,8 +43,8 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2", true);
-    private final EntityRewriter entityRewriter = new MetadataRewriter1_13_1To1_13(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
+    private final MetadataRewriter1_13_1To1_13 entityRewriter = new MetadataRewriter1_13_1To1_13(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
     public Protocol1_13_1To1_13() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
@@ -144,8 +142,8 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        new TagRewriter(this).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
-        new StatisticsRewriter(this).register(ClientboundPackets1_13.STATISTICS);
+        new TagRewriter<>(this).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.STATISTICS);
     }
 
     @Override
@@ -162,12 +160,12 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_13_1To1_13 getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

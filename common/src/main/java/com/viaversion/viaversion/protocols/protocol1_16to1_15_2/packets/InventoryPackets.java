@@ -40,7 +40,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 
 import java.util.UUID;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_16To1_15_2> {
 
     public InventoryPackets(Protocol1_16To1_15_2 protocol) {
         super(protocol);
@@ -126,7 +126,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
             }
         });
 
-        new RecipeRewriter1_14(protocol).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
+        new RecipeRewriter1_14<>(protocol).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
 
         registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);

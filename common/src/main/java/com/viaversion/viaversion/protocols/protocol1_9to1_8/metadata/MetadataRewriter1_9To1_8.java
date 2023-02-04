@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -33,7 +34,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 import java.util.UUID;
 
-public class MetadataRewriter1_9To1_8 extends EntityRewriter<Protocol1_9To1_8> {
+public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1_8, Protocol1_9To1_8> {
 
     public MetadataRewriter1_9To1_8(Protocol1_9To1_8 protocol) {
         super(protocol);
@@ -99,8 +100,6 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<Protocol1_9To1_8> {
                 }
                 break;
             case Float:
-                metadata.setValue(value);
-                break;
             case String:
                 metadata.setValue(value);
                 break;

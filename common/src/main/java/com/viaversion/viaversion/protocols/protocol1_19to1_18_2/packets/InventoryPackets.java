@@ -28,7 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
+public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_19To1_18_2> {
 
     public InventoryPackets(Protocol1_19To1_18_2 protocol) {
         super(protocol);
@@ -122,7 +122,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_18.DECLARE_RECIPES);
+        new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_18.DECLARE_RECIPES);
     }
 
     private PacketHandler sequenceHandler() {

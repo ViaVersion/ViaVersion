@@ -55,7 +55,7 @@ public class WorldPackets {
     }
 
     public static void register(Protocol1_14To1_13_2 protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, null);
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, null);
 
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
             @Override

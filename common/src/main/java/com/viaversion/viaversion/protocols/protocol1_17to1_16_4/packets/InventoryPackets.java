@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public final class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
+public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_17To1_16_4> {
 
     public InventoryPackets(Protocol1_17To1_16_4 protocol) {
         super(protocol);
@@ -46,7 +46,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_17To1_16_4> {
         registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
         registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
 
-        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);
+        new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);
 
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 

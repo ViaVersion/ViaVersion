@@ -25,7 +25,7 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_16_2To1_16_1> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_16, ServerboundPackets1_16_2, Protocol1_16_2To1_16_1> {
 
     public InventoryPackets(Protocol1_16_2To1_16_1 protocol) {
         super(protocol);
@@ -58,7 +58,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16_2To1_16_1> {
             }
         });
 
-        new RecipeRewriter1_16(protocol).registerDefaultHandler(ClientboundPackets1_16.DECLARE_RECIPES);
+        new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_16.DECLARE_RECIPES);
 
         registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);

@@ -34,8 +34,6 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
@@ -61,11 +59,9 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockCon
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,9 +74,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
-    private final EntityRewriter entityRewriter = new MetadataRewriter1_13To1_12_2(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private final ComponentRewriter componentRewriter = new ComponentRewriter1_13(this);
+    private final MetadataRewriter1_13To1_12_2 entityRewriter = new MetadataRewriter1_13To1_12_2(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final ComponentRewriter1_13<ClientboundPackets1_12_1> componentRewriter = new ComponentRewriter1_13<>(this);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
@@ -629,7 +625,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
         // New 0x4C - Stop Sound
 
-        new SoundRewriter(this).registerSound(ClientboundPackets1_12_1.SOUND);
+        new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
 
         registerClientbound(ClientboundPackets1_12_1.TAB_LIST, new PacketRemapper() {
             @Override
@@ -1045,16 +1041,16 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_13To1_12_2 getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 
-    public ComponentRewriter getComponentRewriter() {
+    public ComponentRewriter1_13 getComponentRewriter() {
         return componentRewriter;
     }
 }

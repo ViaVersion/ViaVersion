@@ -28,8 +28,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -43,12 +41,10 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.EntityPa
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +54,10 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
 
     private static final UUID ZERO_UUID = new UUID(0, 0);
     public static final MappingData MAPPINGS = new MappingData();
-    private final EntityRewriter metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private final ComponentRewriter componentRewriter = new TranslationMappings(this);
-    private TagRewriter tagRewriter;
+    private final MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TranslationMappings componentRewriter = new TranslationMappings(this);
+    private TagRewriter<ClientboundPackets1_15> tagRewriter;
 
     public Protocol1_16To1_15_2() {
         super(ClientboundPackets1_15.class, ClientboundPackets1_16.class, ServerboundPackets1_14.class, ServerboundPackets1_16.class);
@@ -75,10 +71,10 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter(this);
+        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_15.TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_15.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
         registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
@@ -148,7 +144,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         componentRewriter.registerTitle(ClientboundPackets1_15.TITLE);
         componentRewriter.registerCombatEvent(ClientboundPackets1_15.COMBAT_EVENT);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this);
+        SoundRewriter<ClientboundPackets1_15> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
 
@@ -293,16 +289,16 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_16To1_15_2 getEntityRewriter() {
         return metadataRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 
-    public ComponentRewriter getComponentRewriter() {
+    public TranslationMappings getComponentRewriter() {
         return componentRewriter;
     }
 }

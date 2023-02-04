@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_13To1_12_2> {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
     public InventoryPackets(Protocol1_13To1_12_2 protocol) {
@@ -176,12 +176,12 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                             } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
                                 String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                                 List<String> rewrittenChannels = new ArrayList<>();
-                                for (int i = 0; i < channels.length; i++) {
-                                    String rewritten = getNewPluginChannelId(channels[i]);
+                                for (String s : channels) {
+                                    String rewritten = getNewPluginChannelId(s);
                                     if (rewritten != null) {
                                         rewrittenChannels.add(rewritten);
                                     } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + channels[i]);
+                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + s);
                                     }
                                 }
                                 if (!rewrittenChannels.isEmpty()) {
@@ -243,12 +243,12 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                         } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
                             String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                             List<String> rewrittenChannels = new ArrayList<>();
-                            for (int i = 0; i < channels.length; i++) {
-                                String rewritten = getOldPluginChannelId(channels[i]);
+                            for (String s : channels) {
+                                String rewritten = getOldPluginChannelId(s);
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
                                 } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + channels[i]);
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + s);
                                 }
                             }
                             wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));

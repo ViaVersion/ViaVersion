@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_18To1_17_1> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1, Protocol1_18To1_17_1> {
 
     public EntityPackets(final Protocol1_18To1_17_1 protocol) {
         super(protocol);

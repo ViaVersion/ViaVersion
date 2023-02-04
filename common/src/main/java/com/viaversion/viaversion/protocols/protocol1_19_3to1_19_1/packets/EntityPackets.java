@@ -34,7 +34,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.BitSet;
 import java.util.UUID;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1, Protocol1_19_3To1_19_1> {
 
     private static final BitSetType PROFILE_ACTIONS_ENUM_TYPE = new BitSetType(6);
 

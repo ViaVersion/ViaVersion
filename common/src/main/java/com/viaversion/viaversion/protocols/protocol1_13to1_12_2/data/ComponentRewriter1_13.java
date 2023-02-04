@@ -29,14 +29,15 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 
 import java.io.IOException;
 
-public class ComponentRewriter1_13 extends ComponentRewriter {
+public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
-    public ComponentRewriter1_13(Protocol protocol) {
+    public ComponentRewriter1_13(Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
     }
 

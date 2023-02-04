@@ -36,7 +36,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_10> {
+public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_11To1_10> {
 
     public MetadataRewriter1_11To1_10(Protocol1_11To1_10 protocol) {
         super(protocol);

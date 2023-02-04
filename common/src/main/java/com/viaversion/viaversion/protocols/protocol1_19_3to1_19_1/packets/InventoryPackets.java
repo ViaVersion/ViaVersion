@@ -28,7 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPac
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1> {
+public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_1, ServerboundPackets1_19_3, Protocol1_19_3To1_19_1> {
 
     private static final int MISC_CRAFTING_BOOK_CATEGORY = 0;
 
@@ -38,7 +38,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1>
 
     @Override
     public void registerPackets() {
-        final BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_19_1> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
         blockRewriter.registerBlockAction(ClientboundPackets1_19_1.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_19_1.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_1.MULTI_BLOCK_CHANGE);
@@ -57,7 +57,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19_3To1_19_1>
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_1.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_19_1.SPAWN_PARTICLE);
 
-        final RecipeRewriter1_16 recipeRewriter = new RecipeRewriter1_16(protocol);
+        final RecipeRewriter1_16<ClientboundPackets1_19_1> recipeRewriter = new RecipeRewriter1_16<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_19_1.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {

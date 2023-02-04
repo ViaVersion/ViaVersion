@@ -32,10 +32,10 @@ import com.viaversion.viaversion.api.type.Type;
  * Handles json chat components, containing methods to override certain parts of the handling.
  * Also contains methods to register a few of the packets using components.
  */
-public class ComponentRewriter {
-    protected final Protocol protocol;
+public class ComponentRewriter<C extends ClientboundPacketType> {
+    protected final Protocol<C, ?, ?, ?> protocol;
 
-    public ComponentRewriter(Protocol protocol) {
+    public ComponentRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
@@ -52,7 +52,7 @@ public class ComponentRewriter {
      *
      * @param packetType clientbound packet type
      */
-    public void registerComponentPacket(ClientboundPacketType packetType) {
+    public void registerComponentPacket(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -62,11 +62,11 @@ public class ComponentRewriter {
     }
 
     @Deprecated/*(forRemoval = true)**/
-    public void registerChatMessage(ClientboundPacketType packetType) {
+    public void registerChatMessage(C packetType) {
         registerComponentPacket(packetType);
     }
 
-    public void registerBossBar(ClientboundPacketType packetType) {
+    public void registerBossBar(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -85,7 +85,7 @@ public class ComponentRewriter {
     /**
      * Handles sub 1.17 combat event components.
      */
-    public void registerCombatEvent(ClientboundPacketType packetType) {
+    public void registerCombatEvent(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -103,7 +103,7 @@ public class ComponentRewriter {
     /**
      * Handles sub 1.17 title components.
      */
-    public void registerTitle(ClientboundPacketType packetType) {
+    public void registerTitle(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -198,7 +198,7 @@ public class ComponentRewriter {
         }
     }
 
-    public <T extends Protocol> T getProtocol() {
+    public <T extends Protocol<C, ?, ?, ?>> T getProtocol() {
         return (T) protocol;
     }
 }

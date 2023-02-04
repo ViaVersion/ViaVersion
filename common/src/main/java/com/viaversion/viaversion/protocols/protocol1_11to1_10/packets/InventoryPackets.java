@@ -28,7 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_11To1_10> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11To1_10> {
 
     public InventoryPackets(Protocol1_11To1_10 protocol) {
         super(protocol);

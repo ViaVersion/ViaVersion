@@ -50,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
 
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
             "  \"minecraft:chat_type\": {\n" +

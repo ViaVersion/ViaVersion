@@ -42,7 +42,7 @@ import java.util.UUID;
 public class WorldPackets {
 
     public static void register(Protocol1_16To1_15_2 protocol) {
-        BlockRewriter blockRewriter = new BlockRewriter(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_15> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_CHANGE);

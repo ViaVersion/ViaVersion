@@ -19,13 +19,14 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
 
-public class RecipeRewriter1_16 extends RecipeRewriter1_14 {
+public class RecipeRewriter1_16<C extends ClientboundPacketType> extends RecipeRewriter1_14<C> {
 
-    public RecipeRewriter1_16(Protocol protocol) {
+    public RecipeRewriter1_16(Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
         recipeHandlers.put("smithing", this::handleSmithing);
     }

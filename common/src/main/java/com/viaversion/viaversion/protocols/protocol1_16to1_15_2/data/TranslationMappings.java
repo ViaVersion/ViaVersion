@@ -20,16 +20,16 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class TranslationMappings extends ComponentRewriter {
+public class TranslationMappings extends ComponentRewriter<ClientboundPackets1_15> {
     private final Map<String, String> mappings = new HashMap<>();
 
-    public TranslationMappings(Protocol protocol) {
+    public TranslationMappings(Protocol1_16To1_15_2 protocol) {
         super(protocol);
         mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
         mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");

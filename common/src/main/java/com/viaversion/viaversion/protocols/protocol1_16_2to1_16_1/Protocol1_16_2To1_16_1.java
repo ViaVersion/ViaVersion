@@ -18,11 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
@@ -32,7 +31,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.Invent
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -40,9 +38,9 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1_16, ClientboundPackets1_16_2, ServerboundPackets1_16, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData();
-    private final EntityRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private TagRewriter tagRewriter;
+    private final MetadataRewriter1_16_2To1_16_1 metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private TagRewriter<ClientboundPackets1_16> tagRewriter;
 
     public Protocol1_16_2To1_16_1() {
         super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class);
@@ -56,12 +54,12 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter(this);
+        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_16.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16.STATISTICS);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this);
+        SoundRewriter<ClientboundPackets1_16> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
 
@@ -125,12 +123,12 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_16_2To1_16_1 getEntityRewriter() {
         return metadataRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

@@ -28,8 +28,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
@@ -48,7 +46,6 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-
 import java.util.UUID;
 
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
@@ -68,7 +65,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        final TagRewriter tagRewriter = new TagRewriter(this);
+        final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
 
         // Flint and steel was hardcoded before 1.19.3 to ignite a creeper; has been moved to a tag - adding this ensures offhand doesn't trigger as well
         tagRewriter.addTagRaw(RegistryType.ITEM, "minecraft:creeper_igniters", 733); // 733 = flint_and_steel 1.19.3
@@ -81,7 +78,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         entityRewriter.register();
         itemRewriter.register();
 
-        final SoundRewriter soundRewriter = new SoundRewriter(this);
+        final SoundRewriter<ClientboundPackets1_19_1> soundRewriter = new SoundRewriter<>(this);
         registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -117,9 +114,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_19_1.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);
 
-        final CommandRewriter commandRewriter = new CommandRewriter(this) {
+        final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<ClientboundPackets1_19_1>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 switch (argumentType) {
@@ -248,7 +245,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 create(Type.LONG, 0L);
                 handler(wrapper -> {
                     // Remove signature
-                    final byte[] signature = wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE);
+                    wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
                     wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES);
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 
@@ -315,12 +312,12 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public EntityPackets getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

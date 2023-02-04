@@ -28,7 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewri
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_13_1To1_13> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
     public InventoryPackets(Protocol1_13_1To1_13 protocol) {
         super(protocol);
@@ -77,7 +77,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13_1To1_13> {
 
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
-        RecipeRewriter recipeRewriter = new RecipeRewriter1_13_2(protocol);
+        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter1_13_2<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
             @Override
             public void registerMap() {

@@ -29,14 +29,15 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
+public abstract class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
+        T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
 
     protected ItemRewriter(T protocol) {
         super(protocol);
     }
 
     // These two methods always return the same item instance *for now*
-    // It is made this way so it's easy to handle new instance creation/implementation changes
+    // It is made this way, so it's easy to handle new instance creation/implementation changes
     @Override
     public @Nullable Item handleItemToClient(@Nullable Item item) {
         if (item == null) return null;
@@ -55,7 +56,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         return item;
     }
 
-    public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
+    public void registerWindowItems(C packetType, Type<Item[]> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -66,7 +67,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerWindowItems1_17_1(ClientboundPacketType packetType) {
+    public void registerWindowItems1_17_1(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -84,7 +85,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetSlot(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerSetSlot(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -96,7 +97,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetSlot1_17_1(ClientboundPacketType packetType) {
+    public void registerSetSlot1_17_1(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -110,7 +111,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // Sub 1.16
-    public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerEntityEquipment(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -124,7 +125,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // 1.16+
-    public void registerEntityEquipmentArray(ClientboundPacketType packetType) {
+    public void registerEntityEquipmentArray(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -142,7 +143,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerCreativeInvAction(ServerboundPacketType packetType, Type<Item> type) {
+    public void registerCreativeInvAction(S packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -154,7 +155,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow(ServerboundPacketType packetType, Type<Item> type) {
+    public void registerClickWindow(S packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -170,7 +171,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow1_17_1(ServerboundPacketType packetType) {
+    public void registerClickWindow1_17_1(S packetType) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -195,7 +196,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetCooldown(ClientboundPacketType packetType) {
+    public void registerSetCooldown(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -208,7 +209,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // 1.14.4+
-    public void registerTradeList(ClientboundPacketType packetType) {
+    public void registerTradeList(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -238,7 +239,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerTradeList1_19(ClientboundPacketType packetType) {
+    public void registerTradeList1_19(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -264,7 +265,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerAdvancements(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -304,7 +305,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerWindowPropertyEnchantmentHandler(ClientboundPacketType packetType) {
+    public void registerWindowPropertyEnchantmentHandler(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -322,7 +323,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // Not the very best place for this, but has to stay here until *everything* is abstracted
-    public void registerSpawnParticle(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
+    public void registerSpawnParticle(C packetType, Type<Item> itemType, Type<?> coordType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -341,7 +342,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSpawnParticle1_19(ClientboundPacketType packetType) {
+    public void registerSpawnParticle1_19(C packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {

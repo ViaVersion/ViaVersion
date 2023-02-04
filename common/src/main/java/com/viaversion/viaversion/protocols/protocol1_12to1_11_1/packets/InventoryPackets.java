@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_12To1_11_1> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_12, Protocol1_12To1_11_1> {
 
     public InventoryPackets(Protocol1_12To1_11_1 protocol) {
         super(protocol);
