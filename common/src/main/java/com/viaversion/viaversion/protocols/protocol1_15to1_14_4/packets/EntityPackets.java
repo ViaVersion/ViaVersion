@@ -110,7 +110,7 @@ public class EntityPackets {
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.DESTROY_ENTITIES);
     }
 
-    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter rewriter) throws Exception {
+    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter<?, ?> rewriter) throws Exception {
         // Meta is no longer included in the spawn packets, but sent separately
         List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
         if (metadata.isEmpty()) {

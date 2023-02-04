@@ -27,12 +27,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
@@ -46,13 +46,11 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class WorldPackets {
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_9To1_8 protocol) {
         protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -320,8 +318,7 @@ public class WorldPackets {
                         int hand = wrapper.read(Type.VAR_INT);
                         // Wipe the input buffer
                         wrapper.clearInputBuffer();
-                        // First set this packet ID to Block placement
-                        wrapper.setId(0x08);
+                        wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
                         wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
                         wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
                         // Write item in hand

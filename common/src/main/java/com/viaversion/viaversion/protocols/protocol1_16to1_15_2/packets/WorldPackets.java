@@ -26,6 +26,8 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
@@ -69,10 +71,14 @@ public class WorldPackets {
 
                     for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
-                        if (section == null) continue;
-                        for (int i = 0; i < section.getPaletteSize(); i++) {
-                            int old = section.getPaletteEntry(i);
-                            section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
+                        if (section == null) {
+                            continue;
+                        }
+
+                        DataPalette palette = section.palette(PaletteType.BLOCKS);
+                        for (int i = 0; i < palette.size(); i++) {
+                            int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                            palette.setIdByIndex(i, mappedBlockStateId);
                         }
                     }
 

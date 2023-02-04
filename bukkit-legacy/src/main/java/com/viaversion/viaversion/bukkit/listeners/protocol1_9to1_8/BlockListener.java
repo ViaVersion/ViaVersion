@@ -38,7 +38,7 @@ public class BlockListener extends ViaBukkitListener {
         if (isOnPipe(e.getPlayer())) {
             Block b = e.getBlockPlaced();
             EntityTracker1_9 tracker = getUserConnection(e.getPlayer()).getEntityTracker(Protocol1_9To1_8.class);
-            tracker.addBlockInteraction(new Position(b.getX(), (short) b.getY(), b.getZ()));
+            tracker.addBlockInteraction(new Position(b.getX(), b.getY(), b.getZ()));
         }
     }
 }

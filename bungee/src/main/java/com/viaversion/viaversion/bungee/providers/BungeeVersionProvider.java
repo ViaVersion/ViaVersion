@@ -80,9 +80,7 @@ public class BungeeVersionProvider extends BaseVersionProvider {
         try {
             list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
             return list.get(0);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         // Fallback

@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;

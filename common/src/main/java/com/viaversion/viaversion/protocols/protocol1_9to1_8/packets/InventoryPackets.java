@@ -34,7 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTra
 
 public class InventoryPackets {
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_9To1_8 protocol) {
         protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
 
             @Override

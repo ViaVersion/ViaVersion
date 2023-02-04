@@ -74,7 +74,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                         wrapper.clearInputBuffer();
 
                         //write data
-                        wrapper.setId(0x09); //Update block entity
+                        wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
                         wrapper.write(Type.POSITION, position); //Block location
                         wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
 

@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
@@ -81,13 +82,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         Short slots = wrapper.read(Type.UNSIGNED_BYTE);
 
                         if (type.equals("EntityHorse")) {
-                            wrapper.setId(0x1F);
+                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_HORSE_WINDOW);
                             int entityId = wrapper.read(Type.INT);
                             wrapper.write(Type.UNSIGNED_BYTE, windowId);
                             wrapper.write(Type.VAR_INT, slots.intValue());
                             wrapper.write(Type.INT, entityId);
                         } else {
-                            wrapper.setId(0x2E);
+                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_WINDOW);
                             wrapper.write(Type.VAR_INT, windowId.intValue());
 
                             int typeId = -1;
@@ -156,7 +157,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                     public void handle(PacketWrapper wrapper) throws Exception {
                         String channel = wrapper.get(Type.STRING, 0);
                         if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
-                            wrapper.setId(0x27);
+                            wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
                             wrapper.resetReader();
                             wrapper.read(Type.STRING); // Remove channel
 
@@ -192,7 +193,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
                             int hand = wrapper.read(Type.VAR_INT);
                             wrapper.clearPacket();
-                            wrapper.setId(0x2D);
+                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_BOOK);
                             wrapper.write(Type.VAR_INT, hand);
                         }
                     }

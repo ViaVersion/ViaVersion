@@ -19,23 +19,21 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
-import com.viaversion.viaversion.util.Pair;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {
     private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
 
-    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
+    private final Map<Long, SectionData> blockStorage = createLongObjectMap();
 
     static {
         try {
@@ -61,10 +59,10 @@ public class BlockConnectionStorage implements StorableObject {
 
         blockState = mapping;
         long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = getChunkSection(pair, (blockState & 0xF) != 0);
+        SectionData map = getChunkSection(pair, (blockState & 0xF) != 0);
         int blockIndex = encodeBlockPos(x, y, z);
-        map.key()[blockIndex] = (byte) (blockState >> 4);
-        NibbleArray nibbleArray = map.value();
+        map.blockIds()[blockIndex] = (byte) (blockState >> 4);
+        NibbleArray nibbleArray = map.nibbleArray();
         if (nibbleArray != null) {
             nibbleArray.set(blockIndex, blockState);
         }
@@ -72,22 +70,22 @@ public class BlockConnectionStorage implements StorableObject {
 
     public int get(int x, int y, int z) {
         long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = blockStorage.get(pair);
+        SectionData map = blockStorage.get(pair);
         if (map == null) return 0;
         short blockPosition = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.value();
+        NibbleArray nibbleArray = map.nibbleArray();
         return WorldPackets.toNewId(
-                ((map.key()[blockPosition] & 0xFF) << 4)
+                ((map.blockIds()[blockPosition] & 0xFF) << 4)
                         | (nibbleArray == null ? 0 : nibbleArray.get(blockPosition))
         );
     }
 
     public void remove(int x, int y, int z) {
         long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = blockStorage.get(pair);
+        SectionData map = blockStorage.get(pair);
         if (map == null) return;
         int blockIndex = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.value();
+        NibbleArray nibbleArray = map.nibbleArray();
         if (nibbleArray != null) {
             nibbleArray.set(blockIndex, 0);
             boolean allZero = true;
@@ -97,10 +95,10 @@ public class BlockConnectionStorage implements StorableObject {
                     break;
                 }
             }
-            if (allZero) map.setValue(null);
+            if (allZero) map.setNibbleArray(null);
         }
-        map.key()[blockIndex] = 0;
-        for (short entry : map.key()) {
+        map.blockIds()[blockIndex] = 0;
+        for (short entry : map.blockIds()) {
             if (entry != 0) return;
         }
         blockStorage.remove(pair);
@@ -111,7 +109,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     public void unloadChunk(int x, int z) {
-        for (int y = 0; y < 16; y ++) {
+        for (int y = 0; y < 16; y++) {
             unloadSection(x, y, z);
         }
     }
@@ -120,14 +118,14 @@ public class BlockConnectionStorage implements StorableObject {
         blockStorage.remove(getChunkSectionIndex(x << 4, y << 4, z << 4));
     }
 
-    private Pair<byte[], NibbleArray> getChunkSection(long index, boolean requireNibbleArray) {
-        Pair<byte[], NibbleArray> map = blockStorage.get(index);
+    private SectionData getChunkSection(long index, boolean requireNibbleArray) {
+        SectionData map = blockStorage.get(index);
         if (map == null) {
-            map = new Pair<>(new byte[4096], null);
+            map = new SectionData(new byte[4096]);
             blockStorage.put(index, map);
         }
-        if (map.value() == null && requireNibbleArray) {
-            map.setValue(new NibbleArray(4096));
+        if (map.nibbleArray() == null && requireNibbleArray) {
+            map.setNibbleArray(new NibbleArray(4096));
         }
         return map;
     }
@@ -136,16 +134,8 @@ public class BlockConnectionStorage implements StorableObject {
         return (((x >> 4) & 0x3FFFFFFL) << 38) | (((y >> 4) & 0xFFFL) << 26) | ((z >> 4) & 0x3FFFFFFL);
     }
 
-    private long getChunkSectionIndex(Position position) {
-        return getChunkSectionIndex(position.x(), position.y(), position.z());
-    }
-
     private short encodeBlockPos(int x, int y, int z) {
         return (short) (((y & 0xF) << 8) | ((x & 0xF) << 4) | (z & 0xF));
-    }
-
-    private short encodeBlockPos(Position pos) {
-        return encodeBlockPos(pos.x(), pos.y(), pos.z());
     }
 
     private <T> Map<Long, T> createLongObjectMap() {
@@ -157,5 +147,26 @@ public class BlockConnectionStorage implements StorableObject {
             }
         }
         return new HashMap<>();
+    }
+
+    private static final class SectionData {
+        private final byte[] blockIds;
+        private NibbleArray nibbleArray;
+
+        private SectionData(byte[] blockIds) {
+            this.blockIds = blockIds;
+        }
+
+        public byte[] blockIds() {
+            return blockIds;
+        }
+
+        public @Nullable NibbleArray nibbleArray() {
+            return nibbleArray;
+        }
+
+        public void setNibbleArray(@Nullable NibbleArray nibbleArray) {
+            this.nibbleArray = nibbleArray;
+        }
     }
 }

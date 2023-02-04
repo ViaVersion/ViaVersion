@@ -218,7 +218,7 @@ public class ConnectionData {
             blockConnectionData = new Int2ObjectOpenHashMap<>(1146, .99F);
             JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
             for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
-                int id = keyToId.get(entry.getKey());
+                int id = keyToId.getInt(entry.getKey());
                 BlockData blockData = new BlockData();
                 for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
                     String name = type.getKey();
@@ -242,7 +242,7 @@ public class ConnectionData {
         JsonObject blockData = MappingDataLoader.loadData("blockData.json");
         JsonArray occluding = blockData.getAsJsonArray("occluding");
         for (JsonElement jsonElement : occluding) {
-            occludingStates.add(keyToId.get(jsonElement.getAsString()).intValue());
+            occludingStates.add(keyToId.getInt(jsonElement.getAsString()));
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();

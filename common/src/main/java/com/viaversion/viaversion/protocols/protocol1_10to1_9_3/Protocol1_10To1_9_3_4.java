@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -201,7 +202,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
                             int replacementId = Via.getConfig().getPistonReplacementId();
                             for (ChunkSection section : chunk.getSections()) {
                                 if (section == null) continue;
-                                section.replacePaletteEntry(36, replacementId);
+                                section.palette(PaletteType.BLOCKS).replaceId(36, replacementId);
                             }
                         }
                     }

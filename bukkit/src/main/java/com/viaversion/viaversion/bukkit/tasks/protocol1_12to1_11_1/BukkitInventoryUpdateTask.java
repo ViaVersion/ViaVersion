@@ -36,7 +36,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
     public BukkitInventoryUpdateTask(BukkitInventoryQuickMoveProvider provider, UUID uuid) {
         this.provider = provider;
         this.uuid = uuid;
-        this.items = Collections.synchronizedList(new ArrayList<ItemTransaction>());
+        this.items = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void addItem(short windowId, short slotId, short actionId) {

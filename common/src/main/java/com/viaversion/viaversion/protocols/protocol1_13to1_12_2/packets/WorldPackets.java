@@ -76,7 +76,7 @@ public class WorldPackets {
         }
     }
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_13To1_12_2 protocol) {
         // Outgoing packets
         protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
             @Override
@@ -433,7 +433,7 @@ public class WorldPackets {
                                 replacementData.setReplacement(newId);
                             }
 
-                            chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
+                            chunk.getSections()[y >> 4].palette(PaletteType.BLOCKS).setIdAt(x & 0xF, y & 0xF, z & 0xF, newId);
                         }
 
                         final Tag idTag = tag.get("id");

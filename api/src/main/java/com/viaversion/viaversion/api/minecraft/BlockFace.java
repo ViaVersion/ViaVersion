@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public enum BlockFace {
@@ -33,9 +33,9 @@ public enum BlockFace {
     TOP((byte) 0, (byte) 1, (byte) 0, EnumAxis.Y),
     BOTTOM((byte) 0, (byte) -1, (byte) 0, EnumAxis.Y);
 
-    public static final BlockFace[] HORIZONTAL = new BlockFace[]{NORTH, SOUTH, EAST, WEST};
+    public static final BlockFace[] HORIZONTAL = {NORTH, SOUTH, EAST, WEST};
 
-    private static final Map<BlockFace, BlockFace> opposites = new HashMap<>();
+    private static final Map<BlockFace, BlockFace> opposites = new EnumMap<>(BlockFace.class);
 
     static {
         opposites.put(BlockFace.NORTH, BlockFace.SOUTH);

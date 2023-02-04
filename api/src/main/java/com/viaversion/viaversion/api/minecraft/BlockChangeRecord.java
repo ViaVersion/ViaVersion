@@ -54,10 +54,10 @@ public interface BlockChangeRecord {
     short getY(int chunkSectionY);
 
     /**
+     * Returns the absolute y coordinate - only works for sub 1.16 protocols.
+     *
      * @return absolute y coordinate
-     * @deprecated 1.16+ stores the relative y coordinate
      */
-    @Deprecated
     default short getY() {
         return getY(-1);
     }

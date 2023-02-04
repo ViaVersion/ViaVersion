@@ -111,8 +111,6 @@ public class UpdateUtil {
                 return null;
             }
             return statistics.get("name").getAsString();
-        } catch (MalformedURLException e) {
-            return null;
         } catch (IOException e) {
             return null;
         }

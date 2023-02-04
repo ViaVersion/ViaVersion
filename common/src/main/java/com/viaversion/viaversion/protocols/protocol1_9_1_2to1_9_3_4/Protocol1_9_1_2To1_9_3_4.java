@@ -61,7 +61,7 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
 
                             wrapper.clearPacket(); //Clear the packet
 
-                            wrapper.setId(ClientboundPackets1_9.UPDATE_SIGN.ordinal()); //Update sign packet
+                            wrapper.setPacketType(ClientboundPackets1_9.UPDATE_SIGN);
                             wrapper.write(Type.POSITION, position); // Position
                             for (int i = 1; i < 5; i++) {
                                 // Should technically be written as COMPONENT, but left as String for simplification/to remove redundant wrapping for VR

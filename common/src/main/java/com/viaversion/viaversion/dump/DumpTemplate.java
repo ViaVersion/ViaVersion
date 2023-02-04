@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.dump;
 
 import com.google.gson.JsonObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Collection;
 import java.util.Map;
 
 public class DumpTemplate {

@@ -89,7 +89,6 @@ public interface ViaManager {
      *
      * @return true if enabled
      */
-    @Deprecated
     default boolean isDebug() {
         return debugHandler().enabled();
     }

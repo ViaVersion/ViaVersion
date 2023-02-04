@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -33,7 +34,7 @@ public abstract class AbstractStempConnectionHandler extends ConnectionHandler {
     private final int baseStateId;
     private final Set<Integer> blockId = new HashSet<>();
 
-    private final Map<BlockFace, Integer> stemps = new HashMap<>();
+    private final Map<BlockFace, Integer> stemps = new EnumMap<>(BlockFace.class);
 
     protected AbstractStempConnectionHandler(String baseStateId) {
         this.baseStateId = ConnectionData.getId(baseStateId);

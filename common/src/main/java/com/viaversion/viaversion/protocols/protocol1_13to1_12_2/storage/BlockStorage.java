@@ -24,7 +24,6 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import space.vectrix.flare.SyncMap;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {

@@ -19,6 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -44,9 +46,14 @@ public class WorldPackets {
                         Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
 
                         for (ChunkSection section : chunk.getSections()) {
-                            if (section == null) continue;
-                            for (int i = 0; i < section.getPaletteSize(); i++) {
-                                section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(section.getPaletteEntry(i)));
+                            if (section == null) {
+                                continue;
+                            }
+
+                            DataPalette palette = section.palette(PaletteType.BLOCKS);
+                            for (int i = 0; i < palette.size(); i++) {
+                                int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                                palette.setIdByIndex(i, mappedBlockStateId);
                             }
                         }
                     }

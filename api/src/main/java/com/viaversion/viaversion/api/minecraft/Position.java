@@ -33,7 +33,7 @@ public class Position {
         this.z = z;
     }
 
-    @Deprecated/*(forRemoval=true)*/
+    // @Deprecated/*(forRemoval=true)*/ Just leave this unchecked
     public Position(int x, short y, int z) {
         this(x, (int) y, z);
     }

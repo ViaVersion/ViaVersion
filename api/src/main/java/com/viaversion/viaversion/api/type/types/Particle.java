@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.type.types;
 import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Particle {

@@ -21,6 +21,8 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_16_2;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -76,7 +78,7 @@ public final class WorldPackets {
                             throw new IllegalArgumentException("Invalid world border type received: " + type);
                     }
 
-                    wrapper.setId(packetType.getId());
+                    wrapper.setPacketType(packetType);
                 });
             }
         });
@@ -148,10 +150,14 @@ public final class WorldPackets {
 
                     for (int s = 0; s < chunk.getSections().length; s++) {
                         ChunkSection section = chunk.getSections()[s];
-                        if (section == null) continue;
-                        for (int i = 0; i < section.getPaletteSize(); i++) {
-                            int old = section.getPaletteEntry(i);
-                            section.setPaletteEntry(i, protocol.getMappingData().getNewBlockStateId(old));
+                        if (section == null) {
+                            continue;
+                        }
+
+                        DataPalette palette = section.palette(PaletteType.BLOCKS);
+                        for (int i = 0; i < palette.size(); i++) {
+                            int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                            palette.setIdByIndex(i, mappedBlockStateId);
                         }
                     }
                 });
@@ -176,11 +182,12 @@ public final class WorldPackets {
 
             //TODO this can be optimized
             BlockChangeRecord[] blockChangeRecords = new BlockChangeRecord[4096];
+            DataPalette palette = section.palette(PaletteType.BLOCKS);
             int j = 0;
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
-                        int blockStateId = Protocol1_17To1_16_4.MAPPINGS.getNewBlockStateId(section.getFlatBlock(x, y, z));
+                        int blockStateId = Protocol1_17To1_16_4.MAPPINGS.getNewBlockStateId(palette.idAt(x, y, z));
                         blockChangeRecords[j++] = new BlockChangeRecord1_16_2(x, y, z, blockStateId);
                     }
                 }

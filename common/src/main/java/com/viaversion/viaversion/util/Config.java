@@ -83,8 +83,6 @@ public abstract class Config implements ConfigurationProvider {
         if (location.exists()) {
             try (FileInputStream input = new FileInputStream(location)) {
                 config = (Map<String, Object>) YAML.get().load(input);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }

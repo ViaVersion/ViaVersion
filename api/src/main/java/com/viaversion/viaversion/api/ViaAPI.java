@@ -136,7 +136,7 @@ public interface ViaAPI<T> {
      * Returns the supported protocol versions.
      * This method removes any blocked protocol versions.
      *
-     * @return a list of protocol versions
+     * @return a sorted set of protocol versions
      * @see #getFullSupportedVersions() for a full list
      */
     SortedSet<Integer> getSupportedVersions();
@@ -144,7 +144,7 @@ public interface ViaAPI<T> {
     /**
      * Returns the supported protocol versions, including blocked protocols.
      *
-     * @return a list of protocol versions
+     * @return a sorted set of protocol versions
      */
     SortedSet<Integer> getFullSupportedVersions();
 

@@ -314,6 +314,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         } else {
             int mappedId = direction == Direction.CLIENTBOUND ? protocolPacket.getNewId() : protocolPacket.getOldId();
             if (unmappedId != mappedId) {
+                //noinspection deprecation
                 packetWrapper.setId(mappedId);
             }
         }

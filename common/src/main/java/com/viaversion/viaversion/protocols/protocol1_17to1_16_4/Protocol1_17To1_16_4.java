@@ -160,7 +160,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                             throw new IllegalArgumentException("Invalid title type received: " + type);
                     }
 
-                    wrapper.setId(packetType.getId());
+                    wrapper.setPacketType(packetType);
                 });
             }
         });

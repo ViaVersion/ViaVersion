@@ -155,7 +155,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                             throw new IllegalArgumentException("Invalid combat type received: " + type);
                     }
 
-                    wrapper.setId(packetType.getId());
+                    wrapper.setPacketType(packetType);
                 });
             }
         });

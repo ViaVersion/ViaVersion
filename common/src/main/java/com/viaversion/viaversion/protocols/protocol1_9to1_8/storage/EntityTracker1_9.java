@@ -152,7 +152,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        return blockInteractions.contains(new Position(x, (short) y, z));
+        return blockInteractions.contains(new Position(x, y, z));
     }
 
     public void addBlockInteraction(Position p) {

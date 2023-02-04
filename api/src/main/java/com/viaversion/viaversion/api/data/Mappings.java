@@ -85,7 +85,7 @@ public interface Mappings {
     int mappedSize();
 
     static <T extends Mappings> Builder<T> builder(final MappingsSupplier<T> supplier) {
-        return new Builder(supplier);
+        return new Builder<>(supplier);
     }
 
     @FunctionalInterface
