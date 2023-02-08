@@ -93,5 +93,6 @@ public interface ProtocolInfo {
      *
      * @return user connection
      */
+    @Deprecated/*(forRemoval = true)*/
     UserConnection getUser();
 }

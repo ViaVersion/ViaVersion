@@ -18,19 +18,20 @@
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
-import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.EntityPackets;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 
 public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPackets1_19_3, ClientboundPackets1_19_4, ServerboundPackets1_19_3, ServerboundPackets1_19_4> {
 
+    public static final MappingData MAPPINGS = new MappingData();
     private final EntityPackets entityRewriter = new EntityPackets(this);
 
     public Protocol1_19_4To1_19_3() {
@@ -39,6 +40,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
+        //TODO Damage events
         entityRewriter.register();
 
         final CommandRewriter<ClientboundPackets1_19_3> commandRewriter = new CommandRewriter<ClientboundPackets1_19_3>(this) {
@@ -51,22 +53,23 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-
-            @Override
-            protected String argumentType(final int argumentTypeId) {
-                return Protocol1_19_3To1_19_1.MAPPINGS.getArgumentTypeMappings().mappedIdentifier(argumentTypeId);
-            }
-
-            @Override
-            protected int mappedArgumentTypeId(final String mappedArgumentType) {
-                return Protocol1_19_3To1_19_1.MAPPINGS.getArgumentTypeMappings().mappedId(mappedArgumentType);
-            }
         };
         commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_3.DECLARE_COMMANDS);
     }
 
     @Override
+    protected void onMappingDataLoaded() {
+        Entity1_19_4Types.initialize(this);
+        entityRewriter.onMappingDataLoaded();
+    }
+
+    @Override
     public void init(final UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_3Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 }

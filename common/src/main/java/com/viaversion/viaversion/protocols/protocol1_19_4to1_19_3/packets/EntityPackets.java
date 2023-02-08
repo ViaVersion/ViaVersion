@@ -22,10 +22,12 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
+import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
@@ -55,6 +57,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 handler(worldDataTrackerHandlerByKey());
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
+                    registry.put("minecraft:damage_type", damageTypeRegistry);
+
                     final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
                     final ListTag biomes = biomeRegistry.get("value");
                     for (final Tag biomeTag : biomes) {
@@ -92,10 +97,72 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 handler(worldDataTrackerHandlerByKey());
             }
         });
+
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    final int entityId = wrapper.read(Type.INT);
+                    final byte event = wrapper.read(Type.BYTE);
+
+                    final int damageType = damageTypeFromEntityEvent(event);
+                    if (damageType != -1) {
+                        wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
+                        wrapper.write(Type.VAR_INT, entityId);
+                        wrapper.write(Type.VAR_INT, damageType);
+                        wrapper.write(Type.VAR_INT, 0); // No source entity
+                        wrapper.write(Type.VAR_INT, 0); // No direct source entity
+                        wrapper.write(Type.BOOLEAN, false); // No source position
+                        return;
+                    }
+
+                    wrapper.write(Type.INT, entityId);
+                    wrapper.write(Type.BYTE, event);
+                });
+            }
+        });
+
+        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, null);
+        registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
+        registerMetadataRewriter(ClientboundPackets1_19_3.ENTITY_METADATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
+    }
+
+    private int damageTypeFromEntityEvent(byte entityEvent) {
+        switch (entityEvent) {
+            case 33: // Thorned
+                return 36;
+            case 36: // Drowned
+                return 5;
+            case 37: // Burned
+                return 27;
+            case 57: // Frozen
+                return 15;
+            case 44: // Poked
+            case 2: // Generic hurt
+                return 16;
+        }
+        return -1;
+    }
+
+    @Override
+    protected void registerRewrites() {
+        filter().handler((event, meta) -> {
+            int id = meta.metaType().typeId();
+            if (id >= 14) { // Optional block state (and map block state=14 to optional block state)
+                id++;
+            }
+            meta.setMetaType(Types1_19_4.META_TYPES.byId(id));
+        });
+        filter().filterFamily(Entity1_19_4Types.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
     }
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_3Types.getTypeFromId(type);
+        return Entity1_19_4Types.getTypeFromId(type);
     }
 }

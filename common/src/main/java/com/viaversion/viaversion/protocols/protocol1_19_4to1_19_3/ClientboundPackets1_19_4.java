@@ -44,6 +44,7 @@ public enum ClientboundPackets1_19_4 implements ClientboundPacketType {
     COOLDOWN, // 0x14
     CUSTOM_CHAT_COMPLETIONS, // 0x15
     PLUGIN_MESSAGE, // 0x16
+    DAMAGE_EVENT,
     DELETE_CHAT_MESSAGE, // 0x17
     DISCONNECT, // 0x18
     DISGUISED_CHAT, // 0x19

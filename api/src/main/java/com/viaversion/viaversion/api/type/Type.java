@@ -31,7 +31,9 @@ import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
+import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -71,7 +73,9 @@ import com.viaversion.viaversion.api.type.types.minecraft.PlayerMessageSignature
 import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
 import com.viaversion.viaversion.api.type.types.minecraft.PositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.ProfileKeyType;
+import com.viaversion.viaversion.api.type.types.minecraft.QuaternionType;
 import com.viaversion.viaversion.api.type.types.minecraft.VarLongBlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.minecraft.Vector3fType;
 import com.viaversion.viaversion.api.type.types.minecraft.VectorType;
 import com.viaversion.viaversion.api.type.types.minecraft.VillagerDataType;
 
@@ -157,6 +161,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Position> OPTIONAL_POSITION_1_14 = new Position1_14Type.OptionalPosition1_14Type();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
+    public static final Type<Vector3f> VECTOR3F = new Vector3fType();
+    public static final Type<Quaternion> QUATERNION = new QuaternionType();
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
 
