@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +17,44 @@
  */
 package com.viaversion.viaversion.data.entity;
 
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+public final class TrackedEntityImpl implements TrackedEntity {
+    private final EntityType entityType;
+    private StoredEntityData data;
+    private boolean sentMetadata;
 
-public final class StoredEntityImpl implements StoredEntityData {
-    private final Map<Class<?>, Object> storedObjects = new ConcurrentHashMap<>();
-    private final EntityType type;
-
-    public StoredEntityImpl(EntityType type) {
-        this.type = type;
+    public TrackedEntityImpl(final EntityType entityType) {
+        this.entityType = entityType;
     }
 
     @Override
-    public EntityType type() {
-        return type;
+    public EntityType entityType() {
+        return entityType;
     }
 
     @Override
-    public @Nullable <T> T get(Class<T> objectClass) {
-        return (T) storedObjects.get(objectClass);
+    public StoredEntityData data() {
+        if (data == null) {
+            data = new StoredEntityDataImpl(entityType);
+        }
+        return data;
     }
 
     @Override
-    public <T> @Nullable T remove(Class<T> objectClass) {
-        return (T) storedObjects.remove(objectClass);
+    public boolean hasData() {
+        return data != null;
     }
 
     @Override
-    public boolean has(Class<?> objectClass) {
-        return storedObjects.containsKey(objectClass);
+    public boolean hasSentMetadata() {
+        return sentMetadata;
     }
 
     @Override
-    public void put(Object object) {
-        storedObjects.put(object.getClass(), object);
+    public void sentMetadata(final boolean sentMetadata) {
+        this.sentMetadata = sentMetadata;
     }
 }

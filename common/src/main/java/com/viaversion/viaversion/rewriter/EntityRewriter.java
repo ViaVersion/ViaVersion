@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
@@ -102,7 +103,8 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     @Override
     public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
-        EntityType type = tracker(connection).entityType(entityId);
+        final TrackedEntity entity = tracker(connection).entity(entityId);
+        final EntityType type = entity != null ? entity.entityType() : null;
         int i = 0; // Count index for fast removal
         for (Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             // Call handlers implementing the old handleMetadata
@@ -141,6 +143,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 metadataList.addAll(event.extraMeta());
             }
             i++;
+        }
+
+        if (entity != null) {
+            entity.sentMetadata(true);
         }
     }
 

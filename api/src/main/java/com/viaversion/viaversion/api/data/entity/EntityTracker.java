@@ -24,9 +24,8 @@ package com.viaversion.viaversion.api.data.entity;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface EntityTracker {
 
@@ -52,6 +51,14 @@ public interface EntityTracker {
      * @return whether the entity is tracked
      */
     boolean hasEntity(int id);
+
+    /**
+     * Returns the tracked entity for the given entity id if present.
+     *
+     * @param entityId entity id
+     * @return tracked entity if tracked
+     */
+    @Nullable TrackedEntity entity(int entityId);
 
     /**
      * Entity type of the entity if tracked.
