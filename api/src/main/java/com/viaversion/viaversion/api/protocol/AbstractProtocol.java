@@ -52,18 +52,18 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Abstract protocol class to handle packet transformation between two protocol versions.
  *
- * @param <C1> unmapped clientbound packet type
- * @param <C2> mapped clientbound packet type
- * @param <S1> mapped serverbound packet type
- * @param <S2> unmapped serverbound packet type
+ * @param <CU> unmapped clientbound packet type
+ * @param <CM> mapped clientbound packet type
+ * @param <SM> mapped serverbound packet type
+ * @param <SU> unmapped serverbound packet type
  */
-public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType,
-        S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> implements Protocol<C1, C2, S1, S2> {
-    protected final Class<C1> unmappedClientboundPacketType;
-    protected final Class<C2> mappedClientboundPacketType;
-    protected final Class<S1> mappedServerboundPacketType;
-    protected final Class<S2> unmappedServerboundPacketType;
-    private final PacketTypesProvider<C1, C2, S1, S2> packetTypesProvider;
+public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType,
+        SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
+    protected final Class<CU> unmappedClientboundPacketType;
+    protected final Class<CM> mappedClientboundPacketType;
+    protected final Class<SM> mappedServerboundPacketType;
+    protected final Class<SU> unmappedServerboundPacketType;
+    private final PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider;
     private final PacketMappings serverboundMappings = PacketMappings.arrayMappings();
     private final PacketMappings clientboundMappings = PacketMappings.arrayMappings();
     private final Map<Class<?>, Object> storedObjects = new HashMap<>();
@@ -76,8 +76,8 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     /**
      * Creates a protocol with automated id mapping if the respective packet type classes are not null.
      */
-    protected AbstractProtocol(@Nullable Class<C1> unmappedClientboundPacketType, @Nullable Class<C2> mappedClientboundPacketType,
-                               @Nullable Class<S1> mappedServerboundPacketType, @Nullable Class<S2> unmappedServerboundPacketType) {
+    protected AbstractProtocol(@Nullable Class<CU> unmappedClientboundPacketType, @Nullable Class<CM> mappedClientboundPacketType,
+                               @Nullable Class<SM> mappedServerboundPacketType, @Nullable Class<SU> unmappedServerboundPacketType) {
         this.unmappedClientboundPacketType = unmappedClientboundPacketType;
         this.mappedClientboundPacketType = mappedClientboundPacketType;
         this.mappedServerboundPacketType = mappedServerboundPacketType;
@@ -162,7 +162,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         connection.addEntityTracker(this.getClass(), tracker);
     }
 
-    protected PacketTypesProvider<C1, C2, S1, S2> createPacketTypesProvider() {
+    protected PacketTypesProvider<CU, CM, SM, SU> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
                 packetTypeMap(unmappedClientboundPacketType),
                 packetTypeMap(mappedClientboundPacketType),
@@ -217,36 +217,36 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     // ---------------------------------------------------------------------------------
 
     @Override
-    public void registerClientbound(C1 packetType, @Nullable PacketHandler handler) {
-        PacketTypeMap<C2> mappedPacketTypes = packetTypesProvider.mappedClientboundPacketTypes().get(packetType.state());
-        C2 mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedClientboundPacketType, mappedClientboundPacketType);
+    public void registerClientbound(CU packetType, @Nullable PacketHandler handler) {
+        PacketTypeMap<CM> mappedPacketTypes = packetTypesProvider.mappedClientboundPacketTypes().get(packetType.state());
+        CM mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedClientboundPacketType, mappedClientboundPacketType);
         registerClientbound(packetType, mappedPacketType, handler);
     }
 
     @Override
-    public void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketHandler handler, boolean override) {
+    public void registerClientbound(CU packetType, @Nullable CM mappedPacketType, @Nullable PacketHandler handler, boolean override) {
         register(clientboundMappings, packetType, mappedPacketType, unmappedClientboundPacketType, mappedClientboundPacketType, handler, override);
     }
 
     @Override
-    public void cancelClientbound(C1 packetType) {
+    public void cancelClientbound(CU packetType) {
         registerClientbound(packetType, null, PacketWrapper::cancel);
     }
 
     @Override
-    public void registerServerbound(S2 packetType, @Nullable PacketHandler handler) {
-        PacketTypeMap<S1> mappedPacketTypes = packetTypesProvider.mappedServerboundPacketTypes().get(packetType.state());
-        S1 mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedServerboundPacketType, mappedServerboundPacketType);
+    public void registerServerbound(SU packetType, @Nullable PacketHandler handler) {
+        PacketTypeMap<SM> mappedPacketTypes = packetTypesProvider.mappedServerboundPacketTypes().get(packetType.state());
+        SM mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedServerboundPacketType, mappedServerboundPacketType);
         registerServerbound(packetType, mappedPacketType, handler);
     }
 
     @Override
-    public void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketHandler handler, boolean override) {
+    public void registerServerbound(SU packetType, @Nullable SM mappedPacketType, @Nullable PacketHandler handler, boolean override) {
         register(serverboundMappings, packetType, mappedPacketType, unmappedServerboundPacketType, mappedServerboundPacketType, handler, override);
     }
 
     @Override
-    public void cancelServerbound(S2 packetType) {
+    public void cancelServerbound(SU packetType) {
         registerServerbound(packetType, null, PacketWrapper::cancel);
     }
 
@@ -350,13 +350,13 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         throw e;
     }
 
-    private @Nullable C1 unmappedClientboundPacketType(final State state, final int packetId) {
-        PacketTypeMap<C1> map = packetTypesProvider.unmappedClientboundPacketTypes().get(state);
+    private @Nullable CU unmappedClientboundPacketType(final State state, final int packetId) {
+        PacketTypeMap<CU> map = packetTypesProvider.unmappedClientboundPacketTypes().get(state);
         return map != null ? map.typeById(packetId) : null;
     }
 
-    private @Nullable S2 unmappedServerboundPacketType(final State state, final int packetId) {
-        PacketTypeMap<S2> map = packetTypesProvider.unmappedServerboundPacketTypes().get(state);
+    private @Nullable SU unmappedServerboundPacketType(final State state, final int packetId) {
+        PacketTypeMap<SU> map = packetTypesProvider.unmappedServerboundPacketTypes().get(state);
         return map != null ? map.typeById(packetId) : null;
     }
 
@@ -387,7 +387,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         storedObjects.put(object.getClass(), object);
     }
 
-    public PacketTypesProvider<C1, C2, S1, S2> packetTypesProvider() {
+    public PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider() {
         return packetTypesProvider;
     }
 

@@ -27,6 +27,15 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.Map;
 
+/**
+ * Provides unmapped and mapped packet types for a Protocol.
+ *
+ * @param <CU> unmapped clientbound packet type
+ * @param <CM> mapped clientbound packet type
+ * @param <SM> mapped serverbound packet type
+ * @param <SU> unmapped serverbound packet type
+ * @see SimplePacketTypesProvider
+ */
 public interface PacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
 
     /**
