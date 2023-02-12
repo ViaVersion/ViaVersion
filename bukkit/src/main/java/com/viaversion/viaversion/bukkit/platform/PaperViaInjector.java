@@ -19,10 +19,9 @@ package com.viaversion.viaversion.bukkit.platform;
 
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import io.netty.channel.Channel;
-import net.kyori.adventure.key.Key;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import net.kyori.adventure.key.Key;
 
 public final class PaperViaInjector {
     public static final boolean PAPER_INJECTION_METHOD = hasPaperInjectionMethod();

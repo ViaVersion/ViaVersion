@@ -21,7 +21,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-
 import java.util.UUID;
 
 public class VelocityCommandSender implements ViaCommandSender {

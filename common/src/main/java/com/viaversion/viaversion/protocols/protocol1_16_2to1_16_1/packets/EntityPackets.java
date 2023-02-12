@@ -67,14 +67,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    String dimensionType = wrapper.read(Type.STRING);
-                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
-                });
-            }
+        protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
+            String dimensionType = wrapper.read(Type.STRING);
+            wrapper.write(Type.NBT, getDimensionData(dimensionType));
         });
     }
 

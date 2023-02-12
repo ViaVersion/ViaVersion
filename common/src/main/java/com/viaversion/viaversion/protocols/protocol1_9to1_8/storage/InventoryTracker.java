@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-
 import java.util.HashMap;
 import java.util.Map;
 

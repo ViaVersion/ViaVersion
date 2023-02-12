@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_14;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
-
 import java.util.List;
 
 public final class Types1_16 {

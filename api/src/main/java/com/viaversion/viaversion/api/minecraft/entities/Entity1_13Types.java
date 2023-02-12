@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.minecraft.entities;
 
 import com.viaversion.viaversion.api.Via;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

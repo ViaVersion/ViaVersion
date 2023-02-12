@@ -25,12 +25,9 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -38,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TagRewriter<C extends ClientboundPacketType> {
     private static final int[] EMPTY_ARRAY = {};
@@ -136,12 +134,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
      * @param readUntilType read and process the types until (including) the given registry type
      */
     public void register(C packetType, @Nullable RegistryType readUntilType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(getHandler(readUntilType));
-            }
-        });
+        protocol.registerClientbound(packetType, getHandler(readUntilType));
     }
 
     /**
@@ -150,12 +143,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
      * @param packetType packet type
      */
     public void registerGeneric(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(getGenericHandler());
-            }
-        });
+        protocol.registerClientbound(packetType, getGenericHandler());
     }
 
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {

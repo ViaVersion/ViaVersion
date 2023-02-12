@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.data;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-
 import java.util.HashSet;
 import java.util.Set;
 

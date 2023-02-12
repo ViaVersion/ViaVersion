@@ -24,12 +24,11 @@ package us.myles.ViaVersion.api;
 
 import com.viaversion.viaversion.api.Via;
 import io.netty.buffer.ByteBuf;
+import java.util.SortedSet;
+import java.util.UUID;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
 import us.myles.ViaVersion.api.boss.BossStyle;
-
-import java.util.SortedSet;
-import java.util.UUID;
 
 /**
  * @deprecated may be removed at some point, use {@link Via#getAPI()}

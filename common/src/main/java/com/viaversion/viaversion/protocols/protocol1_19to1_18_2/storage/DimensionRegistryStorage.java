@@ -19,9 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class DimensionRegistryStorage implements StorableObject {
 

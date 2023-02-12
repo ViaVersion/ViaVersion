@@ -19,13 +19,12 @@ package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class BukkitInventoryUpdateTask implements Runnable {
 

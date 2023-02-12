@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_18to1_17_1;
 
 import com.viaversion.viaversion.api.Via;
-
 import java.util.Arrays;
 
 public final class BlockEntityIds {

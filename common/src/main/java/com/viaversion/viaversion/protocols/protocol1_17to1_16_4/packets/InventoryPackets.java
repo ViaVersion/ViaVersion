@@ -50,12 +50,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
 
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
-            }
-        });
+        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
 
         protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
             @Override
@@ -92,49 +87,39 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    short inventoryId = wrapper.read(Type.UNSIGNED_BYTE);
-                    short confirmationId = wrapper.read(Type.SHORT);
-                    boolean accepted = wrapper.read(Type.BOOLEAN);
-                    if (!accepted) {
-                        // Use the new ping packet to replace the removed acknowledgement, extra bit for fast dismissal
-                        int id = (1 << 30) | (inventoryId << 16) | (confirmationId & 0xFFFF);
-                        wrapper.user().get(InventoryAcknowledgements.class).addId(id);
+        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, wrapper -> {
+            short inventoryId = wrapper.read(Type.UNSIGNED_BYTE);
+            short confirmationId = wrapper.read(Type.SHORT);
+            boolean accepted = wrapper.read(Type.BOOLEAN);
+            if (!accepted) {
+                // Use the new ping packet to replace the removed acknowledgement, extra bit for fast dismissal
+                int id = (1 << 30) | (inventoryId << 16) | (confirmationId & 0xFFFF);
+                wrapper.user().get(InventoryAcknowledgements.class).addId(id);
 
-                        PacketWrapper pingPacket = wrapper.create(ClientboundPackets1_17.PING);
-                        pingPacket.write(Type.INT, id);
-                        pingPacket.send(Protocol1_17To1_16_4.class);
-                    }
-
-                    wrapper.cancel();
-                });
+                PacketWrapper pingPacket = wrapper.create(ClientboundPackets1_17.PING);
+                pingPacket.write(Type.INT, id);
+                pingPacket.send(Protocol1_17To1_16_4.class);
             }
+
+            wrapper.cancel();
         });
 
         // New pong packet
-        protocol.registerServerbound(ServerboundPackets1_17.PONG, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int id = wrapper.read(Type.INT);
-                    // Check extra bit for fast dismissal
-                    if ((id & (1 << 30)) != 0 && wrapper.user().get(InventoryAcknowledgements.class).removeId(id)) {
-                        // Decode our requested inventory acknowledgement
-                        short inventoryId = (short) ((id >> 16) & 0xFF);
-                        short confirmationId = (short) (id & 0xFFFF);
-                        PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
-                        packet.write(Type.UNSIGNED_BYTE, inventoryId);
-                        packet.write(Type.SHORT, confirmationId);
-                        packet.write(Type.BOOLEAN, true); // Accept
-                        packet.sendToServer(Protocol1_17To1_16_4.class);
-                    }
-
-                    wrapper.cancel();
-                });
+        protocol.registerServerbound(ServerboundPackets1_17.PONG, null, wrapper -> {
+            int id = wrapper.read(Type.INT);
+            // Check extra bit for fast dismissal
+            if ((id & (1 << 30)) != 0 && wrapper.user().get(InventoryAcknowledgements.class).removeId(id)) {
+                // Decode our requested inventory acknowledgement
+                short inventoryId = (short) ((id >> 16) & 0xFF);
+                short confirmationId = (short) (id & 0xFFFF);
+                PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
+                packet.write(Type.UNSIGNED_BYTE, inventoryId);
+                packet.write(Type.SHORT, confirmationId);
+                packet.write(Type.BOOLEAN, true); // Accept
+                packet.sendToServer(Protocol1_17To1_16_4.class);
             }
+
+            wrapper.cancel();
         });
     }
 }

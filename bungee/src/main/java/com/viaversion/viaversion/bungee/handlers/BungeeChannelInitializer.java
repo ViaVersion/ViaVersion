@@ -22,7 +22,6 @@ import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-
 import java.lang.reflect.Method;
 
 public class BungeeChannelInitializer extends ChannelInitializer<Channel> {

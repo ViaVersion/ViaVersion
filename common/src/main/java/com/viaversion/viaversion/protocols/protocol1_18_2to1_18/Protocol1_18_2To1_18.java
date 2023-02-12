@@ -80,12 +80,7 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> addTagPrefix(wrapper.passthrough(Type.NBT)));
-            }
-        });
+        registerClientbound(ClientboundPackets1_18.RESPAWN, wrapper -> addTagPrefix(wrapper.passthrough(Type.NBT)));
     }
 
     private void addTagPrefix(CompoundTag tag) {

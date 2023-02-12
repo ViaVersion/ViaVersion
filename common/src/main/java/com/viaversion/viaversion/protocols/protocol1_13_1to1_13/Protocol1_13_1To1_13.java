@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
@@ -81,13 +80,10 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     Item item = wrapper.get(Type.FLAT_ITEM, 0);
                     itemRewriter.handleItemToServer(item);
                 });
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int hand = wrapper.read(Type.VAR_INT);
-                        if (hand == 1) {
-                            wrapper.cancel();
-                        }
+                handler(wrapper -> {
+                    int hand = wrapper.read(Type.VAR_INT);
+                    if (hand == 1) {
+                        wrapper.cancel();
                     }
                 });
             }
@@ -100,19 +96,16 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 map(Type.VAR_INT); // Start
                 map(Type.VAR_INT); // Length
                 map(Type.VAR_INT); // Count
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int start = wrapper.get(Type.VAR_INT, 1);
-                        wrapper.set(Type.VAR_INT, 1, start + 1); // Offset by +1 to take into account / at beginning
-                        // Passthrough suggestions
-                        int count = wrapper.get(Type.VAR_INT, 3);
-                        for (int i = 0; i < count; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            boolean hasTooltip = wrapper.passthrough(Type.BOOLEAN);
-                            if (hasTooltip) {
-                                wrapper.passthrough(Type.STRING); // JSON Tooltip
-                            }
+                handler(wrapper -> {
+                    int start = wrapper.get(Type.VAR_INT, 1);
+                    wrapper.set(Type.VAR_INT, 1, start + 1); // Offset by +1 to take into account / at beginning
+                    // Passthrough suggestions
+                    int count = wrapper.get(Type.VAR_INT, 3);
+                    for (int i = 0; i < count; i++) {
+                        wrapper.passthrough(Type.STRING);
+                        boolean hasTooltip = wrapper.passthrough(Type.BOOLEAN);
+                        if (hasTooltip) {
+                            wrapper.passthrough(Type.STRING); // JSON Tooltip
                         }
                     }
                 });
@@ -124,19 +117,16 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             public void register() {
                 map(Type.UUID);
                 map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.VAR_INT, 0);
-                        if (action == 0) {
-                            wrapper.passthrough(Type.COMPONENT);
-                            wrapper.passthrough(Type.FLOAT);
-                            wrapper.passthrough(Type.VAR_INT);
-                            wrapper.passthrough(Type.VAR_INT);
-                            short flags = wrapper.read(Type.BYTE);
-                            if ((flags & 0x02) != 0) flags |= 0x04;
-                            wrapper.write(Type.UNSIGNED_BYTE, flags);
-                        }
+                handler(wrapper -> {
+                    int action = wrapper.get(Type.VAR_INT, 0);
+                    if (action == 0) {
+                        wrapper.passthrough(Type.COMPONENT);
+                        wrapper.passthrough(Type.FLOAT);
+                        wrapper.passthrough(Type.VAR_INT);
+                        wrapper.passthrough(Type.VAR_INT);
+                        short flags = wrapper.read(Type.BYTE);
+                        if ((flags & 0x02) != 0) flags |= 0x04;
+                        wrapper.write(Type.UNSIGNED_BYTE, flags);
                     }
                 });
             }

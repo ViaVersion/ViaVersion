@@ -30,8 +30,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
@@ -97,61 +95,45 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (!Via.getConfig().is1_12NBTArrayFix()) return;
-                        try {
-                            JsonElement obj = Protocol1_9To1_8.FIX_JSON.transform(null, wrapper.passthrough(Type.COMPONENT).toString());
-                            TranslateRewriter.toClient(obj, wrapper.user());
-                            ChatItemRewriter.toClient(obj, wrapper.user());
-                            wrapper.set(Type.COMPONENT, 0, obj);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, wrapper -> {
+            if (!Via.getConfig().is1_12NBTArrayFix()) return;
+            try {
+                JsonElement obj = Protocol1_9To1_8.FIX_JSON.transform(null, wrapper.passthrough(Type.COMPONENT).toString());
+                TranslateRewriter.toClient(obj, wrapper.user());
+                ChatItemRewriter.toClient(obj, wrapper.user());
+                wrapper.set(Type.COMPONENT, 0, obj);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-                        Chunk chunk = wrapper.passthrough(type);
+            Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
+            Chunk chunk = wrapper.passthrough(type);
 
-                        for (int s = 0; s < chunk.getSections().length; s++) {
-                            ChunkSection section = chunk.getSections()[s];
-                            if (section == null) continue;
-                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+            for (int s = 0; s < chunk.getSections().length; s++) {
+                ChunkSection section = chunk.getSections()[s];
+                if (section == null) continue;
+                DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                                int id = blocks.idAt(idx) >> 4;
-                                // Is this a bed?
-                                if (id != 26) continue;
+                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                    int id = blocks.idAt(idx) >> 4;
+                    // Is this a bed?
+                    if (id != 26) continue;
 
-                                //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
-                                CompoundTag tag = new CompoundTag();
-                                tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
-                                tag.put("x", new IntTag(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4)));
-                                tag.put("y", new IntTag(ChunkSection.yFromIndex(idx) + (s << 4)));
-                                tag.put("z", new IntTag(ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
-                                tag.put("id", new StringTag("minecraft:bed"));
+                    //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
+                    CompoundTag tag = new CompoundTag();
+                    tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
+                    tag.put("x", new IntTag(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4)));
+                    tag.put("y", new IntTag(ChunkSection.yFromIndex(idx) + (s << 4)));
+                    tag.put("z", new IntTag(ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
+                    tag.put("id", new StringTag("minecraft:bed"));
 
-                                // Add a fake block entity
-                                chunk.getBlockEntities().add(tag);
-                            }
-                        }
-                    }
-                });
+                    // Add a fake block entity
+                    chunk.getBlockEntities().add(tag);
+                }
             }
         });
 
@@ -206,22 +188,19 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 map(Type.BOOLEAN); // 3 - chat colors
                 map(Type.UNSIGNED_BYTE); // 4 - chat flags
                 map(Type.VAR_INT); // 5 - main hand
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // As part of the fix for MC-111054, the max length of
-                        // the locale was raised to 16 (from 7), and the client
-                        // now makes sure that resource packs have names in that
-                        // length.  However, for older servers, it is still 7,
-                        // and thus the server will reject it (and the client
-                        // won't know that the pack's invalid).
-                        // The fix is to just silently lower the length.  The
-                        // server doesn't actually use the locale anywhere, so
-                        // this is fine.
-                        String locale = wrapper.get(Type.STRING, 0);
-                        if (locale.length() > 7) {
-                            wrapper.set(Type.STRING, 0, locale.substring(0, 7));
-                        }
+                handler(wrapper -> {
+                    // As part of the fix for MC-111054, the max length of
+                    // the locale was raised to 16 (from 7), and the client
+                    // now makes sure that resource packs have names in that
+                    // length.  However, for older servers, it is still 7,
+                    // and thus the server will reject it (and the client
+                    // won't know that the pack's invalid).
+                    // The fix is to just silently lower the length.  The
+                    // server doesn't actually use the locale anywhere, so
+                    // this is fine.
+                    String locale = wrapper.get(Type.STRING, 0);
+                    if (locale.length() > 7) {
+                        wrapper.set(Type.STRING, 0, locale.substring(0, 7));
                     }
                 });
             }

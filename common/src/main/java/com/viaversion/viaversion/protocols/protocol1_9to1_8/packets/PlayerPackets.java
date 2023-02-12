@@ -21,8 +21,6 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -311,13 +309,10 @@ public class PlayerPackets {
                 map(Type.STRING); // 3 - Level Type
 
                 // Track player's dimension
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
                 });
 
                 handler(wrapper -> {
@@ -358,16 +353,11 @@ public class PlayerPackets {
         });
 
         /* Removed packets */
-        protocol.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    CompressionProvider provider = Via.getManager().getProviders().get(CompressionProvider.class);
+        protocol.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, wrapper -> {
+            wrapper.cancel();
+            CompressionProvider provider = Via.getManager().getProviders().get(CompressionProvider.class);
 
-                    provider.handlePlayCompression(wrapper.user(), wrapper.read(Type.VAR_INT));
-                });
-            }
+            provider.handlePlayCompression(wrapper.user(), wrapper.read(Type.VAR_INT));
         });
 
 

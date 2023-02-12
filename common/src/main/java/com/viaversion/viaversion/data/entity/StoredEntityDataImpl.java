@@ -19,10 +19,9 @@ package com.viaversion.viaversion.data.entity;
 
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class StoredEntityDataImpl implements StoredEntityData {
     private final Map<Class<?>, Object> storedObjects = new ConcurrentHashMap<>();

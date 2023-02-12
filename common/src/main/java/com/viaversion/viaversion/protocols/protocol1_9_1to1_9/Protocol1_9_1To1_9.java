@@ -18,8 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_9_1to1_9;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
@@ -54,14 +52,11 @@ public class Protocol1_9_1To1_9 extends AbstractProtocol<ClientboundPackets1_9, 
             public void register() {
                 map(Type.VAR_INT); // 0 - Sound ID
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int sound = wrapper.get(Type.VAR_INT, 0);
+                handler(wrapper -> {
+                    int sound = wrapper.get(Type.VAR_INT, 0);
 
-                        if (sound >= 415) // Add 1 to every sound id since there is no Elytra sound on a 1.9 server
-                            wrapper.set(Type.VAR_INT, 0, sound + 1);
-                    }
+                    if (sound >= 415) // Add 1 to every sound id since there is no Elytra sound on a 1.9 server
+                        wrapper.set(Type.VAR_INT, 0, sound + 1);
                 });
             }
         });

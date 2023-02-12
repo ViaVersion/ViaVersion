@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-
 import java.util.Set;
 
 public class ClientChunks extends StoredObject {

@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
@@ -40,34 +39,24 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_16, Serve
         registerEntityEquipmentArray(ClientboundPackets1_16.ENTITY_EQUIPMENT);
         registerAdvancements(ClientboundPackets1_16.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.BOOLEAN); // Open
-                    wrapper.passthrough(Type.BOOLEAN); // Filter
-                    wrapper.passthrough(Type.BOOLEAN); // Furnace
-                    wrapper.passthrough(Type.BOOLEAN); // Filter furnace
-                    // Blast furnace / smoker
-                    wrapper.write(Type.BOOLEAN, false);
-                    wrapper.write(Type.BOOLEAN, false);
-                    wrapper.write(Type.BOOLEAN, false);
-                    wrapper.write(Type.BOOLEAN, false);
-                });
-            }
+        protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Type.BOOLEAN); // Open
+            wrapper.passthrough(Type.BOOLEAN); // Filter
+            wrapper.passthrough(Type.BOOLEAN); // Furnace
+            wrapper.passthrough(Type.BOOLEAN); // Filter furnace
+            // Blast furnace / smoker
+            wrapper.write(Type.BOOLEAN, false);
+            wrapper.write(Type.BOOLEAN, false);
+            wrapper.write(Type.BOOLEAN, false);
+            wrapper.write(Type.BOOLEAN, false);
         });
 
         new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_16.DECLARE_RECIPES);
 
         registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
-        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
-            }
-        });
+        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
 
         registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }

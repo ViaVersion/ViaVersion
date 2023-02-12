@@ -158,4 +158,8 @@ public abstract class PacketHandlers implements PacketHandler {
             handler.handle(wrapper);
         }
     }
+
+    public int handlersSize() {
+        return packetHandlers.size();
+    }
 }

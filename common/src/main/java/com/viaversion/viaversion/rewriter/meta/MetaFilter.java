@@ -22,9 +22,8 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MetaFilter {
     private final MetaHandler handler;

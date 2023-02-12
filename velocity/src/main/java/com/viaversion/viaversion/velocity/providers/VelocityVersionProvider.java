@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
 import com.viaversion.viaversion.velocity.platform.VelocityViaInjector;
 import io.netty.channel.ChannelHandler;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.IntStream;

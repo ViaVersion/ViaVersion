@@ -19,12 +19,11 @@ package com.viaversion.viaversion.bukkit.platform;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-import org.bukkit.plugin.Plugin;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.plugin.Plugin;
 
 public class BukkitViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");

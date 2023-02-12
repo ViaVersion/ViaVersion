@@ -24,9 +24,8 @@ package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Arrays;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IntArrayMappings implements Mappings {
     private final int[] oldToNew;

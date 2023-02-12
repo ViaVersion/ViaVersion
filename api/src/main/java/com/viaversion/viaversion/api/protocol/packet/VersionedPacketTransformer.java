@@ -24,9 +24,8 @@ package com.viaversion.viaversion.api.protocol.packet;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utility to send packets from a given base version to or from any client version supported by Via.

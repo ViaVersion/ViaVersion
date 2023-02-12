@@ -23,16 +23,15 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.handlers.BukkitEncodeHandler;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import io.netty.channel.Channel;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
 
 public class JoinListener implements Listener {
 
@@ -79,7 +78,7 @@ public class JoinListener implements Listener {
 
         Channel channel;
         try {
-          channel = getChannel(player);
+            channel = getChannel(player);
         } catch (Exception ex) {
             Via.getPlatform().getLogger().log(Level.WARNING, ex,
                     () -> "Could not find Channel for logging-in player " + player.getUniqueId());

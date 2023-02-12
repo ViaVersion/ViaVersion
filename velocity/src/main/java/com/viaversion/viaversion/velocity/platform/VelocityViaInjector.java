@@ -27,7 +27,6 @@ import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 

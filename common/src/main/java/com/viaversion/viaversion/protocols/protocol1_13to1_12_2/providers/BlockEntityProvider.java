@@ -33,7 +33,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blocke
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities.FlowerPotHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities.SkullHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities.SpawnerHandler;
-
 import java.util.HashMap;
 import java.util.Map;
 

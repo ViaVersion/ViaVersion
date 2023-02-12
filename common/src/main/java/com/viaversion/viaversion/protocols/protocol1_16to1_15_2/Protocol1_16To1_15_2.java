@@ -77,54 +77,44 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
-        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Transform string to a uuid
-                    UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
-                    wrapper.write(Type.UUID, uuid);
-                });
-            }
+        registerClientbound(State.LOGIN, 0x02, 0x02, wrapper -> {
+            // Transform string to a uuid
+            UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
+            wrapper.write(Type.UUID, uuid);
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
-        registerClientbound(State.STATUS, 0x00, 0x00, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    String original = wrapper.passthrough(Type.STRING);
-                    JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
-                    JsonObject players = object.getAsJsonObject("players");
-                    if (players == null) return;
+        registerClientbound(State.STATUS, 0x00, 0x00, wrapper -> {
+            String original = wrapper.passthrough(Type.STRING);
+            JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
+            JsonObject players = object.getAsJsonObject("players");
+            if (players == null) return;
 
-                    JsonArray sample = players.getAsJsonArray("sample");
-                    if (sample == null) return;
+            JsonArray sample = players.getAsJsonArray("sample");
+            if (sample == null) return;
 
-                    JsonArray splitSamples = new JsonArray();
-                    for (JsonElement element : sample) {
-                        JsonObject playerInfo = element.getAsJsonObject();
-                        String name = playerInfo.getAsJsonPrimitive("name").getAsString();
-                        if (name.indexOf('\n') == -1) {
-                            splitSamples.add(playerInfo);
-                            continue;
-                        }
+            JsonArray splitSamples = new JsonArray();
+            for (JsonElement element : sample) {
+                JsonObject playerInfo = element.getAsJsonObject();
+                String name = playerInfo.getAsJsonPrimitive("name").getAsString();
+                if (name.indexOf('\n') == -1) {
+                    splitSamples.add(playerInfo);
+                    continue;
+                }
 
-                        String id = playerInfo.getAsJsonPrimitive("id").getAsString();
-                        for (String s : name.split("\n")) {
-                            JsonObject newSample = new JsonObject();
-                            newSample.addProperty("name", s);
-                            newSample.addProperty("id", id);
-                            splitSamples.add(newSample);
-                        }
-                    }
+                String id = playerInfo.getAsJsonPrimitive("id").getAsString();
+                for (String s : name.split("\n")) {
+                    JsonObject newSample = new JsonObject();
+                    newSample.addProperty("name", s);
+                    newSample.addProperty("id", id);
+                    splitSamples.add(newSample);
+                }
+            }
 
-                    // Replace data if changed
-                    if (splitSamples.size() != sample.size()) {
-                        players.add("sample", splitSamples);
-                        wrapper.set(Type.STRING, 0, object.toString());
-                    }
-                });
+            // Replace data if changed
+            if (splitSamples.size() != sample.size()) {
+                players.add("sample", splitSamples);
+                wrapper.set(Type.STRING, 0, object.toString());
             }
         });
 
@@ -148,27 +138,22 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
 
-        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT); // Entity Id
-                    int action = wrapper.passthrough(Type.VAR_INT);
-                    if (action == 0 || action == 2) {
-                        if (action == 2) {
-                            // Location
-                            wrapper.passthrough(Type.FLOAT);
-                            wrapper.passthrough(Type.FLOAT);
-                            wrapper.passthrough(Type.FLOAT);
-                        }
+        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Entity Id
+            int action = wrapper.passthrough(Type.VAR_INT);
+            if (action == 0 || action == 2) {
+                if (action == 2) {
+                    // Location
+                    wrapper.passthrough(Type.FLOAT);
+                    wrapper.passthrough(Type.FLOAT);
+                    wrapper.passthrough(Type.FLOAT);
+                }
 
-                        wrapper.passthrough(Type.VAR_INT); // Hand
-                    }
-
-                    // New boolean: Whether the client is sneaking/pressing shift
-                    wrapper.read(Type.BOOLEAN);
-                });
+                wrapper.passthrough(Type.VAR_INT); // Hand
             }
+
+            // New boolean: Whether the client is sneaking/pressing shift
+            wrapper.read(Type.BOOLEAN);
         });
 
         if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
@@ -209,16 +194,11 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             });
         }
 
-        registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.BYTE);
-                    // Flying and walking speed - not important anyways
-                    wrapper.write(Type.FLOAT, 0.05F);
-                    wrapper.write(Type.FLOAT, 0.1F);
-                });
-            }
+        registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, wrapper -> {
+            wrapper.passthrough(Type.BYTE);
+            // Flying and walking speed - not important anyways
+            wrapper.write(Type.FLOAT, 0.05F);
+            wrapper.write(Type.FLOAT, 0.1F);
         });
 
         cancelServerbound(ServerboundPackets1_16.GENERATE_JIGSAW);

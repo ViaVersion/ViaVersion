@@ -29,12 +29,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import net.md_5.bungee.api.ProxyServer;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeViaInjector implements ViaInjector {
 

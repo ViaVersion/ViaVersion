@@ -24,8 +24,6 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -51,36 +49,28 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.EDIT_BOOK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                        protocol.getItemRewriter().handleItemToServer(item);
+        protocol.registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> {
+            Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+            protocol.getItemRewriter().handleItemToServer(item);
 
-                        if (item == null) return;
+            if (item == null) return;
 
-                        CompoundTag tag = item.tag();
-                        if (tag == null) return;
+            CompoundTag tag = item.tag();
+            if (tag == null) return;
 
-                        Tag pages = tag.get("pages");
+            Tag pages = tag.get("pages");
 
-                        // Fix for https://github.com/ViaVersion/ViaVersion/issues/2660
-                        if (pages == null) {
-                            tag.put("pages", new ListTag(Collections.singletonList(new StringTag())));
-                        }
+            // Fix for https://github.com/ViaVersion/ViaVersion/issues/2660
+            if (pages == null) {
+                tag.put("pages", new ListTag(Collections.singletonList(new StringTag())));
+            }
 
-                        // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
-                        if (Via.getConfig().isTruncate1_14Books() && pages instanceof ListTag) {
-                            ListTag listTag = (ListTag) pages;
-                            if (listTag.size() > 50) {
-                                listTag.setValue(listTag.getValue().subList(0, 50));
-                            }
-                        }
-                    }
-                });
+            // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
+            if (Via.getConfig().isTruncate1_14Books() && pages instanceof ListTag) {
+                ListTag listTag = (ListTag) pages;
+                if (listTag.size() > 50) {
+                    listTag.setValue(listTag.getValue().subList(0, 50));
+                }
             }
         });
 
@@ -96,24 +86,21 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int type = wrapper.get(Type.VAR_INT, 0);
-                        if (type == 0) {
-                            wrapper.passthrough(Type.STRING);
-                        } else if (type == 1) {
-                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
-                            wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
-                            wrapper.passthrough(Type.BOOLEAN); // Smelting Recipe Book Open
-                            wrapper.passthrough(Type.BOOLEAN); // Smelting Recipe Filter Active
+                handler(wrapper -> {
+                    int type = wrapper.get(Type.VAR_INT, 0);
+                    if (type == 0) {
+                        wrapper.passthrough(Type.STRING);
+                    } else if (type == 1) {
+                        wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
+                        wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
+                        wrapper.passthrough(Type.BOOLEAN); // Smelting Recipe Book Open
+                        wrapper.passthrough(Type.BOOLEAN); // Smelting Recipe Filter Active
 
-                            // Unknown new booleans
-                            wrapper.read(Type.BOOLEAN);
-                            wrapper.read(Type.BOOLEAN);
-                            wrapper.read(Type.BOOLEAN);
-                            wrapper.read(Type.BOOLEAN);
-                        }
+                        // Unknown new booleans
+                        wrapper.read(Type.BOOLEAN);
+                        wrapper.read(Type.BOOLEAN);
+                        wrapper.read(Type.BOOLEAN);
+                        wrapper.read(Type.BOOLEAN);
                     }
                 });
             }
@@ -138,29 +125,21 @@ public class PlayerPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int hand = wrapper.read(Type.VAR_INT);
-                        Position position = wrapper.read(Type.POSITION1_14);
-                        int face = wrapper.read(Type.VAR_INT);
-                        float x = wrapper.read(Type.FLOAT);
-                        float y = wrapper.read(Type.FLOAT);
-                        float z = wrapper.read(Type.FLOAT);
-                        wrapper.read(Type.BOOLEAN);  // new unknown boolean
+        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+            int hand = wrapper.read(Type.VAR_INT);
+            Position position = wrapper.read(Type.POSITION1_14);
+            int face = wrapper.read(Type.VAR_INT);
+            float x = wrapper.read(Type.FLOAT);
+            float y = wrapper.read(Type.FLOAT);
+            float z = wrapper.read(Type.FLOAT);
+            wrapper.read(Type.BOOLEAN);  // new unknown boolean
 
-                        wrapper.write(Type.POSITION, position);
-                        wrapper.write(Type.VAR_INT, face);
-                        wrapper.write(Type.VAR_INT, hand);
-                        wrapper.write(Type.FLOAT, x);
-                        wrapper.write(Type.FLOAT, y);
-                        wrapper.write(Type.FLOAT, z);
-                    }
-                });
-            }
+            wrapper.write(Type.POSITION, position);
+            wrapper.write(Type.VAR_INT, face);
+            wrapper.write(Type.VAR_INT, hand);
+            wrapper.write(Type.FLOAT, x);
+            wrapper.write(Type.FLOAT, y);
+            wrapper.write(Type.FLOAT, z);
         });
     }
 }

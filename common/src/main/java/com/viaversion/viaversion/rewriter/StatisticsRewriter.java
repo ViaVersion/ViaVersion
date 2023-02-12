@@ -20,7 +20,6 @@ package com.viaversion.viaversion.rewriter;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,42 +32,37 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
     }
 
     public void register(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    int newSize = size;
-                    for (int i = 0; i < size; i++) {
-                        int categoryId = wrapper.read(Type.VAR_INT);
-                        int statisticId = wrapper.read(Type.VAR_INT);
-                        int value = wrapper.read(Type.VAR_INT);
-                        if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
-                            // Rewrite custom statistics id
-                            statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
-                            if (statisticId == -1) {
-                                // Remove entry
-                                newSize--;
-                                continue;
-                            }
-                        } else {
-                            // Rewrite the block/item/entity id
-                            RegistryType type = getRegistryTypeForStatistic(categoryId);
-                            IdRewriteFunction statisticsRewriter;
-                            if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
-                                statisticId = statisticsRewriter.rewrite(statisticId);
-                            }
-                        }
-
-                        wrapper.write(Type.VAR_INT, categoryId);
-                        wrapper.write(Type.VAR_INT, statisticId);
-                        wrapper.write(Type.VAR_INT, value);
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            int newSize = size;
+            for (int i = 0; i < size; i++) {
+                int categoryId = wrapper.read(Type.VAR_INT);
+                int statisticId = wrapper.read(Type.VAR_INT);
+                int value = wrapper.read(Type.VAR_INT);
+                if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
+                    // Rewrite custom statistics id
+                    statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
+                    if (statisticId == -1) {
+                        // Remove entry
+                        newSize--;
+                        continue;
                     }
-
-                    if (newSize != size) {
-                        wrapper.set(Type.VAR_INT, 0, newSize);
+                } else {
+                    // Rewrite the block/item/entity id
+                    RegistryType type = getRegistryTypeForStatistic(categoryId);
+                    IdRewriteFunction statisticsRewriter;
+                    if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
+                        statisticId = statisticsRewriter.rewrite(statisticId);
                     }
-                });
+                }
+
+                wrapper.write(Type.VAR_INT, categoryId);
+                wrapper.write(Type.VAR_INT, statisticId);
+                wrapper.write(Type.VAR_INT, value);
+            }
+
+            if (newSize != size) {
+                wrapper.set(Type.VAR_INT, 0, newSize);
             }
         });
     }

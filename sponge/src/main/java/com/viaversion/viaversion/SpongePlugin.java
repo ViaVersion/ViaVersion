@@ -35,6 +35,14 @@ import com.viaversion.viaversion.sponge.platform.SpongeViaLoader;
 import com.viaversion.viaversion.sponge.platform.SpongeViaTask;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import com.viaversion.viaversion.util.GsonUtil;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
@@ -54,15 +62,6 @@ import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 import org.spongepowered.plugin.metadata.PluginMetadata;
 import org.spongepowered.plugin.metadata.model.PluginContributor;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Plugin("viaversion")
 public class SpongePlugin implements ViaPlatform<Player> {

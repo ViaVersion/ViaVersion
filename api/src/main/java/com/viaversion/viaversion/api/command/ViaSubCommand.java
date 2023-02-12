@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.command;
 
 import com.viaversion.viaversion.util.ChatColorUtil;
-
 import java.util.Collections;
 import java.util.List;
 

@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.util;
 
-import javax.crypto.Cipher;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import javax.crypto.Cipher;
 
 public final class CipherUtil {
 

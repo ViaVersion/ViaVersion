@@ -98,28 +98,23 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int entityId = wrapper.read(Type.INT);
-                    final byte event = wrapper.read(Type.BYTE);
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, wrapper -> {
+            final int entityId = wrapper.read(Type.INT);
+            final byte event = wrapper.read(Type.BYTE);
 
-                    final int damageType = damageTypeFromEntityEvent(event);
-                    if (damageType != -1) {
-                        wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
-                        wrapper.write(Type.VAR_INT, entityId);
-                        wrapper.write(Type.VAR_INT, damageType);
-                        wrapper.write(Type.VAR_INT, 0); // No source entity
-                        wrapper.write(Type.VAR_INT, 0); // No direct source entity
-                        wrapper.write(Type.BOOLEAN, false); // No source position
-                        return;
-                    }
-
-                    wrapper.write(Type.INT, entityId);
-                    wrapper.write(Type.BYTE, event);
-                });
+            final int damageType = damageTypeFromEntityEvent(event);
+            if (damageType != -1) {
+                wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
+                wrapper.write(Type.VAR_INT, entityId);
+                wrapper.write(Type.VAR_INT, damageType);
+                wrapper.write(Type.VAR_INT, 0); // No source entity
+                wrapper.write(Type.VAR_INT, 0); // No direct source entity
+                wrapper.write(Type.BOOLEAN, false); // No source position
+                return;
             }
+
+            wrapper.write(Type.INT, entityId);
+            wrapper.write(Type.BYTE, event);
         });
 
         registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, null);

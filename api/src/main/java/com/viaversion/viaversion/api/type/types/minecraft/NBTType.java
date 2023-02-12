@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 

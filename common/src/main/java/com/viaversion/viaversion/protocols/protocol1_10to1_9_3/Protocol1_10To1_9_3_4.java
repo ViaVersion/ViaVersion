@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -37,7 +36,6 @@ import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -96,12 +94,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.FLOAT); // 5 - Volume
                 map(Type.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.VAR_INT, 0);
-                        wrapper.set(Type.VAR_INT, 0, getNewSoundId(id));
-                    }
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.VAR_INT, 0);
+                    wrapper.set(Type.VAR_INT, 0, getNewSoundId(id));
                 });
             }
         });
@@ -158,14 +153,11 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });
@@ -176,37 +168,26 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.INT); // 0 - Dimension ID
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });
 
         // Chunk Data
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
 
-                        if (Via.getConfig().isReplacePistons()) {
-                            int replacementId = Via.getConfig().getPistonReplacementId();
-                            for (ChunkSection section : chunk.getSections()) {
-                                if (section == null) continue;
-                                section.palette(PaletteType.BLOCKS).replaceId(36, replacementId);
-                            }
-                        }
-                    }
-                });
+            if (Via.getConfig().isReplacePistons()) {
+                int replacementId = Via.getConfig().getPistonReplacementId();
+                for (ChunkSection section : chunk.getSections()) {
+                    if (section == null) continue;
+                    section.palette(PaletteType.BLOCKS).replaceId(36, replacementId);
+                }
             }
         });
 
@@ -217,12 +198,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.STRING); // 0 - URL
                 map(Type.STRING); // 1 - Hash
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
-                        tracker.setLastHash(wrapper.get(Type.STRING, 1)); // Store the hash for resourcepack status
-                    }
+                handler(wrapper -> {
+                    ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
+                    tracker.setLastHash(wrapper.get(Type.STRING, 1)); // Store the hash for resourcepack status
                 });
             }
         });
@@ -231,13 +209,10 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK_STATUS, new PacketHandlers() {
             @Override
             public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
-                        wrapper.write(Type.STRING, tracker.getLastHash());
-                        wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT));
-                    }
+                handler(wrapper -> {
+                    ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
+                    wrapper.write(Type.STRING, tracker.getLastHash());
+                    wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT));
                 });
             }
         });

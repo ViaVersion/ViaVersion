@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

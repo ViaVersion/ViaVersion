@@ -19,11 +19,10 @@ package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
+import java.util.UUID;
 import net.kyori.adventure.identity.Identity;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.util.Identifiable;
-
-import java.util.UUID;
 
 public class SpongeCommandSender implements ViaCommandSender {
     private final CommandCause source;

@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
@@ -39,7 +38,6 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.Client
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-
 import java.util.List;
 
 public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_9_3, ServerboundPackets1_9, ServerboundPackets1_9_3> {
@@ -58,73 +56,57 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     protected void registerPackets() {
         // Sign update packet
-        registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        //read data
-                        Position position = wrapper.read(Type.POSITION);
-                        JsonElement[] lines = new JsonElement[4];
-                        for (int i = 0; i < 4; i++) {
-                            lines[i] = wrapper.read(Type.COMPONENT);
-                        }
-
-                        wrapper.clearInputBuffer();
-
-                        //write data
-                        wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
-                        wrapper.write(Type.POSITION, position); //Block location
-                        wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
-
-                        //Create nbt
-                        CompoundTag tag = new CompoundTag();
-                        tag.put("id", new StringTag("Sign"));
-                        tag.put("x", new IntTag(position.x()));
-                        tag.put("y", new IntTag(position.y()));
-                        tag.put("z", new IntTag(position.z()));
-                        for (int i = 0; i < lines.length; i++) {
-                            tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
-                        }
-
-                        wrapper.write(Type.NBT, tag);
-                    }
-                });
+        registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, wrapper -> {
+            //read data
+            Position position = wrapper.read(Type.POSITION);
+            JsonElement[] lines = new JsonElement[4];
+            for (int i = 0; i < 4; i++) {
+                lines[i] = wrapper.read(Type.COMPONENT);
             }
+
+            wrapper.clearInputBuffer();
+
+            //write data
+            wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
+            wrapper.write(Type.POSITION, position); //Block location
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
+
+            //Create nbt
+            CompoundTag tag = new CompoundTag();
+            tag.put("id", new StringTag("Sign"));
+            tag.put("x", new IntTag(position.x()));
+            tag.put("y", new IntTag(position.y()));
+            tag.put("z", new IntTag(position.z()));
+            for (int i = 0; i < lines.length; i++) {
+                tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
+            }
+
+            wrapper.write(Type.NBT, tag);
         });
 
-        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk chunk = wrapper.read(new Chunk1_9_1_2Type(clientWorld));
-                        wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
+            Chunk chunk = wrapper.read(new Chunk1_9_1_2Type(clientWorld));
+            wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
 
-                        List<CompoundTag> tags = chunk.getBlockEntities();
-                        for (int s = 0; s < chunk.getSections().length; s++) {
-                            ChunkSection section = chunk.getSections()[s];
-                            if (section == null) continue;
-                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
+            List<CompoundTag> tags = chunk.getBlockEntities();
+            for (int s = 0; s < chunk.getSections().length; s++) {
+                ChunkSection section = chunk.getSections()[s];
+                if (section == null) continue;
+                DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                                int id = blocks.idAt(idx) >> 4;
-                                if (FakeTileEntity.isTileEntity(id)) {
-                                    tags.add(FakeTileEntity.createTileEntity(
-                                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
-                                            ChunkSection.yFromIndex(idx) + (s << 4),
-                                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
-                                            id
-                                    ));
-                                }
-                            }
-                        }
+                for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                    int id = blocks.idAt(idx) >> 4;
+                    if (FakeTileEntity.isTileEntity(id)) {
+                        tags.add(FakeTileEntity.createTileEntity(
+                                ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                                ChunkSection.yFromIndex(idx) + (s << 4),
+                                ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                                id
+                        ));
                     }
-                });
+                }
             }
         });
 
@@ -135,13 +117,10 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });
@@ -150,13 +129,10 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             @Override
             public void register() {
                 map(Type.INT); // 0 - Dimension ID
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });

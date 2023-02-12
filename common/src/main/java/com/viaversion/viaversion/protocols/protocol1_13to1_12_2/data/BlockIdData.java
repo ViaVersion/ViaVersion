@@ -22,7 +22,6 @@ import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.util.GsonUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

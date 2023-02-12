@@ -18,17 +18,16 @@
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class HandItemCache extends BukkitRunnable {
 

@@ -19,9 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
@@ -79,67 +76,59 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         };
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
 
-        registerClientbound(ClientboundPackets1_13.TAGS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int blockTagsSize = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, blockTagsSize + 6); // block tags
-                        for (int i = 0; i < blockTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < blockIds.length; j++) {
-                                blockIds[j] = getMappingData().getNewBlockId(blockIds[j]);
-                            }
-                        }
-                        // Minecraft crashes if we not send signs tags
-                        wrapper.write(Type.STRING, "minecraft:signs");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                                getMappingData().getNewBlockId(150), getMappingData().getNewBlockId(155)
-                        });
-                        wrapper.write(Type.STRING, "minecraft:wall_signs");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                                getMappingData().getNewBlockId(155)
-                        });
-                        wrapper.write(Type.STRING, "minecraft:standing_signs");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                                getMappingData().getNewBlockId(150)
-                        });
-                        // Fences and walls tags - used for block connections
-                        wrapper.write(Type.STRING, "minecraft:fences");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 248, 472, 473, 474, 475});
-                        wrapper.write(Type.STRING, "minecraft:walls");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{271, 272});
-                        wrapper.write(Type.STRING, "minecraft:wooden_fences");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 472, 473, 474, 475});
-                        int itemTagsSize = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, itemTagsSize + 2); // item tags
-                        for (int i = 0; i < itemTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                            for (int j = 0; j < itemIds.length; j++) {
-                                itemIds[j] = getMappingData().getNewItemId(itemIds[j]);
-                            }
-                        }
-                        // Should fix fuel shift clicking
-                        wrapper.write(Type.STRING, "minecraft:signs");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                                getMappingData().getNewItemId(541)
-                        });
-                        // Arrows tag (used by bow)
-                        wrapper.write(Type.STRING, "minecraft:arrows");
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{526, 825, 826});
-                        int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
-                        for (int i = 0; i < fluidTagsSize; i++) {
-                            wrapper.passthrough(Type.STRING);
-                            wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                        }
-                        wrapper.write(Type.VAR_INT, 0);  // new entity tags - do we need to send this?
-                    }
-                });
+        registerClientbound(ClientboundPackets1_13.TAGS, wrapper -> {
+            int blockTagsSize = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT, blockTagsSize + 6); // block tags
+            for (int i = 0; i < blockTagsSize; i++) {
+                wrapper.passthrough(Type.STRING);
+                int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+                for (int j = 0; j < blockIds.length; j++) {
+                    blockIds[j] = getMappingData().getNewBlockId(blockIds[j]);
+                }
             }
+            // Minecraft crashes if we not send signs tags
+            wrapper.write(Type.STRING, "minecraft:signs");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
+                    getMappingData().getNewBlockId(150), getMappingData().getNewBlockId(155)
+            });
+            wrapper.write(Type.STRING, "minecraft:wall_signs");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
+                    getMappingData().getNewBlockId(155)
+            });
+            wrapper.write(Type.STRING, "minecraft:standing_signs");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
+                    getMappingData().getNewBlockId(150)
+            });
+            // Fences and walls tags - used for block connections
+            wrapper.write(Type.STRING, "minecraft:fences");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 248, 472, 473, 474, 475});
+            wrapper.write(Type.STRING, "minecraft:walls");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{271, 272});
+            wrapper.write(Type.STRING, "minecraft:wooden_fences");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 472, 473, 474, 475});
+            int itemTagsSize = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT, itemTagsSize + 2); // item tags
+            for (int i = 0; i < itemTagsSize; i++) {
+                wrapper.passthrough(Type.STRING);
+                int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+                for (int j = 0; j < itemIds.length; j++) {
+                    itemIds[j] = getMappingData().getNewItemId(itemIds[j]);
+                }
+            }
+            // Should fix fuel shift clicking
+            wrapper.write(Type.STRING, "minecraft:signs");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
+                    getMappingData().getNewItemId(541)
+            });
+            // Arrows tag (used by bow)
+            wrapper.write(Type.STRING, "minecraft:arrows");
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{526, 825, 826});
+            int fluidTagsSize = wrapper.passthrough(Type.VAR_INT); // fluid tags
+            for (int i = 0; i < fluidTagsSize; i++) {
+                wrapper.passthrough(Type.STRING);
+                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+            }
+            wrapper.write(Type.VAR_INT, 0);  // new entity tags - do we need to send this?
         });
 
         // Set Difficulty packet added in 19w11a

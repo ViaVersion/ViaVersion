@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
 import com.viaversion.viaversion.velocity.platform.VelocityViaConfig;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;

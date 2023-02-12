@@ -25,13 +25,12 @@ import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
+import java.util.Arrays;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Arrays;
 
 public class EntityToggleGlideListener extends ViaBukkitListener {
 

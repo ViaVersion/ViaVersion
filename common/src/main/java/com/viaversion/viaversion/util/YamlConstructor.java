@@ -17,13 +17,12 @@
  */
 package com.viaversion.viaversion.util;
 
+import java.util.concurrent.ConcurrentSkipListMap;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
-
-import java.util.concurrent.ConcurrentSkipListMap;
 
 public class YamlConstructor extends SafeConstructor {
     public YamlConstructor() {

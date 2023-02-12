@@ -19,8 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
@@ -48,26 +46,23 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
             public void register() {
                 map(Type.STRING); // 0 - Channel
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.STRING, 0).equalsIgnoreCase("MC|TrList")) {
-                            wrapper.passthrough(Type.INT); // Passthrough Window ID
+                handler(wrapper -> {
+                    if (wrapper.get(Type.STRING, 0).equalsIgnoreCase("MC|TrList")) {
+                        wrapper.passthrough(Type.INT); // Passthrough Window ID
 
-                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                            for (int i = 0; i < size; i++) {
-                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Input Item
-                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Output Item
+                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        for (int i = 0; i < size; i++) {
+                            handleItemToClient(wrapper.passthrough(Type.ITEM)); // Input Item
+                            handleItemToClient(wrapper.passthrough(Type.ITEM)); // Output Item
 
-                                boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
-                                if (secondItem) {
-                                    handleItemToClient(wrapper.passthrough(Type.ITEM)); // Second Item
-                                }
-
-                                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                                wrapper.passthrough(Type.INT); // Number of tools uses
-                                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            if (secondItem) {
+                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Second Item
                             }
+
+                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Type.INT); // Number of tools uses
+                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
                         }
                     }
                 });
@@ -85,30 +80,27 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
                         map(Type.VAR_INT); // 4 - Mode
                         map(Type.ITEM); // 5 - Clicked Item
 
-                        handler(new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                Item item = wrapper.get(Type.ITEM, 0);
-                                if (!Via.getConfig().is1_12QuickMoveActionFix()) {
-                                    handleItemToServer(item);
-                                    return;
+                        handler(wrapper -> {
+                            Item item = wrapper.get(Type.ITEM, 0);
+                            if (!Via.getConfig().is1_12QuickMoveActionFix()) {
+                                handleItemToServer(item);
+                                return;
+                            }
+                            byte button = wrapper.get(Type.BYTE, 0);
+                            int mode = wrapper.get(Type.VAR_INT, 0);
+                            // QUICK_MOVE PATCH (Shift + (click/double click))
+                            if (mode == 1 && button == 0 && item == null) {
+                                short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                                short slotId = wrapper.get(Type.SHORT, 0);
+                                short actionId = wrapper.get(Type.SHORT, 1);
+                                InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
+                                boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
+                                if (succeed) {
+                                    wrapper.cancel();
                                 }
-                                byte button = wrapper.get(Type.BYTE, 0);
-                                int mode = wrapper.get(Type.VAR_INT, 0);
-                                // QUICK_MOVE PATCH (Shift + (click/double click))
-                                if (mode == 1 && button == 0 && item == null) {
-                                    short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                                    short slotId = wrapper.get(Type.SHORT, 0);
-                                    short actionId = wrapper.get(Type.SHORT, 1);
-                                    InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
-                                    boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
-                                    if (succeed) {
-                                        wrapper.cancel();
-                                    }
-                                    // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
-                                } else {
-                                    handleItemToServer(item);
-                                }
+                                // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
+                            } else {
+                                handleItemToServer(item);
                             }
                         });
                     }

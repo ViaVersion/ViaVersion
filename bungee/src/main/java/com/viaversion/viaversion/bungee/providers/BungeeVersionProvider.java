@@ -24,11 +24,10 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
 import com.viaversion.viaversion.util.ReflectionUtil;
-import net.md_5.bungee.api.ProxyServer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeVersionProvider extends BaseVersionProvider {
     private static Class<?> ref;

@@ -31,13 +31,12 @@ import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Int2IntBiMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
     protected final String oldVersion;

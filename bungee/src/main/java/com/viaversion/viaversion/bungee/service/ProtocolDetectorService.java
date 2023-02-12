@@ -21,13 +21,12 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.config.ServerInfo;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 
 public final class ProtocolDetectorService extends AbstractProtocolDetectorService {
 

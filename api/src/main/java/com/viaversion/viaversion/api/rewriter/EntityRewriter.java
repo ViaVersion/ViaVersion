@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
-
 import java.util.List;
 
 public interface EntityRewriter<T extends Protocol> extends Rewriter<T> {

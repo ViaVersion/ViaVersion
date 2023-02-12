@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.update;
 
 import com.google.common.base.Joiner;
-
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Matcher;

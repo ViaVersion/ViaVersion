@@ -19,9 +19,8 @@ package com.viaversion.viaversion.bukkit.compat;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import protocolsupport.api.Connection;
-
 import java.lang.reflect.Method;
+import protocolsupport.api.Connection;
 
 final class ProtocolSupportConnectionListener extends Connection.PacketListener {
 

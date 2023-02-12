@@ -21,7 +21,6 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,82 +66,72 @@ public class CommandRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerDeclareCommands(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        byte flags = wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
-                        if ((flags & 0x08) != 0) {
-                            wrapper.passthrough(Type.VAR_INT); // Redirect node index
-                        }
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                byte flags = wrapper.passthrough(Type.BYTE);
+                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                if ((flags & 0x08) != 0) {
+                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                }
 
-                        byte nodeType = (byte) (flags & 0x03);
-                        if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                            wrapper.passthrough(Type.STRING); // Name
-                        }
+                byte nodeType = (byte) (flags & 0x03);
+                if (nodeType == 1 || nodeType == 2) { // Literal/argument node
+                    wrapper.passthrough(Type.STRING); // Name
+                }
 
-                        if (nodeType == 2) { // Argument node
-                            String argumentType = wrapper.read(Type.STRING);
-                            String newArgumentType = handleArgumentType(argumentType);
-                            if (newArgumentType != null) {
-                                wrapper.write(Type.STRING, newArgumentType);
-                            }
-
-                            // Always call the handler using the previous name
-                            handleArgument(wrapper, argumentType);
-                        }
-
-                        if ((flags & 0x10) != 0) {
-                            wrapper.passthrough(Type.STRING); // Suggestion type
-                        }
+                if (nodeType == 2) { // Argument node
+                    String argumentType = wrapper.read(Type.STRING);
+                    String newArgumentType = handleArgumentType(argumentType);
+                    if (newArgumentType != null) {
+                        wrapper.write(Type.STRING, newArgumentType);
                     }
 
-                    wrapper.passthrough(Type.VAR_INT); // Root node index
-                });
+                    // Always call the handler using the previous name
+                    handleArgument(wrapper, argumentType);
+                }
+
+                if ((flags & 0x10) != 0) {
+                    wrapper.passthrough(Type.STRING); // Suggestion type
+                }
             }
+
+            wrapper.passthrough(Type.VAR_INT); // Root node index
         });
     }
 
     public void registerDeclareCommands1_19(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        byte flags = wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
-                        if ((flags & 0x08) != 0) {
-                            wrapper.passthrough(Type.VAR_INT); // Redirect node index
-                        }
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                byte flags = wrapper.passthrough(Type.BYTE);
+                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                if ((flags & 0x08) != 0) {
+                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                }
 
-                        byte nodeType = (byte) (flags & 0x03);
-                        if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                            wrapper.passthrough(Type.STRING); // Name
-                        }
+                byte nodeType = (byte) (flags & 0x03);
+                if (nodeType == 1 || nodeType == 2) { // Literal/argument node
+                    wrapper.passthrough(Type.STRING); // Name
+                }
 
-                        if (nodeType == 2) { // Argument node
-                            int argumentTypeId = wrapper.read(Type.VAR_INT);
-                            String argumentType = argumentType(argumentTypeId);
-                            String newArgumentType = handleArgumentType(argumentType);
-                            Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
-                            wrapper.write(Type.VAR_INT, mappedArgumentTypeId(newArgumentType));
+                if (nodeType == 2) { // Argument node
+                    int argumentTypeId = wrapper.read(Type.VAR_INT);
+                    String argumentType = argumentType(argumentTypeId);
+                    String newArgumentType = handleArgumentType(argumentType);
+                    Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
+                    wrapper.write(Type.VAR_INT, mappedArgumentTypeId(newArgumentType));
 
-                            // Always call the handler using the previous name
-                            handleArgument(wrapper, argumentType);
-                        }
+                    // Always call the handler using the previous name
+                    handleArgument(wrapper, argumentType);
+                }
 
-                        if ((flags & 0x10) != 0) {
-                            wrapper.passthrough(Type.STRING); // Suggestion type
-                        }
-                    }
-
-                    wrapper.passthrough(Type.VAR_INT); // Root node index
-                });
+                if ((flags & 0x10) != 0) {
+                    wrapper.passthrough(Type.STRING); // Suggestion type
+                }
             }
+
+            wrapper.passthrough(Type.VAR_INT); // Root node index
         });
     }
 

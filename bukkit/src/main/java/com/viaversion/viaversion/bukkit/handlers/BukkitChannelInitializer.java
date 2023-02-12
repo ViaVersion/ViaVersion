@@ -25,9 +25,8 @@ import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.lang.reflect.Method;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BukkitChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {
 

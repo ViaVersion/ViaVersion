@@ -18,6 +18,9 @@
 package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.Command;
@@ -25,10 +28,6 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SpongeCommandHandler extends ViaCommandHandler implements Command.Raw {
 

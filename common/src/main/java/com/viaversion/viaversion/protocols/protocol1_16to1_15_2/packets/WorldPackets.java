@@ -23,7 +23,6 @@ import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -37,7 +36,6 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
-
 import java.util.Map;
 import java.util.UUID;
 
@@ -60,54 +58,44 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    Chunk chunk = wrapper.read(new Chunk1_15Type());
-                    wrapper.write(new Chunk1_16Type(), chunk);
+        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, wrapper -> {
+            Chunk chunk = wrapper.read(new Chunk1_15Type());
+            wrapper.write(new Chunk1_16Type(), chunk);
 
-                    chunk.setIgnoreOldLightData(chunk.isFullChunk());
+            chunk.setIgnoreOldLightData(chunk.isFullChunk());
 
-                    for (int s = 0; s < chunk.getSections().length; s++) {
-                        ChunkSection section = chunk.getSections()[s];
-                        if (section == null) {
-                            continue;
-                        }
+            for (int s = 0; s < chunk.getSections().length; s++) {
+                ChunkSection section = chunk.getSections()[s];
+                if (section == null) {
+                    continue;
+                }
 
-                        DataPalette palette = section.palette(PaletteType.BLOCKS);
-                        for (int i = 0; i < palette.size(); i++) {
-                            int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                            palette.setIdByIndex(i, mappedBlockStateId);
-                        }
-                    }
+                DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < palette.size(); i++) {
+                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                    palette.setIdByIndex(i, mappedBlockStateId);
+                }
+            }
 
-                    CompoundTag heightMaps = chunk.getHeightMap();
-                    for (Tag heightMapTag : heightMaps.values()) {
-                        LongArrayTag heightMap = (LongArrayTag) heightMapTag;
-                        int[] heightMapData = new int[256];
-                        CompactArrayUtil.iterateCompactArray(9, heightMapData.length, heightMap.getValue(), (i, v) -> heightMapData[i] = v);
-                        heightMap.setValue(CompactArrayUtil.createCompactArrayWithPadding(9, heightMapData.length, i -> heightMapData[i]));
-                    }
+            CompoundTag heightMaps = chunk.getHeightMap();
+            for (Tag heightMapTag : heightMaps.values()) {
+                LongArrayTag heightMap = (LongArrayTag) heightMapTag;
+                int[] heightMapData = new int[256];
+                CompactArrayUtil.iterateCompactArray(9, heightMapData.length, heightMap.getValue(), (i, v) -> heightMapData[i] = v);
+                heightMap.setValue(CompactArrayUtil.createCompactArrayWithPadding(9, heightMapData.length, i -> heightMapData[i]));
+            }
 
-                    if (chunk.getBlockEntities() == null) return;
-                    for (CompoundTag blockEntity : chunk.getBlockEntities()) {
-                        handleBlockEntity(protocol, blockEntity);
-                    }
-                });
+            if (chunk.getBlockEntities() == null) return;
+            for (CompoundTag blockEntity : chunk.getBlockEntities()) {
+                handleBlockEntity(protocol, blockEntity);
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    Position position = wrapper.passthrough(Type.POSITION1_14);
-                    short action = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                    CompoundTag tag = wrapper.passthrough(Type.NBT);
-                    handleBlockEntity(protocol, tag);
-                });
-            }
+        protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, wrapper -> {
+            wrapper.passthrough(Type.POSITION1_14); // Position
+            wrapper.passthrough(Type.UNSIGNED_BYTE); // Action
+            CompoundTag tag = wrapper.passthrough(Type.NBT);
+            handleBlockEntity(protocol, tag);
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);

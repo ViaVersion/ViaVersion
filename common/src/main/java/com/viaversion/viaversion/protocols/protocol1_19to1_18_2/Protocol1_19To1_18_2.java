@@ -127,56 +127,41 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(Component.empty()));
             }
         };
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(titleHandler);
-            }
-        });
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(titleHandler);
-            }
-        });
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
-        registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        final byte flags = wrapper.passthrough(Type.BYTE);
-                        wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
-                        if ((flags & 0x08) != 0) {
-                            wrapper.passthrough(Type.VAR_INT); // Redirect node index
-                        }
+        registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, wrapper -> {
+            final int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                final byte flags = wrapper.passthrough(Type.BYTE);
+                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                if ((flags & 0x08) != 0) {
+                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                }
 
-                        final int nodeType = flags & 0x03;
-                        if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                            wrapper.passthrough(Type.STRING); // Name
-                        }
+                final int nodeType = flags & 0x03;
+                if (nodeType == 1 || nodeType == 2) { // Literal/argument node
+                    wrapper.passthrough(Type.STRING); // Name
+                }
 
-                        if (nodeType == 2) { // Argument node
-                            final String argumentType = wrapper.read(Type.STRING);
-                            final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
-                            if (argumentTypeId == -1) {
-                                Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
-                            }
-
-                            wrapper.write(Type.VAR_INT, argumentTypeId);
-                            commandRewriter.handleArgument(wrapper, argumentType);
-
-                            if ((flags & 0x10) != 0) {
-                                wrapper.passthrough(Type.STRING); // Suggestion type
-                            }
-                        }
+                if (nodeType == 2) { // Argument node
+                    final String argumentType = wrapper.read(Type.STRING);
+                    final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
+                    if (argumentTypeId == -1) {
+                        Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
                     }
 
-                    wrapper.passthrough(Type.VAR_INT); // Root node index
-                });
+                    wrapper.write(Type.VAR_INT, argumentTypeId);
+                    commandRewriter.handleArgument(wrapper, argumentType);
+
+                    if ((flags & 0x10) != 0) {
+                        wrapper.passthrough(Type.STRING); // Suggestion type
+                    }
+                }
             }
+
+            wrapper.passthrough(Type.VAR_INT); // Root node index
         });
 
         // Make every message a system message, including player ones; we don't want to analyze and remove player names from the original component

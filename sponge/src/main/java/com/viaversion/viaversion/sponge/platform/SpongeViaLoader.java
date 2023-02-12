@@ -21,10 +21,9 @@ import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.sponge.listeners.UpdateListener;
-import org.spongepowered.api.Sponge;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.spongepowered.api.Sponge;
 
 public class SpongeViaLoader implements ViaPlatformLoader {
 

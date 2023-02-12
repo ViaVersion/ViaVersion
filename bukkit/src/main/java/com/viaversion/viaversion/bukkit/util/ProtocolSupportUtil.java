@@ -17,10 +17,9 @@
  */
 package com.viaversion.viaversion.bukkit.util;
 
-import org.bukkit.entity.Player;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.bukkit.entity.Player;
 
 public final class ProtocolSupportUtil {
     private static final Method PROTOCOL_VERSION_METHOD;

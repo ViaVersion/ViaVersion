@@ -27,11 +27,9 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,62 +38,57 @@ public class BaseProtocol extends AbstractProtocol {
     @Override
     protected void registerPackets() {
         // Handshake Packet
-        registerServerbound(ServerboundHandshakePackets.CLIENT_INTENTION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int protocolVersion = wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.STRING); // Server Address
-                    wrapper.passthrough(Type.UNSIGNED_SHORT); // Server Port
-                    int state = wrapper.passthrough(Type.VAR_INT);
+        registerServerbound(ServerboundHandshakePackets.CLIENT_INTENTION, wrapper -> {
+            int protocolVersion = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Type.STRING); // Server Address
+            wrapper.passthrough(Type.UNSIGNED_SHORT); // Server Port
+            int state = wrapper.passthrough(Type.VAR_INT);
 
-                    ProtocolInfo info = wrapper.user().getProtocolInfo();
-                    info.setProtocolVersion(protocolVersion);
-                    // Ensure the server has a version provider
-                    VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
-                    if (versionProvider == null) {
-                        wrapper.user().setActive(false);
-                        return;
-                    }
+            ProtocolInfo info = wrapper.user().getProtocolInfo();
+            info.setProtocolVersion(protocolVersion);
+            // Ensure the server has a version provider
+            VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
+            if (versionProvider == null) {
+                wrapper.user().setActive(false);
+                return;
+            }
 
-                    // Choose the pipe
-                    int serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
-                    info.setServerProtocolVersion(serverProtocol);
-                    List<ProtocolPathEntry> protocolPath = null;
+            // Choose the pipe
+            int serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+            info.setServerProtocolVersion(serverProtocol);
+            List<ProtocolPathEntry> protocolPath = null;
 
-                    // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
-                    if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
-                        protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
-                    }
+            // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
+            if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
+                protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
+            }
 
-                    ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
-                    if (protocolPath != null) {
-                        List<Protocol> protocols = new ArrayList<>(protocolPath.size());
-                        for (ProtocolPathEntry entry : protocolPath) {
-                            protocols.add(entry.protocol());
+            ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
+            if (protocolPath != null) {
+                List<Protocol> protocols = new ArrayList<>(protocolPath.size());
+                for (ProtocolPathEntry entry : protocolPath) {
+                    protocols.add(entry.protocol());
 
-                            // Ensure mapping data has already been loaded
-                            Via.getManager().getProtocolManager().completeMappingDataLoading(entry.protocol().getClass());
-                        }
+                    // Ensure mapping data has already been loaded
+                    Via.getManager().getProtocolManager().completeMappingDataLoading(entry.protocol().getClass());
+                }
 
-                        // Add protocols to pipeline
-                        pipeline.add(protocols);
+                // Add protocols to pipeline
+                pipeline.add(protocols);
 
-                        // Set the original snapshot version if present
-                        ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
-                        wrapper.set(Type.VAR_INT, 0, protocol.getOriginalVersion());
-                    }
+                // Set the original snapshot version if present
+                ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
+                wrapper.set(Type.VAR_INT, 0, protocol.getOriginalVersion());
+            }
 
-                    // Add Base Protocol
-                    pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
+            // Add Base Protocol
+            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
 
-                    // Change state
-                    if (state == 1) {
-                        info.setState(State.STATUS);
-                    } else if (state == 2) {
-                        info.setState(State.LOGIN);
-                    }
-                });
+            // Change state
+            if (state == 1) {
+                info.setState(State.STATUS);
+            } else if (state == 2) {
+                info.setState(State.LOGIN);
             }
         });
     }

@@ -53,12 +53,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * @param packetType clientbound packet type
      */
     public void registerComponentPacket(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
-            }
-        });
+        protocol.registerClientbound(packetType, wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
     }
 
     @Deprecated/*(forRemoval = true)**/
@@ -86,16 +81,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * Handles sub 1.17 combat event components.
      */
     public void registerCombatEvent(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    if (wrapper.passthrough(Type.VAR_INT) == 2) {
-                        wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.INT);
-                        processText(wrapper.passthrough(Type.COMPONENT));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            if (wrapper.passthrough(Type.VAR_INT) == 2) {
+                wrapper.passthrough(Type.VAR_INT);
+                wrapper.passthrough(Type.INT);
+                processText(wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
@@ -104,15 +94,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * Handles sub 1.17 title components.
      */
     public void registerTitle(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int action = wrapper.passthrough(Type.VAR_INT);
-                    if (action >= 0 && action <= 2) {
-                        processText(wrapper.passthrough(Type.COMPONENT));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            int action = wrapper.passthrough(Type.VAR_INT);
+            if (action >= 0 && action <= 2) {
+                processText(wrapper.passthrough(Type.COMPONENT));
             }
         });
     }

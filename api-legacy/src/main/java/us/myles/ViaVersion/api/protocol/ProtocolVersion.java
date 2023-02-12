@@ -26,14 +26,13 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.version.VersionRange;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * @deprecated will no longer be updated and may be removed at some point, use {@link com.viaversion.viaversion.api.protocol.version.ProtocolVersion}

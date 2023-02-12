@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
@@ -37,7 +36,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRew
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.Triple;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -104,17 +102,14 @@ public class EntityPackets {
 
                 map(Type.BOOLEAN); // 6 - On Ground
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (Via.getConfig().isHologramPatch()) {
-                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                            if (tracker.getKnownHolograms().contains(entityID)) {
-                                Double newValue = wrapper.get(Type.DOUBLE, 1);
-                                newValue += (Via.getConfig().getHologramYOffset());
-                                wrapper.set(Type.DOUBLE, 1, newValue);
-                            }
+                handler(wrapper -> {
+                    int entityID = wrapper.get(Type.VAR_INT, 0);
+                    if (Via.getConfig().isHologramPatch()) {
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        if (tracker.getKnownHolograms().contains(entityID)) {
+                            Double newValue = wrapper.get(Type.DOUBLE, 1);
+                            newValue += (Via.getConfig().getHologramYOffset());
+                            wrapper.set(Type.DOUBLE, 1, newValue);
                         }
                     }
                 });
@@ -171,29 +166,23 @@ public class EntityPackets {
                 });
                 map(Type.ITEM); // 2 - Item
                 // Item Rewriter
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item stack = wrapper.get(Type.ITEM, 0);
-                        ItemRewriter.toClient(stack);
-                    }
+                handler(wrapper -> {
+                    Item stack = wrapper.get(Type.ITEM, 0);
+                    ItemRewriter.toClient(stack);
                 });
                 // Blocking
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        Item stack = wrapper.get(Type.ITEM, 0);
+                handler(wrapper -> {
+                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    int entityID = wrapper.get(Type.VAR_INT, 0);
+                    Item stack = wrapper.get(Type.ITEM, 0);
 
-                        if (stack != null) {
-                            if (Protocol1_9To1_8.isSword(stack.identifier())) {
-                                entityTracker.getValidBlocking().add(entityID);
-                                return;
-                            }
+                    if (stack != null) {
+                        if (Protocol1_9To1_8.isSword(stack.identifier())) {
+                            entityTracker.getValidBlocking().add(entityID);
+                            return;
                         }
-                        entityTracker.getValidBlocking().remove(entityID);
                     }
+                    entityTracker.getValidBlocking().remove(entityID);
                 });
             }
         });
@@ -203,41 +192,32 @@ public class EntityPackets {
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Types1_8.METADATA_LIST, Types1_9.METADATA_LIST); // 1 - Metadata List
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        if (tracker.hasEntity(entityId)) {
-                            protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
-                        } else {
-                            // Buffer
-                            tracker.addMetadataToBuffer(entityId, metadataList);
-                            wrapper.cancel();
-                        }
+                handler(wrapper -> {
+                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    if (tracker.hasEntity(entityId)) {
+                        protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
+                    } else {
+                        // Buffer
+                        tracker.addMetadataToBuffer(entityId, metadataList);
+                        wrapper.cancel();
                     }
                 });
 
                 // Handler for meta data
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        tracker.handleMetadata(entityID, metadataList);
-                    }
+                handler(wrapper -> {
+                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    int entityID = wrapper.get(Type.VAR_INT, 0);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    tracker.handleMetadata(entityID, metadataList);
                 });
 
                 // Cancel packet if list empty
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
-                        if (metadataList.isEmpty()) {
-                            wrapper.cancel();
-                        }
+                handler(wrapper -> {
+                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    if (metadataList.isEmpty()) {
+                        wrapper.cancel();
                     }
                 });
             }
@@ -250,14 +230,12 @@ public class EntityPackets {
                 map(Type.BYTE); // 1 - Effect ID
                 map(Type.BYTE); // 2 - Amplifier
                 map(Type.VAR_INT); // 3 - Duration
-                handler(new PacketHandler() { //Handle effect indicator
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        boolean showParticles = wrapper.read(Type.BOOLEAN); //In 1.8 = true->Show particles : false->Hide particles
-                        boolean newEffect = Via.getConfig().isNewEffectIndicator();
-                        //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator but we don't use it.
-                        wrapper.write(Type.BYTE, (byte) (showParticles ? newEffect ? 2 : 1 : 0));
-                    }
+                //Handle effect indicator
+                handler(wrapper -> {
+                    boolean showParticles = wrapper.read(Type.BOOLEAN); //In 1.8 = true->Show particles : false->Hide particles
+                    boolean newEffect = Via.getConfig().isNewEffectIndicator();
+                    //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator but we don't use it.
+                    wrapper.write(Type.BYTE, (byte) (showParticles ? newEffect ? 2 : 1 : 0));
                 });
             }
         });
@@ -268,14 +246,11 @@ public class EntityPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT); //Event id
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.VAR_INT, 0) == 2) { // entity dead
-                            wrapper.passthrough(Type.VAR_INT); //Player id
-                            wrapper.passthrough(Type.INT); //Entity id
-                            Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
-                        }
+                handler(wrapper -> {
+                    if (wrapper.get(Type.VAR_INT, 0) == 2) { // entity dead
+                        wrapper.passthrough(Type.VAR_INT); //Player id
+                        wrapper.passthrough(Type.INT); //Entity id
+                        Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
                     }
                 });
             }
@@ -285,53 +260,50 @@ public class EntityPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (!Via.getConfig().isMinimizeCooldown()) return;
+                handler(wrapper -> {
+                    if (!Via.getConfig().isMinimizeCooldown()) return;
 
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        if (wrapper.get(Type.VAR_INT, 0) != tracker.getProvidedEntityId()) {
-                            return;
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    if (wrapper.get(Type.VAR_INT, 0) != tracker.getProvidedEntityId()) {
+                        return;
+                    }
+                    int propertiesToRead = wrapper.read(Type.INT);
+                    Map<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> properties = new HashMap<>(propertiesToRead);
+                    for (int i = 0; i < propertiesToRead; i++) {
+                        String key = wrapper.read(Type.STRING);
+                        Double value = wrapper.read(Type.DOUBLE);
+                        int modifiersToRead = wrapper.read(Type.VAR_INT);
+                        List<Triple<UUID, Double, Byte>> modifiers = new ArrayList<>(modifiersToRead);
+                        for (int j = 0; j < modifiersToRead; j++) {
+                            modifiers.add(
+                                    new Triple<>(
+                                            wrapper.read(Type.UUID),
+                                            wrapper.read(Type.DOUBLE), // Amount
+                                            wrapper.read(Type.BYTE) // Operation
+                                    )
+                            );
                         }
-                        int propertiesToRead = wrapper.read(Type.INT);
-                        Map<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> properties = new HashMap<>(propertiesToRead);
-                        for (int i = 0; i < propertiesToRead; i++) {
-                            String key = wrapper.read(Type.STRING);
-                            Double value = wrapper.read(Type.DOUBLE);
-                            int modifiersToRead = wrapper.read(Type.VAR_INT);
-                            List<Triple<UUID, Double, Byte>> modifiers = new ArrayList<>(modifiersToRead);
-                            for (int j = 0; j < modifiersToRead; j++) {
-                                modifiers.add(
-                                        new Triple<>(
-                                                wrapper.read(Type.UUID),
-                                                wrapper.read(Type.DOUBLE), // Amount
-                                                wrapper.read(Type.BYTE) // Operation
-                                        )
-                                );
-                            }
-                            properties.put(key, new Pair<>(value, modifiers));
-                        }
+                        properties.put(key, new Pair<>(value, modifiers));
+                    }
 
-                        // == Why 15.9? ==
-                        // Higher values hides the cooldown but it bugs visual animation on hand
-                        // when removing item from hand with inventory gui
-                        properties.put("generic.attackSpeed", new Pair<>(15.9, ImmutableList.of( // Neutralize modifiers
-                                new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
-                                new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
-                                new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
-                        )));
+                    // == Why 15.9? ==
+                    // Higher values hides the cooldown but it bugs visual animation on hand
+                    // when removing item from hand with inventory gui
+                    properties.put("generic.attackSpeed", new Pair<>(15.9, ImmutableList.of( // Neutralize modifiers
+                            new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
+                            new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
+                            new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
+                    )));
 
-                        wrapper.write(Type.INT, properties.size());
-                        for (Map.Entry<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> entry : properties.entrySet()) {
-                            wrapper.write(Type.STRING, entry.getKey()); // Key
-                            wrapper.write(Type.DOUBLE, entry.getValue().key()); // Value
-                            wrapper.write(Type.VAR_INT, entry.getValue().value().size());
-                            for (Triple<UUID, Double, Byte> modifier : entry.getValue().value()) {
-                                wrapper.write(Type.UUID, modifier.first());
-                                wrapper.write(Type.DOUBLE, modifier.second()); // Amount
-                                wrapper.write(Type.BYTE, modifier.third()); // Operation
-                            }
+                    wrapper.write(Type.INT, properties.size());
+                    for (Map.Entry<String, Pair<Double, List<Triple<UUID, Double, Byte>>>> entry : properties.entrySet()) {
+                        wrapper.write(Type.STRING, entry.getKey()); // Key
+                        wrapper.write(Type.DOUBLE, entry.getValue().key()); // Value
+                        wrapper.write(Type.VAR_INT, entry.getValue().value().size());
+                        for (Triple<UUID, Double, Byte> modifier : entry.getValue().value()) {
+                            wrapper.write(Type.UUID, modifier.first());
+                            wrapper.write(Type.DOUBLE, modifier.second()); // Amount
+                            wrapper.write(Type.BYTE, modifier.third()); // Operation
                         }
                     }
                 });
@@ -343,12 +315,9 @@ public class EntityPackets {
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Animation
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) {
-                            wrapper.cancel();
-                        }
+                handler(wrapper -> {
+                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 3) {
+                        wrapper.cancel();
                     }
                 });
             }
@@ -363,15 +332,12 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 0 - Player ID
                 map(Type.VAR_INT); // 1 - Action
                 map(Type.VAR_INT); // 2 - Jump
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.VAR_INT, 1);
-                        if (action == 6 || action == 8)
-                            wrapper.cancel();
-                        if (action == 7) {
-                            wrapper.set(Type.VAR_INT, 1, 6);
-                        }
+                handler(wrapper -> {
+                    int action = wrapper.get(Type.VAR_INT, 1);
+                    if (action == 6 || action == 8)
+                        wrapper.cancel();
+                    if (action == 7) {
+                        wrapper.set(Type.VAR_INT, 1, 6);
                     }
                 });
             }
@@ -385,21 +351,18 @@ public class EntityPackets {
                 map(Type.VAR_INT); // 1 - Action Type
 
                 // Cancel second hand to prevent double interact
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int type = wrapper.get(Type.VAR_INT, 1);
-                        if (type == 2) {
-                            wrapper.passthrough(Type.FLOAT); // 2 - X
-                            wrapper.passthrough(Type.FLOAT); // 3 - Y
-                            wrapper.passthrough(Type.FLOAT); // 4 - Z
-                        }
-                        if (type == 0 || type == 2) {
-                            int hand = wrapper.read(Type.VAR_INT); // 2/5 - Hand
+                handler(wrapper -> {
+                    int type = wrapper.get(Type.VAR_INT, 1);
+                    if (type == 2) {
+                        wrapper.passthrough(Type.FLOAT); // 2 - X
+                        wrapper.passthrough(Type.FLOAT); // 3 - Y
+                        wrapper.passthrough(Type.FLOAT); // 4 - Z
+                    }
+                    if (type == 0 || type == 2) {
+                        int hand = wrapper.read(Type.VAR_INT); // 2/5 - Hand
 
-                            if (hand == 1)
-                                wrapper.cancel();
-                        }
+                        if (hand == 1)
+                            wrapper.cancel();
                     }
                 });
             }

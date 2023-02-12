@@ -20,7 +20,6 @@ package com.viaversion.viaversion.platform;
 import com.viaversion.viaversion.api.platform.ProtocolDetectorService;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

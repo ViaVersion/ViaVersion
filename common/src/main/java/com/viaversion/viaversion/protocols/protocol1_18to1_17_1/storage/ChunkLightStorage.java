@@ -18,12 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ChunkLightStorage implements StorableObject {
 

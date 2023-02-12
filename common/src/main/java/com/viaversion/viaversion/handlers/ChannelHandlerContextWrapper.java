@@ -29,7 +29,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.EventExecutor;
-
 import java.net.SocketAddress;
 
 public class ChannelHandlerContextWrapper implements ChannelHandlerContext {

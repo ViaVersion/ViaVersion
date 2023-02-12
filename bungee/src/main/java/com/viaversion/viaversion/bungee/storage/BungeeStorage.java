@@ -18,12 +18,11 @@
 package com.viaversion.viaversion.bungee.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeStorage implements StorableObject {
     private static Field bossField;

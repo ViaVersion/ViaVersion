@@ -24,10 +24,9 @@ package com.viaversion.viaversion.api.minecraft.chunks;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.BitSet;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 // TODO specialized sub interfaces
 public interface Chunk {

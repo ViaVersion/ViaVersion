@@ -17,8 +17,6 @@
  */
 package com.viaversion.viaversion.util;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +24,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Synchronized list wrapper with the addition of an add handler called when an element is added to the list.

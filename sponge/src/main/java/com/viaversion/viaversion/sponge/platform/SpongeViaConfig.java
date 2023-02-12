@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;

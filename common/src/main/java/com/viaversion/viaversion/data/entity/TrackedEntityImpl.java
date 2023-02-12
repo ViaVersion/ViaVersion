@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.data.entity;
 
-import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 
 public final class TrackedEntityImpl implements TrackedEntity {

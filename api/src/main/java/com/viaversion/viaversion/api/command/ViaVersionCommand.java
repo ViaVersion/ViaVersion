@@ -22,9 +22,8 @@
  */
 package com.viaversion.viaversion.api.command;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ViaVersionCommand {
     /**

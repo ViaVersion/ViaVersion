@@ -29,11 +29,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
@@ -42,7 +42,6 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTr
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
-
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -69,79 +68,71 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
         registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
-                        String type = wrapper.read(Type.STRING);
-                        JsonElement title = wrapper.read(Type.COMPONENT);
-                        COMPONENT_REWRITER.processText(title);
-                        Short slots = wrapper.read(Type.UNSIGNED_BYTE);
+        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, wrapper -> {
+            Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
+            String type = wrapper.read(Type.STRING);
+            JsonElement title = wrapper.read(Type.COMPONENT);
+            COMPONENT_REWRITER.processText(title);
+            Short slots = wrapper.read(Type.UNSIGNED_BYTE);
 
-                        if (type.equals("EntityHorse")) {
-                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_HORSE_WINDOW);
-                            int entityId = wrapper.read(Type.INT);
-                            wrapper.write(Type.UNSIGNED_BYTE, windowId);
-                            wrapper.write(Type.VAR_INT, slots.intValue());
-                            wrapper.write(Type.INT, entityId);
-                        } else {
-                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_WINDOW);
-                            wrapper.write(Type.VAR_INT, windowId.intValue());
+            if (type.equals("EntityHorse")) {
+                wrapper.setPacketType(ClientboundPackets1_14.OPEN_HORSE_WINDOW);
+                int entityId = wrapper.read(Type.INT);
+                wrapper.write(Type.UNSIGNED_BYTE, windowId);
+                wrapper.write(Type.VAR_INT, slots.intValue());
+                wrapper.write(Type.INT, entityId);
+            } else {
+                wrapper.setPacketType(ClientboundPackets1_14.OPEN_WINDOW);
+                wrapper.write(Type.VAR_INT, windowId.intValue());
 
-                            int typeId = -1;
-                            switch (type) {
-                                case "minecraft:crafting_table":
-                                    typeId = 11;
-                                    break;
-                                case "minecraft:furnace":
-                                    typeId = 13;
-                                    break;
-                                case "minecraft:dropper":
-                                case "minecraft:dispenser":
-                                    typeId = 6;
-                                    break;
-                                case "minecraft:enchanting_table":
-                                    typeId = 12;
-                                    break;
-                                case "minecraft:brewing_stand":
-                                    typeId = 10;
-                                    break;
-                                case "minecraft:villager":
-                                    typeId = 18;
-                                    break;
-                                case "minecraft:beacon":
-                                    typeId = 8;
-                                    break;
-                                case "minecraft:anvil":
-                                    typeId = 7;
-                                    break;
-                                case "minecraft:hopper":
-                                    typeId = 15;
-                                    break;
-                                case "minecraft:shulker_box":
-                                    typeId = 19;
-                                    break;
-                                case "minecraft:container":
-                                case "minecraft:chest":
-                                default:
-                                    if (slots > 0 && slots <= 54) {
-                                        typeId = slots / 9 - 1;
-                                    }
-                                    break;
-                            }
-
-                            if (typeId == -1) {
-                                Via.getPlatform().getLogger().warning("Can't open inventory for 1.14 player! Type: " + type + " Size: " + slots);
-                            }
-
-                            wrapper.write(Type.VAR_INT, typeId);
-                            wrapper.write(Type.COMPONENT, title);
+                int typeId = -1;
+                switch (type) {
+                    case "minecraft:crafting_table":
+                        typeId = 11;
+                        break;
+                    case "minecraft:furnace":
+                        typeId = 13;
+                        break;
+                    case "minecraft:dropper":
+                    case "minecraft:dispenser":
+                        typeId = 6;
+                        break;
+                    case "minecraft:enchanting_table":
+                        typeId = 12;
+                        break;
+                    case "minecraft:brewing_stand":
+                        typeId = 10;
+                        break;
+                    case "minecraft:villager":
+                        typeId = 18;
+                        break;
+                    case "minecraft:beacon":
+                        typeId = 8;
+                        break;
+                    case "minecraft:anvil":
+                        typeId = 7;
+                        break;
+                    case "minecraft:hopper":
+                        typeId = 15;
+                        break;
+                    case "minecraft:shulker_box":
+                        typeId = 19;
+                        break;
+                    case "minecraft:container":
+                    case "minecraft:chest":
+                    default:
+                        if (slots > 0 && slots <= 54) {
+                            typeId = slots / 9 - 1;
                         }
-                    }
-                });
+                        break;
+                }
+
+                if (typeId == -1) {
+                    Via.getPlatform().getLogger().warning("Can't open inventory for 1.14 player! Type: " + type + " Size: " + slots);
+                }
+
+                wrapper.write(Type.VAR_INT, typeId);
+                wrapper.write(Type.COMPONENT, title);
             }
         });
 
@@ -152,50 +143,47 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             @Override
             public void register() {
                 map(Type.STRING); // Channel
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String channel = wrapper.get(Type.STRING, 0);
-                        if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
-                            wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
-                            wrapper.resetReader();
-                            wrapper.read(Type.STRING); // Remove channel
+                handler(wrapper -> {
+                    String channel = wrapper.get(Type.STRING, 0);
+                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                        wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
+                        wrapper.resetReader();
+                        wrapper.read(Type.STRING); // Remove channel
 
-                            int windowId = wrapper.read(Type.INT);
-                            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
-                            tracker.setLatestTradeWindowId(windowId);
-                            wrapper.write(Type.VAR_INT, windowId);
+                        int windowId = wrapper.read(Type.INT);
+                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
+                        tracker.setLatestTradeWindowId(windowId);
+                        wrapper.write(Type.VAR_INT, windowId);
 
-                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                            for (int i = 0; i < size; i++) {
-                                // Input Item
+                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        for (int i = 0; i < size; i++) {
+                            // Input Item
+                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            // Output Item
+                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+
+                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            if (secondItem) {
+                                // Second Item
                                 handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                                // Output Item
-                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-
-                                boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
-                                if (secondItem) {
-                                    // Second Item
-                                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
-                                }
-
-                                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                                wrapper.passthrough(Type.INT); // Number of tools uses
-                                wrapper.passthrough(Type.INT); // Maximum number of trade uses
-
-                                wrapper.write(Type.INT, 0);
-                                wrapper.write(Type.INT, 0);
-                                wrapper.write(Type.FLOAT, 0f);
                             }
-                            wrapper.write(Type.VAR_INT, 0);
-                            wrapper.write(Type.VAR_INT, 0);
-                            wrapper.write(Type.BOOLEAN, false);
-                        } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
-                            int hand = wrapper.read(Type.VAR_INT);
-                            wrapper.clearPacket();
-                            wrapper.setPacketType(ClientboundPackets1_14.OPEN_BOOK);
-                            wrapper.write(Type.VAR_INT, hand);
+
+                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Type.INT); // Number of tools uses
+                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                            wrapper.write(Type.INT, 0);
+                            wrapper.write(Type.INT, 0);
+                            wrapper.write(Type.FLOAT, 0f);
                         }
+                        wrapper.write(Type.VAR_INT, 0);
+                        wrapper.write(Type.VAR_INT, 0);
+                        wrapper.write(Type.BOOLEAN, false);
+                    } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
+                        int hand = wrapper.read(Type.VAR_INT);
+                        wrapper.clearPacket();
+                        wrapper.setPacketType(ClientboundPackets1_14.OPEN_BOOK);
+                        wrapper.write(Type.VAR_INT, hand);
                     }
                 });
             }
@@ -204,53 +192,40 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter1_13_2<>(protocol);
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    int deleted = 0;
-                    for (int i = 0; i < size; i++) {
-                        String id = wrapper.read(Type.STRING); // Recipe Identifier
-                        String type = wrapper.read(Type.STRING);
-                        if (REMOVED_RECIPE_TYPES.contains(type)) {
-                            deleted++;
-                            continue;
-                        }
-                        wrapper.write(Type.STRING, type);
-                        wrapper.write(Type.STRING, id);
+        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            int deleted = 0;
+            for (int i = 0; i < size; i++) {
+                String id = wrapper.read(Type.STRING); // Recipe Identifier
+                String type = wrapper.read(Type.STRING);
+                if (REMOVED_RECIPE_TYPES.contains(type)) {
+                    deleted++;
+                    continue;
+                }
+                wrapper.write(Type.STRING, type);
+                wrapper.write(Type.STRING, id);
 
-                        recipeRewriter.handleRecipeType(wrapper, type);
-                    }
-                    wrapper.set(Type.VAR_INT, 0, size - deleted);
-                });
+                recipeRewriter.handleRecipeType(wrapper, type);
             }
+            wrapper.set(Type.VAR_INT, 0, size - deleted);
         });
 
 
         registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Selecting trade now moves the items, we need to resync the inventory
-                        PacketWrapper resyncPacket = wrapper.create(0x08);
-                        EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
-                        resyncPacket.write(Type.UNSIGNED_BYTE, ((short) tracker.getLatestTradeWindowId())); // 0 - Window ID
-                        resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
-                        resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
-                        resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number
-                        resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
-                        CompoundTag tag = new CompoundTag();
-                        tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
-                        resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
-                        resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
-                    }
-                });
-            }
+        protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
+            // Selecting trade now moves the items, we need to resync the inventory
+            PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CLICK_WINDOW);
+            EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_14To1_13_2.class);
+            resyncPacket.write(Type.UNSIGNED_BYTE, ((short) tracker.getLatestTradeWindowId())); // 0 - Window ID
+            resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
+            resyncPacket.write(Type.BYTE, (byte) 2); // 2 - Button - End left click
+            resyncPacket.write(Type.SHORT, ((short) ThreadLocalRandom.current().nextInt())); // 3 - Action number
+            resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
+            CompoundTag tag = new CompoundTag();
+            tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
+            resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+            resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
         });
 
         registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);

@@ -18,11 +18,10 @@
 package com.viaversion.viaversion.util;
 
 import com.google.common.collect.ForwardingSet;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SetWrapper<E> extends ForwardingSet<E> {
 

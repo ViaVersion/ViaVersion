@@ -23,10 +23,9 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Collection;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ProtocolPipeline extends SimpleProtocol {
 

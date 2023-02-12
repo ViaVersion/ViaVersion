@@ -32,8 +32,6 @@ import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Int2IntBiMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,6 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataLoader {
 

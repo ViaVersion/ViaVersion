@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -113,18 +112,13 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         metadataRewriter.register();
 
         // Disconnect workaround (JSON!)
-        registerClientbound(State.LOGIN, 0x00, 0x00, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    if (wrapper.isReadable(Type.COMPONENT, 0)) {
-                        // Already written as json somewhere else
-                        return;
-                    }
-
-                    wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
-                });
+        registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> {
+            if (wrapper.isReadable(Type.COMPONENT, 0)) {
+                // Already written as json somewhere else
+                return;
             }
+
+            wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
         });
 
         // Other Handlers

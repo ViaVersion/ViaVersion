@@ -29,7 +29,6 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 
 public class EntityPackets {

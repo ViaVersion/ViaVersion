@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 
 public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_12To1_11_1> {

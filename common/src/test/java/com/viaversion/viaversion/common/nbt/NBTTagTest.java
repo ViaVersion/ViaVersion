@@ -17,11 +17,9 @@
  */
 package com.viaversion.viaversion.common.nbt;
 
-import com.github.steveice10.opennbt.tag.builtin.FloatTag;
+import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO.readString;
 

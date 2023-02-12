@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
@@ -90,21 +89,18 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.SHORT); // 11 - Velocity Z
                 map(Types1_9.METADATA_LIST); // 12 - Metadata
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        // Change Type :)
-                        int type = wrapper.get(Type.VAR_INT, 1);
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    // Change Type :)
+                    int type = wrapper.get(Type.VAR_INT, 1);
 
-                        Entity1_11Types.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
-                        if (entType != null) {
-                            wrapper.set(Type.VAR_INT, 1, entType.getId());
+                    Entity1_11Types.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    if (entType != null) {
+                        wrapper.set(Type.VAR_INT, 1, entType.getId());
 
-                            // Register Type ID
-                            wrapper.user().getEntityTracker(Protocol1_11To1_10.class).addEntity(entityId, entType);
-                            entityRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
-                        }
+                        // Register Type ID
+                        wrapper.user().getEntityTracker(Protocol1_11To1_10.class).addEntity(entityId, entType);
+                        entityRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -118,11 +114,8 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.VAR_INT); // 0 - Collected entity id
                 map(Type.VAR_INT); // 1 - Collector entity id
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.write(Type.VAR_INT, 1); // 2 - Pickup Count
-                    }
+                handler(wrapper -> {
+                    wrapper.write(Type.VAR_INT, 1); // 2 - Pickup Count
                 });
             }
         });
@@ -140,17 +133,14 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.BYTE); // 5 - pitch
                 map(Type.BOOLEAN); // 6 - onGround
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityID = wrapper.get(Type.VAR_INT, 0);
-                        if (Via.getConfig().isHologramPatch()) {
-                            EntityTracker1_11 tracker = wrapper.user().getEntityTracker(Protocol1_11To1_10.class);
-                            if (tracker.isHologram(entityID)) {
-                                Double newValue = wrapper.get(Type.DOUBLE, 1);
-                                newValue -= (Via.getConfig().getHologramYOffset());
-                                wrapper.set(Type.DOUBLE, 1, newValue);
-                            }
+                handler(wrapper -> {
+                    int entityID = wrapper.get(Type.VAR_INT, 0);
+                    if (Via.getConfig().isHologramPatch()) {
+                        EntityTracker1_11 tracker = wrapper.user().getEntityTracker(Protocol1_11To1_10.class);
+                        if (tracker.isHologram(entityID)) {
+                            Double newValue = wrapper.get(Type.DOUBLE, 1);
+                            newValue -= (Via.getConfig().getHologramYOffset());
+                            wrapper.set(Type.DOUBLE, 1, newValue);
                         }
                     }
                 });
@@ -164,15 +154,12 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             public void register() {
                 map(Type.VAR_INT); // 0 - Action
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.VAR_INT, 0);
+                handler(wrapper -> {
+                    int action = wrapper.get(Type.VAR_INT, 0);
 
-                        // Handle the new ActionBar
-                        if (action >= 2) {
-                            wrapper.set(Type.VAR_INT, 0, action + 1);
-                        }
+                    // Handle the new ActionBar
+                    if (action >= 2) {
+                        wrapper.set(Type.VAR_INT, 0, action + 1);
                     }
                 });
             }
@@ -187,14 +174,11 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.VAR_INT); // 3 - Block Type
 
                 // Cheap hack to ensure it's always right block
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(final PacketWrapper actionWrapper) throws Exception {
-                        if (Via.getConfig().isPistonAnimationPatch()) {
-                            int id = actionWrapper.get(Type.VAR_INT, 0);
-                            if (id == 33 || id == 29) {
-                                actionWrapper.cancel();
-                            }
+                handler(actionWrapper -> {
+                    if (Via.getConfig().isPistonAnimationPatch()) {
+                        int id = actionWrapper.get(Type.VAR_INT, 0);
+                        if (id == 33 || id == 29) {
+                            actionWrapper.cancel();
                         }
                     }
                 });
@@ -208,46 +192,35 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NBT); // 2 - NBT data
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        CompoundTag tag = wrapper.get(Type.NBT, 0);
-                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
-                            EntityIdRewriter.toClientSpawner(tag);
+                handler(wrapper -> {
+                    CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
+                        EntityIdRewriter.toClientSpawner(tag);
 
-                        if (tag.contains("id"))
-                            // Handle new identifier
-                            ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier((String) tag.get("id").getValue()));
+                    if (tag.contains("id"))
+                        // Handle new identifier
+                        ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier((String) tag.get("id").getValue()));
 
-                    }
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
 
-                        if (chunk.getBlockEntities() == null) return;
-                        for (CompoundTag tag : chunk.getBlockEntities()) {
-                            if (tag.contains("id")) {
-                                String identifier = ((StringTag) tag.get("id")).getValue();
-                                if (identifier.equals("MobSpawner")) {
-                                    EntityIdRewriter.toClientSpawner(tag);
-                                }
-
-                                // Handle new identifier
-                                ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier(identifier));
-                            }
-                        }
+            if (chunk.getBlockEntities() == null) return;
+            for (CompoundTag tag : chunk.getBlockEntities()) {
+                if (tag.contains("id")) {
+                    String identifier = ((StringTag) tag.get("id")).getValue();
+                    if (identifier.equals("MobSpawner")) {
+                        EntityIdRewriter.toClientSpawner(tag);
                     }
-                });
+
+                    // Handle new identifier
+                    ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier(identifier));
+                }
             }
         });
 
@@ -326,14 +299,11 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Message
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // 100 character limit on older servers
-                        String msg = wrapper.get(Type.STRING, 0);
-                        if (msg.length() > 100) {
-                            wrapper.set(Type.STRING, 0, msg.substring(0, 100));
-                        }
+                handler(wrapper -> {
+                    // 100 character limit on older servers
+                    String msg = wrapper.get(Type.STRING, 0);
+                    if (msg.length() > 100) {
+                        wrapper.set(Type.STRING, 0, msg.substring(0, 100));
                     }
                 });
             }

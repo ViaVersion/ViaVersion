@@ -46,15 +46,14 @@ import com.viaversion.viaversion.velocity.platform.VelocityViaLoader;
 import com.viaversion.viaversion.velocity.platform.VelocityViaTask;
 import com.viaversion.viaversion.velocity.service.ProtocolDetectorService;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.slf4j.Logger;
 
 @Plugin(
         id = "viaversion",

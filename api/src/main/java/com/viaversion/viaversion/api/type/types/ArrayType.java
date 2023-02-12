@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-
 import java.lang.reflect.Array;
 
 public class ArrayType<T> extends Type<T[]> {

@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-
 import java.io.IOException;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {

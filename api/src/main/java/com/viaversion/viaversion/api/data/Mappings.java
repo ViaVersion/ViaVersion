@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import java.util.Arrays;
 
 public interface Mappings {

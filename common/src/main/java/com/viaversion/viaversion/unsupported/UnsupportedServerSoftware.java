@@ -19,7 +19,6 @@ package com.viaversion.viaversion.unsupported;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

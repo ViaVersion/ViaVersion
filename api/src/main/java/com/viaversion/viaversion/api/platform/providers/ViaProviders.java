@@ -22,12 +22,11 @@
  */
 package com.viaversion.viaversion.api.platform.providers;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ViaProviders {
     private final Map<Class<? extends Provider>, Provider> providers = new HashMap<>();

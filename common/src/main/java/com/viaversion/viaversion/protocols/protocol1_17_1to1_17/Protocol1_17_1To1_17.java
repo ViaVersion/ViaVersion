@@ -40,15 +40,10 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Aaaaand back to an array again!
-                    int entityId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
-                });
-            }
+        registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, wrapper -> {
+            // Aaaaand back to an array again!
+            int entityId = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
         });
 
         registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketHandlers() {
@@ -82,51 +77,46 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    CompoundTag tag = new CompoundTag();
-                    Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
+        registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> {
+            CompoundTag tag = new CompoundTag();
+            Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
 
-                    // Write the item, edit the tag down the line
-                    wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
+            // Write the item, edit the tag down the line
+            wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
 
-                    int slot = wrapper.read(Type.VAR_INT);
+            int slot = wrapper.read(Type.VAR_INT);
 
-                    // Save pages to tag
-                    int pages = wrapper.read(Type.VAR_INT);
-                    ListTag pagesTag = new ListTag(StringTag.class);
-                    for (int i = 0; i < pages; i++) {
-                        String page = wrapper.read(PAGE_STRING_TYPE);
-                        pagesTag.add(new StringTag(page));
-                    }
-
-                    // Legacy servers don't like an empty pages list
-                    if (pagesTag.size() == 0) {
-                        pagesTag.add(new StringTag(""));
-                    }
-
-                    tag.put("pages", pagesTag);
-
-                    if (wrapper.read(Type.BOOLEAN)) {
-                        // Save the title to tag
-                        String title = wrapper.read(TITLE_STRING_TYPE);
-                        tag.put("title", new StringTag(title));
-
-                        // Even if unused, legacy servers check for the author tag
-                        tag.put("author", new StringTag(wrapper.user().getProtocolInfo().getUsername()));
-
-                        // Write signing
-                        wrapper.write(Type.BOOLEAN, true);
-                    } else {
-                        wrapper.write(Type.BOOLEAN, false);
-                    }
-
-                    // Write the slot
-                    wrapper.write(Type.VAR_INT, slot);
-                });
+            // Save pages to tag
+            int pages = wrapper.read(Type.VAR_INT);
+            ListTag pagesTag = new ListTag(StringTag.class);
+            for (int i = 0; i < pages; i++) {
+                String page = wrapper.read(PAGE_STRING_TYPE);
+                pagesTag.add(new StringTag(page));
             }
+
+            // Legacy servers don't like an empty pages list
+            if (pagesTag.size() == 0) {
+                pagesTag.add(new StringTag(""));
+            }
+
+            tag.put("pages", pagesTag);
+
+            if (wrapper.read(Type.BOOLEAN)) {
+                // Save the title to tag
+                String title = wrapper.read(TITLE_STRING_TYPE);
+                tag.put("title", new StringTag(title));
+
+                // Even if unused, legacy servers check for the author tag
+                tag.put("author", new StringTag(wrapper.user().getProtocolInfo().getUsername()));
+
+                // Write signing
+                wrapper.write(Type.BOOLEAN, true);
+            } else {
+                wrapper.write(Type.BOOLEAN, false);
+            }
+
+            // Write the slot
+            wrapper.write(Type.VAR_INT, slot);
         });
     }
 }

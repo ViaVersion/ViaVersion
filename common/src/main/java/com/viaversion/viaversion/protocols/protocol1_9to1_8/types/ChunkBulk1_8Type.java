@@ -65,7 +65,8 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
     @Override
     public void write(ByteBuf output, ClientWorld world, Chunk[] chunks) throws Exception {
         boolean skyLight = false;
-        loop1: for (Chunk c : chunks) {
+        loop1:
+        for (Chunk c : chunks) {
             for (ChunkSection section : c.getSections()) {
                 if (section != null && section.getLight().hasSkyLight()) {
                     skyLight = true;

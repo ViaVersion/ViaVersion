@@ -21,8 +21,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
@@ -36,28 +34,20 @@ public class WorldPackets {
     public static void register(Protocol1_13_1To1_13 protocol) {
         BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION);
 
-        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
+        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
 
-                        for (ChunkSection section : chunk.getSections()) {
-                            if (section == null) {
-                                continue;
-                            }
+            for (ChunkSection section : chunk.getSections()) {
+                if (section == null) {
+                    continue;
+                }
 
-                            DataPalette palette = section.palette(PaletteType.BLOCKS);
-                            for (int i = 0; i < palette.size(); i++) {
-                                int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                                palette.setIdByIndex(i, mappedBlockStateId);
-                            }
-                        }
-                    }
-                });
+                DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < palette.size(); i++) {
+                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                    palette.setIdByIndex(i, mappedBlockStateId);
+                }
             }
         });
 
@@ -112,14 +102,11 @@ public class WorldPackets {
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        // Store the player
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-                    }
+                handler(wrapper -> {
+                    // Store the player
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
                 });
             }
         });
@@ -128,13 +115,10 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Dimension ID
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });

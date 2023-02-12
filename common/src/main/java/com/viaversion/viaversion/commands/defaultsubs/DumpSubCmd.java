@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.dump.DumpTemplate;
 import com.viaversion.viaversion.dump.VersionInfo;
 import com.viaversion.viaversion.util.GsonUtil;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InvalidObjectException;

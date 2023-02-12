@@ -25,11 +25,10 @@ import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.legacy.LegacyAPI;
 import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ViaAPIBase<T> implements ViaAPI<T> {
 

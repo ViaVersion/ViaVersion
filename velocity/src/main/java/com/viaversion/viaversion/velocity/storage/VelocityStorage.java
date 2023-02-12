@@ -20,7 +20,6 @@ package com.viaversion.viaversion.velocity.storage;
 import com.velocitypowered.api.proxy.Player;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.util.ReflectionUtil;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;

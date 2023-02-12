@@ -20,7 +20,6 @@ package com.viaversion.viaversion.bungee.platform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;

@@ -23,9 +23,8 @@
 package com.viaversion.viaversion.util;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Simple wrapper class for two {@link Int2IntMap}s.

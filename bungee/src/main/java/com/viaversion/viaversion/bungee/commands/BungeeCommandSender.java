@@ -18,10 +18,9 @@
 package com.viaversion.viaversion.bungee.commands;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
+import java.util.UUID;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
-import java.util.UUID;
 
 public class BungeeCommandSender implements ViaCommandSender {
     private final CommandSender sender;

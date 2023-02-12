@@ -28,7 +28,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
-
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;

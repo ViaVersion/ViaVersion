@@ -31,7 +31,6 @@ import com.viaversion.viaversion.commands.defaultsubs.HelpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ReloadSubCmd;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

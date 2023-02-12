@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

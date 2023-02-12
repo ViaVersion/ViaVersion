@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.common.type;
 
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import com.viaversion.viaversion.api.type.Type;
 
 public class StringTypeTest {
     @Test

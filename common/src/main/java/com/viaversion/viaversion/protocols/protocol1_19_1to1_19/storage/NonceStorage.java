@@ -24,7 +24,7 @@ public final class NonceStorage implements StorableObject {
 
     private final byte[] nonce;
 
-    public NonceStorage(final byte @Nullable[] nonce) {
+    public NonceStorage(final byte @Nullable [] nonce) {
         this.nonce = nonce;
     }
 

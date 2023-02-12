@@ -25,9 +25,8 @@ package com.viaversion.viaversion.api.data;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.util.Int2IntBiMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface MappingData {
 

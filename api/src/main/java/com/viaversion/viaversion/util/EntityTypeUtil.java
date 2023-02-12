@@ -26,7 +26,6 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.Protocol;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

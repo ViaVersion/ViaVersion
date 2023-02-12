@@ -22,9 +22,8 @@
  */
 package com.viaversion.viaversion.util;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Pair<X, Y> {
     private final X key;

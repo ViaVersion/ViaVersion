@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
@@ -43,46 +42,36 @@ public final class WorldPackets {
 
         protocol.cancelClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-                    Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-                    Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
-                    final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
-                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                            MathUtil.ceilLog2(tracker.biomesSent()));
-                    final Chunk chunk = wrapper.passthrough(chunkType);
-                    for (final ChunkSection section : chunk.getSections()) {
-                        final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                        for (int i = 0; i < blockPalette.size(); i++) {
-                            final int id = blockPalette.idByIndex(i);
-                            blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-                        }
-                    }
-                });
+        protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, wrapper -> {
+            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+            final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                    MathUtil.ceilLog2(tracker.biomesSent()));
+            final Chunk chunk = wrapper.passthrough(chunkType);
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                }
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON_EFFECT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Primary effect
-                    if (wrapper.read(Type.BOOLEAN)) {
-                        wrapper.passthrough(Type.VAR_INT);
-                    } else {
-                        wrapper.write(Type.VAR_INT, -1);
-                    }
+        protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON_EFFECT, wrapper -> {
+            // Primary effect
+            if (wrapper.read(Type.BOOLEAN)) {
+                wrapper.passthrough(Type.VAR_INT);
+            } else {
+                wrapper.write(Type.VAR_INT, -1);
+            }
 
-                    // Secondary effect
-                    if (wrapper.read(Type.BOOLEAN)) {
-                        wrapper.passthrough(Type.VAR_INT);
-                    } else {
-                        wrapper.write(Type.VAR_INT, -1);
-                    }
-                });
+            // Secondary effect
+            if (wrapper.read(Type.BOOLEAN)) {
+                wrapper.passthrough(Type.VAR_INT);
+            } else {
+                wrapper.write(Type.VAR_INT, -1);
             }
         });
     }

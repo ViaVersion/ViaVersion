@@ -22,9 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft.chunks;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.EnumMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ChunkSectionImpl implements ChunkSection {
 

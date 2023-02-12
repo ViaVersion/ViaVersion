@@ -23,9 +23,8 @@
 package com.viaversion.viaversion.api.minecraft.metadata;
 
 import com.google.common.base.Preconditions;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Metadata {
     private int id;

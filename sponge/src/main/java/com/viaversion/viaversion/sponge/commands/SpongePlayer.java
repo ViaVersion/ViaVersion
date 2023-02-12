@@ -19,9 +19,8 @@ package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-
 import java.util.UUID;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public class SpongePlayer implements ViaCommandSender {
     private final ServerPlayer player;

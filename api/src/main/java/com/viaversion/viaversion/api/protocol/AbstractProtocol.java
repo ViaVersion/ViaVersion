@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import java.util.Arrays;
@@ -168,12 +167,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void cancelServerbound(State state, int unmappedPacketId, int mappedPacketId) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+        registerServerbound(state, unmappedPacketId, mappedPacketId, PacketWrapper::cancel);
     }
 
     @Override
@@ -183,12 +177,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void cancelClientbound(State state, int unmappedPacketId, int mappedPacketId) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+        registerClientbound(state, unmappedPacketId, mappedPacketId, PacketWrapper::cancel);
     }
 
     @Override
@@ -227,12 +216,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void cancelClientbound(C1 packetType) {
-        registerClientbound(packetType, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+        registerClientbound(packetType, null, PacketWrapper::cancel);
     }
 
     @Override
@@ -254,12 +238,7 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
 
     @Override
     public void cancelServerbound(S2 packetType) {
-        registerServerbound(packetType, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+        registerServerbound(packetType, null, PacketWrapper::cancel);
     }
 
     private void register(Map<Packet, ProtocolPacket> packetMap, PacketType packetType, @Nullable PacketType mappedPacketType,
@@ -513,5 +492,25 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         public PacketHandler getRemapper() {
             return handler;
         }
+
+        @Override
+        public String toString() {
+            return "ProtocolPacket{" +
+                    "state=" + state +
+                    ", oldId=" + oldId +
+                    ", newId=" + newId +
+                    ", unmappedPacketType=" + unmappedPacketType +
+                    ", mappedPacketType=" + mappedPacketType +
+                    ", handler=" + handler +
+                    '}';
+        }
+    }
+
+    public Map<Packet, ProtocolPacket> getClientbound() {
+        return clientbound;
+    }
+
+    public Map<Packet, ProtocolPacket> getServerbound() {
+        return serverbound;
     }
 }

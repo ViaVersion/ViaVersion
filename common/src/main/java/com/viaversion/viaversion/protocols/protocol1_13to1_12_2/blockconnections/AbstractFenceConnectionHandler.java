@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

@@ -59,33 +59,28 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
         WorldPackets.register(this);
 
-        registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Tags are now generically written with resource location - 5 different Vanilla types
-                    wrapper.write(Type.VAR_INT, 5);
-                    for (RegistryType type : RegistryType.getValues()) {
-                        // Prefix with resource location
-                        wrapper.write(Type.STRING, type.resourceLocation());
+        registerClientbound(ClientboundPackets1_16_2.TAGS, wrapper -> {
+            // Tags are now generically written with resource location - 5 different Vanilla types
+            wrapper.write(Type.VAR_INT, 5);
+            for (RegistryType type : RegistryType.getValues()) {
+                // Prefix with resource location
+                wrapper.write(Type.STRING, type.resourceLocation());
 
-                        // Id conversion
-                        tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
+                // Id conversion
+                tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
 
-                        // Stop iterating after entity types
-                        if (type == RegistryType.ENTITY) {
-                            break;
-                        }
-                    }
+                // Stop iterating after entity types
+                if (type == RegistryType.ENTITY) {
+                    break;
+                }
+            }
 
-                    // New Game Event tags type
-                    wrapper.write(Type.STRING, RegistryType.GAME_EVENT.resourceLocation());
-                    wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
-                    for (String tag : NEW_GAME_EVENT_TAGS) {
-                        wrapper.write(Type.STRING, tag);
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
-                    }
-                });
+            // New Game Event tags type
+            wrapper.write(Type.STRING, RegistryType.GAME_EVENT.resourceLocation());
+            wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
+            for (String tag : NEW_GAME_EVENT_TAGS) {
+                wrapper.write(Type.STRING, tag);
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
             }
         });
 
@@ -95,74 +90,59 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.STRING);
-                    wrapper.passthrough(Type.STRING);
-                    wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
-                    wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
-                });
+        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
+            wrapper.passthrough(Type.STRING);
+            wrapper.passthrough(Type.STRING);
+            wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
+            wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
+        });
+
+        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Type.BYTE);
+            wrapper.read(Type.BOOLEAN); // Tracking position removed
+            wrapper.passthrough(Type.BOOLEAN);
+
+            int size = wrapper.read(Type.VAR_INT);
+            // Write whether markers exists or not
+            if (size != 0) {
+                wrapper.write(Type.BOOLEAN, true);
+                wrapper.write(Type.VAR_INT, size);
+            } else {
+                wrapper.write(Type.BOOLEAN, false);
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.BYTE);
-                    wrapper.read(Type.BOOLEAN); // Tracking position removed
-                    wrapper.passthrough(Type.BOOLEAN);
-
-                    int size = wrapper.read(Type.VAR_INT);
-                    // Write whether markers exists or not
-                    if (size != 0) {
-                        wrapper.write(Type.BOOLEAN, true);
-                        wrapper.write(Type.VAR_INT, size);
-                    } else {
-                        wrapper.write(Type.BOOLEAN, false);
-                    }
-                });
+        registerClientbound(ClientboundPackets1_16_2.TITLE, null, wrapper -> {
+            // Title packet actions have been split into individual packets (the content hasn't changed)
+            int type = wrapper.read(Type.VAR_INT);
+            ClientboundPacketType packetType;
+            switch (type) {
+                case 0:
+                    packetType = ClientboundPackets1_17.TITLE_TEXT;
+                    break;
+                case 1:
+                    packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
+                    break;
+                case 2:
+                    packetType = ClientboundPackets1_17.ACTIONBAR;
+                    break;
+                case 3:
+                    packetType = ClientboundPackets1_17.TITLE_TIMES;
+                    break;
+                case 4:
+                    packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                    wrapper.write(Type.BOOLEAN, false); // Reset times
+                    break;
+                case 5:
+                    packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                    wrapper.write(Type.BOOLEAN, true); // Reset times
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid title type received: " + type);
             }
-        });
 
-        registerClientbound(ClientboundPackets1_16_2.TITLE, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Title packet actions have been split into individual packets (the content hasn't changed)
-                    int type = wrapper.read(Type.VAR_INT);
-                    ClientboundPacketType packetType;
-                    switch (type) {
-                        case 0:
-                            packetType = ClientboundPackets1_17.TITLE_TEXT;
-                            break;
-                        case 1:
-                            packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
-                            break;
-                        case 2:
-                            packetType = ClientboundPackets1_17.ACTIONBAR;
-                            break;
-                        case 3:
-                            packetType = ClientboundPackets1_17.TITLE_TIMES;
-                            break;
-                        case 4:
-                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                            wrapper.write(Type.BOOLEAN, false); // Reset times
-                            break;
-                        case 5:
-                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                            wrapper.write(Type.BOOLEAN, true); // Reset times
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Invalid title type received: " + type);
-                    }
-
-                    wrapper.setPacketType(packetType);
-                });
-            }
+            wrapper.setPacketType(packetType);
         });
 
         registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketHandlers() {

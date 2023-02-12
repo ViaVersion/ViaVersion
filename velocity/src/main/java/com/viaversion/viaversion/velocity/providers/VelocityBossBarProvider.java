@@ -20,7 +20,6 @@ package com.viaversion.viaversion.velocity.providers;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.velocity.storage.VelocityStorage;
-
 import java.util.UUID;
 
 public class VelocityBossBarProvider extends BossBarProvider {

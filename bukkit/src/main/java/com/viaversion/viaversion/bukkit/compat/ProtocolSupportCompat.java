@@ -20,12 +20,11 @@ package com.viaversion.viaversion.bukkit.compat;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-
-import java.util.logging.Level;
 
 public final class ProtocolSupportCompat {
 

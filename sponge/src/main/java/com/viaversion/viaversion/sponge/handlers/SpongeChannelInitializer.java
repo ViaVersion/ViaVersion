@@ -27,7 +27,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-
 import java.lang.reflect.Method;
 
 public class SpongeChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {

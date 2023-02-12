@@ -30,7 +30,7 @@ public interface ValueWriter<T> {
     /**
      * Write a value to a packet
      *
-     * @param wrapper     The packet wrapper to write to
+     * @param wrapper    The packet wrapper to write to
      * @param inputValue The value to write
      * @throws Exception Throws exception if it fails to write
      */

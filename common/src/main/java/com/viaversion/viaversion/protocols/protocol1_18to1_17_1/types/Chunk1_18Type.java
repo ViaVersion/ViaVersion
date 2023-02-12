@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.List;
 

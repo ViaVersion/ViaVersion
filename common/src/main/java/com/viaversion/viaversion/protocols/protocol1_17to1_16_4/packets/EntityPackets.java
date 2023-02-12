@@ -50,23 +50,18 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
         registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
-                    wrapper.cancel();
+        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, wrapper -> {
+            int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+            wrapper.cancel();
 
-                    EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_17To1_16_4.class);
-                    for (int entityId : entityIds) {
-                        entityTracker.removeEntity(entityId);
+            EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_17To1_16_4.class);
+            for (int entityId : entityIds) {
+                entityTracker.removeEntity(entityId);
 
-                        // Send individual remove packets
-                        PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
-                        newPacket.write(Type.VAR_INT, entityId);
-                        newPacket.send(Protocol1_17To1_16_4.class);
-                    }
-                });
+                // Send individual remove packets
+                PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
+                newPacket.write(Type.VAR_INT, entityId);
+                newPacket.send(Protocol1_17To1_16_4.class);
             }
         });
 
@@ -96,14 +91,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
-                    addNewDimensionData(dimensionData);
-                });
-            }
+        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, wrapper -> {
+            CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
+            addNewDimensionData(dimensionData);
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketHandlers() {
@@ -134,30 +124,25 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Combat packet actions have been split into individual packets (the content hasn't changed)
-                    int type = wrapper.read(Type.VAR_INT);
-                    ClientboundPacketType packetType;
-                    switch (type) {
-                        case 0:
-                            packetType = ClientboundPackets1_17.COMBAT_ENTER;
-                            break;
-                        case 1:
-                            packetType = ClientboundPackets1_17.COMBAT_END;
-                            break;
-                        case 2:
-                            packetType = ClientboundPackets1_17.COMBAT_KILL;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Invalid combat type received: " + type);
-                    }
-
-                    wrapper.setPacketType(packetType);
-                });
+        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, wrapper -> {
+            // Combat packet actions have been split into individual packets (the content hasn't changed)
+            int type = wrapper.read(Type.VAR_INT);
+            ClientboundPacketType packetType;
+            switch (type) {
+                case 0:
+                    packetType = ClientboundPackets1_17.COMBAT_ENTER;
+                    break;
+                case 1:
+                    packetType = ClientboundPackets1_17.COMBAT_END;
+                    break;
+                case 2:
+                    packetType = ClientboundPackets1_17.COMBAT_KILL;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid combat type received: " + type);
             }
+
+            wrapper.setPacketType(packetType);
         });
 
         // The parent class of the other entity move packets that is never actually used has finally been removed from the id list

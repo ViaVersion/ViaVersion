@@ -32,12 +32,11 @@ import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface UserConnection {
 

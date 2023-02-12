@@ -19,8 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -49,45 +47,42 @@ public class EntityPackets {
                 map(Type.INT); // 8 - Data
 
                 // Track Entity
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int entityId = wrapper.get(Type.VAR_INT, 0);
-                        byte type = wrapper.get(Type.BYTE, 0);
-                        Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
-                        if (entType == null) return;
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    byte type = wrapper.get(Type.BYTE, 0);
+                    Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
+                    if (entType == null) return;
 
-                        // Register Type ID
-                        wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, entType);
+                    // Register Type ID
+                    wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, entType);
 
-                        if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
-                            int oldId = wrapper.get(Type.INT, 0);
-                            int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
-                            wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
+                    if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
+                        int oldId = wrapper.get(Type.INT, 0);
+                        int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+                        wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
+                    }
+
+                    // Fix ItemFrame hitbox
+                    if (entType.is(Entity1_13Types.EntityType.ITEM_FRAME)) {
+                        int data = wrapper.get(Type.INT, 0);
+
+                        switch (data) {
+                            // South
+                            case 0:
+                                data = 3;
+                                break;
+                            // West
+                            case 1:
+                                data = 4;
+                                break;
+                            // North is the same
+                            // East
+                            case 3:
+                                data = 5;
+                                break;
                         }
 
-                        // Fix ItemFrame hitbox
-                        if (entType.is(Entity1_13Types.EntityType.ITEM_FRAME)) {
-                            int data = wrapper.get(Type.INT, 0);
-
-                            switch (data) {
-                                // South
-                                case 0:
-                                    data = 3;
-                                    break;
-                                // West
-                                case 1:
-                                    data = 4;
-                                    break;
-                                // North is the same
-                                // East
-                                case 3:
-                                    data = 5;
-                                    break;
-                            }
-
-                            wrapper.set(Type.INT, 0, data);
-                        }
+                        wrapper.set(Type.INT, 0, data);
                     }
                 });
             }

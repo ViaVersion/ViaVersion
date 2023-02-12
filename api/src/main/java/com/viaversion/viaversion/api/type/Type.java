@@ -78,7 +78,6 @@ import com.viaversion.viaversion.api.type.types.minecraft.VarLongBlockChangeReco
 import com.viaversion.viaversion.api.type.types.minecraft.Vector3fType;
 import com.viaversion.viaversion.api.type.types.minecraft.VectorType;
 import com.viaversion.viaversion.api.type.types.minecraft.VillagerDataType;
-
 import java.util.UUID;
 
 /**

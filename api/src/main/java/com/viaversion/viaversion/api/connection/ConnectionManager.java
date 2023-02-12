@@ -22,11 +22,10 @@
  */
 package com.viaversion.viaversion.api.connection;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles injected UserConnections

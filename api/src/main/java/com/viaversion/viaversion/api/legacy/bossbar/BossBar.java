@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.legacy.bossbar;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-
 import java.util.Set;
 import java.util.UUID;
 

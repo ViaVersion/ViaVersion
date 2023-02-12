@@ -49,26 +49,21 @@ public class SoundRewriter<C extends ClientboundPacketType> {
     }
 
     public void register1_19_3Sound(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int soundId = wrapper.read(Type.VAR_INT);
-                    if (soundId == 0) {
-                        // Is followed by the resource loation
-                        wrapper.write(Type.VAR_INT, 0);
-                        return;
-                    }
-
-                    final int mappedId = idRewriter.rewrite(soundId - 1); // Normalize sound id
-                    if (mappedId == -1) {
-                        wrapper.cancel();
-                        return;
-                    }
-
-                    wrapper.write(Type.VAR_INT, mappedId + 1);
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            final int soundId = wrapper.read(Type.VAR_INT);
+            if (soundId == 0) {
+                // Is followed by the resource loation
+                wrapper.write(Type.VAR_INT, 0);
+                return;
             }
+
+            final int mappedId = idRewriter.rewrite(soundId - 1); // Normalize sound id
+            if (mappedId == -1) {
+                wrapper.cancel();
+                return;
+            }
+
+            wrapper.write(Type.VAR_INT, mappedId + 1);
         });
     }
 

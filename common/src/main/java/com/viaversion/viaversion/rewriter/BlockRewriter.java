@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
-
 import java.util.List;
 
 public class BlockRewriter<C extends ClientboundPacketType> {
@@ -134,34 +133,29 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-                    Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-                    Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
-                    final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
-                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                            MathUtil.ceilLog2(tracker.biomesSent()));
-                    final Chunk chunk = wrapper.passthrough(chunkType);
-                    for (final ChunkSection section : chunk.getSections()) {
-                        final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                        for (int i = 0; i < blockPalette.size(); i++) {
-                            final int id = blockPalette.idByIndex(i);
-                            blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-                        }
-                    }
+        protocol.registerClientbound(packetType, wrapper -> {
+            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+            final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
+                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                    MathUtil.ceilLog2(tracker.biomesSent()));
+            final Chunk chunk = wrapper.passthrough(chunkType);
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                }
+            }
 
-                    final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
-                    if (blockEntityMappings != null) {
-                        List<BlockEntity> blockEntities = chunk.blockEntities();
-                        for (int i = 0; i < blockEntities.size(); i++) {
-                            final BlockEntity blockEntity = blockEntities.get(i);
-                            blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
-                        }
-                    }
-                });
+            final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+            if (blockEntityMappings != null) {
+                List<BlockEntity> blockEntities = chunk.blockEntities();
+                for (int i = 0; i < blockEntities.size(); i++) {
+                    final BlockEntity blockEntity = blockEntities.get(i);
+                    blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                }
             }
         });
     }

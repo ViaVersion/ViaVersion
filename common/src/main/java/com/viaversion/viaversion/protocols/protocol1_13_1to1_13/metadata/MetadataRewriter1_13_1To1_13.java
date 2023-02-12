@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 
 public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<ClientboundPackets1_13, Protocol1_13_1To1_13> {

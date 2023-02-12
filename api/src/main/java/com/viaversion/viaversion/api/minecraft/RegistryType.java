@@ -22,10 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum RegistryType {
 

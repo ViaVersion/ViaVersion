@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.type.types;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-
 import java.util.UUID;
 
 public class UUIDType extends Type<UUID> {

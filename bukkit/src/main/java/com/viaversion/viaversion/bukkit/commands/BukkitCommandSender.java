@@ -18,10 +18,9 @@
 package com.viaversion.viaversion.bukkit.commands;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
+import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-
-import java.util.UUID;
 
 public class BukkitCommandSender implements ViaCommandSender {
     private final CommandSender sender;

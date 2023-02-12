@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThrea
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
 import com.viaversion.viaversion.update.UpdateUtil;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;

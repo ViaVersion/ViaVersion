@@ -38,7 +38,6 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
-
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -47,7 +46,7 @@ public class EntityPackets {
     private static final PacketHandler DIMENSION_HANDLER = wrapper -> {
         WorldIdentifiers map = Via.getConfig().get1_16WorldNamesMap();
         WorldIdentifiers userMap = wrapper.user().get(WorldIdentifiers.class);
-        if (userMap!=null){
+        if (userMap != null) {
             map = userMap;
         }
         int dimension = wrapper.read(Type.INT);
@@ -159,34 +158,29 @@ public class EntityPackets {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
 
         // Spawn lightning -> Spawn entity
-        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int entityId = wrapper.passthrough(Type.VAR_INT);
-                    byte type = wrapper.read(Type.BYTE);
-                    if (type != 1) {
-                        // Cancel if not lightning/invalid id
-                        wrapper.cancel();
-                        return;
-                    }
-
-                    wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
-
-                    wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
-                    wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
-
-                    wrapper.passthrough(Type.DOUBLE); // x
-                    wrapper.passthrough(Type.DOUBLE); // y
-                    wrapper.passthrough(Type.DOUBLE); // z
-                    wrapper.write(Type.BYTE, (byte) 0); // yaw
-                    wrapper.write(Type.BYTE, (byte) 0); // pitch
-                    wrapper.write(Type.INT, 0); // data
-                    wrapper.write(Type.SHORT, (short) 0); // velocity
-                    wrapper.write(Type.SHORT, (short) 0); // velocity
-                    wrapper.write(Type.SHORT, (short) 0); // velocity
-                });
+        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, wrapper -> {
+            int entityId = wrapper.passthrough(Type.VAR_INT);
+            byte type = wrapper.read(Type.BYTE);
+            if (type != 1) {
+                // Cancel if not lightning/invalid id
+                wrapper.cancel();
+                return;
             }
+
+            wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
+
+            wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
+            wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
+
+            wrapper.passthrough(Type.DOUBLE); // x
+            wrapper.passthrough(Type.DOUBLE); // y
+            wrapper.passthrough(Type.DOUBLE); // z
+            wrapper.write(Type.BYTE, (byte) 0); // yaw
+            wrapper.write(Type.BYTE, (byte) 0); // pitch
+            wrapper.write(Type.INT, 0); // data
+            wrapper.write(Type.SHORT, (short) 0); // velocity
+            wrapper.write(Type.SHORT, (short) 0); // velocity
+            wrapper.write(Type.SHORT, (short) 0); // velocity
         });
 
         metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.FALLING_BLOCK);
@@ -239,62 +233,52 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    int size = wrapper.passthrough(Type.INT);
-                    int actualSize = size;
-                    for (int i = 0; i < size; i++) {
-                        // Attributes have been renamed and are now namespaced identifiers
-                        String key = wrapper.read(Type.STRING);
-                        String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
-                        if (attributeIdentifier == null) {
-                            attributeIdentifier = "minecraft:" + key;
-                            if (!com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
-                                if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                    Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
-                                }
-                                actualSize--;
-                                wrapper.read(Type.DOUBLE);
-                                int modifierSize = wrapper.read(Type.VAR_INT);
-                                for (int j = 0; j < modifierSize; j++) {
-                                    wrapper.read(Type.UUID);
-                                    wrapper.read(Type.DOUBLE);
-                                    wrapper.read(Type.BYTE);
-                                }
-                                continue;
-                            }
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Type.INT);
+            int actualSize = size;
+            for (int i = 0; i < size; i++) {
+                // Attributes have been renamed and are now namespaced identifiers
+                String key = wrapper.read(Type.STRING);
+                String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
+                if (attributeIdentifier == null) {
+                    attributeIdentifier = "minecraft:" + key;
+                    if (!com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
+                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
                         }
-
-                        wrapper.write(Type.STRING, attributeIdentifier);
-
-                        wrapper.passthrough(Type.DOUBLE);
-                        int modifierSize = wrapper.passthrough(Type.VAR_INT);
+                        actualSize--;
+                        wrapper.read(Type.DOUBLE);
+                        int modifierSize = wrapper.read(Type.VAR_INT);
                         for (int j = 0; j < modifierSize; j++) {
-                            wrapper.passthrough(Type.UUID);
-                            wrapper.passthrough(Type.DOUBLE);
-                            wrapper.passthrough(Type.BYTE);
+                            wrapper.read(Type.UUID);
+                            wrapper.read(Type.DOUBLE);
+                            wrapper.read(Type.BYTE);
                         }
+                        continue;
                     }
-                    if (size != actualSize) {
-                        wrapper.set(Type.INT, 0, actualSize);
-                    }
-                });
+                }
+
+                wrapper.write(Type.STRING, attributeIdentifier);
+
+                wrapper.passthrough(Type.DOUBLE);
+                int modifierSize = wrapper.passthrough(Type.VAR_INT);
+                for (int j = 0; j < modifierSize; j++) {
+                    wrapper.passthrough(Type.UUID);
+                    wrapper.passthrough(Type.DOUBLE);
+                    wrapper.passthrough(Type.BYTE);
+                }
+            }
+            if (size != actualSize) {
+                wrapper.set(Type.INT, 0, actualSize);
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    // Don't send an arm swing if the player has an inventory opened.
-                    if (inventoryTracker.getInventory() != -1) {
-                        wrapper.cancel();
-                    }
-                });
+        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, wrapper -> {
+            InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+            // Don't send an arm swing if the player has an inventory opened.
+            if (inventoryTracker.getInventory() != -1) {
+                wrapper.cancel();
             }
         });
     }

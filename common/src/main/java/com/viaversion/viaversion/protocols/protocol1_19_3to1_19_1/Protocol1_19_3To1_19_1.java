@@ -103,15 +103,10 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, 0);
-                    wrapper.passthrough(Type.STRING); // Sound identifier
-                    wrapper.write(Type.OPTIONAL_FLOAT, null); // No fixed range
-                });
-            }
+        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
+            wrapper.write(Type.VAR_INT, 0);
+            wrapper.passthrough(Type.STRING); // Sound identifier
+            wrapper.write(Type.OPTIONAL_FLOAT, null); // No fixed range
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);

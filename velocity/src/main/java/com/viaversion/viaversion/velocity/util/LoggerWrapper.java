@@ -17,11 +17,10 @@
  */
 package com.viaversion.viaversion.velocity.util;
 
-import org.slf4j.Logger;
-
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.slf4j.Logger;
 
 public class LoggerWrapper extends java.util.logging.Logger {
     private final Logger base;

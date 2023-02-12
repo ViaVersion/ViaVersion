@@ -21,12 +21,10 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class RecipeRewriter<C extends ClientboundPacketType> {
 
@@ -45,17 +43,12 @@ public abstract class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerDefaultHandler(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
-                        wrapper.passthrough(Type.STRING); // Recipe Identifier
-                        handleRecipeType(wrapper, type);
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                wrapper.passthrough(Type.STRING); // Recipe Identifier
+                handleRecipeType(wrapper, type);
             }
         });
     }

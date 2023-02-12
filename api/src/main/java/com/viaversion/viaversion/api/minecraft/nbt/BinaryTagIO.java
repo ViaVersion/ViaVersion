@@ -24,8 +24,6 @@
 package com.viaversion.viaversion.api.minecraft.nbt;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.io.BufferedInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -38,11 +36,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 // Specific Via changes:
 // - Use OpenNBT tags
 // - Added readString/writeString methods from TagStringIO
 // - Has not been updated for the sake of keeping the class simple
+
 /**
  * Serialization operations for binary tags.
  */

@@ -33,7 +33,6 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -48,39 +47,34 @@ public final class WorldPackets {
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.WORLD_BORDER, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    // Border packet actions have been split into individual packets (the content hasn't changed)
-                    int type = wrapper.read(Type.VAR_INT);
-                    ClientboundPacketType packetType;
-                    switch (type) {
-                        case 0:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_SIZE;
-                            break;
-                        case 1:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
-                            break;
-                        case 2:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_CENTER;
-                            break;
-                        case 3:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_INIT;
-                            break;
-                        case 4:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
-                            break;
-                        case 5:
-                            packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Invalid world border type received: " + type);
-                    }
-
-                    wrapper.setPacketType(packetType);
-                });
+        protocol.registerClientbound(ClientboundPackets1_16_2.WORLD_BORDER, null, wrapper -> {
+            // Border packet actions have been split into individual packets (the content hasn't changed)
+            int type = wrapper.read(Type.VAR_INT);
+            ClientboundPacketType packetType;
+            switch (type) {
+                case 0:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_SIZE;
+                    break;
+                case 1:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
+                    break;
+                case 2:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_CENTER;
+                    break;
+                case 3:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_INIT;
+                    break;
+                case 4:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
+                    break;
+                case 5:
+                    packetType = ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid world border type received: " + type);
             }
+
+            wrapper.setPacketType(packetType);
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketHandlers() {
@@ -127,40 +121,35 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    Chunk chunk = wrapper.read(new Chunk1_16_2Type());
-                    if (!chunk.isFullChunk()) {
-                        // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
-                        // Construct multi block change packets instead
-                        // Height map updates are lost (unless we want to fully cache and resend entire chunks)
-                        // Block entities are always empty for non-full chunks in Vanilla
-                        writeMultiBlockChangePacket(wrapper, chunk);
-                        wrapper.cancel();
-                        return;
-                    }
+        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, wrapper -> {
+            Chunk chunk = wrapper.read(new Chunk1_16_2Type());
+            if (!chunk.isFullChunk()) {
+                // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
+                // Construct multi block change packets instead
+                // Height map updates are lost (unless we want to fully cache and resend entire chunks)
+                // Block entities are always empty for non-full chunks in Vanilla
+                writeMultiBlockChangePacket(wrapper, chunk);
+                wrapper.cancel();
+                return;
+            }
 
-                    // Normal full chunk writing
-                    wrapper.write(new Chunk1_17Type(chunk.getSections().length), chunk);
+            // Normal full chunk writing
+            wrapper.write(new Chunk1_17Type(chunk.getSections().length), chunk);
 
-                    // 1.17 uses a bitset for the mask
-                    chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));
+            // 1.17 uses a bitset for the mask
+            chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));
 
-                    for (int s = 0; s < chunk.getSections().length; s++) {
-                        ChunkSection section = chunk.getSections()[s];
-                        if (section == null) {
-                            continue;
-                        }
+            for (int s = 0; s < chunk.getSections().length; s++) {
+                ChunkSection section = chunk.getSections()[s];
+                if (section == null) {
+                    continue;
+                }
 
-                        DataPalette palette = section.palette(PaletteType.BLOCKS);
-                        for (int i = 0; i < palette.size(); i++) {
-                            int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                            palette.setIdByIndex(i, mappedBlockStateId);
-                        }
-                    }
-                });
+                DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < palette.size(); i++) {
+                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                    palette.setIdByIndex(i, mappedBlockStateId);
+                }
             }
         });
 

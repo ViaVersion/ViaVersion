@@ -348,51 +348,51 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, false);
+        registerClientbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), false);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
-        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, override);
+        registerClientbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), override);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper) {
-        registerClientbound(packetType, (PacketHandler) packetRemapper);
+        registerClientbound(packetType, packetRemapper.asPacketHandler());
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerClientbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, false);
+        registerClientbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), false);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        registerClientbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, override);
+        registerClientbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), override);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, false);
+        registerServerbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), false);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, override);
+        registerServerbound(state, unmappedPacketId, mappedPacketId, packetRemapper.asPacketHandler(), override);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper) {
-        registerServerbound(packetType, (PacketHandler) packetRemapper);
+        registerServerbound(packetType, packetRemapper.asPacketHandler());
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerServerbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, false);
+        registerServerbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), false);
     }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        registerServerbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, override);
+        registerServerbound(packetType, mappedPacketType, packetRemapper.asPacketHandler(), override);
     }
 }

@@ -25,9 +25,8 @@ package com.viaversion.viaversion.api.minecraft.entities;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.EntityTypeUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Locale;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum Entity1_19_3Types implements EntityType {
 

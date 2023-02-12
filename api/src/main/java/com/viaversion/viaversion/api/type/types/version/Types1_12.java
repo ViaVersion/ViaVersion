@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.type.types.version;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
-
 import java.util.List;
 
 public class Types1_12 {

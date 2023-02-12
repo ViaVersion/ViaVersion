@@ -42,7 +42,6 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Pair;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -266,47 +265,42 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int action = wrapper.passthrough(Type.VAR_INT);
-                    final int entries = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < entries; i++) {
-                        wrapper.passthrough(Type.UUID); // UUID
-                        if (action == 0) { // Add player
-                            wrapper.passthrough(Type.STRING); // Player Name
+        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
+            final int action = wrapper.passthrough(Type.VAR_INT);
+            final int entries = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Type.UUID); // UUID
+                if (action == 0) { // Add player
+                    wrapper.passthrough(Type.STRING); // Player Name
 
-                            final int properties = wrapper.passthrough(Type.VAR_INT);
-                            for (int j = 0; j < properties; j++) {
-                                wrapper.passthrough(Type.STRING); // Name
-                                wrapper.passthrough(Type.STRING); // Value
-                                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
-                            }
-
-                            wrapper.passthrough(Type.VAR_INT); // Gamemode
-                            wrapper.passthrough(Type.VAR_INT); // Ping
-                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
-                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                            } else {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
-                            }
-
-                            // No public profile signature
-                            wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
-                        } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                            wrapper.passthrough(Type.VAR_INT);
-                        } else if (action == 3) { // Update display name
-                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
-                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                            } else {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
-                            }
-                        }
+                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Type.STRING); // Name
+                        wrapper.passthrough(Type.STRING); // Value
+                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                     }
-                });
+
+                    wrapper.passthrough(Type.VAR_INT); // Gamemode
+                    wrapper.passthrough(Type.VAR_INT); // Ping
+                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                    }
+
+                    // No public profile signature
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                } else if (action == 1 || action == 2) { // Update gamemode/update latency
+                    wrapper.passthrough(Type.VAR_INT);
+                } else if (action == 3) { // Update display name
+                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                    }
+                }
             }
         });
     }

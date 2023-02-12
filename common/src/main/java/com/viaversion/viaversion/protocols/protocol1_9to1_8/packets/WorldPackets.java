@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -70,25 +69,19 @@ public class WorldPackets {
                 map(Type.INT); // 2 - Data
                 map(Type.BOOLEAN); // 3 - Disable relative volume
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
 
-                        id = Effect.getNewId(id);
-                        wrapper.set(Type.INT, 0, id);
-                    }
+                    id = Effect.getNewId(id);
+                    wrapper.set(Type.INT, 0, id);
                 });
                 // Rewrite potion effect as it changed to use a dynamic registry
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int id = wrapper.get(Type.INT, 0);
-                        if (id == 2002) {
-                            int data = wrapper.get(Type.INT, 1);
-                            int newData = ItemRewriter.getNewEffectID(data);
-                            wrapper.set(Type.INT, 1, newData);
-                        }
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    if (id == 2002) {
+                        int data = wrapper.get(Type.INT, 1);
+                        int newData = ItemRewriter.getNewEffectID(data);
+                        wrapper.set(Type.INT, 1, newData);
                     }
                 });
             }
@@ -101,129 +94,113 @@ public class WorldPackets {
                 // 1 - Sound Category ID
                 // Everything else get's written through
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String name = wrapper.get(Type.STRING, 0);
-
-                        SoundEffect effect = SoundEffect.getByName(name);
-                        int catid = 0;
-                        String newname = name;
-                        if (effect != null) {
-                            catid = effect.getCategory().getId();
-                            newname = effect.getNewName();
-                        }
-                        wrapper.set(Type.STRING, 0, newname);
-                        wrapper.write(Type.VAR_INT, catid); // Write Category ID
-                        if (effect != null && effect.isBreaksound()) {
-                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                            int x = wrapper.passthrough(Type.INT); //Position X
-                            int y = wrapper.passthrough(Type.INT); //Position Y
-                            int z = wrapper.passthrough(Type.INT); //Position Z
-                            if (tracker.interactedBlockRecently((int) Math.floor(x / 8.0), (int) Math.floor(y / 8.0), (int) Math.floor(z / 8.0))) {
-                                wrapper.cancel();
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                        ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                        Chunk chunk = wrapper.read(new Chunk1_8Type(clientWorld));
-
-                        long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
-
-                        // Check if the chunk should be handled as an unload packet
-                        if (chunk.isFullChunk() && chunk.getBitmask() == 0) {
-                            wrapper.setPacketType(ClientboundPackets1_9.UNLOAD_CHUNK);
-                            wrapper.write(Type.INT, chunk.getX());
-                            wrapper.write(Type.INT, chunk.getZ());
-
-                            // Remove commandBlocks on chunk unload
-                            CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-                            provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
-
-                            clientChunks.getLoadedChunks().remove(chunkHash);
-
-                            // Unload the empty chunks
-                            if (Via.getConfig().isChunkBorderFix()) {
-                                for (BlockFace face : BlockFace.HORIZONTAL) {
-                                    int chunkX = chunk.getX() + face.modX();
-                                    int chunkZ = chunk.getZ() + face.modZ();
-                                    if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                                        PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.UNLOAD_CHUNK);
-                                        unloadChunk.write(Type.INT, chunkX);
-                                        unloadChunk.write(Type.INT, chunkZ);
-                                        unloadChunk.send(Protocol1_9To1_8.class);
-                                    }
-                                }
-                            }
-                        } else {
-                            Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
-                            wrapper.write(chunkType, chunk);
-
-                            clientChunks.getLoadedChunks().add(chunkHash);
-
-                            // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
-                            if (Via.getConfig().isChunkBorderFix()) {
-                                for (BlockFace face : BlockFace.HORIZONTAL) {
-                                    int chunkX = chunk.getX() + face.modX();
-                                    int chunkZ = chunk.getZ() + face.modZ();
-                                    if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                                        PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
-                                        Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
-                                        emptyChunk.write(chunkType, c);
-                                        emptyChunk.send(Protocol1_9To1_8.class);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketHandlers() {
-            @Override
-            public void register() {
                 handler(wrapper -> {
-                    wrapper.cancel(); // Cancel the packet from being sent
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-                    Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(clientWorld));
+                    String name = wrapper.get(Type.STRING, 0);
 
-                    Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
-                    // Split into multiple chunk packets
-                    for (Chunk chunk : chunks) {
-                        PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
-                        chunkData.write(chunkType, chunk);
-                        chunkData.send(Protocol1_9To1_8.class);
-
-                        clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
-
-                        // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
-                        if (Via.getConfig().isChunkBorderFix()) {
-                            for (BlockFace face : BlockFace.HORIZONTAL) {
-                                int chunkX = chunk.getX() + face.modX();
-                                int chunkZ = chunk.getZ() + face.modZ();
-                                if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                                    PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
-                                    Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
-                                    emptyChunk.write(chunkType, c);
-                                    emptyChunk.send(Protocol1_9To1_8.class);
-                                }
-                            }
+                    SoundEffect effect = SoundEffect.getByName(name);
+                    int catid = 0;
+                    String newname = name;
+                    if (effect != null) {
+                        catid = effect.getCategory().getId();
+                        newname = effect.getNewName();
+                    }
+                    wrapper.set(Type.STRING, 0, newname);
+                    wrapper.write(Type.VAR_INT, catid); // Write Category ID
+                    if (effect != null && effect.isBreaksound()) {
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        int x = wrapper.passthrough(Type.INT); //Position X
+                        int y = wrapper.passthrough(Type.INT); //Position Y
+                        int z = wrapper.passthrough(Type.INT); //Position Z
+                        if (tracker.interactedBlockRecently((int) Math.floor(x / 8.0), (int) Math.floor(y / 8.0), (int) Math.floor(z / 8.0))) {
+                            wrapper.cancel();
                         }
                     }
                 });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+            Chunk chunk = wrapper.read(new Chunk1_8Type(clientWorld));
+
+            long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
+
+            // Check if the chunk should be handled as an unload packet
+            if (chunk.isFullChunk() && chunk.getBitmask() == 0) {
+                wrapper.setPacketType(ClientboundPackets1_9.UNLOAD_CHUNK);
+                wrapper.write(Type.INT, chunk.getX());
+                wrapper.write(Type.INT, chunk.getZ());
+
+                // Remove commandBlocks on chunk unload
+                CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
+
+                clientChunks.getLoadedChunks().remove(chunkHash);
+
+                // Unload the empty chunks
+                if (Via.getConfig().isChunkBorderFix()) {
+                    for (BlockFace face : BlockFace.HORIZONTAL) {
+                        int chunkX = chunk.getX() + face.modX();
+                        int chunkZ = chunk.getZ() + face.modZ();
+                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                            PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.UNLOAD_CHUNK);
+                            unloadChunk.write(Type.INT, chunkX);
+                            unloadChunk.write(Type.INT, chunkZ);
+                            unloadChunk.send(Protocol1_9To1_8.class);
+                        }
+                    }
+                }
+            } else {
+                Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+                wrapper.write(chunkType, chunk);
+
+                clientChunks.getLoadedChunks().add(chunkHash);
+
+                // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
+                if (Via.getConfig().isChunkBorderFix()) {
+                    for (BlockFace face : BlockFace.HORIZONTAL) {
+                        int chunkX = chunk.getX() + face.modX();
+                        int chunkZ = chunk.getZ() + face.modZ();
+                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                            Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
+                            emptyChunk.write(chunkType, c);
+                            emptyChunk.send(Protocol1_9To1_8.class);
+                        }
+                    }
+                }
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, wrapper -> {
+            wrapper.cancel(); // Cancel the packet from being sent
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+            Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(clientWorld));
+
+            Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+            // Split into multiple chunk packets
+            for (Chunk chunk : chunks) {
+                PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                chunkData.write(chunkType, chunk);
+                chunkData.send(Protocol1_9To1_8.class);
+
+                clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+
+                // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
+                if (Via.getConfig().isChunkBorderFix()) {
+                    for (BlockFace face : BlockFace.HORIZONTAL) {
+                        int chunkX = chunk.getX() + face.modX();
+                        int chunkZ = chunk.getZ() + face.modZ();
+                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                            Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
+                            emptyChunk.write(chunkType, c);
+                            emptyChunk.send(Protocol1_9To1_8.class);
+                        }
+                    }
+                }
             }
         });
 
@@ -233,32 +210,29 @@ public class WorldPackets {
                 map(Type.POSITION); // 0 - Block Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NBT); // 2 - NBT (Might not be present)
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int action = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (action == 1) { // Update Spawner
-                            CompoundTag tag = wrapper.get(Type.NBT, 0);
-                            if (tag != null) {
-                                if (tag.contains("EntityId")) {
-                                    String entity = (String) tag.get("EntityId").getValue();
-                                    CompoundTag spawn = new CompoundTag();
-                                    spawn.put("id", new StringTag(entity));
-                                    tag.put("SpawnData", spawn);
-                                } else { // EntityID does not exist
-                                    CompoundTag spawn = new CompoundTag();
-                                    spawn.put("id", new StringTag("AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
-                                    tag.put("SpawnData", spawn);
-                                }
+                handler(wrapper -> {
+                    int action = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    if (action == 1) { // Update Spawner
+                        CompoundTag tag = wrapper.get(Type.NBT, 0);
+                        if (tag != null) {
+                            if (tag.contains("EntityId")) {
+                                String entity = (String) tag.get("EntityId").getValue();
+                                CompoundTag spawn = new CompoundTag();
+                                spawn.put("id", new StringTag(entity));
+                                tag.put("SpawnData", spawn);
+                            } else { // EntityID does not exist
+                                CompoundTag spawn = new CompoundTag();
+                                spawn.put("id", new StringTag("AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
+                                tag.put("SpawnData", spawn);
                             }
                         }
-                        if (action == 2) { // Update Command Block
-                            CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-                            provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NBT, 0));
+                    }
+                    if (action == 2) { // Update Command Block
+                        CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NBT, 0));
 
-                            // To prevent window issues don't send updates
-                            wrapper.cancel();
-                        }
+                        // To prevent window issues don't send updates
+                        wrapper.cancel();
                     }
                 });
             }
@@ -282,26 +256,20 @@ public class WorldPackets {
             public void register() {
                 map(Type.VAR_INT); // Action
                 map(Type.POSITION); // Position
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int status = wrapper.get(Type.VAR_INT, 0);
-                        if (status == 6)
-                            wrapper.cancel();
-                    }
+                handler(wrapper -> {
+                    int status = wrapper.get(Type.VAR_INT, 0);
+                    if (status == 6)
+                        wrapper.cancel();
                 });
                 // Blocking
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int status = wrapper.get(Type.VAR_INT, 0);
-                        if (status == 5 || status == 4 || status == 3) {
-                            EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                            if (entityTracker.isBlocking()) {
-                                entityTracker.setBlocking(false);
-                                if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
-                                    entityTracker.setSecondHand(null);
-                                }
+                handler(wrapper -> {
+                    int status = wrapper.get(Type.VAR_INT, 0);
+                    if (status == 5 || status == 4 || status == 3) {
+                        EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        if (entityTracker.isBlocking()) {
+                            entityTracker.setBlocking(false);
+                            if (!Via.getConfig().isShowShieldWhenSwordInHand()) {
+                                entityTracker.setSecondHand(null);
                             }
                         }
                     }
@@ -309,70 +277,61 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int hand = wrapper.read(Type.VAR_INT);
-                        // Wipe the input buffer
-                        wrapper.clearInputBuffer();
-                        wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
-                        wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
-                        wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
-                        // Write item in hand
-                        Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
-                        // Blocking patch
-                        if (Via.getConfig().isShieldBlocking()) {
-                            EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM, null, wrapper -> {
+            int hand = wrapper.read(Type.VAR_INT);
+            // Wipe the input buffer
+            wrapper.clearInputBuffer();
+            wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
+            wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
+            // Write item in hand
+            Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
+            // Blocking patch
+            if (Via.getConfig().isShieldBlocking()) {
+                EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
 
-                            // Check if the shield is already there or if we have to give it here
-                            boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
+                // Check if the shield is already there or if we have to give it here
+                boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand();
 
-                            // Method to identify the sword in hand
-                            boolean isSword = showShieldWhenSwordInHand ? tracker.hasSwordInHand()
-                                    : item != null && Protocol1_9To1_8.isSword(item.identifier());
+                // Method to identify the sword in hand
+                boolean isSword = showShieldWhenSwordInHand ? tracker.hasSwordInHand()
+                        : item != null && Protocol1_9To1_8.isSword(item.identifier());
 
-                            if (isSword) {
-                                if (hand == 0) {
-                                    if (!tracker.isBlocking()) {
-                                        tracker.setBlocking(true);
+                if (isSword) {
+                    if (hand == 0) {
+                        if (!tracker.isBlocking()) {
+                            tracker.setBlocking(true);
 
-                                        // Check if the shield is already in the offhand
-                                        if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
+                            // Check if the shield is already in the offhand
+                            if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
 
-                                            // Set shield in offhand when interacting with main hand
-                                            Item shield = new DataItem(442, (byte) 1, (short) 0, null);
-                                            tracker.setSecondHand(shield);
-                                        }
-                                    }
-                                }
-
-                                // Use the main hand to trigger the blocking
-                                boolean blockUsingMainHand = Via.getConfig().isNoDelayShieldBlocking()
-                                        && !showShieldWhenSwordInHand;
-
-                                if (blockUsingMainHand && hand == 1 || !blockUsingMainHand && hand == 0) {
-                                    wrapper.cancel();
-                                }
-                            } else {
-                                if (!showShieldWhenSwordInHand) {
-                                    // Remove the shield from the offhand
-                                    tracker.setSecondHand(null);
-                                }
-                                tracker.setBlocking(false);
+                                // Set shield in offhand when interacting with main hand
+                                Item shield = new DataItem(442, (byte) 1, (short) 0, null);
+                                tracker.setSecondHand(shield);
                             }
                         }
-                        wrapper.write(Type.ITEM, item);
-
-                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
-                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
-                        wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
                     }
-                });
 
+                    // Use the main hand to trigger the blocking
+                    boolean blockUsingMainHand = Via.getConfig().isNoDelayShieldBlocking()
+                            && !showShieldWhenSwordInHand;
+
+                    if (blockUsingMainHand && hand == 1 || !blockUsingMainHand && hand == 0) {
+                        wrapper.cancel();
+                    }
+                } else {
+                    if (!showShieldWhenSwordInHand) {
+                        // Remove the shield from the offhand
+                        tracker.setSecondHand(null);
+                    }
+                    tracker.setBlocking(false);
+                }
             }
+            wrapper.write(Type.ITEM, item);
+
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
         });
 
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
@@ -380,78 +339,66 @@ public class WorldPackets {
             public void register() {
                 map(Type.POSITION); // 0 - Position
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        final int hand = wrapper.read(Type.VAR_INT); // 2 - Hand
-                        if (hand != 0) wrapper.cancel();
-                    }
+                handler(wrapper -> {
+                    final int hand = wrapper.read(Type.VAR_INT); // 2 - Hand
+                    if (hand != 0) wrapper.cancel();
                 });
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
-                        wrapper.write(Type.ITEM, item); // 3 - Item
-                    }
+                handler(wrapper -> {
+                    Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
+                    wrapper.write(Type.ITEM, item); // 3 - Item
                 });
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y
                 map(Type.UNSIGNED_BYTE); // 6 - Z
 
                 //Register block place to fix sounds
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        int face = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        if (face == 255)
-                            return;
-                        Position p = wrapper.get(Type.POSITION, 0);
-                        int x = p.x();
-                        int y = p.y();
-                        int z = p.z();
-                        switch (face) {
-                            case 0:
-                                y--;
-                                break;
-                            case 1:
-                                y++;
-                                break;
-                            case 2:
-                                z--;
-                                break;
-                            case 3:
-                                z++;
-                                break;
-                            case 4:
-                                x--;
-                                break;
-                            case 5:
-                                x++;
-                                break;
-                        }
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        tracker.addBlockInteraction(new Position(x, y, z));
+                handler(wrapper -> {
+                    int face = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    if (face == 255)
+                        return;
+                    Position p = wrapper.get(Type.POSITION, 0);
+                    int x = p.x();
+                    int y = p.y();
+                    int z = p.z();
+                    switch (face) {
+                        case 0:
+                            y--;
+                            break;
+                        case 1:
+                            y++;
+                            break;
+                        case 2:
+                            z--;
+                            break;
+                        case 3:
+                            z++;
+                            break;
+                        case 4:
+                            x--;
+                            break;
+                        case 5:
+                            x++;
+                            break;
                     }
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    tracker.addBlockInteraction(new Position(x, y, z));
                 });
 
                 // Handle CommandBlocks
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                handler(wrapper -> {
+                    CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
 
-                        Position pos = wrapper.get(Type.POSITION, 0);
-                        Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
-                        // Send the Update Block Entity packet if present
-                        if (tag.isPresent()) {
-                            PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
+                    Position pos = wrapper.get(Type.POSITION, 0);
+                    Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
+                    // Send the Update Block Entity packet if present
+                    if (tag.isPresent()) {
+                        PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
 
-                            updateBlockEntity.write(Type.POSITION, pos);
-                            updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
-                            updateBlockEntity.write(Type.NBT, tag.get());
+                        updateBlockEntity.write(Type.POSITION, pos);
+                        updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
+                        updateBlockEntity.write(Type.NBT, tag.get());
 
-                            updateBlockEntity.scheduleSend(Protocol1_9To1_8.class);
-                        }
+                        updateBlockEntity.scheduleSend(Protocol1_9To1_8.class);
                     }
                 });
 

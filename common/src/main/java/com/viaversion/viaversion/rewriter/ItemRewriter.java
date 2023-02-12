@@ -197,110 +197,90 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
     }
 
     public void registerSetCooldown(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int itemId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
-                });
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            int itemId = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
         });
     }
 
     // 1.14.4+
     public void registerTradeList(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                    for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
 
-                        if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
-                        }
+                if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
+                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
+                }
 
-                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                        wrapper.passthrough(Type.INT); // Number of tools uses
-                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
 
-                        wrapper.passthrough(Type.INT); // XP
-                        wrapper.passthrough(Type.INT); // Special price
-                        wrapper.passthrough(Type.FLOAT); // Price multiplier
-                        wrapper.passthrough(Type.INT); // Demand
-                    }
-                    //...
-                });
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
             }
+            //...
         });
     }
 
     public void registerTradeList1_19(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT); // Container id
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Container id
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
 
-                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                        wrapper.passthrough(Type.INT); // Number of tools uses
-                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
 
-                        wrapper.passthrough(Type.INT); // XP
-                        wrapper.passthrough(Type.INT); // Special price
-                        wrapper.passthrough(Type.FLOAT); // Price multiplier
-                        wrapper.passthrough(Type.INT); // Demand
-                    }
-                });
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
             }
         });
     }
 
     public void registerAdvancements(C packetType, Type<Item> type) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-                    int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
-                    for (int i = 0; i < size; i++) {
-                        wrapper.passthrough(Type.STRING); // Identifier
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
 
-                        // Parent
-                        if (wrapper.passthrough(Type.BOOLEAN))
-                            wrapper.passthrough(Type.STRING);
+                // Parent
+                if (wrapper.passthrough(Type.BOOLEAN))
+                    wrapper.passthrough(Type.STRING);
 
-                        // Display data
-                        if (wrapper.passthrough(Type.BOOLEAN)) {
-                            wrapper.passthrough(Type.COMPONENT); // Title
-                            wrapper.passthrough(Type.COMPONENT); // Description
-                            handleItemToClient(wrapper.passthrough(type)); // Icon
-                            wrapper.passthrough(Type.VAR_INT); // Frame type
-                            int flags = wrapper.passthrough(Type.INT); // Flags
-                            if ((flags & 1) != 0) {
-                                wrapper.passthrough(Type.STRING); // Background texture
-                            }
-                            wrapper.passthrough(Type.FLOAT); // X
-                            wrapper.passthrough(Type.FLOAT); // Y
-                        }
-
-                        wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                        int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                        for (int array = 0; array < arrayLength; array++) {
-                            wrapper.passthrough(Type.STRING_ARRAY); // String array
-                        }
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.COMPONENT); // Title
+                    wrapper.passthrough(Type.COMPONENT); // Description
+                    handleItemToClient(wrapper.passthrough(type)); // Icon
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
                     }
-                });
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < arrayLength; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                }
             }
         });
     }

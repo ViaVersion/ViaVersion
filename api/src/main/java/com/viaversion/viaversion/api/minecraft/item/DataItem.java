@@ -24,9 +24,8 @@ package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DataItem implements Item {
     @SerializedName(value = "identifier", alternate = "id")

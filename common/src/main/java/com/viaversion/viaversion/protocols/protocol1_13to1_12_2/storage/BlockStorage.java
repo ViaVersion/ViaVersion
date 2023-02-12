@@ -21,9 +21,8 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import space.vectrix.flare.SyncMap;
-
 import java.util.Map;
+import space.vectrix.flare.SyncMap;
 
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {

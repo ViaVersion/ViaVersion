@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import io.netty.buffer.ByteBuf;
-
 import java.io.File;
 import java.util.UUID;
 import java.util.logging.Logger;
