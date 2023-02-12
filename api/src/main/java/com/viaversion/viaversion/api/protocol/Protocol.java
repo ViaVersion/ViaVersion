@@ -195,7 +195,9 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param packetType clientbound packet type
      * @return true if already registered
      */
-    boolean hasRegisteredClientbound(C1 packetType);
+    default boolean hasRegisteredClientbound(C1 packetType) {
+        return hasRegisteredClientbound(packetType.state(), packetType.getId());
+    }
 
     /**
      * Checks if a serverbound packet has already been registered.
@@ -203,7 +205,9 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param packetType serverbound packet type
      * @return true if already registered
      */
-    boolean hasRegisteredServerbound(S2 packetType);
+    default boolean hasRegisteredServerbound(S2 packetType) {
+        return hasRegisteredServerbound(packetType.state(), packetType.getId());
+    }
 
     /**
      * Checks if a clientbound packet has already been registered.
@@ -338,13 +342,17 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @deprecated use {@link #cancelServerbound(State, int)}
      */
     @Deprecated/*(forRemoval = true)*/
-    void cancelServerbound(State state, int unmappedPacketId, int mappedPacketId);
+    default void cancelServerbound(State state, int unmappedPacketId, int mappedPacketId) {
+        cancelServerbound(state, unmappedPacketId);
+    }
 
     /**
      * @deprecated use {@link #cancelClientbound(State, int)}
      */
     @Deprecated/*(forRemoval = true)*/
-    void cancelClientbound(State state, int unmappedPacketId, int mappedPacketId);
+    default void cancelClientbound(State state, int unmappedPacketId, int mappedPacketId) {
+        cancelClientbound(state, unmappedPacketId);
+    }
 
     @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
