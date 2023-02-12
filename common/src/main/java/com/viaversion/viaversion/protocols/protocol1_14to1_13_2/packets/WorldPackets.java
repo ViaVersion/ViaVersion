@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
@@ -57,23 +57,23 @@ public class WorldPackets {
     public static void register(Protocol1_14To1_13_2 protocol) {
         BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, null);
 
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT);
                 map(Type.POSITION, Type.POSITION1_14);
                 map(Type.BYTE);
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION, Type.POSITION1_14); // Location
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
@@ -86,9 +86,9 @@ public class WorldPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION, Type.POSITION1_14);
                 map(Type.VAR_INT);
                 handler(new PacketHandler() {
@@ -102,9 +102,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE);
                 handler(new PacketHandler() {
                     @Override
@@ -117,9 +117,9 @@ public class WorldPackets {
 
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
 
-        protocol.registerClientbound(ClientboundPackets1_13.EXPLOSION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.EXPLOSION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLOAT); // X
                 map(Type.FLOAT); // Y
                 map(Type.FLOAT); // Z
@@ -140,9 +140,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -271,9 +271,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Effect Id
                 map(Type.POSITION, Type.POSITION1_14); // Location
                 map(Type.INT); // Data
@@ -292,9 +292,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.MAP_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.MAP_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT);
                 map(Type.BYTE);
                 map(Type.BOOLEAN);
@@ -307,9 +307,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
                 handler(new PacketHandler() {
                     @Override
@@ -341,9 +341,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION, Type.POSITION1_14);
             }
         });

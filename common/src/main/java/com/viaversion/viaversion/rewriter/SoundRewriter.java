@@ -20,7 +20,7 @@ package com.viaversion.viaversion.rewriter;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 
 public class SoundRewriter<C extends ClientboundPacketType> {
@@ -39,9 +39,9 @@ public class SoundRewriter<C extends ClientboundPacketType> {
 
     // The same for entity sound
     public void registerSound(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Sound Id
                 handler(getSoundHandler());
             }
@@ -49,9 +49,9 @@ public class SoundRewriter<C extends ClientboundPacketType> {
     }
 
     public void register1_19_3Sound(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int soundId = wrapper.read(Type.VAR_INT);
                     if (soundId == 0) {

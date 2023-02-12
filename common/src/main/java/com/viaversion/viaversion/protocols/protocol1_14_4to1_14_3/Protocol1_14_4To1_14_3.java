@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
@@ -33,9 +33,9 @@ public class Protocol1_14_4To1_14_3 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_14.TRADE_LIST, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

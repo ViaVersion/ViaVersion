@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
@@ -79,9 +79,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         itemRewriter.register();
 
         final SoundRewriter<ClientboundPackets1_19_1> soundRewriter = new SoundRewriter<>(this);
-        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Sound id
                 handler(soundRewriter.getSoundHandler());
                 handler(wrapper -> {
@@ -91,9 +91,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Sound id
                 handler(soundRewriter.getSoundHandler());
                 handler(wrapper -> {
@@ -103,9 +103,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.write(Type.VAR_INT, 0);
                     wrapper.passthrough(Type.STRING); // Sound identifier
@@ -152,9 +152,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         };
         commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.DECLARE_COMMANDS);
 
-        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.OPTIONAL_COMPONENT); // Motd
                 map(Type.OPTIONAL_STRING); // Encoded icon
                 read(Type.BOOLEAN); // Remove previews chat
@@ -162,9 +162,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         });
 
         // Aaaaand once more
-        registerClientbound(ClientboundPackets1_19_1.PLAYER_CHAT, ClientboundPackets1_19_3.DISGUISED_CHAT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.PLAYER_CHAT, ClientboundPackets1_19_3.DISGUISED_CHAT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 read(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Previous signature
                 handler(wrapper -> {
                     final PlayerMessageSignature signature = wrapper.read(Type.PLAYER_MESSAGE_SIGNATURE);
@@ -210,9 +210,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        registerServerbound(ServerboundPackets1_19_3.CHAT_COMMAND, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_3.CHAT_COMMAND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
@@ -235,9 +235,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
             }
         });
-        registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
                 // Salt
@@ -260,16 +260,16 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         });
 
         // Remove the key once again
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Name
                 create(Type.OPTIONAL_PROFILE_KEY, null);
             }
         });
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
                 create(Type.BOOLEAN, true); // Is nonce
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Encrypted challenge

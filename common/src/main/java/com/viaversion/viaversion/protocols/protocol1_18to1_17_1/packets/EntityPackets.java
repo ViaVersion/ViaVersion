@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -40,9 +40,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
     public void registerPackets() {
         registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -62,9 +62,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.NBT); // Current dimension data
                 map(Type.STRING); // World
                 handler(wrapper -> {

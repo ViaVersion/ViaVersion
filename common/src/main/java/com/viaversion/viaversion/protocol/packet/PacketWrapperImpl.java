@@ -76,6 +76,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         for (Pair<Type, Object> packetValue : packetValues) {
             if (packetValue.key() != type) continue;
             if (currentIndex == index) {
+                //noinspection unchecked
                 return (T) packetValue.value();
             }
             currentIndex++;
@@ -145,6 +146,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         if (rtype == type
                 || (type.getBaseClass() == rtype.getBaseClass()
                 && type.getOutputClass() == rtype.getOutputClass())) {
+            //noinspection unchecked
             return (T) read.value();
         } else if (rtype == Type.NOTHING) {
             return read(type); // retry
@@ -169,7 +171,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
             // Attempt conversion
             if (expectedType instanceof TypeConverter) {
-                return ((TypeConverter) expectedType).from(value);
+                return ((TypeConverter<?>) expectedType).from(value);
             }
 
             Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());

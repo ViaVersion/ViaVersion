@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 
 @FunctionalInterface
 public interface ValueReader<T> {
+
     /**
      * Reads value from a PacketWrapper
      *

@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.chunks.BlockEntity;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
@@ -46,9 +46,9 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); //Position
                 map(Type.UNSIGNED_BYTE); //Type
                 map(Type.NBT); //NBT
@@ -75,9 +75,9 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -94,9 +94,9 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
@@ -113,9 +113,9 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
 
                 handler(new PacketHandler() {

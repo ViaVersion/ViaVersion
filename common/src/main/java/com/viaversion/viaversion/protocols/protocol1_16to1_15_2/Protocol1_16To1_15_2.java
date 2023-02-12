@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -77,9 +77,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
-        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+        registerClientbound(State.LOGIN, 0x02, 0x02, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Transform string to a uuid
                     UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
@@ -89,9 +89,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
-        registerClientbound(State.STATUS, 0x00, 0x00, new PacketRemapper() {
+        registerClientbound(State.STATUS, 0x00, 0x00, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     String original = wrapper.passthrough(Type.STRING);
                     JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
@@ -129,9 +129,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Handle (relevant) component cases for translatable and score changes
-        registerClientbound(ClientboundPackets1_15.CHAT_MESSAGE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_15.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.COMPONENT);
                 map(Type.BYTE);
                 handler(wrapper -> {
@@ -148,9 +148,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
 
-        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT); // Entity Id
                     int action = wrapper.passthrough(Type.VAR_INT);
@@ -172,9 +172,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
-            registerServerbound(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketRemapper() {
+            registerServerbound(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketHandlers() {
                 @Override
-                public void registerMap() {
+                public void register() {
                     handler(wrapper -> {
                         String channel = wrapper.passthrough(Type.STRING);
                         if (channel.length() > 32) {
@@ -209,9 +209,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             });
         }
 
-        registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.BYTE);
                     // Flying and walking speed - not important anyways

@@ -27,7 +27,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
@@ -57,9 +57,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             clearPacket.send(Protocol1_16To1_15_2.class);
         };
 
-        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Window Id
                 map(Type.VAR_INT); // Window Type
                 map(Type.COMPONENT); // Window Title
@@ -77,9 +77,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(cursorRemapper);
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
@@ -88,9 +88,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
                 map(Type.SHORT); // Property
                 map(Type.SHORT); // Value
@@ -113,9 +113,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
 
                 handler(wrapper -> {
@@ -131,9 +131,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
                     inventoryTracker.setInventory((short) -1);
@@ -141,9 +141,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });

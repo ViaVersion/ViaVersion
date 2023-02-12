@@ -24,21 +24,25 @@ package com.viaversion.viaversion.api.protocol.remapper;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.exception.CancelException;
-import com.viaversion.viaversion.exception.InformativeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * @deprecated use {@link PacketHandlers} or directly implement {@link PacketHandler}
- */
-@Deprecated/*(forRemoval = true)*/
-public abstract class PacketRemapper {
-    private final List<PacketHandler> valueRemappers = new ArrayList<>();
+public abstract class PacketHandlers implements PacketHandler {
+    private final List<PacketHandler> packetHandlers = new ArrayList<>();
 
-    protected PacketRemapper() {
-        registerMap();
+    protected PacketHandlers() {
+        register();
+    }
+
+    static PacketHandler fromRemapper(List<PacketHandler> valueRemappers) {
+        final PacketHandlers handlers = new PacketHandlers() {
+            @Override
+            public void register() {
+            }
+        };
+        handlers.packetHandlers.addAll(valueRemappers);
+        return handlers;
     }
 
     /**
@@ -46,7 +50,7 @@ public abstract class PacketRemapper {
      *
      * @param type type to map
      */
-    public void map(Type type) {
+    public <T> void map(Type<T> type) {
         handler(wrapper -> wrapper.write(type, wrapper.read(type)));
     }
 
@@ -72,7 +76,7 @@ public abstract class PacketRemapper {
     public <T1, T2> void map(Type<T1> oldType, Type<T2> newType, Function<T1, T2> transformer) {
         map(oldType, new ValueTransformer<T1, T2>(newType) {
             @Override
-            public T2 transform(PacketWrapper wrapper, T1 inputValue) throws Exception {
+            public T2 transform(PacketWrapper wrapper, T1 inputValue) {
                 return transformer.apply(inputValue);
             }
         });
@@ -121,7 +125,7 @@ public abstract class PacketRemapper {
      * @param handler packet handler
      */
     public void handler(PacketHandler handler) {
-        valueRemappers.add(handler);
+        packetHandlers.add(handler);
     }
 
     /**
@@ -139,43 +143,19 @@ public abstract class PacketRemapper {
      *
      * @param type type to read
      */
-    public void read(Type type) {
+    public void read(Type<?> type) {
         handler(wrapper -> wrapper.read(type));
     }
 
     /**
      * Registers the handlers for this packet.
      */
-    public abstract void registerMap();
+    protected abstract void register();
 
-    public PacketHandler asPacketHandler() {
-        return PacketHandlers.fromRemapper(this.valueRemappers);
-    }
-
-    /**
-     * Processes a packet wrapper.
-     *
-     * @param packetWrapper packet wrapper to remap
-     * @throws InformativeException if packet reading or writing fails
-     * @throws CancelException      if the packet should be cancelled
-     */
-    @Deprecated
-    public void remap(PacketWrapper packetWrapper) throws Exception {
-        try {
-            for (PacketHandler handler : valueRemappers) {
-                handler.handle(packetWrapper);
-            }
-        } catch (CancelException e) {
-            // Pass through CancelExceptions
-            throw e;
-        } catch (InformativeException e) {
-            e.addSource(this.getClass());
-            throw e;
-        } catch (Exception e) {
-            // Wrap other exceptions during packet handling
-            InformativeException ex = new InformativeException(e);
-            ex.addSource(this.getClass());
-            throw ex;
+    @Override
+    public final void handle(PacketWrapper wrapper) throws Exception {
+        for (PacketHandler handler : packetHandlers) {
+            handler.handle(wrapper);
         }
     }
 }

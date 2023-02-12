@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -36,9 +36,9 @@ public class WorldPackets {
     public static void register(Protocol1_13_1To1_13 protocol) {
         BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION);
 
-        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -65,9 +65,9 @@ public class WorldPackets {
         blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_CHANGE);
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
 
-        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Effect Id
                 map(Type.POSITION); // Location
                 map(Type.INT); // Data
@@ -105,9 +105,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
@@ -124,9 +124,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
                 handler(new PacketHandler() {
                     @Override

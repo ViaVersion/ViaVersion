@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
@@ -64,9 +64,9 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
         soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
 
         // Recipe book data has been split into 2 separate packets
-        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int recipeType = wrapper.read(Type.VAR_INT);
                     boolean open = wrapper.read(Type.BOOLEAN);
@@ -83,9 +83,9 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     String recipe = wrapper.read(Type.STRING);
                     wrapper.write(Type.VAR_INT, 0); // Shown

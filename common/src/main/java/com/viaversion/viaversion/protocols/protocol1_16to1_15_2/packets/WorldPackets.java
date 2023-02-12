@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
@@ -51,18 +51,18 @@ public class WorldPackets {
         blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.MULTI_BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerClientbound(ClientboundPackets1_15.UPDATE_LIGHT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.UPDATE_LIGHT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // x
                 map(Type.VAR_INT); // y
                 handler(wrapper -> wrapper.write(Type.BOOLEAN, true)); // Take neighbour's light into account as well
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     Chunk chunk = wrapper.read(new Chunk1_15Type());
                     wrapper.write(new Chunk1_16Type(), chunk);
@@ -98,9 +98,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     Position position = wrapper.passthrough(Type.POSITION1_14);
                     short action = wrapper.passthrough(Type.UNSIGNED_BYTE);

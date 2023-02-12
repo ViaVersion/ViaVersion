@@ -23,7 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
@@ -41,25 +41,25 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting");
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
 
-        registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.BYTE, Type.VAR_INT); // Effect id
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.REMOVE_ENTITY_EFFECT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_18.REMOVE_ENTITY_EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.BYTE, Type.VAR_INT); // Effect id
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -80,9 +80,9 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> addTagPrefix(wrapper.passthrough(Type.NBT)));
             }
         });

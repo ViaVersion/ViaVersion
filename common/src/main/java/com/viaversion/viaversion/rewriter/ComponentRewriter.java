@@ -25,7 +25,7 @@ import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 
 /**
@@ -53,9 +53,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * @param packetType clientbound packet type
      */
     public void registerComponentPacket(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
             }
         });
@@ -67,9 +67,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBossBar(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UUID);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
@@ -86,9 +86,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * Handles sub 1.17 combat event components.
      */
     public void registerCombatEvent(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     if (wrapper.passthrough(Type.VAR_INT) == 2) {
                         wrapper.passthrough(Type.VAR_INT);
@@ -104,9 +104,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      * Handles sub 1.17 title components.
      */
     public void registerTitle(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int action = wrapper.passthrough(Type.VAR_INT);
                     if (action >= 0 && action <= 2) {

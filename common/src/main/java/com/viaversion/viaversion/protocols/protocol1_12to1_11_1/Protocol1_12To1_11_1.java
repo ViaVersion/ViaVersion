@@ -32,7 +32,7 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -63,9 +63,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         metadataRewriter.register();
         itemRewriter.register();
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - UUID
                 map(Type.BYTE); // 2 - Type
@@ -75,9 +75,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -97,9 +97,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -117,9 +117,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -158,9 +158,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
 
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT);
                 map(Type.UNSIGNED_BYTE);
                 map(Type.INT);
@@ -178,9 +178,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT);
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
@@ -197,9 +197,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         cancelServerbound(ServerboundPackets1_12.PREPARE_CRAFTING_GRID);
 
         // Client Settings (max length changed)
-        registerServerbound(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - Locale
                 map(Type.BYTE); // 1 - view distance
                 map(Type.VAR_INT); // 2 - chat mode

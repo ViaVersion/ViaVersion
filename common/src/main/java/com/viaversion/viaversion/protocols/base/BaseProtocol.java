@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
@@ -40,9 +40,9 @@ public class BaseProtocol extends AbstractProtocol {
     @Override
     protected void registerPackets() {
         // Handshake Packet
-        registerServerbound(ServerboundHandshakePackets.CLIENT_INTENTION, new PacketRemapper() {
+        registerServerbound(ServerboundHandshakePackets.CLIENT_INTENTION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int protocolVersion = wrapper.passthrough(Type.VAR_INT);
                     wrapper.passthrough(Type.STRING); // Server Address

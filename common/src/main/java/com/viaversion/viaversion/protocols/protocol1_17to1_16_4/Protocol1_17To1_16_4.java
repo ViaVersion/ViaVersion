@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -59,9 +59,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
         WorldPackets.register(this);
 
-        registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Tags are now generically written with resource location - 5 different Vanilla types
                     wrapper.write(Type.VAR_INT, 5);
@@ -95,9 +95,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.STRING);
                     wrapper.passthrough(Type.STRING);
@@ -107,9 +107,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT);
                     wrapper.passthrough(Type.BYTE);
@@ -128,9 +128,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.TITLE, null, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.TITLE, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Title packet actions have been split into individual packets (the content hasn't changed)
                     int type = wrapper.read(Type.VAR_INT);
@@ -165,9 +165,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLOAT); // X
                 map(Type.FLOAT); // Y
                 map(Type.FLOAT); // Z
@@ -179,9 +179,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
                     // Angle (which Mojang just forgot to write to the buffer, lol)
@@ -190,9 +190,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Locale
                 map(Type.BYTE); // View distance
                 map(Type.VAR_INT); // Chat mode

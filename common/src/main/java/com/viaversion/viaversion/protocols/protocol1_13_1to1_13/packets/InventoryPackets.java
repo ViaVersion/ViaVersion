@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -41,9 +41,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_ITEM);
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
 
-        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Channel
                 handler(new PacketHandler() {
                     @Override
@@ -78,16 +78,16 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter1_13_2<>(protocol);
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
                         // First id, then type
                         String id = wrapper.passthrough(Type.STRING);
                         String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
-                        recipeRewriter.handle(wrapper, type);
+                        recipeRewriter.handleRecipeType(wrapper, type);
                     }
                 });
             }

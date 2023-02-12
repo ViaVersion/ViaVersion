@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
 
@@ -45,9 +45,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockAction(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(positionType); // Location
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
@@ -68,9 +68,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockChange(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(positionType);
                 map(Type.VAR_INT);
                 handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 0))));
@@ -79,9 +79,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerMultiBlockChange(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Chunk X
                 map(Type.INT); // 1 - Chunk Z
                 handler(wrapper -> {
@@ -94,9 +94,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerVarLongMultiBlockChange(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.LONG); // Chunk position
                 map(Type.BOOLEAN); // Suppress light updates
                 handler(wrapper -> {
@@ -114,9 +114,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerEffect(C packetType, int playRecordId, int blockBreakId) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Effect Id
                 map(positionType); // Location
                 map(Type.INT); // Data
@@ -134,9 +134,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
                     Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
@@ -167,9 +167,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockEntityData(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
                     final int blockEntityId = wrapper.read(Type.VAR_INT);

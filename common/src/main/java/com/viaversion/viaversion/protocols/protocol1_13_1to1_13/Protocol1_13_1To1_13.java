@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -58,9 +58,9 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT);
                 map(Type.STRING, new ValueTransformer<String, String>(Type.STRING) {
                     @Override
@@ -72,9 +72,9 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLAT_ITEM);
                 map(Type.BOOLEAN);
                 handler(wrapper -> {
@@ -93,9 +93,9 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.TAB_COMPLETE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.TAB_COMPLETE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Transaction id
                 map(Type.VAR_INT); // Start
                 map(Type.VAR_INT); // Length
@@ -119,9 +119,9 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.BOSSBAR, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.BOSSBAR, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UUID);
                 map(Type.VAR_INT);
                 handler(new PacketHandler() {

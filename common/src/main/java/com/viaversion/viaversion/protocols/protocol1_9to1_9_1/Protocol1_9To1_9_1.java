@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_9_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
@@ -35,9 +35,9 @@ public class Protocol1_9To1_9_1 extends AbstractProtocol<ClientboundPackets1_9, 
     protected void registerPackets() {
         // Currently supports 1.9.1 and 1.9.2
 
-        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Player ID
                 map(Type.UNSIGNED_BYTE); // 1 - Player Gamemode
                 // 1.9.1 PRE 2 Changed this
@@ -49,9 +49,9 @@ public class Protocol1_9To1_9_1 extends AbstractProtocol<ClientboundPackets1_9, 
             }
         });
 
-        registerClientbound(ClientboundPackets1_9.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Sound ID
 
                 handler(new PacketHandler() {

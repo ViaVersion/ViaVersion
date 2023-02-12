@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.ServerboundPackets1_12;
@@ -43,9 +43,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
 
         // Plugin message Packet -> Trading
-        protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - Channel
 
                 handler(new PacketHandler() {
@@ -75,9 +75,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         });
 
 
-        protocol.registerServerbound(ServerboundPackets1_12.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_12.CLICK_WINDOW, new PacketHandlers() {
                     @Override
-                    public void registerMap() {
+                    public void register() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID
                         map(Type.SHORT); // 1 - Slot
                         map(Type.BYTE); // 2 - Button

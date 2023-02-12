@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
@@ -40,9 +40,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_16, Serve
         registerEntityEquipmentArray(ClientboundPackets1_16.ENTITY_EQUIPMENT);
         registerAdvancements(ClientboundPackets1_16.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT);
                     wrapper.passthrough(Type.BOOLEAN); // Open
@@ -62,9 +62,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_16, Serve
 
         registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
-        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });

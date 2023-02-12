@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
@@ -58,9 +58,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     protected void registerPackets() {
         // Sign update packet
-        registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -94,9 +94,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -128,9 +128,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
@@ -146,9 +146,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
                 handler(new PacketHandler() {
                     @Override
@@ -162,9 +162,9 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         });
 
         // Sound effect
-        registerClientbound(ClientboundPackets1_9.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Sound name
                 map(Type.VAR_INT); // 1 - Sound Category
                 map(Type.INT); // 2 - x

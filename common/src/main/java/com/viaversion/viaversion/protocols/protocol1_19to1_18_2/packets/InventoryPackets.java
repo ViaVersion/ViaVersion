@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
@@ -41,9 +41,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
         registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT);
         registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT);
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT, Type.VAR_INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
                 map(Type.DOUBLE); // 2 - X
@@ -63,9 +63,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
 
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
 
-        protocol.registerClientbound(ClientboundPackets1_18.TRADE_LIST, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.TRADE_LIST, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Container id
                 handler(wrapper -> {
                     final int size = wrapper.read(Type.UNSIGNED_BYTE);
@@ -92,18 +92,18 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_DIGGING, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_DIGGING, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Action
                 map(Type.POSITION1_14); // Block position
                 map(Type.UNSIGNED_BYTE); // Direction
                 handler(sequenceHandler());
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Hand
                 map(Type.POSITION1_14); // Block position
                 map(Type.VAR_INT); // Direction
@@ -114,9 +114,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                 handler(sequenceHandler());
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Hand
                 handler(sequenceHandler());
             }

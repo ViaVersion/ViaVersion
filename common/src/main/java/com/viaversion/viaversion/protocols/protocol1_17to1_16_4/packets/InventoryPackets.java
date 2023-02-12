@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
@@ -50,16 +50,16 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
 
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
                 map(Type.SHORT); // Slot
                 map(Type.BYTE); // Button
@@ -92,9 +92,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     short inventoryId = wrapper.read(Type.UNSIGNED_BYTE);
                     short confirmationId = wrapper.read(Type.SHORT);
@@ -115,9 +115,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
         });
 
         // New pong packet
-        protocol.registerServerbound(ServerboundPackets1_17.PONG, null, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_17.PONG, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int id = wrapper.read(Type.INT);
                     // Check extra bit for fast dismissal

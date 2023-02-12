@@ -37,7 +37,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
@@ -253,9 +253,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTracker(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -265,9 +265,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTrackerWithData(C packetType, EntityType fallingBlockType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -290,9 +290,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTrackerWithData1_19(C packetType, EntityType fallingBlockType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity type
@@ -323,9 +323,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param intType    int type of the entity id
      */
     public void registerTracker(C packetType, EntityType entityType, Type<Integer> intType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(intType);
                     tracker(wrapper.user()).addEntity(entityId, entityType);
@@ -350,9 +350,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param packetType remove entities packet type
      */
     public void registerRemoveEntities(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int[] entityIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                     EntityTracker entityTracker = tracker(wrapper.user());
@@ -370,9 +370,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param packetType remove entities packet type
      */
     public void registerRemoveEntity(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(Type.VAR_INT);
                     tracker(wrapper.user()).removeEntity(entityId);
@@ -382,9 +382,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerMetadataRewriter(C packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 if (oldMetaType != null) {
                     map(oldMetaType, newMetaType);

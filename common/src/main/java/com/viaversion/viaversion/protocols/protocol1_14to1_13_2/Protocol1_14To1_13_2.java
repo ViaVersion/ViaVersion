@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
@@ -79,9 +79,9 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         };
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
 
-        registerClientbound(ClientboundPackets1_13.TAGS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.TAGS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

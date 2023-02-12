@@ -23,7 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
@@ -40,9 +40,9 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Aaaaand back to an array again!
                     int entityId = wrapper.read(Type.VAR_INT);
@@ -51,17 +51,17 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
                 create(Type.VAR_INT, 0); // Add arbitrary state id
             }
         });
 
-        registerClientbound(ClientboundPackets1_17.WINDOW_ITEMS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_17.WINDOW_ITEMS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
                 create(Type.VAR_INT, 0); // Add arbitrary state id
                 handler(wrapper -> {
@@ -74,17 +74,17 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
                 read(Type.VAR_INT); // Remove state id
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_17.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     CompoundTag tag = new CompoundTag();
                     Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books

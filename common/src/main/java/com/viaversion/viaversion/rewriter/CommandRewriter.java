@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +67,9 @@ public class CommandRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerDeclareCommands(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
@@ -107,9 +107,9 @@ public class CommandRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerDeclareCommands1_19(C packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {

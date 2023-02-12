@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -69,9 +69,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
         registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -148,9 +148,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
         registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Channel
                 handler(new PacketHandler() {
                     @Override
@@ -204,9 +204,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter1_13_2<>(protocol);
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int size = wrapper.passthrough(Type.VAR_INT);
                     int deleted = 0;
@@ -220,7 +220,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         wrapper.write(Type.STRING, type);
                         wrapper.write(Type.STRING, id);
 
-                        recipeRewriter.handle(wrapper, type);
+                        recipeRewriter.handleRecipeType(wrapper, type);
                     }
                     wrapper.set(Type.VAR_INT, 0, size - deleted);
                 });
@@ -230,9 +230,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
 
         registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

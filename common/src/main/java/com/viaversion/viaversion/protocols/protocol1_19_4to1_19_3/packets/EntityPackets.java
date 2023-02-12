@@ -24,7 +24,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
@@ -41,9 +41,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
 
     @Override
     public void registerPackets() {
-        protocol.registerClientbound(ClientboundPackets1_19_3.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -72,9 +72,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_ANIMATION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_ANIMATION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 handler(wrapper -> {
                     final short action = wrapper.read(Type.UNSIGNED_BYTE);
@@ -89,18 +89,18 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int entityId = wrapper.read(Type.INT);
                     final byte event = wrapper.read(Type.BYTE);

@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
@@ -35,10 +35,10 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTra
 public class InventoryPackets {
 
     public static void register(Protocol1_9To1_8 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Property Key
                 map(Type.SHORT); // 2 - Property Value
@@ -74,10 +74,10 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.STRING); // 1 - Window Type
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Window Title
@@ -104,9 +104,9 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM); // 2 - Slot Value
@@ -154,10 +154,10 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM_ARRAY); // 1 - Window Values
 
@@ -215,10 +215,10 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 // Inventory tracking
                 handler(new PacketHandler() {
@@ -232,10 +232,10 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.MAP_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_DATA, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Map ID
                 map(Type.BYTE); // 1 - Map Scale
                 handler(new PacketHandler() {
@@ -250,10 +250,10 @@ public class InventoryPackets {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.SHORT); // 0 - Slot ID
                 map(Type.ITEM); // 1 - Item
                 handler(new PacketHandler() {
@@ -303,10 +303,10 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLICK_WINDOW, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.BYTE); // 2 - Button
@@ -371,10 +371,10 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new PacketHandlers() {
 
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
 
                 // Inventory tracking
@@ -389,9 +389,9 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.SHORT); // 0 - Slot id
 
                 // Blocking patch

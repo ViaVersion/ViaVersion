@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -39,79 +40,67 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Abstract protocol class handling packet transformation between two protocol versions.
  * Clientbound and serverbount packet types can be set to enforce correct usage of them.
  *
- * @param <C1> old clientbound packet types
- * @param <C2> new clientbound packet types
- * @param <S1> old serverbound packet types
- * @param <S2> new serverbound packet types
+ * @param <C1> unmapped ("old") clientbound packet types
+ * @param <C2> mapped ("new") clientbound packet types
+ * @param <S1> mapped ("old") serverbound packet types
+ * @param <S2> unmapped ("new") serverbound packet types
  * @see SimpleProtocol for a helper class if you do not want to define any of the types above
  */
 public interface Protocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType> {
 
-    default void registerServerbound(State state, int oldPacketID, int newPacketID) {
-        registerServerbound(state, oldPacketID, newPacketID, null);
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
     }
 
-    default void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerServerbound(state, oldPacketID, newPacketID, packetRemapper, false);
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
     }
 
     /**
      * Registers a serverbound packet, with id transformation and remapper.
      *
-     * @param state          state which the packet is sent in.
-     * @param oldPacketID    old packet ID
-     * @param newPacketID    new packet ID
-     * @param packetRemapper remapper to use for the packet
-     * @param override       whether an existing mapper should be overridden
-     * @see #registerServerbound(ServerboundPacketType, ServerboundPacketType, PacketRemapper, boolean)
+     * @param state            state which the packet is sent in.
+     * @param unmappedPacketId unmapped packet id
+     * @param mappedPacketId   mapped packet id
+     * @param handler          packet handler
+     * @param override         whether an existing mapper should be overridden
+     * @see #registerServerbound(ServerboundPacketType, ServerboundPacketType, PacketHandler, boolean)
      */
-    void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
+    void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override);
 
-    /**
-     * @deprecated use {@link #cancelServerbound(State, int)}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    void cancelServerbound(State state, int oldPacketID, int newPacketID);
+    void cancelServerbound(State state, int mappedPacketId);
 
-    void cancelServerbound(State state, int newPacketID);
-
-    default void registerClientbound(State state, int oldPacketID, int newPacketID) {
-        registerClientbound(state, oldPacketID, newPacketID, null);
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId) {
+        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
     }
 
-    default void registerClientbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper) {
-        registerClientbound(state, oldPacketID, newPacketID, packetRemapper, false);
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler) {
+        registerClientbound(state, unmappedPacketId, mappedPacketId, handler, false);
     }
 
-    /**
-     * @deprecated use {@link #cancelClientbound(State, int)}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    void cancelClientbound(State state, int oldPacketID, int newPacketID);
-
-    void cancelClientbound(State state, int oldPacketID);
+    void cancelClientbound(State state, int unmappedPacketId);
 
     /**
      * Registers a clientbound packet, with id transformation and remapper.
      *
-     * @param state          state which the packet is sent in.
-     * @param oldPacketID    old packet ID
-     * @param newPacketID    new packet ID
-     * @param packetRemapper remapper to use for the packet
-     * @param override       whether an existing mapper should be overridden
-     * @see #registerClientbound(ClientboundPacketType, ClientboundPacketType, PacketRemapper, boolean)
+     * @param state            state which the packet is sent in.
+     * @param unmappedPacketId unmapped packet id
+     * @param mappedPacketId   mapped packet id
+     * @param handler          packet handler
+     * @param override         whether an existing mapper should be overridden
+     * @see #registerClientbound(ClientboundPacketType, ClientboundPacketType, PacketHandler, boolean)
      */
-    void registerClientbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override);
+    void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override);
 
     // ---------------------------------------------------------------------------------------
 
     /**
      * Registers a clientbound protocol and automatically maps it to the new id.
      *
-     * @param packetType     clientbound packet type the server sends
-     * @param packetRemapper remapper
+     * @param packetType clientbound packet type the server sends
+     * @param handler    packet handler
      */
-    void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper);
+    void registerClientbound(C1 packetType, @Nullable PacketHandler handler);
 
     /**
      * Maps a packet type to another packet type without a packet handler.
@@ -121,7 +110,7 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param mappedPacketType clientbound packet type after transforming for the client
      */
     default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType) {
-        registerClientbound(packetType, mappedPacketType, null);
+        registerClientbound(packetType, mappedPacketType, (PacketHandler) null);
     }
 
     /**
@@ -129,10 +118,10 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
-     * @param packetRemapper   remapper
+     * @param handler          packet handler
      */
-    default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerClientbound(packetType, mappedPacketType, packetRemapper, false);
+    default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketHandler handler) {
+        registerClientbound(packetType, mappedPacketType, handler, false);
     }
 
     /**
@@ -140,10 +129,10 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @param packetType       clientbound packet type the server initially sends
      * @param mappedPacketType clientbound packet type after transforming for the client
-     * @param packetRemapper   remapper
+     * @param handler          packet handler
      * @param override         whether an existing mapping should be overridden if present
      */
-    void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override);
+    void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketHandler handler, boolean override);
 
     /**
      * Cancels any clientbound packets from the given type.
@@ -160,26 +149,26 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      * @param mappedPacketType serverbound packet type after transforming for the client
      */
     default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType) {
-        registerServerbound(packetType, mappedPacketType, null);
+        registerServerbound(packetType, mappedPacketType, (PacketHandler) null);
     }
 
     /**
      * Registers a serverbound protocol and automatically maps it to the server's id.
      *
-     * @param packetType     serverbound packet type the client sends
-     * @param packetRemapper remapper
+     * @param packetType serverbound packet type the client sends
+     * @param handler    packet handler
      */
-    void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper);
+    void registerServerbound(S2 packetType, @Nullable PacketHandler handler);
 
     /**
      * Registers a serverbound protocol.
      *
      * @param packetType       serverbound packet type initially sent by the client
      * @param mappedPacketType serverbound packet type after transforming for the server
-     * @param packetRemapper   remapper
+     * @param handler          packet handler
      */
-    default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
-        registerServerbound(packetType, mappedPacketType, packetRemapper, false);
+    default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketHandler handler) {
+        registerServerbound(packetType, mappedPacketType, handler, false);
     }
 
     /**
@@ -187,10 +176,10 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @param packetType       serverbound packet type initially sent by the client
      * @param mappedPacketType serverbound packet type after transforming for the server
-     * @param packetRemapper   remapper
+     * @param handler          packet handler
      * @param override         whether an existing mapping should be overridden if present
      */
-    void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override);
+    void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketHandler handler, boolean override);
 
     /**
      * Cancels any serverbound packets from the given type.
@@ -219,17 +208,17 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
     /**
      * Checks if a clientbound packet has already been registered.
      *
-     * @param state       state which the packet is sent in
-     * @param oldPacketId old packet id
+     * @param state            state which the packet is sent in
+     * @param unmappedPacketId unmapped packet id
      * @return true if already registered
      */
-    boolean hasRegisteredClientbound(State state, int oldPacketId);
+    boolean hasRegisteredClientbound(State state, int unmappedPacketId);
 
     /**
      * Checks if a serverbound packet has already been registered.
      *
      * @param state            state which the packet is sent in
-     * @param unmappedPacketId new packet id
+     * @param unmappedPacketId mapped packet id
      * @return true if already registered
      */
     boolean hasRegisteredServerbound(State state, int unmappedPacketId);
@@ -275,7 +264,9 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @return true if this Protocol's {@link #loadMappingData()} method should be called
      */
-    boolean hasMappingDataToLoad();
+    default boolean hasMappingDataToLoad() {
+        return getMappingData() != null;
+    }
 
     /**
      * Loads the protocol's mapping data.
@@ -319,7 +310,7 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @return entity rewriter
      */
-    default @Nullable EntityRewriter getEntityRewriter() {
+    default @Nullable EntityRewriter<?> getEntityRewriter() {
         return null;
     }
 
@@ -328,7 +319,7 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      *
      * @return item rewriter
      */
-    default @Nullable ItemRewriter getItemRewriter() {
+    default @Nullable ItemRewriter<?> getItemRewriter() {
         return null;
     }
 
@@ -339,5 +330,69 @@ public interface Protocol<C1 extends ClientboundPacketType, C2 extends Clientbou
      */
     default boolean isBaseProtocol() {
         return false;
+    }
+
+    // ---------------------------------------------------------
+
+    /**
+     * @deprecated use {@link #cancelServerbound(State, int)}
+     */
+    @Deprecated/*(forRemoval = true)*/
+    void cancelServerbound(State state, int unmappedPacketId, int mappedPacketId);
+
+    /**
+     * @deprecated use {@link #cancelClientbound(State, int)}
+     */
+    @Deprecated/*(forRemoval = true)*/
+    void cancelClientbound(State state, int unmappedPacketId, int mappedPacketId);
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
+        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, false);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
+        registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, override);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper) {
+        registerClientbound(packetType, (PacketHandler) packetRemapper);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
+        registerClientbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, false);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
+        registerClientbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, override);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, false);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketRemapper packetRemapper, boolean override) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) packetRemapper, override);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper) {
+        registerServerbound(packetType, (PacketHandler) packetRemapper);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper) {
+        registerServerbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, false);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
+        registerServerbound(packetType, mappedPacketType, (PacketHandler) packetRemapper, override);
     }
 }

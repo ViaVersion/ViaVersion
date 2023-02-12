@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
@@ -71,9 +71,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         itemRewriter.register();
 
         // Named sound effect
-        registerClientbound(ClientboundPackets1_9_3.NAMED_SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.NAMED_SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - Sound name
                 map(Type.VAR_INT); // 1 - Sound Category
                 map(Type.INT); // 2 - x
@@ -85,9 +85,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Sound effect
-        registerClientbound(ClientboundPackets1_9_3.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Sound name
                 map(Type.VAR_INT); // 1 - Sound Category
                 map(Type.INT); // 2 - x
@@ -107,18 +107,18 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Metadata packet
-        registerClientbound(ClientboundPackets1_9_3.ENTITY_METADATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.ENTITY_METADATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
             }
         });
 
         // Spawn Mob
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - UUID
                 map(Type.UNSIGNED_BYTE); // 2 - Entity Type
@@ -136,9 +136,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Spawn Player
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_PLAYER, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.SPAWN_PLAYER, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Player UUID
                 map(Type.DOUBLE); // 2 - X
@@ -151,9 +151,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Join Game
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
@@ -171,9 +171,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Respawn
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
 
                 handler(new PacketHandler() {
@@ -189,9 +189,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Chunk Data
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -211,9 +211,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Packet Send ResourcePack
-        registerClientbound(ClientboundPackets1_9_3.RESOURCE_PACK, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESOURCE_PACK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - URL
                 map(Type.STRING); // 1 - Hash
 
@@ -228,9 +228,9 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         });
 
         // Packet ResourcePack status
-        registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK_STATUS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK_STATUS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

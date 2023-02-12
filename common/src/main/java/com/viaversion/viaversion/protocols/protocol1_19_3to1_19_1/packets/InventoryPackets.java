@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
@@ -58,9 +58,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         registerSpawnParticle1_19(ClientboundPackets1_19_1.SPAWN_PARTICLE);
 
         final RecipeRewriter1_16<ClientboundPackets1_19_1> recipeRewriter = new RecipeRewriter1_16<>(protocol);
-        protocol.registerClientbound(ClientboundPackets1_19_1.DECLARE_RECIPES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.DECLARE_RECIPES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
@@ -123,7 +123,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                                 wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                                 break;
                             default:
-                                recipeRewriter.handle(wrapper, type);
+                                recipeRewriter.handleRecipeType(wrapper, type);
                                 break;
                         }
                     }
@@ -131,9 +131,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.EXPLOSION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.EXPLOSION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLOAT, Type.DOUBLE); // X
                 map(Type.FLOAT, Type.DOUBLE); // Y
                 map(Type.FLOAT, Type.DOUBLE); // Z

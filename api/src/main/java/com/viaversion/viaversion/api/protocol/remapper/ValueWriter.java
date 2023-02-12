@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 
 @FunctionalInterface
 public interface ValueWriter<T> {
+
     /**
      * Write a value to a packet
      *

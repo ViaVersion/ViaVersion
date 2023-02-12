@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
@@ -50,9 +50,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         /* Outgoing Packets */
 
         // Status Response Packet
-        registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketRemapper() { // Status Response Packet
+        registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() { // Status Response Packet
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING);
                 handler(new PacketHandler() {
                     @Override
@@ -125,9 +125,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         });
 
         // Login Success Packet
-        registerClientbound(ClientboundLoginPackets.GAME_PROFILE, new PacketRemapper() {
+        registerClientbound(ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -162,9 +162,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
 
         /* Incoming Packets */
         // Login Start Packet
-        registerServerbound(ServerboundLoginPackets.HELLO, new PacketRemapper() {
+        registerServerbound(ServerboundLoginPackets.HELLO, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(final PacketWrapper wrapper) throws Exception {

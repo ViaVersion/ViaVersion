@@ -31,7 +31,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -96,9 +96,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity type
@@ -123,9 +123,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 handler(wrapper -> {
@@ -159,9 +159,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity ID
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity Type
@@ -184,9 +184,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.VAR_INT); // Effect id
                 map(Type.BYTE); // Amplifier
@@ -196,9 +196,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -250,9 +250,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> writeDimensionKey(wrapper, wrapper.user().get(DimensionRegistryStorage.class)));
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -266,9 +266,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int action = wrapper.passthrough(Type.VAR_INT);
                     final int entries = wrapper.passthrough(Type.VAR_INT);

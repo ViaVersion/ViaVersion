@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets.InventoryPackets;
@@ -41,16 +41,16 @@ public class Protocol1_13_2To1_13_1 extends AbstractProtocol<ClientboundPackets1
         WorldPackets.register(this);
         EntityPackets.register(this);
 
-        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM);
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_13.ADVANCEMENTS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {

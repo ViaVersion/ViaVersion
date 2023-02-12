@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -159,9 +159,9 @@ public class EntityPackets {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
 
         // Spawn lightning -> Spawn entity
-        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int entityId = wrapper.passthrough(Type.VAR_INT);
                     byte type = wrapper.read(Type.BYTE);
@@ -195,9 +195,9 @@ public class EntityPackets {
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_16.METADATA_LIST);
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_15.DESTROY_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(DIMENSION_HANDLER);
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -212,9 +212,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.UNSIGNED_BYTE); //  Gamemode
                 handler(wrapper -> {
@@ -239,9 +239,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.passthrough(Type.VAR_INT);
                     int size = wrapper.passthrough(Type.INT);
@@ -285,9 +285,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
                     // Don't send an arm swing if the player has an inventory opened.

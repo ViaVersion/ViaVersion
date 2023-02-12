@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
@@ -51,9 +51,9 @@ import java.util.Optional;
 
 public class WorldPackets {
     public static void register(Protocol1_9To1_8 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
@@ -62,9 +62,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Effect ID
                 map(Type.POSITION); // 1 - Position
                 map(Type.INT); // 2 - Data
@@ -94,9 +94,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.NAMED_SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - Sound Name
                 // 1 - Sound Category ID
                 // Everything else get's written through
@@ -129,9 +129,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -191,9 +191,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel(); // Cancel the packet from being sent
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
@@ -227,9 +227,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // 0 - Block Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NBT); // 2 - NBT (Might not be present)
@@ -266,9 +266,9 @@ public class WorldPackets {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
@@ -277,9 +277,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_DIGGING, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_DIGGING, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Action
                 map(Type.POSITION); // Position
                 handler(new PacketHandler() {
@@ -309,9 +309,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM, null, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper wrapper) throws Exception {
@@ -375,9 +375,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // 0 - Position
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
                 handler(new PacketHandler() {

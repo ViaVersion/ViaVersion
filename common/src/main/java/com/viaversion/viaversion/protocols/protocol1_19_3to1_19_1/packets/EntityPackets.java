@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -48,9 +48,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
         registerMetadataRewriter(ClientboundPackets1_19_1.ENTITY_METADATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -72,9 +72,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -94,9 +94,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int action = wrapper.read(Type.VAR_INT);
                     if (action == 4) { // Remove player

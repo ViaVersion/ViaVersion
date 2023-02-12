@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.Protocol1_13_2To1_13_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -27,9 +27,9 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 public class WorldPackets {
 
     public static void register(Protocol1_13_2To1_13_1 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
                 map(Type.FLOAT); // 2 - X

@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -50,9 +50,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
         registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, Entity1_17Types.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
                     wrapper.cancel();
@@ -70,9 +70,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -96,9 +96,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
                     addNewDimensionData(dimensionData);
@@ -106,9 +106,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 handler(wrapper -> {
                     // Collection length is now a var int
@@ -117,9 +117,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_POSITION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_POSITION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.DOUBLE);
                 map(Type.DOUBLE);
                 map(Type.DOUBLE);
@@ -134,9 +134,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Combat packet actions have been split into individual packets (the content hasn't changed)
                     int type = wrapper.read(Type.VAR_INT);

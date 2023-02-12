@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
@@ -43,9 +43,9 @@ import java.util.List;
 public final class WorldPackets {
 
     public static void register(final Protocol1_18To1_17_1 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
                     final short id = wrapper.read(Type.UNSIGNED_BYTE);
@@ -57,9 +57,9 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.UPDATE_LIGHT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.UPDATE_LIGHT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int chunkX = wrapper.passthrough(Type.VAR_INT);
                     final int chunkZ = wrapper.passthrough(Type.VAR_INT);
@@ -101,9 +101,9 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.CHUNK_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.CHUNK_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
                     final Chunk oldChunk = wrapper.read(new Chunk1_17Type(tracker.currentWorldSectionHeight()));
@@ -199,9 +199,9 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.UNLOAD_CHUNK, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.UNLOAD_CHUNK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final int chunkX = wrapper.passthrough(Type.INT);
                     final int chunkZ = wrapper.passthrough(Type.INT);

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 
 import com.viaversion.viaversion.api.data.ParticleMappings;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
@@ -41,9 +41,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_
         registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
         registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT);
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Effect id
                 map(Type.POSITION1_14); // Location
                 map(Type.INT); // Data
@@ -57,9 +57,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.SPAWN_PARTICLE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Particle id
                 map(Type.BOOLEAN); // Override limiter
                 map(Type.DOUBLE); // X
