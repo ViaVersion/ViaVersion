@@ -26,13 +26,30 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class RecipeRewriter<C extends ClientboundPacketType> {
+public class RecipeRewriter<C extends ClientboundPacketType> {
 
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final Map<String, RecipeConsumer> recipeHandlers = new HashMap<>();
 
-    protected RecipeRewriter(Protocol<C, ?, ?, ?> protocol) {
+    public RecipeRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
+        recipeHandlers.put("crafting_shapeless", this::handleCraftingShapeless);
+        recipeHandlers.put("crafting_shaped", this::handleCraftingShaped);
+        recipeHandlers.put("smelting", this::handleSmelting);
+
+        // Added in 1.14
+        recipeHandlers.put("stonecutting", this::handleStonecutting);
+        recipeHandlers.put("blasting", this::handleSmelting);
+        recipeHandlers.put("smoking", this::handleSmelting);
+        recipeHandlers.put("campfire_cooking", this::handleSmelting);
+
+        // Added in 1.16
+        recipeHandlers.put("smithing", this::handleSmithing);
+
+        // Added in 1.19.4
+        recipeHandlers.put("smithing_transform", this::handleSmithingTransform);
+        recipeHandlers.put("smithing_trim", this::handleSmithingTransform);
+        recipeHandlers.put("crafting_decorated_pot", this::handleSimpleRecipe);
     }
 
     public void handleRecipeType(PacketWrapper wrapper, String type) throws Exception {
@@ -42,7 +59,12 @@ public abstract class RecipeRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    public void registerDefaultHandler(C packetType) {
+    /**
+     * Registers a packet handler to rewrite recipe types, for 1.14+.
+     *
+     * @param packetType packet type
+     */
+    public void register(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
@@ -53,9 +75,69 @@ public abstract class RecipeRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void handleCraftingShaped(PacketWrapper wrapper) throws Exception {
+        int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
+        wrapper.passthrough(Type.STRING); // Group
+        for (int i = 0; i < ingredientsNo; i++) {
+            handleIngredient(wrapper);
+        }
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
+    public void handleCraftingShapeless(PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.STRING); // Group
+        handleIngredients(wrapper);
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
+    public void handleSmelting(PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.STRING); // Group
+        handleIngredient(wrapper);
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        wrapper.passthrough(Type.FLOAT); // EXP
+        wrapper.passthrough(Type.VAR_INT); // Cooking time
+    }
+
+    public void handleStonecutting(PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.STRING);
+        handleIngredient(wrapper);
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
+    public void handleSmithing(PacketWrapper wrapper) throws Exception {
+        handleIngredient(wrapper); // Base
+        handleIngredient(wrapper); // Addition
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
+    public void handleSimpleRecipe(final PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.VAR_INT); // Crafting book category
+    }
+
+    public void handleSmithingTransform(final PacketWrapper wrapper) throws Exception {
+        handleIngredient(wrapper); // Template
+        handleIngredient(wrapper); // Base
+        handleIngredient(wrapper); // Additions
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
     protected void rewrite(@Nullable Item item) {
         if (protocol.getItemRewriter() != null) {
             protocol.getItemRewriter().handleItemToClient(item);
+        }
+    }
+
+    protected void handleIngredient(final PacketWrapper wrapper) throws Exception {
+        final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
+        for (final Item item : items) {
+            rewrite(item);
+        }
+    }
+
+    protected void handleIngredients(final PacketWrapper wrapper) throws Exception {
+        final int ingredients = wrapper.passthrough(Type.VAR_INT);
+        for (int i = 0; i < ingredients; i++) {
+            handleIngredient(wrapper);
         }
     }
 

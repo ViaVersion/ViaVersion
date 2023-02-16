@@ -15,33 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data;
+package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data;
 
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
+import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.data.RecipeRewriter1_19_3;
 
-public class RecipeRewriter1_14<C extends ClientboundPacketType> extends RecipeRewriter1_13_2<C> {
+public class RecipeRewriter1_19_4<C extends ClientboundPacketType> extends RecipeRewriter1_19_3<C> {
 
-    public RecipeRewriter1_14(Protocol<C, ?, ?, ?> protocol) {
+    public RecipeRewriter1_19_4(final Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
-        recipeHandlers.put("stonecutting", this::handleStonecutting);
-
-        recipeHandlers.put("blasting", this::handleSmelting);
-        recipeHandlers.put("smoking", this::handleSmelting);
-        recipeHandlers.put("campfire_cooking", this::handleSmelting);
     }
 
-    public void handleStonecutting(PacketWrapper wrapper) throws Exception {
-        wrapper.passthrough(Type.STRING);
-        Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-        for (Item item : items) {
-            rewrite(item);
-        }
-
+    @Override
+    public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.STRING); // Group
+        wrapper.passthrough(Type.VAR_INT); // Crafting book category
+        handleIngredients(wrapper);
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        wrapper.passthrough(Type.BOOLEAN); // Show notification
     }
 }

@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.RecipeRewriter1_13_2;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
@@ -72,7 +71,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
 
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_ITEM);
 
-        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter1_13_2<>(protocol);
+        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {

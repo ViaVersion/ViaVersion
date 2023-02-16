@@ -23,12 +23,12 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_17To1_16_4> {
 
@@ -46,7 +46,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
         registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
         registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
 
-        new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_16_2.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.DECLARE_RECIPES);
 
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 

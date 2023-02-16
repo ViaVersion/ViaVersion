@@ -17,17 +17,17 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.data;
 
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
+import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
-public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends RecipeRewriter1_16<C> {
+public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends RecipeRewriter<C> {
 
     public RecipeRewriter1_19_3(final Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
+        // Existed before, but now have serialization data
         recipeHandlers.put("crafting_special_armordye", this::handleSimpleRecipe);
         recipeHandlers.put("crafting_special_bookcloning", this::handleSimpleRecipe);
         recipeHandlers.put("crafting_special_mapcloning", this::handleSimpleRecipe);
@@ -47,13 +47,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
     public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        final int ingredients = wrapper.passthrough(Type.VAR_INT);
-        for (int j = 0; j < ingredients; j++) {
-            final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-            for (final Item item : items) {
-                rewrite(item);
-            }
-        }
+        handleIngredients(wrapper);
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
 
@@ -62,11 +56,8 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        for (int j = 0; j < ingredients; j++) {
-            final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-            for (final Item item : items) {
-                rewrite(item);
-            }
+        for (int i = 0; i < ingredients; i++) {
+            handleIngredient(wrapper);
         }
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
@@ -75,16 +66,9 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
     public void handleSmelting(final PacketWrapper wrapper) throws Exception {
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Ingredients
-        for (final Item item : items) {
-            rewrite(item);
-        }
+        handleIngredient(wrapper);
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
-    }
-
-    public void handleSimpleRecipe(final PacketWrapper wrapper) throws Exception {
-        wrapper.passthrough(Type.VAR_INT); // Crafting book category
     }
 }

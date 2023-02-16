@@ -401,56 +401,53 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                         wrapper.write(Type.STRING_ARRAY, stringIds);
                     }
                     if (action == 0) {
-                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, new PacketHandler() { // Declare recipes
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.VAR_INT, RecipeData.recipes.size());
-                                for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
-                                    wrapper.write(Type.STRING, entry.getKey()); // Id
-                                    wrapper.write(Type.STRING, entry.getValue().getType());
-                                    switch (entry.getValue().getType()) {
-                                        case "crafting_shapeless": {
-                                            wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                            wrapper.write(Type.VAR_INT, entry.getValue().getIngredients().length);
-                                            for (Item[] ingredient : entry.getValue().getIngredients()) {
-                                                Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                                                for (int i = 0; i < clone.length; i++) {
-                                                    if (clone[i] == null) continue;
-                                                    clone[i] = new DataItem(clone[i]);
-                                                }
-                                                wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                            }
-                                            wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
-                                            break;
-                                        }
-                                        case "crafting_shaped": {
-                                            wrapper.write(Type.VAR_INT, entry.getValue().getWidth());
-                                            wrapper.write(Type.VAR_INT, entry.getValue().getHeight());
-                                            wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                            for (Item[] ingredient : entry.getValue().getIngredients()) {
-                                                Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                                                for (int i = 0; i < clone.length; i++) {
-                                                    if (clone[i] == null) continue;
-                                                    clone[i] = new DataItem(clone[i]);
-                                                }
-                                                wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                            }
-                                            wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
-                                            break;
-                                        }
-                                        case "smelting": {
-                                            wrapper.write(Type.STRING, entry.getValue().getGroup());
-                                            Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
+                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, wrapper1 -> {
+                            wrapper1.write(Type.VAR_INT, RecipeData.recipes.size());
+                            for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
+                                wrapper1.write(Type.STRING, entry.getKey()); // Id
+                                wrapper1.write(Type.STRING, entry.getValue().getType());
+                                switch (entry.getValue().getType()) {
+                                    case "crafting_shapeless": {
+                                        wrapper1.write(Type.STRING, entry.getValue().getGroup());
+                                        wrapper1.write(Type.VAR_INT, entry.getValue().getIngredients().length);
+                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                                             for (int i = 0; i < clone.length; i++) {
                                                 if (clone[i] == null) continue;
                                                 clone[i] = new DataItem(clone[i]);
                                             }
-                                            wrapper.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                            wrapper.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
-                                            wrapper.write(Type.FLOAT, entry.getValue().getExperience());
-                                            wrapper.write(Type.VAR_INT, entry.getValue().getCookingTime());
-                                            break;
+                                            wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
                                         }
+                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        break;
+                                    }
+                                    case "crafting_shaped": {
+                                        wrapper1.write(Type.VAR_INT, entry.getValue().getWidth());
+                                        wrapper1.write(Type.VAR_INT, entry.getValue().getHeight());
+                                        wrapper1.write(Type.STRING, entry.getValue().getGroup());
+                                        for (Item[] ingredient : entry.getValue().getIngredients()) {
+                                            Item[] clone = ingredient.clone(); // Clone because array and item is mutable
+                                            for (int i = 0; i < clone.length; i++) {
+                                                if (clone[i] == null) continue;
+                                                clone[i] = new DataItem(clone[i]);
+                                            }
+                                            wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                        }
+                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        break;
+                                    }
+                                    case "smelting": {
+                                        wrapper1.write(Type.STRING, entry.getValue().getGroup());
+                                        Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
+                                        for (int i = 0; i < clone.length; i++) {
+                                            if (clone[i] == null) continue;
+                                            clone[i] = new DataItem(clone[i]);
+                                        }
+                                        wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        wrapper1.write(Type.FLOAT, entry.getValue().getExperience());
+                                        wrapper1.write(Type.VAR_INT, entry.getValue().getCookingTime());
+                                        break;
                                     }
                                 }
                             }
