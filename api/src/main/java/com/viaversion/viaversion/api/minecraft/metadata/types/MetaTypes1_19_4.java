@@ -53,11 +53,12 @@ public final class MetaTypes1_19_4 extends AbstractMetaTypes {
     public final MetaType frogVariantType = add(22, Type.VAR_INT);
     public final MetaType optionalGlobalPosition = add(23, Type.OPTIONAL_GLOBAL_POSITION);
     public final MetaType paintingVariantType = add(24, Type.VAR_INT);
-    public final MetaType vectorType = add(25, Type.VECTOR3F);
-    public final MetaType quaternionType = add(26, Type.QUATERNION);
+    public final MetaType snifferState = add(25, Type.VAR_INT);
+    public final MetaType vectorType = add(26, Type.VECTOR3F);
+    public final MetaType quaternionType = add(27, Type.QUATERNION);
 
     public MetaTypes1_19_4(final ParticleType particleType) {
-        super(27);
+        super(28);
         this.particleType = add(17, particleType);
     }
 }

@@ -21,12 +21,12 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.RecipeRewriter1_16;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.rewriter.RecipeRewriter;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_19To1_18_2> {
 
@@ -122,7 +122,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
             }
         });
 
-        new RecipeRewriter1_16<>(protocol).registerDefaultHandler(ClientboundPackets1_18.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_18.DECLARE_RECIPES);
     }
 
     private PacketHandler sequenceHandler() {

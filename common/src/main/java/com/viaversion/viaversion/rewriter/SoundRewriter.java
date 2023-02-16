@@ -48,6 +48,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    // Not for entity sounds
     public void register1_19_3Sound(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final int soundId = wrapper.read(Type.VAR_INT);

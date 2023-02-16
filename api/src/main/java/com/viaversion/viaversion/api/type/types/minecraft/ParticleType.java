@@ -50,7 +50,7 @@ public class ParticleType extends Type<Particle> {
     }
 
     public ParticleTypeFiller filler(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
-        return this.new ParticleTypeFiller(protocol, useMappedNames);
+        return new ParticleTypeFiller(protocol, useMappedNames);
     }
 
     @Override

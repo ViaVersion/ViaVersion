@@ -17,22 +17,31 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.InventoryPackets;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPackets1_19_3, ClientboundPackets1_19_4, ServerboundPackets1_19_3, ServerboundPackets1_19_4> {
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityPackets entityRewriter = new EntityPackets(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
     public Protocol1_19_4To1_19_3() {
         super(ClientboundPackets1_19_3.class, ClientboundPackets1_19_4.class, ServerboundPackets1_19_3.class, ServerboundPackets1_19_4.class);
@@ -40,10 +49,14 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        //TODO Damage events
         entityRewriter.register();
+        itemRewriter.register();
 
-        final CommandRewriter<ClientboundPackets1_19_3> commandRewriter = new CommandRewriter<ClientboundPackets1_19_3>(this) {
+        final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
+        soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
+
+        new CommandRewriter<ClientboundPackets1_19_3>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 if (argumentType.equals("minecraft:time")) {
@@ -53,13 +66,35 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-        };
-        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_3.DECLARE_COMMANDS);
+
+        }.registerDeclareCommands1_19(ClientboundPackets1_19_3.DECLARE_COMMANDS);
+
+        registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
+            JsonElement element = wrapper.read(Type.OPTIONAL_COMPONENT);
+            if (element == null) {
+                element = new JsonObject();
+            }
+            wrapper.write(Type.COMPONENT, element);
+
+            final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);
+            final byte[] iconBytes = iconBase64 != null ? Base64.getDecoder().decode(iconBase64.substring("data:image/png;base64,".length()).getBytes(StandardCharsets.UTF_8)) : null;
+            wrapper.write(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE, iconBytes);
+        });
     }
 
     @Override
     protected void onMappingDataLoaded() {
         Entity1_19_4Types.initialize(this);
+        Types1_19_4.PARTICLE.filler(this)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("block_marker", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("vibration", ParticleType.Readers.VIBRATION)
+                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+                .reader("shriek", ParticleType.Readers.SHRIEK);
         entityRewriter.onMappingDataLoaded();
     }
 
@@ -71,5 +106,15 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
+    }
+
+    @Override
+    public EntityPackets getEntityRewriter() {
+        return entityRewriter;
+    }
+
+    @Override
+    public InventoryPackets getItemRewriter() {
+        return itemRewriter;
     }
 }

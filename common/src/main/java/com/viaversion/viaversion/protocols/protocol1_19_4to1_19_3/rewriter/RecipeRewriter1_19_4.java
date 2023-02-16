@@ -19,13 +19,22 @@ package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.rewriter.CommandRewriter;
+import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.rewriter.RecipeRewriter1_19_3;
 
-public class CommandRewriter1_19_3<C extends ClientboundPacketType> extends CommandRewriter<C> {
+public class RecipeRewriter1_19_4<C extends ClientboundPacketType> extends RecipeRewriter1_19_3<C> {
 
-    public CommandRewriter1_19_3(Protocol<C, ?, ?, ?> protocol) {
+    public RecipeRewriter1_19_4(final Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
-        this.parserHandlers.put("minecraft:time", wrapper -> wrapper.passthrough(Type.INT)); // Minimum
+    }
+
+    @Override
+    public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
+        wrapper.passthrough(Type.STRING); // Group
+        wrapper.passthrough(Type.VAR_INT); // Crafting book category
+        handleIngredients(wrapper);
+        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        wrapper.passthrough(Type.BOOLEAN); // Show notification
     }
 }

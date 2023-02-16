@@ -15,26 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data;
+package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.data.RecipeRewriter1_19_3;
+import com.viaversion.viaversion.rewriter.CommandRewriter;
 
-public class RecipeRewriter1_19_4<C extends ClientboundPacketType> extends RecipeRewriter1_19_3<C> {
+public class CommandRewriter1_19_4<C extends ClientboundPacketType> extends CommandRewriter<C> {
 
-    public RecipeRewriter1_19_4(final Protocol<C, ?, ?, ?> protocol) {
+    public CommandRewriter1_19_4(Protocol<C, ?, ?, ?> protocol) {
         super(protocol);
-    }
-
-    @Override
-    public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
-        wrapper.passthrough(Type.STRING); // Group
-        wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
-        wrapper.passthrough(Type.BOOLEAN); // Show notification
+        this.parserHandlers.put("minecraft:time", wrapper -> wrapper.passthrough(Type.INT)); // Minimum
     }
 }

@@ -31,17 +31,17 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final Map<String, RecipeConsumer> recipeHandlers = new HashMap<>();
 
-    public RecipeRewriter(Protocol<C, ?, ?, ?> protocol) {
+    public RecipeRewriter(final Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
         recipeHandlers.put("crafting_shapeless", this::handleCraftingShapeless);
         recipeHandlers.put("crafting_shaped", this::handleCraftingShaped);
         recipeHandlers.put("smelting", this::handleSmelting);
 
         // Added in 1.14
-        recipeHandlers.put("stonecutting", this::handleStonecutting);
         recipeHandlers.put("blasting", this::handleSmelting);
         recipeHandlers.put("smoking", this::handleSmelting);
         recipeHandlers.put("campfire_cooking", this::handleSmelting);
+        recipeHandlers.put("stonecutting", this::handleStonecutting);
 
         // Added in 1.16
         recipeHandlers.put("smithing", this::handleSmithing);
@@ -99,7 +99,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     public void handleStonecutting(PacketWrapper wrapper) throws Exception {
-        wrapper.passthrough(Type.STRING);
+        wrapper.passthrough(Type.STRING); // Group
         handleIngredient(wrapper);
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
     }
