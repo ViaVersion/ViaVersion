@@ -48,7 +48,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
 
         // Added in 1.19.4
         recipeHandlers.put("smithing_transform", this::handleSmithingTransform);
-        recipeHandlers.put("smithing_trim", this::handleSmithingTransform);
+        recipeHandlers.put("smithing_trim", this::handleSmithingTrim);
         recipeHandlers.put("crafting_decorated_pot", this::handleSimpleRecipe);
     }
 
@@ -119,6 +119,12 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
         rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    }
+
+    public void handleSmithingTrim(final PacketWrapper wrapper) throws Exception {
+        handleIngredient(wrapper); // Template
+        handleIngredient(wrapper); // Base
+        handleIngredient(wrapper); // Additions
     }
 
     protected void rewrite(@Nullable Item item) {

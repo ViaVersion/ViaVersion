@@ -148,6 +148,8 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
             meta.setMetaType(Types1_19_4.META_TYPES.byId(id));
         });
+        registerMetaTypeHandler(Types1_19_4.META_TYPES.itemType, Types1_19_4.META_TYPES.blockStateType, Types1_19_4.META_TYPES.particleType);
+
         filter().filterFamily(Entity1_19_4Types.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
     }
 
