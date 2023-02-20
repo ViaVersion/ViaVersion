@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
@@ -79,11 +78,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onLoad() {
-        if (hasPaperPluginLoader()) {
-            // Paper's plugin loader constructs plugin only once they're actually loaded and there's no place for VB to enable caching before the protocols are initialized
-            MappingDataLoader.enableMappingsCache();
-        }
-
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
 
@@ -92,15 +86,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             ((ViaManagerImpl) Via.getManager()).init();
         } else {
             getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded. Waiting for boot (late-bind).");
-        }
-    }
-
-    private boolean hasPaperPluginLoader() {
-        try {
-            Class.forName("io.papermc.paper.plugin.configuration.PluginMeta");
-            return true;
-        } catch (final ClassNotFoundException e) {
-            return false;
         }
     }
 
