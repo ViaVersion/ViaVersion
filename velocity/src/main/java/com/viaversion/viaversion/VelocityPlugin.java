@@ -30,7 +30,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -105,10 +104,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
                 .commandHandler(commandHandler)
                 .loader(new VelocityViaLoader())
                 .injector(new VelocityViaInjector()).build());
-
-        if (proxy.getPluginManager().getPlugin("viabackwards").isPresent()) {
-            MappingDataLoader.enableMappingsCache();
-        }
     }
 
     @Subscribe(order = PostOrder.LAST)

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SpongeViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval",
+    private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval",
             "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
             "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
 

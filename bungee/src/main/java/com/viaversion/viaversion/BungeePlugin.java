@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
@@ -86,11 +85,6 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
 
     @Override
     public void onEnable() {
-        if (ProxyServer.getInstance().getPluginManager().getPlugin("ViaBackwards") != null) {
-            MappingDataLoader.enableMappingsCache();
-        }
-
-        // Inject
         ((ViaManagerImpl) Via.getManager()).init();
     }
 

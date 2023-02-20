@@ -187,13 +187,6 @@ public interface ViaVersionConfig {
     String getMaxWarningsKickMessage();
 
     /**
-     * Is anti-xray enabled?
-     *
-     * @return A boolean
-     */
-    boolean isAntiXRay();
-
-    /**
      * Send supported versions in the status response packet
      *
      * @return If true, enabled

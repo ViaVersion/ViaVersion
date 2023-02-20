@@ -333,11 +333,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isAntiXRay() {
-        return false;
-    }
-
-    @Override
     public boolean isSendSupportedVersions() {
         return sendSupportedVersions;
     }

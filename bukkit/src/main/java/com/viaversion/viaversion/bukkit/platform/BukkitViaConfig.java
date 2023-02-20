@@ -27,7 +27,6 @@ import org.bukkit.plugin.Plugin;
 
 public class BukkitViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
-    private boolean antiXRay;
     private boolean quickMoveActionFix;
     private boolean hitboxFix1_9;
     private boolean hitboxFix1_14;
@@ -42,7 +41,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     protected void loadFields() {
         super.loadFields();
-        antiXRay = getBoolean("anti-xray-patch", true);
         quickMoveActionFix = getBoolean("quick-move-action-fix", false);
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
@@ -52,11 +50,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
 
     @Override
     protected void handleConfig(Map<String, Object> config) {
-    }
-
-    @Override
-    public boolean isAntiXRay() {
-        return antiXRay;
     }
 
     @Override

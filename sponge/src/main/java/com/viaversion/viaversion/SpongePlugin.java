@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -89,7 +88,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public void constructPlugin(ConstructPluginEvent event) {
         // Setup Plugin
         conf = new SpongeViaConfig(configDir.toFile());
-        logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
@@ -104,13 +102,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public void onServerStart(StartingEngineEvent<Server> event) {
         // Can't use the command register event for raw commands...
         Sponge.server().commandManager().registrar(Command.Raw.class).get().register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
-
-        if (game.pluginManager().plugin("viabackwards").isPresent()) {
-            MappingDataLoader.enableMappingsCache();
-        }
-
-        // Inject!
-        logger.info("ViaVersion is injecting!");
         ((ViaManagerImpl) Via.getManager()).init();
     }
 

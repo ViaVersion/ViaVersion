@@ -55,7 +55,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
     private final List<Runnable> queuedTasks = new ArrayList<>();
     private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
-    private final boolean protocolSupport;
+    private boolean protocolSupport;
     private boolean lateBind;
 
     public ViaVersionPlugin() {
@@ -66,7 +66,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Init platform
         BukkitViaInjector injector = new BukkitViaInjector();
-
         Via.init(ViaManagerImpl.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
@@ -76,22 +75,30 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Config magic
         conf = new BukkitViaConfig();
-
-        // Check if we're using protocol support too
-        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
     }
 
     @Override
     public void onLoad() {
-        if (getServer().getPluginManager().getPlugin("ViaBackwards") != null) {
+        if (hasPaperPluginLoader()) {
+            // Paper's plugin loader constructs plugin only once they're actually loaded and there's no place for VB to enable caching before the protocols are initialized
             MappingDataLoader.enableMappingsCache();
         }
 
+        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
 
         getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
         if (!lateBind) {
             ((ViaManagerImpl) Via.getManager()).init();
+        }
+    }
+
+    private boolean hasPaperPluginLoader() {
+        try {
+            Class.forName("io.papermc.paper.plugin.configuration.PluginMeta");
+            return true;
+        } catch (final ClassNotFoundException e) {
+            return false;
         }
     }
 
@@ -103,11 +110,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
-
-        // Warn them if they have anti-xray on and they aren't using spigot
-        if (conf.isAntiXRay() && !isSpigot()) {
-            getLogger().info("You have anti-xray on in your config, since you're not using spigot it won't fix xray!");
-        }
 
         // Run queued tasks
         for (Runnable r : queuedTasks) {
@@ -279,15 +281,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return protocolSupport;
     }
 
-    private boolean isSpigot() {
-        try {
-            Class.forName("org.spigotmc.SpigotConfig");
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
-    }
-
+    @Deprecated/*(forRemoval = true)*/
     public static ViaVersionPlugin getInstance() {
         return instance;
     }

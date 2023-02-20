@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class MappingDataLoader {
+public final class MappingDataLoader {
 
     private static final Map<String, JsonObject> MAPPINGS_CACHE = new ConcurrentHashMap<>();
     private static boolean cacheJsonMappings;
@@ -77,7 +77,9 @@ public class MappingDataLoader {
      */
     public static @Nullable JsonObject loadFromDataDir(String name) {
         File file = new File(Via.getPlatform().getDataFolder(), name);
-        if (!file.exists()) return loadData(name);
+        if (!file.exists()) {
+            return loadData(name);
+        }
 
         // Load the file from the platform's directory if present
         try (FileReader reader = new FileReader(file)) {
