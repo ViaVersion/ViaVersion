@@ -68,7 +68,9 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public void load() {
-        getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
+        if (Via.getManager().isDebug()) {
+            getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
+        }
         JsonObject diffmapping = hasDiffFile ? loadDiffFile() : null;
         JsonObject oldMappings = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
         JsonObject newMappings = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);

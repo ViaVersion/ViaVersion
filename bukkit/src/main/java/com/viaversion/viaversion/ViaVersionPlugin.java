@@ -87,9 +87,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
 
-        getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded" + (lateBind ? ", waiting for boot. (late-bind)" : ", injecting!"));
         if (!lateBind) {
+            getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded. Registering protocol transformers and injecting...");
             ((ViaManagerImpl) Via.getManager()).init();
+        } else {
+            getLogger().info("ViaVersion " + getDescription().getVersion() + " is now loaded. Waiting for boot (late-bind).");
         }
     }
 
@@ -105,6 +107,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public void onEnable() {
         if (lateBind) {
+            getLogger().info("Registering protocol transformers and injecting...");
             ((ViaManagerImpl) Via.getManager()).init();
         }
 

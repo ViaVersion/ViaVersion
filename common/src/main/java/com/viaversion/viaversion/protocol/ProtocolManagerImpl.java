@@ -126,7 +126,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public ProtocolManagerImpl() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
-        mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
+        mappingLoaderExecutor = new ThreadPoolExecutor(12, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
         mappingLoaderExecutor.allowCoreThreadTimeOut(true);
     }
 
@@ -434,7 +434,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public boolean checkForMappingCompletion() {
         mappingLoaderLock.readLock().lock();
         try {
-            if (mappingsLoaded) return false;
+            if (mappingsLoaded) {
+                return false;
+            }
 
             for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
                 // Return if any future hasn't completed yet
