@@ -37,4 +37,7 @@ public interface Rewriter<T extends Protocol> {
      * @return protocol of the rewriter
      */
     T protocol();
+
+    default void onMappingDataLoaded() {
+    }
 }

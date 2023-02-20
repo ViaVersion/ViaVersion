@@ -59,8 +59,7 @@ public class ViaManagerImpl implements ViaManager {
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
     private List<Runnable> enableListeners = new ArrayList<>();
-    private PlatformTask mappingLoadingTask;
-    private boolean debug;
+    private PlatformTask<?> mappingLoadingTask;
 
     public ViaManagerImpl(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
@@ -124,7 +123,7 @@ public class ViaManagerImpl implements ViaManager {
             if (platform.isProxy()) {
                 platform.getLogger().info("ViaVersion detected lowest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.lowestSupportedVersion()));
                 platform.getLogger().info("Highest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
-                if (debug) {
+                if (debugHandler.enabled()) {
                     platform.getLogger().info("Supported version range: " + Arrays.toString(protocolVersion.supportedVersions().toArray(new int[0])));
                 }
             } else {

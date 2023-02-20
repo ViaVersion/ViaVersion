@@ -49,8 +49,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
@@ -84,6 +83,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
         Entity1_19_4Types.initialize(this);
         Types1_19_4.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
@@ -95,7 +95,6 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
                 .reader("vibration", ParticleType.Readers.VIBRATION)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
-        entityRewriter.onMappingDataLoaded();
     }
 
     @Override

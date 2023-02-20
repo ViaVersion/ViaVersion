@@ -59,7 +59,7 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     @Override
     public void onLoad() {
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_19_1");
+            ProtocolConstants.class.getField("MINECRAFT_1_19_4");
         } catch (NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");

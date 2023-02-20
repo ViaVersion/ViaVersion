@@ -281,7 +281,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
-        entityRewriter.onMappingDataLoaded();
+        super.onMappingDataLoaded();
         Types1_19_3.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)

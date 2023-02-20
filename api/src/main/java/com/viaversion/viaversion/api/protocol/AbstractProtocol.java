@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypeMap;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import java.util.Collections;
@@ -148,6 +149,8 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
      * Register the packets for this protocol. To be overriden.
      */
     protected void registerPackets() {
+        callRegister(getEntityRewriter());
+        callRegister(getItemRewriter());
     }
 
     /**
@@ -156,6 +159,20 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
      * To be overridden if needed.
      */
     protected void onMappingDataLoaded() {
+        callOnMappingDataLoaded(getEntityRewriter());
+        callOnMappingDataLoaded(getItemRewriter());
+    }
+
+    private void callRegister(@Nullable Rewriter<?> rewriter) {
+        if (rewriter != null) {
+            rewriter.register();
+        }
+    }
+
+    private void callOnMappingDataLoaded(@Nullable Rewriter<?> rewriter) {
+        if (rewriter != null) {
+            rewriter.onMappingDataLoaded();
+        }
     }
 
     protected void addEntityTracker(UserConnection connection, EntityTracker tracker) {

@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.packets.InventoryPackets;
@@ -58,7 +57,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
             return metaList;
         }
     };
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
     public Protocol1_10To1_9_3_4() {
         super(ClientboundPackets1_9_3.class, ClientboundPackets1_9_3.class, ServerboundPackets1_9_3.class, ServerboundPackets1_9_3.class);
@@ -243,7 +242,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }
