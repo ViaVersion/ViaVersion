@@ -64,12 +64,13 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     protected final Class<CM> mappedClientboundPacketType;
     protected final Class<SM> mappedServerboundPacketType;
     protected final Class<SU> unmappedServerboundPacketType;
-    private final PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider;
-    private final PacketMappings serverboundMappings = PacketMappings.arrayMappings();
-    private final PacketMappings clientboundMappings = PacketMappings.arrayMappings();
+    protected final PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider;
+    protected final PacketMappings clientboundMappings;
+    protected final PacketMappings serverboundMappings;
     private final Map<Class<?>, Object> storedObjects = new HashMap<>();
     private boolean initialized;
 
+    @Deprecated
     protected AbstractProtocol() {
         this(null, null, null, null);
     }
@@ -84,6 +85,8 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         this.mappedServerboundPacketType = mappedServerboundPacketType;
         this.unmappedServerboundPacketType = unmappedServerboundPacketType;
         this.packetTypesProvider = createPacketTypesProvider();
+        this.clientboundMappings = createClientboundPacketMappings();
+        this.serverboundMappings = createServerboundPacketMappings();
     }
 
     @Override
@@ -186,6 +189,14 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
                 packetTypeMap(mappedServerboundPacketType),
                 packetTypeMap(unmappedServerboundPacketType)
         );
+    }
+
+    protected PacketMappings createClientboundPacketMappings() {
+        return PacketMappings.arrayMappings();
+    }
+
+    protected PacketMappings createServerboundPacketMappings() {
+        return PacketMappings.arrayMappings();
     }
 
     private <P extends PacketType> Map<State, PacketTypeMap<P>> packetTypeMap(Class<P> packetTypeClass) {

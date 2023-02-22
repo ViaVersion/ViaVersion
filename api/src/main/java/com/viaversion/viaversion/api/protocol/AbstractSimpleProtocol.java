@@ -22,6 +22,15 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
+/**
+ * A simple protocol which does not have any packet types.
+ * <p>
+ * {@link AbstractProtocol} should be preferred over this class in most cases.
+ */
 public abstract class AbstractSimpleProtocol extends AbstractProtocol<SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes,
         SimpleProtocol.DummyPacketTypes, SimpleProtocol.DummyPacketTypes> implements SimpleProtocol {
+
+    protected AbstractSimpleProtocol() {
+        super(null, null, null, null);
+    }
 }

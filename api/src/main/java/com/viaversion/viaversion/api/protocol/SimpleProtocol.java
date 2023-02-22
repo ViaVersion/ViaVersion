@@ -39,7 +39,7 @@ public interface SimpleProtocol extends Protocol<SimpleProtocol.DummyPacketTypes
 
         @Override
         public int getId() {
-            return ordinal();
+            return 0;
         }
 
         @Override
