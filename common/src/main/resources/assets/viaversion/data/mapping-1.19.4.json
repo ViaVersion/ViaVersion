@@ -27600,6 +27600,7 @@
     "minecraft:resource_key",
     "minecraft:template_mirror",
     "minecraft:template_rotation",
+    "minecraft:heightmap",
     "minecraft:uuid"
   ],
   "enchantments": [
