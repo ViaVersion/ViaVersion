@@ -46,7 +46,6 @@ public class ProtocolVersion {
     public static final ProtocolVersion v_1_6_3 = register(77, "1.6.3");
     public static final ProtocolVersion v_1_6_4 = register(78, "1.6.4");
     // After the Netty rewrite
-    public static final ProtocolVersion v1_7 = register(3, "1.7/1.7.1", new VersionRange("1.7", 0, 1));
     public static final ProtocolVersion v1_7_1 = register(4, "1.7.2-1.7.5", new VersionRange("1.7", 2, 5));
     public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new VersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x");
