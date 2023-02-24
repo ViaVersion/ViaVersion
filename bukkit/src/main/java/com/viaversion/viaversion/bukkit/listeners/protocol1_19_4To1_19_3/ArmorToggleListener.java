@@ -30,25 +30,38 @@ import org.bukkit.inventory.ItemStack;
 
 public final class ArmorToggleListener extends ViaBukkitListener {
 
-    public ArmorToggleListener(ViaVersionPlugin plugin) {
+    private static final boolean ENABLED = hasEquipmentSlot();
+
+    public ArmorToggleListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_19_4To1_19_3.class);
+    }
+
+    private static boolean hasEquipmentSlot() {
+        // Doesn't exist on 1.8
+        try {
+            Material.class.getMethod("getEquipmentSlot");
+            return true;
+        } catch (final NoSuchMethodException e) {
+            return false;
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void itemUse(final PlayerInteractEvent event) {
-        final Player player = event.getPlayer();
-        if (!isOnPipe(player)) return;
-
-        final ItemStack item = event.getItem();
-        if (item == null) {
+        if (!ENABLED) {
             return;
         }
-        final EquipmentSlot equipmentSlot = item.getType().getEquipmentSlot();
-        // Name comparison for OFF_HAND so 1.8 doesn't complain
-        if (equipmentSlot != EquipmentSlot.HAND && !equipmentSlot.name().equals("OFF_HAND")) {
+
+        final Player player = event.getPlayer();
+        if (!isOnPipe(player) || event.getItem() == null) {
+            return;
+        }
+
+        final EquipmentSlot equipmentSlot = event.getItem().getType().getEquipmentSlot();
+        if (equipmentSlot != EquipmentSlot.HAND && equipmentSlot != EquipmentSlot.OFF_HAND) {
             final ItemStack armor = player.getInventory().getItem(equipmentSlot);
             // If two pieces of armor are equal, the client will do nothing.
-            if (armor != null && armor.getType() != Material.AIR && !armor.equals(item)) {
+            if (armor != null && armor.getType() != Material.AIR && !armor.equals(event.getItem())) {
                 player.updateInventory();
             }
         }
