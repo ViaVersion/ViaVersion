@@ -405,6 +405,11 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     @Override
+    public PacketTypesProvider<CU, CM, SM, SU> getPacketTypesProvider() {
+        return packetTypesProvider;
+    }
+
+    @Override
     public @Nullable <T> T get(Class<T> objectClass) {
         //noinspection unchecked
         return (T) storedObjects.get(objectClass);

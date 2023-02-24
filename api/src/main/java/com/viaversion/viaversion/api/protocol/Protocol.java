@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
+import com.google.common.annotations.Beta;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -30,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
@@ -235,6 +237,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @throws Exception Throws exception if it fails to transform
      */
     void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception;
+
+    /**
+     * Returns a packet type provider for this protocol to get packet types by id.
+     * Depending on the Protocol, not every state may be populated.
+     *
+     * @return the packet types provider
+     */
+    @Beta
+    PacketTypesProvider<CU, CM, SM, SU> getPacketTypesProvider();
 
     /**
      * Returns a cached object by the given type if present.
