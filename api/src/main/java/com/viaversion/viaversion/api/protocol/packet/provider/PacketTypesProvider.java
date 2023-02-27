@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
+import com.google.common.annotations.Beta;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -36,6 +37,7 @@ import java.util.Map;
  * @param <SU> unmapped serverbound packet type
  * @see SimplePacketTypesProvider
  */
+@Beta
 public interface PacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
 
     /**

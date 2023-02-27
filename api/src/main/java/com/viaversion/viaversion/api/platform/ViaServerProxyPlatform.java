@@ -22,15 +22,6 @@
  */
 package com.viaversion.viaversion.api.platform;
 
-import com.google.common.annotations.Beta;
-
-/**
- * Represents a platform that proxies a list of Minecraft servers (Velocity, Bungee).
- * A platform might not be a proxy platform, even if {@link ViaPlatform#isProxy()} is true.
- *
- * @param <T> platform player type
- */
-@Beta
 public interface ViaServerProxyPlatform<T> extends ViaPlatform<T> {
 
     /**
