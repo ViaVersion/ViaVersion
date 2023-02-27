@@ -12,6 +12,7 @@ openNBT = "2.1"
 netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "1.18"
+snakeYaml2 = "2.0"
 
 junit = "5.9.2"
 checkerQual = "3.29.0"
@@ -41,6 +42,7 @@ openNBT = { group = "com.viaversion", name = "opennbt", version.ref = "openNBT" 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 snakeYaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml" }
+snakeYaml2 = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeYaml2" }
 
 jupiterApi = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
 jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }

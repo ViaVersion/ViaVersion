@@ -27,7 +27,7 @@ rootProject.name = "viaversion-parent"
 includeBuild("build-logic")
 
 include("adventure")
-include("compat", "compat:java-compat-common", "compat:java-compat-unsafe", "compat:protocolsupport-compat")
+include("compat", "compat:snakeyaml-compat-common", "compat:snakeyaml2-compat", "compat:snakeyaml1-compat", "compat:protocolsupport-compat")
 
 setupViaSubproject("api")
 setupViaSubproject("api-legacy")

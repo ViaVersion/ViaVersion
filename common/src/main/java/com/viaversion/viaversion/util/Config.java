@@ -20,6 +20,9 @@ package com.viaversion.viaversion.util;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.compatibility.YamlCompat;
+import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
+import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import java.io.File;
@@ -35,15 +38,15 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.representer.Representer;
 
 public abstract class Config implements ConfigurationProvider {
+    private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion2() ? new Yaml2Compat() : new Yaml1Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
         options.setIndent(2);
-        return new Yaml(new YamlConstructor(), new Representer(), options);
+        return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
     });
 
     private final CommentStore commentStore = new CommentStore('.', 2);
@@ -56,7 +59,7 @@ public abstract class Config implements ConfigurationProvider {
      *
      * @param configFile The location of where the config is loaded/saved.
      */
-    public Config(File configFile) {
+    protected Config(File configFile) {
         this.configFile = configFile;
     }
 
