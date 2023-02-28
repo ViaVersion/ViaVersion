@@ -18,7 +18,7 @@ pluginManagement {
     // default plugin versions
     plugins {
         id("net.kyori.blossom") version "1.2.0"
-        id("com.github.johnrengelman.shadow") version "8.0.0"
+        id("com.github.johnrengelman.shadow") version "8.1.0"
     }
 }
 

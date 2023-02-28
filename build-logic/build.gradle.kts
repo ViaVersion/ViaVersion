@@ -8,5 +8,5 @@ repositories {
 
 dependencies {
     // version must be manually kept in sync with the one in root project settings.gradle.kts
-    implementation("gradle.plugin.com.github.johnrengelman", "shadow", "8.0.0")
+    implementation("com.github.johnrengelman", "shadow", "8.1.0")
 }
