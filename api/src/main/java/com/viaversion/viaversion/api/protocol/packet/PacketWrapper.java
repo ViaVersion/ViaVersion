@@ -301,16 +301,25 @@ public interface PacketWrapper {
     PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception;
 
     /**
-     * Cancel this packet from sending
-     */
-    void cancel();
-
-    /**
      * Check if this packet is cancelled.
      *
      * @return True if the packet won't be sent.
      */
     boolean isCancelled();
+
+    /**
+     * Cancel this packet from sending.
+     */
+    default void cancel() {
+        setCancelled(true);
+    }
+
+    /**
+     * Sets the cancellation state of the packet.
+     *
+     * @param cancel whether the packet should be cancelled
+     */
+    void setCancelled(boolean cancel);
 
     /**
      * Get the user associated with this Packet
