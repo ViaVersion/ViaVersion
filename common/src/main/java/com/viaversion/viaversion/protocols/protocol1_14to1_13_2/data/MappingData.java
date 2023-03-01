@@ -25,8 +25,8 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import java.util.HashMap;
-import java.util.Map;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 public class MappingData extends MappingDataBase {
     private IntSet motionBlocking;
@@ -37,11 +37,13 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    public void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
-        JsonObject blockStates = newMappings.getAsJsonObject("blockstates");
-        Map<String, Integer> blockStateMap = new HashMap<>(blockStates.entrySet().size());
-        for (Map.Entry<String, JsonElement> entry : blockStates.entrySet()) {
-            blockStateMap.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
+    public void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
+        JsonArray mappedBlockStates = mappedIdentifiers.getAsJsonArray("blockstates");
+        Object2IntMap<String> blockStateMap = new Object2IntOpenHashMap<>(mappedBlockStates.size());
+        blockStateMap.defaultReturnValue(-1);
+        for (int i = 0; i < mappedBlockStates.size(); i++) {
+            String state = mappedBlockStates.get(i).getAsString();
+            blockStateMap.put(state, i);
         }
 
         JsonObject heightMapData = MappingDataLoader.loadData("heightMapData-1.14.json");
@@ -49,20 +51,21 @@ public class MappingData extends MappingDataBase {
         this.motionBlocking = new IntOpenHashSet(motionBlocking.size(), .99F);
         for (JsonElement blockState : motionBlocking) {
             String key = blockState.getAsString();
-            Integer id = blockStateMap.get(key);
-            if (id == null) {
+            int id = blockStateMap.getInt(key);
+            if (id == -1) {
                 Via.getPlatform().getLogger().warning("Unknown blockstate " + key + " :(");
             } else {
-                this.motionBlocking.add(id.intValue());
+                this.motionBlocking.add(id);
             }
         }
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
             nonFullBlocks = new IntOpenHashSet(1611, .99F);
-            for (Map.Entry<String, JsonElement> blockstates : oldMappings.getAsJsonObject("blockstates").entrySet()) {
-                final String state = blockstates.getValue().getAsString();
+            JsonArray blockStates = unmappedIdentifiers.getAsJsonArray("blockstates");
+            for (int i = 0; i < blockStates.size(); i++) {
+                String state = blockStates.get(i).getAsString();
                 if (state.contains("_slab") || state.contains("_stairs") || state.contains("_wall[")) {
-                    nonFullBlocks.add(blockStateMappings.getNewId(Integer.parseInt(blockstates.getKey())));
+                    nonFullBlocks.add(blockStateMappings.getNewId(i));
                 }
             }
             nonFullBlocks.add(blockStateMappings.getNewId(8163)); // grass path

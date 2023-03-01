@@ -430,14 +430,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
         }
 
-        if (!Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId)) {
+        if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId) == -1) {
             if (!isDamageable(item.identifier()) && item.identifier() != 358) { // Map
                 if (tag == null) item.setTag(tag = new CompoundTag());
                 tag.put(NBT_TAG_NAME, new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
-            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId & ~0xF)) {
+            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId & ~0xF) != -1) {
                 rawId &= ~0xF; // Remove data
             } else {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
@@ -447,7 +447,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
         }
 
-        item.setIdentifier(Protocol1_13To1_12_2.MAPPINGS.getItemMappings().get(rawId));
+        item.setIdentifier(Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId));
         item.setData((short) 0);
         return item;
     }
@@ -501,7 +501,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         }
 
         if (rawId == null) {
-            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().get(item.identifier());
+            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().getNewId(item.identifier());
             if (oldId != -1) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);

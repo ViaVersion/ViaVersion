@@ -34,7 +34,7 @@ public final class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(final JsonObject oldMappings, final JsonObject newMappings, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings) {
         try {
             damageTypesRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
         } catch (final IOException e) {

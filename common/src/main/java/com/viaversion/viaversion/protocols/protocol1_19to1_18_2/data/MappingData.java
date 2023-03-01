@@ -39,7 +39,7 @@ public final class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(final JsonObject oldMappings, final JsonObject newMappings, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings) {
         try {
             final ListTag chatTypes = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
             for (final Tag chatType : chatTypes) {

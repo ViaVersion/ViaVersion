@@ -39,7 +39,7 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    public void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
+    public void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
         try {
             dimensionRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (IOException e) {

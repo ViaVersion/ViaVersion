@@ -136,84 +136,88 @@ public final class MappingDataLoader {
         }
     }
 
-    public static void mapIdentifiers(Int2IntBiMap output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (value != -1) {
-                output.put(Integer.parseInt(entry.getKey()), value);
+    public static void mapIdentifiers(Int2IntBiMap output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
+        for (Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
+            int id = Integer.parseInt(entry.getKey());
+            int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
+            if (mappedId != -1) {
+                output.put(id, mappedId);
+            }
+        }
+    }
+
+    public static void mapIdentifiers(Mappings mappings, Mappings inverseMappings, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
+        for (int id = 0; id < unmappedIdentifiers.size(); id++) {
+            String value = unmappedIdentifiers.get(id).getAsString();
+            int mappedId = mapIdentifierEntry(id, value, newIdentifierMap, diffIdentifiers, warnOnMissing);
+            if (mappedId != -1) {
+                mappings.setNewId(id, mappedId);
+                inverseMappings.setNewId(mappedId, id);
             }
         }
     }
 
     @Deprecated/*(forRemoval = true)*/
-    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers) {
-        mapIdentifiers(output, oldIdentifiers, newIdentifiers, null);
+    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers) {
+        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, null);
     }
 
-    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(newIdentifiers);
-        for (Map.Entry<String, JsonElement> entry : oldIdentifiers.entrySet()) {
-            int value = mapIdentifierEntry(entry, newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (value != -1) {
-                output[Integer.parseInt(entry.getKey())] = value;
+    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
+        for (Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
+            int id = Integer.parseInt(entry.getKey());
+            int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
+            if (mappedId != -1) {
+                output[id] = mappedId;
             }
         }
     }
 
-    public static void mapIdentifiers(int[] output, JsonObject oldIdentifiers, JsonObject newIdentifiers, @Nullable JsonObject diffIdentifiers) {
-        mapIdentifiers(output, oldIdentifiers, newIdentifiers, diffIdentifiers, true);
+    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers) {
+        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, diffIdentifiers, true);
     }
 
-    private static int mapIdentifierEntry(Map.Entry<String, JsonElement> entry, Object2IntMap<String> newIdentifierMap, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        int value = newIdentifierMap.getInt(entry.getValue().getAsString());
-        if (value == -1) {
+    private static int mapIdentifierEntry(int id, String val, Object2IntMap<String> mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+        int mappedId = mappedIdentifiers.getInt(val);
+        if (mappedId == -1) {
             // Search in diff mappings
             if (diffIdentifiers != null) {
-                JsonElement diffElement = diffIdentifiers.get(entry.getKey());
-                if (diffElement != null) {
-                    value = newIdentifierMap.getInt(diffElement.getAsString());
+                JsonElement diffElement = diffIdentifiers.get(val);
+                if (diffElement != null || (diffElement = diffIdentifiers.get(Integer.toString(id))) != null) {
+                    String mappedName = diffElement.getAsString();
+                    if (mappedName.isEmpty()) {
+                        return -1; // "empty" remaps without warnings
+                    }
+
+                    mappedId = mappedIdentifiers.getInt(mappedName);
+
                 }
             }
-            if (value == -1) {
+            if (mappedId == -1) {
                 if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + entry.getValue() + " :( ");
+                    Via.getPlatform().getLogger().warning("No key for " + val + " :( ");
                 }
                 return -1;
             }
         }
-        return value;
+        return mappedId;
     }
 
     @Deprecated/*(forRemoval = true)*/
-    public static void mapIdentifiers(int[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, boolean warnOnMissing) {
-        mapIdentifiers(output, oldIdentifiers, newIdentifiers, null, warnOnMissing);
+    public static void mapIdentifiers(int[] output, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, boolean warnOnMissing) {
+        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, null, warnOnMissing);
     }
 
-    public static void mapIdentifiers(int[] output, JsonArray oldIdentifiers, JsonArray newIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(newIdentifiers);
-        for (int i = 0; i < oldIdentifiers.size(); i++) {
-            JsonElement oldIdentifier = oldIdentifiers.get(i);
-            int mappedId = newIdentifierMap.getInt(oldIdentifier.getAsString());
-            if (mappedId == -1) {
-                // Search in diff mappings
-                if (diffIdentifiers != null) {
-                    JsonElement diffElement = diffIdentifiers.get(oldIdentifier.getAsString());
-                    if (diffElement != null) {
-                        String mappedName = diffElement.getAsString();
-                        if (mappedName.isEmpty()) continue; // "empty" remaps
-
-                        mappedId = newIdentifierMap.getInt(mappedName);
-                    }
-                }
-                if (mappedId == -1) {
-                    if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                        Via.getPlatform().getLogger().warning("No key for " + oldIdentifier + " :( ");
-                    }
-                    continue;
-                }
+    public static void mapIdentifiers(int[] output, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
+        for (int id = 0; id < unmappedIdentifiers.size(); id++) {
+            JsonElement unmappedIdentifier = unmappedIdentifiers.get(id);
+            int mappedId = mapIdentifierEntry(id, unmappedIdentifier.getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
+            if (mappedId != -1) {
+                output[id] = mappedId;
             }
-            output[i] = mappedId;
         }
     }
 

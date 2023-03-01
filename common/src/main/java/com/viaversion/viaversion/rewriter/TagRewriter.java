@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
@@ -176,9 +177,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
                 }
 
                 wrapper.write(Type.STRING, registryKey);
-                if (registryKey.startsWith("minecraft:")) {
-                    registryKey = registryKey.substring(10);
-                }
+                registryKey = Key.stripMinecraftNamespace(registryKey);
 
                 RegistryType type = RegistryType.getByKey(registryKey);
                 if (type != null) {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,12 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+public interface BiMappings extends Mappings {
 
-public class Int2IntMapMappings implements Mappings {
-    private final Int2IntMap mappings;
-    private final int mappedIds;
-
-    protected Int2IntMapMappings(final Int2IntMap mappings, final int mappedIds) {
-        this.mappings = mappings;
-        this.mappedIds = mappedIds;
-        mappings.defaultReturnValue(-1);
-    }
-
-    public static Int2IntMapMappings of(final Int2IntMap mappings, final int mappedIds) {
-        return new Int2IntMapMappings(mappings, mappedIds);
-    }
-
-    public static Int2IntMapMappings of() {
-        return new Int2IntMapMappings(new Int2IntOpenHashMap(), -1);
-    }
-
-    @Override
-    public int getNewId(final int id) {
-        return mappings.get(id);
-    }
-
-    @Override
-    public void setNewId(final int id, final int newId) {
-        mappings.put(id, newId);
-    }
-
-    @Override
-    public int size() {
-        return mappings.size();
-    }
-
-    @Override
-    public int mappedSize() {
-        return mappedIds;
-    }
+    /**
+     * Returns the inverse of the bimappings.
+     *
+     * @return inverse of the bimappings
+     */
+    BiMappings inverse();
 }

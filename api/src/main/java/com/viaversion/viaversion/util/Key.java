@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,46 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data;
+package com.viaversion.viaversion.util;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+public final class Key {
 
-public class Int2IntMapMappings implements Mappings {
-    private final Int2IntMap mappings;
-    private final int mappedIds;
-
-    protected Int2IntMapMappings(final Int2IntMap mappings, final int mappedIds) {
-        this.mappings = mappings;
-        this.mappedIds = mappedIds;
-        mappings.defaultReturnValue(-1);
+    public static String stripNamespace(final String identifier) {
+        int index = identifier.indexOf(':');
+        if (index == -1) {
+            return identifier;
+        }
+        return identifier.substring(index + 1);
     }
 
-    public static Int2IntMapMappings of(final Int2IntMap mappings, final int mappedIds) {
-        return new Int2IntMapMappings(mappings, mappedIds);
+    public static String stripMinecraftNamespace(final String identifier) {
+        if (identifier.startsWith("minecraft:")) {
+            return identifier.substring(10);
+        }
+        return identifier;
     }
 
-    public static Int2IntMapMappings of() {
-        return new Int2IntMapMappings(new Int2IntOpenHashMap(), -1);
-    }
-
-    @Override
-    public int getNewId(final int id) {
-        return mappings.get(id);
-    }
-
-    @Override
-    public void setNewId(final int id, final int newId) {
-        mappings.put(id, newId);
-    }
-
-    @Override
-    public int size() {
-        return mappings.size();
-    }
-
-    @Override
-    public int mappedSize() {
-        return mappedIds;
+    public static String namespaced(final String identifier) {
+        if (identifier.indexOf(':') == -1) {
+            return "minecraft:" + identifier;
+        }
+        return identifier;
     }
 }

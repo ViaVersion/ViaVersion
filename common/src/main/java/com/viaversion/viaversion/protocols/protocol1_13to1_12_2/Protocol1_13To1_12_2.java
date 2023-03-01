@@ -302,8 +302,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             wrapper.cancel();
             if (item == 383) { // Spawn egg
                 for (int i = 0; i < 44; i++) {
-                    Integer newItem = getMappingData().getItemMappings().get(item << 16 | i);
-                    if (newItem != null) {
+                    int newItem = MAPPINGS.getItemMappings().getNewId(item << 16 | i);
+                    if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                         packet.write(Type.VAR_INT, newItem);
                         packet.write(Type.VAR_INT, ticks);
@@ -314,7 +314,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 }
             } else {
                 for (int i = 0; i < 16; i++) {
-                    int newItem = getMappingData().getItemMappings().get(item << 4 | i);
+                    int newItem = MAPPINGS.getItemMappings().getNewId(item << 4 | i);
                     if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                         packet.write(Type.VAR_INT, newItem);
@@ -339,7 +339,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().get(data << 4));
+                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(data << 4));
                     } else if (id == 2001) { // Block break + block break sound
                         int blockId = data & 0xFFF;
                         int blockData = data >> 12;

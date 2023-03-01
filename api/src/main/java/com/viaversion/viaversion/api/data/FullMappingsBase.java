@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.data;
 
 import com.google.gson.JsonArray;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -57,23 +58,25 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public int id(final String identifier) {
-        return stringToId.getInt(identifier);
+    public int id(String identifier) {
+        return stringToId.getInt(Key.stripMinecraftNamespace(identifier));
     }
 
     @Override
     public int mappedId(final String mappedIdentifier) {
-        return mappedStringToId.getInt(mappedIdentifier);
+        return mappedStringToId.getInt(Key.stripMinecraftNamespace(mappedIdentifier));
     }
 
     @Override
     public String identifier(final int id) {
-        return idToString[id];
+        final String identifier = idToString[id];
+        return Key.namespaced(identifier);
     }
 
     @Override
     public String mappedIdentifier(final int mappedId) {
-        return mappedIdToString[mappedId];
+        final String identifier = mappedIdToString[mappedId];
+        return Key.namespaced(identifier);
     }
 
     @Override

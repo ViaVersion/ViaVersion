@@ -25,11 +25,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.BiMappings;
+import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
 import com.viaversion.viaversion.api.data.IntArrayMappings;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.Int2IntBiHashMap;
+import com.viaversion.viaversion.util.Int2IntBiMap;
+import com.viaversion.viaversion.util.Key;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -52,14 +57,14 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    public void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
-        loadTags(blockTags, newMappings.getAsJsonObject("block_tags"));
-        loadTags(itemTags, newMappings.getAsJsonObject("item_tags"));
-        loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
+    public void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
+        loadTags(blockTags, mappedIdentifiers.getAsJsonObject("block_tags"));
+        loadTags(itemTags, mappedIdentifiers.getAsJsonObject("item_tags"));
+        loadTags(fluidTags, mappedIdentifiers.getAsJsonObject("fluid_tags"));
 
-        loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("legacy_enchantments"));
+        loadEnchantments(oldEnchantmentsIds, unmappedIdentifiers.getAsJsonObject("legacy_enchantments"));
         enchantmentMappings = IntArrayMappings.builder().customEntrySize(72)
-                .unmapped(oldMappings.getAsJsonObject("legacy_enchantments")).mapped(newMappings.getAsJsonArray("enchantments")).build();
+                .unmapped(unmappedIdentifiers.getAsJsonObject("legacy_enchantments")).mapped(mappedIdentifiers.getAsJsonArray("enchantments")).build();
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
         if (Via.getConfig().isSnowCollisionFix()) {
@@ -122,14 +127,38 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+    protected @Nullable Mappings loadFromArray(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings, final String key) {
         if (key.equals("blocks")) {
-            // Need to use a custom size since there are larger gaps in ids
+            // Need to use a custom size since there are larger gaps in ids, also object -> array
             return IntArrayMappings.builder().customEntrySize(4084)
-                    .unmapped(oldMappings.getAsJsonObject("blocks")).mapped(newMappings.getAsJsonObject("blockstates")).build();
+                    .unmapped(unmappedIdentifiers.getAsJsonObject("blocks")).mapped(mappedIdentifiers.getAsJsonArray("blockstates")).build();
+        } else if (key.equals("items")) {
+            // Object -> array
+            return IntArrayMappings.builder()
+                    .unmapped(unmappedIdentifiers.getAsJsonObject(key)).mapped(mappedIdentifiers.getAsJsonArray(key)).build();
         } else {
-            return super.loadFromObject(oldMappings, newMappings, diffMappings, key);
+            return super.loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffMappings, key);
         }
+    }
+
+    @Override
+    protected @Nullable BiMappings loadBiFromArray(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings, final String key) {
+        if (key.equals("items")) {
+            final Int2IntBiMap itemMappings = new Int2IntBiHashMap();
+            itemMappings.defaultReturnValue(-1);
+            MappingDataLoader.mapIdentifiers(itemMappings, unmappedIdentifiers.getAsJsonObject("items"), toJsonObject(mappedIdentifiers.getAsJsonArray("items")), null, true);
+            return Int2IntMapBiMappings.of(itemMappings);
+        }
+        return super.loadBiFromArray(unmappedIdentifiers, mappedIdentifiers, diffMappings, key);
+    }
+
+    private JsonObject toJsonObject(final JsonArray array) {
+        final JsonObject object = new JsonObject();
+        for (int i = 0; i < array.size(); i++) {
+            final JsonElement element = array.get(i);
+            object.add(Integer.toString(i), element);
+        }
+        return object;
     }
 
     public static String validateNewChannel(String newId) {
@@ -157,7 +186,7 @@ public class MappingData extends MappingDataBase {
             for (int i = 0; i < ids.size(); i++) {
                 idsArray[i] = ids.get(i).getAsInt();
             }
-            output.put(entry.getKey(), idsArray);
+            output.put(Key.namespaced(entry.getKey()), idsArray);
         }
     }
 

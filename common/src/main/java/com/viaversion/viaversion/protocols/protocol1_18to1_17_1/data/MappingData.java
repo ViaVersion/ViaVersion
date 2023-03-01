@@ -34,9 +34,9 @@ public final class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(final JsonObject oldMappings, final JsonObject newMappings, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings) {
         int i = 0;
-        for (final JsonElement element : newMappings.getAsJsonArray("blockentities")) {
+        for (final JsonElement element : mappedIdentifiers.getAsJsonArray("blockentities")) {
             final String id = element.getAsString();
             blockEntityIds.put(id, i++);
         }

@@ -4,7 +4,7 @@ dependencyResolutionManagement {
     // configures repositories for all projects
     repositories {
         maven("https://repo.viaversion.com")
-        maven("https://papermc.io/repo/repository/maven-public/")
+        maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://repo.spongepowered.org/repository/maven-public/")
         maven("https://libraries.minecraft.net")

@@ -65,7 +65,6 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-
         }.registerDeclareCommands1_19(ClientboundPackets1_19_3.DECLARE_COMMANDS);
 
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {

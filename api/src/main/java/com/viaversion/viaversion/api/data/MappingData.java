@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.data;
 
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
-import com.viaversion.viaversion.util.Int2IntBiMap;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -88,7 +87,7 @@ public interface MappingData {
      */
     @Nullable List<TagData> getTags(RegistryType type);
 
-    @Nullable Int2IntBiMap getItemMappings();
+    @Nullable BiMappings getItemMappings();
 
     @Nullable ParticleMappings getParticleMappings();
 

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -104,10 +105,7 @@ public class ParticleType extends Type<Particle> {
 
             String resourceLocation = Type.STRING.read(buf);
             particle.add(Type.STRING, resourceLocation);
-            if (resourceLocation.startsWith("minecraft:")) {
-                resourceLocation = resourceLocation.substring(10);
-            }
-
+            resourceLocation = Key.stripMinecraftNamespace(resourceLocation);
             if (resourceLocation.equals("block")) {
                 particle.add(Type.POSITION1_14, Type.POSITION1_14.read(buf)); // Target block pos
             } else if (resourceLocation.equals("entity")) {

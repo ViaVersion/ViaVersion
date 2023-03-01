@@ -30,7 +30,7 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
+    protected void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
         attributeMappings.put("generic.maxHealth", "minecraft:generic.max_health");
         attributeMappings.put("zombie.spawnReinforcements", "minecraft:zombie.spawn_reinforcements");
         attributeMappings.put("horse.jumpStrength", "minecraft:horse.jump_strength");

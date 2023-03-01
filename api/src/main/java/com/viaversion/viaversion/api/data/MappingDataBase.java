@@ -28,8 +28,7 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
-import com.viaversion.viaversion.util.Int2IntBiHashMap;
-import com.viaversion.viaversion.util.Int2IntBiMap;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -42,7 +41,7 @@ public class MappingDataBase implements MappingData {
     protected final String oldVersion;
     protected final String newVersion;
     protected final boolean hasDiffFile;
-    protected Int2IntBiMap itemMappings;
+    protected BiMappings itemMappings;
     protected FullMappings argumentTypeMappings;
     protected FullMappings entityMappings;
     protected ParticleMappings particleMappings;
@@ -54,15 +53,14 @@ public class MappingDataBase implements MappingData {
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
     protected Map<RegistryType, List<TagData>> tags;
-    protected boolean loadItems = true;
 
-    public MappingDataBase(String oldVersion, String newVersion) {
-        this(oldVersion, newVersion, false);
+    public MappingDataBase(String unmappedVersion, String mappedVersion) {
+        this(unmappedVersion, mappedVersion, false);
     }
 
-    public MappingDataBase(String oldVersion, String newVersion, boolean hasDiffFile) {
-        this.oldVersion = oldVersion;
-        this.newVersion = newVersion;
+    public MappingDataBase(String unmappedVersion, String mappedVersion, boolean hasDiffFile) {
+        this.oldVersion = unmappedVersion;
+        this.newVersion = mappedVersion;
         this.hasDiffFile = hasDiffFile;
     }
 
@@ -72,49 +70,44 @@ public class MappingDataBase implements MappingData {
             getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
         }
         JsonObject diffmapping = hasDiffFile ? loadDiffFile() : null;
-        JsonObject oldMappings = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
-        JsonObject newMappings = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);
+        JsonObject unmappedIdentifiers = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
+        JsonObject mappedIdentifiers = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);
 
-        blockMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blocks");
-        blockStateMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blockstates");
-        blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
-        soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
-        statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
-        enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
-        paintingMappings = loadFromArray(oldMappings, newMappings, diffmapping, "paintings");
+        blockMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blocks");
+        blockStateMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blockstates");
+        blockEntityMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blockentities");
+        soundMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "sounds");
+        statisticsMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "statistics");
+        enchantmentMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "enchantments");
+        paintingMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "paintings");
 
-        entityMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "entities");
-        argumentTypeMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "argumenttypes");
+        entityMappings = loadFullMappings(unmappedIdentifiers, mappedIdentifiers, diffmapping, "entities");
+        argumentTypeMappings = loadFullMappings(unmappedIdentifiers, mappedIdentifiers, diffmapping, "argumenttypes");
 
-        Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
+        Mappings particles = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "particles");
         if (particles != null) {
-            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), newMappings.getAsJsonArray("particles"), particles);
+            particleMappings = new ParticleMappings(unmappedIdentifiers.getAsJsonArray("particles"), mappedIdentifiers.getAsJsonArray("particles"), particles);
         }
 
-        if (loadItems && newMappings.has("items")) {
-            itemMappings = new Int2IntBiHashMap();
-            itemMappings.defaultReturnValue(-1);
-            MappingDataLoader.mapIdentifiers(itemMappings, oldMappings.getAsJsonObject("items"), newMappings.getAsJsonObject("items"),
-                    diffmapping != null ? diffmapping.getAsJsonObject("items") : null, true);
-        }
+        itemMappings = loadBiFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "items");
 
         if (diffmapping != null && diffmapping.has("tags")) {
             this.tags = new EnumMap<>(RegistryType.class);
             JsonObject tags = diffmapping.getAsJsonObject("tags");
             if (tags.has(RegistryType.ITEM.resourceLocation())) {
-                loadTags(RegistryType.ITEM, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("items")));
+                loadTags(RegistryType.ITEM, tags, MappingDataLoader.arrayToMap(mappedIdentifiers.getAsJsonArray("items")));
             }
             if (tags.has(RegistryType.BLOCK.resourceLocation())) {
-                loadTags(RegistryType.BLOCK, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("blocks")));
+                loadTags(RegistryType.BLOCK, tags, MappingDataLoader.arrayToMap(mappedIdentifiers.getAsJsonArray("blocks")));
             }
         }
 
-        loadExtras(oldMappings, newMappings, diffmapping);
+        loadExtras(unmappedIdentifiers, mappedIdentifiers, diffmapping);
     }
 
-    protected FullMappings loadFullMappings(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        Mappings mappings = loadFromArray(oldMappings, newMappings, diffMappings, key);
-        return mappings != null ? new FullMappingsBase(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), mappings) : null;
+    protected FullMappings loadFullMappings(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
+        Mappings mappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffMappings, key);
+        return mappings != null ? new FullMappingsBase(unmappedIdentifiers.getAsJsonArray(key), mappedIdentifiers.getAsJsonArray(key), mappings) : null;
     }
 
     private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
@@ -126,7 +119,7 @@ public class MappingDataBase implements MappingData {
             int i = 0;
             for (JsonElement element : array) {
                 String stringId = element.getAsString();
-                if (!typeMapping.containsKey(stringId) && !typeMapping.containsKey(stringId = stringId.replace("minecraft:", ""))) { // aaa
+                if (!typeMapping.containsKey(stringId) && !typeMapping.containsKey(stringId = Key.stripMinecraftNamespace(stringId))) { // aaa
                     getLogger().warning(type + " Tags contains invalid type identifier " + stringId + " in tag " + entry.getKey());
                     continue;
                 }
@@ -151,14 +144,12 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getNewItemId(int id) {
-        return checkValidity(id, itemMappings.get(id), "item");
+        return checkValidity(id, itemMappings.getNewId(id), "item");
     }
 
     @Override
     public int getOldItemId(int id) {
-        int oldId = itemMappings.inverse().get(id);
-        // Remap new items to stone
-        return oldId != -1 ? oldId : 1;
+        return itemMappings.inverse().getNewIdOrDefault(id, 1);
     }
 
     @Override
@@ -172,7 +163,7 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public @Nullable Int2IntBiMap getItemMappings() {
+    public @Nullable BiMappings getItemMappings() {
         return itemMappings;
     }
 
@@ -226,20 +217,34 @@ public class MappingDataBase implements MappingData {
         return paintingMappings;
     }
 
-    protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
+    protected @Nullable Mappings loadFromArray(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
+        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
+            return null;
+        }
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonArray(key))
-                .mapped(newMappings.getAsJsonArray(key)).diffMappings(diff).build();
+        return IntArrayMappings.builder().unmapped(unmappedIdentifiers.getAsJsonArray(key))
+                .mapped(mappedIdentifiers.getAsJsonArray(key)).diffMappings(diff).build();
     }
 
-    protected @Nullable Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
+    protected @Nullable Mappings loadFromObject(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
+        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
+            return null;
+        }
 
         JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonObject(key))
-                .mapped(newMappings.getAsJsonObject(key)).diffMappings(diff).build();
+        return IntArrayMappings.builder().unmapped(unmappedIdentifiers.getAsJsonObject(key))
+                .mapped(mappedIdentifiers.getAsJsonObject(key)).diffMappings(diff).build();
+    }
+
+    protected @Nullable BiMappings loadBiFromArray(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
+        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
+            return null;
+        }
+
+        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
+        return IntArrayBiMappings.builder().unmapped(unmappedIdentifiers.getAsJsonArray(key)).mapped(mappedIdentifiers.getAsJsonArray(key))
+                .diffMappings(diff).build();
     }
 
     protected @Nullable JsonObject loadDiffFile() {
@@ -267,12 +272,16 @@ public class MappingDataBase implements MappingData {
     }
 
     /**
-     * To be overridden.
+     * To be overridden if needed.
      *
-     * @param oldMappings  old mappings
-     * @param newMappings  new mappings
-     * @param diffMappings diff mappings if present
+     * @param unmappedIdentifiers old mappings
+     * @param mappedIdentifiers   new mappings
+     * @param diffMappings        diff mappings if present
      */
-    protected void loadExtras(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings) {
+    protected void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings) {
+    }
+
+    protected boolean shouldLoad(String key) {
+        return true;
     }
 }

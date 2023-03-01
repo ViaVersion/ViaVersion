@@ -27,6 +27,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPac
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_1, ServerboundPackets1_19_3, Protocol1_19_3To1_19_1> {
 
@@ -61,7 +62,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         protocol.registerClientbound(ClientboundPackets1_19_1.DECLARE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
                 wrapper.passthrough(Type.STRING); // Recipe Identifier
                 switch (type) {
                     case "crafting_shapeless": {

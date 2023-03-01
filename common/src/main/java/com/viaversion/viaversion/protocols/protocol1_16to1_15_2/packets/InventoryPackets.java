@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 import java.util.UUID;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_16To1_15_2> {
@@ -240,8 +241,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         if (attributeNameTag == null) return;
 
         String attributeName = attributeNameTag.getValue();
-        if (inverse && !attributeName.startsWith("minecraft:")) {
-            attributeName = "minecraft:" + attributeName;
+        if (inverse) {
+            attributeName = Key.namespaced(attributeName);
         }
 
         String mappedAttribute = (inverse ? Protocol1_16To1_15_2.MAPPINGS.getAttributeMappings().inverse()

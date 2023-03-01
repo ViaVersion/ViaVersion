@@ -22,25 +22,31 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import com.viaversion.viaversion.util.Int2IntBiMap;
 
-public class Int2IntMapMappings implements Mappings {
-    private final Int2IntMap mappings;
-    private final int mappedIds;
+public class Int2IntMapBiMappings implements BiMappings {
 
-    protected Int2IntMapMappings(final Int2IntMap mappings, final int mappedIds) {
+    private final Int2IntBiMap mappings;
+    private final BiMappings inverse;
+
+    protected Int2IntMapBiMappings(final Int2IntBiMap mappings) {
         this.mappings = mappings;
-        this.mappedIds = mappedIds;
+        this.inverse = new Int2IntMapBiMappings(mappings.inverse(), this);
         mappings.defaultReturnValue(-1);
     }
 
-    public static Int2IntMapMappings of(final Int2IntMap mappings, final int mappedIds) {
-        return new Int2IntMapMappings(mappings, mappedIds);
+    private Int2IntMapBiMappings(final Int2IntBiMap mappings, final BiMappings inverse) {
+        this.mappings = mappings;
+        this.inverse = inverse;
     }
 
-    public static Int2IntMapMappings of() {
-        return new Int2IntMapMappings(new Int2IntOpenHashMap(), -1);
+    public static Int2IntMapBiMappings of(final Int2IntBiMap mappings) {
+        return new Int2IntMapBiMappings(mappings);
+    }
+
+    @Override
+    public BiMappings inverse() {
+        return this.inverse;
     }
 
     @Override
@@ -60,6 +66,6 @@ public class Int2IntMapMappings implements Mappings {
 
     @Override
     public int mappedSize() {
-        return mappedIds;
+        return mappings.inverse().size();
     }
 }

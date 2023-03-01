@@ -1,7 +1,7 @@
 {
   "argumenttypes": {
-    "minecraft:item_enchantment": "minecraft:resource",
-    "minecraft:mob_effect": "minecraft:resource",
-    "minecraft:entity_summon": "minecraft:resource"
+    "item_enchantment": "resource",
+    "mob_effect": "resource",
+    "entity_summon": "resource"
   }
 }

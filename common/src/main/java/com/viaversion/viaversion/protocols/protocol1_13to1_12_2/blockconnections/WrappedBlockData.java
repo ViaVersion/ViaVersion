@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.util.Key;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -52,7 +53,7 @@ public class WrappedBlockData {
     }
 
     private WrappedBlockData(String minecraftKey, int savedBlockStateId) {
-        this.minecraftKey = minecraftKey;
+        this.minecraftKey = Key.namespaced(minecraftKey);
         this.savedBlockStateId = savedBlockStateId;
     }
 

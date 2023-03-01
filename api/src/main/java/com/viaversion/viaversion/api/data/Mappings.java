@@ -42,7 +42,7 @@ public interface Mappings {
      *
      * @param id  unmapped id
      * @param def fallback return value
-     * @return mapped id, or -1 if invalid/out of bounds
+     * @return mapped id, or def if invalid/out of bounds
      */
     default int getNewIdOrDefault(int id, int def) {
         final int mappedId = getNewId(id);
