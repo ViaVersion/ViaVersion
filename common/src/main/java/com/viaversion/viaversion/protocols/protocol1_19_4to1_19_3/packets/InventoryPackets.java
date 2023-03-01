@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
@@ -42,6 +43,21 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         blockRewriter.registerEffect(ClientboundPackets1_19_3.EFFECT, 1010, 2001);
         blockRewriter.registerChunkData1_19(ClientboundPackets1_19_3.CHUNK_DATA, Chunk1_18Type::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_19_3.BLOCK_ENTITY_DATA);
+
+        protocol.registerClientbound(ClientboundPackets1_19_3.OPEN_WINDOW, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Container id
+                map(Type.VAR_INT); // Container type
+                map(Type.COMPONENT); // Title
+                handler(wrapper -> {
+                    final int windowType = wrapper.get(Type.VAR_INT, 1);
+                    if (windowType >= 21) { // New smithing menu
+                        wrapper.set(Type.VAR_INT, 1, windowType + 1);
+                    }
+                });
+            }
+        });
 
         registerSetCooldown(ClientboundPackets1_19_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_19_3.WINDOW_ITEMS);
