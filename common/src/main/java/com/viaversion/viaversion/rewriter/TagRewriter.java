@@ -45,7 +45,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
     private final Map<RegistryType, Map<String, String>> toRename = new EnumMap<>(RegistryType.class);
     private final Set<String> toRemove = new HashSet<>();
 
-    public TagRewriter(Protocol<C, ?, ?, ?> protocol) {
+    public TagRewriter(final Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
