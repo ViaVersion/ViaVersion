@@ -110,9 +110,11 @@ public class TagRewriter<C extends ClientboundPacketType> {
     public void addTag(RegistryType tagType, String tagId, int... unmappedIds) {
         List<TagData> newTags = getOrComputeNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
-        for (int i = 0; i < unmappedIds.length; i++) {
-            int oldId = unmappedIds[i];
-            unmappedIds[i] = rewriteFunction.rewrite(oldId);
+        if (rewriteFunction != null) {
+            for (int i = 0; i < unmappedIds.length; i++) {
+                int unmappedId = unmappedIds[i];
+                unmappedIds[i] = rewriteFunction.rewrite(unmappedId);
+            }
         }
         newTags.add(new TagData(tagId, unmappedIds));
     }
