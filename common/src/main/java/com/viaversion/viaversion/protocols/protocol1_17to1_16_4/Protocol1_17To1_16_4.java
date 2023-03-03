@@ -42,7 +42,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17", true);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17");
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);

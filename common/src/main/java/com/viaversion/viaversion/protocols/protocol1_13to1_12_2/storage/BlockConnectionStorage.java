@@ -53,6 +53,9 @@ public class BlockConnectionStorage implements StorableObject {
         }
     }
 
+    public static void init() {
+    }
+
     public void store(int x, int y, int z, int blockState) {
         short mapping = REVERSE_BLOCK_MAPPINGS[blockState];
         if (mapping == -1) return;

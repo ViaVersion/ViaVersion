@@ -21,7 +21,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
@@ -35,24 +34,25 @@ public class MappingData extends MappingDataBase {
     private CompoundTag dimensionRegistry;
 
     public MappingData() {
-        super("1.16", "1.16.2", true);
+        super("1.16", "1.16.2");
     }
 
     @Override
-    public void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
+    public void loadExtras(final CompoundTag data) {
         try {
+            // TODO Read uncompressed file
             dimensionRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             Via.getPlatform().getLogger().severe("Error loading dimension registry:");
             e.printStackTrace();
         }
 
         // Data of each dimension
-        ListTag dimensions = ((CompoundTag) dimensionRegistry.get("minecraft:dimension_type")).get("value");
-        for (Tag dimension : dimensions) {
-            CompoundTag dimensionCompound = (CompoundTag) dimension;
+        final ListTag dimensions = ((CompoundTag) dimensionRegistry.get("minecraft:dimension_type")).get("value");
+        for (final Tag dimension : dimensions) {
+            final CompoundTag dimensionCompound = (CompoundTag) dimension;
             // Copy with an empty name
-            CompoundTag dimensionData = new CompoundTag(((CompoundTag) dimensionCompound.get("element")).getValue());
+            final CompoundTag dimensionData = new CompoundTag(((CompoundTag) dimensionCompound.get("element")).getValue());
             dimensionDataMap.put(((StringTag) dimensionCompound.get("name")).getValue(), dimensionData);
         }
     }

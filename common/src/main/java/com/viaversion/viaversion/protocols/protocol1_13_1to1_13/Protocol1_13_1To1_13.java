@@ -41,7 +41,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2", true);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2");
     private final MetadataRewriter1_13_1To1_13 entityRewriter = new MetadataRewriter1_13_1To1_13(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 

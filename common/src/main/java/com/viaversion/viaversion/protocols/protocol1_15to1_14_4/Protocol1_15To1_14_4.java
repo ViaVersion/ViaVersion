@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -25,7 +27,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets.InventoryPackets;
@@ -36,7 +37,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_15, ServerboundPackets1_14, ServerboundPackets1_14> {
 
-    public static final MappingData MAPPINGS = new MappingData();
+    public static final MappingData MAPPINGS = new MappingDataBase("1.14", "1.15");
     private final MetadataRewriter1_15To1_14_4 metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
     private TagRewriter<ClientboundPackets1_14> tagRewriter;

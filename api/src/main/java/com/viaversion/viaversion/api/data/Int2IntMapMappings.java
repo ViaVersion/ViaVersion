@@ -49,8 +49,8 @@ public class Int2IntMapMappings implements Mappings {
     }
 
     @Override
-    public void setNewId(final int id, final int newId) {
-        mappings.put(id, newId);
+    public void setNewId(final int id, final int mappedId) {
+        mappings.put(id, mappedId);
     }
 
     @Override

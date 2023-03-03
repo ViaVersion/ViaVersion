@@ -21,7 +21,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
@@ -35,12 +34,13 @@ public final class MappingData extends MappingDataBase {
     private final Int2ObjectMap<CompoundTag> defaultChatTypes = new Int2ObjectOpenHashMap<>();
 
     public MappingData() {
-        super("1.18", "1.19", true);
+        super("1.18", "1.19");
     }
 
     @Override
-    protected void loadExtras(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final CompoundTag daata) {
         try {
+            // TODO Read uncompressed file
             final ListTag chatTypes = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
             for (final Tag chatType : chatTypes) {
                 final CompoundTag chatTypeCompound = (CompoundTag) chatType;
@@ -48,7 +48,7 @@ public final class MappingData extends MappingDataBase {
                 defaultChatTypes.put(idTag.asInt(), chatTypeCompound);
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

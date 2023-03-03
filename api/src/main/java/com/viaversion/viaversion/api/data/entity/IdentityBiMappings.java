@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft;
+package com.viaversion.viaversion.api.data.entity;
 
-public final class TagData {
-    private final String identifier;
-    private final int[] entries;
+import com.viaversion.viaversion.api.data.BiMappings;
+import com.viaversion.viaversion.api.data.IdentityMappings;
 
-    public TagData(final String identifier, final int[] entries) {
-        this.identifier = identifier;
-        this.entries = entries;
+public final class IdentityBiMappings extends IdentityMappings implements BiMappings {
+
+    public IdentityBiMappings(final int size, final int mappedSize) {
+        super(size, mappedSize);
     }
 
-    public String identifier() {
-        return identifier;
-    }
-
-    public int[] entries() {
-        return entries;
+    @Override
+    public BiMappings inverse() {
+        return this;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft;
+package com.viaversion.viaversion.api.data;
 
-public final class TagData {
-    private final String identifier;
-    private final int[] entries;
+public class IdentityMappings implements Mappings {
 
-    public TagData(final String identifier, final int[] entries) {
-        this.identifier = identifier;
-        this.entries = entries;
+    private final int size;
+    private final int mappedSize;
+
+    public IdentityMappings(final int size, final int mappedSize) {
+        this.size = size;
+        this.mappedSize = mappedSize;
     }
 
-    public String identifier() {
-        return identifier;
+    @Override
+    public int getNewId(final int id) {
+        return id >= 0 && id < size ? id : -1;
     }
 
-    public int[] entries() {
-        return entries;
+    @Override
+    public void setNewId(final int id, final int mappedId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public int mappedSize() {
+        return mappedSize;
     }
 }

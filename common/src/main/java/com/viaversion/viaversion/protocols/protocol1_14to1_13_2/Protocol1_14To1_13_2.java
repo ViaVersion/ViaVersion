@@ -83,21 +83,21 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
                 wrapper.passthrough(Type.STRING);
                 int[] blockIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                 for (int j = 0; j < blockIds.length; j++) {
-                    blockIds[j] = getMappingData().getNewBlockId(blockIds[j]);
+                    blockIds[j] = MAPPINGS.getNewBlockId(blockIds[j]);
                 }
             }
             // Minecraft crashes if we not send signs tags
             wrapper.write(Type.STRING, "minecraft:signs");
             wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    getMappingData().getNewBlockId(150), getMappingData().getNewBlockId(155)
+                    MAPPINGS.getNewBlockId(150), MAPPINGS.getNewBlockId(155)
             });
             wrapper.write(Type.STRING, "minecraft:wall_signs");
             wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    getMappingData().getNewBlockId(155)
+                    MAPPINGS.getNewBlockId(155)
             });
             wrapper.write(Type.STRING, "minecraft:standing_signs");
             wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    getMappingData().getNewBlockId(150)
+                    MAPPINGS.getNewBlockId(150)
             });
             // Fences and walls tags - used for block connections
             wrapper.write(Type.STRING, "minecraft:fences");
@@ -112,13 +112,13 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
                 wrapper.passthrough(Type.STRING);
                 int[] itemIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
                 for (int j = 0; j < itemIds.length; j++) {
-                    itemIds[j] = getMappingData().getNewItemId(itemIds[j]);
+                    itemIds[j] = MAPPINGS.getNewItemId(itemIds[j]);
                 }
             }
             // Should fix fuel shift clicking
             wrapper.write(Type.STRING, "minecraft:signs");
             wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    getMappingData().getNewItemId(541)
+                    MAPPINGS.getNewItemId(541)
             });
             // Arrows tag (used by bow)
             wrapper.write(Type.STRING, "minecraft:arrows");
@@ -141,9 +141,9 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
-        WorldPackets.air = getMappingData().getBlockStateMappings().getNewId(0);
-        WorldPackets.voidAir = getMappingData().getBlockStateMappings().getNewId(8591);
-        WorldPackets.caveAir = getMappingData().getBlockStateMappings().getNewId(8592);
+        WorldPackets.air = MAPPINGS.getBlockStateMappings().getNewId(0);
+        WorldPackets.voidAir = MAPPINGS.getBlockStateMappings().getNewId(8591);
+        WorldPackets.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);
 
         Types1_13_2.PARTICLE.filler(this, false)
                 .reader("block", ParticleType.Readers.BLOCK)

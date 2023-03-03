@@ -17,20 +17,20 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 
 public class MappingData extends MappingDataBase {
     private final BiMap<String, String> attributeMappings = HashBiMap.create();
 
     public MappingData() {
-        super("1.15", "1.16", true);
+        super("1.15", "1.16");
     }
 
     @Override
-    protected void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, JsonObject diffMappings) {
+    protected void loadExtras(final CompoundTag data) {
         attributeMappings.put("generic.maxHealth", "minecraft:generic.max_health");
         attributeMappings.put("zombie.spawnReinforcements", "minecraft:zombie.spawn_reinforcements");
         attributeMappings.put("horse.jumpStrength", "minecraft:horse.jump_strength");

@@ -138,22 +138,22 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 // Send tags packet
                 w.create(ClientboundPackets1_13.TAGS, wrapper -> {
                     wrapper.write(Type.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
-                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getBlockTags().entrySet()) {
+                    for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
                         wrapper.write(Type.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
                     wrapper.write(Type.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
-                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getItemTags().entrySet()) {
+                    for (Map.Entry<String, int[]> tag : MAPPINGS.getItemTags().entrySet()) {
                         wrapper.write(Type.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
                     wrapper.write(Type.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
-                    for (Map.Entry<String, Integer[]> tag : MAPPINGS.getFluidTags().entrySet()) {
+                    for (Map.Entry<String, int[]> tag : MAPPINGS.getFluidTags().entrySet()) {
                         wrapper.write(Type.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, toPrimitive(tag.getValue()));
+                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
                 }).scheduleSend(Protocol1_13To1_12_2.class);
             };
@@ -852,6 +852,10 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader(20, ParticleType.Readers.DUST)
                 .reader(11, ParticleType.Readers.DUST)
                 .reader(27, ParticleType.Readers.ITEM);
+
+        if (Via.getConfig().isServersideBlockConnections() && Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
+            BlockConnectionStorage.init();
+        }
     }
 
     @Override
@@ -906,14 +910,6 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             name = newName.toString();
         }
         return name;
-    }
-
-    public static int[] toPrimitive(Integer[] array) {
-        int[] prim = new int[array.length];
-        for (int i = 0; i < array.length; i++) {
-            prim[i] = array[i];
-        }
-        return prim;
     }
 
     @Override

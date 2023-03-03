@@ -22,34 +22,26 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.gson.JsonArray;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class FullMappingsBase implements FullMappings {
+    private static final String[] EMPTY_ARRAY = new String[0];
     private final Object2IntMap<String> stringToId;
     private final Object2IntMap<String> mappedStringToId;
     private final String[] idToString;
     private final String[] mappedIdToString;
     private final Mappings mappings;
 
-    public FullMappingsBase(final JsonArray oldMappings, final JsonArray newMappings, final Mappings mappings) {
+    public FullMappingsBase(final List<String> unmappedIdentifiers, final List<String> mappedIdentifiers, final Mappings mappings) {
         this.mappings = mappings;
-        stringToId = MappingDataLoader.arrayToMap(oldMappings);
-        mappedStringToId = MappingDataLoader.arrayToMap(newMappings);
-        stringToId.defaultReturnValue(-1);
-        mappedStringToId.defaultReturnValue(-1);
-
-        idToString = new String[oldMappings.size()];
-        for (int i = 0; i < oldMappings.size(); i++) {
-            idToString[i] = oldMappings.get(i).getAsString();
-        }
-
-        mappedIdToString = new String[newMappings.size()];
-        for (int i = 0; i < newMappings.size(); i++) {
-            mappedIdToString[i] = newMappings.get(i).getAsString();
-        }
+        this.stringToId = toInverseMap(unmappedIdentifiers);
+        this.mappedStringToId = toInverseMap(mappedIdentifiers);
+        this.idToString = unmappedIdentifiers.toArray(EMPTY_ARRAY);
+        this. mappedIdToString = mappedIdentifiers.toArray(EMPTY_ARRAY);
     }
 
     @Override
@@ -58,7 +50,7 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public int id(String identifier) {
+    public int id(final String identifier) {
         return stringToId.getInt(Key.stripMinecraftNamespace(identifier));
     }
 
@@ -88,5 +80,14 @@ public class FullMappingsBase implements FullMappings {
 
         final int mappedId = mappings.getNewId(id);
         return mappedId != -1 ? mappedIdentifier(mappedId) : null;
+    }
+
+    private static Object2IntMap<String> toInverseMap(final List<String> list) {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(list.size());
+        map.defaultReturnValue(-1);
+        for (int i = 0; i < list.size(); i++) {
+            map.put(list.get(i), i);
+        }
+        return map;
     }
 }

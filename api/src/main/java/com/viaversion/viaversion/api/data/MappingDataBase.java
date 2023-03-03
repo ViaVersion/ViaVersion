@@ -22,25 +22,25 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
-import com.viaversion.viaversion.util.Key;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
-    protected final String oldVersion;
-    protected final String newVersion;
-    protected final boolean hasDiffFile;
+
+    protected final String unmappedVersion;
+    protected final String mappedVersion;
     protected BiMappings itemMappings;
     protected FullMappings argumentTypeMappings;
     protected FullMappings entityMappings;
@@ -54,111 +54,113 @@ public class MappingDataBase implements MappingData {
     protected Mappings paintingMappings;
     protected Map<RegistryType, List<TagData>> tags;
 
-    public MappingDataBase(String unmappedVersion, String mappedVersion) {
-        this(unmappedVersion, mappedVersion, false);
-    }
-
-    public MappingDataBase(String unmappedVersion, String mappedVersion, boolean hasDiffFile) {
-        this.oldVersion = unmappedVersion;
-        this.newVersion = mappedVersion;
-        this.hasDiffFile = hasDiffFile;
+    public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
+        this.unmappedVersion = unmappedVersion;
+        this.mappedVersion = mappedVersion;
     }
 
     @Override
     public void load() {
         if (Via.getManager().isDebug()) {
-            getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
-        }
-        JsonObject diffmapping = hasDiffFile ? loadDiffFile() : null;
-        JsonObject unmappedIdentifiers = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
-        JsonObject mappedIdentifiers = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);
-
-        blockMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blocks");
-        blockStateMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blockstates");
-        blockEntityMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "blockentities");
-        soundMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "sounds");
-        statisticsMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "statistics");
-        enchantmentMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "enchantments");
-        paintingMappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "paintings");
-
-        entityMappings = loadFullMappings(unmappedIdentifiers, mappedIdentifiers, diffmapping, "entities");
-        argumentTypeMappings = loadFullMappings(unmappedIdentifiers, mappedIdentifiers, diffmapping, "argumenttypes");
-
-        Mappings particles = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "particles");
-        if (particles != null) {
-            particleMappings = new ParticleMappings(unmappedIdentifiers.getAsJsonArray("particles"), mappedIdentifiers.getAsJsonArray("particles"), particles);
+            getLogger().info("Loading " + unmappedVersion + " -> " + mappedVersion + " mappings...");
         }
 
-        itemMappings = loadBiFromArray(unmappedIdentifiers, mappedIdentifiers, diffmapping, "items");
+        final CompoundTag data = MappingDataLoader.loadNBT("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
+        blockMappings = loadMappings(data, "blocks");
+        blockStateMappings = loadMappings(data, "blockstates");
+        blockEntityMappings = loadMappings(data, "blockentities");
+        soundMappings = loadMappings(data, "sounds");
+        statisticsMappings = loadMappings(data, "statistics");
+        enchantmentMappings = loadMappings(data, "enchantments");
+        paintingMappings = loadMappings(data, "paintings");
+        itemMappings = loadBiMappings(data, "items");
 
-        if (diffmapping != null && diffmapping.has("tags")) {
-            this.tags = new EnumMap<>(RegistryType.class);
-            JsonObject tags = diffmapping.getAsJsonObject("tags");
-            if (tags.has(RegistryType.ITEM.resourceLocation())) {
-                loadTags(RegistryType.ITEM, tags, MappingDataLoader.arrayToMap(mappedIdentifiers.getAsJsonArray("items")));
-            }
-            if (tags.has(RegistryType.BLOCK.resourceLocation())) {
-                loadTags(RegistryType.BLOCK, tags, MappingDataLoader.arrayToMap(mappedIdentifiers.getAsJsonArray("blocks")));
-            }
-        }
+        // TODO Don't load one file multiple times
+        final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt");
+        final CompoundTag mappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + mappedVersion + ".nbt");
+        if (unmappedIdentifierData != null && mappedIdentifierData != null) {
+            entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
+            argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
 
-        loadExtras(unmappedIdentifiers, mappedIdentifiers, diffmapping);
-    }
-
-    protected FullMappings loadFullMappings(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
-        Mappings mappings = loadFromArray(unmappedIdentifiers, mappedIdentifiers, diffMappings, key);
-        return mappings != null ? new FullMappingsBase(unmappedIdentifiers.getAsJsonArray(key), mappedIdentifiers.getAsJsonArray(key), mappings) : null;
-    }
-
-    private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
-        JsonObject tags = object.getAsJsonObject(type.resourceLocation());
-        List<TagData> tagsList = new ArrayList<>(tags.size());
-        for (Map.Entry<String, JsonElement> entry : tags.entrySet()) {
-            JsonArray array = entry.getValue().getAsJsonArray();
-            int[] entries = new int[array.size()];
-            int i = 0;
-            for (JsonElement element : array) {
-                String stringId = element.getAsString();
-                if (!typeMapping.containsKey(stringId) && !typeMapping.containsKey(stringId = Key.stripMinecraftNamespace(stringId))) { // aaa
-                    getLogger().warning(type + " Tags contains invalid type identifier " + stringId + " in tag " + entry.getKey());
-                    continue;
+            final ListTag unmappedParticles = unmappedIdentifierData.get("particles");
+            final ListTag mappedParticles = mappedIdentifierData.get("particles");
+            if (unmappedParticles != null && mappedParticles != null) {
+                Mappings particleMappings = loadMappings(data, "particles");
+                if (particleMappings == null) {
+                    particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
                 }
 
-                entries[i++] = typeMapping.getInt(stringId);
+                final List<String> identifiers = unmappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
+                final List<String> mappedIdentifiers = mappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
+                this.particleMappings = new ParticleMappings(identifiers, mappedIdentifiers, particleMappings);
             }
-            tagsList.add(new TagData(entry.getKey(), entries));
+        }
+
+        final CompoundTag tagsTag = data.get("tags");
+        if (tagsTag != null) {
+            this.tags = new EnumMap<>(RegistryType.class);
+            loadTags(RegistryType.ITEM, tagsTag);
+            loadTags(RegistryType.BLOCK, tagsTag);
+        }
+
+        loadExtras(data);
+    }
+
+    protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
+        return MappingDataLoader.loadMappings(data, key);
+    }
+
+    protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
+        return MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
+    }
+
+    protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
+        final Mappings mappings = loadMappings(data, key);
+        return mappings != null ? IntArrayBiMappings.of((IntArrayMappings) mappings) : null;
+    }
+
+    private void loadTags(final RegistryType type, final CompoundTag data) {
+        final CompoundTag tag = data.get(type.resourceLocation());
+        if (tag == null) {
+            return;
+        }
+
+        final List<TagData> tagsList = new ArrayList<>(tags.size());
+        for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
+            final IntArrayTag entries = (IntArrayTag) entry.getValue();
+            tagsList.add(new TagData(entry.getKey(), entries.getValue()));
         }
 
         this.tags.put(type, tagsList);
     }
 
     @Override
-    public int getNewBlockStateId(int id) {
+    public int getNewBlockStateId(final int id) {
         return checkValidity(id, blockStateMappings.getNewId(id), "blockstate");
     }
 
     @Override
-    public int getNewBlockId(int id) {
+    public int getNewBlockId(final int id) {
         return checkValidity(id, blockMappings.getNewId(id), "block");
     }
 
     @Override
-    public int getNewItemId(int id) {
+    public int getNewItemId(final int id) {
         return checkValidity(id, itemMappings.getNewId(id), "item");
     }
 
     @Override
-    public int getOldItemId(int id) {
+    public int getOldItemId(final int id) {
         return itemMappings.inverse().getNewIdOrDefault(id, 1);
     }
 
     @Override
-    public int getNewParticleId(int id) {
+    public int getNewParticleId(final int id) {
         return checkValidity(id, particleMappings.mappings().getNewId(id), "particles");
     }
 
     @Override
-    public @Nullable List<TagData> getTags(RegistryType type) {
+    public @Nullable List<TagData> getTags(final RegistryType type) {
         return tags != null ? tags.get(type) : null;
     }
 
@@ -217,40 +219,6 @@ public class MappingDataBase implements MappingData {
         return paintingMappings;
     }
 
-    protected @Nullable Mappings loadFromArray(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
-        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
-            return null;
-        }
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(unmappedIdentifiers.getAsJsonArray(key))
-                .mapped(mappedIdentifiers.getAsJsonArray(key)).diffMappings(diff).build();
-    }
-
-    protected @Nullable Mappings loadFromObject(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
-        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
-            return null;
-        }
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(unmappedIdentifiers.getAsJsonObject(key))
-                .mapped(mappedIdentifiers.getAsJsonObject(key)).diffMappings(diff).build();
-    }
-
-    protected @Nullable BiMappings loadBiFromArray(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings, String key) {
-        if (!unmappedIdentifiers.has(key) || !mappedIdentifiers.has(key) || !shouldLoad(key)) {
-            return null;
-        }
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayBiMappings.builder().unmapped(unmappedIdentifiers.getAsJsonArray(key)).mapped(mappedIdentifiers.getAsJsonArray(key))
-                .diffMappings(diff).build();
-    }
-
-    protected @Nullable JsonObject loadDiffFile() {
-        return MappingDataLoader.loadData("mappingdiff-" + oldVersion + "to" + newVersion + ".json");
-    }
-
     protected Logger getLogger() {
         return Via.getPlatform().getLogger();
     }
@@ -263,25 +231,14 @@ public class MappingDataBase implements MappingData {
      * @param type     mapping type (e.g. "item")
      * @return the given mapped id if valid, else 0
      */
-    protected int checkValidity(int id, int mappedId, String type) {
+    protected int checkValidity(final int id, final int mappedId, final String type) {
         if (mappedId == -1) {
-            getLogger().warning(String.format("Missing %s %s for %s %s %d", newVersion, type, oldVersion, type, id));
+            getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
             return 0;
         }
         return mappedId;
     }
 
-    /**
-     * To be overridden if needed.
-     *
-     * @param unmappedIdentifiers old mappings
-     * @param mappedIdentifiers   new mappings
-     * @param diffMappings        diff mappings if present
-     */
-    protected void loadExtras(JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffMappings) {
-    }
-
-    protected boolean shouldLoad(String key) {
-        return true;
+    protected void loadExtras(final CompoundTag data) {
     }
 }

@@ -22,6 +22,13 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.github.steveice10.opennbt.NBTIO;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.google.common.annotations.Beta;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -29,7 +36,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
-import com.viaversion.viaversion.util.Int2IntBiMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.io.File;
@@ -38,155 +44,189 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MappingDataLoader {
 
-    private static final Map<String, JsonObject> MAPPINGS_CACHE = new ConcurrentHashMap<>();
-    private static boolean cacheJsonMappings;
-
-    /**
-     * Returns true if a selected number of mappings should be cached.
-     * If enabled, cleanup should be done after the cache is no longer needed.
-     *
-     * @return true if mappings should be cached
-     */
-    public static boolean isCacheJsonMappings() {
-        return cacheJsonMappings;
-    }
-
-    public static void enableMappingsCache() {
-        cacheJsonMappings = true;
-    }
-
-    /**
-     * Returns the cached mappings. Cleared after ViaVersion has been fully loaded.
-     *
-     * @return cached mapping file json objects
-     * @see #isCacheJsonMappings()
-     */
-    public static Map<String, JsonObject> getMappingsCache() {
-        return MAPPINGS_CACHE;
-    }
+    private static final byte DIRECT_ID = 0;
+    private static final byte SHIFTS_ID = 1;
+    private static final byte CHANGES_ID = 2;
+    private static final byte IDENTITY_ID = 3;
 
     /**
      * Loads the file from the plugin folder if present, else from the bundled resources.
      *
      * @return loaded json object, or null if not found or invalid
      */
-    public static @Nullable JsonObject loadFromDataDir(String name) {
-        File file = new File(Via.getPlatform().getDataFolder(), name);
+    public static @Nullable JsonObject loadFromDataDir(final String name) {
+        final File file = new File(Via.getPlatform().getDataFolder(), name);
         if (!file.exists()) {
             return loadData(name);
         }
 
         // Load the file from the platform's directory if present
-        try (FileReader reader = new FileReader(file)) {
+        try (final FileReader reader = new FileReader(file)) {
             return GsonUtil.getGson().fromJson(reader, JsonObject.class);
-        } catch (JsonSyntaxException e) {
+        } catch (final JsonSyntaxException e) {
             // Users might mess up the format, so let's catch the syntax error
             Via.getPlatform().getLogger().warning(name + " is badly formatted!");
-            e.printStackTrace();
-        } catch (IOException | JsonIOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (final IOException | JsonIOException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**
-     * Loads the file from the bundled resources. Uses the cache if enabled.
+     * Loads the file from the bundled resources.
      *
      * @return loaded json object from bundled resources if present
      */
-    public static @Nullable JsonObject loadData(String name) {
-        return loadData(name, false);
-    }
-
-    /**
-     * Loads the file from the bundled resources. Uses the cache if enabled.
-     *
-     * @param cacheIfEnabled whether loaded files should be cached
-     * @return loaded json object from bundled resources if present
-     */
-    public static @Nullable JsonObject loadData(String name, boolean cacheIfEnabled) {
-        if (cacheJsonMappings) {
-            JsonObject cached = MAPPINGS_CACHE.get(name);
-            if (cached != null) {
-                return cached;
-            }
+    public static @Nullable JsonObject loadData(final String name) {
+        final InputStream stream = getResource(name);
+        if (stream == null) {
+            return null;
         }
 
-        InputStream stream = getResource(name);
-        if (stream == null) return null;
-
-        InputStreamReader reader = new InputStreamReader(stream);
-        try {
-            JsonObject object = GsonUtil.getGson().fromJson(reader, JsonObject.class);
-            if (cacheIfEnabled && cacheJsonMappings) {
-                MAPPINGS_CACHE.put(name, object);
-            }
-            return object;
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
+        try (final InputStreamReader reader = new InputStreamReader(stream)) {
+            return GsonUtil.getGson().fromJson(reader, JsonObject.class);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void mapIdentifiers(Int2IntBiMap output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
-        for (Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
-            int id = Integer.parseInt(entry.getKey());
-            int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (mappedId != -1) {
-                output.put(id, mappedId);
-            }
+    public static @Nullable CompoundTag loadNBT(final String name) {
+        final InputStream resource = getResource(name);
+        if (resource == null) {
+            return null;
+        }
+
+        try (final InputStream stream = resource) {
+            return NBTIO.readTag(stream);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void mapIdentifiers(Mappings mappings, Mappings inverseMappings, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
-        for (int id = 0; id < unmappedIdentifiers.size(); id++) {
-            String value = unmappedIdentifiers.get(id).getAsString();
-            int mappedId = mapIdentifierEntry(id, value, newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (mappedId != -1) {
-                mappings.setNewId(id, mappedId);
-                inverseMappings.setNewId(mappedId, id);
-            }
+    public static @Nullable Mappings loadMappings(final CompoundTag mappingsTag, final String key) {
+        return loadMappings(mappingsTag, key, int[]::new, (array, id, mappedId) -> array[id] = mappedId, IntArrayMappings::of);
+    }
+
+    @Beta
+    public static <M extends Mappings, V> @Nullable Mappings loadMappings(
+            final CompoundTag mappingsTag,
+            final String key,
+            final MappingHolderSupplier<V> holderSupplier,
+            final AddConsumer<V> addConsumer,
+            final MappingsSupplier<M, V> mappingsSupplier
+    ) {
+        final CompoundTag tag = mappingsTag.get(key);
+        if (tag == null) {
+            return null;
         }
+
+        final ByteTag serializationStragetyTag = tag.get("id");
+        final IntTag mappedSizeTag = tag.get("mappedSize");
+        final byte strategy = serializationStragetyTag.asByte();
+        final V mappings;
+        if (strategy == DIRECT_ID) {
+            final IntArrayTag valuesTag = tag.get("val");
+            return IntArrayMappings.of(valuesTag.getValue(), mappedSizeTag.asInt());
+        } else if (strategy == SHIFTS_ID) {
+            final IntArrayTag shiftsAtTag = tag.get("at");
+            final IntArrayTag shiftsTag = tag.get("val");
+            final IntTag sizeTag = tag.get("size");
+            final int[] shiftsAt = shiftsAtTag.getValue();
+            final int[] shifts = shiftsTag.getValue();
+            final int size = sizeTag.asInt();
+            mappings = holderSupplier.get(size);
+
+            // Handle values until first shift
+            if (shiftsAt[0] != 0) {
+                final int to = shiftsAt[0];
+                for (int id = 0; id < to; id++) {
+                    addConsumer.addTo(mappings, id, id);
+                }
+            }
+
+            // Handle shifts
+            for (int i = 0; i < shiftsAt.length; i++) {
+                final int from = shiftsAt[i];
+                final int to = i == shiftsAt.length - 1 ? size : shiftsAt[i + 1];
+                final int shiftBy = shifts[i];
+                for (int id = from; id < to; id++) {
+                    addConsumer.addTo(mappings, id, id + shiftBy);
+                }
+            }
+        } else if (strategy == CHANGES_ID) {
+            final IntArrayTag changesAtTag = tag.get("at");
+            final IntArrayTag valuesTag = tag.get("val");
+            final IntTag sizeTag = tag.get("size");
+            final boolean fillBetween = tag.get("nofill") == null;
+            final int[] changesAt = changesAtTag.getValue();
+            final int[] values = valuesTag.getValue();
+            mappings = holderSupplier.get(sizeTag.asInt());
+
+            for (int i = 0; i < changesAt.length; i++) {
+                final int id = changesAt[i];
+                if (fillBetween) {
+                    // Fill from after the last change to before this change with unchanged ids
+                    final int previousId = i != 0 ? changesAt[i - 1] + 1 : 0;
+                    for (int identity = previousId; identity < id; identity++) {
+                        addConsumer.addTo(mappings, identity, identity);
+                    }
+                }
+
+                // Assign the changed value
+                addConsumer.addTo(mappings, id, values[i]);
+            }
+        } else if (strategy == IDENTITY_ID) {
+            final IntTag sizeTag = tag.get("size");
+            return new IdentityMappings(sizeTag.asInt(), mappedSizeTag.asInt());
+        } else {
+            throw new IllegalArgumentException("Unknown serialization strategy: " + strategy);
+        }
+        return mappingsSupplier.create(mappings, mappedSizeTag.asInt());
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers) {
-        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, null);
+    public static FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
+        final ListTag unmappedElements = unmappedIdentifiers.get(key);
+        final ListTag mappedElements = mappedIdentifiers.get(key);
+        if (unmappedElements == null || mappedElements == null) {
+            return null;
+        }
+
+        Mappings mappings = loadMappings(mappingsTag, key);
+        if (mappings == null) {
+            mappings = new IdentityMappings(unmappedElements.size(), mappedElements.size());
+        }
+
+        return new FullMappingsBase(
+                unmappedElements.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList()),
+                mappedElements.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList()),
+                mappings
+        );
     }
 
-    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
-        for (Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
-            int id = Integer.parseInt(entry.getKey());
-            int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
+    public static void mapIdentifiers(final int[] output, final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
+        final Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
+        for (final Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
+            final int id = Integer.parseInt(entry.getKey());
+            final int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
             if (mappedId != -1) {
                 output[id] = mappedId;
             }
         }
     }
 
-    public static void mapIdentifiers(int[] output, JsonObject unmappedIdentifiers, JsonObject mappedIdentifiers, @Nullable JsonObject diffIdentifiers) {
-        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, diffIdentifiers, true);
-    }
-
-    private static int mapIdentifierEntry(int id, String val, Object2IntMap<String> mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
+    private static int mapIdentifierEntry(final int id, final String val, final Object2IntMap<String> mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
         int mappedId = mappedIdentifiers.getInt(val);
         if (mappedId == -1) {
             // Search in diff mappings
             if (diffIdentifiers != null) {
                 JsonElement diffElement = diffIdentifiers.get(val);
                 if (diffElement != null || (diffElement = diffIdentifiers.get(Integer.toString(id))) != null) {
-                    String mappedName = diffElement.getAsString();
+                    final String mappedName = diffElement.getAsString();
                     if (mappedName.isEmpty()) {
                         return -1; // "empty" remaps without warnings
                     }
@@ -205,16 +245,11 @@ public final class MappingDataLoader {
         return mappedId;
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public static void mapIdentifiers(int[] output, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, boolean warnOnMissing) {
-        mapIdentifiers(output, unmappedIdentifiers, mappedIdentifiers, null, warnOnMissing);
-    }
-
-    public static void mapIdentifiers(int[] output, JsonArray unmappedIdentifiers, JsonArray mappedIdentifiers, @Nullable JsonObject diffIdentifiers, boolean warnOnMissing) {
-        Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
+    public static void mapIdentifiers(final int[] output, final JsonArray unmappedIdentifiers, final JsonArray mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
+        final Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
         for (int id = 0; id < unmappedIdentifiers.size(); id++) {
-            JsonElement unmappedIdentifier = unmappedIdentifiers.get(id);
-            int mappedId = mapIdentifierEntry(id, unmappedIdentifier.getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
+            final JsonElement unmappedIdentifier = unmappedIdentifiers.get(id);
+            final int mappedId = mapIdentifierEntry(id, unmappedIdentifier.getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
             if (mappedId != -1) {
                 output[id] = mappedId;
             }
@@ -227,10 +262,10 @@ public final class MappingDataLoader {
      * @param object json object
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap<String> indexedObjectToMap(JsonObject object) {
-        Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), .99F);
+    public static Object2IntMap<String> indexedObjectToMap(final JsonObject object) {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), .99F);
         map.defaultReturnValue(-1);
-        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+        for (final Map.Entry<String, JsonElement> entry : object.entrySet()) {
             map.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
         }
         return map;
@@ -242,8 +277,8 @@ public final class MappingDataLoader {
      * @param array json array
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap<String> arrayToMap(JsonArray array) {
-        Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), .99F);
+    public static Object2IntMap<String> arrayToMap(final JsonArray array) {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), .99F);
         map.defaultReturnValue(-1);
         for (int i = 0; i < array.size(); i++) {
             map.put(array.get(i).getAsString(), i);
@@ -251,7 +286,25 @@ public final class MappingDataLoader {
         return map;
     }
 
-    public static @Nullable InputStream getResource(String name) {
+    public static @Nullable InputStream getResource(final String name) {
         return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
+    }
+
+    @FunctionalInterface
+    public interface AddConsumer<T> {
+
+        void addTo(T holder, int id, int mappedId);
+    }
+
+    @FunctionalInterface
+    public interface MappingHolderSupplier<T> {
+
+        T get(int expectedSize);
+    }
+
+    @FunctionalInterface
+    public interface MappingsSupplier<T extends Mappings, V> {
+
+        T create(V mappings, int mappedSize);
     }
 }

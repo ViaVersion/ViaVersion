@@ -515,7 +515,7 @@ public class PacketWrapperImpl implements PacketWrapper {
                 '}';
     }
 
-    private static final class PacketValue {
+    public static final class PacketValue {
         private final Type type;
         private Object value;
 

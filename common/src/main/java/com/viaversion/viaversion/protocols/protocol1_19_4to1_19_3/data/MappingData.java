@@ -18,12 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import java.io.IOException;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MappingData extends MappingDataBase {
 
@@ -34,8 +32,9 @@ public final class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected void loadExtras(final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final CompoundTag data) {
         try {
+            // TODO Read uncompressed file
             damageTypesRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
         } catch (final IOException e) {
             throw new RuntimeException(e);

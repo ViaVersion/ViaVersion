@@ -52,6 +52,10 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
                 handler(wrapper -> {
+                    if (protocol.getMappingData().getBlockMappings() == null) {
+                        return;
+                    }
+
                     int id = wrapper.get(Type.VAR_INT, 0);
                     int mappedId = protocol.getMappingData().getNewBlockId(id);
                     if (mappedId == -1) {
@@ -166,8 +170,11 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
-                    final int blockEntityId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntityId, blockEntityId));
+                    final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
+                    if (mappings != null) {
+                        final int blockEntityId = wrapper.read(Type.VAR_INT);
+                        wrapper.write(Type.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
+                    }
                 });
             }
         });

@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -205,10 +206,9 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        JsonObject mapping1_13 = MappingDataLoader.loadData("mapping-1.13.json", true);
-        JsonArray blocks1_13 = mapping1_13.getAsJsonArray("blockstates");
-        for (int id = 0; id < blocks1_13.size(); id++) {
-            String key = blocks1_13.get(id).getAsString();
+        ListTag blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").get("blockstates");
+        for (int id = 0; id < blockStates.size(); id++) {
+            String key = (String) blockStates.get(id).getValue();
             idToKey.put(id, key);
             keyToId.put(key, id);
         }

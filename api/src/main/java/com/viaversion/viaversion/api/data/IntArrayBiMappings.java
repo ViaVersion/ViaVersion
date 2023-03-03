@@ -29,18 +29,34 @@ public class IntArrayBiMappings implements BiMappings {
     private final Mappings mappings;
     private final IntArrayBiMappings inverse;
 
-    protected IntArrayBiMappings(final Mappings mappings, final Mappings inverseMappings) {
+    protected IntArrayBiMappings(final IntArrayMappings mappings) {
         this.mappings = mappings;
-        this.inverse = new IntArrayBiMappings(inverseMappings, this);
+
+        final int[] raw = mappings.raw();
+        final int[] inverseMappings = new int[mappings.mappedSize()];
+        Arrays.fill(inverseMappings, -1);
+        for (int id = 0; id < raw.length; id++) {
+            final int mappedId = raw[id];
+            inverseMappings[mappedId] = id;
+        }
+        this.inverse = new IntArrayBiMappings(new IntArrayMappings(inverseMappings, raw.length), this);
     }
 
-    private IntArrayBiMappings(final Mappings mappings, final IntArrayBiMappings inverse) {
+    protected IntArrayBiMappings(final Mappings mappings, final IntArrayBiMappings inverse) {
         this.mappings = mappings;
         this.inverse = inverse;
     }
 
+    private IntArrayBiMappings(final int[] mappings, final int mappedIds) {
+        this(new IntArrayMappings(mappings, mappedIds));
+    }
+
+    public static IntArrayBiMappings of(final IntArrayMappings mappings) {
+        return new IntArrayBiMappings(mappings);
+    }
+
     public static Mappings.Builder<IntArrayBiMappings> builder() {
-        return new Builder(IntArrayMappings::new);
+        return new Builder<>(IntArrayBiMappings::new);
     }
 
     @Override
@@ -54,9 +70,9 @@ public class IntArrayBiMappings implements BiMappings {
     }
 
     @Override
-    public void setNewId(final int id, final int newId) {
-        mappings.setNewId(id, newId);
-        inverse.mappings.setNewId(newId, id);
+    public void setNewId(final int id, final int mappedId) {
+        mappings.setNewId(id, mappedId);
+        inverse.mappings.setNewId(mappedId, id);
     }
 
     @Override
@@ -67,35 +83,5 @@ public class IntArrayBiMappings implements BiMappings {
     @Override
     public int mappedSize() {
         return mappings.mappedSize();
-    }
-
-    public static final class Builder extends Mappings.Builder<IntArrayBiMappings> {
-
-        private final MappingsSupplier<?> supplier;
-
-        private Builder(final MappingsSupplier<?> supplier) {
-            super(null);
-            this.supplier = supplier;
-        }
-
-        @Override
-        public IntArrayBiMappings build() {
-            final int size = this.size != -1 ? this.size : size(unmapped);
-            final int mappedSize = this.mappedSize != -1 ? this.mappedSize : size(mapped);
-            final int[] mappingsArray = new int[size];
-            final int[] inverseMappingsArray = new int[mappedSize];
-            Arrays.fill(mappingsArray, -1);
-            Arrays.fill(inverseMappingsArray, -1);
-
-            final Mappings mappings = supplier.supply(mappingsArray, mappedSize);
-            final Mappings inverseMappings = supplier.supply(inverseMappingsArray, size);
-            if (unmapped.isJsonArray() && mapped.isJsonArray()) {
-                MappingDataLoader.mapIdentifiers(mappings, inverseMappings, unmapped.getAsJsonArray(), mapped.getAsJsonArray(), diffMappings, true);
-            } else {
-                throw new UnsupportedOperationException();
-            }
-
-            return new IntArrayBiMappings(mappings, inverseMappings);
-        }
     }
 }

@@ -62,11 +62,11 @@ public interface Mappings {
     /**
      * Manually maps a specific id.
      *
-     * @param id    unmapped id
-     * @param newId mapped id
+     * @param id       unmapped id
+     * @param mappedId mapped id
      * @throws IndexOutOfBoundsException if the unmapped id is invalid
      */
-    void setNewId(int id, int newId);
+    void setNewId(int id, int mappedId);
 
     /**
      * Returns amount of unmapped entries, being the size of the mapping.

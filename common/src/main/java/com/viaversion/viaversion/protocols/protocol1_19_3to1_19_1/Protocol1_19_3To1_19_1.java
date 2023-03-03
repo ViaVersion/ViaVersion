@@ -50,7 +50,7 @@ import java.util.UUID;
 
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3", true);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
     private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
     private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
     private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
