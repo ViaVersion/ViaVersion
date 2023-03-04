@@ -55,6 +55,10 @@ public final class MappingDataLoader {
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
 
+    public static void enableMappingsCache() {
+        //TODO
+    }
+
     /**
      * Loads the file from the plugin folder if present, else from the bundled resources.
      *
