@@ -15,16 +15,21 @@ On Paper you may also use ProtocolSupport, but ensure you have the right build f
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
 
-Sources:
+Sources
 --------
-**[wiki.vg](https://wiki.vg)** (Used for information regarding packet structure, we also contribute back)
+**[OpenNBT](https://github.com/ViaVersion/OpenNBT)**
+
+**[Via Mappings Generator](https://github.com/ViaVersion/Mappings)**
+
+**[Mojang mappings](https://minecraft.fandom.com/wiki/Obfuscation_map)** (Thank you, Mojang, very cool)
+
+**[wiki.vg](https://wiki.vg)** (Used for historic information regarding packet structure, we also contribute back)
 
 **[Burger](https://github.com/Pokechu22/Burger)** (See [PAaaS](https://github.com/Matsv/Paaas))
 
-**[OpenNBT](https://github.com/ViaVersion/OpenNBT)**
 
 
-Releases / Dev Builds:
+Releases / Dev Builds
 --------
 You can find official releases here:
 
@@ -62,13 +67,18 @@ If you need access to the existing protocol or platform implementations, use the
 Please note the [differences in licensing](#license).
 
 
-Building:
+Building
 --------
 After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out of
 the `build/libs` directory.
 
 
-License:
+Mapping Files
+--------------
+Mapping files are generated and managed in our [Mappings repository](https://github.com/ViaVersion/Mappings).
+
+
+License
 --------
 The entirety of the [API directory](api) (including the legacy API directory) is licensed under the MIT License; see [licenses/MIT.md](licenses/MIT.md) for
 details.
