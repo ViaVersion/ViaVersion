@@ -146,7 +146,11 @@ public class MappingData extends MappingDataBase {
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
         // Special cursed case
         if (key.equals("items")) {
-            return (BiMappings) MappingDataLoader.loadMappings(data, "items", Int2IntBiHashMap::new, Int2IntBiHashMap::put, (v, mappedSize) -> Int2IntMapBiMappings.of(v));
+            return (BiMappings) MappingDataLoader.loadMappings(data, "items", size -> {
+                final Int2IntBiHashMap map = new Int2IntBiHashMap(size);
+                map.defaultReturnValue(-1);
+                return map;
+            }, Int2IntBiHashMap::put, (v, mappedSize) -> Int2IntMapBiMappings.of(v));
         } else {
             return super.loadBiMappings(data, key);
         }

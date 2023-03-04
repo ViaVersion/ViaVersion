@@ -65,7 +65,7 @@ public class MappingDataBase implements MappingData {
             getLogger().info("Loading " + unmappedVersion + " -> " + mappedVersion + " mappings...");
         }
 
-        final CompoundTag data = MappingDataLoader.loadNBT("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
+        final CompoundTag data = readNBTFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
         blockMappings = loadMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
         blockEntityMappings = loadMappings(data, "blockentities");
@@ -106,15 +106,23 @@ public class MappingDataBase implements MappingData {
         loadExtras(data);
     }
 
+    protected @Nullable CompoundTag readNBTFile(final String name) {
+        return MappingDataLoader.loadNBT(name);
+    }
+
     protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
-        return MappingDataLoader.loadMappings(data, key);
+        return shouldLoad(key) ? MappingDataLoader.loadMappings(data, key) : null;
     }
 
     protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        return MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
+        return shouldLoad(key) ? MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key) : null;
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
+        if (!shouldLoad(key)) {
+            return null;
+        }
+
         final Mappings mappings = loadMappings(data, key);
         return mappings != null ? IntArrayBiMappings.of((IntArrayMappings) mappings) : null;
     }
@@ -156,7 +164,7 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getNewParticleId(final int id) {
-        return checkValidity(id, particleMappings.mappings().getNewId(id), "particles");
+        return checkValidity(id, particleMappings.getNewId(id), "particles");
     }
 
     @Override
@@ -237,6 +245,10 @@ public class MappingDataBase implements MappingData {
             return 0;
         }
         return mappedId;
+    }
+
+    protected boolean shouldLoad(final String key) {
+        return true;
     }
 
     protected void loadExtras(final CompoundTag data) {

@@ -228,7 +228,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     public void mapTypes() {
         Preconditions.checkArgument(typeMappings == null, "Type mappings have already been set - manual type mappings should be set *after* this");
         Preconditions.checkNotNull(protocol.getMappingData().getEntityMappings(), "Protocol does not have entity mappings");
-        typeMappings = protocol.getMappingData().getEntityMappings().mappings();
+        typeMappings = protocol.getMappingData().getEntityMappings();
     }
 
     /**

@@ -22,12 +22,14 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Int2IntBiMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
 public class Int2IntMapBiMappings implements BiMappings {
 
     private final Int2IntBiMap mappings;
-    private final BiMappings inverse;
+    private final Int2IntMapBiMappings inverse;
 
     protected Int2IntMapBiMappings(final Int2IntBiMap mappings) {
         this.mappings = mappings;
@@ -35,7 +37,7 @@ public class Int2IntMapBiMappings implements BiMappings {
         mappings.defaultReturnValue(-1);
     }
 
-    private Int2IntMapBiMappings(final Int2IntBiMap mappings, final BiMappings inverse) {
+    private Int2IntMapBiMappings(final Int2IntBiMap mappings, final Int2IntMapBiMappings inverse) {
         this.mappings = mappings;
         this.inverse = inverse;
     }
@@ -67,5 +69,14 @@ public class Int2IntMapBiMappings implements BiMappings {
     @Override
     public int mappedSize() {
         return mappings.inverse().size();
+    }
+
+    @Override
+    public Mappings createInverse() {
+        final Int2IntBiMap inverseCopy = new Int2IntBiHashMap(inverse.mappings.size());
+        for (final Int2IntMap.Entry entry : inverse.mappings.int2IntEntrySet()) {
+            inverseCopy.put(entry.getIntKey(), entry.getIntValue());
+        }
+        return of(inverseCopy);
     }
 }

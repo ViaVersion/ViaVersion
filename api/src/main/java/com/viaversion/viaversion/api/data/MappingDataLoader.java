@@ -43,6 +43,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -109,7 +110,11 @@ public final class MappingDataLoader {
     }
 
     public static @Nullable Mappings loadMappings(final CompoundTag mappingsTag, final String key) {
-        return loadMappings(mappingsTag, key, int[]::new, (array, id, mappedId) -> array[id] = mappedId, IntArrayMappings::of);
+        return loadMappings(mappingsTag, key, size -> {
+            final int[] array = new int[size];
+            Arrays.fill(array, -1);
+            return array;
+        }, (array, id, mappedId) -> array[id] = mappedId, IntArrayMappings::of);
     }
 
     @Beta
@@ -134,10 +139,10 @@ public final class MappingDataLoader {
             return IntArrayMappings.of(valuesTag.getValue(), mappedSizeTag.asInt());
         } else if (strategy == SHIFTS_ID) {
             final IntArrayTag shiftsAtTag = tag.get("at");
-            final IntArrayTag shiftsTag = tag.get("val");
+            final IntArrayTag shiftsTag = tag.get("to");
             final IntTag sizeTag = tag.get("size");
             final int[] shiftsAt = shiftsAtTag.getValue();
-            final int[] shifts = shiftsTag.getValue();
+            final int[] shiftsTo = shiftsTag.getValue();
             final int size = sizeTag.asInt();
             mappings = holderSupplier.get(size);
 
@@ -153,9 +158,9 @@ public final class MappingDataLoader {
             for (int i = 0; i < shiftsAt.length; i++) {
                 final int from = shiftsAt[i];
                 final int to = i == shiftsAt.length - 1 ? size : shiftsAt[i + 1];
-                final int shiftBy = shifts[i];
+                int mappedId = shiftsTo[i];
                 for (int id = from; id < to; id++) {
-                    addConsumer.addTo(mappings, id, id + shiftBy);
+                    addConsumer.addTo(mappings, id, mappedId++);
                 }
             }
         } else if (strategy == CHANGES_ID) {

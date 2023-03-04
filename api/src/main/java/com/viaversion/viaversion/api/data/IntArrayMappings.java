@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import java.util.Arrays;
+
 public class IntArrayMappings implements Mappings {
     private final int[] mappings;
     private final int mappedIds;
@@ -57,6 +59,17 @@ public class IntArrayMappings implements Mappings {
     @Override
     public int mappedSize() {
         return mappedIds;
+    }
+
+    @Override
+    public Mappings createInverse() {
+        final int[] inverse = new int[mappedIds];
+        Arrays.fill(inverse, -1);
+        for (int id = 0; id < mappings.length; id++) {
+            final int mappedId = mappings[id];
+            inverse[mappedId] = id;
+        }
+        return of(inverse, mappings.length);
     }
 
     public int[] raw() {

@@ -44,6 +44,14 @@ public class FullMappingsBase implements FullMappings {
         this. mappedIdToString = mappedIdentifiers.toArray(EMPTY_ARRAY);
     }
 
+    private FullMappingsBase(final Object2IntMap<String> stringToId, final Object2IntMap<String> mappedStringToId, final String[] idToString, final String[] mappedIdToString, final Mappings mappings) {
+        this.stringToId = stringToId;
+        this.mappedStringToId = mappedStringToId;
+        this.idToString = idToString;
+        this.mappedIdToString = mappedIdToString;
+        this.mappings = mappings;
+    }
+
     @Override
     public Mappings mappings() {
         return mappings;
@@ -80,6 +88,31 @@ public class FullMappingsBase implements FullMappings {
 
         final int mappedId = mappings.getNewId(id);
         return mappedId != -1 ? mappedIdentifier(mappedId) : null;
+    }
+
+    @Override
+    public int getNewId(int id) {
+        return mappings.getNewId(id);
+    }
+
+    @Override
+    public void setNewId(int id, int mappedId) {
+        mappings.setNewId(id, mappedId);
+    }
+
+    @Override
+    public int size() {
+        return mappings.size();
+    }
+
+    @Override
+    public int mappedSize() {
+        return mappings.mappedSize();
+    }
+
+    @Override
+    public FullMappings createInverse() {
+        return new FullMappingsBase(mappedStringToId, stringToId, mappedIdToString, idToString, mappings.createInverse());
     }
 
     private static Object2IntMap<String> toInverseMap(final List<String> list) {

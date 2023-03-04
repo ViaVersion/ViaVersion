@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.data.entity;
 
 import com.viaversion.viaversion.api.data.BiMappings;
 import com.viaversion.viaversion.api.data.IdentityMappings;
+import com.viaversion.viaversion.api.data.Mappings;
 
 public final class IdentityBiMappings extends IdentityMappings implements BiMappings {
 
@@ -34,5 +35,10 @@ public final class IdentityBiMappings extends IdentityMappings implements BiMapp
     @Override
     public BiMappings inverse() {
         return this;
+    }
+
+    @Override
+    public Mappings createInverse() {
+        return new IdentityBiMappings(mappedSize(), size());
     }
 }

@@ -62,4 +62,13 @@ public class Int2IntMapMappings implements Mappings {
     public int mappedSize() {
         return mappedIds;
     }
+
+    @Override
+    public Mappings createInverse() {
+        final Int2IntMap inverse = new Int2IntOpenHashMap();
+        for (final Int2IntMap.Entry entry : mappings.int2IntEntrySet()) {
+            inverse.put(entry.getIntValue(), entry.getIntKey());
+        }
+        return of(inverse, size());
+    }
 }

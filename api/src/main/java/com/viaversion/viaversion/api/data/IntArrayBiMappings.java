@@ -84,4 +84,9 @@ public class IntArrayBiMappings implements BiMappings {
     public int mappedSize() {
         return mappings.mappedSize();
     }
+
+    @Override
+    public Mappings createInverse() {
+        return mappings.createInverse();
+    }
 }
