@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
@@ -37,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.PacketBlockConnectionProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.UserBlockData;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -75,80 +75,6 @@ public final class ConnectionData {
                 ex.printStackTrace();
             }
         }
-    }
-
-    public static void updateChunkSectionNeighbours(UserConnection user, int chunkX, int chunkZ, int chunkSectionY) {
-        int chunkMinY = chunkSectionY << 4;
-        List<BlockChangeRecord1_8> updates = new ArrayList<>();
-        for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {
-            for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
-                int distance = Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ);
-                if (distance == 0) continue;
-
-                int chunkMinX = (chunkX + chunkDeltaX) << 4;
-                int chunkMinZ = (chunkZ + chunkDeltaZ) << 4;
-                if (distance == 2) { // Corner
-                    for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
-                        int blockPosX = chunkDeltaX == 1 ? 0 : 15;
-                        int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
-                        updateBlock(user, new Position(chunkMinX + blockPosX, blockY, chunkMinZ + blockPosZ), updates);
-                    }
-                } else {
-                    for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
-                        int xStart, xEnd;
-                        int zStart, zEnd;
-                        if (chunkDeltaX == 1) {
-                            xStart = 0;
-                            xEnd = 2;
-                            zStart = 0;
-                            zEnd = 16;
-                        } else if (chunkDeltaX == -1) {
-                            xStart = 14;
-                            xEnd = 16;
-                            zStart = 0;
-                            zEnd = 16;
-                        } else if (chunkDeltaZ == 1) {
-                            xStart = 0;
-                            xEnd = 16;
-                            zStart = 0;
-                            zEnd = 2;
-                        } else {
-                            xStart = 0;
-                            xEnd = 16;
-                            zStart = 14;
-                            zEnd = 16;
-                        }
-                        for (int blockX = xStart; blockX < xEnd; blockX++) {
-                            for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
-                                updateBlock(user, new Position(chunkMinX + blockX, blockY, chunkMinZ + blockZ), updates);
-                            }
-                        }
-                    }
-                }
-
-                if (!updates.isEmpty()) {
-                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.MULTI_BLOCK_CHANGE, null, user);
-                    wrapper.write(Type.INT, chunkX + chunkDeltaX);
-                    wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
-                    wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
-                    try {
-                        wrapper.send(Protocol1_13To1_12_2.class);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    updates.clear();
-                }
-            }
-        }
-    }
-
-    public static void updateBlock(UserConnection user, Position pos, List<BlockChangeRecord1_8> records) {
-        int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
-        ConnectionHandler handler = getConnectionHandler(blockState);
-        if (handler == null) return;
-
-        int newBlockState = handler.connect(user, pos, blockState);
-        records.add(new BlockChangeRecord1_8(pos.x() & 0xF, pos.y(), pos.z() & 0xF, newBlockState));
     }
 
     public static void updateBlockStorage(UserConnection userConnection, int x, int y, int z, int blockState) {
@@ -692,5 +618,90 @@ public final class ConnectionData {
 
     public static Object2IntMap<String> getKeyToId() {
         return keyToId;
+    }
+
+    public static class NeighbourUpdater {
+        private final UserConnection user;
+        private final UserBlockData userBlockData;
+
+        public NeighbourUpdater(UserConnection user) {
+            this.user = user;
+            this.userBlockData = blockConnectionProvider.forUser(user);
+        }
+
+        public void updateChunkSectionNeighbours(int chunkX, int chunkZ, int chunkSectionY) {
+            int chunkMinY = chunkSectionY << 4;
+            List<BlockChangeRecord1_8> updates = new ArrayList<>();
+            for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {
+                for (int chunkDeltaZ = -1; chunkDeltaZ <= 1; chunkDeltaZ++) {
+                    int distance = Math.abs(chunkDeltaX) + Math.abs(chunkDeltaZ);
+                    if (distance == 0) continue;
+
+                    int chunkMinX = (chunkX + chunkDeltaX) << 4;
+                    int chunkMinZ = (chunkZ + chunkDeltaZ) << 4;
+                    if (distance == 2) { // Corner
+                        for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
+                            int blockPosX = chunkDeltaX == 1 ? 0 : 15;
+                            int blockPosZ = chunkDeltaZ == 1 ? 0 : 15;
+                            updateBlock(chunkMinX + blockPosX, blockY, chunkMinZ + blockPosZ, updates);
+                        }
+                    } else {
+                        for (int blockY = chunkMinY; blockY < chunkMinY + 16; blockY++) {
+                            int xStart, xEnd;
+                            int zStart, zEnd;
+                            if (chunkDeltaX == 1) {
+                                xStart = 0;
+                                xEnd = 2;
+                                zStart = 0;
+                                zEnd = 16;
+                            } else if (chunkDeltaX == -1) {
+                                xStart = 14;
+                                xEnd = 16;
+                                zStart = 0;
+                                zEnd = 16;
+                            } else if (chunkDeltaZ == 1) {
+                                xStart = 0;
+                                xEnd = 16;
+                                zStart = 0;
+                                zEnd = 2;
+                            } else {
+                                xStart = 0;
+                                xEnd = 16;
+                                zStart = 14;
+                                zEnd = 16;
+                            }
+                            for (int blockX = xStart; blockX < xEnd; blockX++) {
+                                for (int blockZ = zStart; blockZ < zEnd; blockZ++) {
+                                    updateBlock(chunkMinX + blockX, blockY, chunkMinZ + blockZ, updates);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!updates.isEmpty()) {
+                        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.MULTI_BLOCK_CHANGE, null, user);
+                        wrapper.write(Type.INT, chunkX + chunkDeltaX);
+                        wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
+                        wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
+                        try {
+                            wrapper.send(Protocol1_13To1_12_2.class);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        updates.clear();
+                    }
+                }
+            }
+        }
+
+        private void updateBlock(int x, int y, int z, List<BlockChangeRecord1_8> records) {
+            int blockState = userBlockData.getBlockData(x, y, z);
+            ConnectionHandler handler = getConnectionHandler(blockState);
+            if (handler == null) return;
+
+            Position pos = new Position(x, y, z);
+            int newBlockState = handler.connect(user, pos, blockState);
+            records.add(new BlockChangeRecord1_8(pos.x() & 0xF, pos.y(), pos.z() & 0xF, newBlockState));
+        }
     }
 }

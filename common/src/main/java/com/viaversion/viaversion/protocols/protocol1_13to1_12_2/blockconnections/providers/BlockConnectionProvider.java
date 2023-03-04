@@ -55,4 +55,9 @@ public class BlockConnectionProvider implements Provider {
     public boolean storesBlocks() {
         return false;
     }
+
+    public UserBlockData forUser(UserConnection connection) {
+        return (x, y, z) -> getBlockData(connection, x, y, z);
+    }
+
 }

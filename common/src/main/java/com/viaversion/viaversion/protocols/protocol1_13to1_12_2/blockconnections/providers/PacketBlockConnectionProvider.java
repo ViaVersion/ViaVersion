@@ -56,4 +56,9 @@ public class PacketBlockConnectionProvider extends BlockConnectionProvider {
     public boolean storesBlocks() {
         return true;
     }
+
+    @Override
+    public UserBlockData forUser(UserConnection connection) {
+        return connection.get(BlockConnectionStorage.class)::get;
+    }
 }

@@ -35,6 +35,10 @@ public class BlockConnectionStorage implements StorableObject {
 
     private final Map<Long, SectionData> blockStorage = createLongObjectMap();
 
+    // Cache to retrieve section quicker
+    private long lastIndex;
+    private SectionData lastSection;
+
     static {
         try {
             //noinspection StringBufferReplaceableByString - prevent relocation
@@ -73,7 +77,7 @@ public class BlockConnectionStorage implements StorableObject {
 
     public int get(int x, int y, int z) {
         long pair = getChunkSectionIndex(x, y, z);
-        SectionData map = blockStorage.get(pair);
+        SectionData map = getSection(pair);
         if (map == null) return 0;
         short blockPosition = encodeBlockPos(x, y, z);
         NibbleArray nibbleArray = map.nibbleArray();
@@ -85,7 +89,7 @@ public class BlockConnectionStorage implements StorableObject {
 
     public void remove(int x, int y, int z) {
         long pair = getChunkSectionIndex(x, y, z);
-        SectionData map = blockStorage.get(pair);
+        SectionData map = getSection(pair);
         if (map == null) return;
         int blockIndex = encodeBlockPos(x, y, z);
         NibbleArray nibbleArray = map.nibbleArray();
@@ -109,6 +113,7 @@ public class BlockConnectionStorage implements StorableObject {
 
     public void clear() {
         blockStorage.clear();
+        lastSection = null;
     }
 
     public void unloadChunk(int x, int z) {
@@ -118,11 +123,15 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     public void unloadSection(int x, int y, int z) {
-        blockStorage.remove(getChunkSectionIndex(x << 4, y << 4, z << 4));
+        long index = getChunkSectionIndex(x << 4, y << 4, z << 4);
+        blockStorage.remove(index);
+        if (index == lastIndex) {
+            lastSection = null;
+        }
     }
 
     private SectionData getChunkSection(long index, boolean requireNibbleArray) {
-        SectionData map = blockStorage.get(index);
+        SectionData map = getSection(index);
         if (map == null) {
             map = new SectionData(new byte[4096]);
             blockStorage.put(index, map);
@@ -131,6 +140,14 @@ public class BlockConnectionStorage implements StorableObject {
             map.setNibbleArray(new NibbleArray(4096));
         }
         return map;
+    }
+
+    private SectionData getSection(long index) {
+        if (lastSection != null && lastIndex == index) {
+            return lastSection;
+        }
+        lastIndex = index;
+        return lastSection = blockStorage.get(index);
     }
 
     private long getChunkSectionIndex(int x, int y, int z) {
