@@ -291,9 +291,13 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
                 handler(wrapper -> {
+                    Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+                    if (mappings == null) {
+                        return;
+                    }
+
                     short property = wrapper.passthrough(Type.SHORT);
                     if (property >= 4 && property <= 6) { // Enchantment id
-                        Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
                         short enchantmentId = (short) mappings.getNewId(wrapper.read(Type.SHORT));
                         wrapper.write(Type.SHORT, enchantmentId);
                     }
