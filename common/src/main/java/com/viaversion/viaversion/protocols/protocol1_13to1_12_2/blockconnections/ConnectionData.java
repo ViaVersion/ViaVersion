@@ -629,7 +629,7 @@ public final class ConnectionData {
             this.userBlockData = blockConnectionProvider.forUser(user);
         }
 
-        public void updateChunkSectionNeighbours(int chunkX, int chunkZ, int chunkSectionY) {
+        public void updateChunkSectionNeighbours(int chunkX, int chunkZ, int chunkSectionY) throws Exception {
             int chunkMinY = chunkSectionY << 4;
             List<BlockChangeRecord1_8> updates = new ArrayList<>();
             for (int chunkDeltaX = -1; chunkDeltaX <= 1; chunkDeltaX++) {
@@ -683,11 +683,7 @@ public final class ConnectionData {
                         wrapper.write(Type.INT, chunkX + chunkDeltaX);
                         wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                         wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
-                        try {
-                            wrapper.send(Protocol1_13To1_12_2.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        wrapper.send(Protocol1_13To1_12_2.class);
                         updates.clear();
                     }
                 }

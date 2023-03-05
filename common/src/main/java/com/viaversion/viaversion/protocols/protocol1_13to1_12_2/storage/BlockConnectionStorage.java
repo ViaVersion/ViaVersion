@@ -108,7 +108,7 @@ public class BlockConnectionStorage implements StorableObject {
         for (short entry : map.blockIds()) {
             if (entry != 0) return;
         }
-        blockStorage.remove(pair);
+        removeSection(pair);
     }
 
     public void clear() {
@@ -123,11 +123,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     public void unloadSection(int x, int y, int z) {
-        long index = getChunkSectionIndex(x << 4, y << 4, z << 4);
-        blockStorage.remove(index);
-        if (index == lastIndex) {
-            lastSection = null;
-        }
+        removeSection(getChunkSectionIndex(x << 4, y << 4, z << 4));
     }
 
     private SectionData getChunkSection(long index, boolean requireNibbleArray) {
@@ -135,6 +131,8 @@ public class BlockConnectionStorage implements StorableObject {
         if (map == null) {
             map = new SectionData(new byte[4096]);
             blockStorage.put(index, map);
+            lastSection = map;
+            lastIndex = index;
         }
         if (map.nibbleArray() == null && requireNibbleArray) {
             map.setNibbleArray(new NibbleArray(4096));
@@ -148,6 +146,13 @@ public class BlockConnectionStorage implements StorableObject {
         }
         lastIndex = index;
         return lastSection = blockStorage.get(index);
+    }
+
+    private void removeSection(long index) {
+        blockStorage.remove(index);
+        if (index == lastIndex) {
+            lastSection = null;
+        }
     }
 
     private long getChunkSectionIndex(int x, int y, int z) {
