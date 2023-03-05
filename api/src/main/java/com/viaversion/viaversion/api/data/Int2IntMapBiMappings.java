@@ -74,6 +74,7 @@ public class Int2IntMapBiMappings implements BiMappings {
     @Override
     public Mappings createInverse() {
         final Int2IntBiMap inverseCopy = new Int2IntBiHashMap(inverse.mappings.size());
+        inverseCopy.defaultReturnValue(-1);
         for (final Int2IntMap.Entry entry : inverse.mappings.int2IntEntrySet()) {
             inverseCopy.put(entry.getIntKey(), entry.getIntValue());
         }

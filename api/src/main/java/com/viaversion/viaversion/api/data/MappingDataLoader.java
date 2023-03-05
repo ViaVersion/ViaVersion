@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -54,9 +55,17 @@ public final class MappingDataLoader {
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
+    private static final Map<String, CompoundTag> MAPPINGS_CACHE = new HashMap<>();
+    private static boolean cacheValid = true;
 
+    @Deprecated/*(forRemoval = true)*/
     public static void enableMappingsCache() {
-        //TODO
+        // Always enabled
+    }
+
+    public static void clearCache() {
+        MAPPINGS_CACHE.clear();
+        cacheValid = false;
     }
 
     /**
@@ -100,7 +109,29 @@ public final class MappingDataLoader {
         }
     }
 
+    public static @Nullable CompoundTag loadNBT(final String name, final boolean cache) {
+        if (!cacheValid) {
+            return loadNBTFromFile(name);
+        }
+
+        CompoundTag data = MAPPINGS_CACHE.get(name);
+        if (data != null) {
+            return data;
+        }
+
+        data = loadNBTFromFile(name);
+
+        if (cache && data != null) {
+            MAPPINGS_CACHE.put(name, data);
+        }
+        return data;
+    }
+
     public static @Nullable CompoundTag loadNBT(final String name) {
+        return loadNBT(name, false);
+    }
+
+    private static @Nullable CompoundTag loadNBTFromFile(final String name) {
         final InputStream resource = getResource(name);
         if (resource == null) {
             return null;

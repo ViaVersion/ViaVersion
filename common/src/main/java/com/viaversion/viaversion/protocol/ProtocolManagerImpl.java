@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
@@ -517,6 +518,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         mappingLoaderExecutor = null;
         mappingLoaderFutures.clear();
         mappingLoaderFutures = null;
+
+        // Clear cached mapping files
+        MappingDataLoader.clearCache();
     }
 
     private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {

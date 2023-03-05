@@ -67,7 +67,9 @@ public class IntArrayMappings implements Mappings {
         Arrays.fill(inverse, -1);
         for (int id = 0; id < mappings.length; id++) {
             final int mappedId = mappings[id];
-            inverse[mappedId] = id;
+            if (mappedId != -1) {
+                inverse[mappedId] = id;
+            }
         }
         return of(inverse, mappings.length);
     }

@@ -66,6 +66,7 @@ public class Int2IntMapMappings implements Mappings {
     @Override
     public Mappings createInverse() {
         final Int2IntMap inverse = new Int2IntOpenHashMap();
+        inverse.defaultReturnValue(-1);
         for (final Int2IntMap.Entry entry : mappings.int2IntEntrySet()) {
             inverse.put(entry.getIntValue(), entry.getIntKey());
         }

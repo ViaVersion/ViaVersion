@@ -75,9 +75,8 @@ public class MappingDataBase implements MappingData {
         paintingMappings = loadMappings(data, "paintings");
         itemMappings = loadBiMappings(data, "items");
 
-        // TODO Don't load one file multiple times
-        final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt");
-        final CompoundTag mappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + mappedVersion + ".nbt");
+        final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt", true);
+        final CompoundTag mappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + mappedVersion + ".nbt", true);
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
