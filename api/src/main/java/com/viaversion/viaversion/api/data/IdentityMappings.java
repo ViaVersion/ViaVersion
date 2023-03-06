@@ -53,7 +53,7 @@ public class IdentityMappings implements Mappings {
     }
 
     @Override
-    public Mappings createInverse() {
+    public Mappings inverse() {
         return new IdentityMappings(mappedSize, size);
     }
 }

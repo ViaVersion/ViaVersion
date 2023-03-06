@@ -22,46 +22,19 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import java.util.Arrays;
+public class BiMappingsBase implements BiMappings {
 
-public class IntArrayBiMappings implements BiMappings {
+    protected final Mappings mappings;
+    private final BiMappingsBase inverse;
 
-    private final Mappings mappings;
-    private final IntArrayBiMappings inverse;
-
-    protected IntArrayBiMappings(final IntArrayMappings mappings) {
+    protected BiMappingsBase(final Mappings mappings, final Mappings inverse) {
         this.mappings = mappings;
-
-        final int[] raw = mappings.raw();
-        final int[] inverseMappings = new int[mappings.mappedSize()];
-        Arrays.fill(inverseMappings, -1);
-        for (int id = 0; id < raw.length; id++) {
-            final int mappedId = raw[id];
-            inverseMappings[mappedId] = id;
-        }
-        this.inverse = new IntArrayBiMappings(new IntArrayMappings(inverseMappings, raw.length), this);
+        this.inverse = new BiMappingsBase(inverse, this);
     }
 
-    protected IntArrayBiMappings(final Mappings mappings, final IntArrayBiMappings inverse) {
+    private BiMappingsBase(final Mappings mappings, final BiMappingsBase inverse) {
         this.mappings = mappings;
         this.inverse = inverse;
-    }
-
-    private IntArrayBiMappings(final int[] mappings, final int mappedIds) {
-        this(new IntArrayMappings(mappings, mappedIds));
-    }
-
-    public static IntArrayBiMappings of(final IntArrayMappings mappings) {
-        return new IntArrayBiMappings(mappings);
-    }
-
-    public static Mappings.Builder<IntArrayBiMappings> builder() {
-        return new Builder<>(IntArrayBiMappings::new);
-    }
-
-    @Override
-    public BiMappings inverse() {
-        return this.inverse;
     }
 
     @Override
@@ -86,7 +59,7 @@ public class IntArrayBiMappings implements BiMappings {
     }
 
     @Override
-    public Mappings createInverse() {
-        return mappings.createInverse();
+    public BiMappings inverse() {
+        return this.inverse;
     }
 }

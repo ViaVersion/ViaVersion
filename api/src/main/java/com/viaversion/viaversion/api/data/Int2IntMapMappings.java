@@ -64,11 +64,13 @@ public class Int2IntMapMappings implements Mappings {
     }
 
     @Override
-    public Mappings createInverse() {
+    public Mappings inverse() {
         final Int2IntMap inverse = new Int2IntOpenHashMap();
         inverse.defaultReturnValue(-1);
         for (final Int2IntMap.Entry entry : mappings.int2IntEntrySet()) {
-            inverse.put(entry.getIntValue(), entry.getIntKey());
+            if (entry.getIntValue() != -1) {
+                inverse.putIfAbsent(entry.getIntValue(), entry.getIntKey());
+            }
         }
         return of(inverse, size());
     }

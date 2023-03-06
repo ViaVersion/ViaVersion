@@ -84,11 +84,11 @@ public interface Mappings {
     int mappedSize();
 
     /**
-     * Creates a new Mappings instance of the same type with the same mappings, but with the keys and values swapped.
+     * Mappings with keys and values swapped.
      *
-     * @return a new Mappings instance with the same mappings, but with the keys and values swapped
+     * @return mappings with keys and values swapped
      */
-    Mappings createInverse();
+    Mappings inverse();
 
     static <T extends Mappings> Builder<T> builder(final MappingsSupplier<T> supplier) {
         return new Builder<>(supplier);
@@ -100,6 +100,7 @@ public interface Mappings {
         T supply(int[] mappings, int mappedIds);
     }
 
+    @Deprecated
     class Builder<T extends Mappings> {
 
         protected final MappingsSupplier<T> supplier;

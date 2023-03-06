@@ -29,5 +29,14 @@ public interface BiMappings extends Mappings {
      *
      * @return inverse of the bimappings
      */
+    @Override
     BiMappings inverse();
+
+    static BiMappings of(final Mappings mappings) {
+        return of(mappings, mappings.inverse());
+    }
+
+    static BiMappings of(final Mappings mappings, final Mappings inverse) {
+        return new BiMappingsBase(mappings, inverse);
+    }
 }

@@ -248,6 +248,7 @@ public final class MappingDataLoader {
         );
     }
 
+    @Deprecated
     public static void mapIdentifiers(final int[] output, final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
         final Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
         for (final Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
@@ -285,6 +286,7 @@ public final class MappingDataLoader {
         return mappedId;
     }
 
+    @Deprecated
     public static void mapIdentifiers(final int[] output, final JsonArray unmappedIdentifiers, final JsonArray mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
         final Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
         for (int id = 0; id < unmappedIdentifiers.size(); id++) {

@@ -74,5 +74,6 @@ public interface FullMappings extends Mappings {
      */
     @Nullable String mappedIdentifier(String identifier);
 
-    FullMappings createInverse();
+    @Override
+    FullMappings inverse();
 }

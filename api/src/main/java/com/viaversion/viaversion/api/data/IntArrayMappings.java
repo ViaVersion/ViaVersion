@@ -37,6 +37,7 @@ public class IntArrayMappings implements Mappings {
         return new IntArrayMappings(mappings, mappedIds);
     }
 
+    @Deprecated
     public static Builder<IntArrayMappings> builder() {
         return Mappings.builder(IntArrayMappings::new);
     }
@@ -62,12 +63,12 @@ public class IntArrayMappings implements Mappings {
     }
 
     @Override
-    public Mappings createInverse() {
+    public Mappings inverse() {
         final int[] inverse = new int[mappedIds];
         Arrays.fill(inverse, -1);
         for (int id = 0; id < mappings.length; id++) {
             final int mappedId = mappings[id];
-            if (mappedId != -1) {
+            if (mappedId != -1 && inverse[mappedId] == -1) {
                 inverse[mappedId] = id;
             }
         }

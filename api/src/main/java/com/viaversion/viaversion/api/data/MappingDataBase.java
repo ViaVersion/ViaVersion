@@ -110,20 +110,16 @@ public class MappingDataBase implements MappingData {
     }
 
     protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
-        return shouldLoad(key) ? MappingDataLoader.loadMappings(data, key) : null;
+        return MappingDataLoader.loadMappings(data, key);
     }
 
     protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        return shouldLoad(key) ? MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key) : null;
+        return MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
-        if (!shouldLoad(key)) {
-            return null;
-        }
-
         final Mappings mappings = loadMappings(data, key);
-        return mappings != null ? IntArrayBiMappings.of((IntArrayMappings) mappings) : null;
+        return mappings != null ? BiMappings.of(mappings) : null;
     }
 
     private void loadTags(final RegistryType type, final CompoundTag data) {
@@ -244,10 +240,6 @@ public class MappingDataBase implements MappingData {
             return 0;
         }
         return mappedId;
-    }
-
-    protected boolean shouldLoad(final String key) {
-        return true;
     }
 
     protected void loadExtras(final CompoundTag data) {
