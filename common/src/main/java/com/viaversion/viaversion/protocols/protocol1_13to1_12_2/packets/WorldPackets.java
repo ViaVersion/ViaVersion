@@ -448,10 +448,11 @@ public class WorldPackets {
                 // Workaround for packet order issue
                 wrapper.send(Protocol1_13To1_12_2.class);
                 wrapper.cancel();
+                ConnectionData.NeighbourUpdater updater = new ConnectionData.NeighbourUpdater(wrapper.user());
                 for (int i = 0; i < chunk.getSections().length; i++) {
                     ChunkSection section = chunk.getSections()[i];
                     if (section == null) continue;
-                    ConnectionData.updateChunkSectionNeighbours(wrapper.user(), chunk.getX(), chunk.getZ(), i);
+                    updater.updateChunkSectionNeighbours(chunk.getX(), chunk.getZ(), i);
                 }
             }
         });
