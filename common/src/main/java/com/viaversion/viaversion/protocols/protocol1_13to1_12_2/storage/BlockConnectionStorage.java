@@ -36,7 +36,7 @@ public class BlockConnectionStorage implements StorableObject {
     private final Map<Long, SectionData> blockStorage = createLongObjectMap();
 
     // Cache to retrieve section quicker
-    private long lastIndex;
+    private Long lastIndex;
     private SectionData lastSection;
 
     static {
@@ -114,6 +114,7 @@ public class BlockConnectionStorage implements StorableObject {
     public void clear() {
         blockStorage.clear();
         lastSection = null;
+        lastIndex = null;
     }
 
     public void unloadChunk(int x, int z) {
@@ -141,7 +142,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     private SectionData getSection(long index) {
-        if (lastSection != null && lastIndex == index) {
+        if (lastIndex != null && lastIndex == index) {
             return lastSection;
         }
         lastIndex = index;
@@ -150,7 +151,8 @@ public class BlockConnectionStorage implements StorableObject {
 
     private void removeSection(long index) {
         blockStorage.remove(index);
-        if (index == lastIndex) {
+        if (lastIndex != null && lastIndex == index) {
+            lastIndex = null;
             lastSection = null;
         }
     }
