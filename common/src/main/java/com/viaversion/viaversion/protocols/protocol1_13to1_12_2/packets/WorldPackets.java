@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
@@ -161,7 +162,7 @@ public class WorldPackets {
                         blockId = blockId - 219 + 483;
 
                     if (blockId == 73) { // Note block
-                        PacketWrapper blockChange = wrapper.create(0x0B); // block change
+                        PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_CHANGE);
                         blockChange.write(Type.POSITION, pos);
                         blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_13To1_12_2.class);
@@ -451,7 +452,10 @@ public class WorldPackets {
                 ConnectionData.NeighbourUpdater updater = new ConnectionData.NeighbourUpdater(wrapper.user());
                 for (int i = 0; i < chunk.getSections().length; i++) {
                     ChunkSection section = chunk.getSections()[i];
-                    if (section == null) continue;
+                    if (section == null) {
+                        continue;
+                    }
+
                     updater.updateChunkSectionNeighbours(chunk.getX(), chunk.getZ(), i);
                 }
             }

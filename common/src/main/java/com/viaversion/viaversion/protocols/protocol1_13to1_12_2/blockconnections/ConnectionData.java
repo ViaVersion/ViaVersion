@@ -58,22 +58,24 @@ public final class ConnectionData {
     static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
     static IntSet occludingStates = new IntOpenHashSet(377, .99F);
 
-    public static void update(UserConnection user, Position position) {
+    public static void update(UserConnection user, Position position) throws Exception {
         for (BlockFace face : BlockFace.values()) {
             Position pos = position.getRelative(face);
             int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
-            if (handler == null) continue;
+            if (handler == null) {
+                continue;
+            }
 
             int newBlockState = handler.connect(user, pos, blockState);
+            if (newBlockState == blockState) {
+                continue;
+            }
+
             PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
             blockUpdatePacket.write(Type.POSITION, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
-            try {
-                blockUpdatePacket.send(Protocol1_13To1_12_2.class);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            blockUpdatePacket.send(Protocol1_13To1_12_2.class);
         }
     }
 
@@ -693,11 +695,15 @@ public final class ConnectionData {
         private void updateBlock(int x, int y, int z, List<BlockChangeRecord1_8> records) {
             int blockState = userBlockData.getBlockData(x, y, z);
             ConnectionHandler handler = getConnectionHandler(blockState);
-            if (handler == null) return;
+            if (handler == null) {
+                return;
+            }
 
             Position pos = new Position(x, y, z);
             int newBlockState = handler.connect(user, pos, blockState);
-            records.add(new BlockChangeRecord1_8(pos.x() & 0xF, pos.y(), pos.z() & 0xF, newBlockState));
+            if (blockState != newBlockState) {
+                records.add(new BlockChangeRecord1_8(x & 0xF, y, z & 0xF, newBlockState));
+            }
         }
     }
 }
