@@ -20,17 +20,17 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class AbstractStempConnectionHandler extends ConnectionHandler {
     private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
 
+    private final IntSet blockId = new IntOpenHashSet();
     private final int baseStateId;
-    private final Set<Integer> blockId = new HashSet<>();
 
     private final Map<BlockFace, Integer> stemps = new EnumMap<>(BlockFace.class);
 

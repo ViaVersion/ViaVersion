@@ -17,9 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import com.github.steveice10.opennbt.tag.builtin.ByteArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
@@ -46,17 +49,19 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 
 public final class ConnectionData {
-    private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
     public static BlockConnectionProvider blockConnectionProvider;
-    static Int2ObjectMap<String> idToKey = new Int2ObjectOpenHashMap<>(8582, .99F);
-    static Object2IntMap<String> keyToId = new Object2IntOpenHashMap<>(8582, .99F);
-    static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>(1);
-    static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>(1);
-    static IntSet occludingStates = new IntOpenHashSet(377, .99F);
+    static final Object2IntMap<String> KEY_TO_ID = new Object2IntOpenHashMap<>(8582, .99F);
+    static final IntSet OCCLUDING_STATES = new IntOpenHashSet(377, .99F);
+    static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>();
+    static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>();
+    private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
+
+    static {
+        KEY_TO_ID.defaultReturnValue(-1);
+    }
 
     public static void update(UserConnection user, Position position) throws Exception {
         for (BlockFace face : BlockFace.values()) {
@@ -68,9 +73,11 @@ public final class ConnectionData {
             }
 
             int newBlockState = handler.connect(user, pos, blockState);
-            if (newBlockState == blockState) {
+            if (newBlockState == blockState && blockConnectionProvider.storesBlocks()) {
                 continue;
             }
+
+            updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
 
             PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
             blockUpdatePacket.write(Type.POSITION, pos);
@@ -103,7 +110,10 @@ public final class ConnectionData {
 
         for (int s = 0; s < chunk.getSections().length; s++) {
             ChunkSection section = chunk.getSections()[s];
-            if (section == null) continue;
+            if (section == null) {
+                continue;
+            }
+
             DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
             boolean willConnect = false;
@@ -114,16 +124,25 @@ public final class ConnectionData {
                     break;
                 }
             }
-            if (!willConnect) continue;
+            if (!willConnect) {
+                continue;
+            }
 
             int yOff = s << 4;
 
             for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                 int id = blocks.idAt(idx);
                 ConnectionHandler handler = ConnectionData.getConnectionHandler(id);
-                if (handler == null) continue;
-                id = handler.connect(user, new Position(xOff + ChunkSection.xFromIndex(idx), yOff + ChunkSection.yFromIndex(idx), zOff + ChunkSection.zFromIndex(idx)), id);
-                blocks.setIdAt(idx, id);
+                if (handler == null) {
+                    continue;
+                }
+
+                Position position = new Position(xOff + ChunkSection.xFromIndex(idx), yOff + ChunkSection.yFromIndex(idx), zOff + ChunkSection.zFromIndex(idx));
+                int connectedId = handler.connect(user, position, id);
+                if (connectedId != id) {
+                    blocks.setIdAt(idx, connectedId);
+                    updateBlockStorage(user, position.x(), position.y(), position.z(), connectedId);
+                }
             }
         }
     }
@@ -137,39 +156,49 @@ public final class ConnectionData {
         ListTag blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").get("blockstates");
         for (int id = 0; id < blockStates.size(); id++) {
             String key = (String) blockStates.get(id).getValue();
-            idToKey.put(id, key);
-            keyToId.put(key, id);
+            KEY_TO_ID.put(key, id);
         }
 
         connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, .99F);
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
-            blockConnectionData = new Int2ObjectOpenHashMap<>(1146, .99F);
-            JsonObject mappingBlockConnections = MappingDataLoader.loadData("blockConnections.json");
-            for (Entry<String, JsonElement> entry : mappingBlockConnections.entrySet()) {
-                int id = keyToId.getInt(entry.getKey());
+            blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
+
+            ListTag blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").get("data");
+            for (Tag blockTag : blockConnectionMappings) {
+                CompoundTag blockCompoundTag = (CompoundTag) blockTag;
                 BlockData blockData = new BlockData();
-                for (Entry<String, JsonElement> type : entry.getValue().getAsJsonObject().entrySet()) {
-                    String name = type.getKey();
-                    JsonObject object = type.getValue().getAsJsonObject();
-                    boolean[] data = new boolean[6];
-                    for (BlockFace value : BlockFace.values()) {
-                        String face = value.toString().toLowerCase(Locale.ROOT);
-                        if (object.has(face)) {
-                            data[value.ordinal()] = object.getAsJsonPrimitive(face).getAsBoolean();
-                        }
+                for (Entry<String, Tag> entry : blockCompoundTag.entrySet()) {
+                    String key = entry.getKey();
+                    if (key.equals("id") || key.equals("ids")) {
+                        continue;
                     }
-                    blockData.put(name, data);
+
+
+                    boolean[] attachingFaces = new boolean[4];
+                    ByteArrayTag connections = (ByteArrayTag) entry.getValue();
+                    for (byte blockFaceId : connections.getValue()) {
+                        attachingFaces[blockFaceId] = true;
+                    }
+
+                    int connectionTypeId = Integer.parseInt(key);
+                    blockData.put(connectionTypeId, attachingFaces);
                 }
-                if (entry.getKey().contains("stairs")) {
-                    blockData.put("allFalseIfStairPre1_12", new boolean[6]);
+
+                NumberTag idTag = blockCompoundTag.get("id");
+                if (idTag != null) {
+                    blockConnectionData.put(idTag.asInt(), blockData);
+                } else {
+                    IntArrayTag idsTag = blockCompoundTag.get("ids");
+                    for (int id : idsTag.getValue()) {
+                        blockConnectionData.put(id, blockData);
+                    }
                 }
-                blockConnectionData.put(id, blockData);
             }
         }
 
         for (String state : occludingBlockStates()) {
-            occludingStates.add(keyToId.getInt(state));
+            OCCLUDING_STATES.add(KEY_TO_ID.getInt(state));
         }
 
         List<ConnectorInitAction> initActions = new ArrayList<>();
@@ -192,7 +221,7 @@ public final class ConnectionData {
             initActions.add(VineConnectionHandler.init());
         }
 
-        for (String key : keyToId.keySet()) {
+        for (String key : KEY_TO_ID.keySet()) {
             WrappedBlockData wrappedBlockData = WrappedBlockData.fromString(key);
             for (ConnectorInitAction action : initActions) {
                 action.check(wrappedBlockData);
@@ -223,11 +252,7 @@ public final class ConnectionData {
     }
 
     public static int getId(String key) {
-        return keyToId.getOrDefault(Key.stripMinecraftNamespace(key), -1);
-    }
-
-    public static String getKey(int id) {
-        return idToKey.get(id);
+        return KEY_TO_ID.getOrDefault(Key.stripMinecraftNamespace(key), -1);
     }
 
     private static String[] occludingBlockStates() {
@@ -619,10 +644,10 @@ public final class ConnectionData {
     }
 
     public static Object2IntMap<String> getKeyToId() {
-        return keyToId;
+        return KEY_TO_ID;
     }
 
-    public static class NeighbourUpdater {
+    public static final class NeighbourUpdater {
         private final UserConnection user;
         private final UserBlockData userBlockData;
 
@@ -701,8 +726,9 @@ public final class ConnectionData {
 
             Position pos = new Position(x, y, z);
             int newBlockState = handler.connect(user, pos, blockState);
-            if (blockState != newBlockState) {
+            if (blockState != newBlockState || !blockConnectionProvider.storesBlocks()) {
                 records.add(new BlockChangeRecord1_8(x & 0xF, y, z & 0xF, newBlockState));
+                updateBlockStorage(user, x, y, z, newBlockState);
             }
         }
     }

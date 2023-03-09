@@ -28,7 +28,7 @@ import java.util.Set;
 
 
 public class FlowerConnectionHandler extends ConnectionHandler {
-    private static final Int2IntMap flowers = new Int2IntOpenHashMap();
+    private static final Int2IntMap FLOWERS = new Int2IntOpenHashMap();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> baseFlower = new HashSet<>();
@@ -45,7 +45,7 @@ public class FlowerConnectionHandler extends ConnectionHandler {
                 ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
                 if (blockData.getValue("half").equals("lower")) {
                     blockData.set("half", "upper");
-                    flowers.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
+                    FLOWERS.put(blockData.getSavedBlockStateId(), blockData.getBlockStateId());
                 }
             }
         };
@@ -54,14 +54,14 @@ public class FlowerConnectionHandler extends ConnectionHandler {
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
-        int connectBelow = flowers.get(blockBelowId);
+        int connectBelow = FLOWERS.get(blockBelowId);
         if (connectBelow != 0) {
             int blockAboveId = getBlockData(user, position.getRelative(BlockFace.TOP));
             if (Via.getConfig().isStemWhenBlockAbove()) {
                 if (blockAboveId == 0) {
                     return connectBelow;
                 }
-            } else if (!flowers.containsKey(blockAboveId)) {
+            } else if (!FLOWERS.containsKey(blockAboveId)) {
                 return connectBelow;
             }
         }

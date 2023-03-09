@@ -183,18 +183,18 @@ public class WorldPackets {
 
                     UserConnection userConnection = wrapper.user();
                     if (Via.getConfig().isServersideBlockConnections()) {
-
-                        ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                         newId = ConnectionData.connect(userConnection, position, newId);
+                        ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                     }
+
                     wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
+
                     if (Via.getConfig().isServersideBlockConnections()) {
                         // Workaround for packet order issue
                         wrapper.send(Protocol1_13To1_12_2.class);
                         wrapper.cancel();
                         ConnectionData.update(userConnection, position);
                     }
-
                 });
             }
         });
@@ -214,14 +214,14 @@ public class WorldPackets {
                     for (BlockChangeRecord record : records) {
                         int newBlock = toNewId(record.getBlockId());
                         Position position = new Position(
-                                record.getSectionX() + (chunkX * 16),
+                                record.getSectionX() + (chunkX << 4),
                                 record.getY(),
-                                record.getSectionZ() + (chunkZ * 16));
+                                record.getSectionZ() + (chunkZ << 4));
 
+                        record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         if (Via.getConfig().isServersideBlockConnections()) {
                             ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newBlock);
                         }
-                        record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                     }
 
                     if (Via.getConfig().isServersideBlockConnections()) {
@@ -237,8 +237,10 @@ public class WorldPackets {
                             if (handler != null) {
                                 blockState = handler.connect(userConnection, position, blockState);
                                 record.setBlockId(blockState);
+                                ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), blockState);
                             }
                         }
+
                         // Workaround for packet order issue
                         wrapper.send(Protocol1_13To1_12_2.class);
                         wrapper.cancel();
@@ -251,7 +253,6 @@ public class WorldPackets {
                             ConnectionData.update(userConnection, position);
                         }
                     }
-
                 });
             }
         });
@@ -358,22 +359,25 @@ public class WorldPackets {
                     }
                     for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                         int id = blocks.idAt(idx);
+                        Position position = new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4));
                         if (storage.isWelcome(id)) {
-                            storage.store(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)), id);
+                            storage.store(position, id);
                         } else if (!chunk.isFullChunk()) { // Update
-                            storage.remove(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
+                            storage.remove(position);
                         }
                     }
                 }
 
                 save_connections:
                 {
-                    if (!Via.getConfig().isServersideBlockConnections() || !ConnectionData.needStoreBlocks())
+                    if (!Via.getConfig().isServersideBlockConnections() || !ConnectionData.needStoreBlocks()) {
                         break save_connections;
+                    }
 
                     if (!chunk.isFullChunk()) { // Update
                         ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), s, chunk.getZ());
                     }
+
                     boolean willSave = false;
                     for (int p = 0; p < blocks.size(); p++) {
                         if (ConnectionData.isWelcome(blocks.idByIndex(p))) {
@@ -381,7 +385,9 @@ public class WorldPackets {
                             break;
                         }
                     }
-                    if (!willSave) break save_connections;
+                    if (!willSave) {
+                        break save_connections;
+                    }
 
                     for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                         int id = blocks.idAt(idx);

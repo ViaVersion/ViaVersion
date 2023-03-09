@@ -17,15 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.Key;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-public class WrappedBlockData {
+public final class WrappedBlockData {
+    private final LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
     private final String minecraftKey;
     private final int savedBlockStateId;
-    private final LinkedHashMap<String, String> blockData = new LinkedHashMap<>();
 
     public static WrappedBlockData fromString(String s) {
         String[] array = s.split("\\[");
@@ -41,15 +40,6 @@ public class WrappedBlockData {
             }
         }
         return wrappedBlockdata;
-    }
-
-    public static WrappedBlockData fromStateId(int id) {
-        String blockData = ConnectionData.getKey(id);
-        if (blockData != null) {
-            return fromString(blockData);
-        }
-        Via.getPlatform().getLogger().info("Unable to get blockdata from " + id);
-        return fromString("minecraft:air");
     }
 
     private WrappedBlockData(String minecraftKey, int savedBlockStateId) {

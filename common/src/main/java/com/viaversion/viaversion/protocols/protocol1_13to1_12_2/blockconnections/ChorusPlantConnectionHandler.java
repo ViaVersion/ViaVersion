@@ -56,6 +56,11 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
     }
 
     @Override
+    protected byte statesSize() {
+        return 64;
+    }
+
+    @Override
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
         if (connects(BlockFace.TOP, getBlockData(user, position.getRelative(BlockFace.TOP)), false)) states |= 16;

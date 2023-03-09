@@ -29,8 +29,8 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
 
     static List<ConnectionData.ConnectorInitAction> init() {
         List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
-        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:cobblestone_wall"));
-        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:mossy_cobblestone_wall"));
+        actions.add(new WallConnectionHandler("cobbleWall").getInitAction("minecraft:cobblestone_wall"));
+        actions.add(new WallConnectionHandler("cobbleWall").getInitAction("minecraft:mossy_cobblestone_wall"));
         return actions;
     }
 
@@ -46,10 +46,16 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return states;
     }
 
+    @Override
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
         if (up(user, position)) states |= 16;
         return states;
+    }
+
+    @Override
+    protected byte statesSize() {
+        return 32;
     }
 
     public boolean up(UserConnection user, Position position) {
