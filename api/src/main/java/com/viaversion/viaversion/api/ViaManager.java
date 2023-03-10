@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
+import com.viaversion.viaversion.api.scheduler.Scheduler;
 import java.util.Set;
 
 public interface ViaManager {
@@ -82,6 +83,13 @@ public interface ViaManager {
      * @return platform loader
      */
     ViaPlatformLoader getLoader();
+
+    /**
+     * Returns the async task scheduler.
+     *
+     * @return async task scheduler
+     */
+    Scheduler getScheduler();
 
     /**
      * If debug is enabled, packets and other otherwise suppressed warnings will be logged.

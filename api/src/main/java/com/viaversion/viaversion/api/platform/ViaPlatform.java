@@ -87,6 +87,15 @@ public interface ViaPlatform<T> {
     PlatformTask runAsync(Runnable runnable);
 
     /**
+     * Run a task async at a repeating interval.
+     *
+     * @param runnable The task to run
+     * @param ticks    The interval to run it at
+     * @return The Task ID
+     */
+    PlatformTask runRepeatingAsync(Runnable runnable, long ticks);
+
+    /**
      * Run a task Sync
      *
      * @param runnable The task to run
@@ -106,7 +115,6 @@ public interface ViaPlatform<T> {
 
     /**
      * Run a task at a repeating interval.
-     * Initial interval is the same as repeat.
      *
      * @param runnable The task to run
      * @param ticks    The interval to run it at

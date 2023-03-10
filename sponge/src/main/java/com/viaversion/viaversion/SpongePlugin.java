@@ -53,6 +53,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.scheduler.Task;
@@ -102,7 +103,15 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public void onServerStart(StartingEngineEvent<Server> event) {
         // Can't use the command register event for raw commands...
         Sponge.server().commandManager().registrar(Command.Raw.class).get().register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
-        ((ViaManagerImpl) Via.getManager()).init();
+
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.init();
+    }
+
+    @Listener
+    public void onServerStarted(StartedEngineEvent<Server> event) {
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.onServerLoaded();
     }
 
     @Listener
@@ -128,6 +137,12 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public PlatformTask runAsync(Runnable runnable) {
         final Task task = Task.builder().plugin(container).execute(runnable).build();
+        return new SpongeViaTask(game.asyncScheduler().submit(task));
+    }
+
+    @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(ticks)).build();
         return new SpongeViaTask(game.asyncScheduler().submit(task));
     }
 

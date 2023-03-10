@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.platform;
+package com.viaversion.viaversion.api.scheduler;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-/**
- * @param <T> task type
- */
-public interface PlatformTask<T> {
+public enum TaskStatus {
 
     /**
-     * Returns the actual object represented by this task/task id.
-     * Null if task cannot be instantly tracked.
-     *
-     * @return platform based object, or null if not tracked/cancellable
+     * The task has been scheduled but not yet started.
      */
-    @Deprecated/*(forRemoval = true)*/
-    @Nullable T getObject();
-
+    SCHEDULED,
     /**
-     * Cancels the task.
-     *
-     * @throws IllegalArgumentException if the task is not cancellable
+     * The task is currently running.
      */
-    void cancel();
+    RUNNING,
+    /**
+     * The task has finished running or has been cancelled.
+     */
+    STOPPED
 }

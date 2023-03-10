@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class UpdateUtil {
+public final class UpdateUtil {
 
     private static final String PREFIX = "§a§l[ViaVersion] §a";
     private static final String URL = "https://api.spiget.org/v2/resources/";

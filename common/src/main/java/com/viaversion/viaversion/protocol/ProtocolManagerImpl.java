@@ -508,7 +508,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerList.clear();
     }
 
-    private void shutdownLoaderExecutor() {
+    public void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
         // If this log message is missing, something is wrong

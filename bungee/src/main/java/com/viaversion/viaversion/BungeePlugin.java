@@ -85,7 +85,9 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
 
     @Override
     public void onEnable() {
-        ((ViaManagerImpl) Via.getManager()).init();
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.init();
+        manager.onServerLoaded();
     }
 
     @Override
@@ -114,6 +116,11 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     }
 
     @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
+    }
+
+    @Override
     public PlatformTask runSync(Runnable runnable) {
         return runAsync(runnable);
     }
@@ -125,7 +132,7 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
+        return runRepeatingAsync(runnable, ticks);
     }
 
     @Override

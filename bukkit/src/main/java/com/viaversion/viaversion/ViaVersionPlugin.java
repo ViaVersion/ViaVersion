@@ -32,6 +32,8 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaConfig;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
+import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
+import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
 import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
@@ -41,19 +43,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
+    private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionisedServer");
     private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler;
     private final BukkitViaConfig conf;
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
-    private final List<Runnable> queuedTasks = new ArrayList<>();
-    private final List<Runnable> asyncQueuedTasks = new ArrayList<>();
     private boolean protocolSupport;
     private boolean lateBind;
 
@@ -91,25 +96,30 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onEnable() {
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
         if (lateBind) {
             getLogger().info("Registering protocol transformers and injecting...");
-            ((ViaManagerImpl) Via.getManager()).init();
+            manager.init();
+        }
+
+        if (FOLIA) {
+            // Use Folia's RegionisedServerInitEvent to run code after the server has loaded
+            final Class<? extends Event> serverInitEventClass;
+            try {
+                //noinspection unchecked
+                serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionisedServerInitEvent");
+            } catch (final ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+
+            getServer().getPluginManager().registerEvent(serverInitEventClass, new Listener() {
+            }, EventPriority.HIGHEST, (listener, event) -> manager.onServerLoaded(), this);
+        } else {
+            manager.onServerLoaded();
         }
 
         getCommand("viaversion").setExecutor(commandHandler);
         getCommand("viaversion").setTabCompleter(commandHandler);
-
-        // Run queued tasks
-        for (Runnable r : queuedTasks) {
-            Bukkit.getScheduler().runTask(this, r);
-        }
-        queuedTasks.clear();
-
-        // Run async queued tasks
-        for (Runnable r : asyncQueuedTasks) {
-            Bukkit.getScheduler().runTaskAsynchronously(this, r);
-        }
-        asyncQueuedTasks.clear();
     }
 
     @Override
@@ -134,22 +144,27 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public PlatformTask runAsync(Runnable runnable) {
-        if (isPluginEnabled()) {
-            return new BukkitViaTask(getServer().getScheduler().runTaskAsynchronously(this, runnable));
-        } else {
-            asyncQueuedTasks.add(runnable);
-            return new BukkitViaTask(null);
+        if (FOLIA) {
+            return new BukkitViaTaskTask(Via.getManager().getScheduler().execute(runnable));
         }
+        return new BukkitViaTask(getServer().getScheduler().runTaskAsynchronously(this, runnable));
+    }
+
+    @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        if (FOLIA) {
+            return new BukkitViaTaskTask(Via.getManager().getScheduler().schedule(runnable, ticks * 50, TimeUnit.MILLISECONDS));
+        }
+        return new BukkitViaTask(getServer().getScheduler().runTaskTimerAsynchronously(this, runnable, 0, ticks));
     }
 
     @Override
     public PlatformTask runSync(Runnable runnable) {
-        if (isPluginEnabled()) {
-            return new BukkitViaTask(getServer().getScheduler().runTask(this, runnable));
-        } else {
-            queuedTasks.add(runnable);
-            return new BukkitViaTask(null);
+        if (FOLIA) {
+            // We just need to make sure everything put here is actually thread safe; currently, this is the case, at least on Folia
+            return runAsync(runnable);
         }
+        return new BukkitViaTask(getServer().getScheduler().runTask(this, runnable));
     }
 
     @Override

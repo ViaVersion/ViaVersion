@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.api.scheduler.Scheduler;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThread;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
+import com.viaversion.viaversion.scheduler.TaskScheduler;
 import com.viaversion.viaversion.update.UpdateUtil;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class ViaManagerImpl implements ViaManager {
     private final ConnectionManager connectionManager = new ConnectionManagerImpl();
     private final DebugHandler debugHandler = new DebugHandlerImpl();
     private final ViaProviders providers = new ViaProviders();
+    private final Scheduler scheduler = new TaskScheduler();
     private final ViaPlatform<?> platform;
     private final ViaInjector injector;
     private final ViaCommandHandler commandHandler;
@@ -76,10 +79,6 @@ public class ViaManagerImpl implements ViaManager {
         if (System.getProperty("ViaVersion") != null) {
             // Reload?
             platform.onReload();
-        }
-        // Check for updates
-        if (platform.getConf().isCheckForUpdates()) {
-            UpdateUtil.sendUpdateMessage();
         }
 
         // Load supported protocol versions if we can
@@ -106,12 +105,14 @@ public class ViaManagerImpl implements ViaManager {
             listener.run();
         }
         enableListeners = null;
-
-        // If successful
-        platform.runSync(this::onServerLoaded);
     }
 
     public void onServerLoaded() {
+        // Check for updates
+        if (platform.getConf().isCheckForUpdates()) {
+            UpdateUtil.sendUpdateMessage();
+        }
+
         if (!protocolManager.getServerProtocolVersion().isKnown()) {
             // Try again
             loadServerProtocol();
@@ -154,7 +155,7 @@ public class ViaManagerImpl implements ViaManager {
         // Load Platform
         loader.load();
         // Common tasks
-        mappingLoadingTask = Via.getPlatform().runRepeatingSync(() -> {
+        mappingLoadingTask = Via.getPlatform().runRepeatingAsync(() -> {
             if (protocolManager.checkForMappingCompletion() && mappingLoadingTask != null) {
                 mappingLoadingTask.cancel();
                 mappingLoadingTask = null;
@@ -205,11 +206,11 @@ public class ViaManagerImpl implements ViaManager {
             e.printStackTrace();
         }
 
-        // Unload
         loader.unload();
+        scheduler.shutdown();
     }
 
-    private final void checkJavaVersion() { // Stolen from Paper
+    private void checkJavaVersion() { // Stolen from Paper
         String javaVersion = System.getProperty("java.version");
         Matcher matcher = Pattern.compile("(?:1\\.)?(\\d+)").matcher(javaVersion);
         if (!matcher.find()) {
@@ -297,6 +298,11 @@ public class ViaManagerImpl implements ViaManager {
     @Override
     public ViaPlatformLoader getLoader() {
         return loader;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     /**

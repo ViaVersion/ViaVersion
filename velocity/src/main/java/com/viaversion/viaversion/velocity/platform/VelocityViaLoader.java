@@ -50,7 +50,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
 
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
         if (pingInterval > 0) {
-            Via.getPlatform().runRepeatingSync(
+            Via.getPlatform().runRepeatingAsync(
                     () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
                     pingInterval * 20L);
         }

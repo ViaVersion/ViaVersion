@@ -61,6 +61,11 @@ public final class TestPlatform implements ViaPlatform {
     }
 
     @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        return null;
+    }
+
+    @Override
     public PlatformTask runSync(Runnable runnable) {
         return null;
     }

@@ -108,7 +108,9 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
 
     @Subscribe(order = PostOrder.LAST)
     public void onProxyLateInit(ProxyInitializeEvent e) {
-        ((ViaManagerImpl) Via.getManager()).init();
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.init();
+        manager.onServerLoaded();
     }
 
     @Override
@@ -139,6 +141,15 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        return new VelocityViaTask(
+                PROXY.getScheduler()
+                        .buildTask(this, runnable)
+                        .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()
+        );
+    }
+
+    @Override
     public PlatformTask runSync(Runnable runnable) {
         return runSync(runnable, 0L);
     }
@@ -154,11 +165,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new VelocityViaTask(
-                PROXY.getScheduler()
-                        .buildTask(this, runnable)
-                        .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()
-        );
+        return runRepeatingAsync(runnable, ticks);
     }
 
     @Override

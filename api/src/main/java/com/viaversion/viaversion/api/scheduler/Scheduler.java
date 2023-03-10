@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.platform;
+package com.viaversion.viaversion.api.scheduler;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @param <T> task type
- */
-public interface PlatformTask<T> {
+public interface Scheduler {
 
     /**
-     * Returns the actual object represented by this task/task id.
-     * Null if task cannot be instantly tracked.
+     * Executes the given runnable asynchronously.
      *
-     * @return platform based object, or null if not tracked/cancellable
+     * @param runnable runnable to execute
      */
-    @Deprecated/*(forRemoval = true)*/
-    @Nullable T getObject();
+    Task execute(Runnable runnable);
 
     /**
-     * Cancels the task.
+     * Schedules the given runnable to be executed asynchronously after the given delay.
      *
-     * @throws IllegalArgumentException if the task is not cancellable
+     * @param runnable runnable to execute
+     * @param delay    delay before execution
+     * @param timeUnit time unit of the delay
      */
-    void cancel();
+    Task schedule(Runnable runnable, long delay, TimeUnit timeUnit);
+
+    /**
+     * Schedules the given runnable to be executed asynchronously after a delay and then repeatedly with a period.
+     *
+     * @param runnable runnable to execute
+     * @param delay    delay before execution
+     * @param period   period between executions
+     * @param timeUnit time unit of the delay and period
+     */
+    Task scheduleRepeating(Runnable runnable, long delay, long period, TimeUnit timeUnit);
+
+    /**
+     * Shuts down the scheduler and awaits task termination.
+     */
+    void shutdown();
 }

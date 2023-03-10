@@ -71,7 +71,7 @@ public final class PaperViaInjector {
         return hasClass("com.destroystokyo.paper.PaperConfig$PacketLimit") || hasClass("io.papermc.paper.configuration.GlobalConfiguration$PacketLimiter");
     }
 
-    private static boolean hasClass(final String className) {
+    public static boolean hasClass(final String className) {
         try {
             Class.forName(className);
             return true;
