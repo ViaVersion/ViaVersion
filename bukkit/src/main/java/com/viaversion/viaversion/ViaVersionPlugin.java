@@ -114,6 +114,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
             getServer().getPluginManager().registerEvent(serverInitEventClass, new Listener() {
             }, EventPriority.HIGHEST, (listener, event) -> manager.onServerLoaded(), this);
+        } else if (Via.getManager().getInjector().lateProtocolVersionSetting()) {
+            // Enable after server has loaded at the next tick
+            runSync(manager::onServerLoaded);
         } else {
             manager.onServerLoaded();
         }

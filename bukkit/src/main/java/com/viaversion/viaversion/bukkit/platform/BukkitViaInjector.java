@@ -153,6 +153,11 @@ public class BukkitViaInjector extends LegacyViaInjector {
         }
     }
 
+    @Override
+    public boolean lateProtocolVersionSetting() {
+        return !PaperViaInjector.PAPER_PROTOCOL_METHOD;
+    }
+
     public boolean isBinded() {
         if (PaperViaInjector.PAPER_INJECTION_METHOD) {
             return true;
