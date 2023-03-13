@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -27,6 +26,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
+import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
@@ -41,6 +42,7 @@ import java.util.Base64;
 public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPackets1_19_3, ClientboundPackets1_19_4, ServerboundPackets1_19_3, ServerboundPackets1_19_4> {
 
     public static final MappingData MAPPINGS = new MappingData();
+    private static final JsonElement EMPTY_COMPONENT = GsonComponentSerializer.gson().serializeToTree(Component.empty());
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -58,6 +60,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
         soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
 
+
         new CommandRewriter<ClientboundPackets1_19_3>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
@@ -72,10 +75,11 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
             JsonElement element = wrapper.read(Type.OPTIONAL_COMPONENT);
-            if (element == null) {
-                element = new JsonObject();
+            if (element != null) {
+                wrapper.write(Type.COMPONENT, element);
+            } else {
+                wrapper.write(Type.COMPONENT, EMPTY_COMPONENT);
             }
-            wrapper.write(Type.COMPONENT, element);
 
             final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);
             final byte[] iconBytes = iconBase64 != null ? Base64.getDecoder().decode(iconBase64.substring("data:image/png;base64,".length()).getBytes(StandardCharsets.UTF_8)) : null;
