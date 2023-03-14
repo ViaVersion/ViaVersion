@@ -46,7 +46,12 @@ public abstract class Config implements ConfigurationProvider {
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
         options.setIndent(2);
-        return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
+        try {
+            return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
+        } catch (NoSuchMethodError e) {
+            YamlCompat compat = new Yaml1Compat();
+            return new Yaml(compat.createSafeConstructor(), compat.createRepresenter(options), options);
+        }
     });
 
     private final CommentStore commentStore = new CommentStore('.', 2);
