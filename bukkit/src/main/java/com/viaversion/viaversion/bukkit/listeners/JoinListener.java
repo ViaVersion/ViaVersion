@@ -49,9 +49,6 @@ public class JoinListener implements Listener {
             conn = findField(gh.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
             nm = findField(conn.getType(), "NetworkManager", "Connection");
             ch = findField(nm.getType(), "Channel");
-            if (!Modifier.isPublic(nm.getModifiers())) {
-                nm.setAccessible(true);
-            }
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
                     Level.WARNING,
@@ -70,6 +67,9 @@ public class JoinListener implements Listener {
         for (Field field : cl.getDeclaredFields()) {
             for (String type : types) {
                 if (field.getType().getSimpleName().equals(type)) {
+                    if (!Modifier.isPublic(field.getModifiers())) {
+                        field.setAccessible(true);
+                    }
                     return field;
                 }
             }
