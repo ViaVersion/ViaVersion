@@ -131,7 +131,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             wrapper.write(Type.BYTE, event);
         });
 
-        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, null);
+        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
         registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
         registerMetadataRewriter(ClientboundPackets1_19_3.ENTITY_METADATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
     }
