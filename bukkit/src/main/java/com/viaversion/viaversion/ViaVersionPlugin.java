@@ -171,13 +171,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new BukkitViaTask(getServer().getScheduler().runTaskLater(this, runnable, ticks));
+    public PlatformTask runSync(Runnable runnable, long delay) {
+        return new BukkitViaTask(getServer().getScheduler().runTaskLater(this, runnable, delay));
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new BukkitViaTask(getServer().getScheduler().runTaskTimer(this, runnable, 0, ticks));
+    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        return new BukkitViaTask(getServer().getScheduler().runTaskTimer(this, runnable, 0, period));
     }
 
     @Override

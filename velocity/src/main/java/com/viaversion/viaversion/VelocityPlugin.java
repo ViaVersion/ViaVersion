@@ -155,17 +155,17 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, long ticks) {
+    public PlatformTask runSync(Runnable runnable, long delay) {
         return new VelocityViaTask(
                 PROXY.getScheduler()
                         .buildTask(this, runnable)
-                        .delay(ticks * 50, TimeUnit.MILLISECONDS).schedule()
+                        .delay(delay * 50, TimeUnit.MILLISECONDS).schedule()
         );
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return runRepeatingAsync(runnable, ticks);
+    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        return runRepeatingAsync(runnable, period);
     }
 
     @Override

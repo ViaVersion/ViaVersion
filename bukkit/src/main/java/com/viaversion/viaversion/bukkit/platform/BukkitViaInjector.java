@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.platform.LegacyViaInjector;
@@ -34,6 +35,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitViaInjector extends LegacyViaInjector {
+
+    private static final boolean HAS_SHARED_CONSTANTS = PaperViaInjector.hasClass("net.minecraft.SharedConstants") && PaperViaInjector.hasClass("net.minecraft.WorldVersion");
 
     @Override
     public void inject() throws ReflectiveOperationException {
@@ -62,10 +65,37 @@ public class BukkitViaInjector extends LegacyViaInjector {
             return Bukkit.getUnsafe().getProtocolVersion();
         }
 
-        // Time to go on a journey! The protocol version is hidden inside an int in ServerPing.ServerData
+        return HAS_SHARED_CONSTANTS ? cursedProtocolDetection() : veryCursedProtocolDetection();
+    }
+
+    private int cursedProtocolDetection() throws ReflectiveOperationException {
+        // Get the version from SharedConstants.getWorldVersion().getProtocolVersion()
+        Class<?> sharedConstantsClass = Class.forName("net.minecraft.SharedConstants");
+        Class<?> worldVersionClass = Class.forName("net.minecraft.WorldVersion");
+        Method getWorldVersionMethod = null;
+        for (Method method : sharedConstantsClass.getDeclaredMethods()) {
+            if (method.getReturnType() == worldVersionClass && method.getParameterTypes().length == 0) {
+                getWorldVersionMethod = method;
+                break;
+            }
+        }
+        Preconditions.checkNotNull(getWorldVersionMethod, "Failed to get world version method");
+
+        Object worldVersion = getWorldVersionMethod.invoke(null);
+        for (Method method : worldVersionClass.getDeclaredMethods()) {
+            if (method.getReturnType() == int.class && method.getParameterTypes().length == 0) {
+                return (int) method.invoke(worldVersion);
+            }
+        }
+        throw new IllegalAccessException("Failed to find protocol version method in WorldVersion");
+    }
+
+    private int veryCursedProtocolDetection() throws ReflectiveOperationException {
+        // Time to go on a journey! The protocol version is hidden inside an int in ServerPing.ServerData, that is only set once the server has ticked once
         // Grab a static instance of the server
         Class<?> serverClazz = NMSUtil.nms("MinecraftServer", "net.minecraft.server.MinecraftServer");
         Object server = ReflectionUtil.invokeStatic(serverClazz, "getServer");
+        Preconditions.checkNotNull(server, "Failed to get server instance");
 
         // Grab the ping class and find the field to access it
         Class<?> pingClazz = NMSUtil.nms(
@@ -80,6 +110,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
                 break;
             }
         }
+        Preconditions.checkNotNull(ping, "Failed to get server ping");
 
         // Now get the ServerData inside ServerPing
         Class<?> serverDataClass = NMSUtil.nms(
@@ -94,6 +125,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
                 break;
             }
         }
+        Preconditions.checkNotNull(serverData, "Failed to get server data");
 
         // Get protocol version field
         for (Field field : serverDataClass.getDeclaredFields()) {
@@ -155,7 +187,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
 
     @Override
     public boolean lateProtocolVersionSetting() {
-        return !PaperViaInjector.PAPER_PROTOCOL_METHOD;
+        return !PaperViaInjector.PAPER_PROTOCOL_METHOD && !HAS_SHARED_CONSTANTS;
     }
 
     public boolean isBinded() {

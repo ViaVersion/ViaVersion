@@ -104,23 +104,22 @@ public interface ViaPlatform<T> {
     PlatformTask runSync(Runnable runnable);
 
     /**
-     * Run a task Sync after a interval
-     * This must be only used after plugin enable.
+     * Runs a synchronous task after a delay in ticks.
      *
-     * @param runnable The task to run
-     * @param ticks    The interval to run it after
-     * @return The Task ID
+     * @param runnable task to run
+     * @param delay    delay in ticks to run it after
+     * @return created task
      */
-    PlatformTask runSync(Runnable runnable, long ticks);
+    PlatformTask runSync(Runnable runnable, long delay);
 
     /**
-     * Run a task at a repeating interval.
+     * Runs a synchronous task at a repeating interval.
      *
-     * @param runnable The task to run
-     * @param ticks    The interval to run it at
-     * @return The Task ID
+     * @param runnable task to run
+     * @param period   period in ticks to run at
+     * @return created task
      */
-    PlatformTask runRepeatingSync(Runnable runnable, long ticks);
+    PlatformTask runRepeatingSync(Runnable runnable, long period);
 
     /**
      * Get the online players

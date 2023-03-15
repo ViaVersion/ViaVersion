@@ -153,14 +153,14 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, long ticks) {
-        final Task task = Task.builder().plugin(container).execute(runnable).delay(Ticks.of(ticks)).build();
+    public PlatformTask runSync(Runnable runnable, long delay) {
+        final Task task = Task.builder().plugin(container).execute(runnable).delay(Ticks.of(delay)).build();
         return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(ticks)).build();
+    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(period)).build();
         return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
