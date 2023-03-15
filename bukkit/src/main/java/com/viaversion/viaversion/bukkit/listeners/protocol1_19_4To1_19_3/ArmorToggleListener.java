@@ -27,6 +27,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public final class ArmorToggleListener extends ViaBukkitListener {
 
@@ -46,23 +47,26 @@ public final class ArmorToggleListener extends ViaBukkitListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void itemUse(final PlayerInteractEvent event) {
         if (!ENABLED) {
             return;
         }
 
         final Player player = event.getPlayer();
-        if (!isOnPipe(player) || event.getItem() == null) {
+        final ItemStack item = event.getItem();
+        if (item == null || event.getHand() == null || !isOnPipe(player)) {
             return;
         }
 
-        final EquipmentSlot equipmentSlot = event.getItem().getType().getEquipmentSlot();
-        if (equipmentSlot != EquipmentSlot.HAND && equipmentSlot != EquipmentSlot.OFF_HAND) {
-            final ItemStack armor = player.getInventory().getItem(equipmentSlot);
+        final EquipmentSlot armorItemSlot = item.getType().getEquipmentSlot();
+        if (armorItemSlot != EquipmentSlot.HAND && armorItemSlot != EquipmentSlot.OFF_HAND) {
+            final PlayerInventory inventory = player.getInventory();
+            final ItemStack armor = inventory.getItem(armorItemSlot);
             // If two pieces of armor are equal, the client will do nothing.
-            if (armor != null && armor.getType() != Material.AIR && !armor.equals(event.getItem())) {
-                player.updateInventory();
+            if (armor != null && armor.getType() != Material.AIR && !armor.equals(item)) {
+                inventory.setItem(event.getHand(), inventory.getItem(event.getHand()));
+                inventory.setItem(armorItemSlot, armor);
             }
         }
     }
