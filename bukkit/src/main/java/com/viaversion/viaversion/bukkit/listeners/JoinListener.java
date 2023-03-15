@@ -25,6 +25,7 @@ import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import io.netty.channel.Channel;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,6 +49,9 @@ public class JoinListener implements Listener {
             conn = findField(gh.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
             nm = findField(conn.getType(), "NetworkManager", "Connection");
             ch = findField(nm.getType(), "Channel");
+            if (!Modifier.isPublic(nm.getModifiers())) {
+                nm.setAccessible(true);
+            }
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
                     Level.WARNING,
@@ -64,9 +68,11 @@ public class JoinListener implements Listener {
     // Loosely search a field with any name, as long as it matches a type name.
     private static Field findField(Class<?> cl, String... types) throws NoSuchFieldException {
         for (Field field : cl.getDeclaredFields()) {
-            for (String type : types)
-                if (field.getType().getSimpleName().equals(type))
+            for (String type : types) {
+                if (field.getType().getSimpleName().equals(type)) {
                     return field;
+                }
+            }
         }
         throw new NoSuchFieldException(types[0]);
     }
