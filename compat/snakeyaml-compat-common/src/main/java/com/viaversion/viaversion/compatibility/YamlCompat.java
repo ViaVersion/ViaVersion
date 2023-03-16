@@ -27,9 +27,9 @@ public interface YamlCompat {
 
     SafeConstructor createSafeConstructor();
 
-    static boolean isVersion2() {
+    static boolean isVersion1() {
         try {
-            Representer.class.getDeclaredConstructor(DumperOptions.class);
+            SafeConstructor.class.getDeclaredConstructor();
             return true;
         } catch (NoSuchMethodException e) {
             return false;

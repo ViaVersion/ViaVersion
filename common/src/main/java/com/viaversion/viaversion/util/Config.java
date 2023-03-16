@@ -39,19 +39,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config implements ConfigurationProvider {
-    private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion2() ? new Yaml2Compat() : new Yaml1Compat();
+    private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
         options.setIndent(2);
-        try {
-            return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
-        } catch (NoSuchMethodError e) {
-            YamlCompat compat = new Yaml1Compat();
-            return new Yaml(compat.createSafeConstructor(), compat.createRepresenter(options), options);
-        }
+        return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
     });
 
     private final CommentStore commentStore = new CommentStore('.', 2);
