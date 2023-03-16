@@ -187,7 +187,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
 
     @Override
     public boolean lateProtocolVersionSetting() {
-        return !PaperViaInjector.PAPER_PROTOCOL_METHOD && !HAS_SHARED_CONSTANTS;
+        return !(PaperViaInjector.PAPER_PROTOCOL_METHOD || HAS_SHARED_CONSTANTS);
     }
 
     public boolean isBinded() {

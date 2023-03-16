@@ -63,6 +63,7 @@ public class ViaManagerImpl implements ViaManager {
     private final Set<String> subPlatforms = new HashSet<>();
     private List<Runnable> enableListeners = new ArrayList<>();
     private PlatformTask<?> mappingLoadingTask;
+    private boolean initialized;
 
     public ViaManagerImpl(ViaPlatform<?> platform, ViaInjector injector, ViaCommandHandler commandHandler, ViaPlatformLoader loader) {
         this.platform = platform;
@@ -105,6 +106,8 @@ public class ViaManagerImpl implements ViaManager {
             listener.run();
         }
         enableListeners = null;
+
+        initialized = true;
     }
 
     public void onServerLoaded() {
@@ -148,9 +151,6 @@ public class ViaManagerImpl implements ViaManager {
 
         // Check for unsupported plugins/software
         unsupportedSoftwareWarning();
-
-        // Load Listeners / Tasks
-        protocolManager.onServerLoaded();
 
         // Load Platform
         loader.load();
@@ -322,6 +322,11 @@ public class ViaManagerImpl implements ViaManager {
      */
     public void addEnableListener(Runnable runnable) {
         enableListeners.add(runnable);
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public static final class ViaManagerBuilder {

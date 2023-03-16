@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
@@ -42,7 +43,6 @@ import java.util.Base64;
 public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPackets1_19_3, ClientboundPackets1_19_4, ServerboundPackets1_19_3, ServerboundPackets1_19_4> {
 
     public static final MappingData MAPPINGS = new MappingData();
-    private static final JsonElement EMPTY_COMPONENT = GsonComponentSerializer.gson().serializeToTree(Component.empty());
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
 
@@ -59,7 +59,6 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
-
 
         new CommandRewriter<ClientboundPackets1_19_3>(this) {
             @Override
@@ -78,7 +77,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
             if (element != null) {
                 wrapper.write(Type.COMPONENT, element);
             } else {
-                wrapper.write(Type.COMPONENT, EMPTY_COMPONENT);
+                wrapper.write(Type.COMPONENT, ChatRewriter.EMPTY_COMPONENT);
             }
 
             final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);

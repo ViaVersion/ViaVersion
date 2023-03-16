@@ -53,13 +53,10 @@ public class InventoryPackets {
                                 // Send 2 properties, splitting it into enchantID & level
                                 final short level = (short) (value >> 8);
                                 final short enchantID = (short) (value & 0xFF);
-                                wrapper.create(wrapper.getId(), new PacketHandler() {
-                                    @Override
-                                    public void handle(PacketWrapper wrapper) throws Exception {
-                                        wrapper.write(Type.UNSIGNED_BYTE, windowId);
-                                        wrapper.write(Type.SHORT, property);
-                                        wrapper.write(Type.SHORT, enchantID);
-                                    }
+                                wrapper.create(wrapper.getId(), propertyPacket -> {
+                                    propertyPacket.write(Type.UNSIGNED_BYTE, windowId);
+                                    propertyPacket.write(Type.SHORT, property);
+                                    propertyPacket.write(Type.SHORT, enchantID);
                                 }).scheduleSend(Protocol1_9To1_8.class);
 
                                 wrapper.set(Type.SHORT, 0, (short) (property + 3));

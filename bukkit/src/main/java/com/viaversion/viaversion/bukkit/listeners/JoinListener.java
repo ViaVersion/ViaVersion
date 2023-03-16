@@ -42,13 +42,13 @@ public class JoinListener implements Listener {
     private static final Field CHANNEL;
 
     static {
-        Method gh = null;
-        Field conn = null, nm = null, ch = null;
+        Method getHandleMethod = null;
+        Field gamePacketListenerField = null, connectionField = null, channelField = null;
         try {
-            gh = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
-            conn = findField(gh.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
-            nm = findField(conn.getType(), "NetworkManager", "Connection");
-            ch = findField(nm.getType(), "Channel");
+            getHandleMethod = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
+            gamePacketListenerField = findField(getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
+            connectionField = findField(gamePacketListenerField.getType(), "NetworkManager", "Connection");
+            channelField = findField(connectionField.getType(), Class.forName("io.netty.channel.Channel"));
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
                     Level.WARNING,
@@ -56,25 +56,45 @@ public class JoinListener implements Listener {
                             "Login race condition fixer will be disabled.\n" +
                             " Some plugins that use ViaAPI on join event may work incorrectly.", e);
         }
-        GET_HANDLE = gh;
-        CONNECTION = conn;
-        NETWORK_MANAGER = nm;
-        CHANNEL = ch;
+        GET_HANDLE = getHandleMethod;
+        CONNECTION = gamePacketListenerField;
+        NETWORK_MANAGER = connectionField;
+        CHANNEL = channelField;
+    }
+
+    public static void init() {
     }
 
     // Loosely search a field with any name, as long as it matches a type name.
-    private static Field findField(Class<?> cl, String... types) throws NoSuchFieldException {
-        for (Field field : cl.getDeclaredFields()) {
+    private static Field findField(Class<?> clazz, String... types) throws NoSuchFieldException {
+        for (Field field : clazz.getDeclaredFields()) {
+            String fieldTypeName = field.getType().getSimpleName();
             for (String type : types) {
-                if (field.getType().getSimpleName().equals(type)) {
-                    if (!Modifier.isPublic(field.getModifiers())) {
-                        field.setAccessible(true);
-                    }
-                    return field;
+                if (!fieldTypeName.equals(type)) {
+                    continue;
                 }
+
+                if (!Modifier.isPublic(field.getModifiers())) {
+                    field.setAccessible(true);
+                }
+                return field;
             }
         }
         throw new NoSuchFieldException(types[0]);
+    }
+
+    private static Field findField(Class<?> clazz, Class<?> fieldType) throws NoSuchFieldException {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.getType() != fieldType) {
+                continue;
+            }
+
+            if (!Modifier.isPublic(field.getModifiers())) {
+                field.setAccessible(true);
+            }
+            return field;
+        }
+        throw new NoSuchFieldException(fieldType.getSimpleName());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

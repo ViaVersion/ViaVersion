@@ -384,6 +384,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
+    public boolean shouldRegisterUserConnectionOnJoin() {
+        return false;
+    }
+
+    @Override
     public boolean is1_12QuickMoveActionFix() {
         return false;
     }

@@ -57,10 +57,12 @@ public class ViaBukkitListener extends ViaListener implements Listener {
      */
     @Override
     public void register() {
-        if (isRegistered()) return;
+        if (isRegistered()) {
+            return;
+        }
 
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
         setRegistered(true);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public Plugin getPlugin() {

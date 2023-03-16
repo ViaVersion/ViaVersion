@@ -109,11 +109,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
-    private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>();
+    private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>(64);
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<Integer> supportedVersions = new HashSet<>();
     private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
-    private final List<Protocol> registerList = new ArrayList<>();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
     private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
@@ -208,11 +207,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
             protocolMap.put(serverVersion, protocol);
         }
 
-        if (Via.getPlatform().isPluginEnabled()) {
-            protocol.register(Via.getManager().getProviders());
+        protocol.register(Via.getManager().getProviders());
+        if (Via.getManager().isInitialized()) {
             refreshVersions();
-        } else {
-            registerList.add(protocol);
         }
 
         if (protocol.hasMappingDataToLoad()) {
@@ -232,11 +229,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         baseProtocol.initialize();
 
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
-        if (Via.getPlatform().isPluginEnabled()) {
-            baseProtocol.register(Via.getManager().getProviders());
+        baseProtocol.register(Via.getManager().getProviders());
+        if (Via.getManager().isInitialized()) {
             refreshVersions();
-        } else {
-            registerList.add(baseProtocol);
         }
     }
 
@@ -496,16 +491,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Deprecated
     public PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection) {
         return new PacketWrapperImpl(packetId, buf, connection);
-    }
-
-    /**
-     * Called when the server is enabled, to register any non-registered listeners.
-     */
-    public void onServerLoaded() {
-        for (Protocol protocol : registerList) {
-            protocol.register(Via.getManager().getProviders());
-        }
-        registerList.clear();
     }
 
     public void shutdownLoaderExecutor() {

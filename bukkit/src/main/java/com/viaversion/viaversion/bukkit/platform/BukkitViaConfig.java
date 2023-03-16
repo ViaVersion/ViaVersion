@@ -32,6 +32,7 @@ public class BukkitViaConfig extends AbstractViaConfig {
     private boolean hitboxFix1_14;
     private String blockConnectionMethod;
     private boolean armorToggleFix;
+    private boolean registerUserConnectionOnJoin;
 
     public BukkitViaConfig() {
         super(new File(((Plugin) Via.getPlatform()).getDataFolder(), "config.yml"));
@@ -41,6 +42,7 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     protected void loadFields() {
         super.loadFields();
+        registerUserConnectionOnJoin = getBoolean("register-userconnections-on-join", true);
         quickMoveActionFix = getBoolean("quick-move-action-fix", false);
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
@@ -50,6 +52,11 @@ public class BukkitViaConfig extends AbstractViaConfig {
 
     @Override
     protected void handleConfig(Map<String, Object> config) {
+    }
+
+    @Override
+    public boolean shouldRegisterUserConnectionOnJoin() {
+        return registerUserConnectionOnJoin;
     }
 
     @Override

@@ -256,6 +256,8 @@ public interface ViaVersionConfig {
      */
     boolean is1_13TeamColourFix();
 
+    boolean shouldRegisterUserConnectionOnJoin();
+
     /**
      * Should we fix shift quick move action for 1.12 clients
      *

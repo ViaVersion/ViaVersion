@@ -131,4 +131,11 @@ public interface ViaManager {
      * @param runnable runnable to be executed
      */
     void addEnableListener(Runnable runnable);
+
+    /**
+     * Returns whether the manager has been initialized (and protocols have been loaded).
+     *
+     * @return whether the manager has been initialized
+     */
+    boolean isInitialized();
 }

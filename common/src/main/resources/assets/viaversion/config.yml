@@ -102,6 +102,9 @@ tracking-max-kick-msg: "You are sending too many packets, :("
 #                 MULTIPLE VERSIONS OPTIONS                #
 #----------------------------------------------------------#
 #
+# Whether to make sure ViaVersion's UserConnection object is already available in the PlayerJoinEvent.
+# You may disable this for faster startup/join time if you are 100% sure no plugin requires this.
+register-userconnections-on-join: true
 # Should we enable our hologram patch?
 # If they're in the wrong place enable this
 hologram-patch: false

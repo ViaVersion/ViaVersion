@@ -51,16 +51,13 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitTask;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
-    private final ViaVersionPlugin plugin;
 
-    private final Set<Listener> listeners = new HashSet<>();
     private final Set<BukkitTask> tasks = new HashSet<>();
-
+    private final ViaVersionPlugin plugin;
     private HandItemCache handItemCache;
 
     public BukkitViaLoader(ViaVersionPlugin plugin) {
@@ -68,21 +65,21 @@ public class BukkitViaLoader implements ViaPlatformLoader {
     }
 
     public void registerListener(Listener listener) {
-        Bukkit.getPluginManager().registerEvents(storeListener(listener), plugin);
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public <T extends Listener> T storeListener(T listener) {
-        listeners.add(listener);
         return listener;
     }
 
     @Override
     public void load() {
-        // Update Listener
         registerListener(new UpdateListener());
 
-        // Login listener
-        registerListener(new JoinListener());
+        if (Via.getConfig().shouldRegisterUserConnectionOnJoin()) {
+            registerListener(new JoinListener());
+        }
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
@@ -92,13 +89,18 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             ProtocolSupportCompat.registerPSConnectListener(plugin);
         }
 
+        if (!Via.getAPI().getServerVersion().isKnown()) {
+            Via.getPlatform().getLogger().severe("Server version has not been loaded yet, cannot register additional listeners");
+            return;
+        }
+
         int serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedVersion();
 
         /* 1.9 client to 1.8 server */
         if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
-            storeListener(new ArmorListener(plugin)).register();
-            storeListener(new DeathListener(plugin)).register();
-            storeListener(new BlockListener(plugin)).register();
+            new ArmorListener(plugin).register();
+            new DeathListener(plugin).register();
+            new BlockListener(plugin).register();
 
             if (plugin.getConf().isItemCache()) {
                 handItemCache = new HandItemCache();
@@ -110,7 +112,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && serverProtocolVersion < ProtocolVersion.v1_9.getVersion();
             if (use1_9Fix || plugin.getConf().is1_14HitboxFix()) {
                 try {
-                    storeListener(new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix())).register();
+                    new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix()).register();
                 } catch (ReflectiveOperationException e) {
                     Via.getPlatform().getLogger().warning("Could not load hitbox fix - please report this on our GitHub");
                     e.printStackTrace();
@@ -121,7 +123,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (serverProtocolVersion < ProtocolVersion.v1_15.getVersion()) {
             try {
                 Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
-                storeListener(new EntityToggleGlideListener(plugin)).register();
+                new EntityToggleGlideListener(plugin).register();
             } catch (ClassNotFoundException ignored) {
             }
         }
@@ -138,12 +140,12 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 }
             }
             if (paper) {
-                storeListener(new PaperPatch(plugin)).register();
+                new PaperPatch(plugin).register();
             }
         }
 
         if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix()) {
-            storeListener(new ArmorToggleListener(plugin)).register();
+            new ArmorToggleListener(plugin).register();
         }
 
         /* Providers */
@@ -189,16 +191,12 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
             Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
-            storeListener(new BlockBreakListener(plugin)).register();
+            new BlockBreakListener(plugin).register();
         }
     }
 
     @Override
     public void unload() {
-        for (Listener listener : listeners) {
-            HandlerList.unregisterAll(listener);
-        }
-        listeners.clear();
         for (BukkitTask task : tasks) {
             task.cancel();
         }

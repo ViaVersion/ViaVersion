@@ -28,6 +28,10 @@ import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.Leg
 
 public final class ChatRewriter {
     public static final GsonComponentSerializer HOVER_GSON_SERIALIZER = GsonComponentSerializer.builder().emitLegacyHoverEvent().legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get()).build();
+    public static final JsonElement EMPTY_COMPONENT = GsonComponentSerializer.gson().serializeToTree(Component.empty());
+
+    public static void init() {
+    }
 
     public static String legacyTextToJsonString(String message, boolean itemData) {
         // Not used for chat messages, so no need for url extraction
