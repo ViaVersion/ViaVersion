@@ -52,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
@@ -144,7 +145,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix()) {
+        if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix() && hasGetHandMethod()) {
             new ArmorToggleListener(plugin).register();
         }
 
@@ -192,6 +193,15 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
             Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
             new BlockBreakListener(plugin).register();
+        }
+    }
+
+    private boolean hasGetHandMethod() {
+        try {
+            PlayerInteractEvent.class.getDeclaredMethod("getHand");
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
         }
     }
 

@@ -31,28 +31,12 @@ import org.bukkit.inventory.PlayerInventory;
 
 public final class ArmorToggleListener extends ViaBukkitListener {
 
-    private static final boolean ENABLED = hasEquipmentSlot();
-
     public ArmorToggleListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_19_4To1_19_3.class);
     }
 
-    private static boolean hasEquipmentSlot() {
-        // Doesn't exist on 1.8
-        try {
-            Material.class.getMethod("getEquipmentSlot");
-            return true;
-        } catch (final NoSuchMethodException e) {
-            return false;
-        }
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void itemUse(final PlayerInteractEvent event) {
-        if (!ENABLED) {
-            return;
-        }
-
         final Player player = event.getPlayer();
         final ItemStack item = event.getItem();
         if (item == null || event.getHand() == null || !isOnPipe(player)) {
