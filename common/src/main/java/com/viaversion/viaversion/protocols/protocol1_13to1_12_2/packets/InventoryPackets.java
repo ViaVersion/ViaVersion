@@ -106,7 +106,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
 
                         // Reset the packet
                         wrapper.clearPacket();
-                        wrapper.setPacketType(ClientboundPackets1_13.SOUND);
+                        wrapper.setPacketType(ClientboundPackets1_13.STOP_SOUND);
 
                         byte flags = 0;
                         wrapper.write(Type.BYTE, flags); // Placeholder
