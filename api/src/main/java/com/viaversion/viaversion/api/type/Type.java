@@ -237,6 +237,6 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     @Override
     public String toString() {
-        return "Type|" + typeName;
+        return typeName;
     }
 }

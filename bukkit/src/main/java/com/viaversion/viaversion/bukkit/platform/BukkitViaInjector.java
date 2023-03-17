@@ -36,7 +36,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitViaInjector extends LegacyViaInjector {
 
-    private static final boolean HAS_SHARED_CONSTANTS = PaperViaInjector.hasClass("net.minecraft.SharedConstants") && PaperViaInjector.hasClass("net.minecraft.WorldVersion");
+    private static final boolean HAS_WORLD_VERSION_PROTOCOL_VERSION = PaperViaInjector.hasClass("net.minecraft.SharedConstants")
+            && PaperViaInjector.hasClass("net.minecraft.WorldVersion")
+            && !PaperViaInjector.hasClass("com.mojang.bridge.game.GameVersion");
 
     @Override
     public void inject() throws ReflectiveOperationException {
@@ -65,7 +67,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
             return Bukkit.getUnsafe().getProtocolVersion();
         }
 
-        return HAS_SHARED_CONSTANTS ? cursedProtocolDetection() : veryCursedProtocolDetection();
+        return HAS_WORLD_VERSION_PROTOCOL_VERSION ? cursedProtocolDetection() : veryCursedProtocolDetection();
     }
 
     private int cursedProtocolDetection() throws ReflectiveOperationException {
@@ -187,7 +189,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
 
     @Override
     public boolean lateProtocolVersionSetting() {
-        return !(PaperViaInjector.PAPER_PROTOCOL_METHOD || HAS_SHARED_CONSTANTS);
+        return !(PaperViaInjector.PAPER_PROTOCOL_METHOD || HAS_WORLD_VERSION_PROTOCOL_VERSION);
     }
 
     public boolean isBinded() {

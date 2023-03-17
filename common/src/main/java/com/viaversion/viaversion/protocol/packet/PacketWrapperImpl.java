@@ -509,10 +509,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public String toString() {
         return "PacketWrapper{" +
-                "packetType=" + packetType +
+                "type=" + packetType +
                 ", id=" + id +
-                ", packetValues=" + packetValues +
-                ", readableObjects=" + readableObjects +
+                ", values=" + packetValues +
+                ", readable=" + readableObjects +
                 '}';
     }
 
@@ -555,10 +555,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
         @Override
         public String toString() {
-            return "{"
-                    + type +
-                    ", " + value +
-                    '}';
+            return "{" + type + ": " + value + "}";
         }
     }
 }
