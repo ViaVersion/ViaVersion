@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -199,6 +200,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
     private boolean hasGetHandMethod() {
         try {
             PlayerInteractEvent.class.getDeclaredMethod("getHand");
+            Material.class.getMethod("getEquipmentSlot");
             return true;
         } catch (NoSuchMethodException e) {
             return false;
