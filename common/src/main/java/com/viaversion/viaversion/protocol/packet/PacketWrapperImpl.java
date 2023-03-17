@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PacketWrapperImpl implements PacketWrapper {
@@ -534,6 +535,30 @@ public class PacketWrapperImpl implements PacketWrapper {
 
         public void setValue(@Nullable Object value) {
             this.value = value;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final PacketValue that = (PacketValue) o;
+            if (!type.equals(that.type)) return false;
+            return Objects.equals(value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type.hashCode();
+            result = 31 * result + (value != null ? value.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "{"
+                    + type +
+                    ", " + value +
+                    '}';
         }
     }
 }
