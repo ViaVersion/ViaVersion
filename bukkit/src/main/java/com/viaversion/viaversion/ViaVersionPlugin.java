@@ -36,7 +36,6 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.dump.PluginInfo;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
 import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -83,13 +82,9 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         conf = new BukkitViaConfig();
 
         // Load a bunch of classes early with slow reflection and more classloading
-        Via.getManager().getScheduler().execute(() -> {
-            if (conf.shouldRegisterUserConnectionOnJoin()) {
-                JoinListener.init();
-            }
-
-            ChatRewriter.init();
-        });
+        if (conf.shouldRegisterUserConnectionOnJoin()) {
+            Via.getManager().getScheduler().execute(JoinListener::init);
+        }
     }
 
     @Override
