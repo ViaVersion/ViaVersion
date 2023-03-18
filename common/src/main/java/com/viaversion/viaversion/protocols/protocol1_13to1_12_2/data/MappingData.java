@@ -115,14 +115,12 @@ public class MappingData extends MappingDataBase {
                 }
 
                 String key = keyAndTranslation[0];
-                if (!translateData.containsKey(key)) {
-                    String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
-                    mojangTranslation.put(key, translation);
-                } else {
-                    String dataValue = translateData.get(key);
-                    if (dataValue != null) {
-                        translateMapping.put(key, dataValue);
-                    }
+                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s").trim();
+                mojangTranslation.put(key, translation);
+
+                String dataValue = translateData.get(key);
+                if (dataValue != null) {
+                    translateMapping.put(key, dataValue);
                 }
             }
         } catch (IOException e) {
