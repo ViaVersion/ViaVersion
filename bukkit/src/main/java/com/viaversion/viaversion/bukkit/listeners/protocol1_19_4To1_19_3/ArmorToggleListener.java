@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +40,7 @@ public final class ArmorToggleListener extends ViaBukkitListener {
     public void itemUse(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = event.getItem();
-        if (item == null || event.getHand() == null || !isOnPipe(player)) {
+        if (item == null || event.getHand() == null || event.getAction() != Action.RIGHT_CLICK_AIR || !isOnPipe(player)) {
             return;
         }
 
@@ -49,8 +50,8 @@ public final class ArmorToggleListener extends ViaBukkitListener {
             final ItemStack armor = inventory.getItem(armorItemSlot);
             // If two pieces of armor are equal, the client will do nothing.
             if (armor != null && armor.getType() != Material.AIR && !armor.equals(item)) {
-                inventory.setItem(event.getHand(), inventory.getItem(event.getHand()));
-                inventory.setItem(armorItemSlot, armor);
+                inventory.setItem(event.getHand(), armor);
+                inventory.setItem(armorItemSlot, item);
             }
         }
     }
