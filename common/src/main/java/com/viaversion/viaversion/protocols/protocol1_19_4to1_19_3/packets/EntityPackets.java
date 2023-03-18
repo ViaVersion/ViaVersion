@@ -169,6 +169,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
 
+        filter().filterFamily(Entity1_19_4Types.BOAT).index(11).handler((event, meta) -> {
+            final int boatType = meta.value();
+            if (boatType > 4) { // Cherry added
+                meta.setValue(boatType + 1);
+            }
+        });
+
         filter().filterFamily(Entity1_19_4Types.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
     }
 
