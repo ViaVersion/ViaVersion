@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import net.md_5.bungee.api.ProxyServer;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeViaInjector implements ViaInjector {
 

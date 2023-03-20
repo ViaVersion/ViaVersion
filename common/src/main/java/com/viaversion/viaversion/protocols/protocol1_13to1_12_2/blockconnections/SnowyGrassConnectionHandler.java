@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,16 +20,16 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.util.Pair;
-
-import java.util.HashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class SnowyGrassConnectionHandler extends ConnectionHandler {
-    private static final Map<Pair<Integer, Boolean>, Integer> grassBlocks = new HashMap<>();
-    private static final Set<Integer> snows = new HashSet<>();
+    private static final Object2IntMap<GrassBlock> GRASS_BLOCKS = new Object2IntOpenHashMap<>();
+    private static final IntSet SNOWY_GRASS_BLOCKS = new IntOpenHashSet();
 
     static ConnectionData.ConnectorInitAction init() {
         final Set<String> snowyGrassBlocks = new HashSet<>();
@@ -37,18 +37,19 @@ public class SnowyGrassConnectionHandler extends ConnectionHandler {
         snowyGrassBlocks.add("minecraft:podzol");
         snowyGrassBlocks.add("minecraft:mycelium");
 
+        GRASS_BLOCKS.defaultReturnValue(-1);
         final SnowyGrassConnectionHandler handler = new SnowyGrassConnectionHandler();
         return blockData -> {
             if (snowyGrassBlocks.contains(blockData.getMinecraftKey())) {
                 ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
                 blockData.set("snowy", "true");
-                grassBlocks.put(new Pair<>(blockData.getSavedBlockStateId(), true), blockData.getBlockStateId());
+                GRASS_BLOCKS.put(new GrassBlock(blockData.getSavedBlockStateId(), true), blockData.getBlockStateId());
                 blockData.set("snowy", "false");
-                grassBlocks.put(new Pair<>(blockData.getSavedBlockStateId(), false), blockData.getBlockStateId());
+                GRASS_BLOCKS.put(new GrassBlock(blockData.getSavedBlockStateId(), false), blockData.getBlockStateId());
             }
             if (blockData.getMinecraftKey().equals("minecraft:snow") || blockData.getMinecraftKey().equals("minecraft:snow_block")) {
                 ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
-                snows.add(blockData.getSavedBlockStateId());
+                SnowyGrassConnectionHandler.SNOWY_GRASS_BLOCKS.add(blockData.getSavedBlockStateId());
             }
         };
     }
@@ -56,10 +57,33 @@ public class SnowyGrassConnectionHandler extends ConnectionHandler {
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
         int blockUpId = getBlockData(user, position.getRelative(BlockFace.TOP));
-        Integer newId = grassBlocks.get(new Pair<>(blockState, snows.contains(blockUpId)));
-        if (newId != null) {
-            return newId;
+        int newId = GRASS_BLOCKS.getInt(new GrassBlock(blockState, SNOWY_GRASS_BLOCKS.contains(blockUpId)));
+        return newId != -1 ? newId : blockState;
+    }
+
+    private static final class GrassBlock {
+        private final int blockStateId;
+        private final boolean snowy;
+
+        private GrassBlock(final int blockStateId, final boolean snowy) {
+            this.blockStateId = blockStateId;
+            this.snowy = snowy;
         }
-        return blockState;
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final GrassBlock that = (GrassBlock) o;
+            if (blockStateId != that.blockStateId) return false;
+            return snowy == that.snowy;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = blockStateId;
+            result = 31 * result + (snowy ? 1 : 0);
+            return result;
+        }
     }
 }

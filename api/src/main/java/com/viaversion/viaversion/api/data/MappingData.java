@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,8 @@ package com.viaversion.viaversion.api.data;
 
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
-import com.viaversion.viaversion.util.Int2IntBiMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface MappingData {
 
@@ -89,7 +87,7 @@ public interface MappingData {
      */
     @Nullable List<TagData> getTags(RegistryType type);
 
-    @Nullable Int2IntBiMap getItemMappings();
+    @Nullable BiMappings getItemMappings();
 
     @Nullable ParticleMappings getParticleMappings();
 

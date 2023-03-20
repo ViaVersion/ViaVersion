@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ public class BlockListener extends ViaBukkitListener {
         if (isOnPipe(e.getPlayer())) {
             Block b = e.getBlockPlaced();
             EntityTracker1_9 tracker = getUserConnection(e.getPlayer()).getEntityTracker(Protocol1_9To1_8.class);
-            tracker.addBlockInteraction(new Position(b.getX(), (short) b.getY(), b.getZ()));
+            tracker.addBlockInteraction(new Position(b.getX(), b.getY(), b.getZ()));
         }
     }
 }

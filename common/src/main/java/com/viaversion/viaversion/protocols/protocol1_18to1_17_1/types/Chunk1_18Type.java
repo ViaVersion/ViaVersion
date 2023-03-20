@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
@@ -29,7 +28,6 @@ import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.List;
 

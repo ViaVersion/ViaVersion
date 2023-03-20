@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@ public class Int2IntMapMappings implements Mappings {
     }
 
     public static Int2IntMapMappings of() {
-
         return new Int2IntMapMappings(new Int2IntOpenHashMap(), -1);
     }
 
@@ -50,8 +49,8 @@ public class Int2IntMapMappings implements Mappings {
     }
 
     @Override
-    public void setNewId(final int id, final int newId) {
-        mappings.put(id, newId);
+    public void setNewId(final int id, final int mappedId) {
+        mappings.put(id, mappedId);
     }
 
     @Override
@@ -62,5 +61,17 @@ public class Int2IntMapMappings implements Mappings {
     @Override
     public int mappedSize() {
         return mappedIds;
+    }
+
+    @Override
+    public Mappings inverse() {
+        final Int2IntMap inverse = new Int2IntOpenHashMap();
+        inverse.defaultReturnValue(-1);
+        for (final Int2IntMap.Entry entry : mappings.int2IntEntrySet()) {
+            if (entry.getIntValue() != -1) {
+                inverse.putIfAbsent(entry.getIntValue(), entry.getIntKey());
+            }
+        }
+        return of(inverse, size());
     }
 }

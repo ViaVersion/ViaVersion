@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-
 import java.util.Optional;
 
 public class CommandBlockProvider implements Provider {

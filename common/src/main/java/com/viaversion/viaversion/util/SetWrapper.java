@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,10 @@
 package com.viaversion.viaversion.util;
 
 import com.google.common.collect.ForwardingSet;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SetWrapper<E> extends ForwardingSet<E> {
 

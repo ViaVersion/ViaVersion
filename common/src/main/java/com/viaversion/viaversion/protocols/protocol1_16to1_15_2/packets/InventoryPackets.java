@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,20 +27,20 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.data.RecipeRewriter1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
-
+import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 import java.util.UUID;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_16To1_15_2> {
 
     public InventoryPackets(Protocol1_16To1_15_2 protocol) {
         super(protocol);
@@ -51,15 +51,15 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
         // clear cursor item to prevent client to try dropping it during navigation between multiple inventories causing arm swing
         PacketHandler cursorRemapper = wrapper -> {
             PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.SET_SLOT);
-            clearPacket.write(Type.UNSIGNED_BYTE, (short)-1);
-            clearPacket.write(Type.SHORT, (short)-1);
+            clearPacket.write(Type.UNSIGNED_BYTE, (short) -1);
+            clearPacket.write(Type.SHORT, (short) -1);
             clearPacket.write(Type.FLAT_VAR_INT_ITEM, null);
             clearPacket.send(Protocol1_16To1_15_2.class);
         };
 
-        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Window Id
                 map(Type.VAR_INT); // Window Type
                 map(Type.COMPONENT); // Window Title
@@ -77,9 +77,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(cursorRemapper);
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
@@ -88,9 +88,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
                 map(Type.SHORT); // Property
                 map(Type.SHORT); // Value
@@ -113,9 +113,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
         registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
         registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
 
                 handler(wrapper -> {
@@ -126,27 +126,17 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
             }
         });
 
-        new RecipeRewriter1_14(protocol).registerDefaultHandler(ClientboundPackets1_15.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.DECLARE_RECIPES);
 
         registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
         registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
-        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    inventoryTracker.setInventory((short) -1);
-                });
-            }
+        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, wrapper -> {
+            InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
+            inventoryTracker.setInventory((short) -1);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
-            }
-        });
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
 
         registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
     }
@@ -251,8 +241,8 @@ public class InventoryPackets extends ItemRewriter<Protocol1_16To1_15_2> {
         if (attributeNameTag == null) return;
 
         String attributeName = attributeNameTag.getValue();
-        if (inverse && !attributeName.startsWith("minecraft:")) {
-            attributeName = "minecraft:" + attributeName;
+        if (inverse) {
+            attributeName = Key.namespaced(attributeName);
         }
 
         String mappedAttribute = (inverse ? Protocol1_16To1_15_2.MAPPINGS.getAttributeMappings().inverse()

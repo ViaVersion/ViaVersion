@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,30 +21,33 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.Arrays;
 
 public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
     private static final StairConnectionHandler STAIR_CONNECTION_HANDLER = new StairConnectionHandler();
-    private final String blockConnections;
-    private final Set<Integer> blockStates = new HashSet<>();
-    private final Map<Byte, Integer> connectedBlockStates = new HashMap<>();
+    private final IntSet blockStates = new IntOpenHashSet();
+    private final int[] connectedBlockStates = new int[statesSize()];
+    private final int blockConnectionsTypeId;
 
     protected AbstractFenceConnectionHandler(String blockConnections) {
-        this.blockConnections = blockConnections;
+        this.blockConnectionsTypeId = blockConnections != null ? BlockData.connectionTypeId(blockConnections) : -1;
+        Arrays.fill(connectedBlockStates, -1);
     }
 
     public ConnectionData.ConnectorInitAction getInitAction(final String key) {
         final AbstractFenceConnectionHandler handler = this;
         return blockData -> {
             if (key.equals(blockData.getMinecraftKey())) {
-                if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) return;
+                if (blockData.hasData("waterlogged") && blockData.getValue("waterlogged").equals("true")) {
+                    return;
+                }
+
                 blockStates.add(blockData.getSavedBlockStateId());
                 ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), handler);
-                connectedBlockStates.put(getStates(blockData), blockData.getSavedBlockStateId());
+                byte internalStateId = getStates(blockData);
+                connectedBlockStates[internalStateId] = blockData.getSavedBlockStateId();
             }
         };
     }
@@ -68,6 +71,10 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         return states;
     }
 
+    protected byte statesSize() {
+        return 16;
+    }
+
     @Override
     public int getBlockData(UserConnection user, Position position) {
         return STAIR_CONNECTION_HANDLER.connect(user, position, super.getBlockData(user, position));
@@ -75,19 +82,19 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
-        final Integer newBlockState = connectedBlockStates.get(getStates(user, position, blockState));
-        return newBlockState == null ? blockState : newBlockState;
+        final int newBlockState = connectedBlockStates[getStates(user, position, blockState)];
+        return newBlockState == -1 ? blockState : newBlockState;
     }
 
     protected boolean connects(BlockFace side, int blockState, boolean pre1_12) {
         if (blockStates.contains(blockState)) return true;
-        if (blockConnections == null) return false;
+        if (blockConnectionsTypeId == -1) return false;
 
         BlockData blockData = ConnectionData.blockConnectionData.get(blockState);
-        return blockData != null && blockData.connectsTo(blockConnections, side.opposite(), pre1_12);
+        return blockData != null && blockData.connectsTo(blockConnectionsTypeId, side.opposite(), pre1_12);
     }
 
-    public Set<Integer> getBlockStates() {
+    public IntSet getBlockStates() {
         return blockStates;
     }
 }

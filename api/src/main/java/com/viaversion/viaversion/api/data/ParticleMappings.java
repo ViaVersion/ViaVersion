@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,16 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.gson.JsonArray;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import java.util.List;
 
 public class ParticleMappings extends FullMappingsBase {
-    private final IntList itemParticleIds = new IntArrayList(2);
+    private final IntList itemParticleIds = new IntArrayList(4);
     private final IntList blockParticleIds = new IntArrayList(4);
 
-    public ParticleMappings(JsonArray oldMappings, JsonArray newMappings, Mappings mappings) {
-        super(oldMappings, newMappings, mappings);
+    public ParticleMappings(final List<String> unmappedIdentifiers, final List<String> mappedIdentifiers, final Mappings mappings) {
+        super(unmappedIdentifiers, mappedIdentifiers, mappings);
         addBlockParticle("block");
         addBlockParticle("falling_dust");
         addBlockParticle("block_marker");

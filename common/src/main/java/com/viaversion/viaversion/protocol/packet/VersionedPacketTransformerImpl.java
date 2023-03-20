@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,10 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
 

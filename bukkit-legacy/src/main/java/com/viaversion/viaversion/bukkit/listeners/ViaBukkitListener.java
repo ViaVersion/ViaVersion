@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.bukkit.listeners;
 
+import com.viaversion.viaversion.ViaListener;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.ViaListener;
-import com.viaversion.viaversion.api.connection.UserConnection;
 
 public class ViaBukkitListener extends ViaListener implements Listener {
     private final Plugin plugin;
@@ -57,10 +57,12 @@ public class ViaBukkitListener extends ViaListener implements Listener {
      */
     @Override
     public void register() {
-        if (isRegistered()) return;
+        if (isRegistered()) {
+            return;
+        }
 
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
         setRegistered(true);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
     public Plugin getPlugin() {

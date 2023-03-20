@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,9 @@
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data.MappingData;
@@ -32,7 +30,6 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.Invent
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
-import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -40,9 +37,9 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1_16, ClientboundPackets1_16_2, ServerboundPackets1_16, ServerboundPackets1_16_2> {
 
     public static final MappingData MAPPINGS = new MappingData();
-    private final EntityRewriter metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private TagRewriter tagRewriter;
+    private final MetadataRewriter1_16_2To1_16_1 metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private TagRewriter<ClientboundPackets1_16> tagRewriter;
 
     public Protocol1_16_2To1_16_1() {
         super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class);
@@ -56,44 +53,34 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter(this);
+        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_16.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16.STATISTICS);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this);
+        SoundRewriter<ClientboundPackets1_16> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
 
         // Recipe book data has been split into 2 separate packets
-        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int recipeType = wrapper.read(Type.VAR_INT);
-                    boolean open = wrapper.read(Type.BOOLEAN);
-                    boolean filter = wrapper.read(Type.BOOLEAN);
-                    wrapper.write(Type.VAR_INT, 1); // Settings
-                    wrapper.write(Type.BOOLEAN, recipeType == 0 && open); // Crafting
-                    wrapper.write(Type.BOOLEAN, filter);
-                    wrapper.write(Type.BOOLEAN, recipeType == 1 && open); // Furnace
-                    wrapper.write(Type.BOOLEAN, filter);
-                    wrapper.write(Type.BOOLEAN, recipeType == 2 && open); // Blast Furnace
-                    wrapper.write(Type.BOOLEAN, filter);
-                    wrapper.write(Type.BOOLEAN, recipeType == 3 && open); // Smoker
-                    wrapper.write(Type.BOOLEAN, filter);
-                });
-            }
+        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, wrapper -> {
+            int recipeType = wrapper.read(Type.VAR_INT);
+            boolean open = wrapper.read(Type.BOOLEAN);
+            boolean filter = wrapper.read(Type.BOOLEAN);
+            wrapper.write(Type.VAR_INT, 1); // Settings
+            wrapper.write(Type.BOOLEAN, recipeType == 0 && open); // Crafting
+            wrapper.write(Type.BOOLEAN, filter);
+            wrapper.write(Type.BOOLEAN, recipeType == 1 && open); // Furnace
+            wrapper.write(Type.BOOLEAN, filter);
+            wrapper.write(Type.BOOLEAN, recipeType == 2 && open); // Blast Furnace
+            wrapper.write(Type.BOOLEAN, filter);
+            wrapper.write(Type.BOOLEAN, recipeType == 3 && open); // Smoker
+            wrapper.write(Type.BOOLEAN, filter);
         });
-        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    String recipe = wrapper.read(Type.STRING);
-                    wrapper.write(Type.VAR_INT, 0); // Shown
-                    wrapper.write(Type.STRING, recipe);
-                });
-            }
+        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, wrapper -> {
+            String recipe = wrapper.read(Type.STRING);
+            wrapper.write(Type.VAR_INT, 0); // Shown
+            wrapper.write(Type.STRING, recipe);
         });
     }
 
@@ -125,12 +112,12 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_16_2To1_16_1 getEntityRewriter() {
         return metadataRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

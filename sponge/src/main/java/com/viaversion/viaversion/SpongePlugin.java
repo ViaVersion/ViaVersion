@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import com.google.inject.Inject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -35,6 +34,14 @@ import com.viaversion.viaversion.sponge.platform.SpongeViaLoader;
 import com.viaversion.viaversion.sponge.platform.SpongeViaTask;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import com.viaversion.viaversion.util.GsonUtil;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
@@ -46,6 +53,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.scheduler.Task;
@@ -54,15 +62,6 @@ import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 import org.spongepowered.plugin.metadata.PluginMetadata;
 import org.spongepowered.plugin.metadata.model.PluginContributor;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Plugin("viaversion")
 public class SpongePlugin implements ViaPlatform<Player> {
@@ -90,7 +89,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public void constructPlugin(ConstructPluginEvent event) {
         // Setup Plugin
         conf = new SpongeViaConfig(configDir.toFile());
-        logger.info("ViaVersion " + getPluginVersion() + " is now loaded!");
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
@@ -106,13 +104,14 @@ public class SpongePlugin implements ViaPlatform<Player> {
         // Can't use the command register event for raw commands...
         Sponge.server().commandManager().registrar(Command.Raw.class).get().register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
 
-        if (game.pluginManager().plugin("viabackwards").isPresent()) {
-            MappingDataLoader.enableMappingsCache();
-        }
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.init();
+    }
 
-        // Inject!
-        logger.info("ViaVersion is injecting!");
-        ((ViaManagerImpl) Via.getManager()).init();
+    @Listener
+    public void onServerStarted(StartedEngineEvent<Server> event) {
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.onServerLoaded();
     }
 
     @Listener
@@ -142,20 +141,26 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(ticks)).build();
+        return new SpongeViaTask(game.asyncScheduler().submit(task));
+    }
+
+    @Override
     public PlatformTask runSync(Runnable runnable) {
         final Task task = Task.builder().plugin(container).execute(runnable).build();
         return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, long ticks) {
-        final Task task = Task.builder().plugin(container).execute(runnable).delay(Ticks.of(ticks)).build();
+    public PlatformTask runSync(Runnable runnable, long delay) {
+        final Task task = Task.builder().plugin(container).execute(runnable).delay(Ticks.of(delay)).build();
         return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(ticks)).build();
+    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        final Task task = Task.builder().plugin(container).execute(runnable).interval(Ticks.of(period)).build();
         return new SpongeViaTask(game.server().scheduler().submit(task));
     }
 

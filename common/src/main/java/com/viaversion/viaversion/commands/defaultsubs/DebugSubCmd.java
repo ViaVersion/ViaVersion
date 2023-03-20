@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.api.debug.DebugHandler;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

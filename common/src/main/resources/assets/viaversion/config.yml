@@ -102,6 +102,9 @@ tracking-max-kick-msg: "You are sending too many packets, :("
 #                 MULTIPLE VERSIONS OPTIONS                #
 #----------------------------------------------------------#
 #
+# Whether to make sure ViaVersion's UserConnection object is already available in the PlayerJoinEvent.
+# You may disable this for faster startup/join time if you are 100% sure no plugin requires this.
+register-userconnections-on-join: true
 # Should we enable our hologram patch?
 # If they're in the wrong place enable this
 hologram-patch: false
@@ -172,6 +175,9 @@ chat-types-1_19:
   chat.type.team.text: "%s <%s> %s"
   chat.type.emote: "* %s %s"
 #
+# Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
+armor-toggle-fix: true
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
@@ -207,8 +213,6 @@ use-new-effect-indicator: true
 use-new-deathmessages: true
 # Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
 item-cache: true
-# Patch the anti xray to work on 1.9+ (If your server is 1.8) This can cost more performance, so disable it if you don't use it.
-anti-xray-patch: true
 # Should we replace extended pistons to fix 1.10.1 (Only on chunk load)
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)

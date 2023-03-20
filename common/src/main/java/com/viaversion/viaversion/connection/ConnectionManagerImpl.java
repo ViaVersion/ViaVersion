@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,14 +22,13 @@ import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConnectionManagerImpl implements ConnectionManager {
     protected final Map<UUID, UserConnection> clients = new ConcurrentHashMap<>();

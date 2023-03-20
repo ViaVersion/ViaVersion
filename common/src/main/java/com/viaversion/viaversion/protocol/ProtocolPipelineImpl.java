@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements ProtocolPipeline {
     private final UserConnection userConnection;

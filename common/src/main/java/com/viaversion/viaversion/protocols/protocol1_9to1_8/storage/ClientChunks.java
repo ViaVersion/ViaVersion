@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.storage;
 import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-
 import java.util.Set;
 
 public class ClientChunks extends StoredObject {

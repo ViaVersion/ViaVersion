@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +29,8 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
 
     static List<ConnectionData.ConnectorInitAction> init() {
         List<ConnectionData.ConnectorInitAction> actions = new ArrayList<>(2);
-        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:cobblestone_wall"));
-        actions.add(new WallConnectionHandler("cobbleWallConnections").getInitAction("minecraft:mossy_cobblestone_wall"));
+        actions.add(new WallConnectionHandler("cobbleWall").getInitAction("minecraft:cobblestone_wall"));
+        actions.add(new WallConnectionHandler("cobbleWall").getInitAction("minecraft:mossy_cobblestone_wall"));
         return actions;
     }
 
@@ -47,10 +46,16 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return states;
     }
 
+    @Override
     protected byte getStates(UserConnection user, Position position, int blockState) {
         byte states = super.getStates(user, position, blockState);
         if (up(user, position)) states |= 16;
         return states;
+    }
+
+    @Override
+    protected byte statesSize() {
+        return 32;
     }
 
     public boolean up(UserConnection user, Position position) {

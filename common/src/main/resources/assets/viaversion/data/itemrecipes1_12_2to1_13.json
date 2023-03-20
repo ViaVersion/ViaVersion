@@ -21290,7 +21290,7 @@
       ]
     ]
   },
-  "minecraft:baked_potato": {
+  "baked_potato": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21306,15 +21306,15 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:banner_duplicate": {
+  "banner_duplicate": {
     "type": "crafting_special_bannerduplicate",
     "group": ""
   },
-  "minecraft:banner_add_pattern": {
+  "banner_add_pattern": {
     "type": "crafting_special_banneraddpattern",
     "group": ""
   },
-  "minecraft:quartz": {
+  "quartz": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21330,7 +21330,7 @@
     "experience": 0.2,
     "cookingTime": 200
   },
-  "minecraft:sponge": {
+  "sponge": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21346,7 +21346,7 @@
     "experience": 0.15,
     "cookingTime": 200
   },
-  "minecraft:iron_ingot": {
+  "iron_ingot": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21362,11 +21362,11 @@
     "experience": 0.7,
     "cookingTime": 200
   },
-  "minecraft:tipped_arrow": {
+  "tipped_arrow": {
     "type": "crafting_special_tippedarrow",
     "group": ""
   },
-  "minecraft:gold_ingot": {
+  "gold_ingot": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21382,7 +21382,7 @@
     "experience": 1.0,
     "cookingTime": 200
   },
-  "minecraft:glass": {
+  "glass": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21402,7 +21402,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:stone": {
+  "stone": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21418,7 +21418,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:white_glazed_terracotta": {
+  "white_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21434,7 +21434,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:diamond_from_smelting": {
+  "diamond_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21450,7 +21450,7 @@
     "experience": 1.0,
     "cookingTime": 200
   },
-  "minecraft:lapis_from_smelting": {
+  "lapis_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21466,7 +21466,7 @@
     "experience": 0.2,
     "cookingTime": 200
   },
-  "minecraft:emerald_from_smelting": {
+  "emerald_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21482,7 +21482,7 @@
     "experience": 1.0,
     "cookingTime": 200
   },
-  "minecraft:cooked_porkchop": {
+  "cooked_porkchop": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21498,11 +21498,11 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:book_cloning": {
+  "book_cloning": {
     "type": "crafting_special_bookcloning",
     "group": ""
   },
-  "minecraft:pink_glazed_terracotta": {
+  "pink_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21518,7 +21518,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:orange_glazed_terracotta": {
+  "orange_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21534,7 +21534,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:yellow_glazed_terracotta": {
+  "yellow_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21550,7 +21550,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:iron_nugget_from_smelting": {
+  "iron_nugget_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21618,7 +21618,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:dried_kelp_from_smelting": {
+  "dried_kelp_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21634,7 +21634,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:redstone_from_smelting": {
+  "redstone_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21650,7 +21650,7 @@
     "experience": 0.7,
     "cookingTime": 200
   },
-  "minecraft:cooked_salmon": {
+  "cooked_salmon": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21666,11 +21666,11 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:map_extending": {
+  "map_extending": {
     "type": "crafting_special_mapextending",
     "group": ""
   },
-  "minecraft:green_glazed_terracotta": {
+  "green_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21686,7 +21686,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:lime_glazed_terracotta": {
+  "lime_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21702,7 +21702,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:popped_chorus_fruit": {
+  "popped_chorus_fruit": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21718,7 +21718,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:cactus_green": {
+  "cactus_green": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21734,7 +21734,7 @@
     "experience": 1.0,
     "cookingTime": 200
   },
-  "minecraft:cooked_cod": {
+  "cooked_cod": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21750,7 +21750,7 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:magenta_glazed_terracotta": {
+  "magenta_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21766,7 +21766,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:nether_brick": {
+  "nether_brick": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21782,7 +21782,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:light_gray_glazed_terracotta": {
+  "light_gray_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21798,7 +21798,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:blue_glazed_terracotta": {
+  "blue_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21814,7 +21814,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:cooked_mutton": {
+  "cooked_mutton": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21830,7 +21830,7 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:brown_glazed_terracotta": {
+  "brown_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21846,11 +21846,11 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:map_cloning": {
+  "map_cloning": {
     "type": "crafting_special_mapcloning",
     "group": ""
   },
-  "minecraft:cracked_stone_bricks": {
+  "cracked_stone_bricks": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21866,7 +21866,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:charcoal": {
+  "charcoal": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21974,7 +21974,7 @@
     "experience": 0.15,
     "cookingTime": 200
   },
-  "minecraft:black_glazed_terracotta": {
+  "black_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -21990,7 +21990,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:purple_glazed_terracotta": {
+  "purple_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22006,7 +22006,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:coal_from_smelting": {
+  "coal_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22022,7 +22022,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:gray_glazed_terracotta": {
+  "gray_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22038,7 +22038,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:red_glazed_terracotta": {
+  "red_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22054,7 +22054,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:brick": {
+  "brick": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22070,7 +22070,7 @@
     "experience": 0.3,
     "cookingTime": 200
   },
-  "minecraft:light_blue_glazed_terracotta": {
+  "light_blue_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22086,11 +22086,11 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:firework_rocket": {
+  "firework_rocket": {
     "type": "crafting_special_firework_rocket",
     "group": ""
   },
-  "minecraft:gold_nugget_from_smelting": {
+  "gold_nugget_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22142,7 +22142,7 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:terracotta": {
+  "terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22158,7 +22158,7 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:lime_dye_from_smelting": {
+  "lime_dye_from_smelting": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22174,15 +22174,15 @@
     "experience": 0.1,
     "cookingTime": 200
   },
-  "minecraft:firework_star_fade": {
+  "firework_star_fade": {
     "type": "crafting_special_firework_star_fade",
     "group": ""
   },
-  "minecraft:shulker_box_coloring": {
+  "shulker_box_coloring": {
     "type": "crafting_special_shulkerboxcoloring",
     "group": ""
   },
-  "minecraft:cooked_chicken": {
+  "cooked_chicken": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22198,15 +22198,15 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:shield_decoration": {
+  "shield_decoration": {
     "type": "crafting_special_shielddecoration",
     "group": ""
   },
-  "minecraft:armor_dye": {
+  "armor_dye": {
     "type": "crafting_special_armordye",
     "group": ""
   },
-  "minecraft:cooked_rabbit": {
+  "cooked_rabbit": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22222,15 +22222,15 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:firework_star": {
+  "firework_star": {
     "type": "crafting_special_firework_star",
     "group": ""
   },
-  "minecraft:repair_item": {
+  "repair_item": {
     "type": "crafting_special_repairitem",
     "group": ""
   },
-  "minecraft:cooked_beef": {
+  "cooked_beef": {
     "type": "smelting",
     "group": "",
     "ingredient": [
@@ -22246,7 +22246,7 @@
     "experience": 0.35,
     "cookingTime": 200
   },
-  "minecraft:cyan_glazed_terracotta": {
+  "cyan_glazed_terracotta": {
     "type": "smelting",
     "group": "",
     "ingredient": [

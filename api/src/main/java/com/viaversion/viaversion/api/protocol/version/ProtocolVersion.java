@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,13 @@ package com.viaversion.viaversion.api.protocol.version;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolVersion {
     private static final Int2ObjectMap<ProtocolVersion> VERSIONS = new Int2ObjectOpenHashMap<>();
@@ -40,14 +39,14 @@ public class ProtocolVersion {
 
     // Before the Netty rewrite
     public static final ProtocolVersion v1_4_6 = register(51, "1.4.6/7", new VersionRange("1.4", 6, 7));
-    public static final ProtocolVersion v1_5_1 = register(60, "1.5.1");
+    public static final ProtocolVersion v1_5_1 = register(60, "1.5/1.5.1", new VersionRange("1.5", 0, 1));
     public static final ProtocolVersion v1_5_2 = register(61, "1.5.2");
     public static final ProtocolVersion v_1_6_1 = register(73, "1.6.1");
     public static final ProtocolVersion v_1_6_2 = register(74, "1.6.2");
     public static final ProtocolVersion v_1_6_3 = register(77, "1.6.3");
     public static final ProtocolVersion v_1_6_4 = register(78, "1.6.4");
     // After the Netty rewrite
-    public static final ProtocolVersion v1_7_1 = register(4, "1.7-1.7.5", new VersionRange("1.7", 0, 5));
+    public static final ProtocolVersion v1_7_1 = register(4, "1.7.2-1.7.5", new VersionRange("1.7", 2, 5));
     public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new VersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x");
     public static final ProtocolVersion v1_9 = register(107, "1.9");
@@ -83,6 +82,7 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_19 = register(759, "1.19");
     public static final ProtocolVersion v1_19_1 = register(760, "1.19.1/2", new VersionRange("1.19", 1, 2));
     public static final ProtocolVersion v1_19_3 = register(761, "1.19.3");
+    public static final ProtocolVersion v1_19_4 = register(762, "1.19.4");
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
     public static ProtocolVersion register(int version, String name) {

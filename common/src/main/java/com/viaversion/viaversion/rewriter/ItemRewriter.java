@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,20 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
+public abstract class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
+        T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
 
     protected ItemRewriter(T protocol) {
         super(protocol);
     }
 
     // These two methods always return the same item instance *for now*
-    // It is made this way so it's easy to handle new instance creation/implementation changes
+    // It is made this way, so it's easy to handle new instance creation/implementation changes
     @Override
     public @Nullable Item handleItemToClient(@Nullable Item item) {
         if (item == null) return null;
@@ -55,10 +56,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         return item;
     }
 
-    public void registerWindowItems(ClientboundPacketType packetType, Type<Item[]> type) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerWindowItems(C packetType, Type<Item[]> type) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(type); // Items
                 handler(itemArrayHandler(type));
@@ -66,10 +67,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerWindowItems1_17_1(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerWindowItems1_17_1(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 handler(wrapper -> {
@@ -84,10 +85,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetSlot(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerSetSlot(C packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.SHORT); // Slot id
                 map(type); // Item
@@ -96,10 +97,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetSlot1_17_1(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerSetSlot1_17_1(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 map(Type.SHORT); // Slot id
@@ -110,10 +111,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // Sub 1.16
-    public void registerEntityEquipment(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerEntityEquipment(C packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(type); // 2 - Item
@@ -124,10 +125,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // 1.16+
-    public void registerEntityEquipmentArray(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerEntityEquipmentArray(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
 
                 handler(wrapper -> {
@@ -142,10 +143,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerCreativeInvAction(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerServerbound(packetType, new PacketRemapper() {
+    public void registerCreativeInvAction(S packetType, Type<Item> type) {
+        protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.SHORT); // 0 - Slot
                 map(type); // 1 - Clicked Item
 
@@ -154,10 +155,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow(ServerboundPacketType packetType, Type<Item> type) {
-        protocol.registerServerbound(packetType, new PacketRemapper() {
+    public void registerClickWindow(S packetType, Type<Item> type) {
+        protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot
                 map(Type.BYTE); // 2 - Button
@@ -170,10 +171,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow1_17_1(ServerboundPacketType packetType) {
-        protocol.registerServerbound(packetType, new PacketRemapper() {
+    public void registerClickWindow1_17_1(S packetType) {
+        protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
                 map(Type.VAR_INT); // State id
                 map(Type.SHORT); // Slot
@@ -195,124 +196,108 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetCooldown(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int itemId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
-                });
-            }
+    public void registerSetCooldown(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int itemId = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
         });
     }
 
     // 1.14.4+
-    public void registerTradeList(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                    for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
+    public void registerTradeList(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
 
-                        if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
-                        }
+                if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
+                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
+                }
 
-                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                        wrapper.passthrough(Type.INT); // Number of tools uses
-                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
 
-                        wrapper.passthrough(Type.INT); // XP
-                        wrapper.passthrough(Type.INT); // Special price
-                        wrapper.passthrough(Type.FLOAT); // Price multiplier
-                        wrapper.passthrough(Type.INT); // Demand
-                    }
-                    //...
-                });
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
+            }
+            //...
+        });
+    }
+
+    public void registerTradeList1_19(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Container id
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
+                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
+
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
             }
         });
     }
 
-    public void registerTradeList1_19(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT); // Container id
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
+    public void registerAdvancements(C packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
 
-                        wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                        wrapper.passthrough(Type.INT); // Number of tools uses
-                        wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                // Parent
+                if (wrapper.passthrough(Type.BOOLEAN))
+                    wrapper.passthrough(Type.STRING);
 
-                        wrapper.passthrough(Type.INT); // XP
-                        wrapper.passthrough(Type.INT); // Special price
-                        wrapper.passthrough(Type.FLOAT); // Price multiplier
-                        wrapper.passthrough(Type.INT); // Demand
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.COMPONENT); // Title
+                    wrapper.passthrough(Type.COMPONENT); // Description
+                    handleItemToClient(wrapper.passthrough(type)); // Icon
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
                     }
-                });
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < arrayLength; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                }
             }
         });
     }
 
-    public void registerAdvancements(ClientboundPacketType packetType, Type<Item> type) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerWindowPropertyEnchantmentHandler(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-                    int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
-                    for (int i = 0; i < size; i++) {
-                        wrapper.passthrough(Type.STRING); // Identifier
-
-                        // Parent
-                        if (wrapper.passthrough(Type.BOOLEAN))
-                            wrapper.passthrough(Type.STRING);
-
-                        // Display data
-                        if (wrapper.passthrough(Type.BOOLEAN)) {
-                            wrapper.passthrough(Type.COMPONENT); // Title
-                            wrapper.passthrough(Type.COMPONENT); // Description
-                            handleItemToClient(wrapper.passthrough(type)); // Icon
-                            wrapper.passthrough(Type.VAR_INT); // Frame type
-                            int flags = wrapper.passthrough(Type.INT); // Flags
-                            if ((flags & 1) != 0) {
-                                wrapper.passthrough(Type.STRING); // Background texture
-                            }
-                            wrapper.passthrough(Type.FLOAT); // X
-                            wrapper.passthrough(Type.FLOAT); // Y
-                        }
-
-                        wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                        int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                        for (int array = 0; array < arrayLength; array++) {
-                            wrapper.passthrough(Type.STRING_ARRAY); // String array
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    public void registerWindowPropertyEnchantmentHandler(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
                 handler(wrapper -> {
+                    Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+                    if (mappings == null) {
+                        return;
+                    }
+
                     short property = wrapper.passthrough(Type.SHORT);
                     if (property >= 4 && property <= 6) { // Enchantment id
-                        Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
                         short enchantmentId = (short) mappings.getNewId(wrapper.read(Type.SHORT));
                         wrapper.write(Type.SHORT, enchantmentId);
                     }
@@ -322,10 +307,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // Not the very best place for this, but has to stay here until *everything* is abstracted
-    public void registerSpawnParticle(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerSpawnParticle(C packetType, Type<Item> itemType, Type<?> coordType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
                 map(coordType); // 2 - X
@@ -341,10 +326,10 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSpawnParticle1_19(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerSpawnParticle1_19(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
                 map(Type.DOUBLE); // 2 - X

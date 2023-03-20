@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_16_4to1_16_3;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ServerboundPackets1_16_2;
@@ -31,9 +31,9 @@ public class Protocol1_16_4To1_16_3 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLAT_VAR_INT_ITEM);
                 map(Type.BOOLEAN);
                 handler(wrapper -> {

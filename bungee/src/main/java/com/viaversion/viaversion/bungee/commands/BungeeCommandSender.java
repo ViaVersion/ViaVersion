@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,9 @@
 package com.viaversion.viaversion.bungee.commands;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
+import java.util.UUID;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-
-import java.util.UUID;
 
 public class BungeeCommandSender implements ViaCommandSender {
     private final CommandSender sender;
@@ -45,7 +44,7 @@ public class BungeeCommandSender implements ViaCommandSender {
         if (sender instanceof ProxiedPlayer) {
             return ((ProxiedPlayer) sender).getUniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
     }
 

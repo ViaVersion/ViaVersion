@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,10 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocols.base.BaseVersionProvider;
 import com.viaversion.viaversion.util.ReflectionUtil;
-import net.md_5.bungee.api.ProxyServer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeVersionProvider extends BaseVersionProvider {
     private static Class<?> ref;
@@ -80,9 +79,7 @@ public class BungeeVersionProvider extends BaseVersionProvider {
         try {
             list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
             return list.get(0);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         // Fallback

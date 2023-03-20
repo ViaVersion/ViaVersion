@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -30,11 +30,10 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.BitSet;
 import java.util.UUID;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1, Protocol1_19_3To1_19_1> {
 
     private static final BitSetType PROFILE_ACTIONS_ENUM_TYPE = new BitSetType(6);
 
@@ -48,9 +47,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
         registerMetadataRewriter(ClientboundPackets1_19_1.ENTITY_METADATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -72,9 +71,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -94,63 +93,58 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19_3To1_19_1> 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    final int action = wrapper.read(Type.VAR_INT);
-                    if (action == 4) { // Remove player
-                        // Write into new packet type
-                        final int entries = wrapper.read(Type.VAR_INT);
-                        final UUID[] uuidsToRemove = new UUID[entries];
-                        for (int i = 0; i < entries; i++) {
-                            uuidsToRemove[i] = wrapper.read(Type.UUID);
-                        }
-                        wrapper.write(Type.UUID_ARRAY, uuidsToRemove);
-                        wrapper.setPacketType(ClientboundPackets1_19_3.PLAYER_INFO_REMOVE);
-                        return;
+        protocol.registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, wrapper -> {
+            final int action = wrapper.read(Type.VAR_INT);
+            if (action == 4) { // Remove player
+                // Write into new packet type
+                final int entries = wrapper.read(Type.VAR_INT);
+                final UUID[] uuidsToRemove = new UUID[entries];
+                for (int i = 0; i < entries; i++) {
+                    uuidsToRemove[i] = wrapper.read(Type.UUID);
+                }
+                wrapper.write(Type.UUID_ARRAY, uuidsToRemove);
+                wrapper.setPacketType(ClientboundPackets1_19_3.PLAYER_INFO_REMOVE);
+                return;
+            }
+
+            final BitSet set = new BitSet(6);
+            if (action == 0) {
+                // Includes add player, profile key, gamemode, listed status, latency, and display name
+                set.set(0, 6);
+            } else {
+                // Update listed added at 3, initialize chat added at index 1
+                set.set(action == 1 ? action + 1 : action + 2);
+            }
+
+            wrapper.write(PROFILE_ACTIONS_ENUM_TYPE, set);
+            final int entries = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Type.UUID); // UUID
+                if (action == 0) { // Add player
+                    wrapper.passthrough(Type.STRING); // Player Name
+
+                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Type.STRING); // Name
+                        wrapper.passthrough(Type.STRING); // Value
+                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                     }
 
-                    final BitSet set = new BitSet(6);
-                    if (action == 0) {
-                        // Includes add player, profile key, gamemode, listed status, latency, and display name
-                        set.set(0, 6);
-                    } else {
-                        // Update listed added at 3, initialize chat added at index 1
-                        set.set(action == 1 ? action + 1 : action + 2);
-                    }
+                    final int gamemode = wrapper.read(Type.VAR_INT);
+                    final int ping = wrapper.read(Type.VAR_INT);
+                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
+                    wrapper.read(Type.OPTIONAL_PROFILE_KEY);
 
-                    wrapper.write(PROFILE_ACTIONS_ENUM_TYPE, set);
-                    final int entries = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < entries; i++) {
-                        wrapper.passthrough(Type.UUID); // UUID
-                        if (action == 0) { // Add player
-                            wrapper.passthrough(Type.STRING); // Player Name
-
-                            final int properties = wrapper.passthrough(Type.VAR_INT);
-                            for (int j = 0; j < properties; j++) {
-                                wrapper.passthrough(Type.STRING); // Name
-                                wrapper.passthrough(Type.STRING); // Value
-                                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
-                            }
-
-                            final int gamemode = wrapper.read(Type.VAR_INT);
-                            final int ping = wrapper.read(Type.VAR_INT);
-                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
-                            wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-
-                            wrapper.write(Type.BOOLEAN, false); // No chat session data
-                            wrapper.write(Type.VAR_INT, gamemode);
-                            wrapper.write(Type.BOOLEAN, true); // Also update listed
-                            wrapper.write(Type.VAR_INT, ping);
-                            wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                        } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                            wrapper.passthrough(Type.VAR_INT);
-                        } else if (action == 3) { // Update display name
-                            wrapper.passthrough(Type.OPTIONAL_COMPONENT);
-                        }
-                    }
-                });
+                    wrapper.write(Type.BOOLEAN, false); // No chat session data
+                    wrapper.write(Type.VAR_INT, gamemode);
+                    wrapper.write(Type.BOOLEAN, true); // Also update listed
+                    wrapper.write(Type.VAR_INT, ping);
+                    wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                } else if (action == 1 || action == 2) { // Update gamemode/update latency
+                    wrapper.passthrough(Type.VAR_INT);
+                } else if (action == 3) { // Update display name
+                    wrapper.passthrough(Type.OPTIONAL_COMPONENT);
+                }
             }
         });
     }

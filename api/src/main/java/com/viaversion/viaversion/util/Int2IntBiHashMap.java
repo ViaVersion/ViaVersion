@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,11 +36,16 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
 
     public Int2IntBiHashMap() {
         this.map = new Int2IntOpenHashMap();
-        this.inverse = new Int2IntBiHashMap(this);
+        this.inverse = new Int2IntBiHashMap(this, -1);
     }
 
-    private Int2IntBiHashMap(Int2IntBiHashMap inverse) {
-        this.map = new Int2IntOpenHashMap();
+    public Int2IntBiHashMap(final int expected) {
+        this.map = new Int2IntOpenHashMap(expected);
+        this.inverse = new Int2IntBiHashMap(this, expected);
+    }
+
+    private Int2IntBiHashMap(final Int2IntBiHashMap inverse, final int expected) {
+        this.map = expected != -1 ? new Int2IntOpenHashMap(expected) : new Int2IntOpenHashMap();
         this.inverse = inverse;
     }
 
@@ -50,7 +55,7 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
     }
 
     @Override
-    public int put(int key, int value) {
+    public int put(final int key, final int value) {
         if (containsKey(key) && value == get(key)) return value;
 
         Preconditions.checkArgument(!containsValue(value), "value already present: %s", value);
@@ -60,13 +65,13 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
     }
 
     @Override
-    public boolean remove(int key, int value) {
+    public boolean remove(final int key, final int value) {
         map.remove(key, value);
         return inverse.map.remove(key, value);
     }
 
     @Override
-    public int get(int key) {
+    public int get(final int key) {
         return map.get(key);
     }
 
@@ -87,7 +92,7 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
     }
 
     @Override
-    public void defaultReturnValue(int rv) {
+    public void defaultReturnValue(final int rv) {
         map.defaultReturnValue(rv);
         inverse.map.defaultReturnValue(rv);
     }
@@ -113,12 +118,12 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
     }
 
     @Override
-    public boolean containsKey(int key) {
+    public boolean containsKey(final int key) {
         return map.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(int value) {
+    public boolean containsValue(final int value) {
         return inverse.map.containsKey(value);
     }
 }

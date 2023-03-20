@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import java.util.ArrayList;
 
 public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
@@ -129,7 +128,8 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         // Write sky light
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            if (chunk.getSections()[i].getLight().hasSkyLight()) chunk.getSections()[i].getLight().writeSkyLight(output);
+            if (chunk.getSections()[i].getLight().hasSkyLight())
+                chunk.getSections()[i].getLight().writeSkyLight(output);
         }
 
         // Write biome data

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,9 @@ import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.sponge.listeners.UpdateListener;
-import org.spongepowered.api.Sponge;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.spongepowered.api.Sponge;
 
 public class SpongeViaLoader implements ViaPlatformLoader {
 

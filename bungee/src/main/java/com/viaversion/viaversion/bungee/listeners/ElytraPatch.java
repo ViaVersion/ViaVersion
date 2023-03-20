@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,11 @@ import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import java.util.Collections;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-
-import java.util.Collections;
 
 /*
  * This patches https://github.com/ViaVersion/ViaVersion/issues/555

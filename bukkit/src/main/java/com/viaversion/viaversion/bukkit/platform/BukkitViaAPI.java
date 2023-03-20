@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,9 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 import io.netty.buffer.ByteBuf;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class BukkitViaAPI extends ViaAPIBase<Player> {
     private final ViaVersionPlugin plugin;

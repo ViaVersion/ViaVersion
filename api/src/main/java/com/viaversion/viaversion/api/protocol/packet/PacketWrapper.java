@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface PacketWrapper {
 
@@ -302,16 +301,25 @@ public interface PacketWrapper {
     PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception;
 
     /**
-     * Cancel this packet from sending
-     */
-    void cancel();
-
-    /**
      * Check if this packet is cancelled.
      *
      * @return True if the packet won't be sent.
      */
     boolean isCancelled();
+
+    /**
+     * Cancel this packet from sending.
+     */
+    default void cancel() {
+        setCancelled(true);
+    }
+
+    /**
+     * Sets the cancellation state of the packet.
+     *
+     * @param cancel whether the packet should be cancelled
+     */
+    void setCancelled(boolean cancel);
 
     /**
      * Get the user associated with this Packet

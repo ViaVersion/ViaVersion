@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ import com.viaversion.viaversion.commands.defaultsubs.HelpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ReloadSubCmd;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

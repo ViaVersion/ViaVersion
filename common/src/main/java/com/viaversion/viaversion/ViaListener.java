@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@ package com.viaversion.viaversion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ViaListener {
     private final Class<? extends Protocol> requiredPipeline;

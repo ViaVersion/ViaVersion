@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,34 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import java.util.Arrays;
+import java.util.List;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class BlockData {
+    private static final List<String> CONNECTION_TYPES = Arrays.asList("fence", "netherFence", "pane", "cobbleWall", "redstone", "allFalseIfStairPre1_12");
+    private static final int MAGIC_STAIRS_ID = connectionTypeId("allFalseIfStairPre1_12");
+    private final Int2ObjectMap<boolean[]> connectData = new Int2ObjectArrayMap<>();
 
-public class BlockData {
-    private final Map<String, boolean[]> connectData = new HashMap<>();
-
-    public void put(String key, boolean[] booleans) {
-        connectData.put(key, booleans);
+    public void put(final int blockConnectionTypeId, final boolean[] booleans) {
+        connectData.put(blockConnectionTypeId, booleans);
     }
 
-    public boolean connectsTo(String blockConnection, BlockFace face, boolean pre1_12AbstractFence) {
-        boolean[] booleans = null;
-        if (pre1_12AbstractFence) {
-            booleans = connectData.get("allFalseIfStairPre1_12"); // https://minecraft.gamepedia.com/Java_Edition_1.12
+    public boolean connectsTo(final int blockConnectionTypeId, final BlockFace face, final boolean pre1_12AbstractFence) {
+        if (pre1_12AbstractFence && connectData.containsKey(MAGIC_STAIRS_ID)) {
+            return false;
         }
-        if (booleans == null) {
-            booleans = connectData.get(blockConnection);
-        }
+
+        final boolean[] booleans = connectData.get(blockConnectionTypeId);
         return booleans != null && booleans[face.ordinal()];
+    }
+
+    public static int connectionTypeId(final String blockConnection) {
+        final int connectionTypeId = CONNECTION_TYPES.indexOf(blockConnection);
+        Preconditions.checkArgument(connectionTypeId != -1, "Unknown connection type: " + blockConnection);
+        return connectionTypeId;
     }
 }

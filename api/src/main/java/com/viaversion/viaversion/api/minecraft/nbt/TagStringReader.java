@@ -39,7 +39,6 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 

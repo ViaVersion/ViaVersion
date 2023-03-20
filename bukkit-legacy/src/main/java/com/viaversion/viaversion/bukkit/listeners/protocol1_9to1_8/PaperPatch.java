@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -25,8 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class PaperPatch extends ViaBukkitListener {
 

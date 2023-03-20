@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.dump;
 
 import com.google.gson.JsonObject;
-
 import java.util.Map;
 
 public class DumpTemplate {
@@ -26,12 +25,14 @@ public class DumpTemplate {
     private final Map<String, Object> configuration;
     private final JsonObject platformDump;
     private final JsonObject injectionDump;
+    private final JsonObject playerSample;
 
-    public DumpTemplate(VersionInfo versionInfo, Map<String, Object> configuration, JsonObject platformDump, JsonObject injectionDump) {
+    public DumpTemplate(VersionInfo versionInfo, Map<String, Object> configuration, JsonObject platformDump, JsonObject injectionDump, JsonObject playerSample) {
         this.versionInfo = versionInfo;
         this.configuration = configuration;
         this.platformDump = platformDump;
         this.injectionDump = injectionDump;
+        this.playerSample = playerSample;
     }
 
     public VersionInfo getVersionInfo() {
@@ -48,5 +49,9 @@ public class DumpTemplate {
 
     public JsonObject getInjectionDump() {
         return injectionDump;
+    }
+
+    public JsonObject getPlayerSample() {
+        return playerSample;
     }
 }

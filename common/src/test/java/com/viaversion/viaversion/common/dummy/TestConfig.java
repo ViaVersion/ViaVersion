@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.common.dummy;
 
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Collections;

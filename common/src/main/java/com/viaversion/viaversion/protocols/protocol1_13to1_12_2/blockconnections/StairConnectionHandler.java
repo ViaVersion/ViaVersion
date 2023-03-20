@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,8 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class StairConnectionHandler extends ConnectionHandler {
-    private static final Map<Integer, StairData> stairDataMap = new HashMap<>();
-    private static final Map<Short, Integer> connectedBlocks = new HashMap<>();
+    private static final Int2ObjectMap<StairData> STAIR_DATA_MAP = new Int2ObjectOpenHashMap<>();
+    private static final Map<Short, Integer> CONNECTED_BLOCKS = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final List<String> baseStairs = new LinkedList<>();
@@ -85,8 +86,8 @@ public class StairConnectionHandler extends ConnectionHandler {
                     BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
             );
 
-            stairDataMap.put(blockData.getSavedBlockStateId(), stairData);
-            connectedBlocks.put(getStates(stairData), blockData.getSavedBlockStateId());
+            STAIR_DATA_MAP.put(blockData.getSavedBlockStateId(), stairData);
+            CONNECTED_BLOCKS.put(getStates(stairData), blockData.getSavedBlockStateId());
 
             ConnectionData.connectionHandlerMap.put(blockData.getSavedBlockStateId(), connectionHandler);
         };
@@ -103,7 +104,7 @@ public class StairConnectionHandler extends ConnectionHandler {
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
-        StairData stairData = stairDataMap.get(blockState);
+        StairData stairData = STAIR_DATA_MAP.get(blockState);
         if (stairData == null) return blockState;
 
         short s = 0;
@@ -112,14 +113,14 @@ public class StairConnectionHandler extends ConnectionHandler {
         s |= stairData.getType() << 4;
         s |= stairData.getFacing().ordinal() << 9;
 
-        Integer newBlockState = connectedBlocks.get(s);
+        Integer newBlockState = CONNECTED_BLOCKS.get(s);
         return newBlockState == null ? blockState : newBlockState;
     }
 
     private int getShape(UserConnection user, Position position, StairData stair) {
         BlockFace facing = stair.getFacing();
 
-        StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing)));
+        StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(facing)));
         if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
             if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2.opposite())) {
@@ -127,7 +128,7 @@ public class StairConnectionHandler extends ConnectionHandler {
             }
         }
 
-        relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(facing.opposite())));
+        relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(facing.opposite())));
         if (relativeStair != null && relativeStair.isBottom() == stair.isBottom()) {
             BlockFace facing2 = relativeStair.getFacing();
             if (facing.axis() != facing2.axis() && checkOpposite(user, stair, position, facing2)) {
@@ -139,7 +140,7 @@ public class StairConnectionHandler extends ConnectionHandler {
     }
 
     private boolean checkOpposite(UserConnection user, StairData stair, Position position, BlockFace face) {
-        StairData relativeStair = stairDataMap.get(getBlockData(user, position.getRelative(face)));
+        StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(face)));
         return relativeStair == null || relativeStair.getFacing() != stair.getFacing() || relativeStair.isBottom() != stair.isBottom();
     }
 

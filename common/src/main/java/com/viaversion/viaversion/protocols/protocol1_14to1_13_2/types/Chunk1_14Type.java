@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

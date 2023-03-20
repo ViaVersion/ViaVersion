@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,13 +19,12 @@ package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class BukkitInventoryUpdateTask implements Runnable {
 
@@ -36,7 +35,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
     public BukkitInventoryUpdateTask(BukkitInventoryQuickMoveProvider provider, UUID uuid) {
         this.provider = provider;
         this.uuid = uuid;
-        this.items = Collections.synchronizedList(new ArrayList<ItemTransaction>());
+        this.items = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void addItem(short windowId, short slotId, short actionId) {

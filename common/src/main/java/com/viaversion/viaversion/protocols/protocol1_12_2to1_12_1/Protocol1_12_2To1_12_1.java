@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_12_2to1_12_1;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
@@ -31,16 +31,16 @@ public class Protocol1_12_2To1_12_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_12_1.KEEP_ALIVE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT, Type.LONG);
             }
         });
 
-        registerServerbound(ServerboundPackets1_12_1.KEEP_ALIVE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_12_1.KEEP_ALIVE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.LONG, Type.VAR_INT);
             }
         });

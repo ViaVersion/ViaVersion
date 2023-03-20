@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,10 @@
  */
 package com.viaversion.viaversion.sponge.util;
 
-import org.apache.logging.log4j.Logger;
-
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import org.apache.logging.log4j.Logger;
 
 public class LoggerWrapper extends java.util.logging.Logger {
     private final Logger base;

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,9 @@
 package com.viaversion.viaversion.bukkit.commands;
 
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import java.util.UUID;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 
 public class BukkitCommandSender implements ViaCommandSender {
     private final CommandSender sender;
@@ -42,10 +41,10 @@ public class BukkitCommandSender implements ViaCommandSender {
 
     @Override
     public UUID getUUID() {
-        if (sender instanceof Player) {
-            return ((Player) sender).getUniqueId();
+        if (sender instanceof Entity) {
+            return ((Entity) sender).getUniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
     }
 

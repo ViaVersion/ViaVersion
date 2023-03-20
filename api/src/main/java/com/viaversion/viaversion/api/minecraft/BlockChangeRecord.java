@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,10 @@ public interface BlockChangeRecord {
     short getY(int chunkSectionY);
 
     /**
+     * Returns the absolute y coordinate - only works for sub 1.16 protocols.
+     *
      * @return absolute y coordinate
-     * @deprecated 1.16+ stores the relative y coordinate
      */
-    @Deprecated
     default short getY() {
         return getY(-1);
     }

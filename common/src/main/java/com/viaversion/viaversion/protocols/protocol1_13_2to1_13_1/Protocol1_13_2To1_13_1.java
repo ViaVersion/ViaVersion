@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets.InventoryPackets;
@@ -41,53 +39,45 @@ public class Protocol1_13_2To1_13_1 extends AbstractProtocol<ClientboundPackets1
         WorldPackets.register(this);
         EntityPackets.register(this);
 
-        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM);
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.ADVANCEMENTS, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-                        int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+        registerClientbound(ClientboundPackets1_13.ADVANCEMENTS, wrapper -> {
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
 
-                        for (int i = 0; i < size; i++) {
-                            wrapper.passthrough(Type.STRING); // Identifier
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
 
-                            // Parent
-                            if (wrapper.passthrough(Type.BOOLEAN))
-                                wrapper.passthrough(Type.STRING);
+                // Parent
+                if (wrapper.passthrough(Type.BOOLEAN))
+                    wrapper.passthrough(Type.STRING);
 
-                            // Display data
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.COMPONENT); // Title
-                                wrapper.passthrough(Type.COMPONENT); // Description
-                                Item icon = wrapper.read(Type.FLAT_ITEM);
-                                wrapper.write(Type.FLAT_VAR_INT_ITEM, icon);
-                                wrapper.passthrough(Type.VAR_INT); // Frame type
-                                int flags = wrapper.passthrough(Type.INT); // Flags
-                                if ((flags & 1) != 0) {
-                                    wrapper.passthrough(Type.STRING); // Background texture
-                                }
-                                wrapper.passthrough(Type.FLOAT); // X
-                                wrapper.passthrough(Type.FLOAT); // Y
-                            }
-
-                            wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                            int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                            for (int array = 0; array < arrayLength; array++) {
-                                wrapper.passthrough(Type.STRING_ARRAY); // String array
-                            }
-                        }
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.COMPONENT); // Title
+                    wrapper.passthrough(Type.COMPONENT); // Description
+                    Item icon = wrapper.read(Type.FLAT_ITEM);
+                    wrapper.write(Type.FLAT_VAR_INT_ITEM, icon);
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
                     }
-                });
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < arrayLength; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                }
             }
         });
     }

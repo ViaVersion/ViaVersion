@@ -1,6 +1,6 @@
 /*
- * This file is part of ViaBackwards - https://github.com/ViaVersion/ViaBackwards
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
-
 import java.util.Arrays;
 
 public final class ReceivedMessagesStorage implements StorableObject {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 
 public class DeathListener extends ViaBukkitListener {
 

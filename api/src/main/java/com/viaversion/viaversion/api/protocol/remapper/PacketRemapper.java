@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,14 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @deprecated use {@link PacketHandlers} or directly implement {@link PacketHandler}
+ */
+@Deprecated/*(forRemoval = true)*/
 public abstract class PacketRemapper {
     private final List<PacketHandler> valueRemappers = new ArrayList<>();
 
@@ -145,6 +148,10 @@ public abstract class PacketRemapper {
      */
     public abstract void registerMap();
 
+    public PacketHandler asPacketHandler() {
+        return PacketHandlers.fromRemapper(this.valueRemappers);
+    }
+
     /**
      * Processes a packet wrapper.
      *
@@ -152,6 +159,7 @@ public abstract class PacketRemapper {
      * @throws InformativeException if packet reading or writing fails
      * @throws CancelException      if the packet should be cancelled
      */
+    @Deprecated
     public void remap(PacketWrapper packetWrapper) throws Exception {
         try {
             for (PacketHandler handler : valueRemappers) {

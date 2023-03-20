@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,55 +20,49 @@ package com.viaversion.viaversion.rewriter;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class StatisticsRewriter {
-    private final Protocol protocol;
-    private final int customStatsCategory = 8; // Make this changeable if it differs in a future version
+public class StatisticsRewriter<C extends ClientboundPacketType> {
+    private static final int CUSTOM_STATS_CATEGORY = 8; // Make this changeable if it differs in a future version
+    private final Protocol<C, ?, ?, ?> protocol;
 
-    public StatisticsRewriter(Protocol protocol) {
+    public StatisticsRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
-    public void register(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int size = wrapper.passthrough(Type.VAR_INT);
-                    int newSize = size;
-                    for (int i = 0; i < size; i++) {
-                        int categoryId = wrapper.read(Type.VAR_INT);
-                        int statisticId = wrapper.read(Type.VAR_INT);
-                        int value = wrapper.read(Type.VAR_INT);
-                        if (categoryId == customStatsCategory && protocol.getMappingData().getStatisticsMappings() != null) {
-                            // Rewrite custom statistics id
-                            statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
-                            if (statisticId == -1) {
-                                // Remove entry
-                                newSize--;
-                                continue;
-                            }
-                        } else {
-                            // Rewrite the block/item/entity id
-                            RegistryType type = getRegistryTypeForStatistic(categoryId);
-                            IdRewriteFunction statisticsRewriter;
-                            if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
-                                statisticId = statisticsRewriter.rewrite(statisticId);
-                            }
-                        }
-
-                        wrapper.write(Type.VAR_INT, categoryId);
-                        wrapper.write(Type.VAR_INT, statisticId);
-                        wrapper.write(Type.VAR_INT, value);
+    public void register(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            int newSize = size;
+            for (int i = 0; i < size; i++) {
+                int categoryId = wrapper.read(Type.VAR_INT);
+                int statisticId = wrapper.read(Type.VAR_INT);
+                int value = wrapper.read(Type.VAR_INT);
+                if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
+                    // Rewrite custom statistics id
+                    statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
+                    if (statisticId == -1) {
+                        // Remove entry
+                        newSize--;
+                        continue;
                     }
-
-                    if (newSize != size) {
-                        wrapper.set(Type.VAR_INT, 0, newSize);
+                } else {
+                    // Rewrite the block/item/entity id
+                    RegistryType type = getRegistryTypeForStatistic(categoryId);
+                    IdRewriteFunction statisticsRewriter;
+                    if (type != null && (statisticsRewriter = getRewriter(type)) != null) {
+                        statisticId = statisticsRewriter.rewrite(statisticId);
                     }
-                });
+                }
+
+                wrapper.write(Type.VAR_INT, categoryId);
+                wrapper.write(Type.VAR_INT, statisticId);
+                wrapper.write(Type.VAR_INT, value);
+            }
+
+            if (newSize != size) {
+                wrapper.set(Type.VAR_INT, 0, newSize);
             }
         });
     }

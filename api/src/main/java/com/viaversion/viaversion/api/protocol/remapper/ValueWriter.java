@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,11 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 
 @FunctionalInterface
 public interface ValueWriter<T> {
+
     /**
      * Write a value to a packet
      *
-     * @param wrapper     The packet wrapper to write to
+     * @param wrapper    The packet wrapper to write to
      * @param inputValue The value to write
      * @throws Exception Throws exception if it fails to write
      */

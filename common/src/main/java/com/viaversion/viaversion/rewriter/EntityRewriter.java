@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
@@ -36,7 +37,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
@@ -44,8 +45,6 @@ import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -53,8 +52,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
+public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
+        extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
@@ -101,7 +102,8 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
 
     @Override
     public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
-        EntityType type = tracker(connection).entityType(entityId);
+        final TrackedEntity entity = tracker(connection).entity(entityId);
+        final EntityType type = entity != null ? entity.entityType() : null;
         int i = 0; // Count index for fast removal
         for (Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             // Call handlers implementing the old handleMetadata
@@ -140,6 +142,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
                 metadataList.addAll(event.extraMeta());
             }
             i++;
+        }
+
+        if (entity != null) {
+            entity.sentMetadata(true);
         }
     }
 
@@ -222,7 +228,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
     public void mapTypes() {
         Preconditions.checkArgument(typeMappings == null, "Type mappings have already been set - manual type mappings should be set *after* this");
         Preconditions.checkNotNull(protocol.getMappingData().getEntityMappings(), "Protocol does not have entity mappings");
-        typeMappings = protocol.getMappingData().getEntityMappings().mappings();
+        typeMappings = protocol.getMappingData().getEntityMappings();
     }
 
     /**
@@ -245,10 +251,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTracker(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerTracker(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -257,10 +263,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTrackerWithData(ClientboundPacketType packetType, EntityType fallingBlockType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerTrackerWithData(C packetType, EntityType fallingBlockType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -282,10 +288,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerTrackerWithData1_19(ClientboundPacketType packetType, EntityType fallingBlockType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerTrackerWithData1_19(C packetType, EntityType fallingBlockType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity type
@@ -315,15 +321,10 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param entityType entity type
      * @param intType    int type of the entity id
      */
-    public void registerTracker(ClientboundPacketType packetType, EntityType entityType, Type<Integer> intType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int entityId = wrapper.passthrough(intType);
-                    tracker(wrapper.user()).addEntity(entityId, entityType);
-                });
-            }
+    public void registerTracker(C packetType, EntityType entityType, Type<Integer> intType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int entityId = wrapper.passthrough(intType);
+            tracker(wrapper.user()).addEntity(entityId, entityType);
         });
     }
 
@@ -333,7 +334,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      * @param packetType packet type
      * @param entityType entity type
      */
-    public void registerTracker(ClientboundPacketType packetType, EntityType entityType) {
+    public void registerTracker(C packetType, EntityType entityType) {
         registerTracker(packetType, entityType, Type.VAR_INT);
     }
 
@@ -342,17 +343,12 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      *
      * @param packetType remove entities packet type
      */
-    public void registerRemoveEntities(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int[] entityIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
-                    EntityTracker entityTracker = tracker(wrapper.user());
-                    for (int entity : entityIds) {
-                        entityTracker.removeEntity(entity);
-                    }
-                });
+    public void registerRemoveEntities(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int[] entityIds = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+            EntityTracker entityTracker = tracker(wrapper.user());
+            for (int entity : entityIds) {
+                entityTracker.removeEntity(entity);
             }
         });
     }
@@ -362,22 +358,17 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
      *
      * @param packetType remove entities packet type
      */
-    public void registerRemoveEntity(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int entityId = wrapper.passthrough(Type.VAR_INT);
-                    tracker(wrapper.user()).removeEntity(entityId);
-                });
-            }
+    public void registerRemoveEntity(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int entityId = wrapper.passthrough(Type.VAR_INT);
+            tracker(wrapper.user()).removeEntity(entityId);
         });
     }
 
-    public void registerMetadataRewriter(ClientboundPacketType packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerMetadataRewriter(C packetType, @Nullable Type<List<Metadata>> oldMetaType, Type<List<Metadata>> newMetaType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 if (oldMetaType != null) {
                     map(oldMetaType, newMetaType);
@@ -393,7 +384,7 @@ public abstract class EntityRewriter<T extends Protocol> extends RewriterBase<T>
         });
     }
 
-    public void registerMetadataRewriter(ClientboundPacketType packetType, Type<List<Metadata>> metaType) {
+    public void registerMetadataRewriter(C packetType, Type<List<Metadata>> metaType) {
         registerMetadataRewriter(packetType, null, metaType);
     }
 

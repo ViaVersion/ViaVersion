@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,6 @@
  */
 package com.viaversion.viaversion.api.platform;
 
-import com.google.common.annotations.Beta;
-
-/**
- * Represents a platform that proxies a list of Minecraft servers (Velocity, Bungee).
- * A platform might not be a proxy platform, even if {@link ViaPlatform#isProxy()} is true.
- *
- * @param <T> platform player type
- */
-@Beta
 public interface ViaServerProxyPlatform<T> extends ViaPlatform<T> {
 
     /**

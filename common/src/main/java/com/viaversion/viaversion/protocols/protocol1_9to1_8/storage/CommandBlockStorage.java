@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.util.Pair;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

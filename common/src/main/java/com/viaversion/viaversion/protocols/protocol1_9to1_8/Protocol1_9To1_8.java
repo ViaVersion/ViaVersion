@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,17 +26,29 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.*;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.*;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.*;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.PlayerPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.SpawnPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CompressionProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 import com.viaversion.viaversion.util.GsonUtil;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
@@ -46,7 +58,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
             return fixJson(line);
         }
     };
-    private final EntityRewriter metadataRewriter = new MetadataRewriter1_9To1_8(this);
+    private final MetadataRewriter1_9To1_8 metadataRewriter = new MetadataRewriter1_9To1_8(this);
 
     public Protocol1_9To1_8() {
         super(ClientboundPackets1_8.class, ClientboundPackets1_9.class, ServerboundPackets1_8.class, ServerboundPackets1_9.class);
@@ -100,18 +112,13 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         metadataRewriter.register();
 
         // Disconnect workaround (JSON!)
-        registerClientbound(State.LOGIN, 0x00, 0x00, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    if (wrapper.isReadable(Type.COMPONENT, 0)) {
-                        // Already written as json somewhere else
-                        return;
-                    }
-
-                    wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
-                });
+        registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> {
+            if (wrapper.isReadable(Type.COMPONENT, 0)) {
+                // Already written as json somewhere else
+                return;
             }
+
+            wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
         });
 
         // Other Handlers
@@ -152,7 +159,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public MetadataRewriter1_9To1_8 getEntityRewriter() {
         return metadataRewriter;
     }
 }

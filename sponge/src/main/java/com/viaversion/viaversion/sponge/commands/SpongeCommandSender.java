@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@ package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.SpongePlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
+import java.util.UUID;
 import net.kyori.adventure.identity.Identity;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.util.Identifiable;
-
-import java.util.UUID;
 
 public class SpongeCommandSender implements ViaCommandSender {
     private final CommandCause source;
@@ -47,7 +46,7 @@ public class SpongeCommandSender implements ViaCommandSender {
         if (source instanceof Identifiable) {
             return ((Identifiable) source).uniqueId();
         } else {
-            return UUID.fromString(getName());
+            return new UUID(0, 0);
         }
 
     }

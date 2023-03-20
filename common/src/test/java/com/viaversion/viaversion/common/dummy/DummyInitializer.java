@@ -23,7 +23,14 @@ import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 
 public final class DummyInitializer {
 
+    private static boolean initialized;
+
     public static void init() {
+        if (initialized) {
+            return;
+        }
+
+        initialized = true;
         Via.init(new ViaManagerImpl(new TestPlatform(), null, null, null));
         ((ProtocolManagerImpl) Via.getManager().getProtocolManager()).registerProtocols();
     }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,30 +29,33 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
-
 import java.util.List;
 
-public class BlockRewriter {
-    private final Protocol protocol;
+public class BlockRewriter<C extends ClientboundPacketType> {
+    private final Protocol<C, ?, ?, ?> protocol;
     private final Type<Position> positionType;
 
-    public BlockRewriter(Protocol protocol, Type<Position> positionType) {
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
         this.protocol = protocol;
         this.positionType = positionType;
     }
 
-    public void registerBlockAction(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerBlockAction(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(positionType); // Location
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
                 handler(wrapper -> {
+                    if (protocol.getMappingData().getBlockMappings() == null) {
+                        return;
+                    }
+
                     int id = wrapper.get(Type.VAR_INT, 0);
                     int mappedId = protocol.getMappingData().getNewBlockId(id);
                     if (mappedId == -1) {
@@ -67,10 +70,10 @@ public class BlockRewriter {
         });
     }
 
-    public void registerBlockChange(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerBlockChange(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(positionType);
                 map(Type.VAR_INT);
                 handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 0))));
@@ -78,10 +81,10 @@ public class BlockRewriter {
         });
     }
 
-    public void registerMultiBlockChange(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerMultiBlockChange(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Chunk X
                 map(Type.INT); // 1 - Chunk Z
                 handler(wrapper -> {
@@ -93,10 +96,10 @@ public class BlockRewriter {
         });
     }
 
-    public void registerVarLongMultiBlockChange(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerVarLongMultiBlockChange(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.LONG); // Chunk position
                 map(Type.BOOLEAN); // Suppress light updates
                 handler(wrapper -> {
@@ -108,15 +111,15 @@ public class BlockRewriter {
         });
     }
 
-    public void registerAcknowledgePlayerDigging(ClientboundPacketType packetType) {
+    public void registerAcknowledgePlayerDigging(C packetType) {
         // Same exact handler
         registerBlockChange(packetType);
     }
 
-    public void registerEffect(ClientboundPacketType packetType, int playRecordId, int blockBreakId) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerEffect(C packetType, int playRecordId, int blockBreakId) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Effect Id
                 map(positionType); // Location
                 map(Type.INT); // Data
@@ -133,47 +136,45 @@ public class BlockRewriter {
         });
     }
 
-    public void registerChunkData1_19(ClientboundPacketType packetType, ChunkTypeSupplier chunkTypeSupplier) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-                    Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-                    Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
-                    final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
-                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                            MathUtil.ceilLog2(tracker.biomesSent()));
-                    final Chunk chunk = wrapper.passthrough(chunkType);
-                    for (final ChunkSection section : chunk.getSections()) {
-                        final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                        for (int i = 0; i < blockPalette.size(); i++) {
-                            final int id = blockPalette.idByIndex(i);
-                            blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-                        }
-                    }
+    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+            final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
+                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                    MathUtil.ceilLog2(tracker.biomesSent()));
+            final Chunk chunk = wrapper.passthrough(chunkType);
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                }
+            }
 
-                    final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
-                    if (blockEntityMappings != null) {
-                        List<BlockEntity> blockEntities = chunk.blockEntities();
-                        for (int i = 0; i < blockEntities.size(); i++) {
-                            final BlockEntity blockEntity = blockEntities.get(i);
-                            blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
-                        }
-                    }
-                });
+            final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+            if (blockEntityMappings != null) {
+                List<BlockEntity> blockEntities = chunk.blockEntities();
+                for (int i = 0; i < blockEntities.size(); i++) {
+                    final BlockEntity blockEntity = blockEntities.get(i);
+                    blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                }
             }
         });
     }
 
-    public void registerBlockEntityData(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerBlockEntityData(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
-                    final int blockEntityId = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntityId, blockEntityId));
+                    final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
+                    if (mappings != null) {
+                        final int blockEntityId = wrapper.read(Type.VAR_INT);
+                        wrapper.write(Type.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
+                    }
                 });
             }
         });

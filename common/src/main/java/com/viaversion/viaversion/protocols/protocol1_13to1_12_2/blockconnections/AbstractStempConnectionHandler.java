@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,20 +20,19 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-
-import java.util.HashMap;
-import java.util.HashSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class AbstractStempConnectionHandler extends ConnectionHandler {
     private static final BlockFace[] BLOCK_FACES = {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
 
+    private final IntSet blockId = new IntOpenHashSet();
     private final int baseStateId;
-    private final Set<Integer> blockId = new HashSet<>();
 
-    private final Map<BlockFace, Integer> stemps = new HashMap<>();
+    private final Map<BlockFace, Integer> stemps = new EnumMap<>(BlockFace.class);
 
     protected AbstractStempConnectionHandler(String baseStateId) {
         this.baseStateId = ConnectionData.getId(baseStateId);

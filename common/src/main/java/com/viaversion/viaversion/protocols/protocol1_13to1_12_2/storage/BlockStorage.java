@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,8 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import space.vectrix.flare.SyncMap;
-
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import space.vectrix.flare.SyncMap;
 
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {

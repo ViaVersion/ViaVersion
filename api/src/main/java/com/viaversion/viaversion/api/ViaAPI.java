@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,9 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.SortedSet;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * General api point. For more specialized api methods, see {@link Via#getManager()}.
@@ -64,7 +63,7 @@ public interface ViaAPI<T> {
      * @return API version incremented with meaningful API changes
      */
     default int apiVersion() {
-        return 15;
+        return 19;
     }
 
     /**
@@ -136,7 +135,7 @@ public interface ViaAPI<T> {
      * Returns the supported protocol versions.
      * This method removes any blocked protocol versions.
      *
-     * @return a list of protocol versions
+     * @return a sorted set of protocol versions
      * @see #getFullSupportedVersions() for a full list
      */
     SortedSet<Integer> getSupportedVersions();
@@ -144,7 +143,7 @@ public interface ViaAPI<T> {
     /**
      * Returns the supported protocol versions, including blocked protocols.
      *
-     * @return a list of protocol versions
+     * @return a sorted set of protocol versions
      */
     SortedSet<Integer> getFullSupportedVersions();
 

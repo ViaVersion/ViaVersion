@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,8 +67,9 @@ import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_
 import com.viaversion.viaversion.protocols.protocol1_18_2to1_18.Protocol1_18_2To1_18;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.Protocol1_19_1To1_19;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
+import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.Protocol1_9_1_2To1_9_3_4;
 import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.Protocol1_9_1To1_9;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3To1_9_1_2;
@@ -80,11 +81,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,17 +101,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 public class ProtocolManagerImpl implements ProtocolManager {
     private static final Protocol BASE_PROTOCOL = new BaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
-    private final Map<Class<? extends Protocol>, Protocol> protocols = new HashMap<>();
+    private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>(64);
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<Integer> supportedVersions = new HashSet<>();
     private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
-    private final List<Protocol> registerList = new ArrayList<>();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
     private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
@@ -125,7 +125,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public ProtocolManagerImpl() {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("Via-Mappingloader-%d").build();
-        mappingLoaderExecutor = new ThreadPoolExecutor(5, 16, 45L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
+        mappingLoaderExecutor = new ThreadPoolExecutor(12, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
         mappingLoaderExecutor.allowCoreThreadTimeOut(true);
     }
 
@@ -172,13 +172,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         registerProtocol(new Protocol1_17To1_16_4(), ProtocolVersion.v1_17, ProtocolVersion.v1_16_4);
         registerProtocol(new Protocol1_17_1To1_17(), ProtocolVersion.v1_17_1, ProtocolVersion.v1_17);
+
         registerProtocol(new Protocol1_18To1_17_1(), ProtocolVersion.v1_18, ProtocolVersion.v1_17_1);
         registerProtocol(new Protocol1_18_2To1_18(), ProtocolVersion.v1_18_2, ProtocolVersion.v1_18);
 
         registerProtocol(new Protocol1_19To1_18_2(), ProtocolVersion.v1_19, ProtocolVersion.v1_18_2);
         registerProtocol(new Protocol1_19_1To1_19(), ProtocolVersion.v1_19_1, ProtocolVersion.v1_19);
-
         registerProtocol(new Protocol1_19_3To1_19_1(), ProtocolVersion.v1_19_3, ProtocolVersion.v1_19_1);
+        registerProtocol(new Protocol1_19_4To1_19_3(), ProtocolVersion.v1_19_4, ProtocolVersion.v1_19_3);
     }
 
     @Override
@@ -206,11 +207,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
             protocolMap.put(serverVersion, protocol);
         }
 
-        if (Via.getPlatform().isPluginEnabled()) {
-            protocol.register(Via.getManager().getProviders());
+        protocol.register(Via.getManager().getProviders());
+        if (Via.getManager().isInitialized()) {
             refreshVersions();
-        } else {
-            registerList.add(protocol);
         }
 
         if (protocol.hasMappingDataToLoad()) {
@@ -230,11 +229,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
         baseProtocol.initialize();
 
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
-        if (Via.getPlatform().isPluginEnabled()) {
-            baseProtocol.register(Via.getManager().getProviders());
+        baseProtocol.register(Via.getManager().getProviders());
+        if (Via.getManager().isInitialized()) {
             refreshVersions();
-        } else {
-            registerList.add(baseProtocol);
         }
     }
 
@@ -360,6 +357,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
+    public Collection<Protocol<?, ?, ?, ?>> getProtocols() {
+        return Collections.unmodifiableCollection(protocols.values());
+    }
+
+    @Override
     public ServerProtocolVersion getServerProtocolVersion() {
         return serverProtocolVersion;
     }
@@ -427,7 +429,9 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public boolean checkForMappingCompletion() {
         mappingLoaderLock.readLock().lock();
         try {
-            if (mappingsLoaded) return false;
+            if (mappingsLoaded) {
+                return false;
+            }
 
             for (CompletableFuture<Void> future : mappingLoaderFutures.values()) {
                 // Return if any future hasn't completed yet
@@ -489,17 +493,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         return new PacketWrapperImpl(packetId, buf, connection);
     }
 
-    /**
-     * Called when the server is enabled, to register any non-registered listeners.
-     */
-    public void onServerLoaded() {
-        for (Protocol protocol : registerList) {
-            protocol.register(Via.getManager().getProviders());
-        }
-        registerList.clear();
-    }
-
-    private void shutdownLoaderExecutor() {
+    public void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
         // If this log message is missing, something is wrong
@@ -510,10 +504,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         mappingLoaderFutures.clear();
         mappingLoaderFutures = null;
 
-        // Clear cached json files
-        if (MappingDataLoader.isCacheJsonMappings()) {
-            MappingDataLoader.getMappingsCache().clear();
-        }
+        // Clear cached mapping files
+        MappingDataLoader.clearCache();
     }
 
     private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {

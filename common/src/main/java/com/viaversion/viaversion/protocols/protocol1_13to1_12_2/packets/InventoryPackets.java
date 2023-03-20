@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,11 @@ import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.BlockIdData;
@@ -42,14 +41,13 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SoundSource;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
+public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_13To1_12_2> {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
     public InventoryPackets(Protocol1_13To1_12_2 protocol) {
@@ -58,9 +56,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
 
     @Override
     public void registerPackets() {
-        protocol.registerClientbound(ClientboundPackets1_12_1.SET_SLOT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.SET_SLOT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Slot Value
@@ -68,139 +66,133 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                 handler(itemToClientHandler(Type.FLAT_ITEM));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM_ARRAY, Type.FLAT_ITEM_ARRAY); // 1 - Window Values
 
                 handler(itemArrayHandler(Type.FLAT_ITEM_ARRAY));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.SHORT); // Property
                 map(Type.SHORT); // Value
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        short property = wrapper.get(Type.SHORT, 0);
-                        if (property >= 4 && property <= 6) { // Enchantment id
-                            wrapper.set(Type.SHORT, 1, (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.get(Type.SHORT, 1)));
-                        }
+                handler(wrapper -> {
+                    short property = wrapper.get(Type.SHORT, 0);
+                    if (property >= 4 && property <= 6) { // Enchantment id
+                        wrapper.set(Type.SHORT, 1, (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.get(Type.SHORT, 1)));
                     }
                 });
             }
         });
 
         // Plugin message Packet -> Trading
-        protocol.registerClientbound(ClientboundPackets1_12_1.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // 0 - Channel
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String channel = wrapper.get(Type.STRING, 0);
-                        // Handle stopsound change
-                        if (channel.equalsIgnoreCase("MC|StopSound")) {
-                            String originalSource = wrapper.read(Type.STRING);
-                            String originalSound = wrapper.read(Type.STRING);
+                handler(wrapper -> {
+                    String channel = wrapper.get(Type.STRING, 0);
+                    // Handle stopsound change
+                    if (channel.equalsIgnoreCase("MC|StopSound")) {
+                        String originalSource = wrapper.read(Type.STRING);
+                        String originalSound = wrapper.read(Type.STRING);
 
-                            // Reset the packet
-                            wrapper.clearPacket();
-                            wrapper.setId(0x4C);
+                        // Reset the packet
+                        wrapper.clearPacket();
+                        wrapper.setPacketType(ClientboundPackets1_13.STOP_SOUND);
 
-                            byte flags = 0;
-                            wrapper.write(Type.BYTE, flags); // Placeholder
-                            if (!originalSource.isEmpty()) {
-                                flags |= 1;
-                                Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
-                                if (!finalSource.isPresent()) {
-                                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                        Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
-                                    }
-                                    finalSource = Optional.of(SoundSource.MASTER);
-
-                                }
-
-                                wrapper.write(Type.VAR_INT, finalSource.get().getId());
-                            }
-                            if (!originalSound.isEmpty()) {
-                                flags |= 2;
-                                wrapper.write(Type.STRING, originalSound);
-                            }
-
-                            wrapper.set(Type.BYTE, 0, flags); // Update flags
-                            return;
-                        } else if (channel.equalsIgnoreCase("MC|TrList")) {
-                            channel = "minecraft:trader_list";
-                            wrapper.passthrough(Type.INT); // Passthrough Window ID
-
-                            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                            for (int i = 0; i < size; i++) {
-                                // Input Item
-                                Item input = wrapper.read(Type.ITEM);
-                                handleItemToClient(input);
-                                wrapper.write(Type.FLAT_ITEM, input);
-                                // Output Item
-                                Item output = wrapper.read(Type.ITEM);
-                                handleItemToClient(output);
-                                wrapper.write(Type.FLAT_ITEM, output);
-
-                                boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
-                                if (secondItem) {
-                                    // Second Item
-                                    Item second = wrapper.read(Type.ITEM);
-                                    handleItemToClient(second);
-                                    wrapper.write(Type.FLAT_ITEM, second);
-                                }
-
-                                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                                wrapper.passthrough(Type.INT); // Number of tools uses
-                                wrapper.passthrough(Type.INT); // Maximum number of trade uses
-                            }
-                        } else {
-                            String old = channel;
-                            channel = getNewPluginChannelId(channel);
-                            if (channel == null) {
+                        byte flags = 0;
+                        wrapper.write(Type.BYTE, flags); // Placeholder
+                        if (!originalSource.isEmpty()) {
+                            flags |= 1;
+                            Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
+                            if (!finalSource.isPresent()) {
                                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring outgoing plugin message with channel: " + old);
+                                    Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                 }
+                                finalSource = Optional.of(SoundSource.MASTER);
+
+                            }
+
+                            wrapper.write(Type.VAR_INT, finalSource.get().getId());
+                        }
+                        if (!originalSound.isEmpty()) {
+                            flags |= 2;
+                            wrapper.write(Type.STRING, originalSound);
+                        }
+
+                        wrapper.set(Type.BYTE, 0, flags); // Update flags
+                        return;
+                    } else if (channel.equalsIgnoreCase("MC|TrList")) {
+                        channel = "minecraft:trader_list";
+                        wrapper.passthrough(Type.INT); // Passthrough Window ID
+
+                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        for (int i = 0; i < size; i++) {
+                            // Input Item
+                            Item input = wrapper.read(Type.ITEM);
+                            handleItemToClient(input);
+                            wrapper.write(Type.FLAT_ITEM, input);
+                            // Output Item
+                            Item output = wrapper.read(Type.ITEM);
+                            handleItemToClient(output);
+                            wrapper.write(Type.FLAT_ITEM, output);
+
+                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            if (secondItem) {
+                                // Second Item
+                                Item second = wrapper.read(Type.ITEM);
+                                handleItemToClient(second);
+                                wrapper.write(Type.FLAT_ITEM, second);
+                            }
+
+                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Type.INT); // Number of tools uses
+                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                        }
+                    } else {
+                        String old = channel;
+                        channel = getNewPluginChannelId(channel);
+                        if (channel == null) {
+                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                Via.getPlatform().getLogger().warning("Ignoring outgoing plugin message with channel: " + old);
+                            }
+                            wrapper.cancel();
+                            return;
+                        } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
+                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            List<String> rewrittenChannels = new ArrayList<>();
+                            for (String s : channels) {
+                                String rewritten = getNewPluginChannelId(s);
+                                if (rewritten != null) {
+                                    rewrittenChannels.add(rewritten);
+                                } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + s);
+                                }
+                            }
+                            if (!rewrittenChannels.isEmpty()) {
+                                wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                            } else {
                                 wrapper.cancel();
                                 return;
-                            } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
-                                String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
-                                List<String> rewrittenChannels = new ArrayList<>();
-                                for (int i = 0; i < channels.length; i++) {
-                                    String rewritten = getNewPluginChannelId(channels[i]);
-                                    if (rewritten != null) {
-                                        rewrittenChannels.add(rewritten);
-                                    } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + channels[i]);
-                                    }
-                                }
-                                if (!rewrittenChannels.isEmpty()) {
-                                    wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
-                                } else {
-                                    wrapper.cancel();
-                                    return;
-                                }
                             }
                         }
-                        wrapper.set(Type.STRING, 0, channel);
                     }
+                    wrapper.set(Type.STRING, 0, channel);
                 });
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.ENTITY_EQUIPMENT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.ENTITY_EQUIPMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(Type.ITEM, Type.FLAT_ITEM); // 2 - Item
@@ -210,9 +202,9 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
         });
 
 
-        protocol.registerServerbound(ServerboundPackets1_13.CLICK_WINDOW, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_13.CLICK_WINDOW, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot
                 map(Type.BYTE); // 2 - Button
@@ -224,44 +216,41 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_13.PLUGIN_MESSAGE, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Channel
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        String channel = wrapper.get(Type.STRING, 0);
-                        String old = channel;
-                        channel = getOldPluginChannelId(channel);
-                        if (channel == null) {
-                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Ignoring incoming plugin message with channel: " + old);
-                            }
-                            wrapper.cancel();
-                            return;
-                        } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
-                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
-                            List<String> rewrittenChannels = new ArrayList<>();
-                            for (int i = 0; i < channels.length; i++) {
-                                String rewritten = getOldPluginChannelId(channels[i]);
-                                if (rewritten != null) {
-                                    rewrittenChannels.add(rewritten);
-                                } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + channels[i]);
-                                }
-                            }
-                            wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                handler(wrapper -> {
+                    String channel = wrapper.get(Type.STRING, 0);
+                    String old = channel;
+                    channel = getOldPluginChannelId(channel);
+                    if (channel == null) {
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            Via.getPlatform().getLogger().warning("Ignoring incoming plugin message with channel: " + old);
                         }
-                        wrapper.set(Type.STRING, 0, channel);
+                        wrapper.cancel();
+                        return;
+                    } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
+                        String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                        List<String> rewrittenChannels = new ArrayList<>();
+                        for (String s : channels) {
+                            String rewritten = getOldPluginChannelId(s);
+                            if (rewritten != null) {
+                                rewrittenChannels.add(rewritten);
+                            } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + s);
+                            }
+                        }
+                        wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                     }
+                    wrapper.set(Type.STRING, 0, channel);
                 });
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
+        protocol.registerServerbound(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.SHORT); // 0 - Slot
                 map(Type.FLAT_ITEM, Type.ITEM); // 1 - Clicked Item
 
@@ -441,14 +430,14 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
             }
         }
 
-        if (!Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId)) {
+        if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId) == -1) {
             if (!isDamageable(item.identifier()) && item.identifier() != 358) { // Map
                 if (tag == null) item.setTag(tag = new CompoundTag());
                 tag.put(NBT_TAG_NAME, new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
-            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().containsKey(rawId & ~0xF)) {
+            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId & ~0xF) != -1) {
                 rawId &= ~0xF; // Remove data
             } else {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
@@ -458,7 +447,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
             }
         }
 
-        item.setIdentifier(Protocol1_13To1_12_2.MAPPINGS.getItemMappings().get(rawId));
+        item.setIdentifier(Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId));
         item.setData((short) 0);
         return item;
     }
@@ -512,7 +501,7 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
         }
 
         if (rawId == null) {
-            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().get(item.identifier());
+            int oldId = Protocol1_13To1_12_2.MAPPINGS.getItemMappings().inverse().getNewId(item.identifier());
             if (oldId != -1) {
                 // Handle spawn eggs
                 Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);

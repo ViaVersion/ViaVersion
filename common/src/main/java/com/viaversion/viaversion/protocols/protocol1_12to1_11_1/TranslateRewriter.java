@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.data.AchievementTranslationMapping;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 
 public class TranslateRewriter {
 
-    private final static ComponentRewriter achievementTextRewriter = new ComponentRewriter() {
+    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<ClientboundPackets1_9_3>() {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             String text = AchievementTranslationMapping.get(translate);
@@ -108,7 +109,7 @@ public class TranslateRewriter {
             JsonElement translate = obj.get("translate");
             if (translate != null) {
                 if (translate.getAsString().startsWith("chat.type.achievement")) {
-                    achievementTextRewriter.processText(obj);
+                    ACHIEVEMENT_TEXT_REWRITER.processText(obj);
                 }
             }
         }

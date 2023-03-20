@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,22 +30,23 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PacketWrapperImpl implements PacketWrapper {
     private static final Protocol[] PROTOCOL_ARRAY = new Protocol[0];
 
+    private final Deque<PacketValue> readableObjects = new ArrayDeque<>();
+    private final List<PacketValue> packetValues = new ArrayList<>();
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
@@ -54,8 +55,6 @@ public class PacketWrapperImpl implements PacketWrapper {
      */
     private PacketType packetType;
     private int id;
-    private final Deque<Pair<Type, Object>> readableObjects = new ArrayDeque<>();
-    private final List<Pair<Type, Object>> packetValues = new ArrayList<>();
 
     public PacketWrapperImpl(int packetId, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
         this.id = packetId;
@@ -73,9 +72,12 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
-        for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.key() != type) continue;
+        for (PacketValue packetValue : packetValues) {
+            if (packetValue.type() != type) {
+                continue;
+            }
             if (currentIndex == index) {
+                //noinspection unchecked
                 return (T) packetValue.value();
             }
             currentIndex++;
@@ -86,8 +88,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public boolean is(Type type, int index) {
         int currentIndex = 0;
-        for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.key() != type) continue;
+        for (PacketValue packetValue : packetValues) {
+            if (packetValue.type() != type) {
+                continue;
+            }
             if (currentIndex == index) {
                 return true;
             }
@@ -99,8 +103,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public boolean isReadable(Type type, int index) {
         int currentIndex = 0;
-        for (Pair<Type, Object> packetValue : readableObjects) {
-            if (packetValue.key().getBaseClass() != type.getBaseClass()) continue;
+        for (PacketValue packetValue : readableObjects) {
+            if (packetValue.type().getBaseClass() != type.getBaseClass()) {
+                continue;
+            }
             if (currentIndex == index) {
                 return true;
             }
@@ -113,8 +119,10 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public <T> void set(Type<T> type, int index, T value) throws Exception {
         int currentIndex = 0;
-        for (Pair<Type, Object> packetValue : packetValues) {
-            if (packetValue.key() != type) continue;
+        for (PacketValue packetValue : packetValues) {
+            if (packetValue.type() != type) {
+                continue;
+            }
             if (currentIndex == index) {
                 packetValue.setValue(attemptTransform(type, value));
                 return;
@@ -140,22 +148,23 @@ public class PacketWrapperImpl implements PacketWrapper {
             }
         }
 
-        Pair<Type, Object> read = readableObjects.poll();
-        Type rtype = read.key();
-        if (rtype == type
-                || (type.getBaseClass() == rtype.getBaseClass()
-                && type.getOutputClass() == rtype.getOutputClass())) {
-            return (T) read.value();
-        } else if (rtype == Type.NOTHING) {
+        PacketValue readValue = readableObjects.poll();
+        Type readType = readValue.type();
+        if (readType == type
+                || (type.getBaseClass() == readType.getBaseClass()
+                && type.getOutputClass() == readType.getOutputClass())) {
+            //noinspection unchecked
+            return (T) readValue.value();
+        } else if (readType == Type.NOTHING) {
             return read(type); // retry
         } else {
-            throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + read.key().getTypeName()), type, readableObjects.size());
+            throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + readValue.type().getTypeName()), type, readableObjects.size());
         }
     }
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        packetValues.add(new Pair<>(type, attemptTransform(type, value)));
+        packetValues.add(new PacketValue(type, attemptTransform(type, value)));
     }
 
     /**
@@ -169,7 +178,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
             // Attempt conversion
             if (expectedType instanceof TypeConverter) {
-                return ((TypeConverter) expectedType).from(value);
+                return ((TypeConverter<?>) expectedType).from(value);
             }
 
             Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());
@@ -206,11 +215,11 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         int index = 0;
-        for (Pair<Type, Object> packetValue : packetValues) {
+        for (PacketValue packetValue : packetValues) {
             try {
-                packetValue.key().write(buffer, packetValue.value());
+                packetValue.type().write(buffer, packetValue.value());
             } catch (Exception e) {
-                throw createInformativeException(e, packetValue.key(), index);
+                throw createInformativeException(e, packetValue.type(), index);
             }
             index++;
         }
@@ -391,13 +400,13 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public void cancel() {
-        this.send = false;
+    public boolean isCancelled() {
+        return !this.send;
     }
 
     @Override
-    public boolean isCancelled() {
-        return !this.send;
+    public void setCancelled(boolean cancel) {
+        this.send = !cancel;
     }
 
     @Override
@@ -451,7 +460,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     private void sendToServer0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (isCancelled()) return;
+        if (isCancelled()) {
+            return;
+        }
 
         try {
             ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
@@ -498,10 +509,53 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public String toString() {
         return "PacketWrapper{" +
-                "packetType=" + packetType +
+                "type=" + packetType +
                 ", id=" + id +
-                ", packetValues=" + packetValues +
-                ", readableObjects=" + readableObjects +
+                ", values=" + packetValues +
+                ", readable=" + readableObjects +
                 '}';
+    }
+
+    public static final class PacketValue {
+        private final Type type;
+        private Object value;
+
+        private PacketValue(Type type, @Nullable Object value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        public Type type() {
+            return type;
+        }
+
+        public @Nullable Object value() {
+            return value;
+        }
+
+        public void setValue(@Nullable Object value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final PacketValue that = (PacketValue) o;
+            if (!type.equals(that.type)) return false;
+            return Objects.equals(value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = type.hashCode();
+            result = 31 * result + (value != null ? value.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "{" + type + ": " + value + "}";
+        }
     }
 }

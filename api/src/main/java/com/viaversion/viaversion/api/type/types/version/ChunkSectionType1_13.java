@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@ package com.viaversion.viaversion.api.type.types.version;
 
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import io.netty.buffer.ByteBuf;
@@ -39,8 +41,6 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
     public ChunkSection read(ByteBuf buffer) throws Exception {
         // Reaad bits per block
         int bitsPerBlock = buffer.readUnsignedByte();
-        int originalBitsPerBlock = bitsPerBlock;
-
         if (bitsPerBlock > 8) {
             bitsPerBlock = GLOBAL_PALETTE;
         } else if (bitsPerBlock < 4) {
@@ -52,8 +52,9 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
         if (bitsPerBlock != GLOBAL_PALETTE) {
             int paletteLength = Type.VAR_INT.readPrimitive(buffer);
             chunkSection = new ChunkSectionImpl(true, paletteLength);
+            DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
             for (int i = 0; i < paletteLength; i++) {
-                chunkSection.addPaletteEntry(Type.VAR_INT.readPrimitive(buffer));
+                blockPalette.addId(Type.VAR_INT.readPrimitive(buffer));
             }
         } else {
             chunkSection = new ChunkSectionImpl(true);
@@ -64,8 +65,9 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
         if (blockData.length > 0) {
             int expectedLength = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
             if (blockData.length == expectedLength) {
+                DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
                 CompactArrayUtil.iterateCompactArray(bitsPerBlock, ChunkSection.SIZE, blockData,
-                        bitsPerBlock == GLOBAL_PALETTE ? chunkSection::setFlatBlock : chunkSection::setPaletteIndex);
+                        bitsPerBlock == GLOBAL_PALETTE ? blockPalette::setIdAt : blockPalette::setPaletteIndexAt);
             }
         }
 
@@ -75,7 +77,8 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
     @Override
     public void write(ByteBuf buffer, ChunkSection chunkSection) throws Exception {
         int bitsPerBlock = 4;
-        while (chunkSection.getPaletteSize() > 1 << bitsPerBlock) {
+        DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
+        while (blockPalette.size() > 1 << bitsPerBlock) {
             bitsPerBlock += 1;
         }
 
@@ -87,14 +90,14 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
         // Write palette
         if (bitsPerBlock != GLOBAL_PALETTE) {
-            Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteSize());
-            for (int i = 0; i < chunkSection.getPaletteSize(); i++) {
-                Type.VAR_INT.writePrimitive(buffer, chunkSection.getPaletteEntry(i));
+            Type.VAR_INT.writePrimitive(buffer, blockPalette.size());
+            for (int i = 0; i < blockPalette.size(); i++) {
+                Type.VAR_INT.writePrimitive(buffer, blockPalette.idByIndex(i));
             }
         }
 
         long[] data = CompactArrayUtil.createCompactArray(bitsPerBlock, ChunkSection.SIZE,
-                bitsPerBlock == GLOBAL_PALETTE ? chunkSection::getFlatBlock : chunkSection::getPaletteIndex);
+                bitsPerBlock == GLOBAL_PALETTE ? blockPalette::idAt : blockPalette::paletteIndexAt);
         Type.LONG_ARRAY_PRIMITIVE.write(buffer, data);
     }
 }

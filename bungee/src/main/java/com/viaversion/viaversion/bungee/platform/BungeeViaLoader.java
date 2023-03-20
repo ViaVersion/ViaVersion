@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,13 +34,12 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarPro
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.scheduler.ScheduledTask;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class BungeeViaLoader implements ViaPlatformLoader {
     private final Set<Listener> listeners = new HashSet<>();

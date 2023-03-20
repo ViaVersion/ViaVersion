@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,15 +35,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import net.md_5.bungee.api.event.ServerSwitchEvent;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.score.Team;
-import net.md_5.bungee.event.EventHandler;
-import net.md_5.bungee.protocol.packet.PluginMessage;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -53,6 +44,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectEvent;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.score.Team;
+import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.packet.PluginMessage;
 
 public class BungeeServerHandler implements Listener {
     private static Method getHandshake;

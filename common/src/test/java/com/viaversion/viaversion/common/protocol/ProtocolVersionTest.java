@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.common.protocol;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
 public class ProtocolVersionTest {
 

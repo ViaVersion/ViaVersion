@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +41,14 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarPro
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
@@ -152,7 +156,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        return blockInteractions.contains(new Position(x, (short) y, z));
+        return blockInteractions.contains(new Position(x, y, z));
     }
 
     public void addBlockInteraction(Position p) {

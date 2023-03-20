@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,14 +18,13 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class SpongeViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("anti-xray-patch", "bungee-ping-interval",
+    private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval",
             "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
             "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
 

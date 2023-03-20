@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +53,11 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
         if (blockData.getValue("up").equals("true")) states |= 16;
         if (blockData.getValue("down").equals("true")) states |= 32;
         return states;
+    }
+
+    @Override
+    protected byte statesSize() {
+        return 64;
     }
 
     @Override

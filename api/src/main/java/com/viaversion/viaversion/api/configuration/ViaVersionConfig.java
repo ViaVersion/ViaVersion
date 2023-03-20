@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -187,13 +187,6 @@ public interface ViaVersionConfig {
     String getMaxWarningsKickMessage();
 
     /**
-     * Is anti-xray enabled?
-     *
-     * @return A boolean
-     */
-    boolean isAntiXRay();
-
-    /**
      * Send supported versions in the status response packet
      *
      * @return If true, enabled
@@ -262,6 +255,8 @@ public interface ViaVersionConfig {
      * @return true if enabled
      */
     boolean is1_13TeamColourFix();
+
+    boolean shouldRegisterUserConnectionOnJoin();
 
     /**
      * Should we fix shift quick move action for 1.12 clients
@@ -458,4 +453,6 @@ public interface ViaVersionConfig {
     boolean cache1_17Light();
 
     @Nullable String chatTypeFormat(String translationKey);
+
+    boolean isArmorToggleFix();
 }

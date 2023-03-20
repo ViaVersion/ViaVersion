@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -44,11 +42,11 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPackets1_16_2, ClientboundPackets1_17, ServerboundPackets1_16_2, ServerboundPackets1_17> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17", true);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.16.2", "1.17");
     private static final String[] NEW_GAME_EVENT_TAGS = {"minecraft:ignore_vibrations_sneaking", "minecraft:vibrations"};
-    private final EntityRewriter entityRewriter = new EntityPackets(this);
-    private final ItemRewriter itemRewriter = new InventoryPackets(this);
-    private final TagRewriter tagRewriter = new TagRewriter(this);
+    private final EntityPackets entityRewriter = new EntityPackets(this);
+    private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_16_2> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_17To1_16_4() {
         super(ClientboundPackets1_16_2.class, ClientboundPackets1_17.class, ServerboundPackets1_16_2.class, ServerboundPackets1_17.class);
@@ -61,115 +59,95 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
         WorldPackets.register(this);
 
-        registerClientbound(ClientboundPackets1_16_2.TAGS, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    // Tags are now generically written with resource location - 5 different Vanilla types
-                    wrapper.write(Type.VAR_INT, 5);
-                    for (RegistryType type : RegistryType.getValues()) {
-                        // Prefix with resource location
-                        wrapper.write(Type.STRING, type.resourceLocation());
+        registerClientbound(ClientboundPackets1_16_2.TAGS, wrapper -> {
+            // Tags are now generically written with resource location - 5 different Vanilla types
+            wrapper.write(Type.VAR_INT, 5);
+            for (RegistryType type : RegistryType.getValues()) {
+                // Prefix with resource location
+                wrapper.write(Type.STRING, type.resourceLocation());
 
-                        // Id conversion
-                        tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
+                // Id conversion
+                tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
 
-                        // Stop iterating after entity types
-                        if (type == RegistryType.ENTITY) {
-                            break;
-                        }
-                    }
+                // Stop iterating after entity types
+                if (type == RegistryType.ENTITY) {
+                    break;
+                }
+            }
 
-                    // New Game Event tags type
-                    wrapper.write(Type.STRING, RegistryType.GAME_EVENT.resourceLocation());
-                    wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
-                    for (String tag : NEW_GAME_EVENT_TAGS) {
-                        wrapper.write(Type.STRING, tag);
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
-                    }
-                });
+            // New Game Event tags type
+            wrapper.write(Type.STRING, RegistryType.GAME_EVENT.resourceLocation());
+            wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
+            for (String tag : NEW_GAME_EVENT_TAGS) {
+                wrapper.write(Type.STRING, tag);
+                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]);
             }
         });
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_16_2.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.STATISTICS);
 
-        SoundRewriter soundRewriter = new SoundRewriter(this);
+        SoundRewriter<ClientboundPackets1_16_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.STRING);
-                    wrapper.passthrough(Type.STRING);
-                    wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
-                    wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
-                });
+        registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
+            wrapper.passthrough(Type.STRING);
+            wrapper.passthrough(Type.STRING);
+            wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
+            wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
+        });
+
+        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Type.BYTE);
+            wrapper.read(Type.BOOLEAN); // Tracking position removed
+            wrapper.passthrough(Type.BOOLEAN);
+
+            int size = wrapper.read(Type.VAR_INT);
+            // Write whether markers exists or not
+            if (size != 0) {
+                wrapper.write(Type.BOOLEAN, true);
+                wrapper.write(Type.VAR_INT, size);
+            } else {
+                wrapper.write(Type.BOOLEAN, false);
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT);
-                    wrapper.passthrough(Type.BYTE);
-                    wrapper.read(Type.BOOLEAN); // Tracking position removed
-                    wrapper.passthrough(Type.BOOLEAN);
-
-                    int size = wrapper.read(Type.VAR_INT);
-                    // Write whether markers exists or not
-                    if (size != 0) {
-                        wrapper.write(Type.BOOLEAN, true);
-                        wrapper.write(Type.VAR_INT, size);
-                    } else {
-                        wrapper.write(Type.BOOLEAN, false);
-                    }
-                });
+        registerClientbound(ClientboundPackets1_16_2.TITLE, null, wrapper -> {
+            // Title packet actions have been split into individual packets (the content hasn't changed)
+            int type = wrapper.read(Type.VAR_INT);
+            ClientboundPacketType packetType;
+            switch (type) {
+                case 0:
+                    packetType = ClientboundPackets1_17.TITLE_TEXT;
+                    break;
+                case 1:
+                    packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
+                    break;
+                case 2:
+                    packetType = ClientboundPackets1_17.ACTIONBAR;
+                    break;
+                case 3:
+                    packetType = ClientboundPackets1_17.TITLE_TIMES;
+                    break;
+                case 4:
+                    packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                    wrapper.write(Type.BOOLEAN, false); // Reset times
+                    break;
+                case 5:
+                    packetType = ClientboundPackets1_17.CLEAR_TITLES;
+                    wrapper.write(Type.BOOLEAN, true); // Reset times
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid title type received: " + type);
             }
+
+            wrapper.setPacketType(packetType);
         });
 
-        registerClientbound(ClientboundPackets1_16_2.TITLE, null, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketHandlers() {
             @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    // Title packet actions have been split into individual packets (the content hasn't changed)
-                    int type = wrapper.read(Type.VAR_INT);
-                    ClientboundPacketType packetType;
-                    switch (type) {
-                        case 0:
-                            packetType = ClientboundPackets1_17.TITLE_TEXT;
-                            break;
-                        case 1:
-                            packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
-                            break;
-                        case 2:
-                            packetType = ClientboundPackets1_17.ACTIONBAR;
-                            break;
-                        case 3:
-                            packetType = ClientboundPackets1_17.TITLE_TIMES;
-                            break;
-                        case 4:
-                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                            wrapper.write(Type.BOOLEAN, false); // Reset times
-                            break;
-                        case 5:
-                            packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                            wrapper.write(Type.BOOLEAN, true); // Reset times
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Invalid title type received: " + type);
-                    }
-
-                    wrapper.setId(packetType.getId());
-                });
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketRemapper() {
-            @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.FLOAT); // X
                 map(Type.FLOAT); // Y
                 map(Type.FLOAT); // Z
@@ -181,9 +159,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION1_14);
                 handler(wrapper -> {
                     // Angle (which Mojang just forgot to write to the buffer, lol)
@@ -192,9 +170,9 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Locale
                 map(Type.BYTE); // View distance
                 map(Type.VAR_INT); // Chat mode
@@ -246,12 +224,12 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public EntityPackets getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

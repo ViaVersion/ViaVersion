@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,8 @@ import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.lang.reflect.Method;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BukkitChannelInitializer extends ChannelInitializer<Channel> implements WrappedChannelInitializer {
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-
 import java.util.Optional;
 
 public class SpawnEggRewriter {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@ import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 
 /**
  * Handles json chat components, containing methods to override certain parts of the handling.
  * Also contains methods to register a few of the packets using components.
  */
-public class ComponentRewriter {
-    protected final Protocol protocol;
+public class ComponentRewriter<C extends ClientboundPacketType> {
+    protected final Protocol<C, ?, ?, ?> protocol;
 
-    public ComponentRewriter(Protocol protocol) {
+    public ComponentRewriter(Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
     }
 
@@ -52,24 +52,19 @@ public class ComponentRewriter {
      *
      * @param packetType clientbound packet type
      */
-    public void registerComponentPacket(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
-            }
-        });
+    public void registerComponentPacket(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
     }
 
     @Deprecated/*(forRemoval = true)**/
-    public void registerChatMessage(ClientboundPacketType packetType) {
+    public void registerChatMessage(C packetType) {
         registerComponentPacket(packetType);
     }
 
-    public void registerBossBar(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
+    public void registerBossBar(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.UUID);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
@@ -85,17 +80,12 @@ public class ComponentRewriter {
     /**
      * Handles sub 1.17 combat event components.
      */
-    public void registerCombatEvent(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    if (wrapper.passthrough(Type.VAR_INT) == 2) {
-                        wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.INT);
-                        processText(wrapper.passthrough(Type.COMPONENT));
-                    }
-                });
+    public void registerCombatEvent(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            if (wrapper.passthrough(Type.VAR_INT) == 2) {
+                wrapper.passthrough(Type.VAR_INT);
+                wrapper.passthrough(Type.INT);
+                processText(wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
@@ -103,16 +93,11 @@ public class ComponentRewriter {
     /**
      * Handles sub 1.17 title components.
      */
-    public void registerTitle(ClientboundPacketType packetType) {
-        protocol.registerClientbound(packetType, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    int action = wrapper.passthrough(Type.VAR_INT);
-                    if (action >= 0 && action <= 2) {
-                        processText(wrapper.passthrough(Type.COMPONENT));
-                    }
-                });
+    public void registerTitle(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int action = wrapper.passthrough(Type.VAR_INT);
+            if (action >= 0 && action <= 2) {
+                processText(wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
@@ -198,7 +183,7 @@ public class ComponentRewriter {
         }
     }
 
-    public <T extends Protocol> T getProtocol() {
+    public <T extends Protocol<C, ?, ?, ?>> T getProtocol() {
         return (T) protocol;
     }
 }

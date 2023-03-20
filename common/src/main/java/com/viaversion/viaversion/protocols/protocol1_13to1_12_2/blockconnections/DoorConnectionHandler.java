@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
-
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,8 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class DoorConnectionHandler extends ConnectionHandler {
-    private static final Map<Integer, DoorData> doorDataMap = new HashMap<>();
-    private static final Map<Short, Integer> connectedStates = new HashMap<>();
+    private static final Int2ObjectMap<DoorData> DOOR_DATA_MAP = new Int2ObjectOpenHashMap<>();
+    private static final Map<Short, Integer> CONNECTED_STATES = new HashMap<>();
 
     static ConnectionData.ConnectorInitAction init() {
         final List<String> baseDoors = new LinkedList<>();
@@ -57,9 +58,9 @@ public class DoorConnectionHandler extends ConnectionHandler {
                     type
             );
 
-            doorDataMap.put(id, doorData);
+            DOOR_DATA_MAP.put(id, doorData);
 
-            connectedStates.put(getStates(doorData), id);
+            CONNECTED_STATES.put(getStates(doorData), id);
 
             ConnectionData.connectionHandlerMap.put(id, connectionHandler);
         };
@@ -78,12 +79,12 @@ public class DoorConnectionHandler extends ConnectionHandler {
 
     @Override
     public int connect(UserConnection user, Position position, int blockState) {
-        DoorData doorData = doorDataMap.get(blockState);
+        DoorData doorData = DOOR_DATA_MAP.get(blockState);
         if (doorData == null) return blockState;
         short s = 0;
         s |= (doorData.getType() & 0x7) << 6;
         if (doorData.isLower()) {
-            DoorData upperHalf = doorDataMap.get(getBlockData(user, position.getRelative(BlockFace.TOP)));
+            DoorData upperHalf = DOOR_DATA_MAP.get(getBlockData(user, position.getRelative(BlockFace.TOP)));
             if (upperHalf == null) return blockState;
             s |= 1;
             if (doorData.isOpen()) s |= 2;
@@ -91,7 +92,7 @@ public class DoorConnectionHandler extends ConnectionHandler {
             if (upperHalf.isRightHinge()) s |= 8;
             s |= doorData.getFacing().ordinal() << 4;
         } else {
-            DoorData lowerHalf = doorDataMap.get(getBlockData(user, position.getRelative(BlockFace.BOTTOM)));
+            DoorData lowerHalf = DOOR_DATA_MAP.get(getBlockData(user, position.getRelative(BlockFace.BOTTOM)));
             if (lowerHalf == null) return blockState;
             if (lowerHalf.isOpen()) s |= 2;
             if (doorData.isPowered()) s |= 4;
@@ -99,7 +100,7 @@ public class DoorConnectionHandler extends ConnectionHandler {
             s |= lowerHalf.getFacing().ordinal() << 4;
         }
 
-        Integer newBlockState = connectedStates.get(s);
+        Integer newBlockState = CONNECTED_STATES.get(s);
         return newBlockState == null ? blockState : newBlockState;
     }
 

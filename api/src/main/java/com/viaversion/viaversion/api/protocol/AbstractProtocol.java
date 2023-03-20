@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,108 +32,114 @@ import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.packet.mapping.PacketMapping;
+import com.viaversion.viaversion.api.protocol.packet.mapping.PacketMappings;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypeMap;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 extends ClientboundPacketType, S1 extends ServerboundPacketType, S2 extends ServerboundPacketType>
-        implements Protocol<C1, C2, S1, S2> {
-    private final Map<Packet, ProtocolPacket> serverbound = new HashMap<>();
-    private final Map<Packet, ProtocolPacket> clientbound = new HashMap<>();
-    private final Map<Class<?>, Object> storedObjects = new HashMap<>(); // currently only used for MetadataRewriters
-    protected final Class<C1> oldClientboundPacketEnum;
-    protected final Class<C2> newClientboundPacketEnum;
-    protected final Class<S1> oldServerboundPacketEnum;
-    protected final Class<S2> newServerboundPacketEnum;
+/**
+ * Abstract protocol class to handle packet transformation between two protocol versions.
+ *
+ * @param <CU> unmapped clientbound packet type
+ * @param <CM> mapped clientbound packet type
+ * @param <SM> mapped serverbound packet type
+ * @param <SU> unmapped serverbound packet type
+ */
+public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType,
+        SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
+    protected final Class<CU> unmappedClientboundPacketType;
+    protected final Class<CM> mappedClientboundPacketType;
+    protected final Class<SM> mappedServerboundPacketType;
+    protected final Class<SU> unmappedServerboundPacketType;
+    protected final PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider;
+    protected final PacketMappings clientboundMappings;
+    protected final PacketMappings serverboundMappings;
+    private final Map<Class<?>, Object> storedObjects = new HashMap<>();
     private boolean initialized;
 
+    @Deprecated
     protected AbstractProtocol() {
         this(null, null, null, null);
     }
 
     /**
-     * Creates a protocol with automated id mapping if the respective enums are not null.
+     * Creates a protocol with automated id mapping if the respective packet type classes are not null.
      */
-    protected AbstractProtocol(@Nullable Class<C1> oldClientboundPacketEnum, @Nullable Class<C2> clientboundPacketEnum,
-                               @Nullable Class<S1> oldServerboundPacketEnum, @Nullable Class<S2> serverboundPacketEnum) {
-        this.oldClientboundPacketEnum = oldClientboundPacketEnum;
-        this.newClientboundPacketEnum = clientboundPacketEnum;
-        this.oldServerboundPacketEnum = oldServerboundPacketEnum;
-        this.newServerboundPacketEnum = serverboundPacketEnum;
+    protected AbstractProtocol(@Nullable Class<CU> unmappedClientboundPacketType, @Nullable Class<CM> mappedClientboundPacketType,
+                               @Nullable Class<SM> mappedServerboundPacketType, @Nullable Class<SU> unmappedServerboundPacketType) {
+        this.unmappedClientboundPacketType = unmappedClientboundPacketType;
+        this.mappedClientboundPacketType = mappedClientboundPacketType;
+        this.mappedServerboundPacketType = mappedServerboundPacketType;
+        this.unmappedServerboundPacketType = unmappedServerboundPacketType;
+        this.packetTypesProvider = createPacketTypesProvider();
+        this.clientboundMappings = createClientboundPacketMappings();
+        this.serverboundMappings = createServerboundPacketMappings();
     }
 
     @Override
     public final void initialize() {
-        Preconditions.checkArgument(!initialized);
+        Preconditions.checkArgument(!initialized, "Protocol has already been initialized");
         initialized = true;
 
         registerPackets();
 
         // Register the rest of the ids with no handlers if necessary
-        if (oldClientboundPacketEnum != null && newClientboundPacketEnum != null
-                && oldClientboundPacketEnum != newClientboundPacketEnum) {
-            registerClientboundChannelIdChanges();
+        if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
+                && unmappedClientboundPacketType != mappedClientboundPacketType) {
+            registerPacketIdChanges(
+                    packetTypesProvider.unmappedClientboundPacketTypes(),
+                    packetTypesProvider.mappedClientboundPacketTypes(),
+                    this::hasRegisteredClientbound,
+                    this::registerClientbound
+            );
         }
-        if (oldServerboundPacketEnum != null && newServerboundPacketEnum != null
-                && oldServerboundPacketEnum != newServerboundPacketEnum) {
-            registerServerboundChannelIdChanges();
-        }
-    }
-
-    protected void registerClientboundChannelIdChanges() {
-        C2[] newConstants = newClientboundPacketEnum.getEnumConstants();
-        Map<String, C2> newClientboundPackets = new HashMap<>(newConstants.length);
-        for (C2 newConstant : newConstants) {
-            newClientboundPackets.put(newConstant.getName(), newConstant);
-        }
-
-        for (C1 packet : oldClientboundPacketEnum.getEnumConstants()) {
-            C2 mappedPacket = newClientboundPackets.get(packet.getName());
-            if (mappedPacket == null) {
-                // Packet doesn't exist on new client
-                Preconditions.checkArgument(hasRegisteredClientbound(packet),
-                        "Packet " + packet + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
-                continue;
-            }
-
-            if (!hasRegisteredClientbound(packet)) {
-                registerClientbound(packet, mappedPacket);
-            }
+        if (mappedServerboundPacketType != null && unmappedServerboundPacketType != null &&
+                mappedServerboundPacketType != unmappedServerboundPacketType) {
+            registerPacketIdChanges(
+                    packetTypesProvider.unmappedServerboundPacketTypes(),
+                    packetTypesProvider.mappedServerboundPacketTypes(),
+                    this::hasRegisteredServerbound,
+                    this::registerServerbound
+            );
         }
     }
 
-    protected void registerServerboundChannelIdChanges() {
-        S1[] oldConstants = oldServerboundPacketEnum.getEnumConstants();
-        Map<String, S1> oldServerboundConstants = new HashMap<>(oldConstants.length);
-        for (S1 oldConstant : oldConstants) {
-            oldServerboundConstants.put(oldConstant.getName(), oldConstant);
-        }
+    private <U extends PacketType, M extends PacketType> void registerPacketIdChanges(
+            Map<State, PacketTypeMap<U>> unmappedPacketTypes,
+            Map<State, PacketTypeMap<M>> mappedPacketTypes,
+            Predicate<U> registeredPredicate,
+            BiConsumer<U, M> registerConsumer
+    ) {
+        for (Map.Entry<State, PacketTypeMap<M>> entry : mappedPacketTypes.entrySet()) {
+            PacketTypeMap<M> mappedTypes = entry.getValue();
+            for (U unmappedType : unmappedPacketTypes.get(entry.getKey()).types()) {
+                M mappedType = mappedTypes.typeByName(unmappedType.getName());
+                if (mappedType == null) {
+                    // No mapped packet of the same name exists
+                    Preconditions.checkArgument(registeredPredicate.test(unmappedType),
+                            "Packet %s in %s has no mapping - it needs to be manually cancelled or remapped", unmappedType, getClass());
+                    continue;
+                }
 
-        for (S2 packet : newServerboundPacketEnum.getEnumConstants()) {
-            S1 mappedPacket = oldServerboundConstants.get(packet.getName());
-            if (mappedPacket == null) {
-                // Packet doesn't exist on old server
-                Preconditions.checkArgument(hasRegisteredServerbound(packet),
-                        "Packet " + packet + " in " + getClass().getSimpleName() + " has no mapping - it needs to be manually cancelled or remapped!");
-                continue;
+                // Register if no custom handler exists and ids are different
+                if (unmappedType.getId() != mappedType.getId() && !registeredPredicate.test(unmappedType)) {
+                    registerConsumer.accept(unmappedType, mappedType);
+                }
             }
-
-            if (!hasRegisteredServerbound(packet)) {
-                registerServerbound(packet, mappedPacket);
-            }
         }
-    }
-
-    /**
-     * Register the packets for this protocol. To be overriden.
-     */
-    protected void registerPackets() {
     }
 
     @Override
@@ -143,187 +149,209 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
     }
 
     /**
+     * Register the packets for this protocol. To be overriden.
+     */
+    protected void registerPackets() {
+        callRegister(getEntityRewriter());
+        callRegister(getItemRewriter());
+    }
+
+    /**
      * Called after {@link #loadMappingData()} is called; load extra mapping data for the protocol.
      * <p>
      * To be overridden if needed.
      */
     protected void onMappingDataLoaded() {
+        callOnMappingDataLoaded(getEntityRewriter());
+        callOnMappingDataLoaded(getItemRewriter());
+    }
+
+    private void callRegister(@Nullable Rewriter<?> rewriter) {
+        if (rewriter != null) {
+            rewriter.register();
+        }
+    }
+
+    private void callOnMappingDataLoaded(@Nullable Rewriter<?> rewriter) {
+        if (rewriter != null) {
+            rewriter.onMappingDataLoaded();
+        }
     }
 
     protected void addEntityTracker(UserConnection connection, EntityTracker tracker) {
         connection.addEntityTracker(this.getClass(), tracker);
     }
 
+    protected PacketTypesProvider<CU, CM, SM, SU> createPacketTypesProvider() {
+        return new SimplePacketTypesProvider<>(
+                packetTypeMap(unmappedClientboundPacketType),
+                packetTypeMap(mappedClientboundPacketType),
+                packetTypeMap(mappedServerboundPacketType),
+                packetTypeMap(unmappedServerboundPacketType)
+        );
+    }
+
+    protected PacketMappings createClientboundPacketMappings() {
+        return PacketMappings.arrayMappings();
+    }
+
+    protected PacketMappings createServerboundPacketMappings() {
+        return PacketMappings.arrayMappings();
+    }
+
+    private <P extends PacketType> Map<State, PacketTypeMap<P>> packetTypeMap(Class<P> packetTypeClass) {
+        if (packetTypeClass != null) {
+            Map<State, PacketTypeMap<P>> map = new EnumMap<>(State.class);
+            map.put(State.PLAY, PacketTypeMap.of(packetTypeClass));
+            return map;
+        }
+        return Collections.emptyMap();
+    }
+
+    // ---------------------------------------------------------------------------------
 
     @Override
-    public void registerServerbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
-        ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        Packet packet = new Packet(state, newPacketID);
-        if (!override && serverbound.containsKey(packet)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, packet + " already registered!" +
+    public void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override) {
+        Preconditions.checkArgument(unmappedPacketId != -1, "Unmapped packet id cannot be -1");
+        PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
+        if (!override && serverboundMappings.hasMapping(state, unmappedPacketId)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
                     " If this override is intentional, set override to true. Stacktrace: ", new Exception());
         }
-        serverbound.put(packet, protocolPacket);
+        serverboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
 
     @Override
-    public void cancelServerbound(State state, int oldPacketID, int newPacketID) {
-        registerServerbound(state, oldPacketID, newPacketID, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+    public void cancelServerbound(State state, int unmappedPacketId) {
+        registerServerbound(state, unmappedPacketId, unmappedPacketId, PacketWrapper::cancel);
     }
 
     @Override
-    public void cancelServerbound(State state, int newPacketID) {
-        cancelServerbound(state, -1, newPacketID);
-    }
-
-    @Override
-    public void cancelClientbound(State state, int oldPacketID, int newPacketID) {
-        registerClientbound(state, oldPacketID, newPacketID, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(PacketWrapper::cancel);
-            }
-        });
-    }
-
-    @Override
-    public void cancelClientbound(State state, int oldPacketID) {
-        cancelClientbound(state, oldPacketID, -1);
-    }
-
-    @Override
-    public void registerClientbound(State state, int oldPacketID, int newPacketID, PacketRemapper packetRemapper, boolean override) {
-        ProtocolPacket protocolPacket = new ProtocolPacket(state, oldPacketID, newPacketID, packetRemapper);
-        Packet packet = new Packet(state, oldPacketID);
-        if (!override && clientbound.containsKey(packet)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, packet + " already registered!" +
+    public void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override) {
+        Preconditions.checkArgument(unmappedPacketId != -1, "Unmapped packet id cannot be -1");
+        PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
+        if (!override && clientboundMappings.hasMapping(state, unmappedPacketId)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
                     " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
-        clientbound.put(packet, protocolPacket);
-    }
-
-
-    @Override
-    public void registerClientbound(C1 packetType, @Nullable PacketRemapper packetRemapper) {
-        checkPacketType(packetType, oldClientboundPacketEnum == null || packetType.getClass() == oldClientboundPacketEnum);
-
-        C2 mappedPacket = oldClientboundPacketEnum == newClientboundPacketEnum ? (C2) packetType
-                : Arrays.stream(newClientboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
-        Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
-
-        registerClientbound(packetType, mappedPacket, packetRemapper);
+        clientboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
 
     @Override
-    public void registerClientbound(C1 packetType, @Nullable C2 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        register(clientbound, packetType, mappedPacketType, oldClientboundPacketEnum, newClientboundPacketEnum, packetRemapper, override);
+    public void cancelClientbound(State state, int unmappedPacketId) {
+        registerClientbound(state, unmappedPacketId, unmappedPacketId, PacketWrapper::cancel);
+    }
+
+    // ---------------------------------------------------------------------------------
+
+    @Override
+    public void registerClientbound(CU packetType, @Nullable PacketHandler handler) {
+        PacketTypeMap<CM> mappedPacketTypes = packetTypesProvider.mappedClientboundPacketTypes().get(packetType.state());
+        CM mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedClientboundPacketType, mappedClientboundPacketType);
+        registerClientbound(packetType, mappedPacketType, handler);
     }
 
     @Override
-    public void cancelClientbound(C1 packetType) {
-        registerClientbound(packetType, null, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+    public void registerClientbound(CU packetType, @Nullable CM mappedPacketType, @Nullable PacketHandler handler, boolean override) {
+        register(clientboundMappings, packetType, mappedPacketType, unmappedClientboundPacketType, mappedClientboundPacketType, handler, override);
     }
 
     @Override
-    public void registerServerbound(S2 packetType, @Nullable PacketRemapper packetRemapper) {
-        checkPacketType(packetType, newServerboundPacketEnum == null || packetType.getClass() == newServerboundPacketEnum);
-
-        S1 mappedPacket = oldServerboundPacketEnum == newServerboundPacketEnum ? (S1) packetType
-                : Arrays.stream(oldServerboundPacketEnum.getEnumConstants()).filter(en -> en.getName().equals(packetType.getName())).findAny().orElse(null);
-        Preconditions.checkNotNull(mappedPacket, "Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
-
-        registerServerbound(packetType, mappedPacket, packetRemapper);
+    public void cancelClientbound(CU packetType) {
+        registerClientbound(packetType, null, PacketWrapper::cancel);
     }
 
     @Override
-    public void registerServerbound(S2 packetType, @Nullable S1 mappedPacketType, @Nullable PacketRemapper packetRemapper, boolean override) {
-        register(serverbound, packetType, mappedPacketType, newServerboundPacketEnum, oldServerboundPacketEnum, packetRemapper, override);
+    public void registerServerbound(SU packetType, @Nullable PacketHandler handler) {
+        PacketTypeMap<SM> mappedPacketTypes = packetTypesProvider.mappedServerboundPacketTypes().get(packetType.state());
+        SM mappedPacketType = mappedPacketType(packetType, mappedPacketTypes, unmappedServerboundPacketType, mappedServerboundPacketType);
+        registerServerbound(packetType, mappedPacketType, handler);
     }
 
     @Override
-    public void cancelServerbound(S2 packetType) {
-        registerServerbound(packetType, null, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(PacketWrapper::cancel);
-            }
-        });
+    public void registerServerbound(SU packetType, @Nullable SM mappedPacketType, @Nullable PacketHandler handler, boolean override) {
+        register(serverboundMappings, packetType, mappedPacketType, unmappedServerboundPacketType, mappedServerboundPacketType, handler, override);
     }
 
-    private void register(Map<Packet, ProtocolPacket> packetMap, PacketType packetType, @Nullable PacketType mappedPacketType,
-                          Class<? extends PacketType> unmappedPacketEnum, Class<? extends PacketType> mappedPacketEnum,
-                          @Nullable PacketRemapper remapper, boolean override) {
-        checkPacketType(packetType, unmappedPacketEnum == null || packetType.getClass() == unmappedPacketEnum);
-        checkPacketType(mappedPacketType, mappedPacketType == null || mappedPacketEnum == null || mappedPacketType.getClass() == mappedPacketEnum);
-        Preconditions.checkArgument(mappedPacketType == null || packetType.state() == mappedPacketType.state(), "Packet type state does not match mapped packet type state");
+    @Override
+    public void cancelServerbound(SU packetType) {
+        registerServerbound(packetType, null, PacketWrapper::cancel);
+    }
 
-        ProtocolPacket protocolPacket = new ProtocolPacket(packetType.state(), packetType, mappedPacketType, remapper);
-        Packet packet = new Packet(packetType.state(), packetType.getId());
-        if (!override && packetMap.containsKey(packet)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, packet + " already registered!" +
+    private void register(PacketMappings packetMappings, PacketType packetType, @Nullable PacketType mappedPacketType,
+                          Class<? extends PacketType> unmappedPacketClass, Class<? extends PacketType> mappedPacketClass,
+                          @Nullable PacketHandler handler, boolean override) {
+        checkPacketType(packetType, unmappedPacketClass == null || unmappedPacketClass.isInstance(packetType));
+        if (mappedPacketType != null) {
+            checkPacketType(mappedPacketType, mappedPacketClass == null || mappedPacketClass.isInstance(mappedPacketType));
+            Preconditions.checkArgument(packetType.state() == mappedPacketType.state(),
+                    "Packet type state does not match mapped packet type state");
+            Preconditions.checkArgument(packetType.direction() == mappedPacketType.direction(),
+                    "Packet type direction does not match mapped packet type state");
+        }
+
+        PacketMapping packetMapping = PacketMapping.of(mappedPacketType, handler);
+        if (!override && packetMappings.hasMapping(packetType)) {
+            Via.getPlatform().getLogger().log(Level.WARNING, packetType + " already registered!" +
                     " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
-        packetMap.put(packet, protocolPacket);
+        packetMappings.addMapping(packetType, packetMapping);
     }
 
-    @Override
-    public boolean hasRegisteredClientbound(C1 packetType) {
-        return hasRegisteredClientbound(packetType.state(), packetType.getId());
-    }
+    private static <U extends PacketType, M extends PacketType> M mappedPacketType(U packetType, PacketTypeMap<M> mappedTypes, Class<U> unmappedPacketTypeClass, Class<M> mappedPacketTypeClass) {
+        Preconditions.checkNotNull(packetType);
+        checkPacketType(packetType, unmappedPacketTypeClass == null || unmappedPacketTypeClass.isInstance(packetType));
+        if (unmappedPacketTypeClass == mappedPacketTypeClass) {
+            //noinspection unchecked
+            return (M) packetType;
+        }
 
-    @Override
-    public boolean hasRegisteredServerbound(S2 packetType) {
-        return hasRegisteredServerbound(packetType.state(), packetType.getId());
+        Preconditions.checkNotNull(mappedTypes, "Mapped packet types not provided for state %s of type class %s", packetType.state(), mappedPacketTypeClass);
+        M mappedType = mappedTypes.typeByName(packetType.getName());
+        if (mappedType != null) {
+            return mappedType;
+        }
+        throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " could not be automatically mapped!");
     }
 
     @Override
     public boolean hasRegisteredClientbound(State state, int unmappedPacketId) {
-        Packet packet = new Packet(state, unmappedPacketId);
-        return clientbound.containsKey(packet);
+        return clientboundMappings.hasMapping(state, unmappedPacketId);
     }
 
     @Override
     public boolean hasRegisteredServerbound(State state, int unmappedPacketId) {
-        Packet packet = new Packet(state, unmappedPacketId);
-        return serverbound.containsKey(packet);
+        return serverboundMappings.hasMapping(state, unmappedPacketId);
     }
 
     @Override
     public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-        Packet statePacket = new Packet(state, packetWrapper.getId());
-        Map<Packet, ProtocolPacket> packetMap = direction == Direction.CLIENTBOUND ? clientbound : serverbound;
-        ProtocolPacket protocolPacket = packetMap.get(statePacket);
-        if (protocolPacket == null) {
+        PacketMappings mappings = direction == Direction.CLIENTBOUND ? clientboundMappings : serverboundMappings;
+        int unmappedId = packetWrapper.getId();
+        PacketMapping packetMapping = mappings.mappedPacket(state, unmappedId);
+        if (packetMapping == null) {
             return;
         }
 
-        // Write packet id
-        int unmappedId = packetWrapper.getId();
-        if (protocolPacket.isMappedOverTypes()) {
-            packetWrapper.setPacketType(protocolPacket.getMappedPacketType());
-        } else {
-            int mappedId = direction == Direction.CLIENTBOUND ? protocolPacket.getNewId() : protocolPacket.getOldId();
-            if (unmappedId != mappedId) {
-                packetWrapper.setId(mappedId);
-            }
-        }
-
-        PacketRemapper remapper = protocolPacket.getRemapper();
-        if (remapper != null) {
+        // Change packet id and apply remapping
+        packetMapping.applyType(packetWrapper);
+        PacketHandler handler = packetMapping.handler();
+        if (handler != null) {
             try {
-                remapper.remap(packetWrapper);
-            } catch (InformativeException e) { // Catch InformativeExceptions, pass through CancelExceptions
+                handler.handle(packetWrapper);
+            } catch (CancelException e) {
+                // Pass through CancelExceptions
+                throw e;
+            } catch (InformativeException e) {
+                // Catch InformativeExceptions
+                e.addSource(handler.getClass());
                 throwRemapError(direction, state, unmappedId, packetWrapper.getId(), e);
+                return;
+            } catch (Exception e) {
+                // Wrap other exceptions during packet handling
+                InformativeException ex = new InformativeException(e);
+                ex.addSource(handler.getClass());
+                throwRemapError(direction, state, unmappedId, packetWrapper.getId(), ex);
                 return;
             }
 
@@ -333,23 +361,31 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         }
     }
 
-    private void throwRemapError(Direction direction, State state, int oldId, int newId, InformativeException e) throws InformativeException {
+    private void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
         // Don't print errors during handshake/login/status
         if (state != State.PLAY && direction == Direction.SERVERBOUND && !Via.getManager().debugHandler().enabled()) {
             e.setShouldBePrinted(false);
             throw e;
         }
 
-        Class<? extends PacketType> packetTypeClass = state == State.PLAY ? (direction == Direction.CLIENTBOUND ? oldClientboundPacketEnum : newServerboundPacketEnum) : null;
-        if (packetTypeClass != null) {
-            PacketType[] enumConstants = packetTypeClass.getEnumConstants();
-            PacketType packetType = oldId < enumConstants.length && oldId >= 0 ? enumConstants[oldId] : null;
-            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(oldId) + ")");
+        PacketType packetType = direction == Direction.CLIENTBOUND ? unmappedClientboundPacketType(state, unmappedPacketId) : unmappedServerboundPacketType(state, unmappedPacketId);
+        if (packetType != null) {
+            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(unmappedPacketId) + ")");
         } else {
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                    + " IN REMAP OF " + toNiceHex(oldId) + "->" + toNiceHex(newId));
+                    + " IN REMAP OF " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
         }
         throw e;
+    }
+
+    private @Nullable CU unmappedClientboundPacketType(final State state, final int packetId) {
+        PacketTypeMap<CU> map = packetTypesProvider.unmappedClientboundPacketTypes().get(state);
+        return map != null ? map.typeById(packetId) : null;
+    }
+
+    private @Nullable SU unmappedServerboundPacketType(final State state, final int packetId) {
+        PacketTypeMap<SU> map = packetTypesProvider.unmappedServerboundPacketTypes().get(state);
+        return map != null ? map.typeById(packetId) : null;
     }
 
     public static String toNiceHex(int id) {
@@ -362,10 +398,15 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
      * @param isValid    expression to check the packet's validity
      * @throws IllegalArgumentException if the given expression is not met
      */
-    private void checkPacketType(PacketType packetType, boolean isValid) {
+    private static void checkPacketType(PacketType packetType, boolean isValid) {
         if (!isValid) {
-            throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " is taken from the wrong enum");
+            throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " is taken from the wrong packet types class");
         }
+    }
+
+    @Override
+    public PacketTypesProvider<CU, CM, SM, SU> getPacketTypesProvider() {
+        return packetTypesProvider;
     }
 
     @Override
@@ -379,130 +420,12 @@ public abstract class AbstractProtocol<C1 extends ClientboundPacketType, C2 exte
         storedObjects.put(object.getClass(), object);
     }
 
-    @Override
-    public boolean hasMappingDataToLoad() {
-        return getMappingData() != null;
+    public PacketTypesProvider<CU, CM, SM, SU> packetTypesProvider() {
+        return packetTypesProvider;
     }
 
     @Override
     public String toString() {
         return "Protocol:" + getClass().getSimpleName();
-    }
-
-    public static final class Packet {
-        private final State state;
-        private final int packetId;
-
-        public Packet(State state, int packetId) {
-            this.state = state;
-            this.packetId = packetId;
-        }
-
-        public State getState() {
-            return state;
-        }
-
-        public int getPacketId() {
-            return packetId;
-        }
-
-        @Override
-        public String toString() {
-            return "Packet{" + "state=" + state + ", packetId=" + packetId + '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Packet that = (Packet) o;
-            return packetId == that.packetId && state == that.state;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = state != null ? state.hashCode() : 0;
-            result = 31 * result + packetId;
-            return result;
-        }
-    }
-
-    public static final class ProtocolPacket {
-        private final State state;
-        private final int oldId;
-        private final int newId;
-        private final PacketType unmappedPacketType;
-        private final PacketType mappedPacketType;
-        private final PacketRemapper remapper;
-
-        @Deprecated
-        public ProtocolPacket(State state, int oldId, int newId, @Nullable PacketRemapper remapper) {
-            this.state = state;
-            this.oldId = oldId;
-            this.newId = newId;
-            this.remapper = remapper;
-            this.unmappedPacketType = null;
-            this.mappedPacketType = null;
-        }
-
-        public ProtocolPacket(State state, PacketType unmappedPacketType, @Nullable PacketType mappedPacketType, @Nullable PacketRemapper remapper) {
-            this.state = state;
-            this.unmappedPacketType = unmappedPacketType;
-            if (unmappedPacketType.direction() == Direction.CLIENTBOUND) {
-                this.oldId = unmappedPacketType.getId();
-                this.newId = mappedPacketType != null ? mappedPacketType.getId() : -1;
-            } else {
-                // Serverbound switcheroo in old vs. new id caused issues and was counterintuitive
-                this.oldId = mappedPacketType != null ? mappedPacketType.getId() : -1;
-                this.newId = unmappedPacketType.getId();
-            }
-            this.mappedPacketType = mappedPacketType;
-            this.remapper = remapper;
-        }
-
-        public State getState() {
-            return state;
-        }
-
-        @Deprecated
-        public int getOldId() {
-            return oldId;
-        }
-
-        @Deprecated
-        public int getNewId() {
-            return newId;
-        }
-
-        /**
-         * Returns the unmapped packet type, or null if mapped over ids.
-         * This is NOT the same as calling {@link #getOldId()} (think of unmapped vs. old in 1.17→1.16).
-         *
-         * @return unmapped packet type, or null if mapped over ids
-         */
-        @Nullable
-        public PacketType getUnmappedPacketType() {
-            return unmappedPacketType;
-        }
-
-        /**
-         * Returns the mapped packet type, or null if mapped over ids or mapped to no packet type.
-         * This is NOT the same as calling {@link #getNewId()} (think of mapped vs. new in 1.17→1.16).
-         *
-         * @return new packet type, or null if mapped over ids or mapped to no packet type
-         */
-        @Nullable
-        public PacketType getMappedPacketType() {
-            return mappedPacketType;
-        }
-
-        public boolean isMappedOverTypes() {
-            return unmappedPacketType != null;
-        }
-
-        @Nullable
-        public PacketRemapper getRemapper() {
-            return remapper;
-        }
     }
 }

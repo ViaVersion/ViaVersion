@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.packets;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
@@ -35,9 +35,9 @@ public class EntityPackets {
             }
         };
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_MOB, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -56,9 +56,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PLAYER, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PLAYER, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Player UUID
                 map(Type.DOUBLE); // 2 - X
@@ -72,9 +72,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_METADATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_METADATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Types1_13.METADATA_LIST, Types1_13_2.METADATA_LIST); // 1 - Metadata list
 

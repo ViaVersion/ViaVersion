@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
     private static final AtomicLong IDS = new AtomicLong();

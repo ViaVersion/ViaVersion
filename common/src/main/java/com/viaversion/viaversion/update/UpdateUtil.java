@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class UpdateUtil {
+public final class UpdateUtil {
 
     private static final String PREFIX = "§a§l[ViaVersion] §a";
     private static final String URL = "https://api.spiget.org/v2/resources/";
@@ -111,8 +109,6 @@ public class UpdateUtil {
                 return null;
             }
             return statistics.get("name").getAsString();
-        } catch (MalformedURLException e) {
-            return null;
         } catch (IOException e) {
             return null;
         }

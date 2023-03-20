@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-
 import java.util.UUID;
 
 public class VelocityCommandSender implements ViaCommandSender {
@@ -46,7 +45,7 @@ public class VelocityCommandSender implements ViaCommandSender {
         if (source instanceof Player) {
             return ((Player) source).getUniqueId();
         }
-        return UUID.fromString(getName());
+        return new UUID(0, 0);
     }
 
     @Override

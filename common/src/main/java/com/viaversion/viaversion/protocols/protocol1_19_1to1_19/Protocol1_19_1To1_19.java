@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
 import com.viaversion.viaversion.libs.kyori.adventure.text.TranslatableComponent;
@@ -47,11 +46,10 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceSto
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
@@ -98,9 +96,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_19.SYSTEM_CHAT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19.SYSTEM_CHAT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.COMPONENT); // Content
                 handler(wrapper -> {
                     final int type = wrapper.read(Type.VAR_INT);
@@ -109,9 +107,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, ClientboundPackets1_19_1.SYSTEM_CHAT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19.PLAYER_CHAT, ClientboundPackets1_19_1.SYSTEM_CHAT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     // Back to system chat
                     final JsonElement signedContent = wrapper.read(Type.COMPONENT);
@@ -136,9 +134,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
             }
         });
-        registerServerbound(ServerboundPackets1_19_1.CHAT_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_1.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Message
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
@@ -148,9 +146,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
-        registerServerbound(ServerboundPackets1_19_1.CHAT_COMMAND, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_1.CHAT_COMMAND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
@@ -168,9 +166,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         });
         cancelServerbound(ServerboundPackets1_19_1.CHAT_ACK);
 
-        registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -194,9 +192,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_19.SERVER_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19.SERVER_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.OPTIONAL_COMPONENT); // Motd
                 map(Type.OPTIONAL_STRING); // Encoded icon
                 map(Type.BOOLEAN); // Previews chat
@@ -204,9 +202,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Name
                 handler(wrapper -> {
                     // Profile keys are not compatible; replace it with an empty one
@@ -220,9 +218,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.OPTIONAL_UUID); // Profile uuid
             }
         });
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Server id
                 handler(wrapper -> {
                     if (wrapper.user().has(NonceStorage.class)) {
@@ -235,9 +233,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
                 handler(wrapper -> {
                     final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
@@ -255,9 +253,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.CUSTOM_QUERY.getId(), ClientboundLoginPackets.CUSTOM_QUERY.getId(), new PacketRemapper() {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.CUSTOM_QUERY.getId(), ClientboundLoginPackets.CUSTOM_QUERY.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT);
                 map(Type.STRING);
                 handler(wrapper -> {

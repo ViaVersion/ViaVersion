@@ -1,13 +1,14 @@
 name: ViaVersion
 main: com.viaversion.viaversion.ViaVersionPlugin
-authors: [_MylesC, creeper123123321, Gerrygames, kennytv, Matsv]
+authors: [ _MylesC, creeper123123321, Gerrygames, kennytv, Matsv ]
 version: ${version}
 description: ${description}
 api-version: 1.13
-loadbefore: [ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer]
-softdepend: [ProtocolSupport, PacketListenerApi]
+folia-supported: true
+loadbefore: [ ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer ]
+softdepend: [ ProtocolSupport, PacketListenerApi ]
 commands:
   viaversion:
     permission: viaversion.admin # The permission is also referenced here to filter root suggestions (/via<tab>)
     description: Shows ViaVersion Version and more.
-    aliases: [viaver, vvbukkit]
+    aliases: [ viaver, vvbukkit ]

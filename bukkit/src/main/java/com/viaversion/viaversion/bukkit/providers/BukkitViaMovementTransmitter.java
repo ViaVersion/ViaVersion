@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,11 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
     private static boolean USE_NMS = true;

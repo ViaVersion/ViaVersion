@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +27,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.rewriter.EntityRewriter;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
@@ -48,12 +46,11 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-
 import java.util.UUID;
 
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3", true);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
     private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
     private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
     private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
@@ -68,7 +65,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        final TagRewriter tagRewriter = new TagRewriter(this);
+        final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
 
         // Flint and steel was hardcoded before 1.19.3 to ignite a creeper; has been moved to a tag - adding this ensures offhand doesn't trigger as well
         tagRewriter.addTagRaw(RegistryType.ITEM, "minecraft:creeper_igniters", 733); // 733 = flint_and_steel 1.19.3
@@ -81,10 +78,10 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         entityRewriter.register();
         itemRewriter.register();
 
-        final SoundRewriter soundRewriter = new SoundRewriter(this);
-        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketRemapper() {
+        final SoundRewriter<ClientboundPackets1_19_1> soundRewriter = new SoundRewriter<>(this);
+        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Sound id
                 handler(soundRewriter.getSoundHandler());
                 handler(wrapper -> {
@@ -94,9 +91,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Sound id
                 handler(soundRewriter.getSoundHandler());
                 handler(wrapper -> {
@@ -106,20 +103,15 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, 0);
-                    wrapper.passthrough(Type.STRING); // Sound identifier
-                    wrapper.write(Type.OPTIONAL_FLOAT, null); // No fixed range
-                });
-            }
+        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
+            wrapper.write(Type.VAR_INT, 0);
+            wrapper.passthrough(Type.STRING); // Sound identifier
+            wrapper.write(Type.OPTIONAL_FLOAT, null); // No fixed range
         });
 
-        new StatisticsRewriter(this).register(ClientboundPackets1_19_1.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);
 
-        final CommandRewriter commandRewriter = new CommandRewriter(this) {
+        final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<ClientboundPackets1_19_1>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 switch (argumentType) {
@@ -155,9 +147,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         };
         commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.DECLARE_COMMANDS);
 
-        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.OPTIONAL_COMPONENT); // Motd
                 map(Type.OPTIONAL_STRING); // Encoded icon
                 read(Type.BOOLEAN); // Remove previews chat
@@ -165,9 +157,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         });
 
         // Aaaaand once more
-        registerClientbound(ClientboundPackets1_19_1.PLAYER_CHAT, ClientboundPackets1_19_3.DISGUISED_CHAT, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_19_1.PLAYER_CHAT, ClientboundPackets1_19_3.DISGUISED_CHAT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 read(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Previous signature
                 handler(wrapper -> {
                     final PlayerMessageSignature signature = wrapper.read(Type.PLAYER_MESSAGE_SIGNATURE);
@@ -213,9 +205,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        registerServerbound(ServerboundPackets1_19_3.CHAT_COMMAND, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_3.CHAT_COMMAND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
@@ -238,9 +230,9 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
             }
         });
-        registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketRemapper() {
+        registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Command
                 map(Type.LONG); // Timestamp
                 // Salt
@@ -248,7 +240,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 create(Type.LONG, 0L);
                 handler(wrapper -> {
                     // Remove signature
-                    final byte[] signature = wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE);
+                    wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
                     wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES);
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 
@@ -263,16 +255,16 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         });
 
         // Remove the key once again
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING); // Name
                 create(Type.OPTIONAL_PROFILE_KEY, null);
             }
         });
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketRemapper() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
                 create(Type.BOOLEAN, true); // Is nonce
                 map(Type.BYTE_ARRAY_PRIMITIVE); // Encrypted challenge
@@ -289,7 +281,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
-        entityRewriter.onMappingDataLoaded();
+        super.onMappingDataLoaded();
         Types1_19_3.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -315,12 +307,12 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    public EntityRewriter getEntityRewriter() {
+    public EntityPackets getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public ItemRewriter getItemRewriter() {
+    public InventoryPackets getItemRewriter() {
         return itemRewriter;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.viaversion.viaversion.bukkit.listeners.JoinListener;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
+import com.viaversion.viaversion.bukkit.listeners.protocol1_19_4To1_19_3.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_19to1_18_2.BlockBreakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8.BlockListener;
@@ -44,23 +45,21 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitTask;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 public class BukkitViaLoader implements ViaPlatformLoader {
-    private final ViaVersionPlugin plugin;
 
-    private final Set<Listener> listeners = new HashSet<>();
     private final Set<BukkitTask> tasks = new HashSet<>();
-
+    private final ViaVersionPlugin plugin;
     private HandItemCache handItemCache;
 
     public BukkitViaLoader(ViaVersionPlugin plugin) {
@@ -68,21 +67,21 @@ public class BukkitViaLoader implements ViaPlatformLoader {
     }
 
     public void registerListener(Listener listener) {
-        Bukkit.getPluginManager().registerEvents(storeListener(listener), plugin);
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
+    @Deprecated/*(forRemoval = true)*/
     public <T extends Listener> T storeListener(T listener) {
-        listeners.add(listener);
         return listener;
     }
 
     @Override
     public void load() {
-        // Update Listener
         registerListener(new UpdateListener());
 
-        // Login listener
-        registerListener(new JoinListener());
+        if (Via.getConfig().shouldRegisterUserConnectionOnJoin()) {
+            registerListener(new JoinListener());
+        }
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
@@ -92,13 +91,18 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             ProtocolSupportCompat.registerPSConnectListener(plugin);
         }
 
+        if (!Via.getAPI().getServerVersion().isKnown()) {
+            Via.getPlatform().getLogger().severe("Server version has not been loaded yet, cannot register additional listeners");
+            return;
+        }
+
         int serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedVersion();
 
         /* 1.9 client to 1.8 server */
         if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
-            storeListener(new ArmorListener(plugin)).register();
-            storeListener(new DeathListener(plugin)).register();
-            storeListener(new BlockListener(plugin)).register();
+            new ArmorListener(plugin).register();
+            new DeathListener(plugin).register();
+            new BlockListener(plugin).register();
 
             if (plugin.getConf().isItemCache()) {
                 handItemCache = new HandItemCache();
@@ -110,7 +114,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && serverProtocolVersion < ProtocolVersion.v1_9.getVersion();
             if (use1_9Fix || plugin.getConf().is1_14HitboxFix()) {
                 try {
-                    storeListener(new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix())).register();
+                    new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix()).register();
                 } catch (ReflectiveOperationException e) {
                     Via.getPlatform().getLogger().warning("Could not load hitbox fix - please report this on our GitHub");
                     e.printStackTrace();
@@ -121,7 +125,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (serverProtocolVersion < ProtocolVersion.v1_15.getVersion()) {
             try {
                 Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
-                storeListener(new EntityToggleGlideListener(plugin)).register();
+                new EntityToggleGlideListener(plugin).register();
             } catch (ClassNotFoundException ignored) {
             }
         }
@@ -138,8 +142,12 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 }
             }
             if (paper) {
-                storeListener(new PaperPatch(plugin)).register();
+                new PaperPatch(plugin).register();
             }
+        }
+
+        if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix() && hasGetHandMethod()) {
+            new ArmorToggleListener(plugin).register();
         }
 
         /* Providers */
@@ -185,16 +193,22 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         }
         if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
             Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
-            storeListener(new BlockBreakListener(plugin)).register();
+            new BlockBreakListener(plugin).register();
+        }
+    }
+
+    private boolean hasGetHandMethod() {
+        try {
+            PlayerInteractEvent.class.getDeclaredMethod("getHand");
+            Material.class.getMethod("getEquipmentSlot");
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
         }
     }
 
     @Override
     public void unload() {
-        for (Listener listener : listeners) {
-            HandlerList.unregisterAll(listener);
-        }
-        listeners.clear();
         for (BukkitTask task : tasks) {
             task.cancel();
         }

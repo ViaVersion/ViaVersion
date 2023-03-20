@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,10 @@ import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 import java.util.Optional;
 
-public class MetadataRewriter1_11To1_10 extends EntityRewriter<Protocol1_11To1_10> {
+public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_11To1_10> {
 
     public MetadataRewriter1_11To1_10(Protocol1_11To1_10 protocol) {
         super(protocol);

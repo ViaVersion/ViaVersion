@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
@@ -39,18 +38,17 @@ import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.unsupported.UnsupportedServerSoftware;
 import com.viaversion.viaversion.util.GsonUtil;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.protocol.ProtocolConstants;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<ProxiedPlayer>, Listener {
     private final ProtocolDetectorService protocolDetectorService = new ProtocolDetectorService();
@@ -60,7 +58,7 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     @Override
     public void onLoad() {
         try {
-            ProtocolConstants.class.getField("MINECRAFT_1_19_1");
+            ProtocolConstants.class.getField("MINECRAFT_1_19_4");
         } catch (NoSuchFieldException e) {
             getLogger().warning("      / \\");
             getLogger().warning("     /   \\");
@@ -88,12 +86,9 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
 
     @Override
     public void onEnable() {
-        if (ProxyServer.getInstance().getPluginManager().getPlugin("ViaBackwards") != null) {
-            MappingDataLoader.enableMappingsCache();
-        }
-
-        // Inject
-        ((ViaManagerImpl) Via.getManager()).init();
+        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
+        manager.init();
+        manager.onServerLoaded();
     }
 
     @Override
@@ -122,18 +117,23 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     }
 
     @Override
+    public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
+        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
+    }
+
+    @Override
     public PlatformTask runSync(Runnable runnable) {
         return runAsync(runnable);
     }
 
     @Override
-    public PlatformTask runSync(Runnable runnable, long ticks) {
-        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, ticks * 50, TimeUnit.MILLISECONDS));
+    public PlatformTask runSync(Runnable runnable, long delay) {
+        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, delay * 50, TimeUnit.MILLISECONDS));
     }
 
     @Override
-    public PlatformTask runRepeatingSync(Runnable runnable, long ticks) {
-        return new BungeeViaTask(getProxy().getScheduler().schedule(this, runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
+    public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        return runRepeatingAsync(runnable, period);
     }
 
     @Override

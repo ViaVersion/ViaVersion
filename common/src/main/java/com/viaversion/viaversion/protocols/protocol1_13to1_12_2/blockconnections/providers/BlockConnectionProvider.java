@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,4 +55,9 @@ public class BlockConnectionProvider implements Provider {
     public boolean storesBlocks() {
         return false;
     }
+
+    public UserBlockData forUser(UserConnection connection) {
+        return (x, y, z) -> getBlockData(connection, x, y, z);
+    }
+
 }

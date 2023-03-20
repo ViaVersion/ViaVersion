@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,11 @@ import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.concurrent.CompletableFuture;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ProtocolManager {
 
@@ -96,12 +96,16 @@ public interface ProtocolManager {
     Protocol getBaseProtocol(int serverVersion);
 
     /**
-     * Returns whether the given protocol is a base protocol.
+     * Returns an immutable collection of registered protocols.
      *
-     * @param protocol protocol
-     * @return whether the protocol is a base protocol
-     * @see Protocol#isBaseProtocol()
+     * @return immutable collection of registered protocols
      */
+    Collection<Protocol<?, ?, ?, ?>> getProtocols();
+
+    /**
+     * @deprecated use Protocol#isBaseProtocol()
+     */
+    @Deprecated/*(forRemoval = true)*/
     default boolean isBaseProtocol(Protocol protocol) {
         return protocol.isBaseProtocol();
     }

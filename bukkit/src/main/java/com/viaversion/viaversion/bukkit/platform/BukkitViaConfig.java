@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@ package com.viaversion.viaversion.bukkit.platform;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
-import org.bukkit.plugin.Plugin;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.plugin.Plugin;
 
 public class BukkitViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
-    private boolean antiXRay;
     private boolean quickMoveActionFix;
     private boolean hitboxFix1_9;
     private boolean hitboxFix1_14;
     private String blockConnectionMethod;
+    private boolean armorToggleFix;
+    private boolean registerUserConnectionOnJoin;
 
     public BukkitViaConfig() {
         super(new File(((Plugin) Via.getPlatform()).getDataFolder(), "config.yml"));
@@ -42,11 +42,12 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     protected void loadFields() {
         super.loadFields();
-        antiXRay = getBoolean("anti-xray-patch", true);
+        registerUserConnectionOnJoin = getBoolean("register-userconnections-on-join", true);
         quickMoveActionFix = getBoolean("quick-move-action-fix", false);
         hitboxFix1_9 = getBoolean("change-1_9-hitbox", false);
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
         blockConnectionMethod = getString("blockconnection-method", "packet");
+        armorToggleFix = getBoolean("armor-toggle-fix", true);
     }
 
     @Override
@@ -54,8 +55,8 @@ public class BukkitViaConfig extends AbstractViaConfig {
     }
 
     @Override
-    public boolean isAntiXRay() {
-        return antiXRay;
+    public boolean shouldRegisterUserConnectionOnJoin() {
+        return registerUserConnectionOnJoin;
     }
 
     @Override
@@ -76,6 +77,11 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     public String getBlockConnectionMethod() {
         return blockConnectionMethod;
+    }
+
+    @Override
+    public boolean isArmorToggleFix() {
+        return armorToggleFix;
     }
 
     @Override

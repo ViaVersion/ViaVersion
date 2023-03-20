@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import java.util.Arrays;
 
 public interface Mappings {
@@ -43,7 +42,7 @@ public interface Mappings {
      *
      * @param id  unmapped id
      * @param def fallback return value
-     * @return mapped id, or -1 if invalid/out of bounds
+     * @return mapped id, or def if invalid/out of bounds
      */
     default int getNewIdOrDefault(int id, int def) {
         final int mappedId = getNewId(id);
@@ -63,11 +62,11 @@ public interface Mappings {
     /**
      * Manually maps a specific id.
      *
-     * @param id    unmapped id
-     * @param newId mapped id
+     * @param id       unmapped id
+     * @param mappedId mapped id
      * @throws IndexOutOfBoundsException if the unmapped id is invalid
      */
-    void setNewId(int id, int newId);
+    void setNewId(int id, int mappedId);
 
     /**
      * Returns amount of unmapped entries, being the size of the mapping.
@@ -84,8 +83,15 @@ public interface Mappings {
      */
     int mappedSize();
 
+    /**
+     * Mappings with keys and values swapped.
+     *
+     * @return mappings with keys and values swapped
+     */
+    Mappings inverse();
+
     static <T extends Mappings> Builder<T> builder(final MappingsSupplier<T> supplier) {
-        return new Builder(supplier);
+        return new Builder<>(supplier);
     }
 
     @FunctionalInterface
@@ -94,6 +100,7 @@ public interface Mappings {
         T supply(int[] mappings, int mappedIds);
     }
 
+    @Deprecated
     class Builder<T extends Mappings> {
 
         protected final MappingsSupplier<T> supplier;

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
@@ -37,9 +37,9 @@ public class EntityPackets {
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_16.METADATA_LIST);
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.DESTROY_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_16.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_16.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 handler(wrapper -> {
                     short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
@@ -67,14 +67,9 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    String dimensionType = wrapper.read(Type.STRING);
-                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
-                });
-            }
+        protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
+            String dimensionType = wrapper.read(Type.STRING);
+            wrapper.write(Type.NBT, getDimensionData(dimensionType));
         });
     }
 

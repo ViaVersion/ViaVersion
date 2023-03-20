@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.Protocol1_12To1_11_1;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 
-public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<Protocol1_12To1_11_1> {
+public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_12To1_11_1> {
 
     public MetadataRewriter1_12To1_11_1(Protocol1_12To1_11_1 protocol) {
         super(protocol);

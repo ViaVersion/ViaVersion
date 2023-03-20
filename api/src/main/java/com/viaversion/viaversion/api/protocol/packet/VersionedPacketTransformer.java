@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,8 @@ package com.viaversion.viaversion.api.protocol.packet;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Utility to send packets from a given base version to or from any client version supported by Via.

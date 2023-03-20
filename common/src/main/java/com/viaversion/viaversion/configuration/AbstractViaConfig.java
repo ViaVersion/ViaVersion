@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,13 +27,12 @@ import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntPredicate;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
 
@@ -334,11 +333,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isAntiXRay() {
-        return false;
-    }
-
-    @Override
     public boolean isSendSupportedVersions() {
         return sendSupportedVersions;
     }
@@ -387,6 +381,11 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean is1_12NBTArrayFix() {
         return nbtArrayFix;
+    }
+
+    @Override
+    public boolean shouldRegisterUserConnectionOnJoin() {
+        return false;
     }
 
     @Override
@@ -532,5 +531,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public @Nullable String chatTypeFormat(final String translationKey) {
         return chatTypeFormats.get(translationKey);
+    }
+
+    @Override
+    public boolean isArmorToggleFix() {
+        return false;
     }
 }

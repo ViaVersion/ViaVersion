@@ -37,7 +37,6 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -45,6 +44,7 @@ import java.util.Map;
 // Specific Via changes:
 // - Use OpenNBT tags
 // - Has not been updated to support pretty printing and legacy writing since that is not needed
+
 /**
  * An emitter for the SNBT format.
  *

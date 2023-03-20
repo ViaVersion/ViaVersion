@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,50 +17,54 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.IntArrayMappings;
+import com.viaversion.viaversion.api.data.BiMappings;
+import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.util.GsonUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
+import com.viaversion.viaversion.util.Int2IntBiHashMap;
+import com.viaversion.viaversion.util.Key;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
-    private final Map<String, Integer[]> blockTags = new HashMap<>();
-    private final Map<String, Integer[]> itemTags = new HashMap<>();
-    private final Map<String, Integer[]> fluidTags = new HashMap<>();
+    private final Map<String, int[]> blockTags = new HashMap<>();
+    private final Map<String, int[]> itemTags = new HashMap<>();
+    private final Map<String, int[]> fluidTags = new HashMap<>();
     private final BiMap<Short, String> oldEnchantmentsIds = HashBiMap.create();
     private final Map<String, String> translateMapping = new HashMap<>();
     private final Map<String, String> mojangTranslation = new HashMap<>();
-    private final BiMap<String, String> channelMappings = HashBiMap.create(); // 1.12->1.13
+    private final BiMap<String, String> channelMappings = HashBiMap.create();
 
     public MappingData() {
         super("1.12", "1.13");
     }
 
     @Override
-    public void loadExtras(JsonObject oldMappings, JsonObject newMappings, JsonObject diffMappings) {
-        loadTags(blockTags, newMappings.getAsJsonObject("block_tags"));
-        loadTags(itemTags, newMappings.getAsJsonObject("item_tags"));
-        loadTags(fluidTags, newMappings.getAsJsonObject("fluid_tags"));
+    protected void loadExtras(final CompoundTag data) {
+        loadTags(blockTags, data.get("block_tags"));
+        loadTags(itemTags, data.get("item_tags"));
+        loadTags(fluidTags, data.get("fluid_tags"));
 
-        loadEnchantments(oldEnchantmentsIds, oldMappings.getAsJsonObject("legacy_enchantments"));
-        enchantmentMappings = IntArrayMappings.builder().customEntrySize(72)
-                .unmapped(oldMappings.getAsJsonObject("legacy_enchantments")).mapped(newMappings.getAsJsonArray("enchantments")).build();
+        CompoundTag legacyEnchantments = data.get("legacy_enchantments");
+        loadEnchantments(oldEnchantmentsIds, legacyEnchantments);
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13
         if (Via.getConfig().isSnowCollisionFix()) {
@@ -101,20 +105,22 @@ public class MappingData extends MappingDataBase {
                 lines = CharStreams.toString(reader).split("\n");
             }
             for (String line : lines) {
-                if (line.isEmpty()) continue;
+                if (line.isEmpty()) {
+                    continue;
+                }
 
                 String[] keyAndTranslation = line.split("=", 2);
-                if (keyAndTranslation.length != 2) continue;
+                if (keyAndTranslation.length != 2) {
+                    continue;
+                }
 
                 String key = keyAndTranslation[0];
-                if (!translateData.containsKey(key)) {
-                    String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s");
-                    mojangTranslation.put(key, translation);
-                } else {
-                    String dataValue = translateData.get(key);
-                    if (dataValue != null) {
-                        translateMapping.put(key, dataValue);
-                    }
+                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s").trim();
+                mojangTranslation.put(key, translation);
+
+                String dataValue = translateData.get(key);
+                if (dataValue != null) {
+                    translateMapping.put(key, dataValue);
                 }
             }
         } catch (IOException e) {
@@ -123,13 +129,28 @@ public class MappingData extends MappingDataBase {
     }
 
     @Override
-    protected Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
+    protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
+        // Special cursed case
         if (key.equals("blocks")) {
-            // Need to use a custom size since there are larger gaps in ids
-            return IntArrayMappings.builder().customEntrySize(4084)
-                    .unmapped(oldMappings.getAsJsonObject("blocks")).mapped(newMappings.getAsJsonObject("blockstates")).build();
+            return super.loadMappings(data, "blockstates");
+        } else if (key.equals("blockstates")) {
+            return null;
         } else {
-            return super.loadFromObject(oldMappings, newMappings, diffMappings, key);
+            return super.loadMappings(data, key);
+        }
+    }
+
+    @Override
+    protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
+        // Special cursed case
+        if (key.equals("items")) {
+            return (BiMappings) MappingDataLoader.loadMappings(data, "items", size -> {
+                final Int2IntBiHashMap map = new Int2IntBiHashMap(size);
+                map.defaultReturnValue(-1);
+                return map;
+            }, Int2IntBiHashMap::put, (v, mappedSize) -> Int2IntMapBiMappings.of(v));
+        } else {
+            return super.loadBiMappings(data, key);
         }
     }
 
@@ -151,32 +172,28 @@ public class MappingData extends MappingDataBase {
         return channelId.matches("([0-9a-z_.-]+:)?[0-9a-z_/.-]+");
     }
 
-    private void loadTags(Map<String, Integer[]> output, JsonObject newTags) {
-        for (Map.Entry<String, JsonElement> entry : newTags.entrySet()) {
-            JsonArray ids = entry.getValue().getAsJsonArray();
-            Integer[] idsArray = new Integer[ids.size()];
-            for (int i = 0; i < ids.size(); i++) {
-                idsArray[i] = ids.get(i).getAsInt();
-            }
-            output.put(entry.getKey(), idsArray);
+    private void loadTags(Map<String, int[]> output, CompoundTag newTags) {
+        for (Map.Entry<String, Tag> entry : newTags.entrySet()) {
+            IntArrayTag ids = (IntArrayTag) entry.getValue();
+            output.put(Key.namespaced(entry.getKey()), ids.getValue());
         }
     }
 
-    private void loadEnchantments(Map<Short, String> output, JsonObject enchantments) {
-        for (Map.Entry<String, JsonElement> enchantment : enchantments.entrySet()) {
-            output.put(Short.parseShort(enchantment.getKey()), enchantment.getValue().getAsString());
+    private void loadEnchantments(Map<Short, String> output, CompoundTag enchantments) {
+        for (Map.Entry<String, Tag> enty : enchantments.entrySet()) {
+            output.put(Short.parseShort(enty.getKey()), ((StringTag) enty.getValue()).getValue());
         }
     }
 
-    public Map<String, Integer[]> getBlockTags() {
+    public Map<String, int[]> getBlockTags() {
         return blockTags;
     }
 
-    public Map<String, Integer[]> getItemTags() {
+    public Map<String, int[]> getItemTags() {
         return itemTags;
     }
 
-    public Map<String, Integer[]> getFluidTags() {
+    public Map<String, int[]> getFluidTags() {
         return fluidTags;
     }
 

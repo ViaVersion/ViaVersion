@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,28 +22,26 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.TagData;
-import com.viaversion.viaversion.util.Int2IntBiHashMap;
-import com.viaversion.viaversion.util.Int2IntBiMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
-    protected final String oldVersion;
-    protected final String newVersion;
-    protected final boolean hasDiffFile;
-    protected Int2IntBiMap itemMappings;
+
+    protected final String unmappedVersion;
+    protected final String mappedVersion;
+    protected BiMappings itemMappings;
     protected FullMappings argumentTypeMappings;
     protected FullMappings entityMappings;
     protected ParticleMappings particleMappings;
@@ -55,123 +53,122 @@ public class MappingDataBase implements MappingData {
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
     protected Map<RegistryType, List<TagData>> tags;
-    protected boolean loadItems = true;
 
-    public MappingDataBase(String oldVersion, String newVersion) {
-        this(oldVersion, newVersion, false);
-    }
-
-    public MappingDataBase(String oldVersion, String newVersion, boolean hasDiffFile) {
-        this.oldVersion = oldVersion;
-        this.newVersion = newVersion;
-        this.hasDiffFile = hasDiffFile;
+    public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
+        this.unmappedVersion = unmappedVersion;
+        this.mappedVersion = mappedVersion;
     }
 
     @Override
     public void load() {
-        getLogger().info("Loading " + oldVersion + " -> " + newVersion + " mappings...");
-        JsonObject diffmapping = hasDiffFile ? loadDiffFile() : null;
-        JsonObject oldMappings = MappingDataLoader.loadData("mapping-" + oldVersion + ".json", true);
-        JsonObject newMappings = MappingDataLoader.loadData("mapping-" + newVersion + ".json", true);
-
-        blockMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blocks");
-        blockStateMappings = loadFromObject(oldMappings, newMappings, diffmapping, "blockstates");
-        blockEntityMappings = loadFromArray(oldMappings, newMappings, diffmapping, "blockentities");
-        soundMappings = loadFromArray(oldMappings, newMappings, diffmapping, "sounds");
-        statisticsMappings = loadFromArray(oldMappings, newMappings, diffmapping, "statistics");
-        enchantmentMappings = loadFromArray(oldMappings, newMappings, diffmapping, "enchantments");
-        paintingMappings = loadFromArray(oldMappings, newMappings, diffmapping, "paintings");
-
-        entityMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "entities");
-        argumentTypeMappings = loadFullMappings(oldMappings, newMappings, diffmapping, "argumenttypes");
-
-        Mappings particles = loadFromArray(oldMappings, newMappings, diffmapping, "particles");
-        if (particles != null) {
-            particleMappings = new ParticleMappings(oldMappings.getAsJsonArray("particles"), newMappings.getAsJsonArray("particles"), particles);
+        if (Via.getManager().isDebug()) {
+            getLogger().info("Loading " + unmappedVersion + " -> " + mappedVersion + " mappings...");
         }
 
-        if (loadItems && newMappings.has("items")) {
-            itemMappings = new Int2IntBiHashMap();
-            itemMappings.defaultReturnValue(-1);
-            MappingDataLoader.mapIdentifiers(itemMappings, oldMappings.getAsJsonObject("items"), newMappings.getAsJsonObject("items"),
-                    diffmapping != null ? diffmapping.getAsJsonObject("items") : null, true);
-        }
+        final CompoundTag data = readNBTFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
+        blockMappings = loadMappings(data, "blocks");
+        blockStateMappings = loadMappings(data, "blockstates");
+        blockEntityMappings = loadMappings(data, "blockentities");
+        soundMappings = loadMappings(data, "sounds");
+        statisticsMappings = loadMappings(data, "statistics");
+        enchantmentMappings = loadMappings(data, "enchantments");
+        paintingMappings = loadMappings(data, "paintings");
+        itemMappings = loadBiMappings(data, "items");
 
-        if (diffmapping != null && diffmapping.has("tags")) {
-            this.tags = new EnumMap<>(RegistryType.class);
-            JsonObject tags = diffmapping.getAsJsonObject("tags");
-            if (tags.has(RegistryType.ITEM.resourceLocation())) {
-                loadTags(RegistryType.ITEM, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("items")));
-            }
-            if (tags.has(RegistryType.BLOCK.resourceLocation())) {
-                loadTags(RegistryType.BLOCK, tags, MappingDataLoader.indexedObjectToMap(newMappings.getAsJsonObject("blocks")));
-            }
-        }
+        final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt", true);
+        final CompoundTag mappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + mappedVersion + ".nbt", true);
+        if (unmappedIdentifierData != null && mappedIdentifierData != null) {
+            entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
+            argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
 
-        loadExtras(oldMappings, newMappings, diffmapping);
-    }
-
-    protected FullMappings loadFullMappings(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        Mappings mappings = loadFromArray(oldMappings, newMappings, diffMappings, key);
-        return mappings != null ? new FullMappingsBase(oldMappings.getAsJsonArray(key), newMappings.getAsJsonArray(key), mappings) : null;
-    }
-
-    private void loadTags(RegistryType type, JsonObject object, Object2IntMap<String> typeMapping) {
-        JsonObject tags = object.getAsJsonObject(type.resourceLocation());
-        List<TagData> tagsList = new ArrayList<>(tags.size());
-        for (Map.Entry<String, JsonElement> entry : tags.entrySet()) {
-            JsonArray array = entry.getValue().getAsJsonArray();
-            int[] entries = new int[array.size()];
-            int i = 0;
-            for (JsonElement element : array) {
-                String stringId = element.getAsString();
-                if (!typeMapping.containsKey(stringId) && !typeMapping.containsKey(stringId = stringId.replace("minecraft:", ""))) { // aaa
-                    getLogger().warning(type + " Tags contains invalid type identifier " + stringId + " in tag " + entry.getKey());
-                    continue;
+            final ListTag unmappedParticles = unmappedIdentifierData.get("particles");
+            final ListTag mappedParticles = mappedIdentifierData.get("particles");
+            if (unmappedParticles != null && mappedParticles != null) {
+                Mappings particleMappings = loadMappings(data, "particles");
+                if (particleMappings == null) {
+                    particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
                 }
 
-                entries[i++] = typeMapping.getInt(stringId);
+                final List<String> identifiers = unmappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
+                final List<String> mappedIdentifiers = mappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
+                this.particleMappings = new ParticleMappings(identifiers, mappedIdentifiers, particleMappings);
             }
-            tagsList.add(new TagData(entry.getKey(), entries));
+        }
+
+        final CompoundTag tagsTag = data.get("tags");
+        if (tagsTag != null) {
+            this.tags = new EnumMap<>(RegistryType.class);
+            loadTags(RegistryType.ITEM, tagsTag);
+            loadTags(RegistryType.BLOCK, tagsTag);
+        }
+
+        loadExtras(data);
+    }
+
+    protected @Nullable CompoundTag readNBTFile(final String name) {
+        return MappingDataLoader.loadNBT(name);
+    }
+
+    protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
+        return MappingDataLoader.loadMappings(data, key);
+    }
+
+    protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
+        return MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
+    }
+
+    protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
+        final Mappings mappings = loadMappings(data, key);
+        return mappings != null ? BiMappings.of(mappings) : null;
+    }
+
+    private void loadTags(final RegistryType type, final CompoundTag data) {
+        final CompoundTag tag = data.get(type.resourceLocation());
+        if (tag == null) {
+            return;
+        }
+
+        final List<TagData> tagsList = new ArrayList<>(tags.size());
+        for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
+            final IntArrayTag entries = (IntArrayTag) entry.getValue();
+            tagsList.add(new TagData(entry.getKey(), entries.getValue()));
         }
 
         this.tags.put(type, tagsList);
     }
 
     @Override
-    public int getNewBlockStateId(int id) {
+    public int getNewBlockStateId(final int id) {
         return checkValidity(id, blockStateMappings.getNewId(id), "blockstate");
     }
 
     @Override
-    public int getNewBlockId(int id) {
+    public int getNewBlockId(final int id) {
         return checkValidity(id, blockMappings.getNewId(id), "block");
     }
 
     @Override
-    public int getNewItemId(int id) {
-        return checkValidity(id, itemMappings.get(id), "item");
+    public int getNewItemId(final int id) {
+        return checkValidity(id, itemMappings.getNewId(id), "item");
     }
 
     @Override
-    public int getOldItemId(int id) {
-        int oldId = itemMappings.inverse().get(id);
-        // Remap new items to stone
-        return oldId != -1 ? oldId : 1;
+    public int getOldItemId(final int id) {
+        return itemMappings.inverse().getNewIdOrDefault(id, 1);
     }
 
     @Override
-    public int getNewParticleId(int id) {
-        return checkValidity(id, particleMappings.mappings().getNewId(id), "particles");
+    public int getNewParticleId(final int id) {
+        return checkValidity(id, particleMappings.getNewId(id), "particles");
     }
 
     @Override
-    public @Nullable List<TagData> getTags(RegistryType type) {
+    public @Nullable List<TagData> getTags(final RegistryType type) {
         return tags != null ? tags.get(type) : null;
     }
 
     @Override
-    public @Nullable Int2IntBiMap getItemMappings() {
+    public @Nullable BiMappings getItemMappings() {
         return itemMappings;
     }
 
@@ -225,26 +222,6 @@ public class MappingDataBase implements MappingData {
         return paintingMappings;
     }
 
-    protected @Nullable Mappings loadFromArray(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonArray(key))
-                .mapped(newMappings.getAsJsonArray(key)).diffMappings(diff).build();
-    }
-
-    protected @Nullable Mappings loadFromObject(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings, String key) {
-        if (!oldMappings.has(key) || !newMappings.has(key)) return null;
-
-        JsonObject diff = diffMappings != null ? diffMappings.getAsJsonObject(key) : null;
-        return IntArrayMappings.builder().unmapped(oldMappings.getAsJsonObject(key))
-                .mapped(newMappings.getAsJsonObject(key)).diffMappings(diff).build();
-    }
-
-    protected @Nullable JsonObject loadDiffFile() {
-        return MappingDataLoader.loadData("mappingdiff-" + oldVersion + "to" + newVersion + ".json");
-    }
-
     protected Logger getLogger() {
         return Via.getPlatform().getLogger();
     }
@@ -257,21 +234,14 @@ public class MappingDataBase implements MappingData {
      * @param type     mapping type (e.g. "item")
      * @return the given mapped id if valid, else 0
      */
-    protected int checkValidity(int id, int mappedId, String type) {
+    protected int checkValidity(final int id, final int mappedId, final String type) {
         if (mappedId == -1) {
-            getLogger().warning(String.format("Missing %s %s for %s %s %d", newVersion, type, oldVersion, type, id));
+            getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
             return 0;
         }
         return mappedId;
     }
 
-    /**
-     * To be overridden.
-     *
-     * @param oldMappings  old mappings
-     * @param newMappings  new mappings
-     * @param diffMappings diff mappings if present
-     */
-    protected void loadExtras(JsonObject oldMappings, JsonObject newMappings, @Nullable JsonObject diffMappings) {
+    protected void loadExtras(final CompoundTag data) {
     }
 }

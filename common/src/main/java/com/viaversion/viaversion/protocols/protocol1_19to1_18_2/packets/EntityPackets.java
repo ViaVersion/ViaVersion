@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -42,7 +42,6 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Pair;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,7 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
+public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
 
     private static final String CHAT_REGISTRY_SNBT = "{\n" +
             "  \"minecraft:chat_type\": {\n" +
@@ -96,9 +95,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity type
@@ -123,9 +122,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 handler(wrapper -> {
@@ -159,9 +158,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity ID
                 map(Type.UUID); // Entity UUID
                 map(Type.VAR_INT); // Entity Type
@@ -184,9 +183,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // Entity id
                 map(Type.VAR_INT); // Effect id
                 map(Type.BYTE); // Amplifier
@@ -196,9 +195,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.UNSIGNED_BYTE); // Gamemode
@@ -250,9 +249,9 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_18.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> writeDimensionKey(wrapper, wrapper.user().get(DimensionRegistryStorage.class)));
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -266,47 +265,42 @@ public final class EntityPackets extends EntityRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    final int action = wrapper.passthrough(Type.VAR_INT);
-                    final int entries = wrapper.passthrough(Type.VAR_INT);
-                    for (int i = 0; i < entries; i++) {
-                        wrapper.passthrough(Type.UUID); // UUID
-                        if (action == 0) { // Add player
-                            wrapper.passthrough(Type.STRING); // Player Name
+        protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
+            final int action = wrapper.passthrough(Type.VAR_INT);
+            final int entries = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Type.UUID); // UUID
+                if (action == 0) { // Add player
+                    wrapper.passthrough(Type.STRING); // Player Name
 
-                            final int properties = wrapper.passthrough(Type.VAR_INT);
-                            for (int j = 0; j < properties; j++) {
-                                wrapper.passthrough(Type.STRING); // Name
-                                wrapper.passthrough(Type.STRING); // Value
-                                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
-                            }
-
-                            wrapper.passthrough(Type.VAR_INT); // Gamemode
-                            wrapper.passthrough(Type.VAR_INT); // Ping
-                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
-                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                            } else {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
-                            }
-
-                            // No public profile signature
-                            wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
-                        } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                            wrapper.passthrough(Type.VAR_INT);
-                        } else if (action == 3) { // Update display name
-                            final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
-                            if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
-                            } else {
-                                wrapper.write(Type.OPTIONAL_COMPONENT, null);
-                            }
-                        }
+                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Type.STRING); // Name
+                        wrapper.passthrough(Type.STRING); // Value
+                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
                     }
-                });
+
+                    wrapper.passthrough(Type.VAR_INT); // Gamemode
+                    wrapper.passthrough(Type.VAR_INT); // Ping
+                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                    }
+
+                    // No public profile signature
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                } else if (action == 1 || action == 2) { // Update gamemode/update latency
+                    wrapper.passthrough(Type.VAR_INT);
+                } else if (action == 3) { // Update display name
+                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    if (!Protocol1_19To1_18_2.isTextComponentNull(displayName)) {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                    } else {
+                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                    }
+                }
             }
         });
     }

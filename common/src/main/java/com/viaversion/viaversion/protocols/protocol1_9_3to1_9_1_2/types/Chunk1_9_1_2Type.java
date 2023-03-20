@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -28,7 +27,6 @@ import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 
@@ -75,7 +73,7 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<CompoundTag>());
+        return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<>());
     }
 
     @Override

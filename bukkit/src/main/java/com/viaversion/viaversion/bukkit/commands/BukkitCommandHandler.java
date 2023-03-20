@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,11 @@
 package com.viaversion.viaversion.bukkit.commands;
 
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-
-import java.util.List;
 
 public class BukkitCommandHandler extends ViaCommandHandler implements CommandExecutor, TabExecutor {
     @Override

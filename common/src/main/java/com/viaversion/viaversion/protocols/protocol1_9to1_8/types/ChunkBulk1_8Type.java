@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,8 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
     @Override
     public void write(ByteBuf output, ClientWorld world, Chunk[] chunks) throws Exception {
         boolean skyLight = false;
-        loop1: for (Chunk c : chunks) {
+        loop1:
+        for (Chunk c : chunks) {
             for (ChunkSection section : c.getSections()) {
                 if (section != null && section.getLight().hasSkyLight()) {
                     skyLight = true;

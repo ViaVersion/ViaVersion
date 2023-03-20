@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,11 @@ public class Position1_14Type extends Type<Position> {
         buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
                 | (object.y() & 0xfff)
                 | ((((long) object.z()) & 0x3ffffff) << 12));
+    }
+
+    @Override
+    public Class<? extends Type> getBaseClass() {
+        return PositionType.class;
     }
 
     public static final class OptionalPosition1_14Type extends OptionalType<Position> {

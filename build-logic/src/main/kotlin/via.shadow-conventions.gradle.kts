@@ -1,6 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.jvm.tasks.Jar
-import org.gradle.kotlin.dsl.named
 
 plugins {
     id("via.base-conventions")

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class DimensionRegistryStorage implements StorableObject {
 

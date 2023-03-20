@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,28 +20,34 @@ package com.viaversion.viaversion.util;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.compatibility.YamlCompat;
+import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
+import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.representer.Representer;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config implements ConfigurationProvider {
+    private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
         options.setIndent(2);
-        return new Yaml(new YamlConstructor(), new Representer(), options);
+        return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
     });
 
     private final CommentStore commentStore = new CommentStore('.', 2);
@@ -54,7 +60,7 @@ public abstract class Config implements ConfigurationProvider {
      *
      * @param configFile The location of where the config is loaded/saved.
      */
-    public Config(File configFile) {
+    protected Config(File configFile) {
         this.configFile = configFile;
     }
 
@@ -83,8 +89,6 @@ public abstract class Config implements ConfigurationProvider {
         if (location.exists()) {
             try (FileInputStream input = new FileInputStream(location)) {
                 config = (Map<String, Object>) YAML.get().load(input);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }

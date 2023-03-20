@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
  */
 package com.viaversion.viaversion.util;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +24,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Synchronized list wrapper with the addition of an add handler called when an element is added to the list.

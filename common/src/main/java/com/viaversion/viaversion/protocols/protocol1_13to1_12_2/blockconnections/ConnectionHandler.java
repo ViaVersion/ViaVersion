@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
 
 public abstract class ConnectionHandler {
 
     public abstract int connect(UserConnection user, Position position, int blockState);
 
     public int getBlockData(UserConnection user, Position position) {
-        return Via.getManager().getProviders().get(BlockConnectionProvider.class).getBlockData(user, position.x(), position.y(), position.z());
+        return ConnectionData.blockConnectionProvider.getBlockData(user, position.x(), position.y(), position.z());
     }
 }

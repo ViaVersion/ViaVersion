@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,23 +19,20 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
-import com.viaversion.viaversion.util.Pair;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {
-    private static final short[] REVERSE_BLOCK_MAPPINGS = new short[8582];
     private static Constructor<?> fastUtilLongObjectHashMap;
 
-    private final Map<Long, Pair<byte[], NibbleArray>> blockStorage = createLongObjectMap();
+    private final Map<Long, SectionData> blockStorage = createLongObjectMap();
+
+    // Cache to retrieve section quicker
+    private Long lastIndex;
+    private SectionData lastSection;
 
     static {
         try {
@@ -45,117 +42,128 @@ public class BlockConnectionStorage implements StorableObject {
             Via.getPlatform().getLogger().info("Using FastUtil Long2ObjectOpenHashMap for block connections");
         } catch (ClassNotFoundException | NoSuchMethodException ignored) {
         }
+    }
 
-        Arrays.fill(REVERSE_BLOCK_MAPPINGS, (short) -1);
-        for (int i = 0; i < 4096; i++) {
-            int newBlock = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(i);
-            if (newBlock != -1) {
-                REVERSE_BLOCK_MAPPINGS[newBlock] = (short) i;
-            }
-        }
+    public static void init() {
     }
 
     public void store(int x, int y, int z, int blockState) {
-        short mapping = REVERSE_BLOCK_MAPPINGS[blockState];
-        if (mapping == -1) return;
+        long index = getChunkSectionIndex(x, y, z);
+        SectionData section = getSection(index);
+        if (section == null) {
+            if (blockState == 0) {
+                // No need to store empty sections
+                return;
+            }
 
-        blockState = mapping;
-        long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = getChunkSection(pair, (blockState & 0xF) != 0);
-        int blockIndex = encodeBlockPos(x, y, z);
-        map.key()[blockIndex] = (byte) (blockState >> 4);
-        NibbleArray nibbleArray = map.value();
-        if (nibbleArray != null) {
-            nibbleArray.set(blockIndex, blockState);
+            blockStorage.put(index, section = new SectionData());
+            lastSection = section;
+            lastIndex = index;
         }
+
+        section.setBlockAt(x, y, z, blockState);
     }
 
     public int get(int x, int y, int z) {
         long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = blockStorage.get(pair);
-        if (map == null) return 0;
-        short blockPosition = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.value();
-        return WorldPackets.toNewId(
-                ((map.key()[blockPosition] & 0xFF) << 4)
-                        | (nibbleArray == null ? 0 : nibbleArray.get(blockPosition))
-        );
+        SectionData section = getSection(pair);
+        if (section == null) {
+            return 0;
+        }
+
+        return section.blockAt(x, y, z);
     }
 
     public void remove(int x, int y, int z) {
-        long pair = getChunkSectionIndex(x, y, z);
-        Pair<byte[], NibbleArray> map = blockStorage.get(pair);
-        if (map == null) return;
-        int blockIndex = encodeBlockPos(x, y, z);
-        NibbleArray nibbleArray = map.value();
-        if (nibbleArray != null) {
-            nibbleArray.set(blockIndex, 0);
-            boolean allZero = true;
-            for (int i = 0; i < 4096; i++) {
-                if (nibbleArray.get(i) != 0) {
-                    allZero = false;
-                    break;
-                }
-            }
-            if (allZero) map.setValue(null);
+        long index = getChunkSectionIndex(x, y, z);
+        SectionData section = getSection(index);
+        if (section == null) {
+            return;
         }
-        map.key()[blockIndex] = 0;
-        for (short entry : map.key()) {
-            if (entry != 0) return;
+
+        section.setBlockAt(x, y, z, 0);
+
+        if (section.nonEmptyBlocks() == 0) {
+            removeSection(index);
         }
-        blockStorage.remove(pair);
     }
 
     public void clear() {
         blockStorage.clear();
+        lastSection = null;
+        lastIndex = null;
     }
 
     public void unloadChunk(int x, int z) {
-        for (int y = 0; y < 16; y ++) {
+        for (int y = 0; y < 16; y++) {
             unloadSection(x, y, z);
         }
     }
 
     public void unloadSection(int x, int y, int z) {
-        blockStorage.remove(getChunkSectionIndex(x << 4, y << 4, z << 4));
+        removeSection(getChunkSectionIndex(x << 4, y << 4, z << 4));
     }
 
-    private Pair<byte[], NibbleArray> getChunkSection(long index, boolean requireNibbleArray) {
-        Pair<byte[], NibbleArray> map = blockStorage.get(index);
-        if (map == null) {
-            map = new Pair<>(new byte[4096], null);
-            blockStorage.put(index, map);
+    private @Nullable SectionData getSection(long index) {
+        if (lastIndex != null && lastIndex == index) {
+            return lastSection;
         }
-        if (map.value() == null && requireNibbleArray) {
-            map.setValue(new NibbleArray(4096));
-        }
-        return map;
+        lastIndex = index;
+        return lastSection = blockStorage.get(index);
     }
 
-    private long getChunkSectionIndex(int x, int y, int z) {
+    private void removeSection(long index) {
+        blockStorage.remove(index);
+        if (lastIndex != null && lastIndex == index) {
+            lastIndex = null;
+            lastSection = null;
+        }
+    }
+
+    private static long getChunkSectionIndex(int x, int y, int z) {
         return (((x >> 4) & 0x3FFFFFFL) << 38) | (((y >> 4) & 0xFFFL) << 26) | ((z >> 4) & 0x3FFFFFFL);
-    }
-
-    private long getChunkSectionIndex(Position position) {
-        return getChunkSectionIndex(position.x(), position.y(), position.z());
-    }
-
-    private short encodeBlockPos(int x, int y, int z) {
-        return (short) (((y & 0xF) << 8) | ((x & 0xF) << 4) | (z & 0xF));
-    }
-
-    private short encodeBlockPos(Position pos) {
-        return encodeBlockPos(pos.x(), pos.y(), pos.z());
     }
 
     private <T> Map<Long, T> createLongObjectMap() {
         if (fastUtilLongObjectHashMap != null) {
             try {
+                //noinspection unchecked
                 return (Map<Long, T>) fastUtilLongObjectHashMap.newInstance();
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
         return new HashMap<>();
+    }
+
+    private static final class SectionData {
+        private final short[] blockStates = new short[4096];
+        private short nonEmptyBlocks;
+
+        public int blockAt(int x, int y, int z) {
+            return blockStates[encodeBlockPos(x, y, z)];
+        }
+
+        public void setBlockAt(int x, int y, int z, int blockState) {
+            int index = encodeBlockPos(x, y, z);
+            if (blockState == blockStates[index]) {
+                return;
+            }
+
+            blockStates[index] = (short) blockState;
+            if (blockState == 0) {
+                nonEmptyBlocks--;
+            } else {
+                nonEmptyBlocks++;
+            }
+        }
+
+        public short nonEmptyBlocks() {
+            return nonEmptyBlocks;
+        }
+
+        private static int encodeBlockPos(int x, int y, int z) {
+            return ((y & 0xF) << 8) | ((x & 0xF) << 4) | (z & 0xF);
+        }
     }
 }

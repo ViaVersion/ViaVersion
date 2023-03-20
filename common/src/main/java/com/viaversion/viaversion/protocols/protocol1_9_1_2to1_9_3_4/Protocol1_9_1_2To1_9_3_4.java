@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.chunks.BlockEntity;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
@@ -46,86 +44,69 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); //Position
                 map(Type.UNSIGNED_BYTE); //Type
                 map(Type.NBT); //NBT
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 9) {
-                            Position position = wrapper.get(Type.POSITION, 0);
-                            CompoundTag tag = wrapper.get(Type.NBT, 0);
+                handler(wrapper -> {
+                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 9) {
+                        Position position = wrapper.get(Type.POSITION, 0);
+                        CompoundTag tag = wrapper.get(Type.NBT, 0);
 
-                            wrapper.clearPacket(); //Clear the packet
+                        wrapper.clearPacket(); //Clear the packet
 
-                            wrapper.setId(ClientboundPackets1_9.UPDATE_SIGN.ordinal()); //Update sign packet
-                            wrapper.write(Type.POSITION, position); // Position
-                            for (int i = 1; i < 5; i++) {
-                                // Should technically be written as COMPONENT, but left as String for simplification/to remove redundant wrapping for VR
-                                Tag textTag = tag.get("Text" + i);
-                                String line = textTag instanceof StringTag ? ((StringTag) textTag).getValue() : "";
-                                wrapper.write(Type.STRING, line); // Sign line
-                            }
+                        wrapper.setPacketType(ClientboundPackets1_9.UPDATE_SIGN);
+                        wrapper.write(Type.POSITION, position); // Position
+                        for (int i = 1; i < 5; i++) {
+                            // Should technically be written as COMPONENT, but left as String for simplification/to remove redundant wrapping for VR
+                            Tag textTag = tag.get("Text" + i);
+                            String line = textTag instanceof StringTag ? ((StringTag) textTag).getValue() : "";
+                            wrapper.write(Type.STRING, line); // Sign line
                         }
                     }
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        Chunk1_9_3_4Type newType = new Chunk1_9_3_4Type(clientWorld);
-                        Chunk1_9_1_2Type oldType = new Chunk1_9_1_2Type(clientWorld); // Get the old type to not write Block Entities
+            Chunk1_9_3_4Type newType = new Chunk1_9_3_4Type(clientWorld);
+            Chunk1_9_1_2Type oldType = new Chunk1_9_1_2Type(clientWorld); // Get the old type to not write Block Entities
 
-                        Chunk chunk = wrapper.read(newType);
-                        wrapper.write(oldType, chunk);
-                        BlockEntity.handle(chunk.getBlockEntities(), wrapper.user());
-                    }
-                });
-            }
+            Chunk chunk = wrapper.read(newType);
+            wrapper.write(oldType, chunk);
+            BlockEntity.handle(chunk.getBlockEntities(), wrapper.user());
         });
 
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Type.INT); // 2 - Dimension
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                handler(wrapper -> {
+                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
 
-                        int dimensionId = wrapper.get(Type.INT, 1);
-                        clientChunks.setEnvironment(dimensionId);
-                    }
+                    int dimensionId = wrapper.get(Type.INT, 1);
+                    clientChunks.setEnvironment(dimensionId);
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketRemapper() {
+        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Dimension ID
 
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                        int dimensionId = wrapper.get(Type.INT, 0);
-                        clientWorld.setEnvironment(dimensionId);
-                    }
+                    int dimensionId = wrapper.get(Type.INT, 0);
+                    clientWorld.setEnvironment(dimensionId);
                 });
             }
         });

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
-
+import com.viaversion.viaversion.api.scheduler.Scheduler;
 import java.util.Set;
 
 public interface ViaManager {
@@ -85,11 +85,17 @@ public interface ViaManager {
     ViaPlatformLoader getLoader();
 
     /**
+     * Returns the async task scheduler.
+     *
+     * @return async task scheduler
+     */
+    Scheduler getScheduler();
+
+    /**
      * If debug is enabled, packets and other otherwise suppressed warnings will be logged.
      *
      * @return true if enabled
      */
-    @Deprecated
     default boolean isDebug() {
         return debugHandler().enabled();
     }
@@ -125,4 +131,11 @@ public interface ViaManager {
      * @param runnable runnable to be executed
      */
     void addEnableListener(Runnable runnable);
+
+    /**
+     * Returns whether the manager has been initialized (and protocols have been loaded).
+     *
+     * @return whether the manager has been initialized
+     */
+    boolean isInitialized();
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,4 +22,8 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
 public class Protocol1_14_2To1_14_1 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_14, ServerboundPackets1_14, ServerboundPackets1_14> {
+
+    public Protocol1_14_2To1_14_1() {
+        super(ClientboundPackets1_14.class, ClientboundPackets1_14.class, ServerboundPackets1_14.class, ServerboundPackets1_14.class);
+    }
 }

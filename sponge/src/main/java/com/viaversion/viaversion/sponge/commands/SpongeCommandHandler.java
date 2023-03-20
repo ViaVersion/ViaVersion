@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,9 @@
 package com.viaversion.viaversion.sponge.commands;
 
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.command.Command;
@@ -25,10 +28,6 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.parameter.ArgumentReader;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class SpongeCommandHandler extends ViaCommandHandler implements Command.Raw {
 

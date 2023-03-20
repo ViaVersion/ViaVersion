@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,27 +21,26 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.IOException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MappingData extends MappingDataBase {
 
     private final Int2ObjectMap<CompoundTag> defaultChatTypes = new Int2ObjectOpenHashMap<>();
 
     public MappingData() {
-        super("1.18", "1.19", true);
+        super("1.18", "1.19");
     }
 
     @Override
-    protected void loadExtras(final JsonObject oldMappings, final JsonObject newMappings, @Nullable final JsonObject diffMappings) {
+    protected void loadExtras(final CompoundTag daata) {
         try {
+            // TODO Read uncompressed file
             final ListTag chatTypes = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
             for (final Tag chatType : chatTypes) {
                 final CompoundTag chatTypeCompound = (CompoundTag) chatType;
@@ -49,7 +48,7 @@ public final class MappingData extends MappingDataBase {
                 defaultChatTypes.put(idTag.asInt(), chatTypeCompound);
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

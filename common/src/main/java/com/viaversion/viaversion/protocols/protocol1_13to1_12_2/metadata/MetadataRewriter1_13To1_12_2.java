@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,16 +24,16 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
+import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.List;
 
-public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<Protocol1_13To1_12_2> {
+public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPackets1_12_1, Protocol1_13To1_12_2> {
 
     public MetadataRewriter1_13To1_12_2(Protocol1_13To1_12_2 protocol) {
         super(protocol);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_14_3to1_14_2;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
@@ -33,34 +30,26 @@ public class Protocol1_14_3To1_14_2 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_14.TRADE_LIST, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(new PacketHandler() {
-                    @Override
-                    public void handle(PacketWrapper wrapper) throws Exception {
-                        wrapper.passthrough(Type.VAR_INT);
-                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
-                        for (int i = 0; i < size; i++) {
-                            wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                            wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                            if (wrapper.passthrough(Type.BOOLEAN)) {
-                                wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                            }
-                            wrapper.passthrough(Type.BOOLEAN);
-                            wrapper.passthrough(Type.INT);
-                            wrapper.passthrough(Type.INT);
-                            wrapper.passthrough(Type.INT);
-                            wrapper.passthrough(Type.INT);
-                            wrapper.passthrough(Type.FLOAT);
-                        }
-                        wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.VAR_INT);
-                        boolean regularVillager = wrapper.passthrough(Type.BOOLEAN);
-                        wrapper.write(Type.BOOLEAN, regularVillager); // new boolean added in pre-1
-                    }
-                });
+        registerClientbound(ClientboundPackets1_14.TRADE_LIST, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                }
+                wrapper.passthrough(Type.BOOLEAN);
+                wrapper.passthrough(Type.INT);
+                wrapper.passthrough(Type.INT);
+                wrapper.passthrough(Type.INT);
+                wrapper.passthrough(Type.INT);
+                wrapper.passthrough(Type.FLOAT);
             }
+            wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Type.VAR_INT);
+            boolean regularVillager = wrapper.passthrough(Type.BOOLEAN);
+            wrapper.write(Type.BOOLEAN, regularVillager); // new boolean added in pre-1
         });
     }
 }

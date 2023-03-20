@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,11 @@ import com.viaversion.viaversion.exception.InformativeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface UserConnection {
 

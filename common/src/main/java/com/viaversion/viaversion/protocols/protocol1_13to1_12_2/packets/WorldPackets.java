@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
@@ -48,7 +48,6 @@ import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -76,11 +75,11 @@ public class WorldPackets {
         }
     }
 
-    public static void register(Protocol protocol) {
+    public static void register(Protocol1_13To1_12_2 protocol) {
         // Outgoing packets
-        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
 
@@ -98,9 +97,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // 0 - Location
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NBT); // 2 - NBT data
@@ -128,9 +127,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION); // Location
                 map(Type.UNSIGNED_BYTE); // Action Id
                 map(Type.UNSIGNED_BYTE); // Action param
@@ -163,7 +162,7 @@ public class WorldPackets {
                         blockId = blockId - 219 + 483;
 
                     if (blockId == 73) { // Note block
-                        PacketWrapper blockChange = wrapper.create(0x0B); // block change
+                        PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_CHANGE);
                         blockChange.write(Type.POSITION, pos);
                         blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_13To1_12_2.class);
@@ -173,9 +172,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.POSITION);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
@@ -184,25 +183,25 @@ public class WorldPackets {
 
                     UserConnection userConnection = wrapper.user();
                     if (Via.getConfig().isServersideBlockConnections()) {
-
-                        ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                         newId = ConnectionData.connect(userConnection, position, newId);
+                        ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                     }
+
                     wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
+
                     if (Via.getConfig().isServersideBlockConnections()) {
                         // Workaround for packet order issue
                         wrapper.send(Protocol1_13To1_12_2.class);
                         wrapper.cancel();
                         ConnectionData.update(userConnection, position);
                     }
-
                 });
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // 0 - Chunk X
                 map(Type.INT); // 1 - Chunk Z
                 map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
@@ -215,14 +214,14 @@ public class WorldPackets {
                     for (BlockChangeRecord record : records) {
                         int newBlock = toNewId(record.getBlockId());
                         Position position = new Position(
-                                record.getSectionX() + (chunkX * 16),
+                                record.getSectionX() + (chunkX << 4),
                                 record.getY(),
-                                record.getSectionZ() + (chunkZ * 16));
+                                record.getSectionZ() + (chunkZ << 4));
 
+                        record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         if (Via.getConfig().isServersideBlockConnections()) {
                             ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newBlock);
                         }
-                        record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                     }
 
                     if (Via.getConfig().isServersideBlockConnections()) {
@@ -238,8 +237,10 @@ public class WorldPackets {
                             if (handler != null) {
                                 blockState = handler.connect(userConnection, position, blockState);
                                 record.setBlockId(blockState);
+                                ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), blockState);
                             }
                         }
+
                         // Workaround for packet order issue
                         wrapper.send(Protocol1_13To1_12_2.class);
                         wrapper.cancel();
@@ -252,16 +253,16 @@ public class WorldPackets {
                             ConnectionData.update(userConnection, position);
                         }
                     }
-
                 });
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.EXPLOSION, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.EXPLOSION, new PacketHandlers() {
             @Override
-            public void registerMap() {
-                if (!Via.getConfig().isServersideBlockConnections())
+            public void register() {
+                if (!Via.getConfig().isServersideBlockConnections()) {
                     return;
+                }
 
                 map(Type.FLOAT); // X
                 map(Type.FLOAT); // Y
@@ -299,9 +300,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 if (Via.getConfig().isServersideBlockConnections()) {
                     handler(wrapper -> {
                         int x = wrapper.passthrough(Type.INT);
@@ -312,9 +313,9 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.NAMED_SOUND, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.NAMED_SOUND, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.STRING);
                 handler(wrapper -> {
                     String sound = wrapper.get(Type.STRING, 0).replace("minecraft:", "");
@@ -324,213 +325,216 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_DATA, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    BlockStorage storage = wrapper.user().get(BlockStorage.class);
+        protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_DATA, wrapper -> {
+            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
-                    Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-                    Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
-                    Chunk chunk = wrapper.read(type);
-                    wrapper.write(type1_13, chunk);
+            Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
+            Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
+            Chunk chunk = wrapper.read(type);
+            wrapper.write(type1_13, chunk);
 
-                    for (int s = 0; s < chunk.getSections().length; s++) {
-                        ChunkSection section = chunk.getSections()[s];
-                        if (section == null) continue;
-                        DataPalette blocks = section.palette(PaletteType.BLOCKS);
+            for (int s = 0; s < chunk.getSections().length; s++) {
+                ChunkSection section = chunk.getSections()[s];
+                if (section == null) continue;
+                DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
+                for (int p = 0; p < blocks.size(); p++) {
+                    int old = blocks.idByIndex(p);
+                    int newId = toNewId(old);
+                    blocks.setIdByIndex(p, newId);
+                }
+
+                storage:
+                {
+                    if (chunk.isFullChunk()) {
+                        boolean willSave = false;
                         for (int p = 0; p < blocks.size(); p++) {
-                            int old = blocks.idByIndex(p);
-                            int newId = toNewId(old);
-                            blocks.setIdByIndex(p, newId);
-                        }
-
-                        storage:
-                        {
-                            if (chunk.isFullChunk()) {
-                                boolean willSave = false;
-                                for (int p = 0; p < blocks.size(); p++) {
-                                    if (storage.isWelcome(blocks.idByIndex(p))) {
-                                        willSave = true;
-                                        break;
-                                    }
-                                }
-                                if (!willSave) break storage;
-                            }
-                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                                int id = blocks.idAt(idx);
-                                if (storage.isWelcome(id)) {
-                                    storage.store(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)), id);
-                                } else if (!chunk.isFullChunk()) { // Update
-                                    storage.remove(new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
-                                }
+                            if (storage.isWelcome(blocks.idByIndex(p))) {
+                                willSave = true;
+                                break;
                             }
                         }
-
-                        save_connections:
-                        {
-                            if (!Via.getConfig().isServersideBlockConnections() || !ConnectionData.needStoreBlocks()) break save_connections;
-
-                            if (!chunk.isFullChunk()) { // Update
-                                ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), s, chunk.getZ());
-                            }
-                            boolean willSave = false;
-                            for (int p = 0; p < blocks.size(); p++) {
-                                if (ConnectionData.isWelcome(blocks.idByIndex(p))) {
-                                    willSave = true;
-                                    break;
-                                }
-                            }
-                            if (!willSave) break save_connections;
-
-                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-                                int id = blocks.idAt(idx);
-                                if (ConnectionData.isWelcome(id)) {
-                                    int globalX = ChunkSection.xFromIndex(idx) + (chunk.getX() << 4);
-                                    int globalY = ChunkSection.yFromIndex(idx) + (s << 4);
-                                    int globalZ = ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4);
-                                    ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), globalX, globalY, globalZ, id);
-                                }
-                            }
+                        if (!willSave) break storage;
+                    }
+                    for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                        int id = blocks.idAt(idx);
+                        Position position = new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4));
+                        if (storage.isWelcome(id)) {
+                            storage.store(position, id);
+                        } else if (!chunk.isFullChunk()) { // Update
+                            storage.remove(position);
                         }
                     }
+                }
 
-                    // Rewrite biome id 255 to plains
-                    if (chunk.isBiomeData()) {
-                        int latestBiomeWarn = Integer.MIN_VALUE;
-                        for (int i = 0; i < 256; i++) {
-                            int biome = chunk.getBiomeData()[i];
-                            if (!VALID_BIOMES.contains(biome)) {
-                                if (biome != 255 // is it generated naturally? *shrug*
-                                        && latestBiomeWarn != biome) {
-                                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                        Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
-                                    }
-                                    latestBiomeWarn = biome;
-                                }
-                                chunk.getBiomeData()[i] = 1; // Plains
-                            }
-                        }
+                save_connections:
+                {
+                    if (!Via.getConfig().isServersideBlockConnections() || !ConnectionData.needStoreBlocks()) {
+                        break save_connections;
                     }
 
-                    // Rewrite BlockEntities to normal blocks
-                    BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
-                    final Iterator<CompoundTag> iterator = chunk.getBlockEntities().iterator();
-                    while (iterator.hasNext()) {
-                        CompoundTag tag = iterator.next();
-                        int newId = provider.transform(wrapper.user(), null, tag, false);
-                        if (newId != -1) {
-                            int x = ((NumberTag) tag.get("x")).asInt();
-                            int y = ((NumberTag) tag.get("y")).asInt();
-                            int z = ((NumberTag) tag.get("z")).asInt();
-
-                            Position position = new Position(x, (short) y, z);
-                            // Store the replacement blocks for blockupdates
-                            BlockStorage.ReplacementData replacementData = storage.get(position);
-                            if (replacementData != null) {
-                                replacementData.setReplacement(newId);
-                            }
-
-                            chunk.getSections()[y >> 4].setFlatBlock(x & 0xF, y & 0xF, z & 0xF, newId);
-                        }
-
-                        final Tag idTag = tag.get("id");
-                        if (idTag instanceof StringTag) {
-                            // No longer block entities
-                            final String id = ((StringTag) idTag).getValue();
-                            if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
-                                iterator.remove();
-                            }
-                        }
+                    if (!chunk.isFullChunk()) { // Update
+                        ConnectionData.blockConnectionProvider.unloadChunkSection(wrapper.user(), chunk.getX(), s, chunk.getZ());
                     }
 
-                    if (Via.getConfig().isServersideBlockConnections()) {
-                        ConnectionData.connectBlocks(wrapper.user(), chunk);
-                        // Workaround for packet order issue
-                        wrapper.send(Protocol1_13To1_12_2.class);
-                        wrapper.cancel();
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
-                            if (section == null) continue;
-                            ConnectionData.updateChunkSectionNeighbours(wrapper.user(), chunk.getX(), chunk.getZ(), i);
+                    boolean willSave = false;
+                    for (int p = 0; p < blocks.size(); p++) {
+                        if (ConnectionData.isWelcome(blocks.idByIndex(p))) {
+                            willSave = true;
+                            break;
                         }
                     }
-                });
+                    if (!willSave) {
+                        break save_connections;
+                    }
+
+                    for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                        int id = blocks.idAt(idx);
+                        if (ConnectionData.isWelcome(id)) {
+                            int globalX = ChunkSection.xFromIndex(idx) + (chunk.getX() << 4);
+                            int globalY = ChunkSection.yFromIndex(idx) + (s << 4);
+                            int globalZ = ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4);
+                            ConnectionData.blockConnectionProvider.storeBlock(wrapper.user(), globalX, globalY, globalZ, id);
+                        }
+                    }
+                }
+            }
+
+            // Rewrite biome id 255 to plains
+            if (chunk.isBiomeData()) {
+                int latestBiomeWarn = Integer.MIN_VALUE;
+                for (int i = 0; i < 256; i++) {
+                    int biome = chunk.getBiomeData()[i];
+                    if (!VALID_BIOMES.contains(biome)) {
+                        if (biome != 255 // is it generated naturally? *shrug*
+                                && latestBiomeWarn != biome) {
+                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                            }
+                            latestBiomeWarn = biome;
+                        }
+                        chunk.getBiomeData()[i] = 1; // Plains
+                    }
+                }
+            }
+
+            // Rewrite BlockEntities to normal blocks
+            BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
+            final Iterator<CompoundTag> iterator = chunk.getBlockEntities().iterator();
+            while (iterator.hasNext()) {
+                CompoundTag tag = iterator.next();
+                int newId = provider.transform(wrapper.user(), null, tag, false);
+                if (newId != -1) {
+                    int x = ((NumberTag) tag.get("x")).asInt();
+                    int y = ((NumberTag) tag.get("y")).asInt();
+                    int z = ((NumberTag) tag.get("z")).asInt();
+
+                    Position position = new Position(x, (short) y, z);
+                    // Store the replacement blocks for blockupdates
+                    BlockStorage.ReplacementData replacementData = storage.get(position);
+                    if (replacementData != null) {
+                        replacementData.setReplacement(newId);
+                    }
+
+                    chunk.getSections()[y >> 4].palette(PaletteType.BLOCKS).setIdAt(x & 0xF, y & 0xF, z & 0xF, newId);
+                }
+
+                final Tag idTag = tag.get("id");
+                if (idTag instanceof StringTag) {
+                    // No longer block entities
+                    final String id = ((StringTag) idTag).getValue();
+                    if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
+                        iterator.remove();
+                    }
+                }
+            }
+
+            if (Via.getConfig().isServersideBlockConnections()) {
+                ConnectionData.connectBlocks(wrapper.user(), chunk);
+                // Workaround for packet order issue
+                wrapper.send(Protocol1_13To1_12_2.class);
+                wrapper.cancel();
+                ConnectionData.NeighbourUpdater updater = new ConnectionData.NeighbourUpdater(wrapper.user());
+                for (int i = 0; i < chunk.getSections().length; i++) {
+                    ChunkSection section = chunk.getSections()[i];
+                    if (section == null) {
+                        continue;
+                    }
+
+                    updater.updateChunkSectionNeighbours(chunk.getX(), chunk.getZ(), i);
+                }
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PARTICLE, new
+        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.INT); // 0 - Particle ID
+                map(Type.BOOLEAN); // 1 - Long Distance
+                map(Type.FLOAT); // 2 - X
+                map(Type.FLOAT); // 3 - Y
+                map(Type.FLOAT); // 4 - Z
+                map(Type.FLOAT); // 5 - Offset X
+                map(Type.FLOAT); // 6 - Offset Y
+                map(Type.FLOAT); // 7 - Offset Z
+                map(Type.FLOAT); // 8 - Particle Data
+                map(Type.INT); // 9 - Particle Count
 
-                PacketRemapper() {
-                    @Override
-                    public void registerMap() {
-                        map(Type.INT); // 0 - Particle ID
-                        map(Type.BOOLEAN); // 1 - Long Distance
-                        map(Type.FLOAT); // 2 - X
-                        map(Type.FLOAT); // 3 - Y
-                        map(Type.FLOAT); // 4 - Z
-                        map(Type.FLOAT); // 5 - Offset X
-                        map(Type.FLOAT); // 6 - Offset Y
-                        map(Type.FLOAT); // 7 - Offset Z
-                        map(Type.FLOAT); // 8 - Particle Data
-                        map(Type.INT); // 9 - Particle Count
+                handler(wrapper -> {
+                    int particleId = wrapper.get(Type.INT, 0);
 
-                        handler(wrapper -> {
-                            int particleId = wrapper.get(Type.INT, 0);
+                    // Get the data (Arrays are overrated)
+                    int dataCount = 0;
+                    // Particles with 1 data [BlockCrack,BlockDust,FallingDust]
+                    if (particleId == 37 || particleId == 38 || particleId == 46)
+                        dataCount = 1;
+                        // Particles with 2 data [IconCrack]
+                    else if (particleId == 36)
+                        dataCount = 2;
 
-                            // Get the data (Arrays are overrated)
-                            int dataCount = 0;
-                            // Particles with 1 data [BlockCrack,BlockDust,FallingDust]
-                            if (particleId == 37 || particleId == 38 || particleId == 46)
-                                dataCount = 1;
-                                // Particles with 2 data [IconCrack]
-                            else if (particleId == 36)
-                                dataCount = 2;
+                    Integer[] data = new Integer[dataCount];
+                    for (int i = 0; i < data.length; i++)
+                        data[i] = wrapper.read(Type.VAR_INT);
 
-                            Integer[] data = new Integer[dataCount];
-                            for (int i = 0; i < data.length; i++)
-                                data[i] = wrapper.read(Type.VAR_INT);
+                    Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
 
-                            Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
-
-                            // Cancel if null or completely removed
-                            if (particle == null || particle.getId() == -1) {
-                                wrapper.cancel();
-                                return;
-                            }
-
-                            //Handle reddust particle color
-                            if (particle.getId() == 11) {
-                                int count = wrapper.get(Type.INT, 1);
-                                float speed = wrapper.get(Type.FLOAT, 6);
-                                // Only handle for count = 0
-                                if (count == 0) {
-                                    wrapper.set(Type.INT, 1, 1);
-                                    wrapper.set(Type.FLOAT, 6, 0f);
-
-                                    List<Particle.ParticleData> arguments = particle.getArguments();
-                                    for (int i = 0; i < 3; i++) {
-                                        //RGB values are represented by the X/Y/Z offset
-                                        float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
-                                        if (colorValue == 0 && i == 0) {
-                                            // https://minecraft.gamepedia.com/User:Alphappy/reddust
-                                            colorValue = 1;
-                                        }
-                                        arguments.get(i).setValue(colorValue);
-                                        wrapper.set(Type.FLOAT, i + 3, 0f);
-                                    }
-                                }
-                            }
-
-                            wrapper.set(Type.INT, 0, particle.getId());
-                            for (Particle.ParticleData particleData : particle.getArguments())
-                                wrapper.write(particleData.getType(), particleData.getValue());
-
-                        });
+                    // Cancel if null or completely removed
+                    if (particle == null || particle.getId() == -1) {
+                        wrapper.cancel();
+                        return;
                     }
+
+                    //Handle reddust particle color
+                    if (particle.getId() == 11) {
+                        int count = wrapper.get(Type.INT, 1);
+                        float speed = wrapper.get(Type.FLOAT, 6);
+                        // Only handle for count = 0
+                        if (count == 0) {
+                            wrapper.set(Type.INT, 1, 1);
+                            wrapper.set(Type.FLOAT, 6, 0f);
+
+                            List<Particle.ParticleData> arguments = particle.getArguments();
+                            for (int i = 0; i < 3; i++) {
+                                //RGB values are represented by the X/Y/Z offset
+                                float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
+                                if (colorValue == 0 && i == 0) {
+                                    // https://minecraft.gamepedia.com/User:Alphappy/reddust
+                                    colorValue = 1;
+                                }
+                                arguments.get(i).setValue(colorValue);
+                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                            }
+                        }
+                    }
+
+                    wrapper.set(Type.INT, 0, particle.getId());
+                    for (Particle.ParticleData particleData : particle.getArguments())
+                        wrapper.write(particleData.getType(), particleData.getValue());
+
                 });
+            }
+        });
     }
 
     public static int toNewId(int oldId) {

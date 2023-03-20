@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_14_1to1_14.packets;
 
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;
@@ -30,9 +30,9 @@ public class EntityPackets {
     public static void register(Protocol1_14_1To1_14 protocol) {
         MetadataRewriter1_14_1To1_14 metadataRewriter = protocol.get(MetadataRewriter1_14_1To1_14.class);
 
-        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_MOB, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Entity UUID
                 map(Type.VAR_INT); // 2 - Entity Type
@@ -53,9 +53,9 @@ public class EntityPackets {
 
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.DESTROY_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PLAYER, new PacketRemapper() {
+        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PLAYER, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.UUID); // 1 - Player UUID
                 map(Type.DOUBLE); // 2 - X

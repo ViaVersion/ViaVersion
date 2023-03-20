@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2022 ViaVersion and contributors
+ * Copyright (C) 2016-2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,8 @@ package com.viaversion.viaversion.bungee.providers;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-
 import java.lang.reflect.Method;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeEntityIdProvider extends EntityIdProvider {
     private static Method getClientEntityId;
