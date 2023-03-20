@@ -40,6 +40,18 @@ public interface ChunkSection {
         return y << 8 | z << 4 | x;
     }
 
+    static int xFromIndex(int idx) {
+        return idx & 0xF;
+    }
+
+    static int yFromIndex(int idx) {
+        return idx >> 8 & 0xF;
+    }
+
+    static int zFromIndex(int idx) {
+        return idx >> 4 & 0xF;
+    }
+
     @Deprecated/*(forRemoval = true)*/
     default int getFlatBlock(int idx) {
         return palette(PaletteType.BLOCKS).idAt(idx);

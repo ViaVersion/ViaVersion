@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class InformativeException extends Exception {
     private final Map<String, Object> info = new HashMap<>();
+    private boolean shouldBePrinted = true;
     private int sources;
 
     public InformativeException(Throwable cause) {
@@ -44,6 +45,14 @@ public class InformativeException extends Exception {
 
     private String getSource(Class<?> sourceClazz) {
         return sourceClazz.isAnonymousClass() ? sourceClazz.getName() + " (Anonymous)" : sourceClazz.getName();
+    }
+
+    public boolean shouldBePrinted() {
+        return shouldBePrinted;
+    }
+
+    public void setShouldBePrinted(final boolean shouldBePrinted) {
+        this.shouldBePrinted = shouldBePrinted;
     }
 
     @Override

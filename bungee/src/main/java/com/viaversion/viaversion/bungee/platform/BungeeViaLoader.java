@@ -76,15 +76,6 @@ public class BungeeViaLoader implements ViaPlatformLoader {
             Via.getManager().getProviders().use(BossBarProvider.class, new BungeeBossBarProvider());
             Via.getManager().getProviders().use(MainHandProvider.class, new BungeeMainHandProvider());
         }
-
-        if (plugin.getConf().getBungeePingInterval() > 0) {
-            tasks.add(plugin.getProxy().getScheduler().schedule(
-                    plugin,
-                    () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
-                    0, plugin.getConf().getBungeePingInterval(),
-                    TimeUnit.SECONDS
-            ));
-        }
     }
 
     @Override

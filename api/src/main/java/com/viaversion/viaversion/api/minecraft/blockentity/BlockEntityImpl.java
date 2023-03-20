@@ -56,4 +56,9 @@ public final class BlockEntityImpl implements BlockEntity {
     public CompoundTag tag() {
         return tag;
     }
+
+    @Override
+    public BlockEntity withTypeId(int typeId) {
+        return new BlockEntityImpl(packedXZ, y, typeId, tag);
+    }
 }

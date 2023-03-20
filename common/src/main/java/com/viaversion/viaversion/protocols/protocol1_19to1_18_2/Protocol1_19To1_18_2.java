@@ -64,6 +64,10 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_19.class);
     }
 
+    public static boolean isTextComponentNull(final JsonElement element) {
+        return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
+    }
+
     @Override
     protected void registerPackets() {
         final TagRewriter tagRewriter = new TagRewriter(this);
@@ -86,7 +90,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -98,7 +102,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.VAR_INT); // Entity id
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
@@ -112,7 +116,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 map(Type.INT); // Z
                 map(Type.FLOAT); // Volume
                 map(Type.FLOAT); // Pitch
-                create(Type.LONG, randomLong()); // Seed
+                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
             }
         });
 
@@ -120,7 +124,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         final PacketHandler titleHandler = wrapper -> {
             final JsonElement component = wrapper.read(Type.COMPONENT);
-            if (!component.isJsonNull()) {
+            if (!isTextComponentNull(component)) {
                 wrapper.write(Type.COMPONENT, component);
             } else {
                 wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(Component.empty()));

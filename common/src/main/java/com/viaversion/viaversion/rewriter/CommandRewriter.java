@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -71,6 +72,12 @@ public class CommandRewriter {
             wrapper.passthrough(Type.STRING); // Resource location
         });
         this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> {
+            wrapper.passthrough(Type.STRING); // Resource location/tag
+        });
+        this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> {
+            wrapper.passthrough(Type.STRING); // Resource location
+        });
+        this.parserHandlers.put("minecraft:resource_key", wrapper -> {
             wrapper.passthrough(Type.STRING); // Resource location/tag
         });
     }
@@ -144,9 +151,8 @@ public class CommandRewriter {
                             int argumentTypeId = wrapper.read(Type.VAR_INT);
                             String argumentType = protocol.getMappingData().getArgumentTypeMappings().identifier(argumentTypeId);
                             String newArgumentType = handleArgumentType(argumentType);
-                            if (newArgumentType != null) {
-                                wrapper.write(Type.VAR_INT, protocol.getMappingData().getArgumentTypeMappings().mappedId(newArgumentType));
-                            }
+                            Preconditions.checkArgument(newArgumentType != null, "No mapping for argument type " + argumentType);
+                            wrapper.write(Type.VAR_INT, protocol.getMappingData().getArgumentTypeMappings().mappedId(newArgumentType));
 
                             // Always call the handler using the previous name
                             handleArgument(wrapper, argumentType);

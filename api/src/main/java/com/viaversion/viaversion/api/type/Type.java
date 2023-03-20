@@ -87,6 +87,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final ByteType BYTE = new ByteType();
     public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
     public static final Type<byte[]> BYTE_ARRAY_PRIMITIVE = new ByteArrayType();
+    public static final Type<byte[]> OPTIONAL_BYTE_ARRAY_PRIMITIVE = new ByteArrayType.OptionalByteArrayType();
     public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
 
@@ -95,6 +96,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final IntType INT = new IntType();
     public static final FloatType FLOAT = new FloatType();
+    public static final FloatType.OptionalFloatType OPTIONAL_FLOAT = new FloatType.OptionalFloatType();
     public static final DoubleType DOUBLE = new DoubleType();
 
     public static final LongType LONG = new LongType();

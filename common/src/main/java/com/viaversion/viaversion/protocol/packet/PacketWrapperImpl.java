@@ -49,7 +49,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
-    /** Only non-null if specifically set and gotten before packet transformation */
+    /**
+     * Only non-null if specifically set and gotten before packet transformation
+     */
     private PacketType packetType;
     private int id;
     private final Deque<Pair<Type, Object>> readableObjects = new ArrayDeque<>();
@@ -78,9 +80,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             }
             currentIndex++;
         }
-
-        Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
-        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
+        throw createInformativeException(new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index), type, index);
     }
 
     @Override
@@ -121,20 +121,22 @@ public class PacketWrapperImpl implements PacketWrapper {
             }
             currentIndex++;
         }
-        Exception e = new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index);
-        throw new InformativeException(e).set("Type", type.getTypeName()).set("Index", index).set("Packet ID", getId()).set("Packet Type", packetType);
+        throw createInformativeException(new ArrayIndexOutOfBoundsException("Could not find type " + type.getTypeName() + " at " + index), type, index);
     }
 
     @Override
     public <T> T read(Type<T> type) throws Exception {
-        if (type == Type.NOTHING) return null;
+        if (type == Type.NOTHING) {
+            return null;
+        }
+
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
             try {
                 return type.read(inputBuffer);
             } catch (Exception e) {
-                throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
+                throw createInformativeException(e, type, packetValues.size() + 1);
             }
         }
 
@@ -147,8 +149,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         } else if (rtype == Type.NOTHING) {
             return read(type); // retry
         } else {
-            Exception e = new IOException("Unable to read type " + type.getTypeName() + ", found " + read.key().getTypeName());
-            throw new InformativeException(e).set("Type", type.getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
+            throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + read.key().getTypeName()), type, readableObjects.size());
         }
     }
 
@@ -209,11 +210,20 @@ public class PacketWrapperImpl implements PacketWrapper {
             try {
                 packetValue.key().write(buffer, packetValue.value());
             } catch (Exception e) {
-                throw new InformativeException(e).set("Index", index).set("Type", packetValue.key().getTypeName()).set("Packet ID", getId()).set("Packet Type", packetType).set("Data", packetValues);
+                throw createInformativeException(e, packetValue.key(), index);
             }
             index++;
         }
         writeRemaining(buffer);
+    }
+
+    private InformativeException createInformativeException(final Exception cause, final Type<?> type, final int index) {
+        return new InformativeException(cause)
+                .set("Index", index)
+                .set("Type", type.getTypeName())
+                .set("Packet ID", this.id)
+                .set("Packet Type", this.packetType)
+                .set("Data", this.packetValues);
     }
 
     @Override

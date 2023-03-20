@@ -25,12 +25,15 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -38,6 +41,8 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
@@ -125,33 +130,28 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                         Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
                         Chunk chunk = wrapper.passthrough(type);
 
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
-                            if (section == null)
-                                continue;
+                        for (int s = 0; s < chunk.getSections().length; s++) {
+                            ChunkSection section = chunk.getSections()[s];
+                            if (section == null) continue;
+                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getBlockWithoutData(x, y, z);
-                                        // Is this a bed?
-                                        if (block == 26) {
-                                            //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
-                                            CompoundTag tag = new CompoundTag();
-                                            tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
-                                            tag.put("x", new IntTag(x + (chunk.getX() << 4)));
-                                            tag.put("y", new IntTag(y + (i << 4)));
-                                            tag.put("z", new IntTag(z + (chunk.getZ() << 4)));
-                                            tag.put("id", new StringTag("minecraft:bed"));
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx) >> 4;
+                                // Is this a bed?
+                                if (id != 26) continue;
 
-                                            // Add a fake block entity
-                                            chunk.getBlockEntities().add(tag);
-                                        }
-                                    }
-                                }
+                                //  NBT -> { color:14, x:132, y:64, z:222, id:"minecraft:bed" } (Debug output)
+                                CompoundTag tag = new CompoundTag();
+                                tag.put("color", new IntTag(14)); // Set color to red (Default in previous versions)
+                                tag.put("x", new IntTag(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4)));
+                                tag.put("y", new IntTag(ChunkSection.yFromIndex(idx) + (s << 4)));
+                                tag.put("z", new IntTag(ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4)));
+                                tag.put("id", new StringTag("minecraft:bed"));
+
+                                // Add a fake block entity
+                                chunk.getBlockEntities().add(tag);
                             }
                         }
-
                     }
                 });
             }
@@ -167,9 +167,16 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
                 map(Type.UNSIGNED_BYTE);
                 map(Type.INT);
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    UserConnection user = wrapper.user();
+                    ClientWorld clientChunks = user.get(ClientWorld.class);
                     int dimensionId = wrapper.get(Type.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
+
+                    // Reset recipes
+                    if (user.getProtocolInfo().getProtocolVersion() >= ProtocolVersion.v1_13.getVersion()) {
+                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
+                                .scheduleSend(Protocol1_13To1_12_2.class);
+                    }
                 });
             }
         });

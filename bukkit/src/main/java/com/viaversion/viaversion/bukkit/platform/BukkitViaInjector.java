@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class BukkitViaInjector extends LegacyViaInjector {
-    private boolean protocolLib;
 
     @Override
     public void inject() throws ReflectiveOperationException {
@@ -113,11 +112,6 @@ public class BukkitViaInjector extends LegacyViaInjector {
     }
 
     @Override
-    public String getDecoderName() {
-        return protocolLib ? "protocol_lib_decoder" : "decoder";
-    }
-
-    @Override
     protected @Nullable Object getServerConnection() throws ReflectiveOperationException {
         Class<?> serverClass = NMSUtil.nms(
                 "MinecraftServer",
@@ -188,9 +182,5 @@ public class BukkitViaInjector extends LegacyViaInjector {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public void setProtocolLib(boolean protocolLib) {
-        this.protocolLib = protocolLib;
     }
 }

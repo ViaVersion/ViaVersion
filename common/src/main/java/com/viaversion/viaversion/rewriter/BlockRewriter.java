@@ -17,12 +17,23 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.data.Mappings;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.MathUtil;
+
+import java.util.List;
 
 public class BlockRewriter {
     private final Protocol protocol;
@@ -120,5 +131,57 @@ public class BlockRewriter {
                 });
             }
         });
+    }
+
+    public void registerChunkData1_19(ClientboundPacketType packetType, ChunkTypeSupplier chunkTypeSupplier) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                handler(wrapper -> {
+                    final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+                    Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
+                    Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+                    final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
+                            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                            MathUtil.ceilLog2(tracker.biomesSent()));
+                    final Chunk chunk = wrapper.passthrough(chunkType);
+                    for (final ChunkSection section : chunk.getSections()) {
+                        final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                        for (int i = 0; i < blockPalette.size(); i++) {
+                            final int id = blockPalette.idByIndex(i);
+                            blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                        }
+                    }
+
+                    final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+                    if (blockEntityMappings != null) {
+                        List<BlockEntity> blockEntities = chunk.blockEntities();
+                        for (int i = 0; i < blockEntities.size(); i++) {
+                            final BlockEntity blockEntity = blockEntities.get(i);
+                            blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void registerBlockEntityData(ClientboundPacketType packetType) {
+        protocol.registerClientbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.POSITION1_14);
+                handler(wrapper -> {
+                    final int blockEntityId = wrapper.read(Type.VAR_INT);
+                    wrapper.write(Type.VAR_INT, protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntityId, blockEntityId));
+                });
+            }
+        });
+    }
+
+    @FunctionalInterface
+    public interface ChunkTypeSupplier {
+
+        Type<Chunk> supply(int ySectionCount, int globalPaletteBlockBits, int globalPaletteBiomeBits);
     }
 }

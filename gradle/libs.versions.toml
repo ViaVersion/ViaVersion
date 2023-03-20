@@ -2,12 +2,11 @@ metadata.format.version = "1.1"
 
 [versions]
 
-adventure = "4.9.3"
-gson = "2.8.8"
+adventure = "4.12.0"
+gson = "2.10"
 fastutil = "8.5.6"
-flare = "2.0.0"
+flare = "2.0.1"
 openNBT = "2.1"
-javassist = "3.28.0-GA"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -15,7 +14,7 @@ guava = "17.0"
 snakeYaml = "1.18"
 
 junit = "5.7.2"
-checkerQual = "3.18.0"
+checkerQual = "3.27.0"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
@@ -38,7 +37,6 @@ fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil"
 flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
 flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
 openNBT = { group = "com.viaversion", name = "opennbt", version.ref = "openNBT" }
-javassist = { group = "org.javassist", name = "javassist", version.ref = "javassist" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }

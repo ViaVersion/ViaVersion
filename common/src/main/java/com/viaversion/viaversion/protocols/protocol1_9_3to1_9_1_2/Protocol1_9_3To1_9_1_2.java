@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -104,18 +106,20 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                         wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
 
                         List<CompoundTag> tags = chunk.getBlockEntities();
-                        for (int i = 0; i < chunk.getSections().length; i++) {
-                            ChunkSection section = chunk.getSections()[i];
+                        for (int s = 0; s < chunk.getSections().length; s++) {
+                            ChunkSection section = chunk.getSections()[s];
                             if (section == null) continue;
+                            DataPalette blocks = section.palette(PaletteType.BLOCKS);
 
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    for (int x = 0; x < 16; x++) {
-                                        int block = section.getBlockWithoutData(x, y, z);
-                                        if (FakeTileEntity.isTileEntity(block)) {
-                                            tags.add(FakeTileEntity.createTileEntity(x + (chunk.getX() << 4), y + (i << 4), z + (chunk.getZ() << 4), block));
-                                        }
-                                    }
+                            for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
+                                int id = blocks.idAt(idx) >> 4;
+                                if (FakeTileEntity.isTileEntity(id)) {
+                                    tags.add(FakeTileEntity.createTileEntity(
+                                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                                            ChunkSection.yFromIndex(idx) + (s << 4),
+                                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                                            id
+                                    ));
                                 }
                             }
                         }

@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -63,7 +65,9 @@ public class Protocol1_9_1_2To1_9_3_4 extends AbstractProtocol<ClientboundPacket
                             wrapper.write(Type.POSITION, position); // Position
                             for (int i = 1; i < 5; i++) {
                                 // Should technically be written as COMPONENT, but left as String for simplification/to remove redundant wrapping for VR
-                                wrapper.write(Type.STRING, (String) tag.get("Text" + i).getValue()); // Sign line
+                                Tag textTag = tag.get("Text" + i);
+                                String line = textTag instanceof StringTag ? ((StringTag) textTag).getValue() : "";
+                                wrapper.write(Type.STRING, line); // Sign line
                             }
                         }
                     }

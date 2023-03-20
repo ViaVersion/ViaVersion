@@ -47,13 +47,6 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
         VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
-
-        int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
-        if (pingInterval > 0) {
-            Via.getPlatform().runRepeatingSync(
-                    () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
-                    pingInterval * 20L);
-        }
     }
 
     @Override

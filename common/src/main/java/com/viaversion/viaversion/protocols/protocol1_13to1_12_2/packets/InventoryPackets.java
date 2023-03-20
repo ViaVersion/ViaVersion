@@ -309,8 +309,12 @@ public class InventoryPackets extends ItemRewriter<Protocol1_13To1_12_2> {
                     if (blockEntityTag.get("Patterns") instanceof ListTag) {
                         for (Tag pattern : (ListTag) blockEntityTag.get("Patterns")) {
                             if (pattern instanceof CompoundTag) {
-                                IntTag c = ((CompoundTag) pattern).get("Color");
-                                c.setValue(15 - c.asInt()); // Invert color id
+                                Tag c = ((CompoundTag) pattern).get("Color");
+                                if (c instanceof NumberTag) {
+                                    // Invert color id
+                                    ((CompoundTag) pattern).put("Color",
+                                            new IntTag(15 - ((NumberTag) c).asInt()));
+                                }
                             }
                         }
                     }

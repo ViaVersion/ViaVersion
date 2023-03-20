@@ -37,10 +37,10 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, Type.FLAT_VAR_INT_ITEM);
-        registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS);
+        registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT);
         registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
-        registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT);
         protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -58,7 +58,7 @@ public final class InventoryPackets extends ItemRewriter<Protocol1_19To1_18_2> {
             }
         });
 
-        registerClickWindow1_17_1(ServerboundPackets1_19.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow1_17_1(ServerboundPackets1_19.CLICK_WINDOW);
         registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
 
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);

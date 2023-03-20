@@ -69,7 +69,7 @@ public final class PaperViaInjector {
     }
 
     private static boolean hasPacketLimiter() {
-        return hasClass("com.destroystokyo.paper.PaperConfig$PacketLimit") || hasClass("io.papermc.paper.PaperConfig$PacketLimit");
+        return hasClass("com.destroystokyo.paper.PaperConfig$PacketLimit") || hasClass("io.papermc.paper.configuration.GlobalConfiguration$PacketLimiter");
     }
 
     private static boolean hasClass(final String className) {

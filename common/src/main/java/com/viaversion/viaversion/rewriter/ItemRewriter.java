@@ -66,21 +66,19 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerWindowItems1_17_1(ClientboundPacketType packetType, Type<Item[]> itemsType, Type<Item> carriedItemType) {
+    public void registerWindowItems1_17_1(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
-                map(itemsType); // Items
-                map(carriedItemType); // Carried item
                 handler(wrapper -> {
-                    Item[] items = wrapper.get(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, 0);
+                    Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
                     for (Item item : items) {
                         handleItemToClient(item);
                     }
 
-                    handleItemToClient(wrapper.get(Type.FLAT_VAR_INT_ITEM, 0));
+                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Carried item
                 });
             }
         });
@@ -98,15 +96,15 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSetSlot1_17_1(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerSetSlot1_17_1(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 map(Type.SHORT); // Slot id
-                map(type); // Item
-                handler(itemToClientHandler(type));
+                map(Type.FLAT_VAR_INT_ITEM); // Item
+                handler(itemToClientHandler(Type.FLAT_VAR_INT_ITEM));
             }
         });
     }
@@ -126,7 +124,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // 1.16+
-    public void registerEntityEquipmentArray(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerEntityEquipmentArray(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -137,7 +135,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                     do {
                         slot = wrapper.passthrough(Type.BYTE);
                         // & 0x7F into an extra variable if slot is needed
-                        handleItemToClient(wrapper.passthrough(type));
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                     } while ((slot & 0xFFFFFF80) != 0);
                 });
             }
@@ -172,7 +170,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerClickWindow1_17_1(ServerboundPacketType packetType, Type<Item> type) {
+    public void registerClickWindow1_17_1(ServerboundPacketType packetType) {
         protocol.registerServerbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -187,11 +185,11 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                     int length = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < length; i++) {
                         wrapper.passthrough(Type.SHORT); // Slot
-                        handleItemToServer(wrapper.passthrough(type));
+                        handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                     }
 
                     // Carried item
-                    handleItemToServer(wrapper.passthrough(type));
+                    handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
                 });
             }
         });
@@ -210,7 +208,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
     }
 
     // 1.14.4+
-    public void registerTradeList(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerTradeList(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -218,11 +216,11 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                     wrapper.passthrough(Type.VAR_INT);
                     int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                     for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(type)); // Input
-                        handleItemToClient(wrapper.passthrough(type)); // Output
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
 
                         if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                            handleItemToClient(wrapper.passthrough(type)); // Second Item
+                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
                         }
 
                         wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -240,7 +238,7 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerTradeList1_19(ClientboundPacketType packetType, Type<Item> type) {
+    public void registerTradeList1_19(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -248,9 +246,9 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
                     wrapper.passthrough(Type.VAR_INT); // Container id
                     int size = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(type)); // Input
-                        handleItemToClient(wrapper.passthrough(type)); // Output
-                        handleItemToClient(wrapper.passthrough(type)); // Second Item
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Input
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Output
+                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Second Item
 
                         wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                         wrapper.passthrough(Type.INT); // Number of tools uses
@@ -343,21 +341,21 @@ public abstract class ItemRewriter<T extends Protocol> extends RewriterBase<T> i
         });
     }
 
-    public void registerSpawnParticle1_19(ClientboundPacketType packetType, Type<Item> itemType, Type<?> coordType) {
+    public void registerSpawnParticle1_19(ClientboundPacketType packetType) {
         protocol.registerClientbound(packetType, new PacketRemapper() {
             @Override
             public void registerMap() {
                 map(Type.VAR_INT); // 0 - Particle ID
                 map(Type.BOOLEAN); // 1 - Long Distance
-                map(coordType); // 2 - X
-                map(coordType); // 3 - Y
-                map(coordType); // 4 - Z
+                map(Type.DOUBLE); // 2 - X
+                map(Type.DOUBLE); // 3 - Y
+                map(Type.DOUBLE); // 4 - Z
                 map(Type.FLOAT); // 5 - Offset X
                 map(Type.FLOAT); // 6 - Offset Y
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(Type.VAR_INT, itemType));
+                handler(getSpawnParticleHandler(Type.VAR_INT, Type.FLAT_VAR_INT_ITEM));
             }
         });
     }

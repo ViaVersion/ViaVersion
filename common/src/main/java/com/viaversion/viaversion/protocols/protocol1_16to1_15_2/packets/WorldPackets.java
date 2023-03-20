@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -85,7 +86,7 @@ public class WorldPackets {
 
                     if (chunk.getBlockEntities() == null) return;
                     for (CompoundTag blockEntity : chunk.getBlockEntities()) {
-                        handleBlockEntity(blockEntity);
+                        handleBlockEntity(protocol, blockEntity);
                     }
                 });
             }
@@ -98,7 +99,7 @@ public class WorldPackets {
                     Position position = wrapper.passthrough(Type.POSITION1_14);
                     short action = wrapper.passthrough(Type.UNSIGNED_BYTE);
                     CompoundTag tag = wrapper.passthrough(Type.NBT);
-                    handleBlockEntity(tag);
+                    handleBlockEntity(protocol, tag);
                 });
             }
         });
@@ -106,7 +107,7 @@ public class WorldPackets {
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);
     }
 
-    private static void handleBlockEntity(CompoundTag compoundTag) {
+    private static void handleBlockEntity(Protocol1_16To1_15_2 protocol, CompoundTag compoundTag) {
         StringTag idTag = compoundTag.get("id");
         if (idTag == null) return;
 
@@ -132,6 +133,25 @@ public class WorldPackets {
                 skullOwnerTag.put(entry.getKey(), entry.getValue());
             }
             compoundTag.put("SkullOwner", skullOwnerTag);
+        } else if (id.equals("minecraft:sign")) {
+            for (int i = 1; i <= 4; i++) {
+                Tag line = compoundTag.get("Text" + i);
+                if (line instanceof StringTag) {
+                    JsonElement text = protocol.getComponentRewriter().processText(((StringTag) line).getValue());
+                    compoundTag.put("Text" + i, new StringTag(text.toString()));
+                }
+            }
+        } else if (id.equals("minecraft:mob_spawner")) {
+            Tag spawnDataTag = compoundTag.get("SpawnData");
+            if (spawnDataTag instanceof CompoundTag) {
+                Tag spawnDataIdTag = ((CompoundTag) spawnDataTag).get("id");
+                if (spawnDataIdTag instanceof StringTag) {
+                    StringTag spawnDataIdStringTag = ((StringTag) spawnDataIdTag);
+                    if (spawnDataIdStringTag.getValue().equals("minecraft:zombie_pigman")) {
+                        spawnDataIdStringTag.setValue("minecraft:zombified_piglin");
+                    }
+                }
+            }
         }
     }
 }

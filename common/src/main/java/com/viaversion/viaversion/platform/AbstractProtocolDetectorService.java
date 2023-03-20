@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.platform.ProtocolDetectorService;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -35,6 +36,18 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
 
     @Override
     public int serverProtocolVersion(final String serverName) {
+
+        // Start omni
+        try {
+            Class<?> BungeeServer = Class.forName("us.omniverse.MineProxy.utils.BungeeServer");
+            Method m = BungeeServer.getMethod("getServerVersion", String.class);
+            m.setAccessible(true);
+            return (int)m.invoke(null, serverName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // End omni
+
         // Step 1. Check detected
         lock.readLock().lock();
         final int detectedProtocol;

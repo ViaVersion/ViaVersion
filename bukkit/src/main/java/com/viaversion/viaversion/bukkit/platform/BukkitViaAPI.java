@@ -43,29 +43,22 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     @Override
     public int getPlayerVersion(UUID uuid) {
         UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
-        if (connection == null) {
+        if (connection != null) {
+            return connection.getProtocolInfo().getProtocolVersion();
+        }
+
+        if (isProtocolSupport()) {
             Player player = Bukkit.getPlayer(uuid);
-            if (player != null && isProtocolSupport()) {
+            if (player != null) {
                 return ProtocolSupportUtil.getProtocolVersion(player);
             }
-            return -1;
         }
-        return connection.getProtocolInfo().getProtocolVersion();
+        return -1;
     }
 
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    /**
-     * Returns if this version is a compatibility build for spigot.
-     * Eg. 1.9.1 / 1.9.2 allow certain versions to connect
-     *
-     * @return true if compat Spigot build
-     */
-    public boolean isCompatSpigotBuild() {
-        return plugin.isCompatSpigotBuild();
     }
 
     /**
@@ -76,5 +69,4 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     public boolean isProtocolSupport() {
         return plugin.isProtocolSupport();
     }
-
 }
