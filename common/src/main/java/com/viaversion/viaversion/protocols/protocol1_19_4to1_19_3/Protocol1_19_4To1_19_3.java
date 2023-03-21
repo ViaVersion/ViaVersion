@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPac
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.storage.PlayerVehicleTracker;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -105,6 +106,8 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
+
+        user.put(new PlayerVehicleTracker(user));
     }
 
     @Override

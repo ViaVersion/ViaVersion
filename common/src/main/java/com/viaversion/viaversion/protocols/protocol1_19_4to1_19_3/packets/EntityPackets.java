@@ -24,6 +24,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.storage.PlayerVehicleTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3, Protocol1_19_4To1_19_3> {
@@ -55,6 +57,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 handler(dimensionDataHandler());
                 handler(biomeSizeTracker());
                 handler(worldDataTrackerHandlerByKey());
+                handler(playerTrackerHandler());
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NBT, 0);
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
@@ -82,7 +85,49 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 map(Type.FLOAT); // Pitch
                 map(Type.BYTE); // Relative arguments
                 map(Type.VAR_INT); // Id
-                read(Type.BOOLEAN); // Dismount vehicle
+                handler(wrapper -> {
+                    if (wrapper.read(Type.BOOLEAN)) { // Dismount vehicle
+                        final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
+                        if (playerVehicleTracker.getVehicleId() != -1) {
+                            final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE);
+                            bundleStart.send(Protocol1_19_4To1_19_3.class);
+                            final PacketWrapper setPassengers = wrapper.create(ClientboundPackets1_19_4.SET_PASSENGERS);
+                            setPassengers.write(Type.VAR_INT, playerVehicleTracker.getVehicleId()); // vehicle id
+                            setPassengers.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // passenger ids
+                            setPassengers.send(Protocol1_19_4To1_19_3.class);
+                            wrapper.send(Protocol1_19_4To1_19_3.class);
+                            wrapper.cancel();
+                            final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_19_4.BUNDLE);
+                            bundleEnd.send(Protocol1_19_4To1_19_3.class);
+
+                            playerVehicleTracker.setVehicleId(-1);
+                        }
+                    }
+                });
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_19_3.SET_PASSENGERS, new PacketHandlers() {
+            @Override
+            protected void register() {
+                map(Type.VAR_INT); // vehicle id
+                map(Type.VAR_INT_ARRAY_PRIMITIVE); // passenger ids
+                handler(wrapper -> {
+                    final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
+                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_4To1_19_3.class).clientEntityId();
+                    final int vehicleId = wrapper.get(Type.VAR_INT, 0);
+
+                    if (playerVehicleTracker.getVehicleId() == vehicleId) {
+                        playerVehicleTracker.setVehicleId(-1);
+                    }
+
+                    final int[] passengerIds = wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0);
+                    for (int passengerId : passengerIds) {
+                        if (passengerId == clientEntityId) {
+                            playerVehicleTracker.setVehicleId(vehicleId);
+                            break;
+                        }
+                    }
+                });
             }
         });
 
@@ -109,6 +154,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
+                handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker(wrapper.user())));
             }
         });
 
