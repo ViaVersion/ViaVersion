@@ -52,6 +52,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings statisticsMappings;
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
+    protected Mappings menuMappings;
     protected Map<RegistryType, List<TagData>> tags;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
@@ -71,6 +72,7 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadMappings(data, "blockentities");
         soundMappings = loadMappings(data, "sounds");
         statisticsMappings = loadMappings(data, "statistics");
+        menuMappings = loadMappings(data, "menus");
         enchantmentMappings = loadMappings(data, "enchantments");
         paintingMappings = loadMappings(data, "paintings");
         itemMappings = loadBiMappings(data, "items");
@@ -200,6 +202,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getStatisticsMappings() {
         return statisticsMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getMenuMappings() {
+        return menuMappings;
     }
 
     @Override

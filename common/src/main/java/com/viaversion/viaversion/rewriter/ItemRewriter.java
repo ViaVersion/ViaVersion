@@ -85,6 +85,25 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
         });
     }
 
+    public void registerOpenWindow(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Container id
+                handler(wrapper -> {
+                    final int windowType = wrapper.read(Type.VAR_INT);
+                    final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
+                    if (mappedId == -1) {
+                        wrapper.cancel();
+                        return;
+                    }
+
+                    wrapper.write(Type.VAR_INT, mappedId);
+                });
+            }
+        });
+    }
+
     public void registerSetSlot(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
