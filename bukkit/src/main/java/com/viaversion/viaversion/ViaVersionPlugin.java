@@ -55,7 +55,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
-    private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionisedServer");
+    private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionizedServer");
     private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler;
     private final BukkitViaConfig conf;
@@ -109,11 +109,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         }
 
         if (FOLIA) {
-            // Use Folia's RegionisedServerInitEvent to run code after the server has loaded
+            // Use Folia's RegionizedServerInitEvent to run code after the server has loaded
             final Class<? extends Event> serverInitEventClass;
             try {
                 //noinspection unchecked
-                serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionisedServerInitEvent");
+                serverInitEventClass = (Class<? extends Event>) Class.forName("io.papermc.paper.threadedregions.RegionizedServerInitEvent");
             } catch (final ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }
