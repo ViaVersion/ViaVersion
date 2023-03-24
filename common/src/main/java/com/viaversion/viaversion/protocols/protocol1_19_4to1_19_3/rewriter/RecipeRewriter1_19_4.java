@@ -30,11 +30,8 @@ public class RecipeRewriter1_19_4<C extends ClientboundPacketType> extends Recip
     }
 
     @Override
-    public void handleCraftingShapeless(final PacketWrapper wrapper) throws Exception {
-        wrapper.passthrough(Type.STRING); // Group
-        wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+    public void handleCraftingShaped(final PacketWrapper wrapper) throws Exception {
+        super.handleCraftingShaped(wrapper);
         wrapper.passthrough(Type.BOOLEAN); // Show notification
     }
 }
