@@ -17,7 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20to1_19_4.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
@@ -41,8 +47,8 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_4.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_19_4.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_4.CHUNK_DATA, Chunk1_18Type::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA);
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_4.CHUNK_DATA, Chunk1_18Type::new, this::handleBlockEntity);
+        blockRewriter.registerBlockEntityData(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, this::handleBlockEntity);
 
         registerOpenWindow(ClientboundPackets1_19_4.OPEN_WINDOW);
         registerSetCooldown(ClientboundPackets1_19_4.COOLDOWN);
@@ -91,5 +97,40 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
 
             wrapper.set(Type.VAR_INT, 0, newSize);
         });
+    }
+
+    private void handleBlockEntity(final BlockEntity blockEntity) {
+        // Check for signs
+        if (blockEntity.typeId() != 7 && blockEntity.typeId() != 8) {
+            return;
+        }
+
+        final CompoundTag tag = blockEntity.tag();
+        final CompoundTag frontText = new CompoundTag();
+        tag.put("front_text", frontText);
+
+        final ListTag messages = new ListTag(StringTag.class);
+        for (int i = 1; i < 5; i++) {
+            final Tag text = tag.get("Text" + i);
+            messages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+        }
+        frontText.put("messages", messages);
+
+        final ListTag filteredMessages = new ListTag(StringTag.class);
+        for (int i = 1; i < 5; i++) {
+            final Tag text = tag.get("FilteredText" + i);
+            filteredMessages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+        }
+        frontText.put("filtered_messages", filteredMessages);
+
+        final Tag color = tag.remove("Color");
+        if (color != null) {
+            frontText.put("color", color);
+        }
+
+        final Tag glowing = tag.remove("GlowingText");
+        if (glowing != null) {
+            frontText.put("has_glowing_text", glowing);
+        }
     }
 }

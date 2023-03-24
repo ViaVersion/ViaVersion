@@ -26,8 +26,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
@@ -78,11 +76,14 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
             if (element != null) {
                 wrapper.write(Type.COMPONENT, element);
             } else {
-                wrapper.write(Type.COMPONENT, ChatRewriter.EMPTY_COMPONENT);
+                wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
             }
 
             final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);
-            final byte[] iconBytes = iconBase64 != null ? Base64.getDecoder().decode(iconBase64.substring("data:image/png;base64,".length()).getBytes(StandardCharsets.UTF_8)) : null;
+            byte[] iconBytes = null;
+            if (iconBase64 != null && iconBase64.startsWith("data:image/png;base64,")) {
+                iconBytes = Base64.getDecoder().decode(iconBase64.substring("data:image/png;base64,".length()).getBytes(StandardCharsets.UTF_8));
+            }
             wrapper.write(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE, iconBytes);
         });
     }

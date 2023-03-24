@@ -27,6 +27,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface BlockEntity {
 
+    static byte pack(int sectionX, int sectionZ) {
+        return (byte) (((sectionX) & 15) << 4 | (sectionZ & 15));
+    }
+
     default byte sectionX() {
         return (byte) ((packedXZ() >> 4) & 15);
     }

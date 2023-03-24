@@ -30,10 +30,9 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.data.MappingData;
@@ -124,7 +123,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             if (!isTextComponentNull(component)) {
                 wrapper.write(Type.COMPONENT, component);
             } else {
-                wrapper.write(Type.COMPONENT, GsonComponentSerializer.gson().serializeToTree(Component.empty()));
+                wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
             }
         };
         registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
