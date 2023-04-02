@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UnsupportedPlugin implements UnsupportedSoftware {
 
@@ -50,13 +51,13 @@ public final class UnsupportedPlugin implements UnsupportedSoftware {
     }
 
     @Override
-    public final boolean findMatch() {
+    public final @Nullable String match() {
         for (final String identifier : identifiers) {
             if (Via.getPlatform().hasPlugin(identifier)) {
-                return true;
+                return identifier;
             }
         }
-        return false;
+        return null;
     }
 
     public static final class Builder {

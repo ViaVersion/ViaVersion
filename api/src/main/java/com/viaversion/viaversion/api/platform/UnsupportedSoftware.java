@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.platform;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public interface UnsupportedSoftware {
 
     /**
@@ -39,9 +41,18 @@ public interface UnsupportedSoftware {
     String getReason();
 
     /**
+     * Returns the name of unsupported software if present.
+     *
+     * @return name of unsupported software if it is matched, else null
+     */
+    @Nullable String match();
+
+    /**
      * Returns whether the unsupported software is present.
      *
      * @return true if the unsupported software is found
      */
-    boolean findMatch();
+    default boolean findMatch() {
+        return match() != null;
+    }
 }
