@@ -106,6 +106,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 });
             }
         });
+
         protocol.registerClientbound(ClientboundPackets1_19_3.SET_PASSENGERS, new PacketHandlers() {
             @Override
             protected void register() {
@@ -127,6 +128,30 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                             break;
                         }
                     }
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_TELEPORT, new PacketHandlers() {
+            @Override
+            protected void register() {
+                handler(wrapper -> {
+                    final int entityId = wrapper.read(Type.VAR_INT); // entity id
+                    final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_4To1_19_3.class).clientEntityId();
+                    if (entityId != clientEntityId) {
+                        wrapper.write(Type.VAR_INT, entityId); // entity id
+                        return;
+                    }
+
+                    wrapper.setPacketType(ClientboundPackets1_19_4.PLAYER_POSITION);
+                    wrapper.passthrough(Type.DOUBLE); // x
+                    wrapper.passthrough(Type.DOUBLE); // y
+                    wrapper.passthrough(Type.DOUBLE); // z
+                    wrapper.write(Type.FLOAT, wrapper.read(Type.BYTE) * 360F / 256F); // yaw
+                    wrapper.write(Type.FLOAT, wrapper.read(Type.BYTE) * 360F / 256F); // pitch
+                    wrapper.read(Type.BOOLEAN); // on ground
+                    wrapper.write(Type.BYTE, (byte) 0); // flags
+                    wrapper.write(Type.VAR_INT, -1); // teleport id
                 });
             }
         });
