@@ -162,7 +162,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 }
             }
         });
-        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, Types1_17.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, null, Types1_17.META_TYPES.particleType);
 
         // Ticks frozen added with id 7
         filter().filterFamily(Entity1_17Types.ENTITY).addIndex(7);
