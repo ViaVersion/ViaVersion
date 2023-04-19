@@ -17,12 +17,15 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PlayerLookTargetProvider;
 
 public class TabCompleteTracker implements StorableObject {
     private int transactionId;
@@ -35,7 +38,8 @@ public class TabCompleteTracker implements StorableObject {
         PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.TAB_COMPLETE, null, connection);
         wrapper.write(Type.STRING, lastTabComplete);
         wrapper.write(Type.BOOLEAN, false);
-        wrapper.write(Type.OPTIONAL_POSITION, null);
+        final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
+        wrapper.write(Type.OPTIONAL_POSITION, playerLookTarget);
         try {
             wrapper.scheduleSendToServer(Protocol1_13To1_12_2.class);
         } catch (Exception e) {
