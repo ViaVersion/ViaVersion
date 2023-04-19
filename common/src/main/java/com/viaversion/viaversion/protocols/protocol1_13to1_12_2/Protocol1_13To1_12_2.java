@@ -637,7 +637,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 // Fake the end of the packet
                 handler(wrapper -> {
                     wrapper.write(Type.BOOLEAN, false);
-                    wrapper.write(Type.OPTIONAL_POSITION, null);
+                    final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
+                    wrapper.write(Type.OPTIONAL_POSITION, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                         TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                         wrapper.cancel();
