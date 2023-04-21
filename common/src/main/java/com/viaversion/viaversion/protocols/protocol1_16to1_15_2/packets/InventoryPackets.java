@@ -72,7 +72,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                     if (windowType >= 20) { // smithing added with id 20
                         wrapper.set(Type.VAR_INT, 1, ++windowType);
                     }
-                    inventoryTracker.setInventory((short) windowId);
+                    inventoryTracker.setInventoryOpen(true);
                 });
             }
         });
@@ -83,7 +83,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 handler(cursorRemapper);
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    inventoryTracker.setInventory((short) -1);
+                    inventoryTracker.setInventoryOpen(false);
                 });
             }
         });
@@ -133,7 +133,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
 
         protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-            inventoryTracker.setInventory((short) -1);
+            inventoryTracker.setInventoryOpen(false);
         });
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));

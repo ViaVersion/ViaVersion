@@ -20,13 +20,13 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class InventoryTracker1_16 implements StorableObject {
-    private short inventory = -1;
+    private boolean inventoryOpen = false;
 
-    public short getInventory() {
-        return this.inventory;
+    public boolean isInventoryOpen() {
+        return inventoryOpen;
     }
 
-    public void setInventory(short inventory) {
-        this.inventory = inventory;
+    public void setInventoryOpen(boolean inventoryOpen) {
+        this.inventoryOpen = inventoryOpen;
     }
 }
