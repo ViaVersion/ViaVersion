@@ -67,7 +67,6 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 handler(cursorRemapper);
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    int windowId = wrapper.get(Type.VAR_INT, 0);
                     int windowType = wrapper.get(Type.VAR_INT, 1);
                     if (windowType >= 20) { // smithing added with id 20
                         wrapper.set(Type.VAR_INT, 1, ++windowType);
