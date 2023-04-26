@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
@@ -115,6 +116,20 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void registerVarLongMultiBlockChange1_20(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.LONG); // Chunk position
+                handler(wrapper -> {
+                    for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
+                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
+                    }
+                });
+            }
+        });
+    }
+
     public void registerAcknowledgePlayerDigging(C packetType) {
         // Same exact handler
         registerBlockChange(packetType);
@@ -145,7 +160,11 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
-        protocol.registerClientbound(packetType, wrapper -> {
+        protocol.registerClientbound(packetType, chunkDataHandler1_19(chunkTypeSupplier, blockEntityHandler));
+    }
+
+    public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+        return wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
@@ -175,7 +194,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                     }
                 }
             }
-        });
+        };
     }
 
     public void registerBlockEntityData(C packetType) {
