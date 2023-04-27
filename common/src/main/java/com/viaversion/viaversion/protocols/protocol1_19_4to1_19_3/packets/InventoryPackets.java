@@ -40,9 +40,33 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         blockRewriter.registerBlockAction(ClientboundPackets1_19_3.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_19_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_3.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_19_3.EFFECT, 1010, 2001);
         blockRewriter.registerChunkData1_19(ClientboundPackets1_19_3.CHUNK_DATA, Chunk1_18Type::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_19_3.BLOCK_ENTITY_DATA);
+
+        protocol.registerClientbound(ClientboundPackets1_19_3.EFFECT, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.INT); // Effect Id
+                map(Type.POSITION1_14); // Location
+                map(Type.INT); // Data
+                handler(wrapper -> {
+                    int id = wrapper.get(Type.INT, 0);
+                    int data = wrapper.get(Type.INT, 1);
+                    if (id == 1010) { // Play record
+                        if (data >= 1092 && data <= 1106) {
+                            // These IDs are valid records
+                            wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                        } else {
+                            // Send stop record instead
+                            wrapper.set(Type.INT, 0, 1011);
+                            wrapper.set(Type.INT, 1, 0);
+                        }
+                    } else if (id == 2001) { // Block break + block break sound
+                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
+                    }
+                });
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_19_3.OPEN_WINDOW, new PacketHandlers() {
             @Override
