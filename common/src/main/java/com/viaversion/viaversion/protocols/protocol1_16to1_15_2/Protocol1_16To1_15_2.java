@@ -200,8 +200,8 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             wrapper.passthrough(Type.BYTE); // Flags
 
             final PlayerAbilitiesProvider playerAbilities = Via.getManager().getProviders().get(PlayerAbilitiesProvider.class);
-            wrapper.write(Type.FLOAT, playerAbilities.getFlyingSpeed());
-            wrapper.write(Type.FLOAT, playerAbilities.getWalkingSpeed());
+            wrapper.write(Type.FLOAT, playerAbilities.getFlyingSpeed(wrapper.user()));
+            wrapper.write(Type.FLOAT, playerAbilities.getWalkingSpeed(wrapper.user()));
         });
 
         cancelServerbound(ServerboundPackets1_16.GENERATE_JIGSAW);
