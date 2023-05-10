@@ -17,6 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20to1_19_4.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.FloatTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -50,9 +57,51 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 map(Type.NBT); // Dimension registry
                 map(Type.STRING); // Dimension key
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.VAR_INT); // Max players
+                map(Type.VAR_INT); // Chunk radius
+                map(Type.VAR_INT); // Simulation distance
+                map(Type.BOOLEAN); // Reduced debug info
+                map(Type.BOOLEAN); // Show death screen
+                map(Type.BOOLEAN); // Debug
+                map(Type.BOOLEAN); // Flat
+                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
+                create(Type.VAR_INT, 0); // Portal cooldown
+
                 handler(dimensionDataHandler()); // Caches dimensions to access data like height later
                 handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(wrapper -> {
+                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag damageTypeRegistry = registry.get("minecraft:damage_type");
+                    final ListTag damageTypes = damageTypeRegistry.get("value");
+                    int highestId = -1;
+                    for (final Tag damageType : damageTypes) {
+                        final IntTag id = ((CompoundTag) damageType).get("id");
+                        highestId = Math.max(highestId, id.asInt());
+                    }
+
+                    // AaaaAAAaa
+                    final CompoundTag outsideBorderReason = new CompoundTag();
+                    final CompoundTag outsideBorderElement = new CompoundTag();
+                    outsideBorderElement.put("scaling", new StringTag("always"));
+                    outsideBorderElement.put("exhaustion", new FloatTag(0F));
+                    outsideBorderElement.put("message_id", new StringTag("badRespawnPoint"));
+                    outsideBorderReason.put("id", new IntTag(highestId + 1));
+                    outsideBorderReason.put("name", new StringTag("minecraft:outside_border"));
+                    outsideBorderReason.put("element", outsideBorderElement);
+                    damageTypes.add(outsideBorderReason);
+
+                    final CompoundTag genericKillReason = new CompoundTag();
+                    final CompoundTag genericKillElement = new CompoundTag();
+                    genericKillElement.put("scaling", new StringTag("always"));
+                    genericKillElement.put("exhaustion", new FloatTag(0F));
+                    genericKillElement.put("message_id", new StringTag("badRespawnPoint"));
+                    genericKillReason.put("id", new IntTag(highestId + 2));
+                    genericKillReason.put("name", new StringTag("minecraft:generic_kill"));
+                    genericKillReason.put("element", genericKillElement);
+                    damageTypes.add(genericKillReason);
+                });
             }
         });
 
@@ -61,6 +110,14 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
             public void register() {
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Previous gamemode
+                map(Type.BOOLEAN); // Debug
+                map(Type.BOOLEAN); // Flat
+                map(Type.BYTE); // Data to keep
+                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
+                create(Type.VAR_INT, 0); // Portal cooldown
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
