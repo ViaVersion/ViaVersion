@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20to1_19_4.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.FloatTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
