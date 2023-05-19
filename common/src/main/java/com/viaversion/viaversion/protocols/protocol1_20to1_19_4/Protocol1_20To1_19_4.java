@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -55,6 +56,15 @@ public final class Protocol1_20To1_19_4 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.STATISTICS);
+
+        registerClientbound(ClientboundPackets1_19_4.COMBAT_END, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Duration
+            wrapper.read(Type.INT); // Killer ID
+        });
+        registerClientbound(ClientboundPackets1_19_4.COMBAT_KILL, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Duration
+            wrapper.read(Type.INT); // Killer ID
+        });
     }
 
     @Override
