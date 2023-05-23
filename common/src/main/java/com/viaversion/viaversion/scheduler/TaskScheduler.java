@@ -29,7 +29,7 @@ public final class TaskScheduler implements Scheduler {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("Via Async Task %d").build());
     private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(
-            0,
+            1, // Fix for https://bugs.openjdk.java.net/browse/JDK-8129861
             new ThreadFactoryBuilder().setNameFormat("Via Async Scheduler %d").build()
     );
 
