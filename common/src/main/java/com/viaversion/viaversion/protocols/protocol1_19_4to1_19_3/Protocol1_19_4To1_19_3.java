@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.packets.Invent
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.storage.PlayerVehicleTracker;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -54,6 +55,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
         super.registerPackets();
 
         new TagRewriter<>(this).registerGeneric(ClientboundPackets1_19_3.TAGS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.STATISTICS);
 
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
