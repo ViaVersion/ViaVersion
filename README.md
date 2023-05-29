@@ -14,7 +14,6 @@ On Paper you may also use ProtocolSupport, but ensure you have the right build f
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
-
 Sources
 --------
 **[OpenNBT](https://github.com/ViaVersion/OpenNBT)**
@@ -44,7 +43,9 @@ You can find official dev builds here:
 **JavaDocs:** https://jd.viaversion.com
 
 **Maven Repository:**
+
 ```xml
+
 <repository>
     <id>viaversion-repo</id>
     <url>https://repo.viaversion.com</url>
@@ -52,7 +53,9 @@ You can find official dev builds here:
 ```
 
 **API-artifact:**
+
 ```xml
+
 <dependency>
     <groupId>com.viaversion</groupId>
     <artifactId>viaversion-api</artifactId>
@@ -69,7 +72,8 @@ Please note the [differences in licensing](#license).
 
 Building
 --------
-After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out of
+After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out
+of
 the `build/libs` directory.
 
 
@@ -80,7 +84,8 @@ Mapping files are generated and managed in our [Mappings repository](https://git
 
 License
 --------
-The entirety of the [API directory](api) (including the legacy API directory) is licensed under the MIT License; see [licenses/MIT.md](licenses/MIT.md) for
+The entirety of the [API directory](api) (including the legacy API directory) is licensed under the MIT License;
+see [licenses/MIT.md](licenses/MIT.md) for
 details.
 
 Everything else, unless explicitly stated otherwise, is licensed under the GNU General Public License, including the end
