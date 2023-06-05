@@ -23,23 +23,23 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
+import com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
-public class WorldPackets {
+public final class WorldPackets {
 
     public static void register(Protocol1_15To1_14_4 protocol) {
-        BlockRewriter<ClientboundPackets1_14> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_14.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_14.BLOCK_CHANGE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14.ACKNOWLEDGE_PLAYER_DIGGING);
+        blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_ACTION);
+        blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_CHANGE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14_4.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.ACKNOWLEDGE_PLAYER_DIGGING);
 
-        protocol.registerClientbound(ClientboundPackets1_14.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_14_4.CHUNK_DATA, wrapper -> {
             Chunk chunk = wrapper.read(new Chunk1_14Type());
             wrapper.write(new Chunk1_15Type(), chunk);
 
@@ -79,8 +79,8 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_14.EFFECT, 1010, 2001);
-        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PARTICLE, new PacketHandlers() {
+        blockRewriter.registerEffect(ClientboundPackets1_14_4.EFFECT, 1010, 2001);
+        protocol.registerClientbound(ClientboundPackets1_14_4.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Particle ID
