@@ -24,15 +24,18 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -41,6 +44,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -353,9 +357,29 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.byId(meta.metaType().typeId())));
+        filter().handler((event, meta) -> {
+            meta.setMetaType(Types1_19.META_TYPES.byId(meta.metaType().typeId()));
 
-        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, Types1_19.META_TYPES.particleType);
+            final MetaType type = meta.metaType();
+            if (type == Types1_19.META_TYPES.particleType) {
+                final Particle particle = (Particle) meta.getValue();
+                final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+                if (particle.getId() == particleMappings.id("vibration")) {
+                    // Remove the position
+                    particle.getArguments().remove(0);
+
+                    final String resourceLocation = Key.stripMinecraftNamespace(particle.getArguments().get(0).get());
+                    if (resourceLocation.equals("entity")) {
+                        // Add Y offset
+                        particle.getArguments().add(2, new Particle.ParticleData(Type.FLOAT, 0F));
+                    }
+                }
+
+                rewriteParticle(particle);
+            }
+        });
+
+        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, null);
 
         filter().filterFamily(Entity1_19Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id

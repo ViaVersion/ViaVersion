@@ -371,7 +371,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
     public PacketHandler getSpawnParticleHandler(Type<Integer> idType, Type<Item> itemType) {
         return wrapper -> {
             int id = wrapper.get(idType, 0);
-            if (id == -1) return;
+            if (id == -1) {
+                return;
+            }
 
             ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             if (mappings.isBlockParticle(id)) {
@@ -381,9 +383,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                 handleItemToClient(wrapper.passthrough(itemType));
             }
 
-            int newId = protocol.getMappingData().getNewParticleId(id);
-            if (newId != id) {
-                wrapper.set(idType, 0, newId);
+            int mappedId = protocol.getMappingData().getNewParticleId(id);
+            if (mappedId != id) {
+                wrapper.set(idType, 0, mappedId);
             }
         };
     }
