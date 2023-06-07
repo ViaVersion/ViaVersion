@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -27,6 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_19To1_18_2> {
 
@@ -54,6 +56,19 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
+                handler(wrapper -> {
+                    final int id = wrapper.get(Type.VAR_INT, 0);
+                    final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+                    if (id == particleMappings.id("vibration")) {
+                        wrapper.read(Type.POSITION1_14); // Remove position
+
+                        final String resourceLocation = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
+                        if (resourceLocation.equals("entity")) {
+                            wrapper.passthrough(Type.VAR_INT); // Target entity
+                            wrapper.write(Type.FLOAT, 0F); // Y offset
+                        }
+                    }
+                });
                 handler(getSpawnParticleHandler(Type.VAR_INT, Type.FLAT_VAR_INT_ITEM));
             }
         });

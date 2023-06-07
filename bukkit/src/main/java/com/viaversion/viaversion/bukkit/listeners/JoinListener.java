@@ -62,9 +62,6 @@ public class JoinListener implements Listener {
         CHANNEL = channelField;
     }
 
-    public static void init() {
-    }
-
     // Loosely search a field with any name, as long as it matches a type name.
     private static Field findField(Class<?> clazz, String... types) throws NoSuchFieldException {
         for (Field field : clazz.getDeclaredFields()) {

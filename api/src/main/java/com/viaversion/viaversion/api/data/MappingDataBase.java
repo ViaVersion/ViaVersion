@@ -52,6 +52,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings statisticsMappings;
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
+    protected Mappings menuMappings;
     protected Map<RegistryType, List<TagData>> tags;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
@@ -71,6 +72,7 @@ public class MappingDataBase implements MappingData {
         blockEntityMappings = loadMappings(data, "blockentities");
         soundMappings = loadMappings(data, "sounds");
         statisticsMappings = loadMappings(data, "statistics");
+        menuMappings = loadMappings(data, "menus");
         enchantmentMappings = loadMappings(data, "enchantments");
         paintingMappings = loadMappings(data, "paintings");
         itemMappings = loadBiMappings(data, "items");
@@ -203,6 +205,11 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
+    public @Nullable Mappings getMenuMappings() {
+        return menuMappings;
+    }
+
+    @Override
     public @Nullable Mappings getEnchantmentMappings() {
         return enchantmentMappings;
     }
@@ -236,7 +243,9 @@ public class MappingDataBase implements MappingData {
      */
     protected int checkValidity(final int id, final int mappedId, final String type) {
         if (mappedId == -1) {
-            getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                getLogger().warning(String.format("Missing %s %s for %s %s %d", mappedVersion, type, unmappedVersion, type, id));
+            }
             return 0;
         }
         return mappedId;

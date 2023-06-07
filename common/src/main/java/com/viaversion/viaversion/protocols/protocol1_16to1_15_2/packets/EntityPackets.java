@@ -277,7 +277,7 @@ public class EntityPackets {
         protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
             // Don't send an arm swing if the player has an inventory opened.
-            if (inventoryTracker.getInventory() != -1) {
+            if (inventoryTracker.isInventoryOpen()) {
                 wrapper.cancel();
             }
         });

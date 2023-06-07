@@ -31,8 +31,6 @@ public class Protocol1_9To1_9_1 extends AbstractProtocol<ClientboundPackets1_9, 
 
     @Override
     protected void registerPackets() {
-        // Currently supports 1.9.1 and 1.9.2
-
         registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketHandlers() {
             @Override
             public void register() {

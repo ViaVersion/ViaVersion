@@ -40,8 +40,7 @@ public final class MappingData extends MappingDataBase {
     @Override
     protected void loadExtras(final CompoundTag daata) {
         try {
-            // TODO Read uncompressed file
-            final ListTag chatTypes = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
+            final ListTag chatTypes = BinaryTagIO.readInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
             for (final Tag chatType : chatTypes) {
                 final CompoundTag chatTypeCompound = (CompoundTag) chatType;
                 final NumberTag idTag = chatTypeCompound.get("id");

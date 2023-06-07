@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -40,6 +41,7 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.Metadat
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.provider.PlayerAbilitiesProvider;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -195,10 +197,11 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         }
 
         registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, wrapper -> {
-            wrapper.passthrough(Type.BYTE);
-            // Flying and walking speed - not important anyways
-            wrapper.write(Type.FLOAT, 0.05F);
-            wrapper.write(Type.FLOAT, 0.1F);
+            wrapper.passthrough(Type.BYTE); // Flags
+
+            final PlayerAbilitiesProvider playerAbilities = Via.getManager().getProviders().get(PlayerAbilitiesProvider.class);
+            wrapper.write(Type.FLOAT, playerAbilities.getFlyingSpeed(wrapper.user()));
+            wrapper.write(Type.FLOAT, playerAbilities.getWalkingSpeed(wrapper.user()));
         });
 
         cancelServerbound(ServerboundPackets1_16.GENERATE_JIGSAW);
@@ -255,6 +258,11 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        providers.register(PlayerAbilitiesProvider.class, new PlayerAbilitiesProvider());
     }
 
     @Override

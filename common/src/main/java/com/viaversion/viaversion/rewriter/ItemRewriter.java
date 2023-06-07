@@ -85,6 +85,25 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
         });
     }
 
+    public void registerOpenWindow(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Container id
+                handler(wrapper -> {
+                    final int windowType = wrapper.read(Type.VAR_INT);
+                    final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
+                    if (mappedId == -1) {
+                        wrapper.cancel();
+                        return;
+                    }
+
+                    wrapper.write(Type.VAR_INT, mappedId);
+                });
+            }
+        });
+    }
+
     public void registerSetSlot(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
@@ -352,7 +371,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
     public PacketHandler getSpawnParticleHandler(Type<Integer> idType, Type<Item> itemType) {
         return wrapper -> {
             int id = wrapper.get(idType, 0);
-            if (id == -1) return;
+            if (id == -1) {
+                return;
+            }
 
             ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             if (mappings.isBlockParticle(id)) {
@@ -362,9 +383,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                 handleItemToClient(wrapper.passthrough(itemType));
             }
 
-            int newId = protocol.getMappingData().getNewParticleId(id);
-            if (newId != id) {
-                wrapper.set(idType, 0, newId);
+            int mappedId = protocol.getMappingData().getNewParticleId(id);
+            if (mappedId != id) {
+                wrapper.set(idType, 0, mappedId);
             }
         };
     }

@@ -29,16 +29,18 @@ import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.jetbrains.annotations.Nullable;
 
 
 public class VelocityViaInjector implements ViaInjector {
-    public static Method getPlayerInfoForwardingMode;
+    public static final Method GET_PLAYER_INFO_FORWARDING_MODE = getPlayerInfoForwardingModeMethod();
 
-    static {
+    private static @Nullable Method getPlayerInfoForwardingModeMethod() {
         try {
-            getPlayerInfoForwardingMode = Class.forName("com.velocitypowered.proxy.config.VelocityConfiguration").getMethod("getPlayerInfoForwardingMode");
+            return Class.forName("com.velocitypowered.proxy.config.VelocityConfiguration").getMethod("getPlayerInfoForwardingMode");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -95,8 +97,8 @@ public class VelocityViaInjector implements ViaInjector {
 
     public static int getLowestSupportedProtocolVersion() {
         try {
-            if (getPlayerInfoForwardingMode != null
-                    && ((Enum<?>) getPlayerInfoForwardingMode.invoke(VelocityPlugin.PROXY.getConfiguration()))
+            if (GET_PLAYER_INFO_FORWARDING_MODE != null
+                    && ((Enum<?>) GET_PLAYER_INFO_FORWARDING_MODE.invoke(VelocityPlugin.PROXY.getConfiguration()))
                     .name().equals("MODERN")) {
                 return ProtocolVersion.v1_13.getVersion();
             }

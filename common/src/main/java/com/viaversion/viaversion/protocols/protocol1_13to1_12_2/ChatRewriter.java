@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
@@ -28,9 +29,15 @@ import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.Leg
 
 public final class ChatRewriter {
     public static final GsonComponentSerializer HOVER_GSON_SERIALIZER = GsonComponentSerializer.builder().emitLegacyHoverEvent().legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get()).build();
-    public static final JsonElement EMPTY_COMPONENT = GsonComponentSerializer.gson().serializeToTree(Component.empty());
 
-    public static void init() {
+    public static JsonObject emptyComponent() {
+        final JsonObject object = new JsonObject();
+        object.addProperty("text", "");
+        return object;
+    }
+
+    public static String emptyComponentString() {
+        return "{\"text\":\"\"}";
     }
 
     public static String legacyTextToJsonString(String message, boolean itemData) {

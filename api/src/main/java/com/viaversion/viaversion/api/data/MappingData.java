@@ -101,6 +101,8 @@ public interface MappingData {
 
     @Nullable Mappings getStatisticsMappings();
 
+    @Nullable Mappings getMenuMappings();
+
     @Nullable Mappings getEnchantmentMappings();
 
     @Nullable FullMappings getEntityMappings();
