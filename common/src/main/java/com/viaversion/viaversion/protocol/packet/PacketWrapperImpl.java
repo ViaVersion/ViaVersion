@@ -266,20 +266,37 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     private void send0(Class<? extends Protocol> protocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
-        if (isCancelled()) return;
-
-        try {
-            ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
-            if (currentThread) {
-                user().sendRawPacket(output);
-            } else {
-                user().scheduleSendRawPacket(output);
-            }
-        } catch (Exception e) {
-            if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                throw e;
-            }
+        if (isCancelled()) {
+            return;
         }
+
+        final UserConnection connection = user();
+        if (currentThread) {
+            try {
+                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
+                connection.sendRawPacket(output);
+            } catch (final Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
+            }
+            return;
+        }
+
+        connection.getChannel().eventLoop().submit(() -> {
+            try {
+                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
+                connection.sendRawPacket(output);
+            } catch (final RuntimeException e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
+            } catch (final Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     /**
@@ -434,7 +451,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     private void sendToServerRaw(boolean currentThread) throws Exception {
-        if (isCancelled()) return;
+        if (isCancelled()) {
+            return;
+        }
 
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
@@ -464,18 +483,33 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        try {
-            ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
-            if (currentThread) {
-                user().sendRawPacketToServer(output);
-            } else {
-                user().scheduleSendRawPacketToServer(output);
+        final UserConnection connection = user();
+        if (currentThread) {
+            try {
+                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
+                connection.sendRawPacketToServer(output);
+            } catch (final Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
             }
-        } catch (Exception e) {
-            if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                throw e;
-            }
+            return;
         }
+
+        connection.getChannel().eventLoop().submit(() -> {
+            try {
+                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.SERVERBOUND);
+                connection.sendRawPacketToServer(output);
+            } catch (final RuntimeException e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw e;
+                }
+            } catch (final Exception e) {
+                if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @Override

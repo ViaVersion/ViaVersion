@@ -83,5 +83,13 @@ public class Particle {
         public void setValue(Object value) {
             this.value = value;
         }
+
+        @Override
+        public String toString() {
+            return "ParticleData{" +
+                    "type=" + type +
+                    ", value=" + value +
+                    '}';
+        }
     }
 }

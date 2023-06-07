@@ -155,7 +155,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
             final int id = meta.metaType().typeId();
             meta.setMetaType(Types1_19_3.META_TYPES.byId(id >= 2 ? id + 1 : id)); // long added
         });
-        registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.blockStateType, Types1_19_3.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.blockStateType, null, Types1_19_3.META_TYPES.particleType);
 
         filter().index(6).handler((event, meta) -> {
             // Sitting pose added

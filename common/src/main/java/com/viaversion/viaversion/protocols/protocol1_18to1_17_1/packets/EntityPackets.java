@@ -96,7 +96,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
             }
         });
 
-        registerMetaTypeHandler(Types1_18.META_TYPES.itemType, null, null);
+        registerMetaTypeHandler(Types1_18.META_TYPES.itemType, null, null, null);
     }
 
     @Override

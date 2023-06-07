@@ -55,6 +55,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PlayerLookTargetProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
@@ -636,7 +637,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 // Fake the end of the packet
                 handler(wrapper -> {
                     wrapper.write(Type.BOOLEAN, false);
-                    wrapper.write(Type.OPTIONAL_POSITION, null);
+                    final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
+                    wrapper.write(Type.OPTIONAL_POSITION, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                         TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                         wrapper.cancel();
@@ -876,6 +878,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     public void register(ViaProviders providers) {
         providers.register(BlockEntityProvider.class, new BlockEntityProvider());
         providers.register(PaintingProvider.class, new PaintingProvider());
+        providers.register(PlayerLookTargetProvider.class, new PlayerLookTargetProvider());
     }
 
     // Based on method from https://github.com/Bukkit/Bukkit/blob/master/src/main/java/org/bukkit/ChatColor.java

@@ -237,7 +237,8 @@ public class ViaManagerImpl implements ViaManager {
     private void unsupportedSoftwareWarning() {
         boolean found = false;
         for (final UnsupportedSoftware software : platform.getUnsupportedSoftwareClasses()) {
-            if (!software.findMatch()) {
+            final String match = software.match();
+            if (match == null) {
                 continue;
             }
 
@@ -249,7 +250,7 @@ public class ViaManagerImpl implements ViaManager {
                 found = true;
             }
 
-            platform.getLogger().severe("We strongly advise against using " + software.getName() + ":");
+            platform.getLogger().severe("We strongly advise against using " + match + ":");
             platform.getLogger().severe(software.getReason());
             platform.getLogger().severe("");
         }

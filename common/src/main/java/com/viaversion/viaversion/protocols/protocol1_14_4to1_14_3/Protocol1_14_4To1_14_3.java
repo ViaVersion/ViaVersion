@@ -22,10 +22,10 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 
-public class Protocol1_14_4To1_14_3 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_14, ServerboundPackets1_14, ServerboundPackets1_14> {
+public class Protocol1_14_4To1_14_3 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_14_4, ServerboundPackets1_14, ServerboundPackets1_14> {
 
     public Protocol1_14_4To1_14_3() {
-        super(ClientboundPackets1_14.class, ClientboundPackets1_14.class, null, null);
+        super(ClientboundPackets1_14.class, ClientboundPackets1_14_4.class, null, null);
     }
 
     @Override
