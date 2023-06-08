@@ -321,6 +321,40 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         });
     }
 
+    public void registerTrackerWithData1_20(C packetType, EntityType fallingBlockType, EntityType itemDisplayType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Yaw
+                map(Type.BYTE); // Head yaw
+                map(Type.VAR_INT); // Data
+                handler(trackerHandler());
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == fallingBlockType) {
+                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
+                    }
+                });
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == itemDisplayType) {
+                        wrapper.set(Type.BYTE, 0, (byte)-wrapper.get(Type.BYTE, 0));
+                        wrapper.set(Type.BYTE, 1, (byte) (wrapper.get(Type.BYTE, 1) - 128));
+                    }
+                });
+            }
+        });
+    }
+
     /**
      * Registers an entity tracker for the extra spawn packets like player, painting, or xp orb spawns.
      *
