@@ -32,4 +32,8 @@ public final class VersionInfo {
      * @see ViaPlatform#getPluginVersion()
      */
     public static final String VERSION = "$VERSION";
+
+    public static String getVersion() {
+        return VERSION;
+    }
 }
