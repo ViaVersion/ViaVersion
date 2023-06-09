@@ -23,8 +23,10 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
@@ -41,9 +43,98 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_19_4.METADATA_LIST, Types1_20.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_19_4.SPAWN_ENTITY, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.UUID); // Entity UUID
+                map(Type.VAR_INT); // Entity type
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.BYTE); // Pitch
+                map(Type.BYTE); // Yaw
+                map(Type.BYTE); // Head yaw
+                map(Type.VAR_INT); // Data
+                handler(trackerHandler());
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
+                    if (entityType == Entity1_19_4Types.FALLING_BLOCK) {
+                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
+                    } else if (entityType == Entity1_19_4Types.ITEM_DISPLAY) {
+                        // Turn it upside down
+                        wrapper.set(Type.BYTE, 0, (byte) -wrapper.get(Type.BYTE, 0));
+                        wrapper.set(Type.BYTE, 1, (byte) (wrapper.get(Type.BYTE, 1) - 128));
+                    }
+                });
+            }
+        });
+
+        final PacketHandler displayYawPitchHandler = wrapper -> {
+            final TrackedEntity trackedEntity = tracker(wrapper.user()).entity(wrapper.get(Type.VAR_INT, 0));
+            if (trackedEntity == null || trackedEntity.entityType() != Entity1_19_4Types.ITEM_DISPLAY) {
+                return;
+            }
+
+            // Turn it upside down
+            wrapper.set(Type.BYTE, 0, (byte) (wrapper.get(Type.BYTE, 0) - 128));
+            wrapper.set(Type.BYTE, 1, (byte) -wrapper.get(Type.BYTE, 1));
+        };
+        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_POSITION_AND_ROTATION, new PacketHandlers() {
+            @Override
+            protected void register() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.SHORT);   // Delta X
+                map(Type.SHORT);   // Delta Y
+                map(Type.SHORT);   // Delta Z
+                map(Type.BYTE);    // Yaw
+                map(Type.BYTE);    // Pitch
+                handler(displayYawPitchHandler);
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_ROTATION, new PacketHandlers() {
+            @Override
+            protected void register() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.BYTE);    // Yaw
+                map(Type.BYTE);    // Pitch
+                handler(displayYawPitchHandler);
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_HEAD_LOOK, wrapper -> {
+            final TrackedEntity trackedEntity = tracker(wrapper.user()).entity(wrapper.passthrough(Type.VAR_INT));
+            if (trackedEntity == null || trackedEntity.entityType() != Entity1_19_4Types.ITEM_DISPLAY) {
+                return;
+            }
+
+            wrapper.write(Type.BYTE, (byte) (wrapper.read(Type.BYTE) - 128));
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_TELEPORT, new PacketHandlers() {
+            @Override
+            protected void register() {
+                map(Type.VAR_INT); // Entity id
+                map(Type.DOUBLE);  // X
+                map(Type.DOUBLE);  // Y
+                map(Type.DOUBLE);  // Z
+                map(Type.BYTE);    // Yaw
+                map(Type.BYTE);    // Pitch
+                map(Type.BOOLEAN); // On Ground
+
+                handler(wrapper -> {
+                    TrackedEntity trackedEntity = tracker(wrapper.user()).entity(wrapper.get(Type.VAR_INT, 0));
+                    if (trackedEntity == null) return;
+                    if (trackedEntity.entityType() != Entity1_19_4Types.ITEM_DISPLAY) return;
+                    wrapper.set(Type.BYTE, 0, (byte) (wrapper.get(Type.BYTE, 0) - 128));
+                    wrapper.set(Type.BYTE, 1, (byte) -wrapper.get(Type.BYTE, 1));
+                });
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.JOIN_GAME, new PacketHandlers() {
             @Override
