@@ -8,7 +8,7 @@
 
 Supported Versions:
 
-![Table (https://i.imgur.com/aSjHvQk.png)](https://i.imgur.com/aSjHvQk.png)
+![Table (https://i.imgur.com/sTrVnC2.png)](https://i.imgur.com/sTrVnC2.png)
 
 On Paper you may also use ProtocolSupport, but ensure you have the right build for your server version.
 
