@@ -124,12 +124,12 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 map(Type.DOUBLE);  // Z
                 map(Type.BYTE);    // Yaw
                 map(Type.BYTE);    // Pitch
-                map(Type.BOOLEAN); // On Ground
-
                 handler(wrapper -> {
                     TrackedEntity trackedEntity = tracker(wrapper.user()).entity(wrapper.get(Type.VAR_INT, 0));
-                    if (trackedEntity == null) return;
-                    if (trackedEntity.entityType() != Entity1_19_4Types.ITEM_DISPLAY) return;
+                    if (trackedEntity == null || trackedEntity.entityType() != Entity1_19_4Types.ITEM_DISPLAY) {
+                        return;
+                    }
+
                     wrapper.set(Type.BYTE, 0, (byte) (wrapper.get(Type.BYTE, 0) - 128));
                     wrapper.set(Type.BYTE, 1, (byte) -wrapper.get(Type.BYTE, 1));
                 });
