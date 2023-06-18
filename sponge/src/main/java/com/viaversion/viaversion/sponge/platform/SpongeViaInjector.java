@@ -32,7 +32,13 @@ public class SpongeViaInjector extends LegacyViaInjector {
     @Override
     public int getServerProtocolVersion() throws ReflectiveOperationException {
         MinecraftVersion version = Sponge.platform().minecraftVersion();
-        return (int) version.getClass().getDeclaredMethod("getProtocol").invoke(version);
+
+        // 'protocolVersion' method was exposed to the API in a 1.19.4 build and 'getProtocol' no longer exists in the impl.
+        try {
+            return (int) version.getClass().getDeclaredMethod("getProtocol").invoke(version);
+        } catch (NoSuchMethodException e) {
+            return (int) version.getClass().getDeclaredMethod("protocolVersion").invoke(version);
+        }
     }
 
     @Override

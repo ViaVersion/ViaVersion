@@ -80,11 +80,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         // Config magic
         conf = new BukkitViaConfig();
-
-        // Load a bunch of classes early with slow reflection and more classloading
-        if (conf.shouldRegisterUserConnectionOnJoin()) {
-            Via.getManager().getScheduler().execute(JoinListener::init);
-        }
     }
 
     @Override

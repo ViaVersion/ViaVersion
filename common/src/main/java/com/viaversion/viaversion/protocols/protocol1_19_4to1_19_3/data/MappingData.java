@@ -34,8 +34,7 @@ public final class MappingData extends MappingDataBase {
     @Override
     protected void loadExtras(final CompoundTag data) {
         try {
-            // TODO Read uncompressed file
-            damageTypesRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
+            damageTypesRegistry = BinaryTagIO.readInputStream(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

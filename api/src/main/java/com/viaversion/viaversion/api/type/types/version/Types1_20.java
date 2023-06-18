@@ -20,32 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.blockentity;
+package com.viaversion.viaversion.api.type.types.version;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_19_4;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import java.util.List;
 
-public interface BlockEntity {
+public final class Types1_20 {
 
-    static byte pack(int sectionX, int sectionZ) {
-        return (byte) (((sectionX) & 15) << 4 | (sectionZ & 15));
-    }
-
-    default byte sectionX() {
-        return (byte) ((packedXZ() >> 4) & 15);
-    }
-
-    default byte sectionZ() {
-        return (byte) (packedXZ() & 15);
-    }
-
-    byte packedXZ();
-
-    short y();
-
-    int typeId();
-
-    @Nullable CompoundTag tag();
-
-    BlockEntity withTypeId(int typeId);
+    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
+    public static final MetaTypes1_19_4 META_TYPES = new MetaTypes1_19_4(PARTICLE);
+    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
+    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
 }

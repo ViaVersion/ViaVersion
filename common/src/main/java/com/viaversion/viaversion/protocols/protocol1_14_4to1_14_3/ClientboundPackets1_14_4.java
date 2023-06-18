@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
+package com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
-public enum ClientboundPackets1_14 implements ClientboundPacketType {
+public enum ClientboundPackets1_14_4 implements ClientboundPacketType {
 
     SPAWN_ENTITY, // 0x00
     SPAWN_EXPERIENCE_ORB, // 0x01
@@ -112,7 +112,8 @@ public enum ClientboundPackets1_14 implements ClientboundPacketType {
     ENTITY_PROPERTIES, // 0x58
     ENTITY_EFFECT, // 0x59
     DECLARE_RECIPES, // 0x5A
-    TAGS; // 0x5B
+    TAGS, // 0x5B
+    ACKNOWLEDGE_PLAYER_DIGGING; // 0x5C
 
     @Override
     public int getId() {

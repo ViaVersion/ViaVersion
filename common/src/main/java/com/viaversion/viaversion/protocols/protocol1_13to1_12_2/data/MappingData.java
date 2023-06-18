@@ -94,37 +94,38 @@ public class MappingData extends MappingDataBase {
             }
         }
 
-        Map<String, String> translateData = GsonUtil.getGson().fromJson(
+        Map<String, String> translationMappingData = GsonUtil.getGson().fromJson(
                 new InputStreamReader(MappingData.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
                 new TypeToken<Map<String, String>>() {
                 }.getType());
-        try {
-            String[] lines;
-            try (Reader reader = new InputStreamReader(MappingData.class.getClassLoader()
-                    .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
-                lines = CharStreams.toString(reader).split("\n");
-            }
-            for (String line : lines) {
-                if (line.isEmpty()) {
-                    continue;
-                }
 
-                String[] keyAndTranslation = line.split("=", 2);
-                if (keyAndTranslation.length != 2) {
-                    continue;
-                }
-
-                String key = keyAndTranslation[0];
-                String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s").trim();
-                mojangTranslation.put(key, translation);
-
-                String dataValue = translateData.get(key);
-                if (dataValue != null) {
-                    translateMapping.put(key, dataValue);
-                }
-            }
+        String[] unmappedTranslationLines;
+        try (Reader reader = new InputStreamReader(MappingData.class.getClassLoader()
+                .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
+            unmappedTranslationLines = CharStreams.toString(reader).split("\n");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        for (String line : unmappedTranslationLines) {
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            String[] keyAndTranslation = line.split("=", 2);
+            if (keyAndTranslation.length != 2) {
+                continue;
+            }
+
+            String key = keyAndTranslation[0];
+            String translation = keyAndTranslation[1].replaceAll("%(\\d\\$)?d", "%$1s").trim();
+            mojangTranslation.put(key, translation);
+
+            // Null values in the file mean the key did not change AND the translation has the same amount of placeholders still
+            if (translationMappingData.containsKey(key)) {
+                String mappedKey = translationMappingData.get(key);
+                translateMapping.put(key, mappedKey != null ? mappedKey : key);
+            }
         }
     }
 

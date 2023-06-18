@@ -40,8 +40,7 @@ public class MappingData extends MappingDataBase {
     @Override
     public void loadExtras(final CompoundTag data) {
         try {
-            // TODO Read uncompressed file
-            dimensionRegistry = BinaryTagIO.readCompressedInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
+            dimensionRegistry = BinaryTagIO.readInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (final IOException e) {
             Via.getPlatform().getLogger().severe("Error loading dimension registry:");
             e.printStackTrace();

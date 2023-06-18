@@ -17,22 +17,27 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.List;
+import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
@@ -111,6 +116,20 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void registerVarLongMultiBlockChange1_20(C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.LONG); // Chunk position
+                handler(wrapper -> {
+                    for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
+                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
+                    }
+                });
+            }
+        });
+    }
+
     public void registerAcknowledgePlayerDigging(C packetType) {
         // Same exact handler
         registerBlockChange(packetType);
@@ -137,7 +156,15 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
-        protocol.registerClientbound(packetType, wrapper -> {
+        registerChunkData1_19(packetType, chunkTypeSupplier, null);
+    }
+
+    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+        protocol.registerClientbound(packetType, chunkDataHandler1_19(chunkTypeSupplier, blockEntityHandler));
+    }
+
+    public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+        return wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
@@ -154,28 +181,42 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
 
             final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
-            if (blockEntityMappings != null) {
+            if (blockEntityMappings != null || blockEntityHandler != null) {
                 List<BlockEntity> blockEntities = chunk.blockEntities();
                 for (int i = 0; i < blockEntities.size(); i++) {
                     final BlockEntity blockEntity = blockEntities.get(i);
-                    blockEntities.set(i, blockEntity.withTypeId(protocol.getMappingData().getBlockEntityMappings().getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                    if (blockEntityMappings != null) {
+                        blockEntities.set(i, blockEntity.withTypeId(blockEntityMappings.getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                    }
+
+                    if (blockEntityHandler != null && blockEntity.tag() != null) {
+                        blockEntityHandler.accept(blockEntity);
+                    }
                 }
             }
-        });
+        };
     }
 
     public void registerBlockEntityData(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.POSITION1_14);
-                handler(wrapper -> {
-                    final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
-                    if (mappings != null) {
-                        final int blockEntityId = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
-                    }
-                });
+        registerBlockEntityData(packetType, null);
+    }
+
+    public void registerBlockEntityData(C packetType, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final Position position = wrapper.passthrough(Type.POSITION1_14);
+
+            final int blockEntityId = wrapper.read(Type.VAR_INT);
+            final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
+            if (mappings != null) {
+                wrapper.write(Type.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
+            } else {
+                wrapper.write(Type.VAR_INT, blockEntityId);
+            }
+
+            final CompoundTag tag;
+            if (blockEntityHandler != null && (tag = wrapper.passthrough(Type.NBT)) != null) {
+                final BlockEntity blockEntity = new BlockEntityImpl(BlockEntity.pack(position.x(), position.z()), (short) position.y(), blockEntityId, tag);
+                blockEntityHandler.accept(blockEntity);
             }
         });
     }
