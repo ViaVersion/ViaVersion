@@ -103,6 +103,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             manager.init();
         }
 
+        if (Via.getConfig().shouldRegisterUserConnectionOnJoin()) {
+            // When event priority ties, registration order is used.
+            // Must register without delay to ensure other plugins on lowest get the fix applied.
+            getServer().getPluginManager().registerEvents(new JoinListener(), this);
+        }
+
         if (FOLIA) {
             // Use Folia's RegionizedServerInitEvent to run code after the server has loaded
             final Class<? extends Event> serverInitEventClass;
