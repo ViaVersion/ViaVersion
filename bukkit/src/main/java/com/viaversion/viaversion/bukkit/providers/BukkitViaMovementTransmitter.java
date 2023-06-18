@@ -25,6 +25,9 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTrac
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import com.viaversion.viaversion.util.PipelineUtil;
+import io.netty.channel.ChannelHandlerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -79,17 +82,15 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
         }
     }
 
-    @Override
     public Object getFlyingPacket() {
-        if (idlePacket == null)
-            throw new NullPointerException("Could not locate flying packet");
+        if (idlePacket == null) throw new NullPointerException("Could not locate flying packet");
+
         return idlePacket;
     }
 
-    @Override
     public Object getGroundPacket() {
-        if (idlePacket == null)
-            throw new NullPointerException("Could not locate flying packet");
+        if (idlePacket == null) throw new NullPointerException("Could not locate flying packet");
+
         return idlePacket2;
     }
 
@@ -112,7 +113,15 @@ public class BukkitViaMovementTransmitter extends MovementTransmitterProvider {
                 }
             }
         } else {
-            super.sendPlayer(info);
+            ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", info.getChannel().pipeline());
+            if (context != null) {
+                if (info.get(MovementTracker.class).isGround()) {
+                    context.fireChannelRead(getGroundPacket());
+                } else {
+                    context.fireChannelRead(getFlyingPacket());
+                }
+                info.get(MovementTracker.class).incrementIdlePacket();
+            }
         }
     }
 }

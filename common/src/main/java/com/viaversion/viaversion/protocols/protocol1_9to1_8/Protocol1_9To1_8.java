@@ -37,13 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.InventoryPac
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.SpawnPackets;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.WorldPackets;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CompressionProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.*;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
@@ -137,7 +131,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         providers.register(BossBarProvider.class, new BossBarProvider());
         providers.register(MainHandProvider.class, new MainHandProvider());
         providers.register(CompressionProvider.class, new CompressionProvider());
-        providers.require(MovementTransmitterProvider.class);
+        providers.register(MovementTransmitterProvider.class, new MovementTransmitterProvider());
     }
 
     @Override

@@ -19,25 +19,27 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import com.viaversion.viaversion.util.PipelineUtil;
-import io.netty.channel.ChannelHandlerContext;
 
-public abstract class MovementTransmitterProvider implements Provider {
-    public abstract Object getFlyingPacket();
-
-    public abstract Object getGroundPacket();
+public class MovementTransmitterProvider implements Provider {
 
     public void sendPlayer(UserConnection userConnection) {
-        // Old method using packets.
-        ChannelHandlerContext context = PipelineUtil.getContextBefore("decoder", userConnection.getChannel().pipeline());
-        if (context != null) {
-            if (userConnection.get(MovementTracker.class).isGround()) {
-                context.fireChannelRead(getGroundPacket());
-            } else {
-                context.fireChannelRead(getFlyingPacket());
+        if (userConnection.getProtocolInfo().getState() == State.PLAY && userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() != -1) {
+            final MovementTracker tracker = userConnection.get(MovementTracker.class);
+
+            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.PLAYER_MOVEMENT, null, userConnection);
+            playerMovement.write(Type.BOOLEAN, tracker.isGround());
+            try {
+                playerMovement.scheduleSendToServer(Protocol1_9To1_8.class);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            userConnection.get(MovementTracker.class).incrementIdlePacket();
+            tracker.incrementIdlePacket();
         }
     }
 }
