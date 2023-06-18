@@ -24,10 +24,8 @@ import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
 import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
-import com.viaversion.viaversion.velocity.providers.VelocityMovementTransmitter;
 import com.viaversion.viaversion.velocity.providers.VelocityVersionProvider;
 
 public class VelocityViaLoader implements ViaPlatformLoader {
@@ -38,7 +36,6 @@ public class VelocityViaLoader implements ViaPlatformLoader {
                 .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
         if (Via.getAPI().getServerVersion().lowestSupportedVersion() < ProtocolVersion.v1_9.getVersion()) {
-            Via.getManager().getProviders().use(MovementTransmitterProvider.class, new VelocityMovementTransmitter());
             Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
         }
 
