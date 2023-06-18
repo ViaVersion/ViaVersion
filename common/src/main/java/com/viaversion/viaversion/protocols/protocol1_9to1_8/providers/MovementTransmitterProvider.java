@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.providers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -26,20 +27,24 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 
+import java.util.logging.Level;
+
 public class MovementTransmitterProvider implements Provider {
 
     public void sendPlayer(UserConnection userConnection) {
-        if (userConnection.getProtocolInfo().getState() == State.PLAY && userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() != -1) {
-            final MovementTracker tracker = userConnection.get(MovementTracker.class);
+        if (userConnection.getProtocolInfo().getState() != State.PLAY || userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() == -1) {
+            return;
+        }
 
-            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.PLAYER_MOVEMENT, null, userConnection);
-            playerMovement.write(Type.BOOLEAN, tracker.isGround());
-            try {
-                playerMovement.scheduleSendToServer(Protocol1_9To1_8.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            tracker.incrementIdlePacket();
+        final MovementTracker movementTracker = userConnection.get(MovementTracker.class);
+        movementTracker.incrementIdlePacket();
+
+        try {
+            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.PLAYER_MOVEMENT, userConnection);
+            playerMovement.write(Type.BOOLEAN, movementTracker.isGround()); // on ground
+            playerMovement.scheduleSendToServer(Protocol1_9To1_8.class);
+        } catch (Throwable e) {
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send player movement packet", e);
         }
     }
 }
