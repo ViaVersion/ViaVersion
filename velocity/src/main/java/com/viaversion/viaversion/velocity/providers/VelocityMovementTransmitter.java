@@ -38,7 +38,7 @@ public class VelocityMovementTransmitter extends MovementTransmitterProvider {
     }
 
     public void sendPlayer(UserConnection userConnection) {
-        if (userConnection.getProtocolInfo().getState() == State.PLAY) {
+        if (userConnection.getProtocolInfo().getState() == State.PLAY && userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() != -1) {
             PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_8.PLAYER_MOVEMENT, null, userConnection);
             MovementTracker tracker = userConnection.get(MovementTracker.class);
             wrapper.write(Type.BOOLEAN, tracker.isGround());
