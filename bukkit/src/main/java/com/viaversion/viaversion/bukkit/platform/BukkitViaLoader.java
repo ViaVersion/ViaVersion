@@ -79,10 +79,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
     public void load() {
         registerListener(new UpdateListener());
 
-        if (Via.getConfig().shouldRegisterUserConnectionOnJoin()) {
-            registerListener(new JoinListener());
-        }
-
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
 
