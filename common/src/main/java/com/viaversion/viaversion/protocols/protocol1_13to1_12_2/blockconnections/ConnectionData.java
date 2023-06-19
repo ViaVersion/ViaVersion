@@ -76,9 +76,13 @@ public final class ConnectionData {
 
             int newBlockState = handler.connect(user, pos, blockState);
             if (newBlockState == blockState) {
-                if (inSync == null) inSync = blockConnectionProvider.storesBlocks(user, position);
+                if (inSync == null) {
+                    inSync = blockConnectionProvider.storesBlocks(user, position);
+                }
                 // Blocks-states are the same, and known to be stored and not de-synced, skip update
-                if (inSync) continue;
+                if (inSync) {
+                    continue;
+                }
             }
 
             updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
@@ -735,7 +739,7 @@ public final class ConnectionData {
 
             Position pos = new Position(x, y, z);
             int newBlockState = handler.connect(user, pos, blockState);
-            if (blockState != newBlockState || !blockConnectionProvider.storesBlocks(user, pos)) {
+            if (blockState != newBlockState || !blockConnectionProvider.storesBlocks(user, null)) {
                 records.add(new BlockChangeRecord1_8(x & 0xF, y, z & 0xF, newBlockState));
                 updateBlockStorage(user, x, y, z, newBlockState);
             }

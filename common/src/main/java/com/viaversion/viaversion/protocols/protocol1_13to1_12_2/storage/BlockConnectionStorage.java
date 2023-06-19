@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -95,13 +96,17 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     public void markModified(Position pos) {
-        this.modified.add(pos);
+        // Avoid saving the same pos twice
+        if (!modified.contains(pos)) {
+            this.modified.add(pos);
+        }
     }
 
     public boolean recentlyModified(Position pos) {
         for (Position p : modified) {
-            if (Math.abs(pos.x() - p.x()) + Math.abs(pos.y() - p.y() + Math.abs(pos.z() - p.z())) < 2)
+            if (Math.abs(pos.x() - p.x()) + Math.abs(pos.y() - p.y()) + Math.abs(pos.z() - p.z()) <= 2) {
                 return true;
+            }
         }
         return false;
     }

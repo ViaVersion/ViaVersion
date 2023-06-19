@@ -540,25 +540,25 @@ public class WorldPackets {
 
         // Incoming Packets
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_BLOCK_PLACEMENT, wrapper -> {
-            Position pos;
-            wrapper.write(Type.POSITION, pos = wrapper.read(Type.POSITION)); // Location
-            wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // block face
-            wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // hand
-            wrapper.write(Type.FLOAT, wrapper.read(Type.FLOAT)); // cursor x
-            wrapper.write(Type.FLOAT, wrapper.read(Type.FLOAT)); // cursor y
-            wrapper.write(Type.FLOAT, wrapper.read(Type.FLOAT)); // cursor z
+            Position pos = wrapper.passthrough(Type.POSITION);
+            wrapper.passthrough(Type.VAR_INT); // block face
+            wrapper.passthrough(Type.VAR_INT); // hand
+            wrapper.passthrough(Type.FLOAT); // cursor x
+            wrapper.passthrough(Type.FLOAT); // cursor y
+            wrapper.passthrough(Type.FLOAT); // cursor z
 
             if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
                 ConnectionData.markModified(wrapper.user(), pos);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_DIGGING, wrapper -> {
-            Position pos;
-            wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Status
-            wrapper.write(Type.POSITION, pos = wrapper.read(Type.POSITION)); // Location
-            wrapper.write(Type.UNSIGNED_BYTE, wrapper.read(Type.UNSIGNED_BYTE)); // block face
+            int status = wrapper.passthrough(Type.VAR_INT); // Status
+            Position pos = wrapper.passthrough(Type.POSITION); // Location
+            wrapper.passthrough(Type.UNSIGNED_BYTE); // block face
 
-            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
+            // 0 = Started digging: if in creative this causes the block to break directly
+            // There's no point in storing the finished digging as it may never show-up (creative)
+            if (status == 0 && Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
                 ConnectionData.markModified(wrapper.user(), pos);
             }
         });
