@@ -64,6 +64,8 @@ public final class ConnectionData {
     }
 
     public static void update(UserConnection user, Position position) throws Exception {
+        Boolean inSync = null;
+
         for (BlockFace face : BlockFace.values()) {
             Position pos = position.getRelative(face);
             int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
@@ -73,8 +75,14 @@ public final class ConnectionData {
             }
 
             int newBlockState = handler.connect(user, pos, blockState);
-            if (newBlockState == blockState && blockConnectionProvider.storesBlocks()) {
-                continue;
+            if (newBlockState == blockState) {
+                if (inSync == null) {
+                    inSync = blockConnectionProvider.storesBlocks(user, position);
+                }
+                // Blocks-states are the same, and known to be stored and not de-synced, skip update
+                if (inSync) {
+                    continue;
+                }
             }
 
             updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
@@ -100,8 +108,13 @@ public final class ConnectionData {
         blockConnectionProvider.clearStorage(connection);
     }
 
+    public static void markModified(UserConnection connection, Position pos) {
+        if (!needStoreBlocks()) return;
+        blockConnectionProvider.modifiedBlock(connection, pos);
+    }
+
     public static boolean needStoreBlocks() {
-        return blockConnectionProvider.storesBlocks();
+        return blockConnectionProvider.storesBlocks(null, null);
     }
 
     public static void connectBlocks(UserConnection user, Chunk chunk) {
@@ -726,7 +739,7 @@ public final class ConnectionData {
 
             Position pos = new Position(x, y, z);
             int newBlockState = handler.connect(user, pos, blockState);
-            if (blockState != newBlockState || !blockConnectionProvider.storesBlocks()) {
+            if (blockState != newBlockState || !blockConnectionProvider.storesBlocks(user, null)) {
                 records.add(new BlockChangeRecord1_8(x & 0xF, y, z & 0xF, newBlockState));
                 updateBlockStorage(user, x, y, z, newBlockState);
             }

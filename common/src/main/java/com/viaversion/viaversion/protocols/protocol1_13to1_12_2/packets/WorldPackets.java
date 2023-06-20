@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
@@ -48,6 +49,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -535,6 +537,32 @@ public class WorldPackets {
                 });
             }
         });
+
+        // Incoming Packets
+        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+            Position pos = wrapper.passthrough(Type.POSITION);
+            wrapper.passthrough(Type.VAR_INT); // block face
+            wrapper.passthrough(Type.VAR_INT); // hand
+            wrapper.passthrough(Type.FLOAT); // cursor x
+            wrapper.passthrough(Type.FLOAT); // cursor y
+            wrapper.passthrough(Type.FLOAT); // cursor z
+
+            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
+                ConnectionData.markModified(wrapper.user(), pos);
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_DIGGING, wrapper -> {
+            int status = wrapper.passthrough(Type.VAR_INT); // Status
+            Position pos = wrapper.passthrough(Type.POSITION); // Location
+            wrapper.passthrough(Type.UNSIGNED_BYTE); // block face
+
+            // 0 = Started digging: if in creative this causes the block to break directly
+            // There's no point in storing the finished digging as it may never show-up (creative)
+            if (status == 0 && Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
+                ConnectionData.markModified(wrapper.user(), pos);
+            }
+        });
+
     }
 
     public static int toNewId(int oldId) {
