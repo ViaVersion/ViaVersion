@@ -39,12 +39,16 @@ public final class ArmorToggleListener extends ViaBukkitListener {
     public void itemUse(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = event.getItem();
-        if (item == null || event.getHand() == null || !isOnPipe(player)) {
+        if (item == null || event.getHand() == null) {
             return;
         }
 
         final EquipmentSlot armorItemSlot = item.getType().getEquipmentSlot();
-        if (armorItemSlot != EquipmentSlot.HAND && armorItemSlot != EquipmentSlot.OFF_HAND) {
+        if (armorItemSlot == EquipmentSlot.HAND || armorItemSlot == EquipmentSlot.OFF_HAND || item.getType().isBlock()) {
+            return;
+        }
+
+        if (isOnPipe(player)) {
             final PlayerInventory inventory = player.getInventory();
             final ItemStack armor = inventory.getItem(armorItemSlot);
             // If two pieces of armor are equal, the client will do nothing.
