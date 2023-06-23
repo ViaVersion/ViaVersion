@@ -118,7 +118,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
-        final PacketHandler titleHandler = wrapper -> {
+        final PacketHandler nullComponentHandler = wrapper -> {
             final JsonElement component = wrapper.read(Type.COMPONENT);
             if (!isTextComponentNull(component)) {
                 wrapper.write(Type.COMPONENT, component);
@@ -126,8 +126,9 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
             }
         };
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, nullComponentHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, nullComponentHandler);
+        registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, nullComponentHandler);
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, wrapper -> {
