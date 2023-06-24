@@ -138,7 +138,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             if (action == 0 || action == 2) {
                 wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
             }
-            wrapper.passthroughAll();
         });
         registerClientbound(ClientboundPackets1_18.TEAMS, wrapper -> {
             wrapper.passthrough(Type.STRING); // Team Name
@@ -152,7 +151,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Prefix
                 wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Suffix
             }
-            wrapper.passthroughAll();
         });
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
