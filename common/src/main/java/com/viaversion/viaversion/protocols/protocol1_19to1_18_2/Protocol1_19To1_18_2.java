@@ -131,6 +131,14 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         };
         registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
         registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
+        registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Objective Name
+            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+            }
+            wrapper.passthroughAll();
+        });
         registerClientbound(ClientboundPackets1_18.TEAMS, wrapper -> {
             wrapper.passthrough(Type.STRING); // Team Name
             byte action = wrapper.passthrough(Type.BYTE); // Mode
