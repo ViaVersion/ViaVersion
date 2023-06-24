@@ -64,6 +64,14 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
     }
 
+    public static JsonElement mapTextComponentIfNull(JsonElement component) {
+        if (!isTextComponentNull(component)) {
+            return component;
+        } else {
+            return ChatRewriter.emptyComponent();
+        }
+    }
+
     @Override
     protected void registerPackets() {
         final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
@@ -118,16 +126,32 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
-        final PacketHandler titleHandler = wrapper -> {
-            final JsonElement component = wrapper.read(Type.COMPONENT);
-            if (!isTextComponentNull(component)) {
-                wrapper.write(Type.COMPONENT, component);
-            } else {
-                wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
-            }
+        final PacketHandler singleNullTextComponentMapper = wrapper -> {
+            wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
         };
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.ACTIONBAR, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Objective Name
+            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+            }
+        });
+        registerClientbound(ClientboundPackets1_18.TEAMS, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Team Name
+            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+                wrapper.passthrough(Type.BYTE); // Flags
+                wrapper.passthrough(Type.STRING); // Name Tag Visibility
+                wrapper.passthrough(Type.STRING); // Collision rule
+                wrapper.passthrough(Type.VAR_INT); // Color
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Prefix
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Suffix
+            }
+        });
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, wrapper -> {
