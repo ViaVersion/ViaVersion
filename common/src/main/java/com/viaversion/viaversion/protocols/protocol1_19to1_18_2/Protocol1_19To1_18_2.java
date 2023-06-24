@@ -64,7 +64,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
         return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
     }
 
-    public static void mapTextComponentIfNull(JsonElement component) {
+    public JsonElement void mapTextComponentIfNull(JsonElement component) {
         if (!isTextComponentNull(component)) {
             return component;
         } else {
