@@ -126,11 +126,12 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
-        final PacketHandler titleHandler = wrapper -> {
+        final PacketHandler singleNullTextComponentMapper = wrapper -> {
             wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
         };
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.ACTIONBAR, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, wrapper -> {
             wrapper.passthrough(Type.STRING); // Objective Name
             byte action = wrapper.passthrough(Type.BYTE); // Mode
