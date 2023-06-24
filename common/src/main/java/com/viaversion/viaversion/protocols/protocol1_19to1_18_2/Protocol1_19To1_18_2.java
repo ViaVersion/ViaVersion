@@ -63,12 +63,13 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     public static boolean isTextComponentNull(final JsonElement element) {
         return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
     }
+
     public static void mapTextComponentIfNull(JsonElement component) {
-            if (!isTextComponentNull(component)) {
-                return component;
-            } else {
-                return ChatRewriter.emptyComponent();
-            }
+        if (!isTextComponentNull(component)) {
+            return component;
+        } else {
+            return ChatRewriter.emptyComponent();
+        }
     }
 
     @Override
@@ -134,7 +135,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             wrapper.passthrough(Type.STRING); // Team Name
             byte action = wrapper.passthrough(Type.BYTE); // Mode
             if (action == 0 || action == 2) {
-                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));; // Display Name
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
                 wrapper.passthrough(Type.BYTE); // Flags
                 wrapper.passthrough(Type.STRING); // Name Tag Visibility
                 wrapper.passthrough(Type.STRING); // Collision rule
