@@ -18,10 +18,12 @@
 package com.viaversion.viaversion.rewriter.meta;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.List;
 
 public interface MetaHandlerEvent {
 
@@ -40,11 +42,20 @@ public interface MetaHandlerEvent {
     int entityId();
 
     /**
+     * Returns the tracked entity if present.
+     *
+     * @return tracked entity if present, else null
+     */
+    @Nullable TrackedEntity trackedEntity();
+
+    /**
      * Returns the entity type of the entity the metadata belongs to if tracked.
      *
      * @return entity type of the entity if tracked, else null
      */
-    @Nullable EntityType entityType();
+    default @Nullable EntityType entityType() {
+        return trackedEntity() != null ? trackedEntity().entityType() : null;
+    }
 
     /**
      * Returns the metadata index.
@@ -109,6 +120,15 @@ public interface MetaHandlerEvent {
      * @return additionally created metadata if present
      */
     @Nullable List<Metadata> extraMeta();
+
+    /**
+     * Returns whether additionally created metadata will be added.
+     *
+     * @return true if additionally created metadata is present
+     */
+    default boolean hasExtraMeta() {
+        return extraMeta() != null;
+    }
 
     /**
      * Adds the given metadata to the metadata list.

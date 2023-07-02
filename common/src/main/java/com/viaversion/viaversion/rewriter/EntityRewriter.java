@@ -101,11 +101,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     @Override
-    public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
+    public void handleMetadata(final int entityId, final List<Metadata> metadataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
         int i = 0; // Count index for fast removal
-        for (Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
+        for (final Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             // Call handlers implementing the old handleMetadata
             if (!callOldMetaHandler(entityId, type, metadata, metadataList, connection)) {
                 metadataList.remove(i--);
@@ -113,18 +113,18 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             }
 
             MetaHandlerEvent event = null;
-            for (MetaFilter filter : metadataFilters) {
+            for (final MetaFilter filter : metadataFilters) {
                 if (!filter.isFiltered(type, metadata)) {
                     continue;
                 }
                 if (event == null) {
                     // Only initialize when needed and share event instance
-                    event = new MetaHandlerEventImpl(connection, type, entityId, metadata, metadataList);
+                    event = new MetaHandlerEventImpl(connection, entity, entityId, metadata, metadataList);
                 }
 
                 try {
                     filter.handler().handle(event, metadata);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     logException(e, type, metadataList, metadata);
                     metadataList.remove(i--);
                     break;
