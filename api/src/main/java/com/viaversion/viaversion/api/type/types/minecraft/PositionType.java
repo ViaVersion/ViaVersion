@@ -37,7 +37,7 @@ public class PositionType extends Type<Position> {
     public Position read(ByteBuf buffer) {
         final long val = buffer.readLong();
         final long x = (val >> 38);
-        final long y = (val >> 26) >> 52;
+        final long y = (val << 26) >> 52;
         final long z = (val << 38) >> 38;
 
         return new Position((int) x, (short) y, (int) z);
