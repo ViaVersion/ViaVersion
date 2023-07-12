@@ -28,26 +28,24 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 public class PositionType extends Type<Position> {
+
     public PositionType() {
         super(Position.class);
     }
 
     @Override
     public Position read(ByteBuf buffer) {
-        long val = buffer.readLong();
-        long x = (val >> 38); // signed
-        long y = (val >> 26) & 0xfff; // unsigned
-        // this shifting madness is used to preserve sign
-        long z = (val << 38) >> 38; // signed
+        final long val = buffer.readLong();
+        final long x = (val >> 38);
+        final long y = (val << 26) >> 52;
+        final long z = (val << 38) >> 38;
 
         return new Position((int) x, (short) y, (int) z);
     }
 
     @Override
     public void write(ByteBuf buffer, Position object) {
-        buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
-                | ((((long) object.y()) & 0xfff) << 26)
-                | (object.z() & 0x3ffffff));
+        buffer.writeLong((object.x() & 0X3FFFFFFL) << 38 | (object.y() & 0XFFFL) << 26 | (object.z() & 0X3FFFFFFL));
     }
 
     public static final class OptionalPositionType extends OptionalType<Position> {
