@@ -132,7 +132,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
         registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType);
 
         // Rotate item display by 180 degrees around the Y axis
-        filter().filterFamily(Entity1_19_4Types.DISPLAY).handler((event, meta) -> {
+        filter().filterFamily(Entity1_19_4Types.ITEM_DISPLAY).handler((event, meta) -> {
             if (event.trackedEntity().hasSentMetadata() || event.hasExtraMeta()) {
                 return;
             }
@@ -141,7 +141,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 event.createExtraMeta(new Metadata(12, Types1_20.META_TYPES.quaternionType, Y_FLIPPED_ROTATION));
             }
         });
-        filter().filterFamily(Entity1_19_4Types.DISPLAY).index(12).handler((event, meta) -> {
+        filter().filterFamily(Entity1_19_4Types.ITEM_DISPLAY).index(12).handler((event, meta) -> {
             final Quaternion quaternion = meta.value();
             meta.setValue(rotateY180(quaternion));
         });
