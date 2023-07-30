@@ -17,6 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -122,4 +125,23 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
             wrapper.cancel();
         });
     }
+
+    @Override
+    public Item handleItemToClient(Item item) {
+        if (item == null) return null;
+
+        CompoundTag tag = item.tag();
+        if (item.identifier() == 733) {
+            if (tag == null) {
+                item.setTag(tag = new CompoundTag());
+            }
+            if (!(tag.get("map") instanceof NumberTag)) {
+                tag.put("map", new IntTag(0));
+            }
+        }
+
+        item.setIdentifier(this.protocol.getMappingData().getNewItemId(item.identifier()));
+        return item;
+    }
+
 }
