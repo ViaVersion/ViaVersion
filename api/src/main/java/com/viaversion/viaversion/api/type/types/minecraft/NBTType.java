@@ -22,15 +22,15 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.limiter.TagLimiter;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.io.IOException;
 
 public class NBTType extends Type<CompoundTag> {
 
@@ -43,23 +43,50 @@ public class NBTType extends Type<CompoundTag> {
 
     @Override
     public CompoundTag read(ByteBuf buffer) throws Exception {
-        int readerIndex = buffer.readerIndex();
-        byte b = buffer.readByte();
-        if (b == 0) {
-            return null;
-        } else {
-            buffer.readerIndex(readerIndex);
-            return NBTIO.readTag((DataInput) new ByteBufInputStream(buffer), TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL));
-        }
+        return read(buffer, true);
     }
 
     @Override
     public void write(ByteBuf buffer, CompoundTag object) throws Exception {
-        if (object == null) {
-            buffer.writeByte(0);
-        } else {
-            ByteBufOutputStream bytebufStream = new ByteBufOutputStream(buffer);
-            NBTIO.writeTag((DataOutput) bytebufStream, object);
+        write(buffer, object, "");
+    }
+
+    public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws Exception {
+        final int readerIndex = buffer.readerIndex();
+        final byte b = buffer.readByte();
+        if (b == 0) {
+            return null;
         }
+
+        buffer.readerIndex(readerIndex);
+
+        final ByteBufInputStream in = new ByteBufInputStream(buffer);
+        final int id = in.readByte();
+        if (id != CompoundTag.ID) {
+            throw new IOException(String.format("Expected root tag to be a CompoundTag, was %s", id));
+        }
+
+        if (readName) {
+            in.skipBytes(in.readUnsignedShort());
+        }
+
+        final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
+        final CompoundTag tag = new CompoundTag();
+        tag.read(in, tagLimiter);
+        return tag;
+    }
+
+    public static void write(final ByteBuf buffer, final CompoundTag tag, final @Nullable String name) throws Exception {
+        if (tag == null) {
+            buffer.writeByte(0);
+            return;
+        }
+
+        final ByteBufOutputStream out = new ByteBufOutputStream(buffer);
+        out.writeByte(CompoundTag.ID);
+        if (name != null) {
+            out.writeUTF(name);
+        }
+        tag.write(out);
     }
 }

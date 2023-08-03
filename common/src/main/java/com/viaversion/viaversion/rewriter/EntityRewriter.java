@@ -45,6 +45,8 @@ import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -52,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
         extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
@@ -468,32 +469,32 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public PacketHandler biomeSizeTracker() {
-        return wrapper -> {
-            final CompoundTag registry = wrapper.get(Type.NBT, 0);
-            final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
-            final ListTag biomes = biomeRegistry.get("value");
-            tracker(wrapper.user()).setBiomesSent(biomes.size());
-        };
+        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NBT, 0));
+    }
+
+    public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
+        final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
+        final ListTag biomes = biomeRegistry.get("value");
+        tracker(connection).setBiomesSent(biomes.size());
+    }
+
+    public PacketHandler dimensionDataHandler() {
+        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.NBT, 0));
     }
 
     /**
-     * Returns a handler to cache dimension data, later used to get height values and other important info.
-     *
-     * @return handler to cache dimension data
+     * Caches dimension data, later used to get height values and other important info.
      */
-    public PacketHandler dimensionDataHandler() {
-        return wrapper -> {
-            final CompoundTag tag = wrapper.get(Type.NBT, 0);
-            final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
-            final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
-            for (final Tag dimension : dimensions) {
-                final CompoundTag dimensionCompound = (CompoundTag) dimension;
-                final CompoundTag element = dimensionCompound.get("element");
-                final String name = (String) dimensionCompound.get("name").getValue();
-                dimensionDataMap.put(name, new DimensionDataImpl(element));
-            }
-            tracker(wrapper.user()).setDimensions(dimensionDataMap);
-        };
+    public void cacheDimensionData(final UserConnection connection, final CompoundTag registry) {
+        final ListTag dimensions = ((CompoundTag) registry.get("minecraft:dimension_type")).get("value");
+        final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
+        for (final Tag dimension : dimensions) {
+            final CompoundTag dimensionCompound = (CompoundTag) dimension;
+            final CompoundTag element = dimensionCompound.get("element");
+            final String name = (String) dimensionCompound.get("name").getValue();
+            dimensionDataMap.put(name, new DimensionDataImpl(element));
+        }
+        tracker(connection).setDimensions(dimensionDataMap);
     }
 
     // ---------------------------------------------------------------------------

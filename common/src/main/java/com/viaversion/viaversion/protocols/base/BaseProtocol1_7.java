@@ -33,10 +33,12 @@ import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import io.netty.channel.ChannelFuture;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -45,9 +47,6 @@ public class BaseProtocol1_7 extends AbstractProtocol {
 
     @Override
     protected void registerPackets() {
-        /* Outgoing Packets */
-
-        // Status Response Packet
         registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() { // Status Response Packet
             @Override
             public void register() {
@@ -122,7 +121,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.PLAY);
+            if (finishLoginAfterGameprofile()) {
+                info.setState(State.PLAY);
+            }
 
             UUID uuid = passthroughLoginUUID(wrapper);
             info.setUuid(uuid);
@@ -147,7 +148,6 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             }
         });
 
-        /* Incoming Packets */
         // Login Start Packet
         registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
             int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
@@ -164,6 +164,10 @@ public class BaseProtocol1_7 extends AbstractProtocol {
                 future.addListener(f -> wrapper.user().getChannel().close());
             }
         });
+
+        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
+        // TODO AAAAAAAAAAAAAAAAA
+        registerServerbound(ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION, wrapper -> wrapper.user().getProtocolInfo().setState(State.PLAY));
     }
 
     @Override
@@ -187,5 +191,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             uuidString = addDashes(uuidString);
         }
         return UUID.fromString(uuidString);
+    }
+
+    protected boolean finishLoginAfterGameprofile() {
+        return true;
     }
 }

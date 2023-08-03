@@ -17,24 +17,31 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler.BlockItemPacketHandler1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler.EntityPacketHandler1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.FakeProtocolState;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.UUID;
 
@@ -50,12 +57,9 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        // TODO Stopped at ForgetLevelChunk
-        // TODO New login packets (custom query answer, login ack)
-        // TODO Handle move from and to configuration state
-        //      Game profile/serverbound ack -> configuration
-        //      Client/serverbound config finish -> play
-        // TODO New helper methods for: join game, respawn,
+        // TODO Updated NBT type used in: block entity, chunk, tag query, entity metadata data, item type, mob effect
+
+        // TODO Handle Enabled features and tags before configuration phase end
         // TODO Make sure Paper/Velocity handle a 0,0 uuid fine during login
 
         // Lesser:
@@ -77,15 +81,96 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             wrapper.write(Type.VAR_INT, (int) slot);
         });
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), wrapper -> {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), wrapper -> {
             wrapper.passthrough(Type.STRING); // Name
-            final UUID uuid = wrapper.read(Type.OPTIONAL_UUID);
-            wrapper.write(Type.UUID, uuid != null ? uuid : new UUID(0, 0));
+
+            final UUID uuid = wrapper.read(Type.UUID);
+            wrapper.write(Type.OPTIONAL_UUID, uuid);
         });
+
+        // Deal with the new CONFIGURATION protocol state the client expects
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
+            wrapper.user().get(FakeProtocolState.class).setConfigurationState(true);
+            wrapper.cancel();
+        });
+
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION.getId(), -1, wrapper -> {
+            wrapper.user().get(FakeProtocolState.class).setConfigurationState(false);
+            wrapper.cancel();
+        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), ServerboundPackets1_19_4.PLUGIN_MESSAGE.getId(), wrapper -> {
+        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), ServerboundPackets1_19_4.KEEP_ALIVE.getId(), wrapper -> {
+        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), ServerboundPackets1_19_4.PONG.getId(), wrapper -> {
+        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ServerboundPackets1_19_4.RESOURCE_PACK_STATUS.getId(), wrapper -> {
+        });
+
+        // Sad emoji
+        cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES);
+
+        registerServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED, null, wrapper -> {
+            wrapper.user().get(FakeProtocolState.class).setConfigurationState(false);
+            wrapper.cancel();
+        });
+
+        // TODO Check if we can just not send batches (probably fine like this)
+        cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
+    }
+
+    @Override
+    public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+        final boolean configurationState = packetWrapper.user().get(FakeProtocolState.class).isConfigurationState();
+        if (direction == Direction.SERVERBOUND) {
+            // Redirect packets during the fake configuration phase
+            // This might mess up people using Via API/other protocols down the line, but such is life. We can't have different states for server and client
+            final State newState = configurationState ? State.CONFIGURATION : state;
+            super.transform(direction, newState, packetWrapper);
+            return;
+        }
+
+        // Make sure we don't send the client any packets from another protocol state
+        if (configurationState) {
+            // TODO Queue these packets to send them later
+            Via.getPlatform().getLogger().warning("Cancelled packet " + packetWrapper.getId() + " sent during configuration state");
+            packetWrapper.cancel();
+            super.transform(direction, state, packetWrapper);
+            return;
+        }
+
+        // Map some of them to their configuration state counterparts
+        final int unmappedId = packetWrapper.getId();
+        if (state == State.PLAY && unmappedId != ClientboundPackets1_19_4.JOIN_GAME.getId()) {
+            if (unmappedId == ClientboundPackets1_19_4.PLUGIN_MESSAGE.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD);
+            } else if (unmappedId == ClientboundPackets1_19_4.DISCONNECT.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.DISCONNECT);
+            } else if (unmappedId == ClientboundPackets1_19_4.KEEP_ALIVE.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.KEEP_ALIVE);
+            } else if (unmappedId == ClientboundPackets1_19_4.PING.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.PING);
+            } else if (unmappedId == ClientboundPackets1_19_4.RESOURCE_PACK.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK);
+            } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
+            } else if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
+            }
+            return;
+        }
+
+        super.transform(direction, state, packetWrapper);
+    }
+
+    @Override
+    protected @Nullable ServerboundPackets1_20_2 configurationAcknowledgedPacket() {
+        return null; // Don't handle it in the transitioning protocol
     }
 
     @Override
     public void init(final UserConnection user) {
+        user.put(new FakeProtocolState());
         addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
     }
 

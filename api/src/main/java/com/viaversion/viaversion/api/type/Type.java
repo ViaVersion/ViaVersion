@@ -59,6 +59,7 @@ import com.viaversion.viaversion.api.type.types.VarIntArrayType;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.api.type.types.VarLongType;
 import com.viaversion.viaversion.api.type.types.VoidType;
+import com.viaversion.viaversion.api.type.types.minecraft.NamelessNBTType;
 import com.viaversion.viaversion.api.type.types.minecraft.BlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.minecraft.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.EulerAngleType;
@@ -165,6 +166,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
     public static final Type<CompoundTag> NBT = new NBTType();
+    public static final Type<CompoundTag> NAMELESS_NBT = new NamelessNBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
     public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();

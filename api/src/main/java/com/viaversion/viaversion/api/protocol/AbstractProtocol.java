@@ -77,6 +77,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     /**
      * Creates a protocol with automated id mapping if the respective packet type classes are not null.
+     * They are also required to track the CONFIGURATION state.
      */
     protected AbstractProtocol(@Nullable Class<CU> unmappedClientboundPacketType, @Nullable Class<CM> mappedClientboundPacketType,
                                @Nullable Class<SM> mappedServerboundPacketType, @Nullable Class<SU> unmappedServerboundPacketType) {
@@ -97,6 +98,12 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         registerPackets();
 
         // Register the rest of the ids with no handlers if necessary
+        final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
+        if (configurationAcknowledgedPacket != null) {
+            // TODO Only register one of those handlers, possibly somehow in the base protocol
+            registerServerbound(configurationAcknowledgedPacket, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
+        }
+
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
                 && unmappedClientboundPacketType != mappedClientboundPacketType) {
             registerPacketIdChanges(
@@ -206,6 +213,12 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             return map;
         }
         return Collections.emptyMap();
+    }
+
+    protected @Nullable SU configurationAcknowledgedPacket() {
+        final Map<State, PacketTypeMap<SU>> packetTypes = packetTypesProvider.unmappedServerboundPacketTypes();
+        final PacketTypeMap<SU> packetTypeMap = packetTypes.get(State.PLAY);
+        return packetTypeMap != null ? packetTypeMap.typeByName("CONFIGURATION_ACKNOWLEDGED") : null;
     }
 
     // ---------------------------------------------------------------------------------
@@ -361,7 +374,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    private void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
+    protected void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
         // Don't print errors during handshake/login/status
         if (state != State.PLAY && direction == Direction.SERVERBOUND && !Via.getManager().debugHandler().enabled()) {
             e.setShouldBePrinted(false);

@@ -20,11 +20,13 @@ package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketHandler1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
@@ -52,10 +54,12 @@ public final class EntityPacketHandler1_20_2 extends EntityRewriter<ClientboundP
 
                     wrapper.passthrough(Type.STRING_ARRAY); // World List
 
-                    final CompoundTag dimensionRegistry = wrapper.read(Type.NBT); // TODO AAAAAAAAAAAAAAAAAAAAA
+                    final CompoundTag dimensionRegistry = wrapper.read(Type.NBT);
                     final String dimensionType = wrapper.read(Type.STRING);
                     final String world = wrapper.read(Type.STRING);
                     final long seed = wrapper.read(Type.LONG);
+                    trackBiomeSize(wrapper.user(), dimensionRegistry); // Caches dimensions to access data like height later
+                    cacheDimensionData(wrapper.user(), dimensionRegistry); // Tracks the amount of biomes sent for chunk data
 
                     wrapper.passthrough(Type.VAR_INT); // Max players
                     wrapper.passthrough(Type.VAR_INT); // View distance
@@ -73,9 +77,23 @@ public final class EntityPacketHandler1_20_2 extends EntityRewriter<ClientboundP
                     wrapper.passthrough(Type.BOOLEAN); // Flat
                     wrapper.passthrough(Type.OPTIONAL_GLOBAL_POSITION); // Last death position
                     wrapper.passthrough(Type.VAR_INT); // Portal cooldown
+
+                    // Send configuration packets first before going into the play protocol state
+                    final PacketWrapper registryDataPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA);
+                    registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
+                    registryDataPacket.send(Protocol1_20_2To1_20.class);
+
+                    // Enabling features is only possible during the configuraton phase
+                    // TODO Capture more packets after login to send them later
+                    final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
+                    enableFeaturesPacket.write(Type.VAR_INT, 1);
+                    enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
+                    enableFeaturesPacket.scheduleSend(Protocol1_20_2To1_20.class);
+
+                    // Manually send it at the end and hope nothing breaks
+                    wrapper.send(Protocol1_20_2To1_20.class);
+                    wrapper.cancel();
                 });
-                handler(dimensionDataHandler()); // Caches dimensions to access data like height later
-                handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
@@ -102,16 +120,6 @@ public final class EntityPacketHandler1_20_2 extends EntityRewriter<ClientboundP
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
-        });
-    }
-
-    @Override
-    protected void registerRewrites() {
-        registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType);
-
-        filter().filterFamily(Entity1_19_4Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
-            final int blockState = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
     }
 

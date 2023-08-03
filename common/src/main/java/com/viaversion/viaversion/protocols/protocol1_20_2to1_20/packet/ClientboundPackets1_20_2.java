@@ -34,8 +34,8 @@ public enum ClientboundPackets1_20_2 implements ClientboundPacketType {
     BLOCK_CHANGE, // 0x0A
     BOSSBAR, // 0x0B
     SERVER_DIFFICULTY, // 0x0C
-    CHUNK_BATCH_FINISHED, // 0x0D // TODO AAAAAAAAAAAAAAAAAAAAAAAAA
-    CHUNK_BATCH_START, // 0x0E // TODO AAAAAAAAAAAAAAAAAAAAAAAAA
+    CHUNK_BATCH_FINISHED, // 0x0D
+    CHUNK_BATCH_START, // 0x0E
     CHUNK_BIOMES, // 0x0F
     CLEAR_TITLES, // 0x10
     TAB_COMPLETE, // 0x11
@@ -46,7 +46,7 @@ public enum ClientboundPackets1_20_2 implements ClientboundPacketType {
     SET_SLOT, // 0x16
     COOLDOWN, // 0x17
     CUSTOM_CHAT_COMPLETIONS, // 0x18
-    PLUGIN_MESSAGE, // 0x19 // TODO AAAAAAAAAAAAAAAAAAAAAAAAA
+    PLUGIN_MESSAGE, // 0x19
     DAMAGE_EVENT, // 0x1A
     DELETE_CHAT_MESSAGE, // 0x1B
     DISCONNECT, // 0x1C
@@ -122,7 +122,7 @@ public enum ClientboundPackets1_20_2 implements ClientboundPacketType {
     TITLE_TIMES, // 0x62
     ENTITY_SOUND, // 0x63
     SOUND, // 0x64
-    START_CONFIGURATION, // 0x65 // TODO AAAAAAAAAAAAAAAAAAAAAAAAA
+    START_CONFIGURATION, // 0x65
     STOP_SOUND, // 0x66
     SYSTEM_CHAT, // 0x67
     TAB_LIST, // 0x68
