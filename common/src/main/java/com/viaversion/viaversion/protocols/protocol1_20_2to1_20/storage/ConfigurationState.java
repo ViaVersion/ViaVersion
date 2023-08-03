@@ -18,55 +18,64 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FakeProtocolState implements StorableObject {
+public class ConfigurationState implements StorableObject {
 
     private final List<QueuedPacket> packetQueue = new ArrayList<>();
-    private boolean configurationState;
-    private boolean gameProfileSent;
+    private BridgePhase bridgePhase = BridgePhase.NONE;
 
-    public boolean isConfigurationState() {
-        return configurationState;
+    public BridgePhase bridgePhase() {
+        return bridgePhase;
     }
 
-    public void setConfigurationState(final boolean configurationState) {
-        this.configurationState = configurationState;
+    public void setBridgePhase(final BridgePhase bridgePhase) {
+        this.bridgePhase = bridgePhase;
     }
 
-    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) {
-        packetQueue.add(new QueuedPacket(((PacketWrapperImpl) wrapper).getInputBuffer().copy(), clientbound)); // TODO
+    public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
+        // Caching packet buffers is cursed, copy to heap buffers to make sure we don't start leaking in dumb cases
+        final ByteBuf copy = Unpooled.buffer();
+        wrapper.writeToBuffer(copy);
+        packetQueue.add(new QueuedPacket(copy, clientbound, wrapper.getPacketType(), wrapper.getId()));
     }
 
     public List<QueuedPacket> packetQueue() {
         return packetQueue;
     }
 
-    public boolean hasGameProfileBeenSent() {
-        return gameProfileSent;
-    }
-
-    public void setGameProfileSent(final boolean gameProfileSent) {
-        this.gameProfileSent = gameProfileSent;
+    public void reset() {
+        packetQueue.clear();
+        bridgePhase = BridgePhase.NONE;
     }
 
     @Override
     public boolean clearOnServerSwitch() {
-        return false;
+        return false; // This might be bad
+    }
+
+    public enum BridgePhase {
+        NONE, PROFILE_SENT, CONFIGURATION
     }
 
     public static final class QueuedPacket {
         private final ByteBuf buf;
         private final boolean clientbound;
+        private final PacketType packetType;
+        private final int packetId;
 
-        private QueuedPacket(final ByteBuf buf, final boolean clientbound) {
+        private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType, final int packetId) {
             this.buf = buf;
             this.clientbound = clientbound;
+            this.packetType = packetType;
+            this.packetId = packetId;
         }
 
         public ByteBuf buf() {
@@ -75,6 +84,14 @@ public class FakeProtocolState implements StorableObject {
 
         public boolean clientbound() {
             return clientbound;
+        }
+
+        public int packetId() {
+            return packetId;
+        }
+
+        public @Nullable PacketType packetType() {
+            return packetType;
         }
     }
 }

@@ -95,8 +95,6 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     final PacketWrapper finishConfigurationPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION);
                     finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
 
-                    System.out.println("PLEASEEEEEEEE");
-
                     // Manually send it at the end and hope nothing breaks
                     wrapper.send(Protocol1_20_2To1_20.class);
                     wrapper.cancel();
