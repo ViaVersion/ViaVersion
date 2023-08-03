@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler;
+package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.type.Type;
@@ -24,9 +24,9 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 
-public final class BlockItemPacketHandler1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
+public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
 
-    public BlockItemPacketHandler1_20_2(final Protocol1_20_2To1_20 protocol) {
+    public BlockItemPacketRewriter1_20_2(final Protocol1_20_2To1_20 protocol) {
         super(protocol);
     }
 

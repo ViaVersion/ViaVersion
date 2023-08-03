@@ -31,8 +31,8 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler.BlockItemPacketHandler1_20_2;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler.EntityPacketHandler1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.BlockItemPacketRewriter1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
@@ -47,8 +47,8 @@ import java.util.UUID;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
-    private final EntityPacketHandler1_20_2 entityPacketHandler = new EntityPacketHandler1_20_2(this);
-    private final BlockItemPacketHandler1_20_2 itemPacketHandler = new BlockItemPacketHandler1_20_2(this);
+    private final EntityPacketRewriter1_20_2 entityPacketRewriter = new EntityPacketRewriter1_20_2(this);
+    private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
 
     public Protocol1_20_2To1_20() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
@@ -176,11 +176,11 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
     @Override
     public EntityRewriter<Protocol1_20_2To1_20> getEntityRewriter() {
-        return entityPacketHandler;
+        return entityPacketRewriter;
     }
 
     @Override
     public ItemRewriter<Protocol1_20_2To1_20> getItemRewriter() {
-        return itemPacketHandler;
+        return itemPacketRewriter;
     }
 }

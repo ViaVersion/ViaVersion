@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.handler;
+package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
@@ -29,9 +29,9 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public final class EntityPacketHandler1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
+public final class EntityPacketRewriter1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
 
-    public EntityPacketHandler1_20_2(final Protocol1_20_2To1_20 protocol) {
+    public EntityPacketRewriter1_20_2(final Protocol1_20_2To1_20 protocol) {
         super(protocol);
     }
 
