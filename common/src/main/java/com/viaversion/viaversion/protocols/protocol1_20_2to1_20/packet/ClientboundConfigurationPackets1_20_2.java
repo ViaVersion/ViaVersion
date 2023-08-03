@@ -15,30 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.base;
+package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 
-public enum ServerboundLoginPackets implements ServerboundPacketType {
-    HELLO, // 0x00
-    ENCRYPTION_KEY, // 0x01
-    CUSTOM_QUERY, // 0x02
-    CUSTOM_QUERY_ANSWER, // 0x03
-    LOGIN_ACKNOWLEDGED; // 0x04
+public enum ClientboundConfigurationPackets1_20_2 implements ClientboundPacketType {
+
+    CUSTOM_PAYLOAD, // 0x00
+    DISCONNECT, // 0x01
+    FINISH_CONFIGURATION, // 0x02
+    KEEP_ALIVE, // 0x03
+    PING, // 0x04
+    REGISTRY_DATA, // 0x05
+    RESOURCE_PACK, // 0x06
+    UPDATE_ENABLED_FEATURES, // 0x07
+    UPDATE_TAGS; // 0x08
 
     @Override
-    public final int getId() {
+    public int getId() {
         return ordinal();
     }
 
     @Override
-    public final String getName() {
+    public String getName() {
         return name();
     }
 
     @Override
-    public final State state() {
-        return State.LOGIN;
+    public State state() {
+        return State.CONFIGURATION;
     }
 }

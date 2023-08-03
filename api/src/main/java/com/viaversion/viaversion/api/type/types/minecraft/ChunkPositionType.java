@@ -20,13 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.packet;
+package com.viaversion.viaversion.api.type.types.minecraft;
 
-public enum State {
+import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
+import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
-    HANDSHAKE,
-    STATUS,
-    LOGIN,
-    PLAY,
-    CONFIGURATION
+public class ChunkPositionType extends Type<ChunkPosition> {
+
+    public ChunkPositionType() {
+        super(ChunkPosition.class);
+    }
+
+    @Override
+    public ChunkPosition read(ByteBuf buffer) throws Exception {
+        final long chunkKey = Type.LONG.readPrimitive(buffer);
+        return new ChunkPosition(chunkKey);
+    }
+
+    @Override
+    public void write(ByteBuf buffer, ChunkPosition chunkPosition) throws Exception {
+        Type.LONG.writePrimitive(buffer, chunkPosition.chunkKey());
+    }
 }

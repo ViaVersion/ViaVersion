@@ -20,13 +20,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.protocol.packet;
+package com.viaversion.viaversion.api.minecraft.metadata;
 
-public enum State {
+import java.util.Objects;
 
-    HANDSHAKE,
-    STATUS,
-    LOGIN,
-    PLAY,
-    CONFIGURATION
+public final class ChunkPosition {
+    private final int chunkX;
+    private final int chunkZ;
+
+    public ChunkPosition(int chunkX, int chunkZ) {
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
+    }
+
+    public ChunkPosition(long chunkKey) {
+        this.chunkX = (int) chunkKey;
+        this.chunkZ = (int) (chunkKey >> 32);
+    }
+
+    public int chunkX() {
+        return chunkX;
+    }
+
+    public int chunkZ() {
+        return chunkZ;
+    }
+
+    public long chunkKey() {
+        return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChunkPosition that = (ChunkPosition) o;
+        return chunkX == that.chunkX && chunkZ == that.chunkZ;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(chunkX, chunkZ);
+    }
+
+    @Override
+    public String toString() {
+        return "ChunkPosition{" +
+                "chunkX=" + chunkX +
+                ", chunkZ=" + chunkZ +
+                '}';
+    }
 }

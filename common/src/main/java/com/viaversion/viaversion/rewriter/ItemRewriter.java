@@ -304,6 +304,43 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
         });
     }
 
+    public void registerAdvancements1_20(C packetType, Type<Item> type) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
+
+                // Parent
+                if (wrapper.passthrough(Type.BOOLEAN))
+                    wrapper.passthrough(Type.STRING);
+
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.COMPONENT); // Title
+                    wrapper.passthrough(Type.COMPONENT); // Description
+                    handleItemToClient(wrapper.passthrough(type)); // Icon
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
+                    }
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+
+                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < arrayLength; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                }
+
+                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+            }
+        });
+    }
+
     public void registerWindowPropertyEnchantmentHandler(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override

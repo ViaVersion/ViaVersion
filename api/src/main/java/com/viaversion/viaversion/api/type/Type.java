@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.BooleanType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
@@ -59,6 +60,7 @@ import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.api.type.types.VarLongType;
 import com.viaversion.viaversion.api.type.types.VoidType;
 import com.viaversion.viaversion.api.type.types.minecraft.BlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.minecraft.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatItemType;
@@ -164,9 +166,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
-
     public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
+    public static final Type<ChunkPosition> CHUNK_POSITION = new ChunkPositionType();
 
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
