@@ -20,43 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.version;
 
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.item.Item;
-import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_19_4;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_2;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 
-public class ItemType extends BaseItemType {
+import java.util.List;
 
-    public ItemType() {
-        super("Item");
-    }
+public final class Types1_20_2 {
 
-    @Override
-    public @Nullable Item read(ByteBuf buffer) throws Exception {
-        short id = buffer.readShort();
-        if (id < 0) {
-            return null;
-        } else {
-            Item item = new DataItem();
-            item.setIdentifier(id);
-            item.setAmount(buffer.readByte());
-            item.setData(buffer.readShort());
-            item.setTag(NBT.read(buffer));
-            return item;
-        }
-    }
-
-    @Override
-    public void write(ByteBuf buffer, @Nullable Item object) throws Exception {
-        if (object == null) {
-            buffer.writeShort(-1);
-        } else {
-            buffer.writeShort(object.identifier());
-            buffer.writeByte(object.amount());
-            buffer.writeShort(object.data());
-            NBT.write(buffer, object.tag());
-        }
-    }
+    public static final ParticleType PARTICLE = Types1_20.PARTICLE; // Only safe to use after protocol loading
+    public static final MetaTypes1_20_2 META_TYPES = new MetaTypes1_20_2(PARTICLE);
+    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
+    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
 }

@@ -27,36 +27,34 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ItemType extends BaseItemType {
+public class Item1_20_2Type extends BaseItemType {
 
-    public ItemType() {
-        super("Item");
+    public Item1_20_2Type() {
+        super("Item1_20_2Type");
     }
 
     @Override
-    public @Nullable Item read(ByteBuf buffer) throws Exception {
-        short id = buffer.readShort();
-        if (id < 0) {
+    public @Nullable Item read(final ByteBuf buffer) throws Exception {
+        if (!buffer.readBoolean()) {
             return null;
-        } else {
-            Item item = new DataItem();
-            item.setIdentifier(id);
-            item.setAmount(buffer.readByte());
-            item.setData(buffer.readShort());
-            item.setTag(NBT.read(buffer));
-            return item;
         }
+
+        final Item item = new DataItem();
+        item.setIdentifier(VAR_INT.readPrimitive(buffer));
+        item.setAmount(buffer.readByte());
+        item.setTag(NAMELESS_NBT.read(buffer));
+        return item;
     }
 
     @Override
-    public void write(ByteBuf buffer, @Nullable Item object) throws Exception {
+    public void write(final ByteBuf buffer, @Nullable final Item object) throws Exception {
         if (object == null) {
-            buffer.writeShort(-1);
+            buffer.writeBoolean(false);
         } else {
-            buffer.writeShort(object.identifier());
+            buffer.writeBoolean(true);
+            VAR_INT.writePrimitive(buffer, object.identifier());
             buffer.writeByte(object.amount());
-            buffer.writeShort(object.data());
-            NBT.write(buffer, object.tag());
+            NAMELESS_NBT.write(buffer, object.tag());
         }
     }
 }

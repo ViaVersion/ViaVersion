@@ -18,16 +18,21 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+
+import java.util.List;
 
 public final class EntityPacketRewriter1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
 
@@ -38,7 +43,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_20.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_20.METADATA_LIST, Types1_20_2.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_4.JOIN_GAME, new PacketHandlers() {
@@ -121,6 +126,11 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
+    }
+
+    @Override
+    protected void registerRewrites() {
+        filter().handler((event, meta) -> meta.setMetaType(Types1_20_2.META_TYPES.byId(meta.metaType().typeId())));
     }
 
     @Override
