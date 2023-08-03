@@ -179,7 +179,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item[]> FLAT_VAR_INT_ITEM_ARRAY_VAR_INT = new ArrayType<>(FLAT_VAR_INT_ITEM);
 
     public static final Type<Item> ITEM1_20_2 = new Item1_20_2Type();
-    public static final Type<Item[]> ITEM1_20_2_ARRAY_VAR_INT = new ArrayType<>(ITEM1_20_2);
+    public static final Type<Item[]> ITEM1_20_2_VAR_INT_ARRAY = new ArrayType<>(ITEM1_20_2);
 
     /* Actual Class */
     private final Class<? super T> outputClass;

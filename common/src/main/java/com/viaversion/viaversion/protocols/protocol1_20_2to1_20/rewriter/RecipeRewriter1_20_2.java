@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.base;
+package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
 
-import java.util.UUID;
+public class RecipeRewriter1_20_2<C extends ClientboundPacketType> extends RecipeRewriter1_19_4<C> {
 
-public class BaseProtocol1_16 extends BaseProtocol1_7 {
+    public RecipeRewriter1_20_2(final Protocol<C, ?, ?, ?> protocol) {
+        super(protocol);
+    }
 
     @Override
-    protected UUID passthroughLoginUUID(final PacketWrapper wrapper) throws Exception {
-        return wrapper.passthrough(Type.UUID);
+    protected Type<Item> itemType() {
+        return Type.ITEM1_20_2;
+    }
+
+    @Override
+    protected Type<Item[]> itemArrayType() {
+        return Type.ITEM1_20_2_VAR_INT_ARRAY;
     }
 }

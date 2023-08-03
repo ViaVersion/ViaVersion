@@ -18,11 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
@@ -31,8 +30,6 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
-import java.util.List;
 
 public final class EntityPacketRewriter1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
 
@@ -95,6 +92,11 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
                     enableFeaturesPacket.scheduleSend(Protocol1_20_2To1_20.class);
 
+                    final PacketWrapper finishConfigurationPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION);
+                    finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
+
+                    System.out.println("PLEASEEEEEEEE");
+
                     // Manually send it at the end and hope nothing breaks
                     wrapper.send(Protocol1_20_2To1_20.class);
                     wrapper.cancel();
@@ -124,6 +126,17 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     wrapper.write(Type.BYTE, dataToKeep);
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_EFFECT, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Entity id
+            wrapper.passthrough(Type.VAR_INT); // Effect id
+            wrapper.passthrough(Type.BYTE); // Amplifier
+            wrapper.passthrough(Type.VAR_INT); // Duration
+            wrapper.passthrough(Type.BYTE); // Flags
+            if (wrapper.passthrough(Type.BOOLEAN)) {
+                wrapper.write(Type.NAMELESS_NBT, wrapper.read(Type.NBT)); // Factor data
             }
         });
     }

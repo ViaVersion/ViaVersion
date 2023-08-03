@@ -23,9 +23,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 public enum ServerboundLoginPackets implements ServerboundPacketType {
     HELLO, // 0x00
     ENCRYPTION_KEY, // 0x01
-    CUSTOM_QUERY, // 0x02
-    CUSTOM_QUERY_ANSWER, // 0x03
-    LOGIN_ACKNOWLEDGED; // 0x04
+    CUSTOM_QUERY_ANSWER, // 0x02
+    LOGIN_ACKNOWLEDGED; // 0x03
 
     @Override
     public final int getId() {

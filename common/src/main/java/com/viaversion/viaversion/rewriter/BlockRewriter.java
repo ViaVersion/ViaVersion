@@ -42,10 +42,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class BlockRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
     private final Type<Position> positionType;
+    private final Type<CompoundTag> nbtType;
 
     public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
+        this(protocol, positionType, Type.NBT);
+    }
+
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> nbtType) {
         this.protocol = protocol;
         this.positionType = positionType;
+        this.nbtType = nbtType;
     }
 
     public void registerBlockAction(C packetType) {
@@ -203,7 +209,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
 
     public void registerBlockEntityData(C packetType, @Nullable Consumer<BlockEntity> blockEntityHandler) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final Position position = wrapper.passthrough(Type.POSITION1_14);
+            final Position position = wrapper.passthrough(positionType);
 
             final int blockEntityId = wrapper.read(Type.VAR_INT);
             final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
@@ -214,7 +220,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
 
             final CompoundTag tag;
-            if (blockEntityHandler != null && (tag = wrapper.passthrough(Type.NBT)) != null) {
+            if (blockEntityHandler != null && (tag = wrapper.passthrough(nbtType)) != null) {
                 final BlockEntity blockEntity = new BlockEntityImpl(BlockEntity.pack(position.x(), position.z()), (short) position.y(), blockEntityId, tag);
                 blockEntityHandler.accept(blockEntity);
             }

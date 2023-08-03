@@ -82,19 +82,19 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         for (int i = 0; i < ingredientsNo; i++) {
             handleIngredient(wrapper);
         }
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     public void handleCraftingShapeless(PacketWrapper wrapper) throws Exception {
         wrapper.passthrough(Type.STRING); // Group
         handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     public void handleSmelting(PacketWrapper wrapper) throws Exception {
         wrapper.passthrough(Type.STRING); // Group
         handleIngredient(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
     }
@@ -102,13 +102,13 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     public void handleStonecutting(PacketWrapper wrapper) throws Exception {
         wrapper.passthrough(Type.STRING); // Group
         handleIngredient(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     public void handleSmithing(PacketWrapper wrapper) throws Exception {
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Addition
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     public void handleSimpleRecipe(final PacketWrapper wrapper) throws Exception {
@@ -119,7 +119,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Template
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     public void handleSmithingTrim(final PacketWrapper wrapper) throws Exception {
@@ -135,7 +135,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleIngredient(final PacketWrapper wrapper) throws Exception {
-        final Item[] items = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
+        final Item[] items = wrapper.passthrough(itemArrayType());
         for (final Item item : items) {
             rewrite(item);
         }
@@ -152,5 +152,13 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     public interface RecipeConsumer {
 
         void accept(PacketWrapper wrapper) throws Exception;
+    }
+
+    protected Type<Item> itemType() {
+        return Type.FLAT_VAR_INT_ITEM;
+    }
+
+    protected Type<Item[]> itemArrayType() {
+        return Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT;
     }
 }

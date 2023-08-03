@@ -48,7 +48,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     @Override
@@ -59,7 +59,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     @Override
@@ -67,7 +67,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredient(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
     }

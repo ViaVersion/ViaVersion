@@ -121,7 +121,7 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            if (finishLoginAfterGameprofile()) {
+            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
                 info.setState(State.PLAY);
             }
 
@@ -166,8 +166,6 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         });
 
         registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
-        // TODO AAAAAAAAAAAAAAAAA
-        registerServerbound(ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION, wrapper -> wrapper.user().getProtocolInfo().setState(State.PLAY));
     }
 
     @Override
@@ -191,9 +189,5 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             uuidString = addDashes(uuidString);
         }
         return UUID.fromString(uuidString);
-    }
-
-    protected boolean finishLoginAfterGameprofile() {
-        return true;
     }
 }
