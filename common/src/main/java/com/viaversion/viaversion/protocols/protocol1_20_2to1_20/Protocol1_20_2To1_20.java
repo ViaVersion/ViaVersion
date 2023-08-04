@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
@@ -52,16 +53,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
 
     public Protocol1_20_2To1_20() {
-        // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
         super(ClientboundPackets1_19_4.class, ClientboundPackets1_20_2.class, ServerboundPackets1_19_4.class, ServerboundPackets1_20_2.class);
     }
 
     @Override
     protected void registerPackets() {
         // Close your eyes and turn around while you still can
-        // TODO Handle Enabled features and tags before configuration phase end?
-        // TODO Player info, replace profile with missing name with null?
-        // TODO Scoreboard objective probably okay, but there are refactors to the id
         super.registerPackets();
 
         final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
@@ -96,51 +93,41 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
-            System.out.println("Login acknowleged!");
             wrapper.cancel();
+
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
             configurationState.setBridgePhase(ConfigurationState.BridgePhase.CONFIGURATION);
             wrapper.user().getProtocolInfo().setState(State.PLAY);
-
-            for (final ConfigurationState.QueuedPacket packet : configurationState.packetQueue()) {
-                final PacketWrapper queuedWrapper;
-                if (packet.packetType() != null) {
-                    queuedWrapper = PacketWrapper.create(packet.packetType(), packet.buf(), wrapper.user());
-                } else {
-                    //noinspection deprecation
-                    queuedWrapper = PacketWrapper.create(packet.packetId(), packet.buf(), wrapper.user());
-                }
-
-                queuedWrapper.send(Protocol1_20_2To1_20.class, false);
-            }
-
-            configurationState.packetQueue().clear();
+            configurationState.sendQueuedPackets(wrapper.user());
         });
-        cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId()); // TODO ?
+        cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId());
 
-        // TODO Make sure this is called in other protocols as well/the base protocol
+        // TODO Needs baseprotocol logic or something to set to PLAY from the next version onwards
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION.getId(), -1, wrapper -> {
-            wrapper.user().get(ConfigurationState.class).reset();
             wrapper.cancel();
-            System.out.println("CLIENT NOW ALSO ENTERING PLAY STATE");
-        });
 
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, wrapper -> {
-            wrapper.setPacketType(ServerboundPackets1_20_2.PLUGIN_MESSAGE);
-            wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
+            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            configurationState.setBridgePhase(ConfigurationState.BridgePhase.NONE);
+            configurationState.sendQueuedPackets(wrapper.user());
+            configurationState.clear();
         });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), ServerboundPackets1_19_4.KEEP_ALIVE.getId(), wrapper -> {
-        });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), ServerboundPackets1_19_4.PONG.getId(), wrapper -> {
-        });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ServerboundPackets1_19_4.RESOURCE_PACK_STATUS.getId(), wrapper -> {
-        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.RESOURCE_PACK_STATUS));
 
-        cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // Sad emoji
+        cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
         cancelServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED);
 
-        // TODO Check if we can just not send batches (probably fine like this)
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
+    }
+
+    private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
+        return wrapper -> {
+            wrapper.setPacketType(packetType);
+            wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
+            wrapper.cancel();
+        };
     }
 
     @Override
@@ -148,10 +135,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         final ConfigurationState configurationBridge = packetWrapper.user().get(ConfigurationState.class);
         if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.NONE) {
             super.transform(direction, state, packetWrapper);
+            return;
         }
 
         if (direction == Direction.SERVERBOUND) {
             // Client and server might be on two different protocol states - always let the client packets go through
+            // Simply change the processed state if necessary
             super.transform(direction, configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.CONFIGURATION
                     ? State.CONFIGURATION : state, packetWrapper);
             return;
@@ -159,38 +148,46 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         // Queue packets sent by the serverwhile we wait for the client to transition to the configuration state
         if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.PROFILE_SENT) {
-            System.out.println("added to queue " + packetWrapper.getId() + " " + direction + " " + state);
-            configurationBridge.addPacketToQueue(packetWrapper, direction == Direction.CLIENTBOUND);
+            configurationBridge.addPacketToQueue(packetWrapper, true);
             throw CancelException.generate();
         }
 
-        // Map some of them to their configuration state counterparts
-        System.out.println("Transforming " + packetWrapper.getId() + " " + direction + " " + state);
-        System.out.println(configurationBridge.bridgePhase());
+        // Map some of them to their configuration state counterparts, but make sure to late join game through
         if (packetWrapper.getPacketType() == null || packetWrapper.getPacketType().state() != State.CONFIGURATION) {
             final int unmappedId = packetWrapper.getId();
-            if (state == State.PLAY) {
-                if (unmappedId == ClientboundPackets1_19_4.PLUGIN_MESSAGE.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD);
-                } else if (unmappedId == ClientboundPackets1_19_4.DISCONNECT.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.DISCONNECT);
-                } else if (unmappedId == ClientboundPackets1_19_4.KEEP_ALIVE.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.KEEP_ALIVE);
-                } else if (unmappedId == ClientboundPackets1_19_4.PING.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.PING);
-                } else if (unmappedId == ClientboundPackets1_19_4.RESOURCE_PACK.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK);
-                } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
-                } else if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
-                    packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
-                } else {
-                    configurationBridge.addPacketToQueue(packetWrapper, direction == Direction.CLIENTBOUND);
-                    throw CancelException.generate();
-                }
+            if (unmappedId == ClientboundPackets1_19_4.JOIN_GAME.getId()) {
+                // Make sure we handle the start of the play phase correctly
+                super.transform(direction, state, packetWrapper);
+                return;
             }
-        }
 
+            if (configurationBridge.queuedOrSentJoinGame()) {
+                // Don't try to send configuration packets after the join game packet has been queued or sent
+                configurationBridge.addPacketToQueue(packetWrapper, true);
+                throw CancelException.generate();
+            }
+
+            if (unmappedId == ClientboundPackets1_19_4.PLUGIN_MESSAGE.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD);
+            } else if (unmappedId == ClientboundPackets1_19_4.DISCONNECT.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.DISCONNECT);
+            } else if (unmappedId == ClientboundPackets1_19_4.KEEP_ALIVE.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.KEEP_ALIVE);
+            } else if (unmappedId == ClientboundPackets1_19_4.PING.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.PING);
+            } else if (unmappedId == ClientboundPackets1_19_4.RESOURCE_PACK.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK);
+            } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
+            } else if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
+                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
+            } else {
+                // Not a packet that can be mapped to the configuration protocol
+                configurationBridge.addPacketToQueue(packetWrapper, true);
+                throw CancelException.generate();
+            }
+            return;
+        }
 
         // Redirect packets during the fake configuration phase
         // This might mess up people using Via API/other protocols down the line, but such is life. We can't have different states for server and client

@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter1_20_2 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20_2To1_20> {
@@ -86,17 +87,18 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     registryDataPacket.send(Protocol1_20_2To1_20.class);
 
                     // Enabling features is only possible during the configuraton phase
-                    // TODO Capture more packets after login to send them later
+                    // TODO Sad emoji
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
                     enableFeaturesPacket.write(Type.VAR_INT, 1);
                     enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.scheduleSend(Protocol1_20_2To1_20.class);
+                    enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
 
                     final PacketWrapper finishConfigurationPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION);
                     finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
 
                     // Manually send it at the end and hope nothing breaks
-                    wrapper.send(Protocol1_20_2To1_20.class);
+                    final ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
+                    configurationBridge.setJoinGamePacket(wrapper);
                     wrapper.cancel();
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
@@ -142,6 +144,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         filter().handler((event, meta) -> meta.setMetaType(Types1_20_2.META_TYPES.byId(meta.metaType().typeId())));
+        filter().filterFamily(Entity1_19_4Types.DISPLAY).addIndex(10);
     }
 
     @Override

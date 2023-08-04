@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.types;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
@@ -27,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.ChunkSectionType1_18;
-import com.viaversion.viaversion.api.type.types.version.Types1_18;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public final class Chunk1_20_2Type extends Type<Chunk> {
         final int blockEntitiesLength = Type.VAR_INT.readPrimitive(buffer);
         final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
         for (int i = 0; i < blockEntitiesLength; i++) {
-            blockEntities.add(Types1_18.BLOCK_ENTITY.read(buffer));
+            blockEntities.add(Types1_20_2.BLOCK_ENTITY.read(buffer));
         }
 
         return new Chunk1_18(chunkX, chunkZ, sections, heightMap, blockEntities);
@@ -91,7 +90,7 @@ public final class Chunk1_20_2Type extends Type<Chunk> {
 
         Type.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());
         for (final BlockEntity blockEntity : chunk.blockEntities()) {
-            Types1_18.BLOCK_ENTITY.write(buffer, blockEntity);
+            Types1_20_2.BLOCK_ENTITY.write(buffer, blockEntity);
         }
     }
 

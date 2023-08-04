@@ -22,12 +22,13 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.Collection;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-final class PacketTypeMapMap<P> implements PacketTypeMap<P> {
+final class PacketTypeMapMap<P extends PacketType> implements PacketTypeMap<P> {
     private final Map<String, P> packetsByName;
     private final Int2ObjectMap<P> packetsById;
 

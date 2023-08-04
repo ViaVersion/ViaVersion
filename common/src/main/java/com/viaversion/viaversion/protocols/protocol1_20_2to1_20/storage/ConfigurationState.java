@@ -18,8 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -31,6 +33,8 @@ public class ConfigurationState implements StorableObject {
 
     private final List<QueuedPacket> packetQueue = new ArrayList<>();
     private BridgePhase bridgePhase = BridgePhase.NONE;
+    private QueuedPacket joinGamePacket;
+    private boolean queuedJoinGame;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -41,24 +45,69 @@ public class ConfigurationState implements StorableObject {
     }
 
     public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
+        packetQueue.add(toQueuedPacket(wrapper, clientbound, false));
+    }
+
+    private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skip1_20_2Pipeline) throws Exception {
         // Caching packet buffers is cursed, copy to heap buffers to make sure we don't start leaking in dumb cases
         final ByteBuf copy = Unpooled.buffer();
+        final PacketType packetType = wrapper.getPacketType();
+        final int packetId = wrapper.getId();
+        // Don't write the packet id to the buffer
+        //noinspection deprecation
+        wrapper.setId(-1);
         wrapper.writeToBuffer(copy);
-        packetQueue.add(new QueuedPacket(copy, clientbound, wrapper.getPacketType(), wrapper.getId()));
+        return new QueuedPacket(copy, clientbound, packetType, packetId, skip1_20_2Pipeline);
     }
 
-    public List<QueuedPacket> packetQueue() {
-        return packetQueue;
-    }
-
-    public void reset() {
-        packetQueue.clear();
-        bridgePhase = BridgePhase.NONE;
+    public void setJoinGamePacket(final PacketWrapper wrapper) throws Exception {
+        this.joinGamePacket = toQueuedPacket(wrapper, true, true);
+        queuedJoinGame = true;
     }
 
     @Override
     public boolean clearOnServerSwitch() {
         return false; // This might be bad
+    }
+
+    public void sendQueuedPackets(final UserConnection connection) throws Exception {
+        if (joinGamePacket != null) {
+            packetQueue.add(0, joinGamePacket);
+            joinGamePacket = null;
+        }
+
+        final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(new ConfigurationState.QueuedPacket[0]);
+        packetQueue.clear();
+
+        for (final ConfigurationState.QueuedPacket packet : queuedPackets) {
+            final PacketWrapper queuedWrapper;
+            try {
+                if (packet.packetType() != null) {
+                    queuedWrapper = PacketWrapper.create(packet.packetType(), packet.buf(), connection);
+                } else {
+                    //noinspection deprecation
+                    queuedWrapper = PacketWrapper.create(packet.packetId(), packet.buf(), connection);
+                }
+
+                if (packet.clientbound()) {
+                    queuedWrapper.send(Protocol1_20_2To1_20.class, packet.skip1_20_2Pipeline());
+                } else {
+                    queuedWrapper.sendToServer(Protocol1_20_2To1_20.class, packet.skip1_20_2Pipeline());
+                }
+            } finally {
+                packet.buf().release();
+            }
+        }
+    }
+
+    public void clear() {
+        packetQueue.clear();
+        bridgePhase = BridgePhase.NONE;
+        queuedJoinGame = false;
+    }
+
+    public boolean queuedOrSentJoinGame() {
+        return queuedJoinGame;
     }
 
     public enum BridgePhase {
@@ -70,12 +119,15 @@ public class ConfigurationState implements StorableObject {
         private final boolean clientbound;
         private final PacketType packetType;
         private final int packetId;
+        private final boolean skip1_20_2Pipeline;
 
-        private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType, final int packetId) {
+        private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType,
+                             final int packetId, final boolean skip1_20_2Pipeline) {
             this.buf = buf;
             this.clientbound = clientbound;
             this.packetType = packetType;
             this.packetId = packetId;
+            this.skip1_20_2Pipeline = skip1_20_2Pipeline;
         }
 
         public ByteBuf buf() {
@@ -92,6 +144,21 @@ public class ConfigurationState implements StorableObject {
 
         public @Nullable PacketType packetType() {
             return packetType;
+        }
+
+        public boolean skip1_20_2Pipeline() {
+            return skip1_20_2Pipeline;
+        }
+
+        @Override
+        public String toString() {
+            return "QueuedPacket{" +
+                    "buf=" + buf +
+                    ", clientbound=" + clientbound +
+                    ", packetType=" + packetType +
+                    ", packetId=" + packetId +
+                    ", skip1_20_2Pipeline=" + skip1_20_2Pipeline +
+                    '}';
         }
     }
 }

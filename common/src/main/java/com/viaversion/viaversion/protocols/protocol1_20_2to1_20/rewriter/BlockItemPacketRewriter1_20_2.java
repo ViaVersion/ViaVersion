@@ -73,14 +73,14 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             wrapper.write(newChunkType, chunk);
         });
 
-        // Weeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+        // Replace the NBT type everywhere
         protocol.registerClientbound(ClientboundPackets1_19_4.WINDOW_ITEMS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 handler(wrapper -> {
-                    wrapper.write(Type.ITEM1_20_2_VAR_INT_ARRAY, wrapper.read(Type.FLAT_ITEM_ARRAY_VAR_INT)); // Items
+                    wrapper.write(Type.ITEM1_20_2_VAR_INT_ARRAY, wrapper.read(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT)); // Items
                     wrapper.write(Type.ITEM1_20_2, wrapper.read(Type.FLAT_VAR_INT_ITEM)); // Carried item
                 });
             }
