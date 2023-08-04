@@ -70,7 +70,7 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(type); // Items
-                handler(itemArrayHandler(type));
+                handler(itemArrayToClientHandler(type));
             }
         });
     }
@@ -384,7 +384,7 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(itemType));
+                handler(getSpawnParticleHandler());
             }
         });
     }
@@ -403,16 +403,16 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                 map(Type.FLOAT); // 7 - Offset Z
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(Type.VAR_INT, itemType));
+                handler(getSpawnParticleHandler(Type.VAR_INT));
             }
         });
     }
 
-    public PacketHandler getSpawnParticleHandler(Type<Item> itemType) {
-        return getSpawnParticleHandler(Type.INT, itemType);
+    public PacketHandler getSpawnParticleHandler() {
+        return getSpawnParticleHandler(Type.INT);
     }
 
-    public PacketHandler getSpawnParticleHandler(Type<Integer> idType, Type<Item> itemType) {
+    public PacketHandler getSpawnParticleHandler(Type<Integer> idType) {
         return wrapper -> {
             int id = wrapper.get(idType, 0);
             if (id == -1) {
@@ -434,8 +434,7 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
         };
     }
 
-    // Only sent to the client
-    public PacketHandler itemArrayHandler(Type<Item[]> type) {
+    public PacketHandler itemArrayToClientHandler(Type<Item[]> type) {
         return wrapper -> {
             Item[] items = wrapper.get(type, 0);
             for (Item item : items) {

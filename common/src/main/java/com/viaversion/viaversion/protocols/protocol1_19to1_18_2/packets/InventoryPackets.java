@@ -69,7 +69,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                         }
                     }
                 });
-                handler(getSpawnParticleHandler(Type.VAR_INT, Type.FLAT_VAR_INT_ITEM));
+                handler(getSpawnParticleHandler(Type.VAR_INT));
             }
         });
 

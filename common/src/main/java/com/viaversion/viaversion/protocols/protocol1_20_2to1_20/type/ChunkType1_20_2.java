@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.types;
+package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
@@ -31,11 +31,11 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Chunk1_20_2Type extends Type<Chunk> {
+public final class ChunkType1_20_2 extends Type<Chunk> {
     private final ChunkSectionType1_18 sectionType;
     private final int ySectionCount;
 
-    public Chunk1_20_2Type(final int ySectionCount, final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
+    public ChunkType1_20_2(final int ySectionCount, final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
         super(Chunk.class);
         Preconditions.checkArgument(ySectionCount > 0);
         this.sectionType = new ChunkSectionType1_18(globalPaletteBlockBits, globalPaletteBiomeBits);

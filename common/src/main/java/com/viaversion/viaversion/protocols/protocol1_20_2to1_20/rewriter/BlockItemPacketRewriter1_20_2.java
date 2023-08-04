@@ -30,7 +30,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.types.Chunk1_20_2Type;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.MathUtil;
@@ -67,7 +67,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                     MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.read(chunkType);
 
-            final Type<Chunk> newChunkType = new Chunk1_20_2Type(tracker.currentWorldSectionHeight(),
+            final Type<Chunk> newChunkType = new ChunkType1_20_2(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(Protocol1_20To1_19_4.MAPPINGS.getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             wrapper.write(newChunkType, chunk);
