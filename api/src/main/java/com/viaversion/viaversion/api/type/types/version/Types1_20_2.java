@@ -28,11 +28,9 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_2;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
-
 import java.util.List;
 
 public final class Types1_20_2 {
-
 
     public static final Type<BlockEntity> BLOCK_ENTITY = new BlockEntityType1_20_2();
     public static final ParticleType PARTICLE = Types1_20.PARTICLE; // Only safe to use after protocol loading

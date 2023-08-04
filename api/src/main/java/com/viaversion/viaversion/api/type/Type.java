@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.type;
 
-
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -59,8 +58,29 @@ import com.viaversion.viaversion.api.type.types.VarIntArrayType;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.api.type.types.VarLongType;
 import com.viaversion.viaversion.api.type.types.VoidType;
-import com.viaversion.viaversion.api.type.types.minecraft.*;
-
+import com.viaversion.viaversion.api.type.types.minecraft.BlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.minecraft.ChunkPositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.EulerAngleType;
+import com.viaversion.viaversion.api.type.types.minecraft.FlatItemArrayType;
+import com.viaversion.viaversion.api.type.types.minecraft.FlatItemType;
+import com.viaversion.viaversion.api.type.types.minecraft.FlatVarIntItemArrayType;
+import com.viaversion.viaversion.api.type.types.minecraft.FlatVarIntItemType;
+import com.viaversion.viaversion.api.type.types.minecraft.GlobalPositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.Item1_20_2Type;
+import com.viaversion.viaversion.api.type.types.minecraft.ItemArrayType;
+import com.viaversion.viaversion.api.type.types.minecraft.ItemType;
+import com.viaversion.viaversion.api.type.types.minecraft.NBTType;
+import com.viaversion.viaversion.api.type.types.minecraft.NamelessNBTType;
+import com.viaversion.viaversion.api.type.types.minecraft.OptionalVarIntType;
+import com.viaversion.viaversion.api.type.types.minecraft.PlayerMessageSignatureType;
+import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
+import com.viaversion.viaversion.api.type.types.minecraft.PositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.ProfileKeyType;
+import com.viaversion.viaversion.api.type.types.minecraft.QuaternionType;
+import com.viaversion.viaversion.api.type.types.minecraft.VarLongBlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.minecraft.Vector3fType;
+import com.viaversion.viaversion.api.type.types.minecraft.VectorType;
+import com.viaversion.viaversion.api.type.types.minecraft.VillagerDataType;
 import java.util.UUID;
 
 /**
