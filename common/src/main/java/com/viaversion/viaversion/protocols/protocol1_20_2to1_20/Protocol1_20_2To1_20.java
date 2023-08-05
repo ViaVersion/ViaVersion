@@ -40,9 +40,6 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Serverbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.BlockItemPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.rewriter.StatisticsRewriter;
-import com.viaversion.viaversion.rewriter.TagRewriter;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -60,15 +57,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // Close your eyes and turn around while you still can
         super.registerPackets();
 
-        final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
-        tagRewriter.registerGeneric(ClientboundPackets1_19_4.TAGS);
-
-        final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_19_4.ENTITY_SOUND);
-
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.STATISTICS);
-
         registerClientbound(ClientboundPackets1_19_4.SCOREBOARD_OBJECTIVE, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
             wrapper.write(Type.VAR_INT, (int) slot);
@@ -83,7 +71,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         // Deal with the new CONFIGURATION protocol state the client expects
         // After the game profile is received by the client, it will send its login ack,
-        // switch to the configration protocol state and send its brand.
+        // switch to the configuration protocol state and send its brand.
         // We need to wait for it send the login ack before actually sending the play login,
         // hence packets are added to a queue. With the data from the login packet, we sent what is needed
         // during the configuration phase before finally transitioning to the play state with the client as well.
@@ -117,7 +105,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
         cancelServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED);
-
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
     }
 

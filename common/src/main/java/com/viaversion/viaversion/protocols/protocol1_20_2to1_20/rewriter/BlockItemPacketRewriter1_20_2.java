@@ -38,7 +38,7 @@ import com.viaversion.viaversion.util.MathUtil;
 public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
 
     public BlockItemPacketRewriter1_20_2(final Protocol1_20_2To1_20 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_VAR_INT_ARRAY);
+        super(protocol);
     }
 
     @Override
