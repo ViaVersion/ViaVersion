@@ -84,6 +84,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
             configurationState.setBridgePhase(ConfigurationState.BridgePhase.CONFIGURATION);
+            // TODO: ... WE NEED TO SET THE ACTUAL STATE TO CONFIGURATON FOR PROTOCOLS DOWN THE LINE AAAAAAAAAAAAAAA
             wrapper.user().getProtocolInfo().setState(State.PLAY);
             configurationState.sendQueuedPackets(wrapper.user());
         });

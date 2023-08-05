@@ -75,10 +75,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     wrapper.write(Type.BYTE, gamemode);
                     wrapper.write(Type.BYTE, previousGamemode);
 
-                    wrapper.passthrough(Type.BOOLEAN); // Debug
-                    wrapper.passthrough(Type.BOOLEAN); // Flat
-                    wrapper.passthrough(Type.OPTIONAL_GLOBAL_POSITION); // Last death position
-                    wrapper.passthrough(Type.VAR_INT); // Portal cooldown
+                    // Debug, flat, last death pos, and portal cooldown at the end unchanged
 
                     // Send configuration packets first before going into the play protocol state
                     final PacketWrapper registryDataPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA);
@@ -111,7 +108,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     wrapper.passthrough(Type.STRING); // Dimension type
                     wrapper.passthrough(Type.STRING); // World
                     wrapper.passthrough(Type.LONG); // Seed
-                    wrapper.passthrough(Type.BYTE); // Gamemode
+                    wrapper.write(Type.BYTE, wrapper.read(Type.UNSIGNED_BYTE).byteValue()); // Gamemode
                     wrapper.passthrough(Type.BYTE); // Previous gamemode
                     wrapper.passthrough(Type.BOOLEAN); // Debug
                     wrapper.passthrough(Type.BOOLEAN); // Flat
