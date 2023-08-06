@@ -47,6 +47,11 @@ public class ChunkSectionLightImpl implements ChunkSectionLight {
 
     @Override
     public void setSkyLight(byte[] data) {
+        if (data == null) {
+            this.skyLight = null;
+            return;
+        }
+
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.skyLight == null) {
             this.skyLight = new NibbleArray(data);
