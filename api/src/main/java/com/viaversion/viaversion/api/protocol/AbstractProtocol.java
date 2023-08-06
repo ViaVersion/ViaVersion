@@ -97,13 +97,20 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
         registerPackets();
 
-        // Register the rest of the ids with no handlers if necessary
+        // Register handlers for protocol state switching
+        // TODO Only register one of those handlers, possibly somehow in the base protocol
         final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
         if (configurationAcknowledgedPacket != null) {
-            // TODO Only register one of those handlers, possibly somehow in the base protocol
             registerServerbound(configurationAcknowledgedPacket, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
         }
 
+        final ServerboundPacketType finishConfigurationPacket = finishConfigurationPacket();
+        if (finishConfigurationPacket != null) {
+            final int id = finishConfigurationPacket.getId();
+            registerServerbound(State.CONFIGURATION, id, id, wrapper -> wrapper.user().getProtocolInfo().setState(State.PLAY));
+        }
+
+        // Register the rest of the ids with no handlers if necessary
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
                 && unmappedClientboundPacketType != mappedClientboundPacketType) {
             registerPacketIdChanges(
@@ -219,6 +226,11 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         final Map<State, PacketTypeMap<SU>> packetTypes = packetTypesProvider.unmappedServerboundPacketTypes();
         final PacketTypeMap<SU> packetTypeMap = packetTypes.get(State.PLAY);
         return packetTypeMap != null ? packetTypeMap.typeByName("CONFIGURATION_ACKNOWLEDGED") : null;
+    }
+
+    protected @Nullable ServerboundPacketType finishConfigurationPacket() {
+        // To be overridden
+        return null;
     }
 
     // ---------------------------------------------------------------------------------

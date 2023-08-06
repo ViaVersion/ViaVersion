@@ -40,6 +40,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Serverbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.BlockItemPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -76,26 +77,27 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // hence packets are added to a queue. With the data from the login packet, we sent what is needed
         // during the configuration phase before finally transitioning to the play state with the client as well.
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
-            wrapper.user().get(ConfigurationState.class).setBridgePhase(ConfigurationState.BridgePhase.PROFILE_SENT);
+            wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
+
+            // Set the state according to what the server expects. All packets between now and when the client
+            // switches to PLAY as well will be discarded after being dealt with.
+            wrapper.user().getProtocolInfo().setState(State.PLAY);
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
             wrapper.cancel();
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
-            configurationState.setBridgePhase(ConfigurationState.BridgePhase.CONFIGURATION);
-            // TODO: ... WE NEED TO SET THE ACTUAL STATE TO CONFIGURATON FOR PROTOCOLS DOWN THE LINE AAAAAAAAAAAAAAA
-            wrapper.user().getProtocolInfo().setState(State.PLAY);
+            configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
             configurationState.sendQueuedPackets(wrapper.user());
         });
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId());
 
-        // TODO Needs baseprotocol logic or something to set to PLAY from the next version onwards
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION.getId(), -1, wrapper -> {
             wrapper.cancel();
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
-            configurationState.setBridgePhase(ConfigurationState.BridgePhase.NONE);
+            configurationState.setBridgePhase(BridgePhase.NONE);
             configurationState.sendQueuedPackets(wrapper.user());
             configurationState.clear();
         });
@@ -120,30 +122,28 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     @Override
     public void transform(final Direction direction, final State state, final PacketWrapper packetWrapper) throws Exception {
         final ConfigurationState configurationBridge = packetWrapper.user().get(ConfigurationState.class);
-        if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.NONE) {
+        final BridgePhase phase = configurationBridge.bridgePhase();
+        if (phase == BridgePhase.NONE) {
             super.transform(direction, state, packetWrapper);
             return;
         }
 
         if (direction == Direction.SERVERBOUND) {
-            // Client and server might be on two different protocol states - always let the client packets go through
-            // Simply change the processed state if necessary
-            super.transform(direction, configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.CONFIGURATION
-                    ? State.CONFIGURATION : state, packetWrapper);
+            // Client and server will be on different protocol states, pick the right client protocol state
+            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN : State.CONFIGURATION, packetWrapper);
             return;
         }
 
-        // Queue packets sent by the serverwhile we wait for the client to transition to the configuration state
-        if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.PROFILE_SENT) {
+        if (phase == BridgePhase.PROFILE_SENT) {
+            // Queue packets sent by the server while we wait for the client to transition to the configuration state
             configurationBridge.addPacketToQueue(packetWrapper, true);
             throw CancelException.generate();
         }
 
-        // Map some of them to their configuration state counterparts, but make sure to late join game through
         if (packetWrapper.getPacketType() == null || packetWrapper.getPacketType().state() != State.CONFIGURATION) {
+            // Map some of them to their configuration state counterparts, but make sure to let join game through
             final int unmappedId = packetWrapper.getId();
             if (unmappedId == ClientboundPackets1_19_4.JOIN_GAME.getId()) {
-                // Make sure we handle the start of the play phase correctly
                 super.transform(direction, state, packetWrapper);
                 return;
             }
