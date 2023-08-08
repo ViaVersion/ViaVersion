@@ -35,7 +35,7 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
     private final Type<Item[]> itemArrayType;
 
     protected ItemRewriter(T protocol) {
-        this(protocol, Type.FLAT_VAR_INT_ITEM, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        this(protocol, Type.FLAT_VAR_INT_ITEM, Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
