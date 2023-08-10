@@ -44,6 +44,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
 
     public static final String[] POTION_EFFECTS = {
+            "", // No effect
             "speed",
             "slowness",
             "haste",
@@ -85,6 +86,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
     @Override
     public void registerPackets() {
+        protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON_EFFECT, wrapper -> {
+            if (wrapper.passthrough(Type.BOOLEAN)) {
+                // Effects start at 1 before 1.20.2
+                wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_19_4.UNLOAD_CHUNK, wrapper -> {
             final int x = wrapper.read(Type.INT);
             final int z = wrapper.read(Type.INT);
@@ -346,20 +354,19 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             return null;
         }
 
-        // TODO Weird disconnect when setting effect type in inventory, probably unrelated to this, but needs fixing
         final IntTag primaryEffect = tag.remove("Primary");
-        if (primaryEffect != null) {
+        if (primaryEffect != null && primaryEffect.asInt() != 0) {
             tag.put("primary_effect", new StringTag(effect(primaryEffect.asInt())));
         }
 
         final IntTag secondaryEffect = tag.remove("Secondary");
-        if (secondaryEffect != null) {
+        if (secondaryEffect != null && secondaryEffect.asInt() != 0) {
             tag.put("secondary_effect", new StringTag(effect(secondaryEffect.asInt())));
         }
         return tag;
     }
 
     private String effect(final int id) {
-        return id >= 0 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : "minecraft:speed";
+        return id >= 1 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : "minecraft:luck";
     }
 }
