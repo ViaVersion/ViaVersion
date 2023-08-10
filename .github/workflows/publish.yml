@@ -12,6 +12,16 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+      - name: Get and Check Commit Message
+        id: commit_check
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          skip_check=$(echo $commit_message | grep -E '^\[ci skip\]')
+          if [ "$skip_check" != "" ]; then
+            echo "Commit message contains [ci skip], skipping publish"
+          fi
+          echo "::set-output name=skip::$skip_check"
+        continue-on-error: true
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Set up JDK 17
@@ -23,4 +33,7 @@ jobs:
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew publishAllPublicationsToHangar # add 'modrinth' after it is approved
+        run: |
+          if [ "${{ steps.commit_check.outputs.skip }}" == "" ]; then
+            ./gradlew publishAllPublicationsToHangar
+          fi

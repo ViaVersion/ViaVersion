@@ -67,17 +67,19 @@ modrinth {
     }
 }
 
-hangarPublish {
-    publications.register("plugin") {
-        version.set(ver)
-        namespace("ViaVersion", "ViaVersion")
-        channel.set(if (branch == "master") "Snapshot" else "Alpha")
-        changelog.set(changelogContent)
-        apiKey.set(System.getenv("HANGAR_TOKEN"))
-        platforms {
-            register(Platforms.PAPER) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf(property("mcVersionRange") as String))
+if (branch == "master") { // Don't spam releases until Hangar has per channel notifications
+    hangarPublish {
+        publications.register("plugin") {
+            version.set(ver)
+            namespace("ViaVersion", "ViaVersion")
+            channel.set(if (branch == "master") "Snapshot" else "Alpha")
+            changelog.set(changelogContent)
+            apiKey.set(System.getenv("HANGAR_TOKEN"))
+            platforms {
+                register(Platforms.PAPER) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("mcVersionRange") as String))
+                }
             }
         }
     }
