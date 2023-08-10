@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
@@ -38,11 +37,47 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Serverbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
-import javax.swing.border.CompoundBorder;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
+
+    public static final String[] POTION_EFFECTS = {
+            "speed",
+            "slowness",
+            "haste",
+            "mining_fatigue",
+            "strength",
+            "instant_health",
+            "instant_damage",
+            "jump_boost",
+            "nausea",
+            "regeneration",
+            "resistance",
+            "fire_resistance",
+            "water_breathing",
+            "invisibility",
+            "blindness",
+            "night_vision",
+            "hunger",
+            "weakness",
+            "poison",
+            "wither",
+            "health_boost",
+            "absorption",
+            "saturation",
+            "glowing",
+            "levitation",
+            "luck",
+            "unluck",
+            "slow_falling",
+            "conduit_power",
+            "dolphins_grace",
+            "bad_omen",
+            "hero_of_the_village",
+            "darkness"
+    };
 
     public BlockItemPacketRewriter1_20_2(final Protocol1_20_2To1_20 protocol) {
         super(protocol);
@@ -314,13 +349,17 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         // TODO Weird disconnect when setting effect type in inventory, probably unrelated to this, but needs fixing
         final IntTag primaryEffect = tag.remove("Primary");
         if (primaryEffect != null) {
-            tag.put("primary_effect", new StringTag("minecraft:speed")); //TODO
+            tag.put("primary_effect", new StringTag(effect(primaryEffect.asInt())));
         }
 
         final IntTag secondaryEffect = tag.remove("Secondary");
         if (secondaryEffect != null) {
-            tag.put("secondary_effect", new StringTag("minecraft:speed")); //TODO
+            tag.put("secondary_effect", new StringTag(effect(secondaryEffect.asInt())));
         }
         return tag;
+    }
+
+    private String effect(final int id) {
+        return id >= 0 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : "minecraft:speed";
     }
 }
