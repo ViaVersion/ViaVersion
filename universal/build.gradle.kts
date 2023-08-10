@@ -1,7 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     id("com.github.johnrengelman.shadow")
+    id("io.papermc.hangar-publish-plugin") version "0.0.5"
+    id("com.modrinth.minotaur") version "2.+"
 }
 
 val platforms = setOf(
@@ -39,3 +42,45 @@ tasks {
 }
 
 publishShadowJar()
+
+val env: MutableMap<String, String> = System.getenv()
+val branch = rootProject.branchName()
+val ver = (project.version as String) + "+" + env["GITHUB_RUN_NUMBER"]
+val changelogContent = rootProject.lastCommitMessage()
+modrinth {
+    val mcVersions: List<String> = (property("mcVersions") as String)
+            .split(",")
+            .map { it.trim() }
+    token.set(env["MODRINTH_TOKEN"])
+    projectId.set("viaversion")
+    versionType.set(if (branch == "master") "beta" else "alpha")
+    versionNumber.set(ver)
+    versionName.set("[$branch] $ver")
+    changelog.set(changelogContent)
+    uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
+    gameVersions.set(mcVersions)
+    loaders.add("fabric")
+    autoAddDependsOn.set(false)
+    detectLoaders.set(false)
+    dependencies {
+        optional.project("viafabric")
+        optional.project("viafabricplus")
+    }
+}
+
+hangarPublish {
+    publications.register("plugin") {
+        apiEndpoint.set("https://hangar.papermc.dev/api/v1")
+        version.set(ver)
+        namespace("ViaVersion", "ViaVersion")
+        channel.set(if (branch == "master") "Snapshot" else "Alpha")
+        changelog.set(changelogContent)
+        apiKey.set(env["HANGAR_TOKEN"])
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                platformVersions.set(listOf(property("mcVersionRange") as String))
+            }
+        }
+    }
+}

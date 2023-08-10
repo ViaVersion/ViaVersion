@@ -38,6 +38,24 @@ fun Project.latestCommitHash(): String {
     return byteOut.toString(Charsets.UTF_8.name()).trim()
 }
 
+fun Project.lastCommitMessage(): String {
+    val byteOut = ByteArrayOutputStream()
+    exec {
+        commandLine = listOf("git", "log", "-1", "--pretty=%B")
+        standardOutput = byteOut
+    }
+    return byteOut.toString(Charsets.UTF_8.name()).trim()
+}
+
+fun Project.branchName(): String {
+    val byteOut = ByteArrayOutputStream()
+    exec {
+        commandLine = listOf("git", "branch")
+        standardOutput = byteOut
+    }
+    return byteOut.toString(Charsets.UTF_8.name()).trim()
+}
+
 fun JavaPluginExtension.javaTarget(version: Int) {
     toolchain.languageVersion.set(JavaLanguageVersion.of(version))
 }
