@@ -46,13 +46,14 @@ publishShadowJar()
 val branch = rootProject.branchName()
 val ver = (project.version as String) + "+" + System.getenv("GITHUB_RUN_NUMBER")
 val changelogContent = rootProject.lastCommitMessage()
+val isMainBranch = branch == "master"
 modrinth {
     val mcVersions: List<String> = (property("mcVersions") as String)
             .split(",")
             .map { it.trim() }
     token.set(System.getenv("MODRINTH_TOKEN"))
     projectId.set("viaversion")
-    versionType.set(if (branch == "master") "beta" else "alpha")
+    versionType.set(if (isMainBranch) "beta" else "alpha")
     versionNumber.set(ver)
     versionName.set("[$branch] $ver")
     changelog.set(changelogContent)
@@ -67,18 +68,26 @@ modrinth {
     }
 }
 
-if (branch == "master") { // Don't spam releases until Hangar has per channel notifications
+if (isMainBranch) { // Don't spam releases until Hangar has per channel notifications
     hangarPublish {
         publications.register("plugin") {
             version.set(ver)
             namespace("ViaVersion", "ViaVersion")
-            channel.set(if (branch == "master") "Snapshot" else "Alpha")
+            channel.set(if (isMainBranch) "Snapshot" else "Alpha")
             changelog.set(changelogContent)
             apiKey.set(System.getenv("HANGAR_TOKEN"))
             platforms {
                 register(Platforms.PAPER) {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                     platformVersions.set(listOf(property("mcVersionRange") as String))
+                }
+                register(Platforms.VELOCITY) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("velocityVersion") as String))
+                }
+                register(Platforms.WATERFALL) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("waterfallVersion") as String))
                 }
             }
         }
