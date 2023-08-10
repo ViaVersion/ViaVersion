@@ -43,15 +43,14 @@ tasks {
 
 publishShadowJar()
 
-val env: MutableMap<String, String> = System.getenv()
 val branch = rootProject.branchName()
-val ver = (project.version as String) + "+" + env["GITHUB_RUN_NUMBER"]
+val ver = (project.version as String) + "+" + System.getenv("GITHUB_RUN_NUMBER")
 val changelogContent = rootProject.lastCommitMessage()
 modrinth {
     val mcVersions: List<String> = (property("mcVersions") as String)
             .split(",")
             .map { it.trim() }
-    token.set(env["MODRINTH_TOKEN"])
+    token.set(System.getenv("MODRINTH_TOKEN"))
     projectId.set("viaversion")
     versionType.set(if (branch == "master") "beta" else "alpha")
     versionNumber.set(ver)
@@ -70,12 +69,11 @@ modrinth {
 
 hangarPublish {
     publications.register("plugin") {
-        apiEndpoint.set("https://hangar.papermc.dev/api/v1")
         version.set(ver)
         namespace("ViaVersion", "ViaVersion")
         channel.set(if (branch == "master") "Snapshot" else "Alpha")
         changelog.set(changelogContent)
-        apiKey.set(env["HANGAR_TOKEN"])
+        apiKey.set(System.getenv("HANGAR_TOKEN"))
         platforms {
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
