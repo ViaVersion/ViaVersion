@@ -45,8 +45,6 @@ import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -54,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
         extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
@@ -312,6 +311,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 map(Type.VAR_INT); // Data
                 handler(trackerHandler());
                 handler(wrapper -> {
+                    if (protocol.getMappingData() == null) {
+                        return;
+                    }
+
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     EntityType entityType = tracker(wrapper.user()).entityType(entityId);
                     if (entityType == fallingBlockType) {
