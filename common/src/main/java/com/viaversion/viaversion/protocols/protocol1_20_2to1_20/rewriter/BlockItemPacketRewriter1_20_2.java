@@ -17,8 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
@@ -34,6 +39,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_
 import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.MathUtil;
+import javax.swing.border.CompoundBorder;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20_2To1_20> {
 
@@ -57,7 +64,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.VAR_INT); // Type
-            wrapper.write(Type.NAMELESS_NBT, wrapper.read(Type.NBT));
+            wrapper.write(Type.NAMELESS_NBT, handleBlockEntity(wrapper.read(Type.NBT)));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, wrapper -> {
@@ -71,6 +78,10 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                     MathUtil.ceilLog2(Protocol1_20To1_19_4.MAPPINGS.getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             wrapper.write(newChunkType, chunk);
+
+            for (final BlockEntity blockEntity : chunk.blockEntities()) {
+                handleBlockEntity(blockEntity.tag());
+            }
         });
 
         // Replace the NBT type everywhere
@@ -293,5 +304,23 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 }
             }
         }.register(ClientboundPackets1_19_4.DECLARE_RECIPES);
+    }
+
+    private @Nullable CompoundTag handleBlockEntity(@Nullable final CompoundTag tag) {
+        if (tag == null) {
+            return null;
+        }
+
+        // TODO Weird disconnect when setting effect type in inventory, probably unrelated to this, but needs fixing
+        final IntTag primaryEffect = tag.remove("Primary");
+        if (primaryEffect != null) {
+            tag.put("primary_effect", new StringTag("minecraft:speed")); //TODO
+        }
+
+        final IntTag secondaryEffect = tag.remove("Secondary");
+        if (secondaryEffect != null) {
+            tag.put("secondary_effect", new StringTag("minecraft:speed")); //TODO
+        }
+        return tag;
     }
 }

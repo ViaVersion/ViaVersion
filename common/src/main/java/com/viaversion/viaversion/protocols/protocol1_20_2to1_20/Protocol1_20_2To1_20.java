@@ -109,6 +109,15 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
         cancelServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED);
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
+
+        registerServerbound(ServerboundPackets1_20_2.PING_REQUEST, null, wrapper -> {
+            wrapper.cancel();
+            final long time = wrapper.read(Type.LONG);
+
+            final PacketWrapper responsePacket = wrapper.create(ClientboundPackets1_20_2.PONG_RESPONSE);
+            responsePacket.write(Type.LONG, time);
+            responsePacket.sendFuture(Protocol1_20_2To1_20.class);
+        });
     }
 
     private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
