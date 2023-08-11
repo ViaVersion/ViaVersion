@@ -80,27 +80,25 @@ modrinth {
     }
 }
 
-if (isMainBranch) { // Don't spam releases until Hangar has per channel notifications
-    hangarPublish {
-        publications.register("plugin") {
-            version.set(suffixedVersion)
-            namespace("ViaVersion", "ViaVersion")
-            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
-            changelog.set(changelogContent)
-            apiKey.set(System.getenv("HANGAR_TOKEN"))
-            platforms {
-                register(Platforms.PAPER) {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("mcVersionRange") as String))
-                }
-                register(Platforms.VELOCITY) {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("velocityVersion") as String))
-                }
-                register(Platforms.WATERFALL) {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("waterfallVersion") as String))
-                }
+hangarPublish {
+    publications.register("plugin") {
+        version.set(suffixedVersion)
+        namespace("ViaVersion", "ViaVersion")
+        channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
+        changelog.set(changelogContent)
+        apiKey.set(System.getenv("HANGAR_TOKEN"))
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                platformVersions.set(listOf(property("mcVersionRange") as String))
+            }
+            register(Platforms.VELOCITY) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                platformVersions.set(listOf(property("velocityVersion") as String))
+            }
+            register(Platforms.WATERFALL) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                platformVersions.set(listOf(property("waterfallVersion") as String))
             }
         }
     }
