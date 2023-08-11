@@ -145,6 +145,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         filter().handler((event, meta) -> meta.setMetaType(Types1_20_2.META_TYPES.byId(meta.metaType().typeId())));
+        registerMetaTypeHandler(null, Types1_20_2.META_TYPES.blockStateType, Types1_20_2.META_TYPES.optionalBlockStateType, Types1_20_2.META_TYPES.particleType);
         filter().filterFamily(Entity1_19_4Types.DISPLAY).addIndex(10);
     }
 

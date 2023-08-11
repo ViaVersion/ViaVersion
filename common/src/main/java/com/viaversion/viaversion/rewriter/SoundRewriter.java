@@ -37,7 +37,6 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         this.idRewriter = idRewriter;
     }
 
-    // The same for entity sound
     public void registerSound(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
@@ -46,6 +45,10 @@ public class SoundRewriter<C extends ClientboundPacketType> {
                 handler(getSoundHandler());
             }
         });
+    }
+
+    public void registerEntitySound(C packetType) {
+        this.registerSound(packetType);
     }
 
     // Not for entity sounds

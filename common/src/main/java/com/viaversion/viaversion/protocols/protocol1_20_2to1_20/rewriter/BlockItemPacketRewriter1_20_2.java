@@ -24,6 +24,9 @@ import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -36,6 +39,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
+import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
@@ -86,6 +90,12 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
     @Override
     public void registerPackets() {
+        final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        blockRewriter.registerBlockAction(ClientboundPackets1_19_4.BLOCK_ACTION);
+        blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_CHANGE);
+        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_19_4.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerEffect(ClientboundPackets1_19_4.EFFECT, 1010, 2001);
+
         protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON_EFFECT, wrapper -> {
             if (wrapper.passthrough(Type.BOOLEAN)) {
                 // Effects start at 1 before 1.20.2
@@ -113,14 +123,22 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             final Type<Chunk> chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(Protocol1_20To1_19_4.MAPPINGS.getBlockStateMappings().mappedSize()),
+                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.read(chunkType);
 
             final Type<Chunk> newChunkType = new ChunkType1_20_2(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(Protocol1_20To1_19_4.MAPPINGS.getBlockStateMappings().mappedSize()),
+                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             wrapper.write(newChunkType, chunk);
+
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                }
+            }
 
             for (final BlockEntity blockEntity : chunk.blockEntities()) {
                 handleBlockEntity(blockEntity.tag());
@@ -150,7 +168,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
 
@@ -164,7 +182,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                     wrapper.passthrough(Type.COMPONENT); // Description
                     wrapper.write(Type.ITEM1_20_2, wrapper.read(Type.FLAT_VAR_INT_ITEM)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    final int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
                         wrapper.passthrough(Type.STRING); // Background texture
                     }
@@ -174,7 +192,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
                 wrapper.passthrough(Type.STRING_ARRAY); // Criteria
 
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                final int arrayLength = wrapper.passthrough(Type.VAR_INT);
                 for (int array = 0; array < arrayLength; array++) {
                     wrapper.passthrough(Type.STRING_ARRAY); // String array
                 }
@@ -206,7 +224,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
                 handler(wrapper -> {
                     // Affected items
-                    int length = wrapper.passthrough(Type.VAR_INT);
+                    final int length = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < length; i++) {
                         wrapper.passthrough(Type.SHORT); // Slot
                         wrapper.write(Type.FLAT_VAR_INT_ITEM, wrapper.read(Type.ITEM1_20_2));
@@ -219,7 +237,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.TRADE_LIST, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Container id
-            int size = wrapper.passthrough(Type.VAR_INT);
+            final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 wrapper.write(Type.ITEM1_20_2, wrapper.read(Type.FLAT_VAR_INT_ITEM)); // Input
                 wrapper.write(Type.ITEM1_20_2, wrapper.read(Type.FLAT_VAR_INT_ITEM)); // Output
@@ -256,9 +274,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 map(Type.FLOAT); // 8 - Particle Data
                 map(Type.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.VAR_INT, 0);
-                    ParticleMappings mappings = Protocol1_20To1_19_4.MAPPINGS.getParticleMappings();
-                    if (mappings.isItemParticle(id)) {
+                    final int id = wrapper.get(Type.VAR_INT, 0);
+                    // Use 1.19.4->1.20 mappings
+                    final ParticleMappings mappings = Protocol1_20To1_19_4.MAPPINGS.getParticleMappings();
+                    if (mappings.isBlockParticle(id)) {
+                        final int data = wrapper.read(Type.VAR_INT);
+                        wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
+                    } else if (mappings.isItemParticle(id)) {
                         wrapper.write(Type.ITEM1_20_2, wrapper.read(Type.FLAT_VAR_INT_ITEM));
                     }
                 });

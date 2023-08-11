@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -41,11 +43,13 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.BlockIt
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
+    public static final MappingData MAPPINGS = new MappingDataBase("1.20", "1.20.2");
     private final EntityPacketRewriter1_20_2 entityPacketRewriter = new EntityPacketRewriter1_20_2(this);
     private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
 
@@ -57,6 +61,10 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         // Close your eyes and turn around while you still can
         super.registerPackets();
+
+        final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
+        soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
         registerClientbound(ClientboundPackets1_19_4.SCOREBOARD_OBJECTIVE, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
@@ -188,6 +196,11 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // Redirect packets during the fake configuration phase
         // This might mess up people using Via API/other protocols down the line, but such is life. We can't have different states for server and client
         super.transform(direction, State.CONFIGURATION, packetWrapper);
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 
     @Override
