@@ -44,8 +44,14 @@ tasks {
 publishShadowJar()
 
 val branch = rootProject.branchName()
-val ver = (project.version as String) + "+" + System.getenv("GITHUB_RUN_NUMBER")
-val changelogContent = rootProject.lastCommitMessage()
+val baseVersion = project.version as String
+val isRelease = !baseVersion.contains('-')
+val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+val changelogContent = if (isRelease) {
+    "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
+} else {
+    rootProject.lastCommitMessage()
+}
 val isMainBranch = branch == "master"
 modrinth {
     val mcVersions: List<String> = (property("mcVersions") as String)
@@ -53,13 +59,18 @@ modrinth {
             .map { it.trim() }
     token.set(System.getenv("MODRINTH_TOKEN"))
     projectId.set("viaversion")
-    versionType.set(if (isMainBranch) "beta" else "alpha")
-    versionNumber.set(ver)
-    versionName.set("[$branch] $ver")
+    versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
+    versionNumber.set(suffixedVersion)
+    versionName.set(suffixedVersion)
     changelog.set(changelogContent)
     uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
     gameVersions.set(mcVersions)
     loaders.add("fabric")
+    loaders.add("paper")
+    loaders.add("folia")
+    loaders.add("velocity")
+    loaders.add("bungeecord")
+    loaders.add("sponge")
     autoAddDependsOn.set(false)
     detectLoaders.set(false)
     dependencies {
@@ -71,9 +82,9 @@ modrinth {
 if (isMainBranch) { // Don't spam releases until Hangar has per channel notifications
     hangarPublish {
         publications.register("plugin") {
-            version.set(ver)
+            version.set(suffixedVersion)
             namespace("ViaVersion", "ViaVersion")
-            channel.set(if (isMainBranch) "Snapshot" else "Alpha")
+            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
             changelog.set(changelogContent)
             apiKey.set(System.getenv("HANGAR_TOKEN"))
             platforms {

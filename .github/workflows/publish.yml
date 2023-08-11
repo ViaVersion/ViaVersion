@@ -23,4 +23,4 @@ jobs:
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: ./gradlew publishAllPublicationsToHangar # add 'modrinth' after it is approved
+        run: ./gradlew build modrinth publishAllPublicationsToHangar --stacktrace
