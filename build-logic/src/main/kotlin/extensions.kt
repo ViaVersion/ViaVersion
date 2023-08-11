@@ -38,7 +38,7 @@ fun Project.latestCommitHash(): String {
     return byteOut.toString(Charsets.UTF_8.name()).trim()
 }
 
-fun Project.lastCommitMessage(): String {
+fun Project.latestCommitMessage(): String {
     val byteOut = ByteArrayOutputStream()
     exec {
         commandLine = listOf("git", "log", "-1", "--pretty=%B")
