@@ -146,7 +146,13 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().handler((event, meta) -> meta.setMetaType(Types1_20_2.META_TYPES.byId(meta.metaType().typeId())));
         registerMetaTypeHandler(null, Types1_20_2.META_TYPES.blockStateType, Types1_20_2.META_TYPES.optionalBlockStateType, Types1_20_2.META_TYPES.particleType);
+
         filter().filterFamily(Entity1_19_4Types.DISPLAY).addIndex(10);
+
+        filter().filterFamily(Entity1_19_4Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+            final int blockState = meta.value();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
+        });
     }
 
     @Override
