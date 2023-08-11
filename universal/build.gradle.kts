@@ -50,7 +50,8 @@ val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System
 val changelogContent = if (isRelease) {
     "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
 } else {
-    "[${rootProject.latestCommitHash()}](https://github.com/ViaVersion/ViaVersion/commit/${rootProject.latestCommitHash()}) ${rootProject.latestCommitMessage()}"
+    val commitHash = rootProject.latestCommitHash()
+    "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
 }
 val isMainBranch = branch == "master"
 modrinth {
