@@ -33,9 +33,9 @@ import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMa
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
-import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;

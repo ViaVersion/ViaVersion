@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -28,12 +30,13 @@ import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
-import java.util.BitSet;
+import java.util.Arrays;
+import java.util.List;
 
-public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
+public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
 
-    public Chunk1_9_1_2Type(ClientWorld clientWorld) {
-        super(clientWorld, Chunk.class);
+    public Chunk1_9_3_4Type(ClientWorld param) {
+        super(param, Chunk.class);
     }
 
     @Override
@@ -41,23 +44,15 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        boolean groundUp = input.readBoolean();
+        boolean fullChunk = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
-        // Size (unused)
         Type.VAR_INT.readPrimitive(input);
 
-        BitSet usedSections = new BitSet(16);
-        ChunkSection[] sections = new ChunkSection[16];
-        // Calculate section count from bitmask
-        for (int i = 0; i < 16; i++) {
-            if ((primaryBitmask & (1 << i)) != 0) {
-                usedSections.set(i);
-            }
-        }
-
         // Read sections
+        ChunkSection[] sections = new ChunkSection[16];
         for (int i = 0; i < 16; i++) {
-            if (!usedSections.get(i)) continue; // Section not set
+            if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
+
             ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
             sections[i] = section;
             section.getLight().readBlockLight(input);
@@ -66,14 +61,24 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        int[] biomeData = groundUp ? new int[256] : null;
-        if (groundUp) {
+        int[] biomeData = fullChunk ? new int[256] : null;
+        if (fullChunk) {
             for (int i = 0; i < 256; i++) {
                 biomeData[i] = input.readByte() & 0xFF;
             }
         }
 
-        return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<>());
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+
+        // Read all the remaining bytes (workaround for #681)
+        if (input.readableBytes() > 0) {
+            byte[] array = Type.REMAINING_BYTES.read(input);
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
+            }
+        }
+
+        return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, nbtData);
     }
 
     @Override
@@ -94,7 +99,6 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
 
                 if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.
                 section.getLight().writeSkyLight(buf);
-
             }
             buf.readerIndex(0);
             Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
@@ -109,6 +113,9 @@ public class Chunk1_9_1_2Type extends PartialType<Chunk, ClientWorld> {
                 output.writeByte((byte) biome);
             }
         }
+
+        // Write Block Entities
+        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
     }
 
     @Override
