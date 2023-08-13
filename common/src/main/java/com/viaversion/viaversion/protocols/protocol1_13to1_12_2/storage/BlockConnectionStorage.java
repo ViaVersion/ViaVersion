@@ -38,7 +38,7 @@ public class BlockConnectionStorage implements StorableObject {
     private final Queue<Position> modified = EvictingQueue.create(5);
 
     // Cache to retrieve section quicker
-    private Long lastIndex;
+    private long lastIndex = -1;
     private SectionData lastSection;
 
     static {
@@ -114,7 +114,7 @@ public class BlockConnectionStorage implements StorableObject {
     public void clear() {
         blockStorage.clear();
         lastSection = null;
-        lastIndex = null;
+        lastIndex = -1;
         modified.clear();
     }
 
@@ -129,7 +129,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     private @Nullable SectionData getSection(long index) {
-        if (lastIndex != null && lastIndex == index) {
+        if (lastIndex == index) {
             return lastSection;
         }
         lastIndex = index;
@@ -138,8 +138,8 @@ public class BlockConnectionStorage implements StorableObject {
 
     private void removeSection(long index) {
         blockStorage.remove(index);
-        if (lastIndex != null && lastIndex == index) {
-            lastIndex = null;
+        if (lastIndex == index) {
+            lastIndex = -1;
             lastSection = null;
         }
     }
