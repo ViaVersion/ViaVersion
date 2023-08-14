@@ -45,7 +45,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockE
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -58,7 +58,7 @@ public class WorldPackets {
     private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, .99F);
 
     static {
-        // Client will crash if it receives a invalid biome id
+        // Client will crash if it receives an invalid biome id
         for (int i = 0; i < 50; i++) {
             VALID_BIOMES.add(i);
         }
