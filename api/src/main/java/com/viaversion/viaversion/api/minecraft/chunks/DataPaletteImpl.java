@@ -29,21 +29,24 @@ import it.unimi.dsi.fastutil.ints.IntList;
 
 public final class DataPaletteImpl implements DataPalette {
 
+    private static final int DEFAULT_INITIAL_SIZE = 16;
+
     private final IntList palette;
     private final Int2IntMap inversePalette;
-    private final int[] values;
     private final int sizeBits;
+    private ChunkData values;
 
     public DataPaletteImpl(final int valuesLength) {
-        this(valuesLength, 8);
+        this(valuesLength, DEFAULT_INITIAL_SIZE);
     }
 
-    public DataPaletteImpl(final int valuesLength, final int expectedPaletteLength) {
-        this.values = new int[valuesLength];
+    public DataPaletteImpl(final int valuesLength, final int initialSize) {
+        values = new EmptyChunkData(valuesLength);
         sizeBits = Integer.numberOfTrailingZeros(valuesLength) / 3;
         // Pre-size the palette array/map
-        palette = new IntArrayList(expectedPaletteLength);
-        inversePalette = new Int2IntOpenHashMap(expectedPaletteLength);
+        palette = new IntArrayList(initialSize);
+        // To get an initial table size of initialSize, need to scale it down by load factor.
+        inversePalette = new Int2IntOpenHashMap((int) (initialSize * Int2IntOpenHashMap.DEFAULT_LOAD_FACTOR));
         inversePalette.defaultReturnValue(-1);
     }
 
@@ -54,7 +57,7 @@ public final class DataPaletteImpl implements DataPalette {
 
     @Override
     public int idAt(final int sectionCoordinate) {
-        final int index = values[sectionCoordinate];
+        final int index = values.get(sectionCoordinate);
         return palette.getInt(index);
     }
 
@@ -67,17 +70,17 @@ public final class DataPaletteImpl implements DataPalette {
             inversePalette.put(id, index);
         }
 
-        values[sectionCoordinate] = index;
+        values.set(sectionCoordinate, index);
     }
 
     @Override
     public int paletteIndexAt(final int packedCoordinate) {
-        return values[packedCoordinate];
+        return values.get(packedCoordinate);
     }
 
     @Override
     public void setPaletteIndexAt(final int sectionCoordinate, final int index) {
-        values[sectionCoordinate] = index;
+        values.set(sectionCoordinate, index);
     }
 
     @Override
@@ -131,4 +134,77 @@ public final class DataPaletteImpl implements DataPalette {
         palette.clear();
         inversePalette.clear();
     }
+
+    interface ChunkData {
+        int get(int idx);
+        void set(int idx, int val);
+    }
+
+    private class EmptyChunkData implements ChunkData {
+
+        private final int size;
+
+        public EmptyChunkData(int size) {
+            this.size = size;
+        }
+
+        @Override
+        public int get(int idx) {
+            return 0;
+        }
+
+        @Override
+        public void set(int idx, int val) {
+            if (val != 0) {
+                values = new ByteChunkData(size);
+                values.set(idx, val);
+            }
+        }
+    }
+
+    private class ByteChunkData implements ChunkData {
+        private final byte[] data;
+
+        public ByteChunkData(int size) {
+            this.data = new byte[size];
+        }
+
+        @Override
+        public int get(int idx) {
+            return data[idx] & 0xFF;
+        }
+
+        @Override
+        public void set(int idx, int val) {
+            // Overflowed size of byte (over 256 different materials), go up to short
+            if (val > 0xFF) {
+                values = new ShortChunkData(data);
+                values.set(idx, val);
+                return;
+            }
+            data[idx] = (byte) val;
+        }
+    }
+
+    private static class ShortChunkData implements ChunkData {
+        private final short[] data;
+
+        public ShortChunkData(byte[] data) {
+            this.data = new short[data.length];
+            for (int i = 0; i < data.length; i++) {
+                this.data[i] = (short) (data[i] & 0xFF);
+            }
+        }
+
+        @Override
+        public int get(int idx) {
+            return data[idx];
+        }
+
+        @Override
+        public void set(int idx, int val) {
+            data[idx] = (short) val;
+        }
+    }
+
 }
