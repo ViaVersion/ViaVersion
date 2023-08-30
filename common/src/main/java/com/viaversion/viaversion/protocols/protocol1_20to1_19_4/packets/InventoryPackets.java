@@ -85,11 +85,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                     wrapper.passthrough(Type.FLOAT); // Y
                 }
 
-                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+                wrapper.passthrough(Type.STRING_ARRAY); // Critereon triggers
 
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                for (int array = 0; array < arrayLength; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                int requirements = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY);
                 }
 
                 wrapper.write(Type.BOOLEAN, false); // Sends telemetry
