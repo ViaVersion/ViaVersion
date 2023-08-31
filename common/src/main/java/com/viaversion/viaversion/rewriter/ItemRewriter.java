@@ -311,7 +311,7 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
         });
     }
 
-    public void registerAdvancements1_20(C packetType) {
+    public void registerAdvancements1_20_2(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
@@ -336,11 +336,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                     wrapper.passthrough(Type.FLOAT); // Y
                 }
 
-                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
-
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                for (int array = 0; array < arrayLength; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                int requirements = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY);
                 }
 
                 wrapper.passthrough(Type.BOOLEAN); // Send telemetry
