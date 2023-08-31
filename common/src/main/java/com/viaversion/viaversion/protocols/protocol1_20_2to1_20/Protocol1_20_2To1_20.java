@@ -66,7 +66,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_19_4.SCOREBOARD_OBJECTIVE, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_4.DISPLAY_SCOREBOARD, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
             wrapper.write(Type.VAR_INT, (int) slot);
         });
