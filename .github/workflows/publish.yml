@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
       - name: Set up JDK 17
@@ -19,6 +19,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          check-latest: true
       - name: Publish
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
