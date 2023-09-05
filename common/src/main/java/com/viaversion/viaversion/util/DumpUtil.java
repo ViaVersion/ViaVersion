@@ -62,7 +62,7 @@ public final class DumpUtil {
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),
-                "$IMPL_VERSION",
+                com.viaversion.viaversion.util.VersionInfo.getImplementationVersion(),
                 Via.getManager().getSubPlatforms()
         );
         final Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
