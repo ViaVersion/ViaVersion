@@ -69,6 +69,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     wrapper.passthrough(Type.BOOLEAN); // Reduced debug info
                     wrapper.passthrough(Type.BOOLEAN); // Show death screen
 
+                    wrapper.write(Type.BOOLEAN, false); // Limited crafting
                     wrapper.write(Type.STRING, dimensionType);
                     wrapper.write(Type.STRING, world);
                     wrapper.write(Type.LONG, seed);
