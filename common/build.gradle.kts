@@ -1,7 +1,3 @@
-plugins {
-    id("net.kyori.blossom")
-}
-
 dependencies {
     api(projects.viaversionApi)
     api(projects.viaversionApiLegacy)
