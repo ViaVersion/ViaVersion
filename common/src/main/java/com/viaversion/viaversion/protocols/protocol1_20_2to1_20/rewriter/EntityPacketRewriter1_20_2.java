@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
@@ -42,6 +43,26 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_20.METADATA_LIST, Types1_20_2.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_19_4.SPAWN_PLAYER, ClientboundPackets1_20_2.SPAWN_ENTITY, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Entity id
+            wrapper.passthrough(Type.UUID); // UUID
+
+            wrapper.write(Type.VAR_INT, Entity1_19_4Types.PLAYER.getId()); // Entity type id
+
+            wrapper.passthrough(Type.DOUBLE); // X
+            wrapper.passthrough(Type.DOUBLE); // Y
+            wrapper.passthrough(Type.DOUBLE); // Z
+
+            final byte yaw = wrapper.read(Type.BYTE); // Yaw
+            wrapper.passthrough(Type.BYTE); // Pitch
+            wrapper.write(Type.BYTE, yaw);
+            wrapper.write(Type.BYTE, yaw); // Head yaw
+            wrapper.write(Type.VAR_INT, 0); // Data
+            wrapper.write(Type.SHORT, (short) 0); // Velocity X
+            wrapper.write(Type.SHORT, (short) 0); // Velocity Y
+            wrapper.write(Type.SHORT, (short) 0); // Velocity Z
+        });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.JOIN_GAME, new PacketHandlers() {
             @Override
