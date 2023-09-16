@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -167,7 +168,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             }
 
             if (configurationBridge.queuedOrSentJoinGame()) {
-                // Don't try to send configuration packets after the join game packet has been queued or sent
+                if (!packetWrapper.user().isClientSide() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
+                    // Cancelling this on the Vanilla server will cause it to exceptionally resend a message
+                    // Assume that we have already sent the login packet and just let it through
+                    // TODO Maybe just don't wait for the finish config response?
+                    super.transform(direction, State.PLAY, packetWrapper);
+                    return;
+                }
+
                 configurationBridge.addPacketToQueue(packetWrapper, true);
                 throw CancelException.generate();
             }
