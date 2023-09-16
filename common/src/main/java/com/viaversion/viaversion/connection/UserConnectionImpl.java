@@ -94,12 +94,19 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public <T extends StorableObject> @Nullable T remove(Class<T> objectClass) {
-        return (T) storedObjects.remove(objectClass);
+        final StorableObject object = storedObjects.remove(objectClass);
+        if (object != null) {
+            object.onRemove();
+        }
+        return (T) object;
     }
 
     @Override
     public void put(StorableObject object) {
-        storedObjects.put(object.getClass(), object);
+        final StorableObject previousObject = storedObjects.put(object.getClass(), object);
+        if (previousObject != null) {
+            previousObject.onRemove();
+        }
     }
 
     @Override
@@ -122,12 +129,21 @@ public class UserConnectionImpl implements UserConnection {
     @Override
     public void clearStoredObjects(boolean isServerSwitch) {
         if (isServerSwitch) {
-            storedObjects.values().removeIf(StorableObject::clearOnServerSwitch);
+            storedObjects.values().removeIf(storableObject -> {
+                if (storableObject.clearOnServerSwitch()) {
+                    storableObject.onRemove();
+                    return true;
+                }
+                return false;
+            });
             for (EntityTracker tracker : entityTrackers.values()) {
                 tracker.clearEntities();
                 tracker.trackClientEntity();
             }
         } else {
+            for (StorableObject object : storedObjects.values()) {
+                object.onRemove();
+            }
             storedObjects.clear();
             entityTrackers.clear();
         }

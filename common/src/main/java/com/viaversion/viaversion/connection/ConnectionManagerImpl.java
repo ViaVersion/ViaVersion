@@ -72,6 +72,8 @@ public class ConnectionManagerImpl implements ConnectionManager {
             UUID id = connection.getProtocolInfo().getUuid();
             clients.remove(id);
         }
+
+        connection.clearStoredObjects();
     }
 
     @Override

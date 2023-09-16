@@ -47,7 +47,7 @@ public class ConfigurationState implements StorableObject {
         packetQueue.add(toQueuedPacket(wrapper, clientbound, false));
     }
 
-    private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skip1_20_2Pipeline) throws Exception {
+    private QueuedPacket toQueuedPacket(final PacketWrapper wrapper, final boolean clientbound, final boolean skipCurrentPipeline) throws Exception {
         // Caching packet buffers is cursed, copy to heap buffers to make sure we don't start leaking in dumb cases
         final ByteBuf copy = Unpooled.buffer();
         final PacketType packetType = wrapper.getPacketType();
@@ -56,7 +56,7 @@ public class ConfigurationState implements StorableObject {
         //noinspection deprecation
         wrapper.setId(-1);
         wrapper.writeToBuffer(copy);
-        return new QueuedPacket(copy, clientbound, packetType, packetId, skip1_20_2Pipeline);
+        return new QueuedPacket(copy, clientbound, packetType, packetId, skipCurrentPipeline);
     }
 
     public void setJoinGamePacket(final PacketWrapper wrapper) throws Exception {
@@ -67,6 +67,16 @@ public class ConfigurationState implements StorableObject {
     @Override
     public boolean clearOnServerSwitch() {
         return false; // This might be bad
+    }
+
+    @Override
+    public void onRemove() {
+        for (final QueuedPacket packet : packetQueue) {
+            packet.buf().release();
+        }
+        if (joinGamePacket != null) {
+            joinGamePacket.buf().release();
+        }
     }
 
     public void sendQueuedPackets(final UserConnection connection) throws Exception {
@@ -89,9 +99,9 @@ public class ConfigurationState implements StorableObject {
                 }
 
                 if (packet.clientbound()) {
-                    queuedWrapper.send(Protocol1_20_2To1_20.class, packet.skip1_20_2Pipeline());
+                    queuedWrapper.send(Protocol1_20_2To1_20.class, packet.skipCurrentPipeline());
                 } else {
-                    queuedWrapper.sendToServer(Protocol1_20_2To1_20.class, packet.skip1_20_2Pipeline());
+                    queuedWrapper.sendToServer(Protocol1_20_2To1_20.class, packet.skipCurrentPipeline());
                 }
             } finally {
                 packet.buf().release();
@@ -118,15 +128,15 @@ public class ConfigurationState implements StorableObject {
         private final boolean clientbound;
         private final PacketType packetType;
         private final int packetId;
-        private final boolean skip1_20_2Pipeline;
+        private final boolean skipCurrentPipeline;
 
         private QueuedPacket(final ByteBuf buf, final boolean clientbound, final PacketType packetType,
-                             final int packetId, final boolean skip1_20_2Pipeline) {
+                             final int packetId, final boolean skipCurrentPipeline) {
             this.buf = buf;
             this.clientbound = clientbound;
             this.packetType = packetType;
             this.packetId = packetId;
-            this.skip1_20_2Pipeline = skip1_20_2Pipeline;
+            this.skipCurrentPipeline = skipCurrentPipeline;
         }
 
         public ByteBuf buf() {
@@ -145,8 +155,8 @@ public class ConfigurationState implements StorableObject {
             return packetType;
         }
 
-        public boolean skip1_20_2Pipeline() {
-            return skip1_20_2Pipeline;
+        public boolean skipCurrentPipeline() {
+            return skipCurrentPipeline;
         }
 
         @Override
@@ -156,7 +166,7 @@ public class ConfigurationState implements StorableObject {
                     ", clientbound=" + clientbound +
                     ", packetType=" + packetType +
                     ", packetId=" + packetId +
-                    ", skip1_20_2Pipeline=" + skip1_20_2Pipeline +
+                    ", skipCurrentPipeline=" + skipCurrentPipeline +
                     '}';
         }
     }
