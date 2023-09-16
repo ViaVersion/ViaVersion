@@ -151,9 +151,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
-                    if (id == playRecordId) { // Play record
+                    if (id == playRecordId && protocol.getMappingData().getItemMappings() != null) {
                         wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
-                    } else if (id == blockBreakId) { // Block break + block break sound
+                    } else if (id == blockBreakId && protocol.getMappingData().getBlockStateMappings() != null) {
                         wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
