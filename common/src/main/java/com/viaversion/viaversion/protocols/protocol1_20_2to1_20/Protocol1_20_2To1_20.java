@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -117,7 +118,19 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.RESOURCE_PACK_STATUS));
 
         cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
-        cancelServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED);
+        registerServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED, null, wrapper -> {
+            wrapper.cancel();
+
+            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            if (configurationState.getReenterInfo() == null) {
+                return;
+            }
+
+            // Reenter the configuration state
+            configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
+            sendConfigurationPackets(wrapper.user(), configurationState.getReenterInfo().dimensionRegistry());
+            configurationState.setReenterInfo(null);
+        });
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
 
         registerServerbound(ServerboundPackets1_20_2.PING_REQUEST, null, wrapper -> {
@@ -141,19 +154,25 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     @Override
     public void transform(final Direction direction, final State state, final PacketWrapper packetWrapper) throws Exception {
         final ConfigurationState configurationBridge = packetWrapper.user().get(ConfigurationState.class);
+        if (configurationBridge == null) {
+            // Bad state during an unexpected disconnect
+            return;
+        }
+
         final BridgePhase phase = configurationBridge.bridgePhase();
         if (phase == BridgePhase.NONE) {
             super.transform(direction, state, packetWrapper);
             return;
         }
 
+        final boolean reentering = configurationBridge.getReenterInfo() != null;
         if (direction == Direction.SERVERBOUND) {
             // Client and server will be on different protocol states, pick the right client protocol state
-            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN : State.CONFIGURATION, packetWrapper);
+            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN : reentering ? State.PLAY : State.CONFIGURATION, packetWrapper);
             return;
         }
 
-        if (phase == BridgePhase.PROFILE_SENT) {
+        if (phase == BridgePhase.PROFILE_SENT || reentering) {
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
             configurationBridge.addPacketToQueue(packetWrapper, true);
             throw CancelException.generate();
@@ -205,6 +224,22 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // Redirect packets during the fake configuration phase
         // This might mess up people using Via API/other protocols down the line, but such is life. We can't have different states for server and client
         super.transform(direction, State.CONFIGURATION, packetWrapper);
+    }
+
+    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry) throws Exception {
+        final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
+        registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
+        registryDataPacket.send(Protocol1_20_2To1_20.class);
+
+        // Enabling features is only possible during the configuration phase
+        // TODO Sad emoji
+        final PacketWrapper enableFeaturesPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES, connection);
+        enableFeaturesPacket.write(Type.VAR_INT, 1);
+        enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
+        enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
+
+        final PacketWrapper finishConfigurationPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION, connection);
+        finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
     }
 
     @Override

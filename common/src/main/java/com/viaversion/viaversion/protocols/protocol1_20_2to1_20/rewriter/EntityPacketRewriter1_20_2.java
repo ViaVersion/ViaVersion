@@ -100,22 +100,23 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     // Debug, flat, last death pos, and portal cooldown at the end unchanged
 
                     // Send configuration packets first before going into the play protocol state
-                    final PacketWrapper registryDataPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA);
-                    registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
-                    registryDataPacket.send(Protocol1_20_2To1_20.class);
+                    ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
+                    if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.NONE) {
+                        // Reenter the configuration state
+                        final PacketWrapper configurationPacket = wrapper.create(ClientboundPackets1_20_2.START_CONFIGURATION);
+                        configurationPacket.send(Protocol1_20_2To1_20.class);
 
-                    // Enabling features is only possible during the configuraton phase
-                    // TODO Sad emoji
-                    final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
-                    enableFeaturesPacket.write(Type.VAR_INT, 1);
-                    enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
+                        // TODO The client clears the resource pack when reentering (?)
+                        configurationBridge.setBridgePhase(ConfigurationState.BridgePhase.REENTERING_CONFIGURATION);
+                        configurationBridge.setJoinGamePacket(wrapper);
+                        configurationBridge.setReenterInfo(new ConfigurationState.ReenterInfo(dimensionRegistry));
+                        wrapper.cancel();
+                        return;
+                    }
 
-                    final PacketWrapper finishConfigurationPacket = wrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION);
-                    finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
+                    Protocol1_20_2To1_20.sendConfigurationPackets(wrapper.user(), dimensionRegistry);
 
                     // Manually send it at the end and hope nothing breaks
-                    final ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
                     configurationBridge.setJoinGamePacket(wrapper);
                     wrapper.cancel();
                 });

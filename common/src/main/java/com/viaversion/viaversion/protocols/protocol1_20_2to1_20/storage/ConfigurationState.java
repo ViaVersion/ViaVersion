@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -34,6 +35,7 @@ public class ConfigurationState implements StorableObject {
     private BridgePhase bridgePhase = BridgePhase.NONE;
     private QueuedPacket joinGamePacket;
     private boolean queuedJoinGame;
+    private ReenterInfo reenterInfo;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -41,6 +43,14 @@ public class ConfigurationState implements StorableObject {
 
     public void setBridgePhase(final BridgePhase bridgePhase) {
         this.bridgePhase = bridgePhase;
+    }
+
+    public @Nullable ReenterInfo getReenterInfo() {
+        return reenterInfo;
+    }
+
+    public void setReenterInfo(@Nullable final ReenterInfo reenterInfo) {
+        this.reenterInfo = reenterInfo;
     }
 
     public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
@@ -113,6 +123,7 @@ public class ConfigurationState implements StorableObject {
         packetQueue.clear();
         bridgePhase = BridgePhase.NONE;
         queuedJoinGame = false;
+        reenterInfo = null;
     }
 
     public boolean queuedOrSentJoinGame() {
@@ -120,7 +131,7 @@ public class ConfigurationState implements StorableObject {
     }
 
     public enum BridgePhase {
-        NONE, PROFILE_SENT, CONFIGURATION
+        NONE, PROFILE_SENT, CONFIGURATION, REENTERING_CONFIGURATION
     }
 
     public static final class QueuedPacket {
@@ -168,6 +179,18 @@ public class ConfigurationState implements StorableObject {
                     ", packetId=" + packetId +
                     ", skipCurrentPipeline=" + skipCurrentPipeline +
                     '}';
+        }
+    }
+
+    public static final class ReenterInfo {
+        private final CompoundTag dimensionRegistry;
+
+        public ReenterInfo(final CompoundTag dimensionRegistry) {
+            this.dimensionRegistry = dimensionRegistry;
+        }
+
+        public CompoundTag dimensionRegistry() {
+            return dimensionRegistry;
         }
     }
 }
