@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -45,6 +46,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.BlockIt
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityPacketRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -67,6 +69,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
+
+        registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
+            final String url = wrapper.passthrough(Type.STRING);
+            final String hash = wrapper.passthrough(Type.STRING);
+            final boolean required = wrapper.passthrough(Type.BOOLEAN);
+            final JsonElement prompt = wrapper.passthrough(Type.OPTIONAL_COMPONENT);
+            wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
+        });
 
         registerClientbound(ClientboundPackets1_19_4.DISPLAY_SCOREBOARD, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
@@ -115,7 +125,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.RESOURCE_PACK_STATUS));
+        // Cancel this, as it will always just be the response to a re-sent pack from us
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, PacketWrapper::cancel);
 
         cancelClientbound(ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES); // TODO Sad emoji
         registerServerbound(ServerboundPackets1_20_2.CONFIGURATION_ACKNOWLEDGED, null, wrapper -> {
@@ -128,7 +139,9 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
             // Reenter the configuration state
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
-            sendConfigurationPackets(wrapper.user(), configurationState.getReenterInfo().dimensionRegistry());
+
+            final LastResourcePack lastResourcePack = wrapper.user().get(LastResourcePack.class);
+            sendConfigurationPackets(wrapper.user(), configurationState.getReenterInfo().dimensionRegistry(), lastResourcePack);
             configurationState.setReenterInfo(null);
         });
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
@@ -165,14 +178,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             return;
         }
 
-        final boolean reentering = configurationBridge.getReenterInfo() != null;
         if (direction == Direction.SERVERBOUND) {
             // Client and server will be on different protocol states, pick the right client protocol state
-            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN : reentering ? State.PLAY : State.CONFIGURATION, packetWrapper);
+            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN
+                    : phase == BridgePhase.REENTERING_CONFIGURATION ? State.PLAY : State.CONFIGURATION, packetWrapper);
             return;
         }
 
-        if (phase == BridgePhase.PROFILE_SENT || reentering) {
+        if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
             configurationBridge.addPacketToQueue(packetWrapper, true);
             throw CancelException.generate();
@@ -207,14 +220,13 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.KEEP_ALIVE);
             } else if (unmappedId == ClientboundPackets1_19_4.PING.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.PING);
-            } else if (unmappedId == ClientboundPackets1_19_4.RESOURCE_PACK.getId()) {
-                packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK);
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
             } else if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
             } else {
                 // Not a packet that can be mapped to the configuration protocol
+                // Includes resource pack packets to make sure it is not applied sooner than the server expects
                 configurationBridge.addPacketToQueue(packetWrapper, true);
                 throw CancelException.generate();
             }
@@ -226,7 +238,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         super.transform(direction, State.CONFIGURATION, packetWrapper);
     }
 
-    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry) throws Exception {
+    public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) throws Exception {
         final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
         registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
         registryDataPacket.send(Protocol1_20_2To1_20.class);
@@ -237,6 +249,16 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         enableFeaturesPacket.write(Type.VAR_INT, 1);
         enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
         enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
+
+        if (lastResourcePack != null) {
+            // The client for some reason drops the resource pack when reentering the configuration state
+            final PacketWrapper resourcePackPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, connection);
+            resourcePackPacket.write(Type.STRING, lastResourcePack.url());
+            resourcePackPacket.write(Type.STRING, lastResourcePack.hash());
+            resourcePackPacket.write(Type.BOOLEAN, lastResourcePack.required());
+            resourcePackPacket.write(Type.OPTIONAL_COMPONENT, lastResourcePack.prompt());
+            resourcePackPacket.send(Protocol1_20_2To1_20.class);
+        }
 
         final PacketWrapper finishConfigurationPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION, connection);
         finishConfigurationPacket.send(Protocol1_20_2To1_20.class);

@@ -114,7 +114,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                         return;
                     }
 
-                    Protocol1_20_2To1_20.sendConfigurationPackets(wrapper.user(), dimensionRegistry);
+                    Protocol1_20_2To1_20.sendConfigurationPackets(wrapper.user(), dimensionRegistry, null);
 
                     // Manually send it at the end and hope nothing breaks
                     configurationBridge.setJoinGamePacket(wrapper);
