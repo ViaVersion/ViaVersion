@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -99,17 +98,19 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
 
                     // Debug, flat, last death pos, and portal cooldown at the end unchanged
 
-                    // Send configuration packets first before going into the play protocol state
-                    ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
+                    final ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
+                    if (!configurationBridge.setLastDimensionRegistry(dimensionRegistry)) {
+                        // No change, so no need to re-enter the configuration state - just let this one through
+                        return;
+                    }
+
                     if (configurationBridge.bridgePhase() == ConfigurationState.BridgePhase.NONE) {
                         // Reenter the configuration state
                         final PacketWrapper configurationPacket = wrapper.create(ClientboundPackets1_20_2.START_CONFIGURATION);
                         configurationPacket.send(Protocol1_20_2To1_20.class);
 
-                        // TODO The client clears the resource pack when reentering (?)
                         configurationBridge.setBridgePhase(ConfigurationState.BridgePhase.REENTERING_CONFIGURATION);
                         configurationBridge.setJoinGamePacket(wrapper);
-                        configurationBridge.setReenterInfo(new ConfigurationState.ReenterInfo(dimensionRegistry));
                         wrapper.cancel();
                         return;
                     }

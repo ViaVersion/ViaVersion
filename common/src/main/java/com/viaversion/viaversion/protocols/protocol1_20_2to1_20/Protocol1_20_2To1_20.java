@@ -133,7 +133,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             wrapper.cancel();
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
-            if (configurationState.getReenterInfo() == null) {
+            if (configurationState.bridgePhase() != BridgePhase.REENTERING_CONFIGURATION) {
                 return;
             }
 
@@ -141,8 +141,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
 
             final LastResourcePack lastResourcePack = wrapper.user().get(LastResourcePack.class);
-            sendConfigurationPackets(wrapper.user(), configurationState.getReenterInfo().dimensionRegistry(), lastResourcePack);
-            configurationState.setReenterInfo(null);
+            sendConfigurationPackets(wrapper.user(), configurationState.lastDimensionRegistry(), lastResourcePack);
         });
         cancelServerbound(ServerboundPackets1_20_2.CHUNK_BATCH_RECEIVED);
 
@@ -203,7 +202,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
                 if (!packetWrapper.user().isClientSide() && !Via.getPlatform().isProxy() && unmappedId == ClientboundPackets1_19_4.SYSTEM_CHAT.getId()) {
                     // Cancelling this on the Vanilla server will cause it to exceptionally resend a message
                     // Assume that we have already sent the login packet and just let it through
-                    // TODO Maybe just don't wait for the finish config response?
                     super.transform(direction, State.PLAY, packetWrapper);
                     return;
                 }

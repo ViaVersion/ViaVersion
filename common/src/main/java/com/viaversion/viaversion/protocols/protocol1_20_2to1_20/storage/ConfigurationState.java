@@ -27,6 +27,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConfigurationState implements StorableObject {
@@ -35,7 +36,7 @@ public class ConfigurationState implements StorableObject {
     private BridgePhase bridgePhase = BridgePhase.NONE;
     private QueuedPacket joinGamePacket;
     private boolean queuedJoinGame;
-    private ReenterInfo reenterInfo;
+    private CompoundTag lastDimensionRegistry;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -45,12 +46,20 @@ public class ConfigurationState implements StorableObject {
         this.bridgePhase = bridgePhase;
     }
 
-    public @Nullable ReenterInfo getReenterInfo() {
-        return reenterInfo;
+    public @Nullable CompoundTag lastDimensionRegistry() {
+        return lastDimensionRegistry;
     }
 
-    public void setReenterInfo(@Nullable final ReenterInfo reenterInfo) {
-        this.reenterInfo = reenterInfo;
+    /**
+     * Sets the last dimension registry and returns whether it differs from the previously stored one.
+     *
+     * @param dimensionRegistry dimension registry to set
+     * @return whether the dimension registry differs from the previously stored one
+     */
+    public boolean setLastDimensionRegistry(final CompoundTag dimensionRegistry) {
+        final boolean equals = Objects.equals(this.lastDimensionRegistry, dimensionRegistry);
+        this.lastDimensionRegistry = dimensionRegistry;
+        return !equals;
     }
 
     public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
@@ -123,7 +132,6 @@ public class ConfigurationState implements StorableObject {
         packetQueue.clear();
         bridgePhase = BridgePhase.NONE;
         queuedJoinGame = false;
-        reenterInfo = null;
     }
 
     public boolean queuedOrSentJoinGame() {
@@ -179,18 +187,6 @@ public class ConfigurationState implements StorableObject {
                     ", packetId=" + packetId +
                     ", skipCurrentPipeline=" + skipCurrentPipeline +
                     '}';
-        }
-    }
-
-    public static final class ReenterInfo {
-        private final CompoundTag dimensionRegistry;
-
-        public ReenterInfo(final CompoundTag dimensionRegistry) {
-            this.dimensionRegistry = dimensionRegistry;
-        }
-
-        public CompoundTag dimensionRegistry() {
-            return dimensionRegistry;
         }
     }
 }
