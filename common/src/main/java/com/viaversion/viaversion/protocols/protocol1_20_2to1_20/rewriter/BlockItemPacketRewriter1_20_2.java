@@ -38,7 +38,6 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.Recip
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_20_2;
-import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -276,8 +275,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 map(Type.INT); // 9 - Particle Count
                 handler(wrapper -> {
                     final int id = wrapper.get(Type.VAR_INT, 0);
-                    // Use 1.19.4->1.20 mappings
-                    final ParticleMappings mappings = Protocol1_20To1_19_4.MAPPINGS.getParticleMappings();
+                    final ParticleMappings mappings = Protocol1_20_2To1_20.MAPPINGS.getParticleMappings();
                     if (mappings.isBlockParticle(id)) {
                         final int data = wrapper.read(Type.VAR_INT);
                         wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
