@@ -46,59 +46,62 @@ publishShadowJar()
 val branch = rootProject.branchName()
 val baseVersion = project.version as String
 val isRelease = !baseVersion.contains('-')
-val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
-val changelogContent = if (isRelease) {
-    "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
-} else {
-    val commitHash = rootProject.latestCommitHash()
-    "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
-}
 val isMainBranch = branch == "master"
-modrinth {
-    val mcVersions: List<String> = (property("mcVersions") as String)
-            .split(",")
-            .map { it.trim() }
-    token.set(System.getenv("MODRINTH_TOKEN"))
-    projectId.set("viaversion")
-    versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
-    versionNumber.set(suffixedVersion)
-    versionName.set(suffixedVersion)
-    changelog.set(changelogContent)
-    uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
-    gameVersions.set(mcVersions)
-    loaders.add("fabric")
-    loaders.add("paper")
-    loaders.add("folia")
-    loaders.add("velocity")
-    loaders.add("bungeecord")
-    loaders.add("sponge")
-    autoAddDependsOn.set(false)
-    detectLoaders.set(false)
-    dependencies {
-        optional.project("viafabric")
-        optional.project("viafabricplus")
+if (!isRelease || isMainBranch) { // Only publish releases from the main branch
+    val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+    val changelogContent = if (isRelease) {
+        "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
+    } else {
+        val commitHash = rootProject.latestCommitHash()
+        "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
     }
-}
 
-hangarPublish {
-    publications.register("plugin") {
-        version.set(suffixedVersion)
-        id.set("ViaVersion")
-        channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
+    modrinth {
+        val mcVersions: List<String> = (property("mcVersions") as String)
+                .split(",")
+                .map { it.trim() }
+        token.set(System.getenv("MODRINTH_TOKEN"))
+        projectId.set("viaversion")
+        versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
+        versionNumber.set(suffixedVersion)
+        versionName.set(suffixedVersion)
         changelog.set(changelogContent)
-        apiKey.set(System.getenv("HANGAR_TOKEN"))
-        platforms {
-            register(Platforms.PAPER) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf(property("mcVersionRange") as String))
-            }
-            register(Platforms.VELOCITY) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf(property("velocityVersion") as String))
-            }
-            register(Platforms.WATERFALL) {
-                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf(property("waterfallVersion") as String))
+        uploadFile.set(tasks.shadowJar.flatMap { it.archiveFile })
+        gameVersions.set(mcVersions)
+        loaders.add("fabric")
+        loaders.add("paper")
+        loaders.add("folia")
+        loaders.add("velocity")
+        loaders.add("bungeecord")
+        loaders.add("sponge")
+        autoAddDependsOn.set(false)
+        detectLoaders.set(false)
+        dependencies {
+            optional.project("viafabric")
+            optional.project("viafabricplus")
+        }
+    }
+
+    hangarPublish {
+        publications.register("plugin") {
+            version.set(suffixedVersion)
+            id.set("ViaVersion")
+            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
+            changelog.set(changelogContent)
+            apiKey.set(System.getenv("HANGAR_TOKEN"))
+            platforms {
+                register(Platforms.PAPER) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("mcVersionRange") as String))
+                }
+                register(Platforms.VELOCITY) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("velocityVersion") as String))
+                }
+                register(Platforms.WATERFALL) {
+                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                    platformVersions.set(listOf(property("waterfallVersion") as String))
+                }
             }
         }
     }
