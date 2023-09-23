@@ -172,15 +172,15 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
 
         final ListTag messages = new ListTag(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final Tag text = tag.get("Text" + i);
+            final Tag text = tag.remove("Text" + i);
             messages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
         }
         frontText.put("messages", messages);
 
         final ListTag filteredMessages = new ListTag(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final Tag text = tag.get("FilteredText" + i);
-            filteredMessages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+            final Tag text = tag.remove("FilteredText" + i);
+            filteredMessages.add(text != null ? text : messages.get(i - 1));
         }
         frontText.put("filtered_messages", filteredMessages);
 
