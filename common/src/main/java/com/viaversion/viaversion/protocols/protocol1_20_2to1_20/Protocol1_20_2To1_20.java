@@ -70,6 +70,17 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
+        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, wrapper -> {
+            final String channel = wrapper.passthrough(Type.STRING);
+            if (channel.equals("minecraft:brand")) {
+                final String brand = wrapper.passthrough(Type.STRING);
+                // TODO No idea what's going on here
+                if (!brand.matches("[a-zA-Z0-9]+")) {
+                    wrapper.cancel();
+                }
+            }
+        });
+
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Type.STRING);
             final String hash = wrapper.passthrough(Type.STRING);
