@@ -182,7 +182,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
             final Tag text = tag.remove("FilteredText" + i);
             filteredMessages.add(text != null ? text : messages.get(i - 1));
         }
-        frontText.put("filtered_messages", filteredMessages);
+        if (!filteredMessages.equals(messages)) {
+            frontText.put("filtered_messages", filteredMessages);
+        }
 
         final Tag color = tag.remove("Color");
         if (color != null) {
