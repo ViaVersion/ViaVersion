@@ -46,8 +46,8 @@ public class JoinListener implements Listener {
         Field gamePacketListenerField = null, connectionField = null, channelField = null;
         try {
             getHandleMethod = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
-            gamePacketListenerField = findField(getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
-            connectionField = findField(gamePacketListenerField.getType(), "NetworkManager", "Connection");
+            gamePacketListenerField = findField(false, getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
+            connectionField = findField(true, gamePacketListenerField.getType(), "NetworkManager", "Connection");
             channelField = findField(connectionField.getType(), Class.forName("io.netty.channel.Channel"));
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
@@ -63,8 +63,8 @@ public class JoinListener implements Listener {
     }
 
     // Loosely search a field with any name, as long as it matches a type name.
-    private static Field findField(Class<?> clazz, String... types) throws NoSuchFieldException {
-        for (Field field : clazz.getDeclaredFields()) {
+    private static Field findField(boolean all, Class<?> clazz, String... types) throws NoSuchFieldException {
+        for (Field field : all ? clazz.getFields() : clazz.getDeclaredFields()) {
             String fieldTypeName = field.getType().getSimpleName();
             for (String type : types) {
                 if (!fieldTypeName.equals(type)) {
