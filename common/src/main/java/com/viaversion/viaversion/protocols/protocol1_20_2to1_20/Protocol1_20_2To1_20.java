@@ -127,7 +127,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
             configurationState.sendQueuedPackets(wrapper.user());
         });
-        cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId());
 
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION.getId(), -1, wrapper -> {
             wrapper.cancel();
