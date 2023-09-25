@@ -49,9 +49,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.Configur
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
@@ -119,6 +118,9 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
             wrapper.cancel();
+
+            // Overwrite the state set in the base protocol to what the server actually keeps sending
+            wrapper.user().getProtocolInfo().setServerState(State.PLAY);
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
@@ -197,7 +199,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             super.transform(direction, state, packetWrapper);
             return;
         }
-
 
         if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
             // Queue packets sent by the server while we wait for the client to transition to the configuration state

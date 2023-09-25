@@ -28,9 +28,8 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.IOException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class NBTType extends Type<CompoundTag> {
 
@@ -42,37 +41,31 @@ public class NBTType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(ByteBuf buffer) throws Exception {
+    public CompoundTag read(final ByteBuf buffer) throws Exception {
         return read(buffer, true);
     }
 
     @Override
-    public void write(ByteBuf buffer, CompoundTag object) throws Exception {
+    public void write(final ByteBuf buffer, final CompoundTag object) throws Exception {
         write(buffer, object, "");
     }
 
     public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws Exception {
-        final int readerIndex = buffer.readerIndex();
-        final byte b = buffer.readByte();
-        if (b == 0) {
+        final byte id = buffer.readByte();
+        if (id == 0) {
             return null;
         }
-
-        buffer.readerIndex(readerIndex);
-
-        final ByteBufInputStream in = new ByteBufInputStream(buffer);
-        final int id = in.readByte();
         if (id != CompoundTag.ID) {
             throw new IOException(String.format("Expected root tag to be a CompoundTag, was %s", id));
         }
 
         if (readName) {
-            in.skipBytes(in.readUnsignedShort());
+            buffer.skipBytes(buffer.readUnsignedShort());
         }
 
         final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
         final CompoundTag tag = new CompoundTag();
-        tag.read(in, tagLimiter);
+        tag.read(new ByteBufInputStream(buffer), tagLimiter);
         return tag;
     }
 
