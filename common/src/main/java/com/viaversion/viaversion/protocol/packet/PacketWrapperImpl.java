@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocol.packet;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -309,8 +310,10 @@ public class PacketWrapperImpl implements PacketWrapper {
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
         // Apply current pipeline - for outgoing protocol, the collection will be reversed in the apply method
-        Protocol[] protocols = user().getProtocolInfo().getPipeline().pipes().toArray(PROTOCOL_ARRAY);
-        boolean reverse = direction == Direction.CLIENTBOUND;
+        final ProtocolInfo protocolInfo = user().getProtocolInfo();
+        final boolean reverse = direction == Direction.CLIENTBOUND;
+        final List<Protocol> pipes = reverse ? protocolInfo.getPipeline().reversedPipes() : protocolInfo.getPipeline().pipes();
+        final Protocol[] protocols = pipes.toArray(PROTOCOL_ARRAY);
         int index = -1;
         for (int i = 0; i < protocols.length; i++) {
             if (protocols[i].getClass() == packetProtocol) {
@@ -332,8 +335,8 @@ public class PacketWrapperImpl implements PacketWrapper {
         resetReader();
 
         // Apply other protocols
-        apply(direction, user().getProtocolInfo().getState(), index, protocols, reverse);
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        apply(direction, protocolInfo.getState(direction), index, protocols, true);
+        final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);
             return output.retain();
@@ -402,15 +405,22 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     private PacketWrapperImpl apply(Direction direction, State state, int index, Protocol[] pipeline, boolean reverse) throws Exception {
         // Reset the reader after every transformation for the packetWrapper, so it can be recycled across packets
+        State updatedState = state; // The state might change while transforming, so we need to check for that
         if (reverse) {
             for (int i = index; i >= 0; i--) {
-                pipeline[i].transform(direction, state, this);
+                pipeline[i].transform(direction, updatedState, this);
                 resetReader();
+                if (this.packetType != null) {
+                    updatedState = this.packetType.state();
+                }
             }
         } else {
             for (int i = index; i < pipeline.length; i++) {
-                pipeline[i].transform(direction, state, this);
+                pipeline[i].transform(direction, updatedState, this);
                 resetReader();
+                if (this.packetType != null) {
+                    updatedState = this.packetType.state();
+                }
             }
         }
         return this;

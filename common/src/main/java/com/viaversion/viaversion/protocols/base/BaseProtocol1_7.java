@@ -33,12 +33,10 @@ import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import io.netty.channel.ChannelFuture;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -121,8 +119,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
-                info.setState(State.PLAY);
+            info.setServerState(State.PLAY);
+            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) { // 1.20.2+ clients will send a login ack first
+                info.setClientState(State.PLAY);
             }
 
             UUID uuid = passthroughLoginUUID(wrapper);
@@ -165,7 +164,10 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             }
         });
 
-        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
+        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
+            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+            info.setClientState(State.CONFIGURATION);
+        });
     }
 
     @Override

@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_2to1_20;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -114,10 +115,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // during the configuration phase before finally transitioning to the play state with the client as well.
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
             wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
-
-            // Set the state according to what the server expects. All packets between now and when the client
-            // switches to PLAY as well will be discarded after being dealt with.
-            wrapper.user().getProtocolInfo().setState(State.PLAY);
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
@@ -130,6 +127,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION.getId(), -1, wrapper -> {
             wrapper.cancel();
+
+            wrapper.user().getProtocolInfo().setClientState(State.PLAY);
 
             final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
             configurationState.setBridgePhase(BridgePhase.NONE);
@@ -153,6 +152,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             }
 
             // Reenter the configuration state
+            wrapper.user().getProtocolInfo().setClientState(State.CONFIGURATION);
             configurationState.setBridgePhase(BridgePhase.CONFIGURATION);
 
             final LastResourcePack lastResourcePack = wrapper.user().get(LastResourcePack.class);
@@ -180,6 +180,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void transform(final Direction direction, final State state, final PacketWrapper packetWrapper) throws Exception {
+        if (direction == Direction.SERVERBOUND) {
+            // The client will have the correct state set
+            super.transform(direction, state, packetWrapper);
+            return;
+        }
+
         final ConfigurationState configurationBridge = packetWrapper.user().get(ConfigurationState.class);
         if (configurationBridge == null) {
             // Bad state during an unexpected disconnect
@@ -192,12 +198,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             return;
         }
 
-        if (direction == Direction.SERVERBOUND) {
-            // Client and server will be on different protocol states, pick the right client protocol state
-            super.transform(direction, phase == BridgePhase.PROFILE_SENT ? State.LOGIN
-                    : phase == BridgePhase.REENTERING_CONFIGURATION ? State.PLAY : State.CONFIGURATION, packetWrapper);
-            return;
-        }
 
         if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
@@ -252,6 +252,9 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     }
 
     public static void sendConfigurationPackets(final UserConnection connection, final CompoundTag dimensionRegistry, @Nullable final LastResourcePack lastResourcePack) throws Exception {
+        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
+        protocolInfo.setServerState(State.CONFIGURATION);
+
         final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
         registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
         registryDataPacket.send(Protocol1_20_2To1_20.class);
@@ -275,6 +278,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         final PacketWrapper finishConfigurationPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION, connection);
         finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
+
+        protocolInfo.setServerState(State.PLAY);
     }
 
     @Override
@@ -283,8 +288,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    protected @Nullable ServerboundPackets1_20_2 configurationAcknowledgedPacket() {
-        return null; // Don't handle it in the transitioning protocol
+    protected void registerConfigurationChangeHandlers() {
+        // Don't handle it in the transitioning protocol
     }
 
     @Override

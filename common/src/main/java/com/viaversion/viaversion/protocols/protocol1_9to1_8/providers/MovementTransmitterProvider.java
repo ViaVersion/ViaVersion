@@ -32,7 +32,7 @@ import java.util.logging.Level;
 public class MovementTransmitterProvider implements Provider {
 
     public void sendPlayer(UserConnection userConnection) {
-        if (userConnection.getProtocolInfo().getState() != State.PLAY || userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() == -1) {
+        if (userConnection.getProtocolInfo().getClientState() != State.PLAY || userConnection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId() == -1) {
             return;
         }
 

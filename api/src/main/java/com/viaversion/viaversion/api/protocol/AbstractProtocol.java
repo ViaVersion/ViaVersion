@@ -96,19 +96,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         initialized = true;
 
         registerPackets();
-
-        // Register handlers for protocol state switching
-        // TODO Only register one of those handlers, possibly somehow in the base protocol
-        final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
-        if (configurationAcknowledgedPacket != null) {
-            registerServerbound(configurationAcknowledgedPacket, wrapper -> wrapper.user().getProtocolInfo().setState(State.CONFIGURATION));
-        }
-
-        final ServerboundPacketType finishConfigurationPacket = finishConfigurationPacket();
-        if (finishConfigurationPacket != null) {
-            final int id = finishConfigurationPacket.getId();
-            registerServerbound(State.CONFIGURATION, id, id, wrapper -> wrapper.user().getProtocolInfo().setState(State.PLAY));
-        }
+        registerConfigurationChangeHandlers();
 
         // Register the rest of the ids with no handlers if necessary
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
@@ -128,6 +116,33 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
                     this::hasRegisteredServerbound,
                     this::registerServerbound
             );
+        }
+    }
+
+    protected void registerConfigurationChangeHandlers() {
+        // Register handlers for protocol state switching
+        // Assuming ids will change too often, it is cleaner to register them here instead of the base protocols,
+        // even if there will be multiple of these handlers
+        final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
+        if (configurationAcknowledgedPacket != null) {
+            registerServerbound(configurationAcknowledgedPacket, setClientStateHandler(State.CONFIGURATION));
+        }
+
+        final CU startConfigurationPacket = startConfigurationPacket();
+        if (startConfigurationPacket != null) {
+            registerClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
+        }
+
+        final ServerboundPacketType finishConfigurationPacket = serverboundFinishConfigurationPacket();
+        if (finishConfigurationPacket != null) {
+            final int id = finishConfigurationPacket.getId();
+            registerServerbound(State.CONFIGURATION, id, id, setClientStateHandler(State.PLAY));
+        }
+
+        final ClientboundPacketType clientboundFinishConfigurationPacket = clientboundFinishConfigurationPacket();
+        if (clientboundFinishConfigurationPacket != null) {
+            final int id = clientboundFinishConfigurationPacket.getId();
+            registerClientbound(State.CONFIGURATION, id, id, setServerStateHandler(State.PLAY));
         }
     }
 
@@ -228,7 +243,18 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         return packetTypeMap != null ? packetTypeMap.typeByName("CONFIGURATION_ACKNOWLEDGED") : null;
     }
 
-    protected @Nullable ServerboundPacketType finishConfigurationPacket() {
+    protected @Nullable CU startConfigurationPacket() {
+        final Map<State, PacketTypeMap<CU>> packetTypes = packetTypesProvider.unmappedClientboundPacketTypes();
+        final PacketTypeMap<CU> packetTypeMap = packetTypes.get(State.PLAY);
+        return packetTypeMap != null ? packetTypeMap.typeByName("START_CONFIGURATION") : null;
+    }
+
+    protected @Nullable ServerboundPacketType serverboundFinishConfigurationPacket() {
+        // To be overridden
+        return null;
+    }
+
+    protected @Nullable ClientboundPacketType clientboundFinishConfigurationPacket() {
         // To be overridden
         return null;
     }
@@ -427,6 +453,14 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         if (!isValid) {
             throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " is taken from the wrong packet types class");
         }
+    }
+
+    protected PacketHandler setClientStateHandler(final State state) {
+        return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
+    }
+
+    protected PacketHandler setServerStateHandler(final State state) {
+        return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
     }
 
     @Override

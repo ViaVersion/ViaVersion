@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
@@ -324,8 +325,9 @@ public class UserConnectionImpl implements UserConnection {
         }
 
         PacketWrapper wrapper = new PacketWrapperImpl(id, buf, this);
+        State state = protocolInfo.getState(direction);
         try {
-            protocolInfo.getPipeline().transform(direction, protocolInfo.getState(), wrapper);
+            protocolInfo.getPipeline().transform(direction, state, wrapper);
         } catch (CancelException ex) {
             throw cancelSupplier.apply(ex);
         }

@@ -73,6 +73,8 @@ public interface ProtocolPipeline extends SimpleProtocol {
      */
     List<Protocol> pipes();
 
+    List<Protocol> reversedPipes();
+
     /**
      * Returns whether this pipe has protocols that are not base protocols, as given by {@link Protocol#isBaseProtocol()}.
      *
