@@ -119,9 +119,8 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setServerState(State.PLAY);
-            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) { // 1.20.2+ clients will send a login ack first
-                info.setClientState(State.PLAY);
+            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) { // On 1.20.2+, wait for the login ack
+                info.setState(State.PLAY);
             }
 
             UUID uuid = passthroughLoginUUID(wrapper);
@@ -166,7 +165,7 @@ public class BaseProtocol1_7 extends AbstractProtocol {
 
         registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setClientState(State.CONFIGURATION);
+            info.setState(State.CONFIGURATION);
         });
     }
 

@@ -309,14 +309,18 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @throws Exception if it fails to write
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
-        // Apply current pipeline - for outgoing protocol, the collection will be reversed in the apply method
         final ProtocolInfo protocolInfo = user().getProtocolInfo();
-        final boolean reverse = direction == Direction.CLIENTBOUND;
-        final List<Protocol> pipes = reverse ? protocolInfo.getPipeline().reversedPipes() : protocolInfo.getPipeline().pipes();
-        final Protocol[] protocols = pipes.toArray(PROTOCOL_ARRAY);
+        final List<Protocol> pipes = direction == Direction.SERVERBOUND ? protocolInfo.getPipeline().pipes() : protocolInfo.getPipeline().reversedPipes();
+        final List<Protocol> protocols = new ArrayList<>();
         int index = -1;
-        for (int i = 0; i < protocols.length; i++) {
-            if (protocols[i].getClass() == packetProtocol) {
+        for (int i = 0; i < pipes.size(); i++) {
+            // Always add base protocols to the head
+            final Protocol protocol = pipes.get(i);
+            if (protocol.isBaseProtocol()) {
+                protocols.add(protocol);
+            }
+
+            if (protocol.getClass() == packetProtocol) {
                 index = i;
                 break;
             }
@@ -328,14 +332,17 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         if (skipCurrentPipeline) {
-            index = reverse ? index - 1 : index + 1;
+            index = Math.min(index + 1, pipes.size());
         }
+
+        // Add remaining protocols on top
+        protocols.addAll(pipes.subList(index, pipes.size()));
 
         // Reset reader before we start
         resetReader();
 
         // Apply other protocols
-        apply(direction, protocolInfo.getState(direction), index, protocols, true);
+        apply(direction, protocolInfo.getState(direction), 0, protocols);
         final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);

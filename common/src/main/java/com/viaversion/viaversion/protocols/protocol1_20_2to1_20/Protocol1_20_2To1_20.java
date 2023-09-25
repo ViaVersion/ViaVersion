@@ -209,7 +209,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             // Map some of them to their configuration state counterparts, but make sure to let join game through
             final int unmappedId = packetWrapper.getId();
             if (unmappedId == ClientboundPackets1_19_4.JOIN_GAME.getId()) {
-                super.transform(direction, state, packetWrapper);
+                super.transform(direction, State.PLAY, packetWrapper);
                 return;
             }
 
