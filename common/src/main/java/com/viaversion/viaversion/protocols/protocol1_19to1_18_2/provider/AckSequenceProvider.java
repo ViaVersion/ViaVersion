@@ -29,6 +29,7 @@ public class AckSequenceProvider implements Provider {
     public void handleSequence(final UserConnection connection, final int sequence) throws Exception {
         final PacketWrapper ackPacket = PacketWrapper.create(ClientboundPackets1_19.BLOCK_CHANGED_ACK, connection);
         ackPacket.write(Type.VAR_INT, sequence);
-        ackPacket.scheduleSend(Protocol1_19To1_18_2.class);
+        ackPacket.send(Protocol1_19To1_18_2.class);
     }
+
 }
