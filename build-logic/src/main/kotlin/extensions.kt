@@ -50,7 +50,7 @@ fun Project.latestCommitMessage(): String {
 fun Project.branchName(): String {
     val byteOut = ByteArrayOutputStream()
     exec {
-        commandLine = listOf("git", "branch")
+        commandLine = listOf("git", "symbolic-ref", "--short", "HEAD")
         standardOutput = byteOut
     }
     return byteOut.toString(Charsets.UTF_8.name()).trim()
