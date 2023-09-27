@@ -172,8 +172,8 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
         return wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
             final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
