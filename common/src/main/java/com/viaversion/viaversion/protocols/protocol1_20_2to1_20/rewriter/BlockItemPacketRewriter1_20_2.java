@@ -62,8 +62,11 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         blockRewriter.registerEffect(ClientboundPackets1_19_4.EFFECT, 1010, 2001);
 
         protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON_EFFECT, wrapper -> {
-            if (wrapper.passthrough(Type.BOOLEAN)) {
-                // Effects start at 1 before 1.20.2
+            // Effects start at 1 before 1.20.2
+            if (wrapper.passthrough(Type.BOOLEAN)) { // Primary effect
+                wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
+            }
+            if (wrapper.passthrough(Type.BOOLEAN)) { // Secondary effect
                 wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
             }
         });
