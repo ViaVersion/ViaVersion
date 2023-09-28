@@ -114,6 +114,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         // during the configuration phase before finally transitioning to the play state with the client as well.
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
             wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
+            wrapper.user().getProtocolInfo().setServerState(State.PLAY);
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), -1, wrapper -> {
