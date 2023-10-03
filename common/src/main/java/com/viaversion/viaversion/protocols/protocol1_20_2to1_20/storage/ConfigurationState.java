@@ -22,6 +22,8 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -37,6 +39,7 @@ public class ConfigurationState implements StorableObject {
     private QueuedPacket joinGamePacket;
     private boolean queuedJoinGame;
     private CompoundTag lastDimensionRegistry;
+    private ClientInformation clientInformation;
 
     public BridgePhase bridgePhase() {
         return bridgePhase;
@@ -60,6 +63,10 @@ public class ConfigurationState implements StorableObject {
         final boolean equals = Objects.equals(this.lastDimensionRegistry, dimensionRegistry);
         this.lastDimensionRegistry = dimensionRegistry;
         return !equals;
+    }
+
+    public void setClientInformation(final ClientInformation clientInformation) {
+        this.clientInformation = clientInformation;
     }
 
     public void addPacketToQueue(final PacketWrapper wrapper, final boolean clientbound) throws Exception {
@@ -104,6 +111,8 @@ public class ConfigurationState implements StorableObject {
             joinGamePacket = null;
         }
 
+        sendClientInformation(connection);
+
         final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(new ConfigurationState.QueuedPacket[0]);
         packetQueue.clear();
 
@@ -140,6 +149,24 @@ public class ConfigurationState implements StorableObject {
 
     public enum BridgePhase {
         NONE, PROFILE_SENT, CONFIGURATION, REENTERING_CONFIGURATION
+    }
+
+    public void sendClientInformation(final UserConnection connection) throws Exception {
+        if (clientInformation == null) {
+            // Should never be null, but we also shouldn't error
+            return;
+        }
+
+        final PacketWrapper settingsPacket = PacketWrapper.create(ServerboundPackets1_19_4.CLIENT_SETTINGS, connection);
+        settingsPacket.write(Type.STRING, clientInformation.language);
+        settingsPacket.write(Type.BYTE, clientInformation.viewDistance);
+        settingsPacket.write(Type.VAR_INT, clientInformation.chatVisibility);
+        settingsPacket.write(Type.BOOLEAN, clientInformation.showChatColors);
+        settingsPacket.write(Type.UNSIGNED_BYTE, clientInformation.modelCustomization);
+        settingsPacket.write(Type.VAR_INT, clientInformation.mainHand);
+        settingsPacket.write(Type.BOOLEAN, clientInformation.textFiltering);
+        settingsPacket.write(Type.BOOLEAN, clientInformation.allowListing);
+        settingsPacket.sendToServer(Protocol1_20_2To1_20.class);
     }
 
     public static final class QueuedPacket {
@@ -187,6 +214,30 @@ public class ConfigurationState implements StorableObject {
                     ", packetId=" + packetId +
                     ", skipCurrentPipeline=" + skipCurrentPipeline +
                     '}';
+        }
+    }
+
+    public static final class ClientInformation {
+        private final String language;
+        private final byte viewDistance;
+        private final int chatVisibility;
+        private final boolean showChatColors;
+        private final short modelCustomization;
+        private final int mainHand;
+        private final boolean textFiltering;
+        private final boolean allowListing;
+
+        public ClientInformation(final String language, final byte viewDistance, final int chatVisibility,
+                                 final boolean showChatColors, final short modelCustomization, final int mainHand,
+                                 final boolean textFiltering, final boolean allowListing) {
+            this.language = language;
+            this.viewDistance = viewDistance;
+            this.chatVisibility = chatVisibility;
+            this.showChatColors = showChatColors;
+            this.modelCustomization = modelCustomization;
+            this.mainHand = mainHand;
+            this.textFiltering = textFiltering;
+            this.allowListing = allowListing;
         }
     }
 }

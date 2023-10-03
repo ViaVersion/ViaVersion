@@ -138,10 +138,28 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.sendQueuedPackets(wrapper.user());
             configurationState.clear();
         });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CLIENT_INFORMATION.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.CLIENT_SETTINGS));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CLIENT_INFORMATION.getId(), -1, wrapper -> {
+            final ConfigurationState.ClientInformation clientInformation = new ConfigurationState.ClientInformation(
+                    wrapper.read(Type.STRING), // Language
+                    wrapper.read(Type.BYTE), // View distance
+                    wrapper.read(Type.VAR_INT), // Chat visibility
+                    wrapper.read(Type.BOOLEAN), // Chat colors
+                    wrapper.read(Type.UNSIGNED_BYTE), // Model customization
+                    wrapper.read(Type.VAR_INT), // Main hand
+                    wrapper.read(Type.BOOLEAN), // Text filtering enabled
+                    wrapper.read(Type.BOOLEAN) // Allow listing in server list preview
+            );
+
+            // Store it to re-send it when another ClientboundLoginPacket is sent, since the client will only send it
+            // once per connection right after the handshake
+            final ConfigurationState configurationState = wrapper.user().get(ConfigurationState.class);
+            configurationState.setClientInformation(clientInformation);
+            wrapper.cancel();
+        });
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
+
         // Cancel this, as it will always just be the response to a re-sent pack from us
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, PacketWrapper::cancel);
 
