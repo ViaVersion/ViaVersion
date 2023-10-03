@@ -104,11 +104,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     public void handleMetadata(final int entityId, final List<Metadata> metadataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
-        int i = 0; // Count index for fast removal
         for (final Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             // Call handlers implementing the old handleMetadata
             if (!callOldMetaHandler(entityId, type, metadata, metadataList, connection)) {
-                metadataList.remove(i--);
+                metadataList.remove(metadata);
                 continue;
             }
 
@@ -126,22 +125,22 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     filter.handler().handle(event, metadata);
                 } catch (final Exception e) {
                     logException(e, type, metadataList, metadata);
-                    metadataList.remove(i--);
+                    metadataList.remove(metadata);
                     break;
                 }
 
                 if (event.cancelled()) {
-                    // Remove meta, decrease list index counter, and break current filter loop
-                    metadataList.remove(i--);
+                    // Remove meta, and break current filter loop
+                    metadataList.remove(metadata);
                     break;
                 }
             }
 
-            if (event != null && event.extraMeta() != null) {
+            final List<Metadata> extraMeta = event != null ? event.extraMeta() : null;
+            if (extraMeta != null) {
                 // Finally, add newly created meta
-                metadataList.addAll(event.extraMeta());
+                metadataList.addAll(extraMeta);
             }
-            i++;
         }
 
         if (entity != null) {
