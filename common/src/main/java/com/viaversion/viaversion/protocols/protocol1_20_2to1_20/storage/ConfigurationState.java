@@ -166,7 +166,7 @@ public class ConfigurationState implements StorableObject {
         settingsPacket.write(Type.VAR_INT, clientInformation.mainHand);
         settingsPacket.write(Type.BOOLEAN, clientInformation.textFiltering);
         settingsPacket.write(Type.BOOLEAN, clientInformation.allowListing);
-        settingsPacket.sendToServer(Protocol1_20_2To1_20.class);
+        settingsPacket.scheduleSendToServer(Protocol1_20_2To1_20.class);
     }
 
     public static final class QueuedPacket {
