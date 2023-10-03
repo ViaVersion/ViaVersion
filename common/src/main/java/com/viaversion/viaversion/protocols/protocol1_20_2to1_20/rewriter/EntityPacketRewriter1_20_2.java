@@ -101,7 +101,10 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     final ConfigurationState configurationBridge = wrapper.user().get(ConfigurationState.class);
                     if (!configurationBridge.setLastDimensionRegistry(dimensionRegistry)) {
                         // No change, so no need to re-enter the configuration state - just let this one through
-                        configurationBridge.sendClientInformation(wrapper.user());
+                        final PacketWrapper clientInformationPacket = configurationBridge.clientInformationPacket(wrapper.user());
+                        if (clientInformationPacket != null) {
+                            clientInformationPacket.sendToServer(Protocol1_20_2To1_20.class);
+                        }
                         return;
                     }
 

@@ -106,12 +106,16 @@ public class ConfigurationState implements StorableObject {
     }
 
     public void sendQueuedPackets(final UserConnection connection) throws Exception {
-        if (joinGamePacket != null) {
+        final boolean hasJoinGamePacket = joinGamePacket != null;
+        if (hasJoinGamePacket) {
             packetQueue.add(0, joinGamePacket);
             joinGamePacket = null;
         }
 
-        sendClientInformation(connection);
+        final PacketWrapper clientInformationPacket = clientInformationPacket(connection);
+        if (clientInformationPacket != null) {
+            packetQueue.add(hasJoinGamePacket ? 1 : 0, toQueuedPacket(clientInformationPacket, false, true));
+        }
 
         final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(new ConfigurationState.QueuedPacket[0]);
         packetQueue.clear();
@@ -151,10 +155,10 @@ public class ConfigurationState implements StorableObject {
         NONE, PROFILE_SENT, CONFIGURATION, REENTERING_CONFIGURATION
     }
 
-    public void sendClientInformation(final UserConnection connection) throws Exception {
+    public @Nullable PacketWrapper clientInformationPacket(final UserConnection connection) {
         if (clientInformation == null) {
             // Should never be null, but we also shouldn't error
-            return;
+            return null;
         }
 
         final PacketWrapper settingsPacket = PacketWrapper.create(ServerboundPackets1_19_4.CLIENT_SETTINGS, connection);
@@ -166,7 +170,7 @@ public class ConfigurationState implements StorableObject {
         settingsPacket.write(Type.VAR_INT, clientInformation.mainHand);
         settingsPacket.write(Type.BOOLEAN, clientInformation.textFiltering);
         settingsPacket.write(Type.BOOLEAN, clientInformation.allowListing);
-        settingsPacket.scheduleSendToServer(Protocol1_20_2To1_20.class);
+        return settingsPacket;
     }
 
     public static final class QueuedPacket {
