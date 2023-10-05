@@ -167,6 +167,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
     public static final Type<CompoundTag> NBT = new NBTType();
     public static final Type<CompoundTag> NAMELESS_NBT = new NamelessNBTType();
+    public static final Type<CompoundTag> OPTIONAL_NAMELESS_NBT = new NamelessNBTType.OptionalNamelessNBTType();
     public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
     public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();

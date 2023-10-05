@@ -460,7 +460,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     protected PacketHandler setServerStateHandler(final State state) {
-        return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
+        return wrapper -> wrapper.user().getProtocolInfo().setServerState(state);
     }
 
     @Override

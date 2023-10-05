@@ -20,33 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.minecraft;
+package com.viaversion.viaversion.api.type.types.version;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.type.OptionalType;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_3;
 import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
+import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import java.util.List;
 
-public class NamelessNBTType extends Type<CompoundTag> {
+public final class Types1_20_3 {
 
-    public NamelessNBTType() {
-        super(CompoundTag.class);
-    }
-
-    @Override
-    public CompoundTag read(final ByteBuf buffer) throws Exception {
-        return NBTType.read(buffer, false);
-    }
-
-    @Override
-    public void write(final ByteBuf buffer, final CompoundTag tag) throws Exception {
-        NBTType.write(buffer, tag, null);
-    }
-
-    public static final class OptionalNamelessNBTType extends OptionalType<CompoundTag> {
-
-        public OptionalNamelessNBTType() {
-            super(Type.NAMELESS_NBT);
-        }
-    }
+    public static final ParticleType PARTICLE = Types1_20.PARTICLE; // Only safe to use after protocol loading
+    public static final MetaTypes1_20_3 META_TYPES = new MetaTypes1_20_3(PARTICLE);
+    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
+    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
 }
