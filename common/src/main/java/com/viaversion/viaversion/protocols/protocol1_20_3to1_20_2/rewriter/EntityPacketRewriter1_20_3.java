@@ -42,25 +42,23 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
         protocol.registerClientbound(ClientboundPackets1_20_2.JOIN_GAME, wrapper -> {
             wrapper.send(Protocol1_20_3To1_20_2.class);
+            wrapper.cancel();
 
             // Make sure the loading screen is closed, continues old client behavior
             final PacketWrapper gameEventPacket = wrapper.create(ClientboundPackets1_20_2.GAME_EVENT);
             gameEventPacket.write(Type.UNSIGNED_BYTE, (short) 13);
             gameEventPacket.write(Type.FLOAT, 0F);
             gameEventPacket.send(Protocol1_20_3To1_20_2.class);
-
-            wrapper.cancel();
         });
         protocol.registerClientbound(ClientboundPackets1_20_2.RESPAWN, wrapper -> {
             wrapper.send(Protocol1_20_3To1_20_2.class);
+            wrapper.cancel();
 
             // Make sure the loading screen is closed, continues old client behavior
             final PacketWrapper gameEventPacket = wrapper.create(ClientboundPackets1_20_2.GAME_EVENT);
             gameEventPacket.write(Type.UNSIGNED_BYTE, (short) 13);
             gameEventPacket.write(Type.FLOAT, 0F);
             gameEventPacket.send(Protocol1_20_3To1_20_2.class);
-
-            wrapper.cancel();
         });
     }
 

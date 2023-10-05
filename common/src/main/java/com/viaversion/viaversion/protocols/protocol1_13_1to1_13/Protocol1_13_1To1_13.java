@@ -103,10 +103,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     int count = wrapper.get(Type.VAR_INT, 3);
                     for (int i = 0; i < count; i++) {
                         wrapper.passthrough(Type.STRING);
-                        boolean hasTooltip = wrapper.passthrough(Type.BOOLEAN);
-                        if (hasTooltip) {
-                            wrapper.passthrough(Type.STRING); // JSON Tooltip
-                        }
+                        wrapper.passthrough(Type.OPTIONAL_COMPONENT); // Tooltip
                     }
                 });
             }

@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
+import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
@@ -43,6 +44,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
     private static final BitSetType PROFILE_ACTIONS_ENUM_TYPE = new BitSetType(6);
+    private static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
+    private static final ByteArrayType SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
 
     public Protocol1_20_3To1_20_2() {
@@ -54,24 +57,111 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         super.registerPackets();
 
         // Components are now (mostly) written as nbt instead of json strings
-        // TODO
         registerClientbound(ClientboundPackets1_20_2.ADVANCEMENTS, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
+
+                // Parent
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.STRING);
+                }
+
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    convertComponent(wrapper); // Title
+                    convertComponent(wrapper); // Description
+                    wrapper.passthrough(Type.ITEM1_20_2); // Icon
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    final int flags = wrapper.passthrough(Type.INT);
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
+                    }
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                final int requirements = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+            }
         });
         registerClientbound(ClientboundPackets1_20_2.TAB_COMPLETE, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.VAR_INT); // Transaction id
+            wrapper.passthrough(Type.VAR_INT); // Start
+            wrapper.passthrough(Type.VAR_INT); // Length
+
+            final int suggestions = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < suggestions; i++) {
+                wrapper.passthrough(Type.STRING); // Suggestion
+                convertOptionalComponent(wrapper); // Tooltip
+            }
         });
         registerClientbound(ClientboundPackets1_20_2.MAP_DATA, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.VAR_INT); // Map id
+            wrapper.passthrough(Type.BYTE); // Scale
+            wrapper.passthrough(Type.BOOLEAN); // Locked
+            if (wrapper.passthrough(Type.BOOLEAN)) {
+                final int icons = wrapper.passthrough(Type.VAR_INT);
+                for (int i = 0; i < icons; i++) {
+                    wrapper.passthrough(Type.BYTE); // Type
+                    wrapper.passthrough(Type.BYTE); // X
+                    wrapper.passthrough(Type.BYTE); // Y
+                    wrapper.passthrough(Type.BYTE); // Rotation
+                    convertOptionalComponent(wrapper); // Display name
+                }
+            }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_CHAT, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.UUID); // Sender
+            wrapper.passthrough(Type.VAR_INT); // Index
+            wrapper.passthrough(OPTIONAL_SIGNATURE_BYTES_TYPE); // Signature
+            wrapper.passthrough(Type.STRING); // Plain content
+            wrapper.passthrough(Type.LONG); // Timestamp
+            wrapper.passthrough(Type.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Type.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(SIGNATURE_BYTES_TYPE);
+                }
+            }
+
+            convertOptionalComponent(wrapper); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Type.VAR_INT);
+            if (filterMaskType == 2) {
+                wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE); // Mask
+            }
+
+            wrapper.passthrough(Type.VAR_INT); // Chat type
+            convertComponent(wrapper); // Sender
+            convertOptionalComponent(wrapper); // Target
         });
         registerClientbound(ClientboundPackets1_20_2.SCOREBOARD_OBJECTIVE, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.STRING); // Objective Name
+            final byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                convertComponent(wrapper); // Display Name
+            }
         });
         registerClientbound(ClientboundPackets1_20_2.TEAMS, wrapper -> {
-            wrapper.cancel();
+            wrapper.passthrough(Type.STRING); // Team Name
+            final byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                convertComponent(wrapper); // Display Name
+                wrapper.passthrough(Type.BYTE); // Flags
+                wrapper.passthrough(Type.STRING); // Name Tag Visibility
+                wrapper.passthrough(Type.STRING); // Collision rule
+                wrapper.passthrough(Type.VAR_INT); // Color
+                convertComponent(wrapper); // Prefix
+                convertComponent(wrapper); // Suffix
+            }
         });
 
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), this::convertComponent);

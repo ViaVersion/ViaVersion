@@ -284,7 +284,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     suggestion = suggestion.substring(1);
                 }
                 wrapper.write(Type.STRING, suggestion);
-                wrapper.write(Type.BOOLEAN, false);
+                wrapper.write(Type.OPTIONAL_COMPONENT, null); // Tooltip
             }
         });
 

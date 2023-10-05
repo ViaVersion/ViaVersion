@@ -319,8 +319,9 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
                 wrapper.passthrough(Type.STRING); // Identifier
 
                 // Parent
-                if (wrapper.passthrough(Type.BOOLEAN))
+                if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.STRING);
+                }
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
