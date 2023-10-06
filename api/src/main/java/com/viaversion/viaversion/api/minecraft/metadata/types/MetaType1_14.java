@@ -42,7 +42,7 @@ public enum MetaType1_14 implements MetaType {
     Direction(11, Type.VAR_INT),
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
-    NBTTag(14, Type.NBT),
+    NBTTag(14, Type.NAMED_COMPOUND_TAG),
     PARTICLE(15, Types1_14.PARTICLE),
     VillagerData(16, Type.VILLAGER_DATA),
     OptVarInt(17, Type.OPTIONAL_VAR_INT),

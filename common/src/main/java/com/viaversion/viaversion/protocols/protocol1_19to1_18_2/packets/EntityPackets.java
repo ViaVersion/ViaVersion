@@ -207,9 +207,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
+                map(Type.NAMED_COMPOUND_TAG); // Registry
                 handler(wrapper -> {
-                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     // Add necessary chat types
                     tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
@@ -311,7 +311,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
-        final CompoundTag currentDimension = wrapper.read(Type.NBT);
+        final CompoundTag currentDimension = wrapper.read(Type.NAMED_COMPOUND_TAG);
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {

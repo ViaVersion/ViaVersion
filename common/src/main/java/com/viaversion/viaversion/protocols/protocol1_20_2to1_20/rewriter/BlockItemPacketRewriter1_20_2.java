@@ -79,13 +79,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
         protocol.registerClientbound(ClientboundPackets1_19_4.NBT_QUERY, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Transaction id
-            wrapper.write(Type.NAMELESS_NBT, wrapper.read(Type.NBT));
+            wrapper.write(Type.COMPOUND_TAG, wrapper.read(Type.NAMED_COMPOUND_TAG));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.VAR_INT); // Type
-            wrapper.write(Type.NAMELESS_NBT, handleBlockEntity(wrapper.read(Type.NBT)));
+            wrapper.write(Type.COMPOUND_TAG, handleBlockEntity(wrapper.read(Type.NAMED_COMPOUND_TAG)));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, wrapper -> {

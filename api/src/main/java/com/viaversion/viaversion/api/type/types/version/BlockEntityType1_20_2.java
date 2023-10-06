@@ -39,7 +39,7 @@ public class BlockEntityType1_20_2 extends Type<BlockEntity> {
         final byte xz = buffer.readByte();
         final short y = buffer.readShort();
         final int typeId = Type.VAR_INT.readPrimitive(buffer);
-        final CompoundTag tag = Type.NAMELESS_NBT.read(buffer);
+        final CompoundTag tag = Type.COMPOUND_TAG.read(buffer);
         return new BlockEntityImpl(xz, y, typeId, tag);
     }
 
@@ -48,6 +48,6 @@ public class BlockEntityType1_20_2 extends Type<BlockEntity> {
         buffer.writeByte(entity.packedXZ());
         buffer.writeShort(entity.y());
         Type.VAR_INT.writePrimitive(buffer, entity.typeId());
-        Type.NAMELESS_NBT.write(buffer, entity.tag());
+        Type.COMPOUND_TAG.write(buffer, entity.tag());
     }
 }

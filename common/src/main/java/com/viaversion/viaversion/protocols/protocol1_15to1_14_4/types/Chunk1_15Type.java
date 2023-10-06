@@ -44,7 +44,7 @@ public class Chunk1_15Type extends Type<Chunk> {
 
         boolean fullChunk = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
-        CompoundTag heightMap = Type.NBT.read(input);
+        CompoundTag heightMap = Type.NAMED_COMPOUND_TAG.read(input);
 
         int[] biomeData = fullChunk ? new int[1024] : null;
         if (fullChunk) {
@@ -66,7 +66,7 @@ public class Chunk1_15Type extends Type<Chunk> {
             sections[i] = section;
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
 
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
@@ -86,7 +86,7 @@ public class Chunk1_15Type extends Type<Chunk> {
 
         output.writeBoolean(chunk.isFullChunk());
         Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
-        Type.NBT.write(output, chunk.getHeightMap());
+        Type.NAMED_COMPOUND_TAG.write(output, chunk.getHeightMap());
 
         // Write biome data
         if (chunk.isBiomeData()) {
@@ -112,7 +112,7 @@ public class Chunk1_15Type extends Type<Chunk> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
+        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
     }
 
     @Override

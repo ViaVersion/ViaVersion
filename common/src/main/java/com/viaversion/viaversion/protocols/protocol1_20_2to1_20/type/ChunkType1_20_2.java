@@ -46,7 +46,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
     public Chunk read(final ByteBuf buffer) throws Exception {
         final int chunkX = buffer.readInt();
         final int chunkZ = buffer.readInt();
-        final CompoundTag heightMap = Type.NAMELESS_NBT.read(buffer);
+        final CompoundTag heightMap = Type.COMPOUND_TAG.read(buffer);
 
         // Read sections
         final ByteBuf sectionsBuf = buffer.readBytes(Type.VAR_INT.readPrimitive(buffer));
@@ -73,7 +73,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
         buffer.writeInt(chunk.getX());
         buffer.writeInt(chunk.getZ());
 
-        Type.NAMELESS_NBT.write(buffer, chunk.getHeightMap());
+        Type.COMPOUND_TAG.write(buffer, chunk.getHeightMap());
 
         final ByteBuf sectionBuffer = buffer.alloc().buffer();
         try {

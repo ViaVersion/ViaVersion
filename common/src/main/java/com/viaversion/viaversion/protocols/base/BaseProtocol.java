@@ -84,6 +84,11 @@ public class BaseProtocol extends AbstractProtocol {
             // Add Base Protocol
             pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
 
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().info("User connected with protocol: " + info.getProtocolVersion() + " and serverProtocol: " + info.getServerProtocolVersion());
+                Via.getPlatform().getLogger().info("Protocol pipeline: " + pipeline.pipes());
+            }
+
             // Change state
             if (state == 1) {
                 info.setState(State.STATUS);

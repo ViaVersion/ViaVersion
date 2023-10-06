@@ -42,7 +42,7 @@ public final class MetaTypes1_13_2 extends AbstractMetaTypes {
     public final MetaType directionType = add(11, Type.VAR_INT);
     public final MetaType optionalUUIDType = add(12, Type.OPTIONAL_UUID);
     public final MetaType blockStateType = add(13, Type.VAR_INT);
-    public final MetaType nbtType = add(14, Type.NBT);
+    public final MetaType nbtType = add(14, Type.NAMED_COMPOUND_TAG);
     public final MetaType particleType;
 
     public MetaTypes1_13_2(final ParticleType particleType) {

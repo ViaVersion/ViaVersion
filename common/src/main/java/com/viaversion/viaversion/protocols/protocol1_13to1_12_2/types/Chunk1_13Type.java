@@ -73,7 +73,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
 
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
@@ -121,7 +121,7 @@ public class Chunk1_13Type extends PartialType<Chunk, ClientWorld> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
+        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
     }
 
     @Override

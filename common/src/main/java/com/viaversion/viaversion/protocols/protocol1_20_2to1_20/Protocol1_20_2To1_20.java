@@ -276,7 +276,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         protocolInfo.setServerState(State.CONFIGURATION);
 
         final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
-        registryDataPacket.write(Type.NAMELESS_NBT, dimensionRegistry);
+        registryDataPacket.write(Type.COMPOUND_TAG, dimensionRegistry);
         registryDataPacket.send(Protocol1_20_2To1_20.class);
 
         // Enabling features is only possible during the configuration phase

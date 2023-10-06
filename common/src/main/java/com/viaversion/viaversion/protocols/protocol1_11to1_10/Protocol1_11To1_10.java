@@ -190,10 +190,10 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             public void register() {
                 map(Type.POSITION); // 0 - Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT data
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
                         EntityIdRewriter.toClientSpawner(tag);
 

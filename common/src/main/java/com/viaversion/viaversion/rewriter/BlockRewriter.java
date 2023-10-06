@@ -45,7 +45,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     private final Type<CompoundTag> nbtType;
 
     public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
-        this(protocol, positionType, Type.NBT);
+        this(protocol, positionType, Type.NAMED_COMPOUND_TAG);
     }
 
     public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> nbtType) {

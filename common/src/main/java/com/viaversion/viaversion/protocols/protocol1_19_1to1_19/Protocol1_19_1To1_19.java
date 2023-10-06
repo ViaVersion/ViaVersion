@@ -178,7 +178,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     final ChatTypeStorage chatTypeStorage = wrapper.user().get(ChatTypeStorage.class);
                     chatTypeStorage.clear();
 
-                    final CompoundTag registry = wrapper.passthrough(Type.NBT);
+                    final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
                     final ListTag chatTypes = ((CompoundTag) registry.get("minecraft:chat_type")).get("value");
                     for (final Tag chatType : chatTypes) {
                         final CompoundTag chatTypeCompound = (CompoundTag) chatType;

@@ -41,7 +41,7 @@ public class FlatVarIntItemType extends BaseItemType {
             Item item = new DataItem();
             item.setIdentifier(VAR_INT.readPrimitive(buffer));
             item.setAmount(buffer.readByte());
-            item.setTag(NBT.read(buffer));
+            item.setTag(NAMED_COMPOUND_TAG.read(buffer));
             return item;
         }
     }
@@ -54,7 +54,7 @@ public class FlatVarIntItemType extends BaseItemType {
             buffer.writeBoolean(true);
             VAR_INT.writePrimitive(buffer, object.identifier());
             buffer.writeByte(object.amount());
-            NBT.write(buffer, object.tag());
+            NAMED_COMPOUND_TAG.write(buffer, object.tag());
         }
     }
 }

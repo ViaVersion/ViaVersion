@@ -43,7 +43,7 @@ public class ItemType extends BaseItemType {
             item.setIdentifier(id);
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
-            item.setTag(NBT.read(buffer));
+            item.setTag(NAMED_COMPOUND_TAG.read(buffer));
             return item;
         }
     }
@@ -56,7 +56,7 @@ public class ItemType extends BaseItemType {
             buffer.writeShort(object.identifier());
             buffer.writeByte(object.amount());
             buffer.writeShort(object.data());
-            NBT.write(buffer, object.tag());
+            NAMED_COMPOUND_TAG.write(buffer, object.tag());
         }
     }
 }

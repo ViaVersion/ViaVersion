@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
@@ -37,6 +38,7 @@ import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.BooleanType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import com.viaversion.viaversion.api.type.types.ByteType;
@@ -60,6 +62,7 @@ import com.viaversion.viaversion.api.type.types.VarLongType;
 import com.viaversion.viaversion.api.type.types.VoidType;
 import com.viaversion.viaversion.api.type.types.minecraft.BlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.minecraft.ChunkPositionType;
+import com.viaversion.viaversion.api.type.types.minecraft.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.minecraft.EulerAngleType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.FlatItemType;
@@ -69,14 +72,14 @@ import com.viaversion.viaversion.api.type.types.minecraft.GlobalPositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.Item1_20_2Type;
 import com.viaversion.viaversion.api.type.types.minecraft.ItemArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.ItemType;
-import com.viaversion.viaversion.api.type.types.minecraft.NBTType;
-import com.viaversion.viaversion.api.type.types.minecraft.NamelessNBTType;
+import com.viaversion.viaversion.api.type.types.minecraft.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.minecraft.OptionalVarIntType;
 import com.viaversion.viaversion.api.type.types.minecraft.PlayerMessageSignatureType;
 import com.viaversion.viaversion.api.type.types.minecraft.Position1_14Type;
 import com.viaversion.viaversion.api.type.types.minecraft.PositionType;
 import com.viaversion.viaversion.api.type.types.minecraft.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.minecraft.QuaternionType;
+import com.viaversion.viaversion.api.type.types.minecraft.TagType;
 import com.viaversion.viaversion.api.type.types.minecraft.VarLongBlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.minecraft.Vector3fType;
 import com.viaversion.viaversion.api.type.types.minecraft.VectorType;
@@ -165,10 +168,18 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
-    public static final Type<CompoundTag> NBT = new NBTType();
-    public static final Type<CompoundTag> NAMELESS_NBT = new NamelessNBTType();
-    public static final Type<CompoundTag> OPTIONAL_NAMELESS_NBT = new NamelessNBTType.OptionalNamelessNBTType();
-    public static final Type<CompoundTag[]> NBT_ARRAY = new ArrayType<>(Type.NBT);
+
+    public static final Type<CompoundTag> NAMED_COMPOUND_TAG = new NamedCompoundTagType();
+    public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Type.NAMED_COMPOUND_TAG);
+    public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
+    public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = new CompoundTagType.OptionalCompoundTagType();
+    public static final Type<Tag> TAG = new TagType();
+    public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
+    @Deprecated/*(forRemoval=true)*/
+    public static final Type<CompoundTag> NBT = NAMED_COMPOUND_TAG;
+    @Deprecated/*(forRemoval=true)*/
+    public static final Type<CompoundTag[]> NBT_ARRAY = NAMED_COMPOUND_TAG_ARRAY;
+
     public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
     public static final Type<ChunkPosition> CHUNK_POSITION = new ChunkPositionType();
@@ -190,6 +201,10 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<PlayerMessageSignature> PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType();
     public static final Type<PlayerMessageSignature> OPTIONAL_PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType.OptionalPlayerMessageSignatureType();
     public static final Type<PlayerMessageSignature[]> PLAYER_MESSAGE_SIGNATURE_ARRAY = new ArrayType<>(PLAYER_MESSAGE_SIGNATURE);
+
+    public static final BitSetType PROFILE_ACTIONS_ENUM = new BitSetType(6);
+    public static final ByteArrayType SIGNATURE_BYTES = new ByteArrayType(256);
+    public static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES = new ByteArrayType.OptionalByteArrayType(256);
 
     /* 1.13 Flat Item (no data) */
     public static final Type<Item> FLAT_ITEM = new FlatItemType();

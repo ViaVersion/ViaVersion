@@ -48,7 +48,7 @@ public final class Chunk1_17Type extends Type<Chunk> {
         int chunkZ = input.readInt();
 
         BitSet sectionsMask = BitSet.valueOf(Type.LONG_ARRAY_PRIMITIVE.read(input));
-        CompoundTag heightMap = Type.NBT.read(input);
+        CompoundTag heightMap = Type.NAMED_COMPOUND_TAG.read(input);
 
         int[] biomeData = Type.VAR_INT_ARRAY_PRIMITIVE.read(input);
 
@@ -65,7 +65,7 @@ public final class Chunk1_17Type extends Type<Chunk> {
             sections[i] = section;
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
 
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
@@ -84,7 +84,7 @@ public final class Chunk1_17Type extends Type<Chunk> {
         output.writeInt(chunk.getZ());
 
         Type.LONG_ARRAY_PRIMITIVE.write(output, chunk.getChunkMask().toLongArray());
-        Type.NBT.write(output, chunk.getHeightMap());
+        Type.NAMED_COMPOUND_TAG.write(output, chunk.getHeightMap());
 
         // Write biome data
         Type.VAR_INT_ARRAY_PRIMITIVE.write(output, chunk.getBiomeData());
@@ -106,7 +106,7 @@ public final class Chunk1_17Type extends Type<Chunk> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
+        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
     }
 
     @Override

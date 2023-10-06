@@ -52,12 +52,12 @@ public class EntityPackets {
                 map(Type.STRING_ARRAY); // World List
                 handler(wrapper -> {
                     // Throw away the old dimension registry, extra conversion would be too hard of a hit
-                    wrapper.read(Type.NBT);
-                    wrapper.write(Type.NBT, protocol.getMappingData().getDimensionRegistry());
+                    wrapper.read(Type.NAMED_COMPOUND_TAG);
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, protocol.getMappingData().getDimensionRegistry());
 
                     // Instead of the dimension's resource key, it now just wants the data directly
                     String dimensionType = wrapper.read(Type.STRING);
-                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
                 });
                 map(Type.STRING); // Dimension
                 map(Type.LONG); // Seed
@@ -69,7 +69,7 @@ public class EntityPackets {
 
         protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
             String dimensionType = wrapper.read(Type.STRING);
-            wrapper.write(Type.NBT, getDimensionData(dimensionType));
+            wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
         });
     }
 

@@ -81,7 +81,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                 tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
             }
 
-            wrapper.write(Type.NBT, tag);
+            wrapper.write(Type.NAMED_COMPOUND_TAG, tag);
         });
 
         registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {

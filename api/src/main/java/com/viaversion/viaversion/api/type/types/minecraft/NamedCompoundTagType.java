@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.minecraft;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.github.steveice10.opennbt.tag.limiter.TagLimiter;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
@@ -31,12 +32,12 @@ import io.netty.buffer.ByteBufOutputStream;
 import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class NBTType extends Type<CompoundTag> {
+public class NamedCompoundTagType extends Type<CompoundTag> {
 
-    private static final int MAX_NBT_BYTES = 2097152; // 2mb
-    private static final int MAX_NESTING_LEVEL = 512;
+    public static final int MAX_NBT_BYTES = 2097152; // 2mb
+    public static final int MAX_NESTING_LEVEL = 512;
 
-    public NBTType() {
+    public NamedCompoundTagType() {
         super(CompoundTag.class);
     }
 
@@ -69,14 +70,14 @@ public class NBTType extends Type<CompoundTag> {
         return tag;
     }
 
-    public static void write(final ByteBuf buffer, final CompoundTag tag, final @Nullable String name) throws Exception {
+    public static void write(final ByteBuf buffer, final Tag tag, final @Nullable String name) throws Exception {
         if (tag == null) {
             buffer.writeByte(0);
             return;
         }
 
         final ByteBufOutputStream out = new ByteBufOutputStream(buffer);
-        out.writeByte(CompoundTag.ID);
+        out.writeByte(tag.getTagId());
         if (name != null) {
             out.writeUTF(name);
         }

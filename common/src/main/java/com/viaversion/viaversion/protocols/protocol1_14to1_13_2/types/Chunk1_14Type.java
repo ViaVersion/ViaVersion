@@ -43,7 +43,7 @@ public class Chunk1_14Type extends Type<Chunk> {
 
         boolean fullChunk = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
-        CompoundTag heightMap = Type.NBT.read(input);
+        CompoundTag heightMap = Type.NAMED_COMPOUND_TAG.read(input);
 
         Type.VAR_INT.readPrimitive(input);
 
@@ -65,7 +65,7 @@ public class Chunk1_14Type extends Type<Chunk> {
             }
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NBT_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
 
         // Read all the remaining bytes (workaround for #681)
         if (input.readableBytes() > 0) {
@@ -85,7 +85,7 @@ public class Chunk1_14Type extends Type<Chunk> {
 
         output.writeBoolean(chunk.isFullChunk());
         Type.VAR_INT.writePrimitive(output, chunk.getBitmask());
-        Type.NBT.write(output, chunk.getHeightMap());
+        Type.NAMED_COMPOUND_TAG.write(output, chunk.getHeightMap());
 
         ByteBuf buf = output.alloc().buffer();
         try {
@@ -111,7 +111,7 @@ public class Chunk1_14Type extends Type<Chunk> {
         }
 
         // Write Block Entities
-        Type.NBT_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
+        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
     }
 
     @Override

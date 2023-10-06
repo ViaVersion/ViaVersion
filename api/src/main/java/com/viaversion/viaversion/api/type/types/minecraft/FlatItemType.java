@@ -42,7 +42,7 @@ public class FlatItemType extends BaseItemType {
             Item item = new DataItem();
             item.setIdentifier(id);
             item.setAmount(buffer.readByte());
-            item.setTag(Type.NBT.read(buffer));
+            item.setTag(Type.NAMED_COMPOUND_TAG.read(buffer));
             return item;
         }
     }
@@ -54,7 +54,7 @@ public class FlatItemType extends BaseItemType {
         } else {
             buffer.writeShort(object.identifier());
             buffer.writeByte(object.amount());
-            Type.NBT.write(buffer, object.tag());
+            Type.NAMED_COMPOUND_TAG.write(buffer, object.tag());
         }
     }
 }

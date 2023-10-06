@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
-import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -51,8 +50,6 @@ import java.util.UUID;
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
-    private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
-    private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
     private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
@@ -216,7 +213,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.VAR_INT, 0);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Type.STRING); // Argument name
-                        wrapper.read(MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
+                        wrapper.read(Type.SIGNATURE_BYTES); // Signature
                     }
 
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
@@ -240,7 +237,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 create(Type.LONG, 0L);
                 handler(wrapper -> {
                     // Remove signature
-                    wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
+                    wrapper.read(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
                     wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES);
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 

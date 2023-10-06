@@ -57,7 +57,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Dimension registry
+                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
                 map(Type.STRING); // Dimension key
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -75,7 +75,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag damageTypeRegistry = registry.get("minecraft:damage_type");
                     final ListTag damageTypes = damageTypeRegistry.get("value");
                     int highestId = -1;

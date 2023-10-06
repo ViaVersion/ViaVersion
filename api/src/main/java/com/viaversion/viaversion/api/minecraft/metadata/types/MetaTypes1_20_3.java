@@ -33,8 +33,8 @@ public final class MetaTypes1_20_3 extends AbstractMetaTypes {
     public final MetaType longType = add(2, Type.VAR_LONG);
     public final MetaType floatType = add(3, Type.FLOAT);
     public final MetaType stringType = add(4, Type.STRING);
-    public final MetaType componentType = add(5, Type.NAMELESS_NBT);
-    public final MetaType optionalComponentType = add(6, Type.OPTIONAL_NAMELESS_NBT);
+    public final MetaType componentType = add(5, Type.COMPOUND_TAG);
+    public final MetaType optionalComponentType = add(6, Type.OPTIONAL_COMPOUND_TAG);
     public final MetaType itemType = add(7, Type.ITEM1_20_2);
     public final MetaType booleanType = add(8, Type.BOOLEAN);
     public final MetaType rotationType = add(9, Type.ROTATION);
@@ -44,7 +44,7 @@ public final class MetaTypes1_20_3 extends AbstractMetaTypes {
     public final MetaType optionalUUIDType = add(13, Type.OPTIONAL_UUID);
     public final MetaType blockStateType = add(14, Type.VAR_INT);
     public final MetaType optionalBlockStateType = add(15, Type.VAR_INT);
-    public final MetaType nbtType = add(16, Type.NAMELESS_NBT);
+    public final MetaType nbtType = add(16, Type.COMPOUND_TAG);
     public final MetaType particleType;
     public final MetaType villagerDatatType = add(18, Type.VILLAGER_DATA);
     public final MetaType optionalVarIntType = add(19, Type.OPTIONAL_VAR_INT);

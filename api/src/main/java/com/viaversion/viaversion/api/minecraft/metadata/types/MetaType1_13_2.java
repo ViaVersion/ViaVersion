@@ -42,7 +42,7 @@ public enum MetaType1_13_2 implements MetaType {
     Direction(11, Type.VAR_INT),
     OptUUID(12, Type.OPTIONAL_UUID),
     BlockID(13, Type.VAR_INT),
-    NBTTag(14, Type.NBT),
+    NBTTag(14, Type.NAMED_COMPOUND_TAG),
     PARTICLE(15, Types1_13_2.PARTICLE);
 
     private final int typeID;

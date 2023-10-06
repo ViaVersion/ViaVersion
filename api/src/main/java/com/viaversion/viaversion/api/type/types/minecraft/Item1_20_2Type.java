@@ -42,7 +42,7 @@ public class Item1_20_2Type extends BaseItemType {
         final Item item = new DataItem();
         item.setIdentifier(VAR_INT.readPrimitive(buffer));
         item.setAmount(buffer.readByte());
-        item.setTag(NAMELESS_NBT.read(buffer));
+        item.setTag(COMPOUND_TAG.read(buffer));
         return item;
     }
 
@@ -54,7 +54,7 @@ public class Item1_20_2Type extends BaseItemType {
             buffer.writeBoolean(true);
             VAR_INT.writePrimitive(buffer, object.identifier());
             buffer.writeByte(object.amount());
-            NAMELESS_NBT.write(buffer, object.tag());
+            COMPOUND_TAG.write(buffer, object.tag());
         }
     }
 }

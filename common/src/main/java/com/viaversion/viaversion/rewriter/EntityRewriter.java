@@ -422,7 +422,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return wrapper -> {
             EntityTracker tracker = tracker(wrapper.user());
 
-            CompoundTag registryData = wrapper.get(Type.NBT, nbtIndex);
+            CompoundTag registryData = wrapper.get(Type.NAMED_COMPOUND_TAG, nbtIndex);
             Tag height = registryData.get("height");
             if (height instanceof IntTag) {
                 int blockHeight = ((IntTag) height).asInt();
@@ -471,7 +471,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public PacketHandler biomeSizeTracker() {
-        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NBT, 0));
+        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
     }
 
     public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
@@ -481,7 +481,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public PacketHandler dimensionDataHandler() {
-        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.NBT, 0));
+        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
     }
 
     /**

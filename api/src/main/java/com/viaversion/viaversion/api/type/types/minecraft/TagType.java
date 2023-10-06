@@ -22,31 +22,42 @@
  */
 package com.viaversion.viaversion.api.type.types.minecraft;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.TagRegistry;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.limiter.TagLimiter;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
 
-public class NamelessNBTType extends Type<CompoundTag> {
+public class TagType extends Type<Tag> {
 
-    public NamelessNBTType() {
-        super(CompoundTag.class);
+    public TagType() {
+        super(Tag.class);
     }
 
     @Override
-    public CompoundTag read(final ByteBuf buffer) throws Exception {
-        return NBTType.read(buffer, false);
+    public Tag read(final ByteBuf buffer) throws Exception {
+        final byte id = buffer.readByte();
+        if (id == 0) {
+            return null;
+        }
+
+        final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
+        final Tag tag = TagRegistry.createInstance(id);
+        tag.read(new ByteBufInputStream(buffer), tagLimiter);
+        return tag;
     }
 
     @Override
-    public void write(final ByteBuf buffer, final CompoundTag tag) throws Exception {
-        NBTType.write(buffer, tag, null);
+    public void write(final ByteBuf buffer, final Tag tag) throws Exception {
+        NamedCompoundTagType.write(buffer, tag, null);
     }
 
-    public static final class OptionalNamelessNBTType extends OptionalType<CompoundTag> {
+    public static final class OptionalTagType extends OptionalType<Tag> {
 
-        public OptionalNamelessNBTType() {
-            super(Type.NAMELESS_NBT);
+        public OptionalTagType() {
+            super(Type.TAG);
         }
     }
 }

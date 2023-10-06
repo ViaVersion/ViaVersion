@@ -209,11 +209,11 @@ public class WorldPackets {
             public void register() {
                 map(Type.POSITION); // 0 - Block Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT (Might not be present)
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT (Might not be present)
                 handler(wrapper -> {
                     int action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     if (action == 1) { // Update Spawner
-                        CompoundTag tag = wrapper.get(Type.NBT, 0);
+                        CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                         if (tag != null) {
                             if (tag.contains("EntityId")) {
                                 String entity = (String) tag.get("EntityId").getValue();
@@ -229,7 +229,7 @@ public class WorldPackets {
                     }
                     if (action == 2) { // Update Command Block
                         CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NBT, 0));
+                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
 
                         // To prevent window issues don't send updates
                         wrapper.cancel();
@@ -396,7 +396,7 @@ public class WorldPackets {
 
                         updateBlockEntity.write(Type.POSITION, pos);
                         updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
-                        updateBlockEntity.write(Type.NBT, tag.get());
+                        updateBlockEntity.write(Type.NAMED_COMPOUND_TAG, tag.get());
 
                         updateBlockEntity.scheduleSend(Protocol1_9To1_8.class);
                     }

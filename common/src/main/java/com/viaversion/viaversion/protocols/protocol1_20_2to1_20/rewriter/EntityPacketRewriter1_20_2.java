@@ -76,7 +76,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
 
                     wrapper.passthrough(Type.STRING_ARRAY); // World List
 
-                    final CompoundTag dimensionRegistry = wrapper.read(Type.NBT);
+                    final CompoundTag dimensionRegistry = wrapper.read(Type.NAMED_COMPOUND_TAG);
                     final String dimensionType = wrapper.read(Type.STRING);
                     final String world = wrapper.read(Type.STRING);
                     final long seed = wrapper.read(Type.LONG);
@@ -160,7 +160,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.passthrough(Type.BYTE); // Flags
             if (wrapper.passthrough(Type.BOOLEAN)) {
-                wrapper.write(Type.NAMELESS_NBT, wrapper.read(Type.NBT)); // Factor data
+                wrapper.write(Type.COMPOUND_TAG, wrapper.read(Type.NAMED_COMPOUND_TAG)); // Factor data
             }
         });
 

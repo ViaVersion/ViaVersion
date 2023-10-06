@@ -48,8 +48,8 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
-                map(Type.NBT); // Current dimension data
+                map(Type.NAMED_COMPOUND_TAG); // Registry
+                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
                 map(Type.VAR_INT); // Max players
@@ -65,7 +65,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
         protocol.registerClientbound(ClientboundPackets1_17_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.NBT); // Current dimension data
+                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
                 map(Type.STRING); // World
                 handler(wrapper -> {
                     final String world = wrapper.get(Type.STRING, 0);

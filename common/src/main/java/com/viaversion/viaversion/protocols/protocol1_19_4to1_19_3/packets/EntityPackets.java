@@ -51,7 +51,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Dimension registry
+                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
                 map(Type.STRING); // Dimension key
                 map(Type.STRING); // World
                 handler(dimensionDataHandler());
@@ -59,7 +59,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 handler(worldDataTrackerHandlerByKey());
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -31,8 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.BitSetType;
-import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
@@ -43,9 +42,7 @@ import java.util.BitSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
-    private static final BitSetType PROFILE_ACTIONS_ENUM_TYPE = new BitSetType(6);
-    private static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
-    private static final ByteArrayType SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
+
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
 
     public Protocol1_20_3To1_20_2() {
@@ -119,7 +116,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_2.PLAYER_CHAT, wrapper -> {
             wrapper.passthrough(Type.UUID); // Sender
             wrapper.passthrough(Type.VAR_INT); // Index
-            wrapper.passthrough(OPTIONAL_SIGNATURE_BYTES_TYPE); // Signature
+            wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
             wrapper.passthrough(Type.STRING); // Plain content
             wrapper.passthrough(Type.LONG); // Timestamp
             wrapper.passthrough(Type.LONG); // Salt
@@ -128,7 +125,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             for (int i = 0; i < lastSeen; i++) {
                 final int index = wrapper.passthrough(Type.VAR_INT);
                 if (index == 0) {
-                    wrapper.passthrough(SIGNATURE_BYTES_TYPE);
+                    wrapper.passthrough(Type.SIGNATURE_BYTES);
                 }
             }
 
@@ -195,8 +192,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_INFO_UPDATE, wrapper -> {
-            wrapper.cancel();
-            final BitSet actions = wrapper.passthrough(PROFILE_ACTIONS_ENUM_TYPE);
+            final BitSet actions = wrapper.passthrough(Type.PROFILE_ACTIONS_ENUM);
             final int entries = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Type.UUID);
@@ -240,17 +236,19 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     }
 
     private void convertComponent(final PacketWrapper wrapper) throws Exception {
-        wrapper.write(Type.NAMELESS_NBT, jsonComponentToTag(wrapper.read(Type.COMPONENT)));
+        wrapper.write(Type.TAG, jsonComponentToTag(wrapper.read(Type.COMPONENT)));
     }
 
     private void convertOptionalComponent(final PacketWrapper wrapper) throws Exception {
-        wrapper.write(Type.OPTIONAL_NAMELESS_NBT, jsonComponentToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
+        wrapper.write(Type.OPTIONAL_TAG, jsonComponentToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
     }
 
-    public static @Nullable JsonElement tagComponentToJson(@Nullable final CompoundTag tag) {
+    public static @Nullable JsonElement tagComponentToJson(@Nullable final Tag tag) {
         if (tag == null) {
             return null;
         }
+
+        System.out.println(tag);
 
         final JsonObject object = new JsonObject();
         // TODO
@@ -258,7 +256,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         return object;
     }
 
-    public static @Nullable CompoundTag jsonComponentToTag(@Nullable final JsonElement component) {
+    public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
         if (component == null) {
             return null;
         }

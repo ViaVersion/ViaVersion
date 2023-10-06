@@ -104,12 +104,12 @@ public class WorldPackets {
             public void register() {
                 map(Type.POSITION); // 0 - Location
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT data
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
                     Position position = wrapper.get(Type.POSITION, 0);
                     short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
                     int newId = provider.transform(wrapper.user(), position, tag, true);

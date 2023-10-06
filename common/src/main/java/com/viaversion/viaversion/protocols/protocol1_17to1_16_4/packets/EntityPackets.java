@@ -73,18 +73,18 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 map(Type.UNSIGNED_BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
-                map(Type.NBT); // Current dimension
+                map(Type.NAMED_COMPOUND_TAG); // Registry
+                map(Type.NAMED_COMPOUND_TAG); // Current dimension
                 handler(wrapper -> {
                     // Add new dimension fields
-                    CompoundTag dimensionRegistry = wrapper.get(Type.NBT, 0).get("minecraft:dimension_type");
+                    CompoundTag dimensionRegistry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0).get("minecraft:dimension_type");
                     ListTag dimensions = dimensionRegistry.get("value");
                     for (Tag dimension : dimensions) {
                         CompoundTag dimensionCompound = ((CompoundTag) dimension).get("element");
                         addNewDimensionData(dimensionCompound);
                     }
 
-                    CompoundTag currentDimensionTag = wrapper.get(Type.NBT, 1);
+                    CompoundTag currentDimensionTag = wrapper.get(Type.NAMED_COMPOUND_TAG, 1);
                     addNewDimensionData(currentDimensionTag);
                 });
                 handler(playerTrackerHandler());
@@ -92,7 +92,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, wrapper -> {
-            CompoundTag dimensionData = wrapper.passthrough(Type.NBT);
+            CompoundTag dimensionData = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
             addNewDimensionData(dimensionData);
         });
 

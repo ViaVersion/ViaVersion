@@ -43,7 +43,7 @@ public final class MetaTypes1_19_3 extends AbstractMetaTypes {
     public final MetaType directionType = add(12, Type.VAR_INT);
     public final MetaType optionalUUIDType = add(13, Type.OPTIONAL_UUID);
     public final MetaType blockStateType = add(14, Type.VAR_INT);
-    public final MetaType nbtType = add(15, Type.NBT);
+    public final MetaType nbtType = add(15, Type.NAMED_COMPOUND_TAG);
     public final MetaType particleType;
     public final MetaType villagerDatatType = add(17, Type.VILLAGER_DATA);
     public final MetaType optionalVarIntType = add(18, Type.OPTIONAL_VAR_INT);

@@ -57,7 +57,7 @@ public final class WorldPackets {
                     final int newId = BlockEntityIds.newId(id);
                     wrapper.write(Type.VAR_INT, newId);
 
-                    handleSpawners(newId, wrapper.passthrough(Type.NBT));
+                    handleSpawners(newId, wrapper.passthrough(Type.NAMED_COMPOUND_TAG));
                 });
             }
         });
