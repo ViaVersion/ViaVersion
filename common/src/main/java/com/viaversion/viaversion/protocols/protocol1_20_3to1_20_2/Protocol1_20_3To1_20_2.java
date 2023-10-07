@@ -17,11 +17,25 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2;
 
+import com.github.steveice10.opennbt.tag.builtin.ByteArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
+import com.github.steveice10.opennbt.tag.builtin.FloatTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.LongTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.ShortTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -32,6 +46,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
@@ -39,6 +54,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Serverbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
 import java.util.BitSet;
+import java.util.Map;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
@@ -244,27 +261,156 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     }
 
     public static @Nullable JsonElement tagComponentToJson(@Nullable final Tag tag) {
-        if (tag == null) {
-            return null;
+        try {
+            return convertToJson(tag);
+        } catch (final Exception e) {
+            Via.getPlatform().getLogger().severe("Error converting component: " + tag);
+            e.printStackTrace();
+            return new JsonPrimitive("<error>");
         }
-
-        System.out.println(tag);
-
-        final JsonObject object = new JsonObject();
-        // TODO
-        object.addProperty("text", "Subscribe to ViaVersion+ to see this message");
-        return object;
     }
 
     public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
-        if (component == null) {
+        // TODO Handle array of different types
+        try {
+            // This mostly works:tm:
+            return convertToTag(component);
+        } catch (final Exception e) {
+            Via.getPlatform().getLogger().severe("Error converting component: " + component);
+            e.printStackTrace();
+            return new StringTag("<error>");
+        }
+    }
+
+    private static @Nullable Tag convertToTag(final @Nullable JsonElement element) {
+        if (element == null || element.isJsonNull()) {
             return null;
+        } else if (element.isJsonObject()) {
+            final CompoundTag tag = new CompoundTag();
+            for (final Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+                convertObjectEntry(entry.getKey(), entry.getValue(), tag);
+            }
+            return tag;
+        } else if (element.isJsonArray()) {
+            // TODO Number arrays
+            final ListTag tag = new ListTag();
+            for (final JsonElement entry : element.getAsJsonArray()) {
+                tag.add(convertToTag(entry));
+            }
+            return tag;
+        } else if (element.isJsonPrimitive()) {
+            final JsonPrimitive primitive = element.getAsJsonPrimitive();
+            if (primitive.isString()) {
+                return new StringTag(primitive.getAsString());
+            } else if (primitive.isBoolean()) {
+                return new ByteTag((byte) (primitive.getAsBoolean() ? 1 : 0));
+            }
+
+            final Number number = primitive.getAsNumber();
+            if (number instanceof Integer) {
+                return new IntTag(number.intValue());
+            } else if (number instanceof Byte) { // This could be a boolean, but we can't know
+                return new ByteTag(number.byteValue());
+            } else if (number instanceof Short) {
+                return new ShortTag(number.shortValue());
+            } else if (number instanceof Long) {
+                return new LongTag(number.longValue());
+            } else if (number instanceof Double) {
+                return new DoubleTag(number.doubleValue());
+            } else if (number instanceof Float) {
+                return new FloatTag(number.floatValue());
+            }
+        }
+        throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName());
+    }
+
+    private static void convertObjectEntry(final String key, final JsonElement element, final CompoundTag tag) {
+        if ((key.equals("contents") || key.equals("value")) && element.isJsonObject()) {
+            // Store show_entity id as int array instead of uuid string
+            final JsonObject hoverEvent = element.getAsJsonObject();
+            final JsonElement id = hoverEvent.get("id");
+            final UUID uuid;
+            if (id != null && id.isJsonPrimitive() && (uuid = parseUUID(id.getAsString())) != null) {
+                tag.put(key, new IntArrayTag(UUIDIntArrayType.uuidToIntArray(uuid)));
+                return;
+            }
         }
 
-        final CompoundTag tag = new CompoundTag();
-        // TODO
-        tag.put("text", new StringTag("Subscribe to ViaVersion+ to see this message"));
-        return tag;
+        tag.put(key, convertToTag(element));
+    }
+
+    private static @Nullable UUID parseUUID(final String uuidString) {
+        try {
+            return UUID.fromString(uuidString);
+        } catch (final IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private static @Nullable JsonElement convertToJson(final @Nullable Tag tag) {
+        if (tag == null) {
+            return null;
+        } else if (tag instanceof CompoundTag) {
+            final JsonObject object = new JsonObject();
+            for (final Map.Entry<String, Tag> entry : ((CompoundTag) tag).entrySet()) {
+                convertCompoundTagEntry(entry.getKey(), entry.getValue(), object);
+            }
+            return object;
+        } else if (tag instanceof ListTag) {
+            final ListTag list = (ListTag) tag;
+            final JsonArray array = new JsonArray();
+            for (final Tag listEntry : list) {
+                array.add(convertToJson(listEntry));
+            }
+            return array;
+        } else if (tag instanceof NumberTag) {
+            return new JsonPrimitive((Number) tag.getValue());
+        } else if (tag instanceof StringTag) {
+            return new JsonPrimitive(((StringTag) tag).getValue());
+        } else if (tag instanceof ByteArrayTag) {
+            final ByteArrayTag arrayTag = (ByteArrayTag) tag;
+            final JsonArray array = new JsonArray();
+            for (final byte num : arrayTag.getValue()) {
+                array.add(num);
+            }
+            return array;
+        } else if (tag instanceof IntArrayTag) {
+            final IntArrayTag arrayTag = (IntArrayTag) tag;
+            final JsonArray array = new JsonArray();
+            for (final int num : arrayTag.getValue()) {
+                array.add(num);
+            }
+            return array;
+        } else if (tag instanceof LongArrayTag) {
+            final LongArrayTag arrayTag = (LongArrayTag) tag;
+            final JsonArray array = new JsonArray();
+            for (final long num : arrayTag.getValue()) {
+                array.add(num);
+            }
+            return array;
+        }
+        throw new IllegalArgumentException("Unhandled tag type " + tag.getClass().getSimpleName());
+    }
+
+    private static void convertCompoundTagEntry(final String key, final Tag tag, final JsonObject object) {
+        if ((key.equals("contents") || key.equals("value")) && tag instanceof CompoundTag) {
+            // Back to a UUID string
+            final CompoundTag showEntity = (CompoundTag) tag;
+            final Tag idTag = showEntity.get("id");
+            if (idTag instanceof IntArrayTag) {
+                object.addProperty(key, uuidIntsToString(((IntArrayTag) idTag).getValue()));
+                return;
+            }
+        }
+
+        object.add(key, convertToJson(tag));
+    }
+
+    private static String uuidIntsToString(final int[] parts) {
+        if (parts.length != 4) {
+            return new UUID(0, 0).toString();
+        }
+        return UUIDIntArrayType.uuidFromIntArray(parts).toString();
     }
 
     @Override
