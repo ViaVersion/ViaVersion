@@ -268,10 +268,9 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equalsIgnoreCase("MC|BOpen")) {
-                        wrapper.read(Type.REMAINING_BYTES); // Not used anymore
+                        wrapper.clearInputBuffer();
                         wrapper.write(Type.VAR_INT, 0);
-                    }
-                    if (name.equalsIgnoreCase("MC|TrList")) {
+                    } else if (name.equalsIgnoreCase("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // ID
 
                         Short size = wrapper.passthrough(Type.UNSIGNED_BYTE);
