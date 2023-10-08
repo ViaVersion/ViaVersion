@@ -30,8 +30,8 @@ import java.util.Map;
 
 public class ItemRewriter {
 
-    public static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
-    public static final Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
+    public static final Map<String, Integer> ENTITY_NAME_TO_ID = new HashMap<>();
+    public static final Map<Integer, String> ENTITY_ID_TO_NAME = new HashMap<>();
     public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     public static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
@@ -164,8 +164,8 @@ public class ItemRewriter {
                     CompoundTag entityTag = tag.get("EntityTag");
                     if (entityTag.get("id") instanceof StringTag) {
                         StringTag id = entityTag.get("id");
-                        if (ENTTIY_NAME_TO_ID.containsKey(id.getValue()))
-                            data = ENTTIY_NAME_TO_ID.get(id.getValue());
+                        if (ENTITY_NAME_TO_ID.containsKey(id.getValue()))
+                            data = ENTITY_NAME_TO_ID.get(id.getValue());
                     }
                     tag.remove("EntityTag");
                 }
@@ -256,7 +256,7 @@ public class ItemRewriter {
                     tag = new CompoundTag();
                 }
                 CompoundTag entityTag = new CompoundTag();
-                String entityName = ENTTIY_ID_TO_NAME.get((int) item.data());
+                String entityName = ENTITY_ID_TO_NAME.get((int) item.data());
                 if (entityName != null) {
                     StringTag id = new StringTag(entityName);
                     entityTag.put("id", id);
@@ -417,8 +417,8 @@ public class ItemRewriter {
     }
 
     private static void registerEntity(int id, String name) {
-        ENTTIY_ID_TO_NAME.put(id, name);
-        ENTTIY_NAME_TO_ID.put(name, id);
+        ENTITY_ID_TO_NAME.put(id, name);
+        ENTITY_NAME_TO_ID.put(name, id);
     }
 
     private static void registerPotion(int id, String name) {

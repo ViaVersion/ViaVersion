@@ -51,7 +51,7 @@ public interface EntityRewriter<T extends Protocol> extends Rewriter<T> {
     }
 
     /**
-     * Returns the mapped entitiy (or the same if it has not changed).
+     * Returns the mapped entity (or the same if it has not changed).
      *
      * @param id unmapped entity id
      * @return mapped entity id
