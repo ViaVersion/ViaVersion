@@ -80,6 +80,8 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     public void init() {
+        configurationProvider.register(platform.getConf());
+
         if (System.getProperty("ViaVersion") != null) {
             // Reload?
             platform.onReload();

@@ -93,7 +93,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     protected AbstractViaConfig(final File configFile) {
         super(configFile);
-        Via.getManager().getConfigurationProvider().register(this);
     }
 
     @Override
