@@ -20,10 +20,10 @@
     "Matsv"
   ],
   "depends": {
-    "fabricloader": ">=0.4.0"
+    "fabricloader": ">=0.14.0"
   },
   "recommends": {
-    "viafabric": ">=0.3.99"
+    "viafabric": ">=0.4.10"
   },
   "custom": {
     "modmenu:api": true,
