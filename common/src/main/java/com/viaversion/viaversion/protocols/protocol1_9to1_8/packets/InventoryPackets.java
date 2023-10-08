@@ -47,21 +47,19 @@ public class InventoryPackets {
                     final short property = wrapper.get(Type.SHORT, 0);
                     short value = wrapper.get(Type.SHORT, 1);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    if (inventoryTracker.getInventory() != null) {
-                        if (inventoryTracker.getInventory().equalsIgnoreCase("minecraft:enchanting_table")) {
-                            if (property > 3 && property < 7) {
-                                // Send 2 properties, splitting it into enchantID & level
-                                final short level = (short) (value >> 8);
-                                final short enchantID = (short) (value & 0xFF);
-                                wrapper.create(wrapper.getId(), propertyPacket -> {
-                                    propertyPacket.write(Type.UNSIGNED_BYTE, windowId);
-                                    propertyPacket.write(Type.SHORT, property);
-                                    propertyPacket.write(Type.SHORT, enchantID);
-                                }).scheduleSend(Protocol1_9To1_8.class);
+                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equalsIgnoreCase("minecraft:enchanting_table")) {
+                        if (property > 3 && property < 7) {
+                            // Send 2 properties, splitting it into enchantID & level
+                            final short level = (short) (value >> 8);
+                            final short enchantID = (short) (value & 0xFF);
+                            wrapper.create(wrapper.getId(), propertyPacket -> {
+                                propertyPacket.write(Type.UNSIGNED_BYTE, windowId);
+                                propertyPacket.write(Type.SHORT, property);
+                                propertyPacket.write(Type.SHORT, enchantID);
+                            }).scheduleSend(Protocol1_9To1_8.class);
 
-                                wrapper.set(Type.SHORT, 0, (short) (property + 3));
-                                wrapper.set(Type.SHORT, 1, level);
-                            }
+                            wrapper.set(Type.SHORT, 0, (short) (property + 3));
+                            wrapper.set(Type.SHORT, 1, level);
                         }
                     }
                 });
@@ -125,11 +123,9 @@ public class InventoryPackets {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
 
                     short slotID = wrapper.get(Type.SHORT, 0);
-                    if (inventoryTracker.getInventory() != null) {
-                        if (inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                            if (slotID >= 4) {
-                                wrapper.set(Type.SHORT, 0, (short) (slotID + 1));
-                            }
+                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
+                        if (slotID >= 4) {
+                            wrapper.set(Type.SHORT, 0, (short) (slotID + 1));
                         }
                     }
                 });
@@ -171,21 +167,19 @@ public class InventoryPackets {
                 // Brewing Patch
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    if (inventoryTracker.getInventory() != null) {
-                        if (inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                            Item[] oldStack = wrapper.get(Type.ITEM_ARRAY, 0);
-                            Item[] newStack = new Item[oldStack.length + 1];
-                            for (int i = 0; i < newStack.length; i++) {
-                                if (i > 4) {
-                                    newStack[i] = oldStack[i - 1];
-                                } else {
-                                    if (i != 4) { // Leave index 3 blank
-                                        newStack[i] = oldStack[i];
-                                    }
+                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
+                        Item[] oldStack = wrapper.get(Type.ITEM_ARRAY, 0);
+                        Item[] newStack = new Item[oldStack.length + 1];
+                        for (int i = 0; i < newStack.length; i++) {
+                            if (i > 4) {
+                                newStack[i] = oldStack[i - 1];
+                            } else {
+                                if (i != 4) { // Leave index 3 blank
+                                    newStack[i] = oldStack[i];
                                 }
                             }
-                            wrapper.set(Type.ITEM_ARRAY, 0, newStack);
                         }
+                        wrapper.set(Type.ITEM_ARRAY, 0, newStack);
                     }
                 });
             }
@@ -298,14 +292,12 @@ public class InventoryPackets {
                     final short slot = wrapper.get(Type.SHORT, 0);
                     boolean throwItem = (slot == 45 && windowID == 0);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    if (inventoryTracker.getInventory() != null) {
-                        if (inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                            if (slot == 4) {
-                                throwItem = true;
-                            }
-                            if (slot > 4) {
-                                wrapper.set(Type.SHORT, 0, (short) (slot - 1));
-                            }
+                    if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
+                        if (slot == 4) {
+                            throwItem = true;
+                        }
+                        if (slot > 4) {
+                            wrapper.set(Type.SHORT, 0, (short) (slot - 1));
                         }
                     }
 
@@ -328,49 +320,53 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new
 
-            @Override
-            public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                PacketHandlers() {
 
-                // Inventory tracking
-                handler(wrapper -> {
-                    InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
-                    inventoryTracker.setInventory(null);
-                    inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
-                });
-            }
-        });
+                    @Override
+                    public void register() {
+                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
 
-        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.SHORT); // 0 - Slot id
-
-                // Blocking patch
-                handler(wrapper -> {
-                    boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
-                            && Via.getConfig().isShieldBlocking();
-
-                    EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    if (entityTracker.isBlocking()) {
-                        entityTracker.setBlocking(false);
-
-                        if (!showShieldWhenSwordInHand) {
-                            entityTracker.setSecondHand(null);
-                        }
-                    }
-
-                    if (showShieldWhenSwordInHand) {
-                        // Update current held item slot index
-                        entityTracker.setHeldItemSlot(wrapper.get(Type.SHORT, 0));
-
-                        // Sync shield item in offhand with main hand
-                        entityTracker.syncShieldWithSword();
+                        // Inventory tracking
+                        handler(wrapper -> {
+                            InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
+                            inventoryTracker.setInventory(null);
+                            inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
+                        });
                     }
                 });
-            }
-        });
+
+        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new
+
+                PacketHandlers() {
+                    @Override
+                    public void register() {
+                        map(Type.SHORT); // 0 - Slot id
+
+                        // Blocking patch
+                        handler(wrapper -> {
+                            boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
+                                    && Via.getConfig().isShieldBlocking();
+
+                            EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                            if (entityTracker.isBlocking()) {
+                                entityTracker.setBlocking(false);
+
+                                if (!showShieldWhenSwordInHand) {
+                                    entityTracker.setSecondHand(null);
+                                }
+                            }
+
+                            if (showShieldWhenSwordInHand) {
+                                // Update current held item slot index
+                                entityTracker.setHeldItemSlot(wrapper.get(Type.SHORT, 0));
+
+                                // Sync shield item in offhand with main hand
+                                entityTracker.syncShieldWithSword();
+                            }
+                        });
+                    }
+                });
     }
 }

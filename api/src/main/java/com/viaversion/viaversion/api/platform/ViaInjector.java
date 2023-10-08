@@ -31,14 +31,14 @@ public interface ViaInjector {
     /**
      * Inject into the current Platform
      *
-     * @throws Exception If there is an error with injecting
+     * @throws Exception if there is an error with injecting
      */
     void inject() throws Exception;
 
     /**
      * Uninject into the current Platform
      *
-     * @throws Exception If there is an error with uninjecting
+     * @throws Exception if there is an error with uninjecting
      */
     void uninject() throws Exception;
 
@@ -57,7 +57,7 @@ public interface ViaInjector {
      * For proxies, this returns the lowest supported protocol version.
      *
      * @return server protocol version
-     * @throws Exception if there is an error with getting this info, eg. not binded
+     * @throws Exception if there is an error with getting this info, e.g. not binded
      * @see ViaPlatform#isProxy()
      */
     int getServerProtocolVersion() throws Exception;
@@ -66,7 +66,7 @@ public interface ViaInjector {
      * Returns the supported server protocol versions.
      *
      * @return server protocol versions
-     * @throws Exception if there is an error with getting this info, eg. not binded
+     * @throws Exception if there is an error with getting this info, e.g. not binded
      * @see ViaPlatform#isProxy()
      */
     default IntSortedSet getServerProtocolVersions() throws Exception {

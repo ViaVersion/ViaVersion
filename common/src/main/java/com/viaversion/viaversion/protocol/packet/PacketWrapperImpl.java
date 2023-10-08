@@ -372,7 +372,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     private void sendRaw(boolean currentThread) throws Exception {
-        if (isCancelled()) return;
+        if (isCancelled()) {
+            return;
+        }
 
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {

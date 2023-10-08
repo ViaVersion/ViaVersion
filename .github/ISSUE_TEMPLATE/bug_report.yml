@@ -71,7 +71,7 @@ body:
     attributes:
       label: Additional Server Info
       description: |
-        Do you use a proxy (eg. BungeeCord)? What software do you use and what plugins?
+        Do you use a proxy (e.g. BungeeCord)? What software do you use and what plugins?
       placeholder: |
         Example: "I also use BungeeCord with the following plugins: x, y, z"
     validations:

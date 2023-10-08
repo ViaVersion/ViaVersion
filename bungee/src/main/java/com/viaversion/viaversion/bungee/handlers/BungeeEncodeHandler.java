@@ -65,30 +65,28 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
         boolean needsCompress = false;
-        if (!handledCompression) {
-            if (ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
-                // Need to decompress this packet due to bad order
-                ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
+        if (!handledCompression && ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
+            // Need to decompress this packet due to bad order
+            ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
 
-                // Ensure the buffer wasn't reused
-                if (buf != decompressed) {
-                    try {
-                        buf.clear().writeBytes(decompressed);
-                    } finally {
-                        decompressed.release();
-                    }
+            // Ensure the buffer wasn't reused
+            if (buf != decompressed) {
+                try {
+                    buf.clear().writeBytes(decompressed);
+                } finally {
+                    decompressed.release();
                 }
-
-                // Reorder the pipeline
-                ChannelHandler dec = ctx.pipeline().get("via-decoder");
-                ChannelHandler enc = ctx.pipeline().get("via-encoder");
-                ctx.pipeline().remove(dec);
-                ctx.pipeline().remove(enc);
-                ctx.pipeline().addAfter("decompress", "via-decoder", dec);
-                ctx.pipeline().addAfter("compress", "via-encoder", enc);
-                needsCompress = true;
-                handledCompression = true;
             }
+
+            // Reorder the pipeline
+            ChannelHandler decoder = ctx.pipeline().get("via-decoder");
+            ChannelHandler encoder = ctx.pipeline().get("via-encoder");
+            ctx.pipeline().remove(decoder);
+            ctx.pipeline().remove(encoder);
+            ctx.pipeline().addAfter("decompress", "via-decoder", decoder);
+            ctx.pipeline().addAfter("compress", "via-encoder", encoder);
+            needsCompress = true;
+            handledCompression = true;
         }
         return needsCompress;
     }

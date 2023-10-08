@@ -221,7 +221,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
                     true,
                     p.getDescription().getName().orElse(p.getDescription().getId()),
                     p.getDescription().getVersion().orElse("Unknown Version"),
-                    p.getInstance().isPresent() ? p.getInstance().get().getClass().getCanonicalName() : "Unknown",
+                    p.getInstance().map(instance -> instance.getClass().getCanonicalName()).orElse("Unknown"),
                     p.getDescription().getAuthors()
             ));
         }

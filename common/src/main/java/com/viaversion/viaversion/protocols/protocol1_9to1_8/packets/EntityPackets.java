@@ -93,9 +93,9 @@ public class EntityPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.INT, SpawnPackets.toNewDouble); // 1 - X - Needs to be divide by 32
-                map(Type.INT, SpawnPackets.toNewDouble); // 2 - Y - Needs to be divide by 32
-                map(Type.INT, SpawnPackets.toNewDouble); // 3 - Z - Needs to be divide by 32
+                map(Type.INT, SpawnPackets.toNewDouble); // 1 - X - Needs to be divided by 32
+                map(Type.INT, SpawnPackets.toNewDouble); // 2 - Y - Needs to be divided by 32
+                map(Type.INT, SpawnPackets.toNewDouble); // 3 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 4 - Pitch
                 map(Type.BYTE); // 5 - Yaw
@@ -176,12 +176,11 @@ public class EntityPackets {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     Item stack = wrapper.get(Type.ITEM, 0);
 
-                    if (stack != null) {
-                        if (Protocol1_9To1_8.isSword(stack.identifier())) {
-                            entityTracker.getValidBlocking().add(entityID);
-                            return;
-                        }
+                    if (stack != null && Protocol1_9To1_8.isSword(stack.identifier())) {
+                        entityTracker.getValidBlocking().add(entityID);
+                        return;
                     }
+
                     entityTracker.getValidBlocking().remove(entityID);
                 });
             }
@@ -234,7 +233,7 @@ public class EntityPackets {
                 handler(wrapper -> {
                     boolean showParticles = wrapper.read(Type.BOOLEAN); //In 1.8 = true->Show particles : false->Hide particles
                     boolean newEffect = Via.getConfig().isNewEffectIndicator();
-                    //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator but we don't use it.
+                    //0: hide, 1: shown without indictator, 2: shown with indicator, 3: hide with beacon indicator, but we don't use it.
                     wrapper.write(Type.BYTE, (byte) (showParticles ? newEffect ? 2 : 1 : 0));
                 });
             }

@@ -47,7 +47,7 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     @Override
     public void setClientState(final State clientState) {
         if (Via.getManager().debugHandler().enabled()) {
-            Via.getPlatform().getLogger().info("Client state changed from " + this.clientState + " to " + clientState + " for " + connection.getProtocolInfo().getUuid());
+            Via.getPlatform().getLogger().info("Client state changed from " + this.clientState + " to " + clientState + " for " + uuid);
         }
         this.clientState = clientState;
     }
@@ -60,7 +60,7 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     @Override
     public void setServerState(final State serverState) {
         if (Via.getManager().debugHandler().enabled()) {
-            Via.getPlatform().getLogger().info("Server state changed from " + this.serverState + " to " + serverState + " for " + connection.getProtocolInfo().getUuid());
+            Via.getPlatform().getLogger().info("Server state changed from " + this.serverState + " to " + serverState + " for " + uuid);
         }
         this.serverState = serverState;
     }

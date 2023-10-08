@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage implements StorableObject {
     private final Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
-    private boolean permissions = false;
+    private boolean permissions;
 
     public void unloadChunk(int x, int z) {
         Pair<Integer, Integer> chunkPos = new Pair<>(x, z);
@@ -38,14 +38,15 @@ public class CommandBlockStorage implements StorableObject {
     public void addOrUpdateBlock(Position position, CompoundTag tag) {
         Pair<Integer, Integer> chunkPos = getChunkCoords(position);
 
-        if (!storedCommandBlocks.containsKey(chunkPos))
+        if (!storedCommandBlocks.containsKey(chunkPos)) {
             storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
+        }
 
         Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
 
-        if (blocks.containsKey(position))
-            if (blocks.get(position).equals(tag))
-                return;
+        if (blocks.containsKey(position) && blocks.get(position).equals(tag)) {
+            return;
+        }
 
         blocks.put(position, tag);
     }

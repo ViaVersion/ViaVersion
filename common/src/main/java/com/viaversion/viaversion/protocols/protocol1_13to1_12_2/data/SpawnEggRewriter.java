@@ -77,7 +77,7 @@ public class SpawnEggRewriter {
         spawnEggs.put(key, spawnEggs.size());
     }
 
-    // Make it a non existing block id
+    // Make it a non-existing block id
     public static int getSpawnEggId(String entityIdentifier) {
         // Fallback to bat
         if (!spawnEggs.containsKey(entityIdentifier))

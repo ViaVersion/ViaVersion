@@ -195,7 +195,7 @@ public class PlayerPackets {
                     clientWorld.setEnvironment(dimensionId);
                 });
 
-                // Gotta fake their op
+                // Fake their op status
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                     provider.sendPermission(wrapper.user());
@@ -381,11 +381,9 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     int hand = wrapper.read(Type.VAR_INT);
 
-                    if (Via.getConfig().isLeftHandedHandling()) {
-                        // Add 0x80 if left handed
-                        if (hand == 0) wrapper.set(Type.UNSIGNED_BYTE, 0,
-                                (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80)
-                        );
+                    // Add 0x80 if left-handed
+                    if (Via.getConfig().isLeftHandedHandling() && hand == 0) {
+                        wrapper.set(Type.UNSIGNED_BYTE, 0, (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80));
                     }
                     wrapper.sendToServer(Protocol1_9To1_8.class);
                     wrapper.cancel();

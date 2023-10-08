@@ -117,7 +117,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         // Update if there is no sword in the main hand or if the player has no shield in the second hand but a sword in the main hand
         if (!swordInHand || this.itemInSecondHand == null) {
 
-            // Update shield in off hand depending if a sword is in the main hand
+            // Update shield in off-hand depending on whether a sword is in the main hand
             setSecondHand(swordInHand ? new DataItem(442, (byte) 1, (short) 0, null) : null);
         }
     }

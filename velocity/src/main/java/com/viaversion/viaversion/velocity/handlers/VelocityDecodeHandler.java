@@ -70,12 +70,10 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
         // Move Via codec handlers back to right position
         ChannelPipeline pipeline = ctx.pipeline();
 
-        ChannelHandler encoder = pipeline.get(VelocityChannelInitializer.VIA_ENCODER);
-        pipeline.remove(encoder);
+        ChannelHandler encoder = pipeline.remove(VelocityChannelInitializer.VIA_ENCODER);
         pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_ENCODER, VelocityChannelInitializer.VIA_ENCODER, encoder);
 
-        ChannelHandler decoder = pipeline.get(VelocityChannelInitializer.VIA_DECODER);
-        pipeline.remove(decoder);
+        ChannelHandler decoder = pipeline.remove(VelocityChannelInitializer.VIA_DECODER);
         pipeline.addBefore(VelocityChannelInitializer.MINECRAFT_DECODER, VelocityChannelInitializer.VIA_DECODER, decoder);
 
         super.userEventTriggered(ctx, event);

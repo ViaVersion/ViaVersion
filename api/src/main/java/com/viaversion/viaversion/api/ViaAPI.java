@@ -117,7 +117,7 @@ public interface ViaAPI<T> {
      * Sends a raw packet to the player.
      *
      * @param player the platform's player object, e.g. for Bukkit this is Player
-     * @param packet the packet; you need a VarInt Id, then the packet contents
+     * @param packet the packet; you need a VarInt id, then the packet contents
      * @throws IllegalArgumentException if the player is not injected by Via
      */
     void sendRawPacket(T player, ByteBuf packet);
@@ -126,7 +126,7 @@ public interface ViaAPI<T> {
      * Sends a raw packet to the player.
      *
      * @param uuid   the uuid from the player to send packet
-     * @param packet the packet; you need a VarInt Id, then the packet contents
+     * @param packet the packet; you need a VarInt id, then the packet contents
      * @throws IllegalArgumentException if the player is not injected by Via
      */
     void sendRawPacket(UUID uuid, ByteBuf packet);

@@ -30,7 +30,8 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     private final Int2ObjectMap<Byte> playerEntityFlags = Int2ObjectSyncMap.hashmap();
     private int latestTradeWindowId;
     private boolean forceSendCenterChunk = true;
-    private int chunkCenterX, chunkCenterZ;
+    private int chunkCenterX;
+    private int chunkCenterZ;
 
     public EntityTracker1_14(UserConnection user) {
         super(user, Entity1_14Types.PLAYER);

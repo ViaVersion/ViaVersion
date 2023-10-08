@@ -28,7 +28,7 @@ public interface ViaCommandSender {
     /**
      * Check if the sender has a permission.
      *
-     * @param permission Permission string eg. viaversion.admin
+     * @param permission Permission string e.g. viaversion.admin
      * @return True if the sender has the permission
      */
     boolean hasPermission(String permission);

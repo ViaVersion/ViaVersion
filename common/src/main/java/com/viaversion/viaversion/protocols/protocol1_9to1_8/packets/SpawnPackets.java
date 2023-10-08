@@ -69,9 +69,9 @@ public class SpawnPackets {
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 3 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 6 - Pitch
                 map(Type.BYTE); // 7 - Yaw
@@ -82,7 +82,9 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int data = wrapper.get(Type.INT, 0); // Data (1st Integer)
 
-                    short vX = 0, vY = 0, vZ = 0;
+                    short vX = 0;
+                    short vY = 0;
+                    short vZ = 0;
                     if (data > 0) {
                         vX = wrapper.read(Type.SHORT);
                         vY = wrapper.read(Type.SHORT);
@@ -134,9 +136,9 @@ public class SpawnPackets {
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 1 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 2 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 1 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 2 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Z - Needs to be divided by 32
 
                 map(Type.SHORT); // 4 - Amount to spawn
             }
@@ -156,9 +158,9 @@ public class SpawnPackets {
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 2 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divided by 32
             }
         });
 
@@ -183,9 +185,9 @@ public class SpawnPackets {
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 3 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 6 - Yaw
                 map(Type.BYTE); // 7 - Pitch
@@ -255,9 +257,9 @@ public class SpawnPackets {
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 2 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 5 - Yaw
                 map(Type.BYTE); // 6 - Pitch

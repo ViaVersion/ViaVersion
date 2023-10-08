@@ -111,7 +111,7 @@ public class Version implements Comparable<Version> {
     }
 
     /**
-     * Get the tag, eg. -ALPHA
+     * Get the tag, e.g. -ALPHA
      *
      * @return The version tag
      */

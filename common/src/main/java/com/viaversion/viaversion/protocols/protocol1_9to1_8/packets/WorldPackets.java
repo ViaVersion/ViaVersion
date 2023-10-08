@@ -32,8 +32,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.types.Chunk1_9_1_2Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -92,7 +92,7 @@ public class WorldPackets {
             public void register() {
                 map(Type.STRING); // 0 - Sound Name
                 // 1 - Sound Category ID
-                // Everything else get's written through
+                // Everything else gets written through
 
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
@@ -298,17 +298,15 @@ public class WorldPackets {
                         : item != null && Protocol1_9To1_8.isSword(item.identifier());
 
                 if (isSword) {
-                    if (hand == 0) {
-                        if (!tracker.isBlocking()) {
-                            tracker.setBlocking(true);
+                    if (hand == 0 && !tracker.isBlocking()) {
+                        tracker.setBlocking(true);
 
-                            // Check if the shield is already in the offhand
-                            if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
+                        // Check if the shield is already in the offhand
+                        if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
 
-                                // Set shield in offhand when interacting with main hand
-                                Item shield = new DataItem(442, (byte) 1, (short) 0, null);
-                                tracker.setSecondHand(shield);
-                            }
+                            // Set shield in offhand when interacting with main hand
+                            Item shield = new DataItem(442, (byte) 1, (short) 0, null);
+                            tracker.setSecondHand(shield);
                         }
                     }
 

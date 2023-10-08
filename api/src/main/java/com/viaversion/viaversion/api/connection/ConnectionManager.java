@@ -65,7 +65,7 @@ public interface ConnectionManager {
 
     /**
      * Returns the UUID from the frontend connection to this proxy server
-     * Returns null when there isn't a server or this connection isn't frontend or it doesn't have an id
+     * Returns null when there isn't a server or this connection isn't frontend, or it doesn't have an id
      * When ViaVersion is reloaded, this method may not return some players.
      * May not return ProtocolSupport players.
      * <p>

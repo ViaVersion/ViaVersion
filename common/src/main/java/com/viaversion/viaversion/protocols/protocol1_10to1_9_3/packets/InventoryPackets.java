@@ -40,7 +40,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         if (item == null) return null;
         boolean newItem = item.identifier() >= 213 && item.identifier() <= 217;
         if (newItem) { // Replace server-side unknown items
-            item.setIdentifier((short) 1);
+            item.setIdentifier(1);
             item.setData((short) 0);
         }
         return item;

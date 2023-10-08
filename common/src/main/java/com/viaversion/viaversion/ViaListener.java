@@ -32,7 +32,7 @@ public abstract class ViaListener {
     }
 
     /**
-     * Get the UserConnection from an UUID
+     * Get the UserConnection from a UUID
      *
      * @param uuid UUID object
      * @return The UserConnection

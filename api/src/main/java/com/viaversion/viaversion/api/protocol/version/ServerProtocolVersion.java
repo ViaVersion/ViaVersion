@@ -52,7 +52,7 @@ public interface ServerProtocolVersion {
 
     /**
      * Returns true if the actual protocol version has not yet been identified.
-     * In that case, all methods above will returns -1.
+     * In that case, all methods above will return -1.
      *
      * @return true if set, false if unknown (yet)
      */

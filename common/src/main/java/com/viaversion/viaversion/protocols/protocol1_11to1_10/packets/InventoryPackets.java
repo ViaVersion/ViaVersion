@@ -83,7 +83,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         boolean newItem = item.identifier() >= 218 && item.identifier() <= 234;
         newItem |= item.identifier() == 449 || item.identifier() == 450;
         if (newItem) { // Replace server-side unknown items
-            item.setIdentifier((short) 1);
+            item.setIdentifier(1);
             item.setData((short) 0);
         }
         return item;

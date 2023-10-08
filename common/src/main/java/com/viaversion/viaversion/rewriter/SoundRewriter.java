@@ -41,7 +41,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Sound Id
+                map(Type.VAR_INT); // Sound id
                 handler(getSoundHandler());
             }
         });

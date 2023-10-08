@@ -58,7 +58,7 @@ public final class PaperViaInjector {
         try {
             Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");
             return true;
-        } catch (ReflectiveOperationException e) {
+        } catch (final ClassNotFoundException | NoSuchMethodException e) {
             return false;
         }
     }
@@ -75,7 +75,7 @@ public final class PaperViaInjector {
         try {
             Class.forName(className);
             return true;
-        } catch (ReflectiveOperationException e) {
+        } catch (final ClassNotFoundException e) {
             return false;
         }
     }

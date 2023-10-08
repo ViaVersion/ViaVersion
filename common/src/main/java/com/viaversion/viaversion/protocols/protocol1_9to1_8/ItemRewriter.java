@@ -207,7 +207,7 @@ public class ItemRewriter {
             newItem |= item.identifier() == 397 && item.data() == 5;
             newItem |= item.identifier() >= 432 && item.identifier() <= 448;
             if (newItem) { // Replace server-side unknown items
-                item.setIdentifier((short) 1);
+                item.setIdentifier(1);
                 item.setData((short) 0);
             }
         }
