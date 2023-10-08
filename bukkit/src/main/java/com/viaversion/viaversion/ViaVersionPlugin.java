@@ -222,11 +222,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
-    }
-
-    @Override
     public void onReload() {
         if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
             getLogger().severe("ViaVersion is already loaded, we're going to kick all the players... because otherwise we'll crash because of ProtocolLib.");

@@ -22,26 +22,32 @@
  */
 package com.viaversion.viaversion.api.configuration;
 
-import java.util.Collection;
+import java.util.Map;
 
-public interface ConfigurationProvider {
+public interface Config {
 
     /**
-     * Registers a config to be saved or reloaded when {@link #reloadConfigs()} is called.
+     * Reloads the config
+     */
+    void reload();
+
+    /**
+     * Saves the config
+     */
+    void save();
+
+    /**
+     * Sets the specified path to the given value.
      *
-     * @param config the config to register
+     * @param path  Path of the object to set.
+     * @param value New value to set the path to
      */
-    void register(Config config);
+    void set(String path, Object value);
 
     /**
-     * Returns all registered configs.
+     * Get all the configuration values
      *
-     * @return unmodifiable collection of all registered configs
+     * @return Map with key-values
      */
-    Collection<Config> configs();
-
-    /**
-     * Reloads the configuration files.
-     */
-    void reloadConfigs();
+    Map<String, Object> getValues();
 }

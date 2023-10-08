@@ -30,7 +30,7 @@ public class SpongeViaConfig extends AbstractViaConfig {
 
     public SpongeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        reloadConfig();
+        reload();
     }
 
     @Override

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
@@ -180,13 +181,10 @@ public interface ViaPlatform<T> {
      */
     ViaVersionConfig getConf();
 
-    /**
-     * Get the backend configuration provider for this platform.
-     * (On some platforms this returns the same as getConf())
-     *
-     * @return The configuration provider
-     */
-    ConfigurationProvider getConfigurationProvider();
+    @Deprecated/*(forRemoval = true)*/
+    default ConfigurationProvider getConfigurationProvider() {
+        return Via.getManager().getConfigurationProvider();
+    }
 
     /**
      * Get ViaVersions's data folder.

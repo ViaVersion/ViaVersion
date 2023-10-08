@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -191,11 +190,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Override
     public boolean isPluginEnabled() {
         return true;
-    }
-
-    @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
     }
 
     @Override

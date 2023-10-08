@@ -19,6 +19,7 @@ package com.viaversion.viaversion;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.PlatformTask;
@@ -32,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.scheduler.Scheduler;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.configuration.ConfigurationProviderImpl;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
@@ -53,6 +55,7 @@ import java.util.regex.Pattern;
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
     private final ConnectionManager connectionManager = new ConnectionManagerImpl();
+    private final ConfigurationProvider configurationProvider = new ConfigurationProviderImpl();
     private final DebugHandler debugHandler = new DebugHandlerImpl();
     private final ViaProviders providers = new ViaProviders();
     private final Scheduler scheduler = new TaskScheduler();
@@ -304,6 +307,11 @@ public class ViaManagerImpl implements ViaManager {
     @Override
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    @Override
+    public ConfigurationProvider getConfigurationProvider() {
+        return configurationProvider;
     }
 
     /**

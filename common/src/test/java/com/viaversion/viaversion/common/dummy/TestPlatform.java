@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
@@ -116,11 +115,6 @@ public final class TestPlatform implements ViaPlatform {
     @Override
     public ViaVersionConfig getConf() {
         return testConfig;
-    }
-
-    @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return null;
     }
 
     @Override

@@ -29,7 +29,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -191,11 +190,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public boolean isPluginEnabled() {
         return true;
-    }
-
-    @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
     }
 
     @Override

@@ -91,13 +91,14 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean cache1_17Light;
     private Map<String, String> chatTypeFormats;
 
-    protected AbstractViaConfig(File configFile) {
+    protected AbstractViaConfig(final File configFile) {
         super(configFile);
+        Via.getManager().getConfigurationProvider().register(this);
     }
 
     @Override
-    public void reloadConfig() {
-        super.reloadConfig();
+    public void reload() {
+        super.reload();
         loadFields();
     }
 

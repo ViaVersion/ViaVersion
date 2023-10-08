@@ -65,7 +65,7 @@ public final class DumpUtil {
                 com.viaversion.viaversion.util.VersionInfo.getImplementationVersion(),
                 Via.getManager().getSubPlatforms()
         );
-        final Map<String, Object> configuration = Via.getPlatform().getConfigurationProvider().getValues();
+        final Map<String, Object> configuration = ((Config) Via.getConfig()).getValues();
         final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(playerToSample));
         final CompletableFuture<String> result = new CompletableFuture<>();
         Via.getPlatform().runAsync(() -> {

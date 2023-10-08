@@ -63,7 +63,8 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
             setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-            if (((VelocityViaConfig) Via.getConfig()).isVelocityPingSave()) {
+            final VelocityViaConfig config = (VelocityViaConfig) Via.getConfig();
+            if (config.isVelocityPingSave()) {
                 final Map<String, Integer> servers = configuredServers();
                 final Integer protocol = servers.get(serverName);
                 if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
@@ -74,7 +75,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 synchronized (Via.getPlatform().getConfigurationProvider()) {
                     servers.put(serverName, serverPing.getVersion().getProtocol());
                 }
-                Via.getPlatform().getConfigurationProvider().saveConfig();
+                config.save();
             }
         });
     }

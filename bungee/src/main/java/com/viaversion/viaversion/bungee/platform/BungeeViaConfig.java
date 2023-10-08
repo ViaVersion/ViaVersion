@@ -35,7 +35,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
 
     public BungeeViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        reloadConfig();
+        reload();
     }
 
     @Override

@@ -20,7 +20,7 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.util.Config;
 
 public class AutoTeamSubCmd extends ViaSubCommand {
     @Override
@@ -35,11 +35,11 @@ public class AutoTeamSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ConfigurationProvider provider = Via.getPlatform().getConfigurationProvider();
         boolean newValue = !Via.getConfig().isAutoTeam();
 
-        provider.set("auto-team", newValue);
-        provider.saveConfig();
+        final Config config = (Config) Via.getConfig();
+        config.set("auto-team", newValue);
+        config.save();
         sendMessage(sender, "&6We will %s", (newValue ? "&aautomatically team players" : "&cno longer auto team players"));
         sendMessage(sender, "&6All players will need to re-login for the change to take place.");
 

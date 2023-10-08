@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.commands.defaultsubs;
+package com.viaversion.viaversion.configuration;
 
-import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.configuration.Config;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-public class ReloadSubCmd extends ViaSubCommand {
+public class ConfigurationProviderImpl implements ConfigurationProvider {
+    private final List<Config> configs = new ArrayList<>();
+
     @Override
-    public String name() {
-        return "reload";
+    public void register(final Config config) {
+        configs.add(config);
     }
 
     @Override
-    public String description() {
-        return "Reload the config from the disk";
+    public Collection<Config> configs() {
+        return Collections.unmodifiableCollection(configs);
     }
 
     @Override
-    public boolean execute(ViaCommandSender sender, String[] args) {
-        Via.getPlatform().getConfigurationProvider().reloadConfigs();
-        sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
-        return true;
+    public void reloadConfigs() {
+        for (final Config config : configs) {
+            config.reload();
+        }
     }
 }

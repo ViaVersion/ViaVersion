@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface ViaVersionConfig {
+public interface ViaVersionConfig extends Config {
 
     /**
      * Get if the plugin should check for updates

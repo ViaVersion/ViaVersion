@@ -36,7 +36,7 @@ public class BukkitViaConfig extends AbstractViaConfig {
 
     public BukkitViaConfig() {
         super(new File(((Plugin) Via.getPlatform()).getDataFolder(), "config.yml"));
-        reloadConfig();
+        reload();
     }
 
     @Override

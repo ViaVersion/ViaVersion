@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api;
 
 import com.viaversion.viaversion.api.command.ViaVersionCommand;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.ViaInjector;
@@ -92,6 +93,13 @@ public interface ViaManager {
     Scheduler getScheduler();
 
     /**
+     * Returns the configuration provider.
+     *
+     * @return the configuration provider
+     */
+    ConfigurationProvider getConfigurationProvider();
+
+    /**
      * If debug is enabled, packets and other otherwise suppressed warnings will be logged.
      *
      * @return true if enabled
@@ -138,4 +146,5 @@ public interface ViaManager {
      * @return whether the manager has been initialized
      */
     boolean isInitialized();
+
 }

@@ -34,7 +34,7 @@ public class VelocityViaConfig extends AbstractViaConfig {
 
     public VelocityViaConfig(File configFile) {
         super(new File(configFile, "config.yml"));
-        reloadConfig();
+        reload();
     }
 
     @Override

@@ -46,8 +46,9 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
             setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-            if (((BungeeViaConfig) Via.getConfig()).isBungeePingSave()) {
-                final Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
+            final BungeeViaConfig config = (BungeeViaConfig) Via.getConfig();
+            if (config.isBungeePingSave()) {
+                final Map<String, Integer> servers = config.getBungeeServerProtocols();
                 final Integer protocol = servers.get(serverName);
                 if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
                     return;
@@ -57,7 +58,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 synchronized (Via.getPlatform().getConfigurationProvider()) {
                     servers.put(serverName, serverPing.getVersion().getProtocol());
                 }
-                Via.getPlatform().getConfigurationProvider().saveConfig();
+                config.save();
             }
         });
     }
