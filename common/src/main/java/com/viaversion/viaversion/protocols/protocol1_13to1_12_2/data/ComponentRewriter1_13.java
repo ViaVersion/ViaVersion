@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
+import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.ShortTag;
@@ -27,12 +28,10 @@ import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import java.io.IOException;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
@@ -54,7 +53,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
 
         CompoundTag tag;
         try {
-            tag = BinaryTagIO.readString(text);
+            tag = SNBT.deserializeCompoundTag(text);
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
@@ -86,10 +85,10 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         array.add(object);
         String serializedNBT;
         try {
-            serializedNBT = BinaryTagIO.writeString(tag);
+            serializedNBT = SNBT.serialize(tag);
             object.addProperty("text", serializedNBT);
             hoverEvent.add("value", array);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Via.getPlatform().getLogger().warning("Error writing NBT in show_item:" + text);
             e.printStackTrace();
         }

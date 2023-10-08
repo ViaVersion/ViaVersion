@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data;
 
+import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import java.io.IOException;
 
 public final class MappingData extends MappingDataBase {
@@ -34,7 +34,7 @@ public final class MappingData extends MappingDataBase {
     @Override
     protected void loadExtras(final CompoundTag data) {
         try {
-            damageTypesRegistry = BinaryTagIO.readInputStream(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
+            damageTypesRegistry = NBTIO.readTag(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

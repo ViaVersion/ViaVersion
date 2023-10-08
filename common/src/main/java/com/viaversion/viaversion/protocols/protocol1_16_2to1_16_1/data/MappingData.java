@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data;
 
+import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
@@ -24,7 +25,6 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class MappingData extends MappingDataBase {
     @Override
     public void loadExtras(final CompoundTag data) {
         try {
-            dimensionRegistry = BinaryTagIO.readInputStream(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
+            dimensionRegistry = NBTIO.readTag(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (final IOException e) {
             Via.getPlatform().getLogger().severe("Error loading dimension registry:");
             e.printStackTrace();
