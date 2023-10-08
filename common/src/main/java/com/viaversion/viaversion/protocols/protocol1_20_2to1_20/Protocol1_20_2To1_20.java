@@ -49,8 +49,9 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.Configur
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.UUID;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
@@ -75,14 +76,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             final String channel = wrapper.passthrough(Type.STRING);
             if (channel.equals("minecraft:brand")) {
                 wrapper.passthrough(Type.STRING);
-                wrapper.read(Type.REMAINING_BYTES);
+                wrapper.clearInputBuffer();
             }
         });
         registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, wrapper -> {
             final String channel = wrapper.passthrough(Type.STRING);
             if (channel.equals("minecraft:brand")) {
                 wrapper.passthrough(Type.STRING);
-                wrapper.read(Type.REMAINING_BYTES);
+                wrapper.clearInputBuffer();
             }
         });
 
