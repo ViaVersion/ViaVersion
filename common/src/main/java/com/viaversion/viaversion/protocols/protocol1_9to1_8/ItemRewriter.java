@@ -30,12 +30,12 @@ import java.util.Map;
 
 public class ItemRewriter {
 
-    private static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
-    private static final Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
-    private static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
-    private static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
+    public static final Map<String, Integer> ENTTIY_NAME_TO_ID = new HashMap<>();
+    public static final Map<Integer, String> ENTTIY_ID_TO_NAME = new HashMap<>();
+    public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+    public static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
-    private static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36, .99F);
+    public static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36, .99F);
 
     static {
         /* Entities */
