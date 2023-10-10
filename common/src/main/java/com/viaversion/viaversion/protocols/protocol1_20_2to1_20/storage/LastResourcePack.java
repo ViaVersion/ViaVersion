@@ -50,4 +50,9 @@ public final class LastResourcePack implements StorableObject {
     public @Nullable JsonElement prompt() {
         return prompt;
     }
+
+    @Override
+    public boolean clearOnServerSwitch() {
+        return false;
+    }
 }

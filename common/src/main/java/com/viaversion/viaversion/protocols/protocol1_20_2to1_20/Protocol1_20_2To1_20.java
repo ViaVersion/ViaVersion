@@ -48,10 +48,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.EntityP
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
@@ -94,6 +94,10 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             final JsonElement prompt = wrapper.passthrough(Type.OPTIONAL_COMPONENT);
             wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
         });
+
+        registerClientbound(ClientboundPackets1_19_4.TAGS, wrapper -> wrapper.user().put(new LastTags(wrapper)));
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(),
+                wrapper -> wrapper.user().put(new LastTags(wrapper)));
 
         registerClientbound(ClientboundPackets1_19_4.DISPLAY_SCOREBOARD, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
@@ -220,7 +224,13 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             return;
         }
 
+        final int unmappedId = packetWrapper.getId();
         if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
+            if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
+                // Don't re-send old tags during config phase
+                packetWrapper.user().remove(LastTags.class);
+            }
+
             // Queue packets sent by the server while we wait for the client to transition to the configuration state
             configurationBridge.addPacketToQueue(packetWrapper, true);
             throw CancelException.generate();
@@ -228,7 +238,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         if (packetWrapper.getPacketType() == null || packetWrapper.getPacketType().state() != State.CONFIGURATION) {
             // Map some of them to their configuration state counterparts, but make sure to let join game through
-            final int unmappedId = packetWrapper.getId();
             if (unmappedId == ClientboundPackets1_19_4.JOIN_GAME.getId()) {
                 super.transform(direction, State.PLAY, packetWrapper);
                 return;
@@ -286,6 +295,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         enableFeaturesPacket.write(Type.VAR_INT, 1);
         enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
         enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
+
+        final LastTags lastTags = connection.get(LastTags.class);
+        if (lastTags != null) {
+            // The server might still follow up with a tags packet, but we wouldn't know
+            lastTags.sendLastTags(connection);
+        }
 
         if (lastResourcePack != null) {
             // The client for some reason drops the resource pack when reentering the configuration state
