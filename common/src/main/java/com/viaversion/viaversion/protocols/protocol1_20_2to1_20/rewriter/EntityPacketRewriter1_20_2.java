@@ -119,11 +119,11 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                         return;
                     }
 
-                    Protocol1_20_2To1_20.sendConfigurationPackets(wrapper.user(), dimensionRegistry, null);
-
-                    // Manually send it at the end and hope nothing breaks
+                    // Queue it and send it after the client acks the configuration finish
                     configurationBridge.setJoinGamePacket(wrapper);
                     wrapper.cancel();
+
+                    Protocol1_20_2To1_20.sendConfigurationPackets(wrapper.user(), dimensionRegistry, null);
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
