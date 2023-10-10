@@ -53,6 +53,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
+import com.viaversion.viaversion.util.GsonUtil;
 import java.util.BitSet;
 import java.util.Map;
 import java.util.UUID;
@@ -270,11 +271,14 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         }
     }
 
-    public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
-        // TODO Handle array of different types
+    public static @Nullable Tag jsonComponentToTag(@Nullable JsonElement component) {
+        component = GsonUtil.getGson().fromJson("[{\"text\": \"A\", \"color\": \"red\"}, \"B\", 1, [\"a\"]]", JsonArray.class);
+        Via.getPlatform().getLogger().info("Converting: " + component);
         try {
             // This mostly works:tm:
-            return convertToTag(component);
+            final Tag tag = convertToTag(component);
+            Via.getPlatform().getLogger().info("To: " + tag);
+            return tag;
         } catch (final Exception e) {
             Via.getPlatform().getLogger().severe("Error converting component: " + component);
             e.printStackTrace();
@@ -288,16 +292,12 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         } else if (element.isJsonObject()) {
             final CompoundTag tag = new CompoundTag();
             for (final Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
+                // Not strictly needed, but might as well make it more compact
                 convertObjectEntry(entry.getKey(), entry.getValue(), tag);
             }
             return tag;
         } else if (element.isJsonArray()) {
-            // TODO Number arrays
-            final ListTag tag = new ListTag();
-            for (final JsonElement entry : element.getAsJsonArray()) {
-                tag.add(convertToTag(entry));
-            }
-            return tag;
+            return convertJsonArray(element);
         } else if (element.isJsonPrimitive()) {
             final JsonPrimitive primitive = element.getAsJsonPrimitive();
             if (primitive.isString()) {
@@ -309,7 +309,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             final Number number = primitive.getAsNumber();
             if (number instanceof Integer) {
                 return new IntTag(number.intValue());
-            } else if (number instanceof Byte) { // This could be a boolean, but we can't know
+            } else if (number instanceof Byte) {
                 return new ByteTag(number.byteValue());
             } else if (number instanceof Short) {
                 return new ShortTag(number.shortValue());
@@ -321,17 +321,55 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 return new FloatTag(number.floatValue());
             }
         }
-        throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName());
+        throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName() + " with value " + element.getAsString());
+    }
+
+    private static ListTag convertJsonArray(final JsonElement element) {
+        // TODO Number arrays
+        final ListTag listTag = new ListTag();
+        boolean singleType = true;
+        for (final JsonElement entry : element.getAsJsonArray()) {
+            final Tag convertedEntryTag = convertToTag(entry);
+            if (listTag.getElementType() != null && listTag.getElementType() != convertedEntryTag.getClass()) {
+                singleType = false;
+                break;
+            }
+
+            listTag.add(convertedEntryTag);
+        }
+
+        if (singleType) {
+            return listTag;
+        }
+
+        // Generally, vanilla-esque serializers should not produce this format, so it should be rare
+        // Lists are only used for lists of components ("extra" and "with")
+        final ListTag processedListTag = new ListTag();
+        for (final JsonElement entry : element.getAsJsonArray()) {
+            final Tag convertedTag = convertToTag(entry);
+            if (convertedTag instanceof CompoundTag) {
+                processedListTag.add(listTag);
+                continue;
+            }
+
+            // Wrap all entries in compound tags as lists can only consist of one type of tag
+            final CompoundTag compoundTag = new CompoundTag();
+            compoundTag.put("text", new StringTag());
+            compoundTag.put("extra", convertedTag);
+        }
+        return processedListTag;
     }
 
     private static void convertObjectEntry(final String key, final JsonElement element, final CompoundTag tag) {
-        if ((key.equals("contents") || key.equals("value")) && element.isJsonObject()) {
+        if ((key.equals("contents")) && element.isJsonObject()) {
             // Store show_entity id as int array instead of uuid string
             final JsonObject hoverEvent = element.getAsJsonObject();
-            final JsonElement id = hoverEvent.get("id");
+            final JsonElement id = hoverEvent.remove("id");
             final UUID uuid;
             if (id != null && id.isJsonPrimitive() && (uuid = parseUUID(id.getAsString())) != null) {
-                tag.put(key, new IntArrayTag(UUIDIntArrayType.uuidToIntArray(uuid)));
+                final CompoundTag convertedTag = (CompoundTag) convertToTag(element);
+                convertedTag.put("id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(uuid)));
+                tag.put(key, convertedTag);
                 return;
             }
         }
@@ -364,6 +402,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             }
             return array;
         } else if (tag instanceof NumberTag) {
+            // TODO Byte could be a boolean
             return new JsonPrimitive((Number) tag.getValue());
         } else if (tag instanceof StringTag) {
             return new JsonPrimitive(((StringTag) tag).getValue());
@@ -393,12 +432,14 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     }
 
     private static void convertCompoundTagEntry(final String key, final Tag tag, final JsonObject object) {
-        if ((key.equals("contents") || key.equals("value")) && tag instanceof CompoundTag) {
+        if ((key.equals("contents")) && tag instanceof CompoundTag) {
             // Back to a UUID string
             final CompoundTag showEntity = (CompoundTag) tag;
-            final Tag idTag = showEntity.get("id");
+            final Tag idTag = showEntity.remove("id");
             if (idTag instanceof IntArrayTag) {
-                object.addProperty(key, uuidIntsToString(((IntArrayTag) idTag).getValue()));
+                final JsonObject convertedElement = (JsonObject) convertToJson(tag);
+                convertedElement.addProperty("id", uuidIntsToString(((IntArrayTag) idTag).getValue()));
+                object.add(key, convertedElement);
                 return;
             }
         }
