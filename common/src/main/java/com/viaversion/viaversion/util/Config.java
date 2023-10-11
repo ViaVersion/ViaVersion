@@ -34,12 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
+    private static final Logger LOGGER = Logger.getLogger("ViaVersion Config");
     private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
@@ -226,7 +228,7 @@ public abstract class Config {
                 if (type.isInstance(o1)) {
                     filteredValues.add(type.cast(o1));
                 } else if (invalidValueMessage != null) {
-                    Via.getPlatform().getLogger().warning(String.format(invalidValueMessage, o1));
+                    LOGGER.warning(String.format(invalidValueMessage, o1));
                 }
             }
             return filteredValues;
