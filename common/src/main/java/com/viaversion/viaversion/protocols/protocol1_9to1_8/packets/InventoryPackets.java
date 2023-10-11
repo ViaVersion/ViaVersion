@@ -245,13 +245,10 @@ public class InventoryPackets {
                     boolean throwItem = (slot == 45);
                     if (throwItem) {
                         // Send a packet wiping the slot
-                        wrapper.create(ClientboundPackets1_9.SET_SLOT, new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
-                                wrapper.write(Type.SHORT, slot);
-                                wrapper.write(Type.ITEM, null);
-                            }
+                        wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
+                            w.write(Type.UNSIGNED_BYTE, (short) 0);
+                            w.write(Type.SHORT, slot);
+                            w.write(Type.ITEM, null);
                         }).send(Protocol1_9To1_8.class);
                         // Finally reset to simulate throwing item
                         wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
@@ -303,13 +300,10 @@ public class InventoryPackets {
 
                     if (throwItem) {
                         // Send a packet wiping the slot
-                        wrapper.create(ClientboundPackets1_9.SET_SLOT, new PacketHandler() {
-                            @Override
-                            public void handle(PacketWrapper wrapper) throws Exception {
-                                wrapper.write(Type.UNSIGNED_BYTE, (short) windowID);
-                                wrapper.write(Type.SHORT, slot);
-                                wrapper.write(Type.ITEM, null);
-                            }
+                        wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
+                            w.write(Type.UNSIGNED_BYTE, windowID);
+                            w.write(Type.SHORT, slot);
+                            w.write(Type.ITEM, null);
                         }).scheduleSend(Protocol1_9To1_8.class);
                         // Finally reset to simulate throwing item
                         wrapper.set(Type.BYTE, 0, (byte) 0); // Set button to 0

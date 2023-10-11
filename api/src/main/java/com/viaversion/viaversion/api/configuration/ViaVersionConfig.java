@@ -87,7 +87,7 @@ public interface ViaVersionConfig extends Config {
      * <p>
      * This option requires {@link #isShowShieldWhenSwordInHand()} to be disabled
      *
-     * @return {@code true} if non delayed shield blocking is enabled.
+     * @return {@code true} if non-delayed shield blocking is enabled.
      */
     boolean isNoDelayShieldBlocking();
 
@@ -126,7 +126,7 @@ public interface ViaVersionConfig extends Config {
      * Get if the boss bars for 1.9 &amp; 1.10 clients are being stopped from flickering
      * This will keep all boss bars on 100% (not recommended)
      *
-     * @return true if boss bar anti flickering is enabled
+     * @return true if boss bar anti-flickering is enabled
      */
     boolean isBossbarAntiflicker();
 
@@ -384,7 +384,7 @@ public interface ViaVersionConfig extends Config {
     boolean isTruncate1_14Books();
 
     /**
-     * Handles left handed info by using unused bit 7 on Client Settings packet
+     * Handles left-handed info by using unused bit 7 on Client Settings packet
      *
      * @return true if enabled
      */
@@ -443,7 +443,7 @@ public interface ViaVersionConfig extends Config {
 
     /***
      * Get the world names that should be returned for each Vanilla dimension.
-     * Note that this can be overriden per-user by using {@link UserConnection#put(StorableObject)} with
+     * Note that this can be overridden per-user by using {@link UserConnection#put(StorableObject)} with
      * a custom instance of {@link WorldIdentifiers} for the user's {@link UserConnection}.
      *
      * @return the global map from vanilla dimensions to world name

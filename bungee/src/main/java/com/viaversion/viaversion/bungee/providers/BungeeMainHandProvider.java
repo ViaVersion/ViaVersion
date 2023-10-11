@@ -26,11 +26,11 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /*
-    This solves the wrong mainhand issue when you join with BungeeCord on a 1.8 server, and switch to a 1.9 or higher.
+    This solves the wrong main hand issue when you join with BungeeCord on a 1.8 server, and switch to a 1.9 or higher.
  */
 public class BungeeMainHandProvider extends MainHandProvider {
-    private static Method getSettings = null;
-    private static Method setMainHand = null;
+    private static Method getSettings;
+    private static Method setMainHand;
 
     static {
         try {

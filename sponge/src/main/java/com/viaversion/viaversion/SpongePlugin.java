@@ -223,11 +223,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public boolean isOldClientsAllowed() {
-        return true;
-    }
-
-    @Override
     public boolean hasPlugin(final String name) {
         return game.pluginManager().plugin(name).isPresent();
     }

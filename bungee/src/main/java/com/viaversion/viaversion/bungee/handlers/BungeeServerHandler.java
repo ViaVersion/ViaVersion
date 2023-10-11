@@ -125,8 +125,8 @@ public class BungeeServerHandler implements Listener {
         int playerId;
         try {
             playerId = Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(userConnection);
-        } catch (Exception ex) {
-            return; // Ignored
+        } catch (Exception ignored) {
+            return;
         }
 
         for (EntityTracker tracker : userConnection.getEntityTrackers()) {
@@ -156,18 +156,13 @@ public class BungeeServerHandler implements Listener {
 
         // Clear auto-team
         EntityTracker1_9 oldEntityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
-        if (oldEntityTracker != null) {
-            if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
-                oldEntityTracker.sendTeamPacket(false, true);
-            }
+        if (oldEntityTracker != null && oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
+            oldEntityTracker.sendTeamPacket(false, true);
         }
 
-        String serverName = event.getServer().getInfo().getName();
-
+        String serverName = server.getInfo().getName();
         storage.setCurrentServer(serverName);
-
         int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
-
         if (protocolId <= ProtocolVersion.v1_8.getVersion() && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {

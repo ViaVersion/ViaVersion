@@ -74,12 +74,9 @@ public class PlayerSneakListener extends ViaBukkitListener {
         if (Via.getAPI().getServerVersion().lowestSupportedVersion() >= ProtocolVersion.v1_9.getVersion()) {
             sneaking = new WeakHashMap<>();
             useCache = true;
-            plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    for (Map.Entry<Player, Boolean> entry : sneaking.entrySet()) {
-                        setHeight(entry.getKey(), entry.getValue() ? HEIGHT_1_14 : HEIGHT_1_9);
-                    }
+            plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+                for (Map.Entry<Player, Boolean> entry : sneaking.entrySet()) {
+                    setHeight(entry.getKey(), entry.getValue() ? HEIGHT_1_14 : HEIGHT_1_9);
                 }
             }, 1, 1);
         }

@@ -76,7 +76,6 @@ public class BungeeViaInjector implements ViaInjector {
         Via.getPlatform().getLogger().severe("ViaVersion cannot remove itself from Bungee without a reboot!");
     }
 
-    @SuppressWarnings("unchecked")
     private void injectChannel(Channel channel) throws ReflectiveOperationException {
         List<String> names = channel.pipeline().names();
         ChannelHandler bootstrapAcceptor = null;

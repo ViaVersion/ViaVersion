@@ -206,12 +206,13 @@ public interface ViaPlatform<T> {
     JsonObject getDump();
 
     /**
-     * Get if older clients are allowed to be used using ViaVersion.
-     * (Only 1.9 on 1.9.2 server is supported by ViaVersion alone)
+     * Get if older clients are allowed using ViaVersion.
      *
      * @return True if allowed
      */
-    boolean isOldClientsAllowed();
+    default boolean isOldClientsAllowed() {
+        return true;
+    }
 
     /**
      * Returns an immutable collection of classes to be checked as unsupported software with their software name.

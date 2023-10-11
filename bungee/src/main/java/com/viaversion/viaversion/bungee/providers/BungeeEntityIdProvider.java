@@ -24,13 +24,13 @@ import java.lang.reflect.Method;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeEntityIdProvider extends EntityIdProvider {
-    private static Method getClientEntityId;
+    private static final Method GET_CLIENT_ENTITY_ID;
 
     static {
         try {
-            getClientEntityId = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getClientEntityId");
+            GET_CLIENT_ENTITY_ID = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getClientEntityId");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -39,6 +39,6 @@ public class BungeeEntityIdProvider extends EntityIdProvider {
         BungeeStorage storage = user.get(BungeeStorage.class);
         ProxiedPlayer player = storage.getPlayer();
 
-        return (int) getClientEntityId.invoke(player);
+        return (int) GET_CLIENT_ENTITY_ID.invoke(player);
     }
 }

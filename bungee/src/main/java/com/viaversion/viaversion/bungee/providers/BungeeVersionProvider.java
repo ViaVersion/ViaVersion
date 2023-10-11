@@ -43,8 +43,10 @@ public class BungeeVersionProvider extends BaseVersionProvider {
 
     @Override
     public int getClosestServerProtocol(UserConnection user) throws Exception {
-        if (ref == null)
+        if (ref == null) {
             return super.getClosestServerProtocol(user);
+        }
+
         // TODO Have one constant list forever until restart? (Might limit plugins if they change this)
         List<Integer> list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
         List<Integer> sorted = new ArrayList<>(list);

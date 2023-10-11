@@ -200,11 +200,6 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     }
 
     @Override
-    public boolean isOldClientsAllowed() {
-        return true;
-    }
-
-    @Override
     public Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
         final Collection<UnsupportedSoftware> list = new ArrayList<>(ViaServerProxyPlatform.super.getUnsupportedSoftwareClasses());
         list.add(new UnsupportedServerSoftware.Builder()
