@@ -37,6 +37,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -53,7 +55,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
-import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.rewriter.SoundRewriter;
 import java.util.BitSet;
 import java.util.Map;
 import java.util.UUID;
@@ -61,6 +63,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
 
+    public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
 
     public Protocol1_20_3To1_20_2() {
@@ -70,6 +73,10 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         super.registerPackets();
+
+        final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_2.SOUND);
+        soundRewriter.registerEntitySound(ClientboundPackets1_20_2.ENTITY_SOUND);
 
         // Components are now (mostly) written as nbt instead of json strings
         registerClientbound(ClientboundPackets1_20_2.ADVANCEMENTS, wrapper -> {
@@ -271,14 +278,10 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         }
     }
 
-    public static @Nullable Tag jsonComponentToTag(@Nullable JsonElement component) {
-        component = GsonUtil.getGson().fromJson("[{\"text\": \"A\", \"color\": \"red\"}, \"B\", 1, [\"a\"]]", JsonArray.class);
-        Via.getPlatform().getLogger().info("Converting: " + component);
+    public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
         try {
             // This mostly works:tm:
-            final Tag tag = convertToTag(component);
-            Via.getPlatform().getLogger().info("To: " + tag);
-            return tag;
+            return convertToTag(component);
         } catch (final Exception e) {
             Via.getPlatform().getLogger().severe("Error converting component: " + component);
             e.printStackTrace();
@@ -320,6 +323,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             } else if (number instanceof Float) {
                 return new FloatTag(number.floatValue());
             }
+            return new StringTag(primitive.getAsString()); // ???
         }
         throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName() + " with value " + element.getAsString());
     }
@@ -457,6 +461,11 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_19_4Types.PLAYER));
+    }
+
+    @Override
+    public MappingData getMappingData() {
+        return MAPPINGS;
     }
 
     @Override
