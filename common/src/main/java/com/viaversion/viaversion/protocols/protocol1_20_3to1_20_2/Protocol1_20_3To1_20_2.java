@@ -138,6 +138,14 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 }
             }
         });
+        registerClientbound(ClientboundPackets1_20_2.BOSSBAR, wrapper -> {
+            wrapper.passthrough(Type.UUID); // Id
+
+            final int action = wrapper.passthrough(Type.VAR_INT);
+            if (action == 0 || action == 3) {
+                convertComponent(wrapper);
+            }
+        });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_CHAT, wrapper -> {
             wrapper.passthrough(Type.UUID); // Sender
             wrapper.passthrough(Type.VAR_INT); // Index
@@ -280,7 +288,6 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
     public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
         try {
-            // This mostly works:tm:
             return convertToTag(component);
         } catch (final Exception e) {
             Via.getPlatform().getLogger().severe("Error converting component: " + component);
