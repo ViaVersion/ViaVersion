@@ -1,0 +1,3 @@
+dependencies {
+    implementation(projects.viaversionCommon)
+}

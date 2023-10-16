@@ -312,6 +312,14 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
     }
 
     public void registerAdvancements1_20_2(C packetType) {
+        registerAdvancements1_20_2(packetType, Type.COMPONENT);
+    }
+
+    public void registerAdvancements1_20_3(C packetType) {
+        registerAdvancements1_20_2(packetType, Type.TAG);
+    }
+
+    private void registerAdvancements1_20_2(C packetType, Type<?> componentType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
@@ -325,8 +333,8 @@ public abstract class ItemRewriter<C extends ClientboundPacketType, S extends Se
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.COMPONENT); // Title
-                    wrapper.passthrough(Type.COMPONENT); // Description
+                    wrapper.passthrough(componentType); // Title
+                    wrapper.passthrough(componentType); // Description
                     handleItemToClient(wrapper.passthrough(itemType)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags

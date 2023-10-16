@@ -39,6 +39,7 @@ setupViaSubproject("bungee")
 setupViaSubproject("velocity")
 setupViaSubproject("sponge")
 setupViaSubproject("fabric")
+setupViaSubproject("template")
 
 setupSubproject("viaversion") {
     projectDir = file("universal")

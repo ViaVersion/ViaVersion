@@ -92,7 +92,7 @@ public class ConfigurationState implements StorableObject {
 
     @Override
     public boolean clearOnServerSwitch() {
-        return false; // This might be bad
+        return false;
     }
 
     @Override
