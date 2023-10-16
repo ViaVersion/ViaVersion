@@ -56,14 +56,25 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Serverbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
+    private static final Set<String> BOOLEAN_TYPES = new HashSet<>(Arrays.asList(
+            "interpret",
+            "bold",
+            "italic",
+            "underlined",
+            "strikethrough",
+            "obfuscated"
+    ));
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
 
     public Protocol1_20_3To1_20_2() {
@@ -278,7 +289,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
     public static @Nullable JsonElement tagComponentToJson(@Nullable final Tag tag) {
         try {
-            return convertToJson(tag);
+            return convertToJson(null, tag);
         } catch (final Exception e) {
             Via.getPlatform().getLogger().severe("Error converting component: " + tag);
             e.printStackTrace();
@@ -396,7 +407,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         }
     }
 
-    private static @Nullable JsonElement convertToJson(final @Nullable Tag tag) {
+    private static @Nullable JsonElement convertToJson(final @Nullable String key, final @Nullable Tag tag) {
         if (tag == null) {
             return null;
         } else if (tag instanceof CompoundTag) {
@@ -409,12 +420,16 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             final ListTag list = (ListTag) tag;
             final JsonArray array = new JsonArray();
             for (final Tag listEntry : list) {
-                array.add(convertToJson(listEntry));
+                array.add(convertToJson(null, listEntry));
             }
             return array;
         } else if (tag instanceof NumberTag) {
-            // TODO Byte could be a boolean
-            return new JsonPrimitive((Number) tag.getValue());
+            final NumberTag numberTag = (NumberTag) tag;
+            if (key != null && BOOLEAN_TYPES.contains(key)) {
+                // Booleans don't have a direct representation in nbt
+                return new JsonPrimitive(numberTag.asBoolean());
+            }
+            return new JsonPrimitive(numberTag.getValue());
         } else if (tag instanceof StringTag) {
             return new JsonPrimitive(((StringTag) tag).getValue());
         } else if (tag instanceof ByteArrayTag) {
@@ -448,14 +463,14 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             final CompoundTag showEntity = (CompoundTag) tag;
             final Tag idTag = showEntity.remove("id");
             if (idTag instanceof IntArrayTag) {
-                final JsonObject convertedElement = (JsonObject) convertToJson(tag);
+                final JsonObject convertedElement = (JsonObject) convertToJson(key, tag);
                 convertedElement.addProperty("id", uuidIntsToString(((IntArrayTag) idTag).getValue()));
                 object.add(key, convertedElement);
                 return;
             }
         }
 
-        object.add(key, convertToJson(tag));
+        object.add(key, convertToJson(key, tag));
     }
 
     private static String uuidIntsToString(final int[] parts) {

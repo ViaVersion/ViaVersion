@@ -22,7 +22,7 @@ dependencies {
     api(libs.fastutil)
     api(libs.flare)
     api(libs.flareFastutil)
-    api(libs.nbt)
+    api(libs.vianbt)
     api(libs.gson)
 
     compileOnlyApi(libs.snakeYaml)
