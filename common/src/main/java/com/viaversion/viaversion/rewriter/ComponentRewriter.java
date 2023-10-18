@@ -31,8 +31,10 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -87,7 +89,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             if (wrapper.passthrough(Type.VAR_INT) == 2) {
                 wrapper.passthrough(Type.VAR_INT);
                 wrapper.passthrough(Type.INT);
-                passthroughAndProcess(wrapper);
+                processText(wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
@@ -99,7 +101,62 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, wrapper -> {
             final int action = wrapper.passthrough(Type.VAR_INT);
             if (action >= 0 && action <= 2) {
-                passthroughAndProcess(wrapper);
+                processText(wrapper.passthrough(Type.COMPONENT));
+            }
+        });
+    }
+
+    public void registerPing() {
+        // Always json
+        protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+    }
+
+    public void registerLegacyOpenWindow(final C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.UNSIGNED_BYTE); // Id
+                map(Type.STRING); // Window Type
+                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+            }
+        });
+    }
+
+    public void registerOpenWindow(final C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Id
+                map(Type.VAR_INT); // Window Type
+                handler(wrapper -> passthroughAndProcess(wrapper));
+            }
+        });
+    }
+
+    public void registerTabList(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            passthroughAndProcess(wrapper);
+            passthroughAndProcess(wrapper);
+        });
+    }
+
+    public void registerCombatKill(final C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT);
+                map(Type.INT);
+                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+            }
+        });
+    }
+
+    public void registerCombatKill1_20(final C packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.VAR_INT); // Duration
+                handler(wrapper -> passthroughAndProcess(wrapper));
             }
         });
     }
