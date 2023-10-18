@@ -71,7 +71,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.STATISTICS);
 
         // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
-        /*final CommandRewriter1_z<ClientboundPackets1_20_2> commandRewriter = new CommandRewriter1_z<ClientboundPackets1_20_2>(this) {
+        /*final CommandRewriter1_19_4<ClientboundPackets1_20_2> commandRewriter = new CommandRewriter1_19_4<ClientboundPackets1_20_2>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 if (argumentType.equals("minecraft:abc")) {
@@ -105,9 +105,9 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
     }
 
     @Override
-    public void init(final UserConnection user) {
+    public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/metadata rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_19_4Types.PLAYER));
     }
 
     // Overriding these three methods is important as they are relied on various rewriter classes

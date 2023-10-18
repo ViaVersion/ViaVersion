@@ -18,16 +18,16 @@
 package com.viaversion.viaversion.template.protocols.rewriter;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.RecipeRewriter1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.type.ChunkType1_20_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 
 // To replace if needed:
-//   Chunk1_18Type
+//   ChunkType1_20_2
 //   RecipeRewriter1_20_2
 public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPackets1_20_2, ServerboundPackets1_20_2, Protocol1_99To_98> {
 
@@ -45,7 +45,7 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         blockRewriter.registerBlockChange(ClientboundPackets1_20_2.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_2.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_2.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_2.CHUNK_DATA, Chunk1_18Type::new);
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_2.CHUNK_DATA, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_2.BLOCK_ENTITY_DATA);
 
         // Registers item id changes

@@ -110,7 +110,7 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
     @Override
     public void onMappingDataLoaded() {
         // IF ENTITY TYPES CHANGED: Automatically map entity id changes AFTER entity ids have been loaded
-        // mapTypes();
+        mapTypes();
     }
 
     @Override

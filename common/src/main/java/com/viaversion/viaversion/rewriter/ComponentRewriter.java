@@ -165,8 +165,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         switch (type) {
             case JSON:
                 processText(wrapper.passthrough(Type.COMPONENT));
+                break;
             case NBT:
                 processTag(wrapper.passthrough(Type.TAG));
+                break;
         }
     }
 
