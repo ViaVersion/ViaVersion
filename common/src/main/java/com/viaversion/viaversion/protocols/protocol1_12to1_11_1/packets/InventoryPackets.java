@@ -31,14 +31,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_12, Protocol1_12To1_11_1> {
 
     public InventoryPackets(Protocol1_12To1_11_1 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM1_8);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM1_8_ARRAY);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM1_8);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
@@ -52,12 +52,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
-                            handleItemToClient(wrapper.passthrough(Type.ITEM)); // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM)); // Output Item
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Input Item
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Output Item
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
-                                handleItemToClient(wrapper.passthrough(Type.ITEM)); // Second Item
+                                handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Second Item
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -78,10 +78,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
                         map(Type.BYTE); // 2 - Button
                         map(Type.SHORT); // 3 - Action number
                         map(Type.VAR_INT); // 4 - Mode
-                        map(Type.ITEM); // 5 - Clicked Item
+                        map(Type.ITEM1_8); // 5 - Clicked Item
 
                         handler(wrapper -> {
-                            Item item = wrapper.get(Type.ITEM, 0);
+                            Item item = wrapper.get(Type.ITEM1_8, 0);
                             if (!Via.getConfig().is1_12QuickMoveActionFix()) {
                                 handleItemToServer(item);
                                 return;
@@ -108,7 +108,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         );
 
         // Creative Inventory Action
-        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
     }
 
     @Override

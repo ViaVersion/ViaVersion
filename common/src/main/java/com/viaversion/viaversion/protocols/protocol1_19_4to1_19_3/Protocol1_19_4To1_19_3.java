@@ -19,11 +19,11 @@ package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
@@ -93,7 +93,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded();
-        Entity1_19_4Types.initialize(this);
+        EntityTypes1_19_4.initialize(this);
         Types1_19_4.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -108,7 +108,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     public void init(final UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
 
         user.put(new PlayerVehicleTracker(user));
     }

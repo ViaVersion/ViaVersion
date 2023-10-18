@@ -20,7 +20,7 @@ package com.viaversion.viaversion.template.protocols;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -107,7 +107,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
     @Override
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/metadata rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
-        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_19_4Types.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_19_4.PLAYER));
     }
 
     // Overriding these three methods is important as they are relied on various rewriter classes

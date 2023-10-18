@@ -36,6 +36,6 @@ public class RecipeRewriter1_20_2<C extends ClientboundPacketType> extends Recip
 
     @Override
     protected Type<Item[]> itemArrayType() {
-        return Type.ITEM1_20_2_VAR_INT_ARRAY;
+        return Type.ITEM1_20_2_ARRAY;
     }
 }

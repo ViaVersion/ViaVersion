@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -60,7 +60,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.STATISTICS);
 
-        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
 
         tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_14_4.TAGS, RegistryType.ENTITY);
@@ -78,7 +78,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, Entity1_15Types.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_15.PLAYER));
     }
 
     @Override

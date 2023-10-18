@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -31,9 +31,9 @@ public class EntityPackets {
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
         MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, Entity1_16_2Types.PLAYER);
+        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, EntityTypes1_16_2.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_16.METADATA_LIST);
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.DESTROY_ENTITIES);
 

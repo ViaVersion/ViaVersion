@@ -29,13 +29,14 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public abstract class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
+public class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
         T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
     private final Type<Item> itemType;
     private final Type<Item[]> itemArrayType;
 
+    @Deprecated/*(forRemoval = true)*/
     protected ItemRewriter(T protocol) {
-        this(protocol, Type.FLAT_VAR_INT_ITEM, Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT);
+        this(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {

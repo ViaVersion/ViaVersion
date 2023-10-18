@@ -124,13 +124,13 @@ public class MetaFilter {
     }
 
     public static final class Builder {
-        private final EntityRewriter rewriter;
+        private final EntityRewriter<?, ?> rewriter;
         private EntityType type;
         private int index = -1;
         private boolean filterFamily;
         private MetaHandler handler;
 
-        public Builder(EntityRewriter rewriter) {
+        public Builder(EntityRewriter<?, ?> rewriter) {
             this.rewriter = rewriter;
         }
 

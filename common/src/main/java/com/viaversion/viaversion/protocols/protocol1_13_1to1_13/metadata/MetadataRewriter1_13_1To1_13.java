@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -50,22 +50,22 @@ public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<ClientboundPack
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
+        if (type.isOrHasParent(EntityTypes1_13.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
             // New block format
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (type.isOrHasParent(Entity1_13Types.EntityType.ABSTRACT_ARROW) && metadata.id() >= 7) {
+        } else if (type.isOrHasParent(EntityTypes1_13.EntityType.ABSTRACT_ARROW) && metadata.id() >= 7) {
             metadata.setId(metadata.id() + 1); // New shooter UUID
         }
     }
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, false);
+        return EntityTypes1_13.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, true);
+        return EntityTypes1_13.getTypeFromId(type, true);
     }
 }

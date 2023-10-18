@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import space.vectrix.flare.fastutil.Int2ObjectSyncMap;

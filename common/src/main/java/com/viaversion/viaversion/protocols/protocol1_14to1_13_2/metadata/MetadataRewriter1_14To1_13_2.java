@@ -20,8 +20,8 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -41,8 +41,8 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
 
     public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
         super(protocol);
-        mapTypes(Entity1_13Types.EntityType.values(), Entity1_14Types.class);
-        mapEntityType(Entity1_13Types.EntityType.OCELOT, Entity1_14Types.CAT);
+        mapTypes(EntityTypes1_13.EntityType.values(), EntityTypes1_14.class);
+        mapEntityType(EntityTypes1_13.EntityType.OCELOT, EntityTypes1_14.CAT);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
         if (metadata.id() > 5) {
             metadata.setId(metadata.id() + 1);
         }
-        if (metadata.id() == 8 && type.isOrHasParent(Entity1_14Types.LIVINGENTITY)) {
+        if (metadata.id() == 8 && type.isOrHasParent(EntityTypes1_14.LIVINGENTITY)) {
             final float v = ((Number) metadata.getValue()).floatValue();
             if (Float.isNaN(v) && Via.getConfig().is1_14HealthNaNFix()) {
                 metadata.setValue(1F);
@@ -75,11 +75,11 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
         }
 
         //Metadata 12 added to living_entity
-        if (metadata.id() > 11 && type.isOrHasParent(Entity1_14Types.LIVINGENTITY)) {
+        if (metadata.id() > 11 && type.isOrHasParent(EntityTypes1_14.LIVINGENTITY)) {
             metadata.setId(metadata.id() + 1);
         }
 
-        if (type.isOrHasParent(Entity1_14Types.ABSTRACT_INSENTIENT)) {
+        if (type.isOrHasParent(EntityTypes1_14.ABSTRACT_INSENTIENT)) {
             if (metadata.id() == 13) {
                 tracker.setInsentientData(entityId, (byte) ((((Number) metadata.getValue()).byteValue() & ~0x4)
                         | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
@@ -87,7 +87,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
         }
 
-        if (type.isOrHasParent(Entity1_14Types.PLAYER)) {
+        if (type.isOrHasParent(EntityTypes1_14.PLAYER)) {
             if (entityId != tracker.clientEntityId()) {
                 if (metadata.id() == 0) {
                     byte flags = ((Number) metadata.getValue()).byteValue();
@@ -100,7 +100,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
                     metadatas.add(new Metadata(6, Types1_14.META_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
-        } else if (type.isOrHasParent(Entity1_14Types.ZOMBIE)) {
+        } else if (type.isOrHasParent(EntityTypes1_14.ZOMBIE)) {
             if (metadata.id() == 16) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
@@ -111,13 +111,13 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
         }
 
-        if (type.isOrHasParent(Entity1_14Types.MINECART_ABSTRACT)) {
+        if (type.isOrHasParent(EntityTypes1_14.MINECART_ABSTRACT)) {
             if (metadata.id() == 10) {
                 // New block format
                 int data = (int) metadata.getValue();
                 metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
             }
-        } else if (type.is(Entity1_14Types.HORSE)) {
+        } else if (type.is(EntityTypes1_14.HORSE)) {
             if (metadata.id() == 18) {
                 metadatas.remove(metadata);
 
@@ -134,31 +134,31 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
                 PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.ENTITY_EQUIPMENT, null, connection);
                 equipmentPacket.write(Type.VAR_INT, entityId);
                 equipmentPacket.write(Type.VAR_INT, 4);
-                equipmentPacket.write(Type.FLAT_VAR_INT_ITEM, armorItem);
+                equipmentPacket.write(Type.ITEM1_13_2, armorItem);
                 equipmentPacket.scheduleSend(Protocol1_14To1_13_2.class);
             }
-        } else if (type.is(Entity1_14Types.VILLAGER)) {
+        } else if (type.is(EntityTypes1_14.VILLAGER)) {
             if (metadata.id() == 15) {
                 // plains
                 metadata.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
-        } else if (type.is(Entity1_14Types.ZOMBIE_VILLAGER)) {
+        } else if (type.is(EntityTypes1_14.ZOMBIE_VILLAGER)) {
             if (metadata.id() == 18) {
                 // plains
                 metadata.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId((int) metadata.getValue()), 0));
             }
-        } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
+        } else if (type.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
             if (metadata.id() >= 9) { // New piercing
                 metadata.setId(metadata.id() + 1);
             }
-        } else if (type.is(Entity1_14Types.FIREWORK_ROCKET)) {
+        } else if (type.is(EntityTypes1_14.FIREWORK_ROCKET)) {
             if (metadata.id() == 8) {
                 metadata.setMetaType(Types1_14.META_TYPES.optionalVarIntType);
                 if (metadata.getValue().equals(0)) {
                     metadata.setValue(null); // https://bugs.mojang.com/browse/MC-111480
                 }
             }
-        } else if (type.isOrHasParent(Entity1_14Types.ABSTRACT_SKELETON)) {
+        } else if (type.isOrHasParent(EntityTypes1_14.ABSTRACT_SKELETON)) {
             if (metadata.id() == 14) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | ((boolean) metadata.getValue() ? 0x4 : 0))); // New attacking
@@ -167,7 +167,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
         }
 
-        if (type.isOrHasParent(Entity1_14Types.ABSTRACT_ILLAGER_BASE)) {
+        if (type.isOrHasParent(EntityTypes1_14.ABSTRACT_ILLAGER_BASE)) {
             if (metadata.id() == 14) {
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                         | (((Number) metadata.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
@@ -176,7 +176,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
         }
 
-        if (type.is(Entity1_14Types.WITCH) || type.is(Entity1_14Types.RAVAGER) || type.isOrHasParent(Entity1_14Types.ABSTRACT_ILLAGER_BASE)) {
+        if (type.is(EntityTypes1_14.WITCH) || type.is(EntityTypes1_14.RAVAGER) || type.isOrHasParent(EntityTypes1_14.ABSTRACT_ILLAGER_BASE)) {
             if (metadata.id() >= 14) {  // 19w13 added a new boolean (raid participant - is celebrating) with id 14
                 metadata.setId(metadata.id() + 1);
             }
@@ -185,7 +185,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_14Types.getTypeFromId(type);
+        return EntityTypes1_14.getTypeFromId(type);
     }
 
     private static boolean isSneaking(byte flags) {

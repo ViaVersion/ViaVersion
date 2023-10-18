@@ -21,11 +21,10 @@ package com.viaversion.viaversion.rewriter.meta;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MetaHandlerEventImpl implements MetaHandlerEvent {
     private final UserConnection connection;
@@ -96,6 +95,10 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
 
     @Override
     public void createExtraMeta(Metadata metadata) {
-        (extraData != null ? extraData : (extraData = new ArrayList<>())).add(metadata);
+        if (extraData == null) {
+            extraData = new ArrayList<>();
+        }
+
+        extraData.add(metadata);
     }
 }

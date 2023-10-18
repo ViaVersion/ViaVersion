@@ -26,8 +26,10 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_14;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.MetaListType;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_16;
+import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
+import com.viaversion.viaversion.api.type.types.metadata.MetadataType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import java.util.List;
 
 public final class Types1_16 {

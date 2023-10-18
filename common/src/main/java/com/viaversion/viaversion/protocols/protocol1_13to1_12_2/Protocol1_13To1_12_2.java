@@ -24,7 +24,7 @@ import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -35,7 +35,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
@@ -417,9 +417,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                                 if (clone[i] == null) continue;
                                                 clone[i] = new DataItem(clone[i]);
                                             }
-                                            wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                            wrapper1.write(Type.ITEM1_13_ARRAY, clone);
                                         }
-                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        wrapper1.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
                                         break;
                                     }
                                     case "crafting_shaped": {
@@ -432,9 +432,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                                 if (clone[i] == null) continue;
                                                 clone[i] = new DataItem(clone[i]);
                                             }
-                                            wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
+                                            wrapper1.write(Type.ITEM1_13_ARRAY, clone);
                                         }
-                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        wrapper1.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
                                         break;
                                     }
                                     case "smelting": {
@@ -444,8 +444,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                                             if (clone[i] == null) continue;
                                             clone[i] = new DataItem(clone[i]);
                                         }
-                                        wrapper1.write(Type.FLAT_ITEM_ARRAY_VAR_INT, clone);
-                                        wrapper1.write(Type.FLAT_ITEM, new DataItem(entry.getValue().getResult()));
+                                        wrapper1.write(Type.ITEM1_13_ARRAY, clone);
+                                        wrapper1.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
                                         wrapper1.write(Type.FLOAT, entry.getValue().getExperience());
                                         wrapper1.write(Type.VAR_INT, entry.getValue().getCookingTime());
                                         break;
@@ -584,9 +584,9 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Title
                     componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Description
-                    Item icon = wrapper.read(Type.ITEM);
+                    Item icon = wrapper.read(Type.ITEM1_8);
                     itemRewriter.handleItemToClient(icon);
-                    wrapper.write(Type.FLAT_ITEM, icon); // Translate item to flat item
+                    wrapper.write(Type.ITEM1_13, icon); // Translate item to flat item
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -651,13 +651,13 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
         // New 0x0A - Edit book -> Plugin Message
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, wrapper -> {
-            Item item = wrapper.read(Type.FLAT_ITEM);
+            Item item = wrapper.read(Type.ITEM1_13);
             boolean isSigning = wrapper.read(Type.BOOLEAN);
 
             itemRewriter.handleItemToServer(item);
 
             wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
-            wrapper.write(Type.ITEM, item);
+            wrapper.write(Type.ITEM1_8, item);
         });
 
         // New 0x0C - Query Entity NBT
@@ -862,7 +862,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_13Types.EntityType.PLAYER));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
         userConnection.put(new TabCompleteTracker());
         if (!userConnection.has(ClientWorld.class))
             userConnection.put(new ClientWorld(userConnection));

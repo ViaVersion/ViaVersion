@@ -39,7 +39,7 @@ public class WorldPackets {
     private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
-        BlockRewriter<ClientboundPackets1_16> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_CHANGE);

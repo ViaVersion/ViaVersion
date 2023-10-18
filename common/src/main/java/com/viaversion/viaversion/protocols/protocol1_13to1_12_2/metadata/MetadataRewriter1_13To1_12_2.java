@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -58,7 +58,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         }
 
         // Remap held block to match new format for remapping to flat block
-        if (type == Entity1_13Types.EntityType.ENDERMAN && metadata.id() == 12) {
+        if (type == EntityTypes1_13.EntityType.ENDERMAN && metadata.id() == 12) {
             int stateId = (int) metadata.getValue();
             int id = stateId & 4095;
             int data = stateId >> 12 & 15;
@@ -78,18 +78,18 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         if (type == null) return;
 
         // Handle new colors
-        if (type == Entity1_13Types.EntityType.WOLF && metadata.id() == 17) {
+        if (type == EntityTypes1_13.EntityType.WOLF && metadata.id() == 17) {
             metadata.setValue(15 - (int) metadata.getValue());
         }
 
         // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
-        if (type.isOrHasParent(Entity1_13Types.EntityType.ZOMBIE)) {
+        if (type.isOrHasParent(EntityTypes1_13.EntityType.ZOMBIE)) {
             if (metadata.id() > 14)
                 metadata.setId(metadata.id() + 1);
         }
 
         // Handle Minecart inner block
-        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
+        if (type.isOrHasParent(EntityTypes1_13.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
             // New block format
             int oldId = (int) metadata.getValue();
             int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
@@ -98,7 +98,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         }
 
         // Handle other changes
-        if (type == Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) {
+        if (type == EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD) {
             if (metadata.id() == 9) {
                 int particleId = (int) metadata.getValue();
                 Metadata parameter1Meta = metaByIndex(10, metadatas);
@@ -130,11 +130,11 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, false);
+        return EntityTypes1_13.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, true);
+        return EntityTypes1_13.getTypeFromId(type, true);
     }
 }

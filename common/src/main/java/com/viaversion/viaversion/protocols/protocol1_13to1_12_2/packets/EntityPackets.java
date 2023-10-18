@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -50,20 +50,20 @@ public class EntityPackets {
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     byte type = wrapper.get(Type.BYTE, 0);
-                    Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
+                    EntityTypes1_13.EntityType entType = EntityTypes1_13.getTypeFromId(type, true);
                     if (entType == null) return;
 
                     // Register Type ID
                     wrapper.user().getEntityTracker(Protocol1_13To1_12_2.class).addEntity(entityId, entType);
 
-                    if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
+                    if (entType.is(EntityTypes1_13.EntityType.FALLING_BLOCK)) {
                         int oldId = wrapper.get(Type.INT, 0);
                         int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
                         wrapper.set(Type.INT, 0, WorldPackets.toNewId(combined));
                     }
 
                     // Fix ItemFrame hitbox
-                    if (entType.is(Entity1_13Types.EntityType.ITEM_FRAME)) {
+                    if (entType.is(EntityTypes1_13.EntityType.ITEM_FRAME)) {
                         int data = wrapper.get(Type.INT, 0);
 
                         switch (data) {
@@ -121,7 +121,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
         });
 

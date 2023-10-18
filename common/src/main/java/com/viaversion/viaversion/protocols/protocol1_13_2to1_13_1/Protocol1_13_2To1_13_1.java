@@ -42,7 +42,7 @@ public class Protocol1_13_2To1_13_1 extends AbstractProtocol<ClientboundPackets1
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLAT_VAR_INT_ITEM, Type.FLAT_ITEM);
+                map(Type.ITEM1_13_2, Type.ITEM1_13);
             }
         });
 
@@ -61,8 +61,8 @@ public class Protocol1_13_2To1_13_1 extends AbstractProtocol<ClientboundPackets1
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.COMPONENT); // Title
                     wrapper.passthrough(Type.COMPONENT); // Description
-                    Item icon = wrapper.read(Type.FLAT_ITEM);
-                    wrapper.write(Type.FLAT_VAR_INT_ITEM, icon);
+                    Item icon = wrapper.read(Type.ITEM1_13);
+                    wrapper.write(Type.ITEM1_13_2, icon);
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {

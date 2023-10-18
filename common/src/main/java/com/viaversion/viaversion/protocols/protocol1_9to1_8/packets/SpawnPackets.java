@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -65,7 +65,7 @@ public class SpawnPackets {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     int typeID = wrapper.get(Type.BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, true));
+                    tracker.addEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
                     tracker.sendMetadataBuffer(entityID);
                 });
 
@@ -102,7 +102,7 @@ public class SpawnPackets {
                     final int data = wrapper.get(Type.INT, 0); // Data
 
                     int typeID = wrapper.get(Type.BYTE, 0);
-                    if (Entity1_10Types.getTypeFromId(typeID, true) == Entity1_10Types.EntityType.SPLASH_POTION) {
+                    if (EntityTypes1_10.getTypeFromId(typeID, true) == EntityTypes1_10.EntityType.SPLASH_POTION) {
                         // Convert this to meta data, woo!
                         PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.ENTITY_METADATA, wrapper1 -> {
                             wrapper1.write(Type.VAR_INT, entityID);
@@ -132,7 +132,7 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
@@ -154,7 +154,7 @@ public class SpawnPackets {
                     // Currently only lightning uses this
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.LIGHTNING);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.LIGHTNING);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
@@ -181,7 +181,7 @@ public class SpawnPackets {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, false));
+                    tracker.addEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, false));
                     tracker.sendMetadataBuffer(entityID);
                 });
 
@@ -228,7 +228,7 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.PAINTING);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.PAINTING);
                     tracker.sendMetadataBuffer(entityID);
                 });
                 handler(wrapper -> {
@@ -253,7 +253,7 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.PLAYER);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
@@ -271,7 +271,7 @@ public class SpawnPackets {
                         PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, wrapper.user());
                         packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                         packet.write(Type.VAR_INT, 0);
-                        packet.write(Type.ITEM, new DataItem(item, (byte) 1, (short) 0, null));
+                        packet.write(Type.ITEM1_8, new DataItem(item, (byte) 1, (short) 0, null));
                         try {
                             packet.send(Protocol1_9To1_8.class);
                         } catch (Exception e) {

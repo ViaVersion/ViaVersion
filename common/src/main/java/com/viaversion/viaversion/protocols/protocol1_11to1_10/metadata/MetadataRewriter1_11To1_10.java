@@ -19,8 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -147,12 +147,12 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
     @Override
     public com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
-        return Entity1_11Types.getTypeFromId(type, false);
+        return EntityTypes1_11.getTypeFromId(type, false);
     }
 
     @Override
     public com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
-        return Entity1_11Types.getTypeFromId(type, true);
+        return EntityTypes1_11.getTypeFromId(type, true);
     }
 
     public static EntityType rewriteEntityType(int numType, List<Metadata> metadata) {

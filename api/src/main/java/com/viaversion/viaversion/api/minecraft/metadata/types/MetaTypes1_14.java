@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 
 public final class MetaTypes1_14 extends AbstractMetaTypes {
 
@@ -34,7 +34,7 @@ public final class MetaTypes1_14 extends AbstractMetaTypes {
     public final MetaType stringType = add(3, Type.STRING);
     public final MetaType componentType = add(4, Type.COMPONENT);
     public final MetaType optionalComponentType = add(5, Type.OPTIONAL_COMPONENT);
-    public final MetaType itemType = add(6, Type.FLAT_VAR_INT_ITEM);
+    public final MetaType itemType = add(6, Type.ITEM1_13_2);
     public final MetaType booleanType = add(7, Type.BOOLEAN);
     public final MetaType rotationType = add(8, Type.ROTATION);
     public final MetaType positionType = add(9, Type.POSITION1_14);

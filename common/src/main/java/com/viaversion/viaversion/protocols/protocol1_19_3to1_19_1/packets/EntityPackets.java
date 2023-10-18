@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -40,7 +40,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_1.SPAWN_ENTITY, Entity1_19_3Types.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_19_1.SPAWN_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_19_1.ENTITY_METADATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
@@ -161,7 +161,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
                 meta.setValue(pose + 1);
             }
         });
-        filter().filterFamily(Entity1_19_3Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
@@ -175,6 +175,6 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_3Types.getTypeFromId(type);
+        return EntityTypes1_19_3.getTypeFromId(type);
     }
 }

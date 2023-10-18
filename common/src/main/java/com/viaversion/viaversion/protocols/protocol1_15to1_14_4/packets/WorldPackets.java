@@ -32,7 +32,7 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 public final class WorldPackets {
 
     public static void register(Protocol1_15To1_14_4 protocol) {
-        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_CHANGE);
@@ -99,7 +99,7 @@ public final class WorldPackets {
                         int data = wrapper.passthrough(Type.VAR_INT);
                         wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (id == 32) {
-                        protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                        protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                     }
                 });
             }

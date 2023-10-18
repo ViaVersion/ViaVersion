@@ -34,7 +34,7 @@ public class Protocol1_16_4To1_16_3 extends AbstractProtocol<ClientboundPackets1
         registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLAT_VAR_INT_ITEM);
+                map(Type.ITEM1_13_2);
                 map(Type.BOOLEAN);
                 handler(wrapper -> {
                     int slot = wrapper.read(Type.VAR_INT);

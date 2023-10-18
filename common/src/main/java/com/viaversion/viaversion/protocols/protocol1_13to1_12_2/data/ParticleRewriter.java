@@ -148,7 +148,7 @@ public class ParticleRewriter {
             // Transform to new Item
             Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
 
-            particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item)); // Item Slot	The item that will be used.
+            particle.getArguments().add(new Particle.ParticleData(Type.ITEM1_13, item)); // Item Slot	The item that will be used.
             return particle;
         };
     }

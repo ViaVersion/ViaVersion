@@ -31,12 +31,12 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_3, ServerboundPackets1_19_4, Protocol1_19_4To1_19_3> {
 
     public InventoryPackets(final Protocol1_19_4To1_19_3 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = BlockRewriter.for1_14(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_19_3.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_19_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_3.MULTI_BLOCK_CHANGE);
@@ -86,12 +86,12 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         registerSetCooldown(ClientboundPackets1_19_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_19_3.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_19_3.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_19_3.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_19_3.ADVANCEMENTS, Type.ITEM1_13_2);
         registerEntityEquipmentArray(ClientboundPackets1_19_3.ENTITY_EQUIPMENT);
         registerTradeList1_19(ClientboundPackets1_19_3.TRADE_LIST);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_3.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_19_3.SPAWN_PARTICLE);
-        registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
         registerClickWindow1_17_1(ServerboundPackets1_19_4.CLICK_WINDOW);
 
         new RecipeRewriter1_19_3<ClientboundPackets1_19_3>(protocol) {

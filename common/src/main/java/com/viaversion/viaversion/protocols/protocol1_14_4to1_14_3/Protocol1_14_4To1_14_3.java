@@ -34,10 +34,10 @@ public class Protocol1_14_4To1_14_3 extends AbstractProtocol<ClientboundPackets1
             wrapper.passthrough(Type.VAR_INT);
             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
-                wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                wrapper.passthrough(Type.ITEM1_13_2);
+                wrapper.passthrough(Type.ITEM1_13_2);
                 if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+                    wrapper.passthrough(Type.ITEM1_13_2);
                 }
                 wrapper.passthrough(Type.BOOLEAN);
                 wrapper.passthrough(Type.INT);

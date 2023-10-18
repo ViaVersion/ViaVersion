@@ -20,14 +20,14 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
@@ -302,7 +302,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 .reader("vibration", ParticleType.Readers.VIBRATION1_19)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
-        Entity1_19Types.initialize(this);
+        EntityTypes1_19.initialize(this);
     }
 
     @Override
@@ -316,7 +316,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             user.put(new DimensionRegistryStorage());
         }
         user.put(new SequenceStorage());
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19.PLAYER));
     }
 
     @Override

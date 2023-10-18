@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
@@ -34,7 +34,7 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     private int chunkCenterZ;
 
     public EntityTracker1_14(UserConnection user) {
-        super(user, Entity1_14Types.PLAYER);
+        super(user, EntityTypes1_14.PLAYER);
     }
 
     @Override

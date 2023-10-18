@@ -135,10 +135,6 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T read(Type<T> type) throws Exception {
-        if (type == Type.NOTHING) {
-            return null;
-        }
-
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
@@ -156,8 +152,6 @@ public class PacketWrapperImpl implements PacketWrapper {
                 && type.getOutputClass() == readType.getOutputClass())) {
             //noinspection unchecked
             return (T) readValue.value();
-        } else if (readType == Type.NOTHING) {
-            return read(type); // retry
         } else {
             throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + readValue.type().getTypeName()), type, readableObjects.size());
         }

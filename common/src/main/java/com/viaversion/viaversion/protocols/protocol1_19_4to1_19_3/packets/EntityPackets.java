@@ -22,7 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -202,7 +202,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             wrapper.write(Type.BYTE, event);
         });
 
-        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
         registerMetadataRewriter(ClientboundPackets1_19_3.ENTITY_METADATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
     }
@@ -235,19 +235,19 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
         });
         registerMetaTypeHandler(Types1_19_4.META_TYPES.itemType, Types1_19_4.META_TYPES.blockStateType, Types1_19_4.META_TYPES.optionalBlockStateType, Types1_19_4.META_TYPES.particleType);
 
-        filter().filterFamily(Entity1_19_4Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
 
-        filter().filterFamily(Entity1_19_4Types.BOAT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.BOAT).index(11).handler((event, meta) -> {
             final int boatType = meta.value();
             if (boatType > 4) { // Cherry added
                 meta.setValue(boatType + 1);
             }
         });
 
-        filter().filterFamily(Entity1_19_4Types.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
+        filter().filterFamily(EntityTypes1_19_4.ABSTRACT_HORSE).removeIndex(18); // Owner UUID
     }
 
     @Override
@@ -257,6 +257,6 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_4Types.getTypeFromId(type);
+        return EntityTypes1_19_4.getTypeFromId(type);
     }
 }

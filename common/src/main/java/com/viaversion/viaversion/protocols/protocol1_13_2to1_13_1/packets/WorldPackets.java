@@ -41,7 +41,7 @@ public class WorldPackets {
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
                     if (id == 27) {
-                        wrapper.write(Type.FLAT_VAR_INT_ITEM, wrapper.read(Type.FLAT_ITEM));
+                        wrapper.write(Type.ITEM1_13_2, wrapper.read(Type.ITEM1_13));
                     }
                 });
             }

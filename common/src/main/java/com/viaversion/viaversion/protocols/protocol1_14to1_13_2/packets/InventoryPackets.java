@@ -59,13 +59,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     };
 
     public InventoryPackets(Protocol1_14To1_13_2 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.ITEM1_13_2);
 
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, wrapper -> {
             Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
@@ -135,8 +135,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.ITEM1_13_2);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
@@ -157,14 +157,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
                             // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                             // Output Item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
-                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -188,7 +188,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.ITEM1_13_2);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
@@ -210,7 +210,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         });
 
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.ITEM1_13_2);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
@@ -223,13 +223,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
             CompoundTag tag = new CompoundTag();
             tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
-            resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+            resyncPacket.write(Type.ITEM1_13_2, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
             resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
         });
 
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.FLOAT);
     }
 
     @Override

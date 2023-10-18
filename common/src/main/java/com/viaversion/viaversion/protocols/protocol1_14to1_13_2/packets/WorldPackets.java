@@ -53,7 +53,7 @@ public class WorldPackets {
     }
 
     public static void register(Protocol1_14To1_13_2 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, null);
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(protocol);
 
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketHandlers() {
             @Override

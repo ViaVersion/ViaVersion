@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -90,7 +90,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     public void registerPackets() {
-        registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, Entity1_19Types.PLAYER);
+        registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, EntityTypes1_19.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
@@ -114,7 +114,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.VAR_INT, 0);
                     final EntityType entityType = tracker(wrapper.user()).entityType(entityId);
-                    if (entityType == Entity1_19Types.FALLING_BLOCK) {
+                    if (entityType == EntityTypes1_19.FALLING_BLOCK) {
                         wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
                     }
                 });
@@ -127,7 +127,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, Entity1_19Types.PAINTING.getId());
+                    wrapper.write(Type.VAR_INT, EntityTypes1_19.PAINTING.getId());
 
                     final int motive = wrapper.read(Type.VAR_INT);
                     final Position blockPosition = wrapper.read(Type.POSITION1_14);
@@ -376,13 +376,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, null);
 
-        filter().filterFamily(Entity1_19Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(Entity1_19Types.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
+        filter().type(EntityTypes1_19.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
     }
 
     @Override
@@ -392,6 +392,6 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19Types.getTypeFromId(type);
+        return EntityTypes1_19.getTypeFromId(type);
     }
 }

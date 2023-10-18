@@ -32,7 +32,7 @@ import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPackets1_20_2, ServerboundPackets1_20_2, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_VAR_INT_ARRAY);
+        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
     }
 
     @Override
@@ -40,7 +40,7 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         // Register block and block state id changes
         // Other places using block state id mappings: Spawn particle, entity metadata, entity spawn (falling blocks)
         // Tags and statistics use block (!) ids
-        final BlockRewriter<ClientboundPackets1_20_2> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_20_2> blockRewriter = BlockRewriter.for1_20_2(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_20_2.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_20_2.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_2.MULTI_BLOCK_CHANGE);

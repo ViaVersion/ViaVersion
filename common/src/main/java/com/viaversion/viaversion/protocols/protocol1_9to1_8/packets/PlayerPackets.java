@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -173,7 +173,7 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityId, Entity1_10Types.EntityType.PLAYER);
+                    tracker.addEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setClientEntityId(entityId);
                 });
                 map(Type.UNSIGNED_BYTE); // 1 - Player Gamemode
@@ -276,16 +276,16 @@ public class PlayerPackets {
                         Short size = wrapper.passthrough(Type.UNSIGNED_BYTE);
 
                         for (int i = 0; i < size; ++i) {
-                            Item item1 = wrapper.passthrough(Type.ITEM);
+                            Item item1 = wrapper.passthrough(Type.ITEM1_8);
                             ItemRewriter.toClient(item1);
 
-                            Item item2 = wrapper.passthrough(Type.ITEM);
+                            Item item2 = wrapper.passthrough(Type.ITEM1_8);
                             ItemRewriter.toClient(item2);
 
                             boolean present = wrapper.passthrough(Type.BOOLEAN);
 
                             if (present) {
-                                Item item3 = wrapper.passthrough(Type.ITEM);
+                                Item item3 = wrapper.passthrough(Type.ITEM1_8);
                                 ItemRewriter.toClient(item3);
                             }
 
@@ -365,7 +365,7 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Requested Command
-                map(Type.BOOLEAN, Type.NOTHING); // 1 - Is Command Block
+                read(Type.BOOLEAN); // 1 - Is Command Block
             }
         });
 
@@ -395,7 +395,7 @@ public class PlayerPackets {
         protocol.registerServerbound(ServerboundPackets1_9.ANIMATION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT, Type.NOTHING); // 0 - Hand
+                read(Type.VAR_INT); // 0 - Hand
             }
         });
 
@@ -410,7 +410,7 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equalsIgnoreCase("MC|BSign")) {
-                        Item item = wrapper.passthrough(Type.ITEM);
+                        Item item = wrapper.passthrough(Type.ITEM1_8);
                         if (item != null) {
                             item.setIdentifier(387); // Written Book
                             ItemRewriter.rewriteBookToServer(item);

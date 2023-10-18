@@ -155,10 +155,10 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     protected Type<Item> itemType() {
-        return Type.FLAT_VAR_INT_ITEM;
+        return Type.ITEM1_13_2;
     }
 
     protected Type<Item[]> itemArrayType() {
-        return Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT;
+        return Type.ITEM1_13_2_ARRAY;
     }
 }

@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -34,8 +34,8 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<ClientboundPack
 
     public MetadataRewriter1_16To1_15_2(Protocol1_16To1_15_2 protocol) {
         super(protocol);
-        mapEntityType(Entity1_15Types.ZOMBIE_PIGMAN, Entity1_16Types.ZOMBIFIED_PIGLIN);
-        mapTypes(Entity1_15Types.values(), Entity1_16Types.class);
+        mapEntityType(EntityTypes1_15.ZOMBIE_PIGMAN, EntityTypes1_16.ZOMBIFIED_PIGLIN);
+        mapTypes(EntityTypes1_15.values(), EntityTypes1_16.class);
     }
 
     @Override
@@ -52,14 +52,14 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<ClientboundPack
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_16Types.MINECART_ABSTRACT)
+        if (type.isOrHasParent(EntityTypes1_16.MINECART_ABSTRACT)
                 && metadata.id() == 10) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
-        if (type.isOrHasParent(Entity1_16Types.ABSTRACT_ARROW)) {
+        if (type.isOrHasParent(EntityTypes1_16.ABSTRACT_ARROW)) {
             if (metadata.id() == 8) {
                 metadatas.remove(metadata);
             } else if (metadata.id() > 8) {
@@ -67,7 +67,7 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<ClientboundPack
             }
         }
 
-        if (type == Entity1_16Types.WOLF) {
+        if (type == EntityTypes1_16.WOLF) {
             if (metadata.id() == 16) {
                 byte mask = metadata.value();
                 int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
@@ -78,6 +78,6 @@ public class MetadataRewriter1_16To1_15_2 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_16Types.getTypeFromId(type);
+        return EntityTypes1_16.getTypeFromId(type);
     }
 }

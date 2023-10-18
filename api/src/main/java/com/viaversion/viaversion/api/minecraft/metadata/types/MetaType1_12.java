@@ -31,7 +31,7 @@ public enum MetaType1_12 implements MetaType {
     Float(2, Type.FLOAT),
     String(3, Type.STRING),
     Chat(4, Type.COMPONENT),
-    Slot(5, Type.ITEM),
+    Slot(5, Type.ITEM1_8),
     Boolean(6, Type.BOOLEAN),
     Vector3F(7, Type.ROTATION),
     Position(8, Type.POSITION),

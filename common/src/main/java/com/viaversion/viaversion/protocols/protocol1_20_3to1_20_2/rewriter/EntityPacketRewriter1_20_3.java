@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -36,7 +36,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_2.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_20_2.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_20_2.ENTITY_METADATA, Types1_20_2.METADATA_LIST, Types1_20_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
@@ -78,6 +78,6 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_4Types.getTypeFromId(type);
+        return EntityTypes1_19_4.getTypeFromId(type);
     }
 }

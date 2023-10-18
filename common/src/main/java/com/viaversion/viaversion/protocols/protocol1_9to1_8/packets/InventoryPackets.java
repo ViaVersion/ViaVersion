@@ -19,8 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -94,9 +92,9 @@ public class InventoryPackets {
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.SHORT); // 1 - Slot ID
-                map(Type.ITEM); // 2 - Slot Value
+                map(Type.ITEM1_8); // 2 - Slot Value
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM, 0);
+                    Item stack = wrapper.get(Type.ITEM1_8, 0);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
@@ -136,10 +134,10 @@ public class InventoryPackets {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM_ARRAY); // 1 - Window Values
+                map(Type.ITEM1_8_ARRAY); // 1 - Window Values
 
                 handler(wrapper -> {
-                    Item[] stacks = wrapper.get(Type.ITEM_ARRAY, 0);
+                    Item[] stacks = wrapper.get(Type.ITEM1_8_ARRAY, 0);
                     Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
@@ -168,7 +166,7 @@ public class InventoryPackets {
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                        Item[] oldStack = wrapper.get(Type.ITEM_ARRAY, 0);
+                        Item[] oldStack = wrapper.get(Type.ITEM1_8_ARRAY, 0);
                         Item[] newStack = new Item[oldStack.length + 1];
                         for (int i = 0; i < newStack.length; i++) {
                             if (i > 4) {
@@ -179,7 +177,7 @@ public class InventoryPackets {
                                 }
                             }
                         }
-                        wrapper.set(Type.ITEM_ARRAY, 0, newStack);
+                        wrapper.set(Type.ITEM1_8_ARRAY, 0, newStack);
                     }
                 });
             }
@@ -218,9 +216,9 @@ public class InventoryPackets {
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot ID
-                map(Type.ITEM); // 1 - Item
+                map(Type.ITEM1_8); // 1 - Item
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM, 0);
+                    Item stack = wrapper.get(Type.ITEM1_8, 0);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
@@ -248,7 +246,7 @@ public class InventoryPackets {
                         wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
                             w.write(Type.UNSIGNED_BYTE, (short) 0);
                             w.write(Type.SHORT, slot);
-                            w.write(Type.ITEM, null);
+                            w.write(Type.ITEM1_8, null);
                         }).send(Protocol1_9To1_8.class);
                         // Finally reset to simulate throwing item
                         wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
@@ -266,9 +264,9 @@ public class InventoryPackets {
                 map(Type.BYTE); // 2 - Button
                 map(Type.SHORT); // 3 - Action
                 map(Type.VAR_INT, Type.BYTE); // 4 - Mode
-                map(Type.ITEM); // 5 - Clicked Item
+                map(Type.ITEM1_8); // 5 - Clicked Item
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM, 0);
+                    Item stack = wrapper.get(Type.ITEM1_8, 0);
 
                     if (Via.getConfig().isShowShieldWhenSwordInHand()) {
                         Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
@@ -303,7 +301,7 @@ public class InventoryPackets {
                         wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
                             w.write(Type.UNSIGNED_BYTE, windowID);
                             w.write(Type.SHORT, slot);
-                            w.write(Type.ITEM, null);
+                            w.write(Type.ITEM1_8, null);
                         }).scheduleSend(Protocol1_9To1_8.class);
                         // Finally reset to simulate throwing item
                         wrapper.set(Type.BYTE, 0, (byte) 0); // Set button to 0

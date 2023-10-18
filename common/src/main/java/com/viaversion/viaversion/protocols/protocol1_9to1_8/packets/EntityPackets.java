@@ -59,31 +59,29 @@ public class EntityPackets {
                 map(Type.INT); // 0 - Entity ID
                 map(Type.INT); // 1 - Vehicle
 
-                // Leash state is removed in new versions
-                map(Type.UNSIGNED_BYTE, new ValueTransformer<Short, Void>(Type.NOTHING) {
-                    @Override
-                    public Void transform(PacketWrapper wrapper, Short inputValue) throws Exception {
-                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                        if (inputValue == 0) {
-                            int passenger = wrapper.get(Type.INT, 0);
-                            int vehicle = wrapper.get(Type.INT, 1);
+                handler(wrapper -> {
+                    final short leashState = wrapper.read(Type.UNSIGNED_BYTE);
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    if (leashState == 0) {
+                        int passenger = wrapper.get(Type.INT, 0);
+                        int vehicle = wrapper.get(Type.INT, 1);
 
-                            wrapper.cancel(); // Don't send current packet
+                        wrapper.cancel(); // Don't send current packet
 
-                            PacketWrapper passengerPacket = wrapper.create(ClientboundPackets1_9.SET_PASSENGERS);
-                            if (vehicle == -1) {
-                                if (!tracker.getVehicleMap().containsKey(passenger))
-                                    return null; // Cancel
-                                passengerPacket.write(Type.VAR_INT, tracker.getVehicleMap().remove(passenger));
-                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{});
-                            } else {
-                                passengerPacket.write(Type.VAR_INT, vehicle);
-                                passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{passenger});
-                                tracker.getVehicleMap().put(passenger, vehicle);
+                        PacketWrapper passengerPacket = wrapper.create(ClientboundPackets1_9.SET_PASSENGERS);
+                        if (vehicle == -1) {
+                            if (!tracker.getVehicleMap().containsKey(passenger)) {
+                                return; // Cancel
                             }
-                            passengerPacket.send(Protocol1_9To1_8.class); // Send the packet
+
+                            passengerPacket.write(Type.VAR_INT, tracker.getVehicleMap().remove(passenger));
+                            passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{});
+                        } else {
+                            passengerPacket.write(Type.VAR_INT, vehicle);
+                            passengerPacket.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{passenger});
+                            tracker.getVehicleMap().put(passenger, vehicle);
                         }
-                        return null;
+                        passengerPacket.send(Protocol1_9To1_8.class); // Send the packet
                     }
                 });
             }
@@ -164,17 +162,17 @@ public class EntityPackets {
                         return slot > 0 ? slot.intValue() + 1 : slot.intValue();
                     }
                 });
-                map(Type.ITEM); // 2 - Item
+                map(Type.ITEM1_8); // 2 - Item
                 // Item Rewriter
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM, 0);
+                    Item stack = wrapper.get(Type.ITEM1_8, 0);
                     ItemRewriter.toClient(stack);
                 });
                 // Blocking
                 handler(wrapper -> {
                     EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                     int entityID = wrapper.get(Type.VAR_INT, 0);
-                    Item stack = wrapper.get(Type.ITEM, 0);
+                    Item stack = wrapper.get(Type.ITEM1_8, 0);
 
                     if (stack != null && Protocol1_9To1_8.isSword(stack.identifier())) {
                         entityTracker.getValidBlocking().add(entityID);

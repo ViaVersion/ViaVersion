@@ -36,24 +36,24 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_17To1_16_4> {
 
     public InventoryPackets(Protocol1_17To1_16_4 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
         registerTradeList(ClientboundPackets1_16_2.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.ITEM1_13_2);
         registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
-        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.DOUBLE);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.DECLARE_RECIPES);
 
-        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
 
-        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
 
         protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
             @Override
@@ -69,11 +69,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
                     int length = wrapper.read(Type.VAR_INT);
                     for (int i = 0; i < length; i++) {
                         wrapper.read(Type.SHORT); // Slot
-                        wrapper.read(Type.FLAT_VAR_INT_ITEM);
+                        wrapper.read(Type.ITEM1_13_2);
                     }
 
                     // 1.17 clients send the then carried item, but 1.16 expects the clicked one
-                    Item item = wrapper.read(Type.FLAT_VAR_INT_ITEM);
+                    Item item = wrapper.read(Type.ITEM1_13_2);
                     int action = wrapper.get(Type.VAR_INT, 0);
                     if (action == 5 || action == 1) {
                         // Quick craft (= dragging / mouse movement while clicking on an empty slot)
@@ -85,7 +85,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
                         handleItemToServer(item);
                     }
 
-                    wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
+                    wrapper.write(Type.ITEM1_13_2, item);
                 });
             }
         });

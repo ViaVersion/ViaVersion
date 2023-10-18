@@ -34,7 +34,7 @@ import com.viaversion.viaversion.util.MathUtil;
 public final class WorldPackets {
 
     public static void register(final Protocol1_19To1_18_2 protocol) {
-        final BlockRewriter<ClientboundPackets1_18> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_14(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_18.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_18.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.MULTI_BLOCK_CHANGE);

@@ -32,7 +32,7 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 public class WorldPackets {
 
     public static void register(Protocol1_13_1To1_13 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION);
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.legacy(protocol);
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);

@@ -42,16 +42,29 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class BlockRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
     private final Type<Position> positionType;
-    private final Type<CompoundTag> nbtType;
+    private final Type<CompoundTag> compoundTagType;
 
+    @Deprecated/*(forRemoval = true)*/
     public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
         this(protocol, positionType, Type.NAMED_COMPOUND_TAG);
     }
 
-    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> nbtType) {
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> compoundTagType) {
         this.protocol = protocol;
         this.positionType = positionType;
-        this.nbtType = nbtType;
+        this.compoundTagType = compoundTagType;
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION, Type.NAMED_COMPOUND_TAG);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_14(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.NAMED_COMPOUND_TAG);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.COMPOUND_TAG);
     }
 
     public void registerBlockAction(C packetType) {
@@ -220,7 +233,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
 
             final CompoundTag tag;
-            if (blockEntityHandler != null && (tag = wrapper.passthrough(nbtType)) != null) {
+            if (blockEntityHandler != null && (tag = wrapper.passthrough(compoundTagType)) != null) {
                 final BlockEntity blockEntity = new BlockEntityImpl(BlockEntity.pack(position.x(), position.z()), (short) position.y(), blockEntityId, tag);
                 blockEntityHandler.accept(blockEntity);
             }

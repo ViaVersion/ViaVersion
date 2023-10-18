@@ -325,7 +325,7 @@ public class WorldPackets {
                     tracker.setBlocking(false);
                 }
             }
-            wrapper.write(Type.ITEM, item);
+            wrapper.write(Type.ITEM1_8, item);
 
             wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
             wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
@@ -343,7 +343,7 @@ public class WorldPackets {
                 });
                 handler(wrapper -> {
                     Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
-                    wrapper.write(Type.ITEM, item); // 3 - Item
+                    wrapper.write(Type.ITEM1_8, item); // 3 - Item
                 });
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y

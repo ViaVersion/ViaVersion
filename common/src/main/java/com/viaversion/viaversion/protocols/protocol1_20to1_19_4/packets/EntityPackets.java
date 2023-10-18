@@ -24,7 +24,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -45,7 +45,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_19_4.METADATA_LIST, Types1_20.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
@@ -132,7 +132,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
         registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType);
 
         // Rotate item display by 180 degrees around the Y axis
-        filter().filterFamily(Entity1_19_4Types.ITEM_DISPLAY).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.ITEM_DISPLAY).handler((event, meta) -> {
             if (event.trackedEntity().hasSentMetadata() || event.hasExtraMeta()) {
                 return;
             }
@@ -141,12 +141,12 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 event.createExtraMeta(new Metadata(12, Types1_20.META_TYPES.quaternionType, Y_FLIPPED_ROTATION));
             }
         });
-        filter().filterFamily(Entity1_19_4Types.ITEM_DISPLAY).index(12).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.ITEM_DISPLAY).index(12).handler((event, meta) -> {
             final Quaternion quaternion = meta.value();
             meta.setValue(rotateY180(quaternion));
         });
 
-        filter().filterFamily(Entity1_19_4Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
@@ -154,7 +154,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_4Types.getTypeFromId(type);
+        return EntityTypes1_19_4.getTypeFromId(type);
     }
 
     private Quaternion rotateY180(final Quaternion quaternion) {
