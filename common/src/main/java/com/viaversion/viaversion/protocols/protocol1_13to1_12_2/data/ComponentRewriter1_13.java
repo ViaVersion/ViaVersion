@@ -36,7 +36,7 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
     public ComponentRewriter1_13(Protocol<C, ?, ?, ?> protocol) {
-        super(protocol);
+        super(protocol, ReadType.JSON);
     }
 
     @Override

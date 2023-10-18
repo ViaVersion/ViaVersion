@@ -28,7 +28,7 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 
 public class TranslateRewriter {
 
-    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<ClientboundPackets1_9_3>() {
+    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<ClientboundPackets1_9_3>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             String text = AchievementTranslationMapping.get(translate);

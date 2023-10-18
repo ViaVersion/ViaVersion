@@ -17,6 +17,11 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,8 +30,10 @@ import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles json chat components, containing methods to override certain parts of the handling.
@@ -34,16 +41,16 @@ import com.viaversion.viaversion.api.type.Type;
  */
 public class ComponentRewriter<C extends ClientboundPacketType> {
     protected final Protocol<C, ?, ?, ?> protocol;
+    protected final ReadType type;
 
-    public ComponentRewriter(Protocol<C, ?, ?, ?> protocol) {
-        this.protocol = protocol;
+    @Deprecated/*(forRemoval = true)*/
+    public ComponentRewriter(final Protocol<C, ?, ?, ?> protocol) {
+        this(protocol, ReadType.JSON);
     }
 
-    /**
-     * Use empty constructor if no packet registering is needed.
-     */
-    public ComponentRewriter() {
-        this.protocol = null;
+    public ComponentRewriter(final Protocol<C, ?, ?, ?> protocol, final ReadType type) {
+        this.protocol = protocol;
+        this.type = type;
     }
 
     /**
@@ -52,25 +59,20 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      *
      * @param packetType clientbound packet type
      */
-    public void registerComponentPacket(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+    public void registerComponentPacket(final C packetType) {
+        protocol.registerClientbound(packetType, this::passthroughAndProcess);
     }
 
-    @Deprecated/*(forRemoval = true)**/
-    public void registerChatMessage(C packetType) {
-        registerComponentPacket(packetType);
-    }
-
-    public void registerBossBar(C packetType) {
+    public void registerBossBar(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UUID);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
-                    int action = wrapper.get(Type.VAR_INT, 0);
+                    final int action = wrapper.get(Type.VAR_INT, 0);
                     if (action == 0 || action == 3) {
-                        processText(wrapper.passthrough(Type.COMPONENT));
+                        passthroughAndProcess(wrapper);
                     }
                 });
             }
@@ -80,12 +82,12 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     /**
      * Handles sub 1.17 combat event components.
      */
-    public void registerCombatEvent(C packetType) {
+    public void registerCombatEvent(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             if (wrapper.passthrough(Type.VAR_INT) == 2) {
                 wrapper.passthrough(Type.VAR_INT);
                 wrapper.passthrough(Type.INT);
-                processText(wrapper.passthrough(Type.COMPONENT));
+                passthroughAndProcess(wrapper);
             }
         });
     }
@@ -93,21 +95,30 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     /**
      * Handles sub 1.17 title components.
      */
-    public void registerTitle(C packetType) {
+    public void registerTitle(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int action = wrapper.passthrough(Type.VAR_INT);
+            final int action = wrapper.passthrough(Type.VAR_INT);
             if (action >= 0 && action <= 2) {
-                processText(wrapper.passthrough(Type.COMPONENT));
+                passthroughAndProcess(wrapper);
             }
         });
     }
 
-    public JsonElement processText(String value) {
+    public void passthroughAndProcess(final PacketWrapper wrapper) throws Exception {
+        switch (type) {
+            case JSON:
+                processText(wrapper.passthrough(Type.COMPONENT));
+            case NBT:
+                processTag(wrapper.passthrough(Type.TAG));
+        }
+    }
+
+    public JsonElement processText(final String value) {
         try {
-            JsonElement root = JsonParser.parseString(value);
+            final JsonElement root = JsonParser.parseString(value);
             processText(root);
             return root;
-        } catch (JsonSyntaxException e) {
+        } catch (final JsonSyntaxException e) {
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().severe("Error when trying to parse json: " + value);
                 throw e;
@@ -117,73 +128,138 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    public void processText(JsonElement element) {
-        if (element == null || element.isJsonNull()) return;
+    public void processText(final JsonElement element) {
+        if (element == null || element.isJsonNull()) {
+            return;
+        }
+
         if (element.isJsonArray()) {
-            processAsArray(element);
-            return;
-        }
-        if (element.isJsonPrimitive()) {
-            handleText(element.getAsJsonPrimitive());
-            return;
-        }
-
-        JsonObject object = element.getAsJsonObject();
-        JsonPrimitive text = object.getAsJsonPrimitive("text");
-        if (text != null) {
-            handleText(text);
-        }
-
-        JsonElement translate = object.get("translate");
-        if (translate != null) {
-            handleTranslate(object, translate.getAsString());
-
-            JsonElement with = object.get("with");
-            if (with != null) {
-                processAsArray(with);
-            }
-        }
-
-        JsonElement extra = object.get("extra");
-        if (extra != null) {
-            processAsArray(extra);
-        }
-
-        JsonObject hoverEvent = object.getAsJsonObject("hoverEvent");
-        if (hoverEvent != null) {
-            handleHoverEvent(hoverEvent);
+            processJsonArray(element.getAsJsonArray());
+        } else if (element.isJsonObject()) {
+            processJsonObject(element.getAsJsonObject());
         }
     }
 
-    protected void handleText(JsonPrimitive text) {
-        // To override if needed
-    }
-
-    protected void handleTranslate(JsonObject object, String translate) {
-        // To override if needed
-    }
-
-    // To override if needed (don't forget to call super if needed)
-    protected void handleHoverEvent(JsonObject hoverEvent) {
-        String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
-        if (action.equals("show_text")) {
-            JsonElement value = hoverEvent.get("value");
-            processText(value != null ? value : hoverEvent.get("contents"));
-        } else if (action.equals("show_entity")) {
-            JsonObject contents = hoverEvent.getAsJsonObject("contents");
-            if (contents != null) {
-                processText(contents.get("name"));
-            }
-        }
-    }
-
-    private void processAsArray(JsonElement element) {
-        for (JsonElement jsonElement : element.getAsJsonArray()) {
+    protected void processJsonArray(final JsonArray array) {
+        for (final JsonElement jsonElement : array) {
             processText(jsonElement);
         }
     }
 
-    public <T extends Protocol<C, ?, ?, ?>> T getProtocol() {
-        return (T) protocol;
+    protected void processJsonObject(final JsonObject object) {
+        final JsonElement translate = object.get("translate");
+        if (translate != null && translate.isJsonPrimitive()) {
+            handleTranslate(object, translate.getAsString());
+
+            final JsonElement with = object.get("with");
+            if (with != null && with.isJsonArray()) {
+                processJsonArray(with.getAsJsonArray());
+            }
+        }
+
+        final JsonElement extra = object.get("extra");
+        if (extra != null && extra.isJsonArray()) {
+            processJsonArray(extra.getAsJsonArray());
+        }
+
+        final JsonElement hoverEvent = object.get("hoverEvent");
+        if (hoverEvent != null && hoverEvent.isJsonObject()) {
+            handleHoverEvent(hoverEvent.getAsJsonObject());
+        }
+    }
+
+    protected void handleTranslate(final JsonObject object, final String translate) {
+        // To override if needed
+    }
+
+    protected void handleHoverEvent(final JsonObject hoverEvent) {
+        // To override if needed (don't forget to call super)
+        final JsonPrimitive actionElement = hoverEvent.getAsJsonPrimitive("action");
+        if (!actionElement.isString()) {
+            return;
+        }
+
+        final String action = actionElement.getAsString();
+        if (action.equals("show_text")) {
+            final JsonElement value = hoverEvent.get("value");
+            processText(value != null ? value : hoverEvent.get("contents"));
+        } else if (action.equals("show_entity")) {
+            final JsonElement contents = hoverEvent.get("contents");
+            if (contents != null && contents.isJsonObject()) {
+                processText(contents.getAsJsonObject().get("name"));
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Tag methods
+
+    public void processTag(@Nullable final Tag tag) {
+        if (tag == null) {
+            return;
+        }
+
+        if (tag instanceof ListTag) {
+            processListTag((ListTag) tag);
+        } else if (tag instanceof CompoundTag) {
+            processCompoundTag((CompoundTag) tag);
+        }
+    }
+
+    private void processListTag(final ListTag tag) {
+        for (final Tag entry : tag) {
+            processTag(entry);
+        }
+    }
+
+    protected void processCompoundTag(final CompoundTag tag) {
+        final Tag translate = tag.get("translate");
+        if (translate instanceof StringTag) {
+            handleTranslate(tag, ((StringTag) translate));
+
+            final Tag with = tag.get("with");
+            if (with instanceof ListTag) {
+                processListTag((ListTag) with);
+            }
+        }
+
+        final Tag extra = tag.get("extra");
+        if (extra instanceof ListTag) {
+            processListTag((ListTag) extra);
+        }
+
+        final Tag hoverEvent = tag.get("hoverEvent");
+        if (hoverEvent instanceof CompoundTag) {
+            handleHoverEvent((CompoundTag) hoverEvent);
+        }
+    }
+
+    protected void handleTranslate(final CompoundTag parentTag, final StringTag translateTag) {
+        // To override if needed
+    }
+
+    protected void handleHoverEvent(final CompoundTag hoverEventTag) {
+        // To override if needed (don't forget to call super)
+        final Tag actionTag = hoverEventTag.get("action");
+        if (!(actionTag instanceof StringTag)) {
+            return;
+        }
+
+        final String action = ((StringTag) actionTag).getValue();
+        if (action.equals("show_text")) {
+            final Tag value = hoverEventTag.get("value");
+            processTag(value != null ? value : hoverEventTag.get("contents"));
+        } else if (action.equals("show_entity")) {
+            final Tag contents = hoverEventTag.get("contents");
+            if (contents instanceof CompoundTag) {
+                processTag(((CompoundTag) contents).get("name"));
+            }
+        }
+    }
+
+    public enum ReadType {
+
+        JSON,
+        NBT
     }
 }

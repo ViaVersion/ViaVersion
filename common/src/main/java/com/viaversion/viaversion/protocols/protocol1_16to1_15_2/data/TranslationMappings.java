@@ -30,7 +30,7 @@ public class TranslationMappings extends ComponentRewriter<ClientboundPackets1_1
     private final Map<String, String> mappings = new HashMap<>();
 
     public TranslationMappings(Protocol1_16To1_15_2 protocol) {
-        super(protocol);
+        super(protocol, ReadType.JSON);
         mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
         mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");
         mappings.put("attribute.name.generic.attackSpeed", "attribute.name.generic.attack_speed");

@@ -45,7 +45,7 @@ import com.viaversion.viaversion.template.protocols.rewriter.BlockItemPacketRewr
 //   1.99, 1.98
 public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_2> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.99", "1.98");
+    public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
 
