@@ -25,8 +25,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public class WorldPackets {
@@ -36,7 +36,7 @@ public class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(new ChunkType1_13(clientWorld));
 
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null) {

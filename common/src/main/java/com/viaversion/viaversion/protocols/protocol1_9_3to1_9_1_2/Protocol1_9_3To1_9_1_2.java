@@ -32,10 +32,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.types.Chunk1_9_1_2Type;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import java.util.List;
@@ -87,8 +87,8 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk chunk = wrapper.read(new Chunk1_9_1_2Type(clientWorld));
-            wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
+            Chunk chunk = wrapper.read(new ChunkType1_9_1(clientWorld));
+            wrapper.write(new ChunkType1_9_3(clientWorld), chunk);
 
             List<CompoundTag> tags = chunk.getBlockEntities();
             for (int s = 0; s < chunk.getSections().length; s++) {

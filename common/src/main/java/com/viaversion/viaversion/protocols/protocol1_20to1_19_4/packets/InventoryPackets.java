@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
@@ -111,7 +111,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                handler(blockRewriter.chunkDataHandler1_19(Chunk1_18Type::new, InventoryPackets.this::handleBlockEntity));
+                handler(blockRewriter.chunkDataHandler1_19(ChunkType1_18::new, InventoryPackets.this::handleBlockEntity));
                 read(Type.BOOLEAN); // Trust edges
             }
         });

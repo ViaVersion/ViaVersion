@@ -35,8 +35,8 @@ import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryP
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
 
@@ -208,7 +208,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(new ChunkType1_9_3(clientWorld));
 
             if (chunk.getBlockEntities() == null) return;
             for (CompoundTag tag : chunk.getBlockEntities()) {

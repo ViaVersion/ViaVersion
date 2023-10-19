@@ -31,9 +31,9 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.Map;
@@ -59,8 +59,8 @@ public class WorldPackets {
         });
 
         protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new Chunk1_15Type());
-            wrapper.write(new Chunk1_16Type(), chunk);
+            Chunk chunk = wrapper.read(new ChunkType1_15());
+            wrapper.write(new ChunkType1_16(), chunk);
 
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
 

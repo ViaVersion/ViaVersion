@@ -31,12 +31,12 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.Arrays;
@@ -126,8 +126,8 @@ public class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.read(new Chunk1_13Type(clientWorld));
-            wrapper.write(new Chunk1_14Type(), chunk);
+            Chunk chunk = wrapper.read(new ChunkType1_13(clientWorld));
+            wrapper.write(new ChunkType1_14(), chunk);
 
             int[] motionBlocking = new int[16 * 16];
             int[] worldSurface = new int[16 * 16];

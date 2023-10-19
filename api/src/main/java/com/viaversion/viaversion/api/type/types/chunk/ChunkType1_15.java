@@ -2,20 +2,25 @@
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
  * Copyright (C) 2016-2023 ViaVersion and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
-package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types;
+package com.viaversion.viaversion.api.type.types.chunk;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
@@ -24,16 +29,16 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
-import com.viaversion.viaversion.api.type.types.version.Types1_16;
+import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Chunk1_16_2Type extends Type<Chunk> {
+public class ChunkType1_15 extends Type<Chunk> {
     private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
 
-    public Chunk1_16_2Type() {
+    public ChunkType1_15() {
         super(Chunk.class);
     }
 
@@ -46,9 +51,11 @@ public class Chunk1_16_2Type extends Type<Chunk> {
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
         CompoundTag heightMap = Type.NAMED_COMPOUND_TAG.read(input);
 
-        int[] biomeData = null;
+        int[] biomeData = fullChunk ? new int[1024] : null;
         if (fullChunk) {
-            biomeData = Type.VAR_INT_ARRAY_PRIMITIVE.read(input);
+            for (int i = 0; i < 1024; i++) {
+                biomeData[i] = input.readInt();
+            }
         }
 
         Type.VAR_INT.readPrimitive(input); // data size in bytes
@@ -59,7 +66,7 @@ public class Chunk1_16_2Type extends Type<Chunk> {
             if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
 
             short nonAirBlocksCount = input.readShort();
-            ChunkSection section = Types1_16.CHUNK_SECTION.read(input);
+            ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
             section.setNonAirBlocksCount(nonAirBlocksCount);
             sections[i] = section;
         }
@@ -88,7 +95,9 @@ public class Chunk1_16_2Type extends Type<Chunk> {
 
         // Write biome data
         if (chunk.isBiomeData()) {
-            Type.VAR_INT_ARRAY_PRIMITIVE.write(output, chunk.getBiomeData());
+            for (int value : chunk.getBiomeData()) {
+                output.writeInt(value);
+            }
         }
 
         ByteBuf buf = output.alloc().buffer();
@@ -98,7 +107,7 @@ public class Chunk1_16_2Type extends Type<Chunk> {
                 if (section == null) continue; // Section not set
 
                 buf.writeShort(section.getNonAirBlocksCount());
-                Types1_16.CHUNK_SECTION.write(buf, section);
+                Types1_13.CHUNK_SECTION.write(buf, section);
             }
             buf.readerIndex(0);
             Type.VAR_INT.writePrimitive(output, buf.readableBytes());

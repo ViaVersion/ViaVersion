@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_18;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
         final int blockEntitiesLength = Type.VAR_INT.readPrimitive(buffer);
         final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
         for (int i = 0; i < blockEntitiesLength; i++) {
-            blockEntities.add(Types1_20_2.BLOCK_ENTITY.read(buffer));
+            blockEntities.add(Type.BLOCK_ENTITY1_20_2.read(buffer));
         }
 
         return new Chunk1_18(chunkX, chunkZ, sections, heightMap, blockEntities);
@@ -89,7 +88,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
 
         Type.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());
         for (final BlockEntity blockEntity : chunk.blockEntities()) {
-            Types1_20_2.BLOCK_ENTITY.write(buffer, blockEntity);
+            Type.BLOCK_ENTITY1_20_2.write(buffer, blockEntity);
         }
     }
 

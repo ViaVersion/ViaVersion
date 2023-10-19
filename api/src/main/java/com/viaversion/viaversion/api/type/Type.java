@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -58,7 +59,9 @@ import com.viaversion.viaversion.api.type.types.UnsignedShortType;
 import com.viaversion.viaversion.api.type.types.VarIntArrayType;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.api.type.types.VarLongType;
-import com.viaversion.viaversion.api.type.types.chunk.BlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.block.BlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.block.BlockEntityType1_18;
+import com.viaversion.viaversion.api.type.types.block.BlockEntityType1_20_2;
 import com.viaversion.viaversion.api.type.types.math.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.misc.CompoundTagType;
 import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
@@ -78,7 +81,7 @@ import com.viaversion.viaversion.api.type.types.math.PositionType1_8;
 import com.viaversion.viaversion.api.type.types.misc.ProfileKeyType;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
 import com.viaversion.viaversion.api.type.types.misc.TagType;
-import com.viaversion.viaversion.api.type.types.chunk.VarLongBlockChangeRecordType;
+import com.viaversion.viaversion.api.type.types.block.VarLongBlockChangeRecordType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
 import com.viaversion.viaversion.api.type.types.misc.VillagerDataType;
@@ -153,9 +156,11 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
     public static final Type<ChunkPosition> CHUNK_POSITION = new ChunkPositionType();
 
+    public static final Type<BlockEntity> BLOCK_ENTITY1_18 = new BlockEntityType1_18();
+    public static final Type<BlockEntity> BLOCK_ENTITY1_20_2 = new BlockEntityType1_20_2();
+
     public static final Type<BlockChangeRecord> BLOCK_CHANGE_RECORD = new BlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.BLOCK_CHANGE_RECORD);
-
     public static final Type<BlockChangeRecord> VAR_LONG_BLOCK_CHANGE_RECORD = new VarLongBlockChangeRecordType();
     public static final Type<BlockChangeRecord[]> VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY = new ArrayType<>(Type.VAR_LONG_BLOCK_CHANGE_RECORD);
 
@@ -188,6 +193,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item> FLAT_ITEM = ITEM1_13;
     @Deprecated/*(forRemoval=true)*/
     public static final Type<Item> FLAT_VAR_INT_ITEM = ITEM1_13_2;
+    @Deprecated/*(forRemoval=true)*/
+    public static final Type<Item[]> ITEM_ARRAY = ITEM1_8_ARRAY;
     @Deprecated/*(forRemoval=true)*/
     public static final Type<Item[]> FLAT_ITEM_ARRAY = ITEM1_13_SHORT_ARRAY;
     @Deprecated/*(forRemoval=true)*/

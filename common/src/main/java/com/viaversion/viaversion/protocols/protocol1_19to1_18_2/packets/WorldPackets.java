@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -46,7 +46,7 @@ public final class WorldPackets {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
-            final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+            final ChunkType1_18 chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.passthrough(chunkType);

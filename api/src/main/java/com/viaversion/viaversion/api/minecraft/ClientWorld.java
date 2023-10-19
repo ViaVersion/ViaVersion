@@ -20,34 +20,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.chunk;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
-import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class BlockEntityType1_18 extends Type<BlockEntity> {
+/**
+ * Stored up until 1.14 to be used in chunk sending.
+ */
+public class ClientWorld extends StoredObject {
+    private Environment environment;
 
-    public BlockEntityType1_18() {
-        super(BlockEntity.class);
+    public ClientWorld(final UserConnection connection) {
+        super(connection);
     }
 
-    @Override
-    public BlockEntity read(final ByteBuf buffer) throws Exception {
-        final byte xz = buffer.readByte();
-        final short y = buffer.readShort();
-        final int typeId = Type.VAR_INT.readPrimitive(buffer);
-        final CompoundTag tag = Type.NAMED_COMPOUND_TAG.read(buffer);
-        return new BlockEntityImpl(xz, y, typeId, tag);
+    public @Nullable Environment getEnvironment() {
+        return environment;
     }
 
-    @Override
-    public void write(final ByteBuf buffer, final BlockEntity entity) throws Exception {
-        buffer.writeByte(entity.packedXZ());
-        buffer.writeShort(entity.y());
-        Type.VAR_INT.writePrimitive(buffer, entity.typeId());
-        Type.NAMED_COMPOUND_TAG.write(buffer, entity.tag());
+    public void setEnvironment(int environmentId) {
+        this.environment = Environment.getEnvironmentById(environmentId);
     }
 }

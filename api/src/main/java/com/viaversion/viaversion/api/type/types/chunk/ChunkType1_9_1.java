@@ -2,23 +2,26 @@
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
  * Copyright (C) 2016-2023 ViaVersion and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
-package com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types;
+package com.viaversion.viaversion.api.type.types.chunk;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -27,16 +30,15 @@ import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.BitSet;
 
-public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_9_1 extends PartialType<Chunk, ClientWorld> {
 
-    public Chunk1_9_3_4Type(ClientWorld param) {
-        super(param, Chunk.class);
+    public ChunkType1_9_1(ClientWorld clientWorld) {
+        super(clientWorld, Chunk.class);
     }
 
     @Override
@@ -44,15 +46,23 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        boolean fullChunk = input.readBoolean();
+        boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
+        // Size (unused)
         Type.VAR_INT.readPrimitive(input);
 
-        // Read sections
+        BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
+        // Calculate section count from bitmask
         for (int i = 0; i < 16; i++) {
-            if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
+            if ((primaryBitmask & (1 << i)) != 0) {
+                usedSections.set(i);
+            }
+        }
 
+        // Read sections
+        for (int i = 0; i < 16; i++) {
+            if (!usedSections.get(i)) continue; // Section not set
             ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
             sections[i] = section;
             section.getLight().readBlockLight(input);
@@ -61,24 +71,14 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        int[] biomeData = fullChunk ? new int[256] : null;
-        if (fullChunk) {
+        int[] biomeData = groundUp ? new int[256] : null;
+        if (groundUp) {
             for (int i = 0; i < 256; i++) {
                 biomeData[i] = input.readByte() & 0xFF;
             }
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
-
-        // Read all the remaining bytes (workaround for #681)
-        if (input.readableBytes() > 0) {
-            byte[] array = Type.REMAINING_BYTES.read(input);
-            if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-            }
-        }
-
-        return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, nbtData);
+        return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<>());
     }
 
     @Override
@@ -99,6 +99,7 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
 
                 if (!section.getLight().hasSkyLight()) continue; // No sky light, we're done here.
                 section.getLight().writeSkyLight(buf);
+
             }
             buf.readerIndex(0);
             Type.VAR_INT.writePrimitive(output, buf.readableBytes() + (chunk.isBiomeData() ? 256 : 0));
@@ -113,9 +114,6 @@ public class Chunk1_9_3_4Type extends PartialType<Chunk, ClientWorld> {
                 output.writeByte((byte) biome);
             }
         }
-
-        // Write Block Entities
-        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
     }
 
     @Override

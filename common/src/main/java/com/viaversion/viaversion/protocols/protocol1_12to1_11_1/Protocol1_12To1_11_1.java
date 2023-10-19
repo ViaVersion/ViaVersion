@@ -42,8 +42,8 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 
@@ -110,7 +110,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
+            ChunkType1_9_3 type = new ChunkType1_9_3(clientWorld);
             Chunk chunk = wrapper.passthrough(type);
 
             for (int s = 0; s < chunk.getSections().length; s++) {

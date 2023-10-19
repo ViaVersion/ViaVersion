@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
@@ -44,7 +44,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         blockRewriter.registerBlockChange(ClientboundPackets1_19_1.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_1.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_19_1.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_1.CHUNK_DATA, Chunk1_18Type::new);
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_1.CHUNK_DATA, ChunkType1_18::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_19_1.BLOCK_ENTITY_DATA);
 
         registerSetCooldown(ClientboundPackets1_19_1.COOLDOWN);

@@ -2,37 +2,41 @@
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
  * Copyright (C) 2016-2023 ViaVersion and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
-package com.viaversion.viaversion.protocols.protocol1_9to1_8.types;
+package com.viaversion.viaversion.api.type.types.chunk;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkBulkType;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 
-public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
+public class BulkChunkType1_8 extends PartialType<Chunk[], ClientWorld> {
 
     private static final int BLOCKS_PER_SECTION = 16 * 16 * 16;
     private static final int BLOCKS_BYTES = BLOCKS_PER_SECTION * 2;
     private static final int LIGHT_BYTES = BLOCKS_PER_SECTION / 2;
     private static final int BIOME_BYTES = 16 * 16;
 
-    public ChunkBulk1_8Type(final ClientWorld clientWorld) {
+    public BulkChunkType1_8(final ClientWorld clientWorld) {
         super(clientWorld, Chunk[].class);
     }
 
@@ -56,7 +60,7 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
         for (int i = 0; i < chunks.length; i++) {
             final ChunkBulkSection chunkBulkSection = chunkInfo[i];
             chunkBulkSection.readData(input);
-            chunks[i] = Chunk1_8Type.deserialize(chunkBulkSection.chunkX, chunkBulkSection.chunkZ, true, skyLight, chunkBulkSection.bitmask, chunkBulkSection.getData());
+            chunks[i] = ChunkType1_8.deserialize(chunkBulkSection.chunkX, chunkBulkSection.chunkZ, true, skyLight, chunkBulkSection.bitmask, chunkBulkSection.data());
         }
 
         return chunks;
@@ -85,7 +89,7 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
         }
         // Write data
         for (Chunk c : chunks) {
-            output.writeBytes(Chunk1_8Type.serialize(c));
+            output.writeBytes(ChunkType1_8.serialize(c));
         }
     }
 
@@ -107,19 +111,19 @@ public class ChunkBulk1_8Type extends PartialType<Chunk[], ClientWorld> {
             input.readBytes(this.data);
         }
 
-        public int getChunkX() {
+        public int chunkX() {
             return this.chunkX;
         }
 
-        public int getChunkZ() {
+        public int chunkZ() {
             return this.chunkZ;
         }
 
-        public int getBitmask() {
+        public int bitmask() {
             return this.bitmask;
         }
 
-        public byte[] getData() {
+        public byte[] data() {
             return this.data;
         }
     }

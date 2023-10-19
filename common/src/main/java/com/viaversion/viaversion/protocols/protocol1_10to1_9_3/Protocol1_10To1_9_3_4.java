@@ -33,8 +33,8 @@ import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.packets.Inventory
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -179,7 +179,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         // Chunk Data
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(new ChunkType1_9_3(clientWorld));
 
             if (Via.getConfig().isReplacePistons()) {
                 int replacementId = Via.getConfig().getPistonReplacementId();

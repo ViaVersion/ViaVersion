@@ -35,7 +35,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
@@ -90,7 +90,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            final Type<Chunk> chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+            final Type<Chunk> chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.read(chunkType);

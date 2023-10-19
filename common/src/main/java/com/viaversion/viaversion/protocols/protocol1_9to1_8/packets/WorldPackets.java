@@ -32,8 +32,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.types.Chunk1_9_1_2Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -43,8 +43,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -122,7 +122,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk chunk = wrapper.read(new Chunk1_8Type(clientWorld));
+            Chunk chunk = wrapper.read(new ChunkType1_8(clientWorld));
 
             long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
 
@@ -152,7 +152,7 @@ public class WorldPackets {
                     }
                 }
             } else {
-                Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+                Type<Chunk> chunkType = new ChunkType1_9_1(clientWorld);
                 wrapper.write(chunkType, chunk);
 
                 clientChunks.getLoadedChunks().add(chunkHash);
@@ -177,9 +177,9 @@ public class WorldPackets {
             wrapper.cancel(); // Cancel the packet from being sent
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(clientWorld));
+            Chunk[] chunks = wrapper.read(new BulkChunkType1_8(clientWorld));
 
-            Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+            Type<Chunk> chunkType = new ChunkType1_9_1(clientWorld);
             // Split into multiple chunk packets
             for (Chunk chunk : chunks) {
                 PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);

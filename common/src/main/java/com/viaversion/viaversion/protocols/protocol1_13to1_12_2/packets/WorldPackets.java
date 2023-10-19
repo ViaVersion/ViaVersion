@@ -44,9 +44,9 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRew
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_3_4Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -331,8 +331,8 @@ public class WorldPackets {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
-            Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-            Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
+            ChunkType1_9_3 type = new ChunkType1_9_3(clientWorld);
+            ChunkType1_13 type1_13 = new ChunkType1_13(clientWorld);
             Chunk chunk = wrapper.read(type);
             wrapper.write(type1_13, chunk);
 

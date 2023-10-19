@@ -20,20 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.version;
+package com.viaversion.viaversion.api.type.types.block;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_14;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
-import com.viaversion.viaversion.api.type.types.metadata.MetadataType;
-import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import java.util.List;
+import io.netty.buffer.ByteBuf;
 
-public final class Types1_18 {
+public class BlockChangeRecordType extends Type<BlockChangeRecord> {
 
-    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
-    public static final MetaTypes1_14 META_TYPES = new MetaTypes1_14(PARTICLE);
-    public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
+    public BlockChangeRecordType() {
+        super(BlockChangeRecord.class);
+    }
+
+    @Override
+    public BlockChangeRecord read(ByteBuf buffer) throws Exception {
+        short position = Type.SHORT.readPrimitive(buffer);
+        int blockId = Type.VAR_INT.readPrimitive(buffer);
+        return new BlockChangeRecord1_8(position >> 12 & 0xF, position & 0xFF, position >> 8 & 0xF, blockId);
+    }
+
+    @Override
+    public void write(ByteBuf buffer, BlockChangeRecord object) throws Exception {
+        Type.SHORT.writePrimitive(buffer, (short) (object.getSectionX() << 12 | object.getSectionZ() << 8 | object.getY()));
+        Type.VAR_INT.writePrimitive(buffer, object.getBlockId());
+    }
 }

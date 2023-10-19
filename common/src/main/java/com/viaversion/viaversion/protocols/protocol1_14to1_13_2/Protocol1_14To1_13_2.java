@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;

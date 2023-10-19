@@ -59,7 +59,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.Player
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
