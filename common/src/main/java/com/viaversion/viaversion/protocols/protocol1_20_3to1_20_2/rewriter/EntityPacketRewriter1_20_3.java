@@ -113,12 +113,10 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 Types1_20_3.META_TYPES.particleType
         );
 
-        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(12).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
-
-        // TODO NEW ENTITY METADATA
     }
 
     @Override
