@@ -32,7 +32,7 @@ import java.util.List;
 
 public final class Types1_20_3 {
 
-    public static final ParticleType PARTICLE = Types1_20.PARTICLE; // Only safe to use after protocol loading
+    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
     public static final MetaTypes1_20_3 META_TYPES = new MetaTypes1_20_3(PARTICLE);
     public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
     public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);

@@ -47,9 +47,9 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.NAMED_COMPOUND_TAG); // Registry data
-                handler(dimensionDataHandler()); // Caches dimensions to access data like height later
-                handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
+                map(Type.COMPOUND_TAG); // Registry data
+                handler(configurationDimensionDataHandler()); // Caches dimensions to access data like height later
+                handler(configurationBiomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
             }
         });
 

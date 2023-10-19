@@ -424,7 +424,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(unmappedPacketId) + ")");
         } else {
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                    + " IN REMAP OF " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
+                    + " IN REMAP OF " + state + " " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
         }
         throw e;
     }

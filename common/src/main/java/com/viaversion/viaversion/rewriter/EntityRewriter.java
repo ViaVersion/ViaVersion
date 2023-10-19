@@ -474,6 +474,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
     }
 
+    public PacketHandler configurationBiomeSizeTracker() {
+        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.COMPOUND_TAG, 0));
+    }
+
     public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
         final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
         final ListTag biomes = biomeRegistry.get("value");
@@ -482,6 +486,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     public PacketHandler dimensionDataHandler() {
         return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
+    }
+
+    public PacketHandler configurationDimensionDataHandler() {
+        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.COMPOUND_TAG, 0));
     }
 
     /**

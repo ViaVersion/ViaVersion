@@ -171,6 +171,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerCreativeInvAction(S packetType) {
+        registerCreativeInvAction(packetType, itemType);
+    }
+
     public void registerCreativeInvAction(S packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
