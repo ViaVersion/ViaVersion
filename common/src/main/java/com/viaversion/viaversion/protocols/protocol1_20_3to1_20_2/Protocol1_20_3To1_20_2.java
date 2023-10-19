@@ -400,9 +400,11 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         if ((key.equals("contents")) && element.isJsonObject()) {
             // Store show_entity id as int array instead of uuid string
             final JsonObject hoverEvent = element.getAsJsonObject();
-            final JsonElement id = hoverEvent.remove("id");
+            final JsonElement id = hoverEvent.get("id");
             final UUID uuid;
             if (id != null && id.isJsonPrimitive() && (uuid = parseUUID(id.getAsString())) != null) {
+                hoverEvent.remove("id");
+
                 final CompoundTag convertedTag = (CompoundTag) convertToTag(element);
                 convertedTag.put("id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(uuid)));
                 tag.put(key, convertedTag);
@@ -475,8 +477,10 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         if ((key.equals("contents")) && tag instanceof CompoundTag) {
             // Back to a UUID string
             final CompoundTag showEntity = (CompoundTag) tag;
-            final Tag idTag = showEntity.remove("id");
+            final Tag idTag = showEntity.get("id");
             if (idTag instanceof IntArrayTag) {
+                showEntity.remove("id");
+
                 final JsonObject convertedElement = (JsonObject) convertToJson(key, tag);
                 convertedElement.addProperty("id", uuidIntsToString(((IntArrayTag) idTag).getValue()));
                 object.add(key, convertedElement);
@@ -484,7 +488,8 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             }
         }
 
-        object.add(key, convertToJson(key, tag));
+        // "":1 is a valid tag, but not a valid json component
+        object.add(key.isEmpty() ? "text" : key, convertToJson(key, tag));
     }
 
     private static String uuidIntsToString(final int[] parts) {
