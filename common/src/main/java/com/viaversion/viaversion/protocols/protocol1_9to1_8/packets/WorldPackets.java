@@ -53,7 +53,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Sign Position
+                map(Type.POSITION1_8); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
@@ -65,7 +65,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Effect ID
-                map(Type.POSITION); // 1 - Position
+                map(Type.POSITION1_8); // 1 - Position
                 map(Type.INT); // 2 - Data
                 map(Type.BOOLEAN); // 3 - Disable relative volume
 
@@ -207,7 +207,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Block Position
+                map(Type.POSITION1_8); // 0 - Block Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NAMED_COMPOUND_TAG); // 2 - NBT (Might not be present)
                 handler(wrapper -> {
@@ -229,7 +229,7 @@ public class WorldPackets {
                     }
                     if (action == 2) { // Update Command Block
                         CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
+                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION1_8, 0), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
 
                         // To prevent window issues don't send updates
                         wrapper.cancel();
@@ -243,7 +243,7 @@ public class WorldPackets {
         protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Sign Position
+                map(Type.POSITION1_8); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
@@ -255,7 +255,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
-                map(Type.POSITION); // Position
+                map(Type.POSITION1_8); // Position
                 handler(wrapper -> {
                     int status = wrapper.get(Type.VAR_INT, 0);
                     if (status == 6)
@@ -282,7 +282,7 @@ public class WorldPackets {
             // Wipe the input buffer
             wrapper.clearInputBuffer();
             wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
-            wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
+            wrapper.write(Type.POSITION1_8, new Position(-1, (short) -1, -1));
             wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
             Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
@@ -335,7 +335,7 @@ public class WorldPackets {
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
                 handler(wrapper -> {
                     final int hand = wrapper.read(Type.VAR_INT); // 2 - Hand
@@ -354,7 +354,7 @@ public class WorldPackets {
                     int face = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     if (face == 255)
                         return;
-                    Position p = wrapper.get(Type.POSITION, 0);
+                    Position p = wrapper.get(Type.POSITION1_8, 0);
                     int x = p.x();
                     int y = p.y();
                     int z = p.z();
@@ -386,13 +386,13 @@ public class WorldPackets {
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
 
-                    Position pos = wrapper.get(Type.POSITION, 0);
+                    Position pos = wrapper.get(Type.POSITION1_8, 0);
                     Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
                     // Send the Update Block Entity packet if present
                     if (tag.isPresent()) {
                         PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
 
-                        updateBlockEntity.write(Type.POSITION, pos);
+                        updateBlockEntity.write(Type.POSITION1_8, pos);
                         updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
                         updateBlockEntity.write(Type.NAMED_COMPOUND_TAG, tag.get());
 

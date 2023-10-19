@@ -102,12 +102,12 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Location
+                map(Type.POSITION1_8); // 0 - Location
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION, 0);
+                    Position position = wrapper.get(Type.POSITION1_8, 0);
                     short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
@@ -132,12 +132,12 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // Location
+                map(Type.POSITION1_8); // Location
                 map(Type.UNSIGNED_BYTE); // Action Id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
                 handler(wrapper -> {
-                    Position pos = wrapper.get(Type.POSITION, 0);
+                    Position pos = wrapper.get(Type.POSITION1_8, 0);
                     short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     short param = wrapper.get(Type.UNSIGNED_BYTE, 1);
                     int blockId = wrapper.get(Type.VAR_INT, 0);
@@ -165,7 +165,7 @@ public class WorldPackets {
 
                     if (blockId == 73) { // Note block
                         PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_CHANGE);
-                        blockChange.write(Type.POSITION, pos);
+                        blockChange.write(Type.POSITION1_8, pos);
                         blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_13To1_12_2.class);
                     }
@@ -177,10 +177,10 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION);
+                map(Type.POSITION1_8);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION, 0);
+                    Position position = wrapper.get(Type.POSITION1_8, 0);
                     int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
                     UserConnection userConnection = wrapper.user();
@@ -540,7 +540,7 @@ public class WorldPackets {
 
         // Incoming Packets
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_BLOCK_PLACEMENT, wrapper -> {
-            Position pos = wrapper.passthrough(Type.POSITION);
+            Position pos = wrapper.passthrough(Type.POSITION1_8);
             wrapper.passthrough(Type.VAR_INT); // block face
             wrapper.passthrough(Type.VAR_INT); // hand
             wrapper.passthrough(Type.FLOAT); // cursor x
@@ -553,7 +553,7 @@ public class WorldPackets {
         });
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_DIGGING, wrapper -> {
             int status = wrapper.passthrough(Type.VAR_INT); // Status
-            Position pos = wrapper.passthrough(Type.POSITION); // Location
+            Position pos = wrapper.passthrough(Type.POSITION1_8); // Location
             wrapper.passthrough(Type.UNSIGNED_BYTE); // block face
 
             // 0 = Started digging: if in creative this causes the block to break directly

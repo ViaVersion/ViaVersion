@@ -59,7 +59,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
-                map(Type.POSITION); // Location
+                map(Type.POSITION1_8); // Location
                 map(Type.INT); // Data
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);

@@ -34,8 +34,8 @@ public enum MetaType1_9 implements MetaType {
     Slot(5, Type.ITEM1_8),
     Boolean(6, Type.BOOLEAN),
     Vector3F(7, Type.ROTATION),
-    Position(8, Type.POSITION),
-    OptPosition(9, Type.OPTIONAL_POSITION),
+    Position(8, Type.POSITION1_8),
+    OptPosition(9, Type.OPTIONAL_POSITION1_8),
     Direction(10, Type.VAR_INT),
     OptUUID(11, Type.OPTIONAL_UUID),
     BlockID(12, Type.VAR_INT);

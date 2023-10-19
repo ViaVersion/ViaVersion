@@ -168,7 +168,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action ID
                 map(Type.UNSIGNED_BYTE); // 2 - Action Param
                 map(Type.VAR_INT); // 3 - Block Type
@@ -188,7 +188,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
                 map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
@@ -253,7 +253,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             @Override
             public void register() {
                 this.map(Type.INT); //effectID
-                this.map(Type.POSITION); //pos
+                this.map(Type.POSITION1_8); //pos
                 this.map(Type.INT); //effectData
                 this.map(Type.BOOLEAN); //serverwide / global
                 handler(packetWrapper -> {
@@ -285,7 +285,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerServerbound(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Location
+                map(Type.POSITION1_8); // 0 - Location
                 map(Type.VAR_INT); // 1 - Face
                 map(Type.VAR_INT); // 2 - Hand
 

@@ -51,7 +51,7 @@ public class PositionType1_8 extends Type<Position> {
     public static final class OptionalPositionType extends OptionalType<Position> {
 
         public OptionalPositionType() {
-            super(Type.POSITION);
+            super(Type.POSITION1_8);
         }
     }
 }

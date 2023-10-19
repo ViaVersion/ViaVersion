@@ -142,7 +142,7 @@ public class EntityPackets {
                 map(Type.VAR_INT);
                 map(Type.UUID);
                 map(Type.VAR_INT);
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.BYTE);
             }
         });
@@ -233,7 +233,7 @@ public class EntityPackets {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     tracker.setSleeping(entityId, true);
 
-                    Position position = wrapper.read(Type.POSITION);
+                    Position position = wrapper.read(Type.POSITION1_8);
                     List<Metadata> metadataList = new LinkedList<>();
                     metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalPositionType, position));
                     if (tracker.clientEntityId() != entityId) {

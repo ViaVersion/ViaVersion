@@ -56,7 +56,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Type.POSITION, Type.NAMED_COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Type.POSITION1_8, Type.NAMED_COMPOUND_TAG);
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> for1_14(final Protocol<C, ?, ?, ?> protocol) {

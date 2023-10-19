@@ -109,7 +109,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
-        Position position = wrapper.read(Type.POSITION);
+        Position position = wrapper.read(Type.POSITION1_8);
         wrapper.write(Type.INT, position.x());
         wrapper.write(Type.INT, position.y());
         wrapper.write(Type.INT, position.z());
@@ -334,7 +334,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
-                map(Type.POSITION); // Location
+                map(Type.POSITION1_8); // Location
                 map(Type.INT); // Data
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
@@ -638,7 +638,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 handler(wrapper -> {
                     wrapper.write(Type.BOOLEAN, false);
                     final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
-                    wrapper.write(Type.OPTIONAL_POSITION, playerLookTarget);
+                    wrapper.write(Type.OPTIONAL_POSITION1_8, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                         TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                         wrapper.cancel();

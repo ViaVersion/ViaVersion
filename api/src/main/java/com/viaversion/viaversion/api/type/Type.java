@@ -132,8 +132,8 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final VarLongType VAR_LONG = new VarLongType();
 
     /* MC Types */
-    public static final Type<Position> POSITION = new PositionType1_8();
-    public static final Type<Position> OPTIONAL_POSITION = new PositionType1_8.OptionalPositionType();
+    public static final Type<Position> POSITION1_8 = new PositionType1_8();
+    public static final Type<Position> OPTIONAL_POSITION1_8 = new PositionType1_8.OptionalPositionType();
     public static final Type<Position> POSITION1_14 = new PositionType1_14();
     public static final Type<Position> OPTIONAL_POSITION_1_14 = new PositionType1_14.OptionalPosition1_14Type();
     public static final Type<EulerAngle> ROTATION = new EulerAngleType();

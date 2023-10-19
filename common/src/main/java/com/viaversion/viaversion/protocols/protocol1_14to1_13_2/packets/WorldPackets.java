@@ -59,20 +59,20 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.BYTE);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14); // Location
+                map(Type.POSITION1_8, Type.POSITION1_14); // Location
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
@@ -82,7 +82,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
                     int id = wrapper.get(Type.VAR_INT, 0);
@@ -251,7 +251,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
-                map(Type.POSITION, Type.POSITION1_14); // Location
+                map(Type.POSITION1_8, Type.POSITION1_14); // Location
                 map(Type.INT); // Data
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
@@ -308,7 +308,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
     }

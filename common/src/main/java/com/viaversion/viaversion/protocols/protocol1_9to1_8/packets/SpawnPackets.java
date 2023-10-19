@@ -238,7 +238,7 @@ public class SpawnPackets {
                 });
 
                 map(Type.STRING); // 2 - Title
-                map(Type.POSITION); // 3 - Position
+                map(Type.POSITION1_8); // 3 - Position
                 map(Type.BYTE); // 4 - Direction
             }
         });

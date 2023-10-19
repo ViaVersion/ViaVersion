@@ -58,7 +58,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         // Sign update packet
         registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, wrapper -> {
             //read data
-            Position position = wrapper.read(Type.POSITION);
+            Position position = wrapper.read(Type.POSITION1_8);
             JsonElement[] lines = new JsonElement[4];
             for (int i = 0; i < 4; i++) {
                 lines[i] = wrapper.read(Type.COMPONENT);
@@ -68,7 +68,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
 
             //write data
             wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
-            wrapper.write(Type.POSITION, position); //Block location
+            wrapper.write(Type.POSITION1_8, position); //Block location
             wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
 
             //Create nbt

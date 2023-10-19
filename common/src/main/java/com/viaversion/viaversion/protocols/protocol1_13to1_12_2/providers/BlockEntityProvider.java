@@ -82,7 +82,7 @@ public class BlockEntityProvider implements Provider {
 
     private void sendBlockChange(UserConnection user, Position position, int blockId) throws Exception {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
-        wrapper.write(Type.POSITION, position);
+        wrapper.write(Type.POSITION1_8, position);
         wrapper.write(Type.VAR_INT, blockId);
 
         wrapper.send(Protocol1_13To1_12_2.class);

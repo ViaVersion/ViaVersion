@@ -88,7 +88,7 @@ public final class ConnectionData {
             updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
 
             PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
-            blockUpdatePacket.write(Type.POSITION, pos);
+            blockUpdatePacket.write(Type.POSITION1_8, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
             blockUpdatePacket.send(Protocol1_13To1_12_2.class);
         }

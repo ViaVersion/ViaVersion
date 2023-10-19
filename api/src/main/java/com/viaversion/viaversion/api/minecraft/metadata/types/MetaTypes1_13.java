@@ -37,8 +37,8 @@ public final class MetaTypes1_13 extends AbstractMetaTypes {
     public final MetaType itemType = add(6, Type.ITEM1_13);
     public final MetaType booleanType = add(7, Type.BOOLEAN);
     public final MetaType rotationType = add(8, Type.ROTATION);
-    public final MetaType positionType = add(9, Type.POSITION);
-    public final MetaType optionalPositionType = add(10, Type.OPTIONAL_POSITION);
+    public final MetaType positionType = add(9, Type.POSITION1_8);
+    public final MetaType optionalPositionType = add(10, Type.OPTIONAL_POSITION1_8);
     public final MetaType directionType = add(11, Type.VAR_INT);
     public final MetaType optionalUUIDType = add(12, Type.OPTIONAL_UUID);
     public final MetaType blockStateType = add(13, Type.VAR_INT);
