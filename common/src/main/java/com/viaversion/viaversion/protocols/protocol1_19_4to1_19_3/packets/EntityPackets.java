@@ -179,7 +179,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                 map(Type.STRING); // Dimension
                 map(Type.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
-                handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker(wrapper.user())));
+                handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker()));
             }
         });
 

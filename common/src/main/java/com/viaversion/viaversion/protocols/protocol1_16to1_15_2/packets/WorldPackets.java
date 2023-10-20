@@ -59,8 +59,8 @@ public class WorldPackets {
         });
 
         protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new ChunkType1_15());
-            wrapper.write(new ChunkType1_16(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_15.TYPE);
+            wrapper.write(ChunkType1_16.TYPE, chunk);
 
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
 

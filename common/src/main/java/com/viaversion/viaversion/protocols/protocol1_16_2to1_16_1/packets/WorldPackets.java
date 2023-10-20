@@ -46,8 +46,8 @@ public class WorldPackets {
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_16.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new ChunkType1_16());
-            wrapper.write(new ChunkType1_16_2(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_16.TYPE);
+            wrapper.write(ChunkType1_16_2.TYPE, chunk);
 
             for (int s = 0; s < chunk.getSections().length; s++) {
                 ChunkSection section = chunk.getSections()[s];

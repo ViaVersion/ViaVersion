@@ -110,7 +110,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     public void init(final UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
 
-        user.put(new PlayerVehicleTracker(user));
+        user.put(new PlayerVehicleTracker());
     }
 
     @Override

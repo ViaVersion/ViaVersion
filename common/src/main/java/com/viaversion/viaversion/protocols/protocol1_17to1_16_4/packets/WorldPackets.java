@@ -122,7 +122,7 @@ public final class WorldPackets {
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new ChunkType1_16_2());
+            Chunk chunk = wrapper.read(ChunkType1_16_2.TYPE);
             if (!chunk.isFullChunk()) {
                 // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
                 // Construct multi block change packets instead

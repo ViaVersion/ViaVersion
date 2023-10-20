@@ -41,7 +41,7 @@ public final class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_14_4.CHUNK_DATA, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
-            wrapper.write(new ChunkType1_15(), chunk);
+            wrapper.write(ChunkType1_15.TYPE, chunk);
 
             if (chunk.isFullChunk()) {
                 int[] biomeData = chunk.getBiomeData();

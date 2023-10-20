@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ChunkType1_16 extends Type<Chunk> {
+    public static final Type<Chunk> TYPE = new ChunkType1_16();
     private static final CompoundTag[] EMPTY_COMPOUNDS = new CompoundTag[0];
 
     public ChunkType1_16() {
