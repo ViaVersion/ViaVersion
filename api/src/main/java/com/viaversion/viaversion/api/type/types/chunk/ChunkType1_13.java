@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.type.types.chunk;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -38,13 +37,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
-public class ChunkType1_13 extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_13 extends PartialType<Chunk, Environment> {
 
-    private static final ChunkType1_13 WITH_SKYLIGHT = new ChunkType1_13(new ClientWorld(Environment.NORMAL));
-    private static final ChunkType1_13 WITHOUT_SKYLIGHT = new ChunkType1_13(new ClientWorld(Environment.NETHER));
+    private static final ChunkType1_13 WITH_SKYLIGHT = new ChunkType1_13(Environment.NORMAL);
+    private static final ChunkType1_13 WITHOUT_SKYLIGHT = new ChunkType1_13(Environment.NETHER);
 
-    public ChunkType1_13(ClientWorld clientWorld) {
-        super(clientWorld, Chunk.class);
+    public ChunkType1_13(Environment environment) {
+        super(environment, Chunk.class);
     }
 
     public static ChunkType1_13 forEnvironment(Environment environment) {
@@ -52,7 +51,7 @@ public class ChunkType1_13 extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
+    public Chunk read(ByteBuf input, Environment environment) throws Exception {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -68,7 +67,7 @@ public class ChunkType1_13 extends PartialType<Chunk, ClientWorld> {
             ChunkSection section = Types1_13.CHUNK_SECTION.read(data);
             sections[i] = section;
             section.getLight().readBlockLight(data);
-            if (world.getEnvironment() == Environment.NORMAL) {
+            if (environment == Environment.NORMAL) {
                 section.getLight().readSkyLight(data);
             }
         }
@@ -98,7 +97,7 @@ public class ChunkType1_13 extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Environment environment, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
@@ -133,10 +132,5 @@ public class ChunkType1_13 extends PartialType<Chunk, ClientWorld> {
 
         // Write Block Entities
         Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
-    }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
     }
 }

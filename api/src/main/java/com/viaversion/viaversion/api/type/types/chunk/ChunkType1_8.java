@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -34,13 +33,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 
-public class ChunkType1_8 extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_8 extends PartialType<Chunk, Environment> {
 
-    private static final ChunkType1_8 WITH_SKYLIGHT = new ChunkType1_8(new ClientWorld(Environment.NORMAL));
-    private static final ChunkType1_8 WITHOUT_SKYLIGHT = new ChunkType1_8(new ClientWorld(Environment.NETHER));
+    private static final ChunkType1_8 WITH_SKYLIGHT = new ChunkType1_8(Environment.NORMAL);
+    private static final ChunkType1_8 WITHOUT_SKYLIGHT = new ChunkType1_8(Environment.NETHER);
 
-    public ChunkType1_8(ClientWorld clientWorld) {
-        super(clientWorld, Chunk.class);
+    public ChunkType1_8(Environment environment) {
+        super(environment, Chunk.class);
     }
 
     public static ChunkType1_8 forEnvironment(Environment environment) {
@@ -48,7 +47,7 @@ public class ChunkType1_8 extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public Chunk read(ByteBuf input, ClientWorld world) throws Exception {
+    public Chunk read(ByteBuf input, Environment environment) throws Exception {
         final int chunkX = input.readInt();
         final int chunkZ = input.readInt();
         final boolean fullChunk = input.readBoolean();
@@ -62,11 +61,11 @@ public class ChunkType1_8 extends PartialType<Chunk, ClientWorld> {
             return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
         }
 
-        return deserialize(chunkX, chunkZ, fullChunk, world.getEnvironment() == Environment.NORMAL, bitmask, data);
+        return deserialize(chunkX, chunkZ, fullChunk, environment == Environment.NORMAL, bitmask, data);
     }
 
     @Override
-    public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Environment environment, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         output.writeBoolean(chunk.isFullChunk());

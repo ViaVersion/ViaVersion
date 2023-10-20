@@ -121,5 +121,4 @@ public class BulkChunkType1_8 extends Type<Chunk[]> {
             return this.data;
         }
     }
-
 }
