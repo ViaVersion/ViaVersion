@@ -22,27 +22,31 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
-import com.viaversion.viaversion.api.type.PartialType;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public class CustomByteType extends PartialType<byte[], Integer> {
+public class FixedByteArrayType extends Type<byte[]> {
 
-    public CustomByteType(Integer param) {
-        super(param, byte[].class);
+    private final int arrayLength;
+
+    public FixedByteArrayType(final int arrayLength) {
+        super(byte[].class);
+        this.arrayLength = arrayLength;
     }
 
     @Override
-    public byte[] read(ByteBuf byteBuf, Integer integer) throws Exception {
-        if (byteBuf.readableBytes() < integer) throw new RuntimeException("Readable bytes does not match expected!");
+    public byte[] read(final ByteBuf byteBuf) throws Exception {
+        if (byteBuf.readableBytes() < this.arrayLength) {
+            throw new RuntimeException("Readable bytes does not match expected!");
+        }
 
-        byte[] byteArray = new byte[integer];
+        final byte[] byteArray = new byte[this.arrayLength];
         byteBuf.readBytes(byteArray);
-
         return byteArray;
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Integer integer, byte[] bytes) throws Exception {
+    public void write(final ByteBuf byteBuf, final byte[] bytes) throws Exception {
         byteBuf.writeBytes(bytes);
     }
 }
