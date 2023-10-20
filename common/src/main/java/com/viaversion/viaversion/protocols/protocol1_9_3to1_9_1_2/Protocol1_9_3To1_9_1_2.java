@@ -87,8 +87,8 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk chunk = wrapper.read(new ChunkType1_9_1(clientWorld));
-            wrapper.write(new ChunkType1_9_3(clientWorld), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment()));
+            wrapper.write(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()), chunk);
 
             List<CompoundTag> tags = chunk.getBlockEntities();
             for (int s = 0; s < chunk.getSections().length; s++) {

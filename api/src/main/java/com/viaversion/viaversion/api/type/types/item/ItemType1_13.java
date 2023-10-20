@@ -28,9 +28,9 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ItemType1_13 extends BaseItemType {
+public class ItemType1_13 extends Type<Item> {
     public ItemType1_13() {
-        super("FlatItem");
+        super("FlatItem", Item.class);
     }
 
     @Override

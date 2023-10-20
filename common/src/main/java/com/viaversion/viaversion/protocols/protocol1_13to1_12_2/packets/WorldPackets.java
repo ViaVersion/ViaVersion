@@ -331,8 +331,8 @@ public class WorldPackets {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
-            ChunkType1_9_3 type = new ChunkType1_9_3(clientWorld);
-            ChunkType1_13 type1_13 = new ChunkType1_13(clientWorld);
+            ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
+            ChunkType1_13 type1_13 = ChunkType1_13.forEnvironment(clientWorld.getEnvironment());
             Chunk chunk = wrapper.read(type);
             wrapper.write(type1_13, chunk);
 

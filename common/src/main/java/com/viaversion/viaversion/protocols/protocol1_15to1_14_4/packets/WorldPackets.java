@@ -40,7 +40,7 @@ public final class WorldPackets {
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_14_4.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new ChunkType1_14());
+            Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
             wrapper.write(new ChunkType1_15(), chunk);
 
             if (chunk.isFullChunk()) {

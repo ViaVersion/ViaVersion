@@ -22,28 +22,29 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 
 public class ChunkType1_8 extends PartialType<Chunk, ClientWorld> {
 
-    public ChunkType1_8(ClientWorld param) {
-        super(param, Chunk.class);
+    private static final ChunkType1_8 WITH_SKYLIGHT = new ChunkType1_8(new ClientWorld(Environment.NORMAL));
+    private static final ChunkType1_8 WITHOUT_SKYLIGHT = new ChunkType1_8(new ClientWorld(Environment.NETHER));
+
+    public ChunkType1_8(ClientWorld clientWorld) {
+        super(clientWorld, Chunk.class);
     }
 
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
+    public static ChunkType1_8 forEnvironment(Environment environment) {
+        return environment == Environment.NORMAL ? WITH_SKYLIGHT : WITHOUT_SKYLIGHT;
     }
 
     @Override

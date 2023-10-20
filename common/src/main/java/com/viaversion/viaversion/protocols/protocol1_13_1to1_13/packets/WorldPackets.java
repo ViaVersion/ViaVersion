@@ -36,7 +36,7 @@ public class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.passthrough(new ChunkType1_13(clientWorld));
+            Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null) {

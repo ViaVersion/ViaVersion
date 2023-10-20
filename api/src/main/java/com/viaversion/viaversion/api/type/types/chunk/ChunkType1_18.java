@@ -97,9 +97,4 @@ public final class ChunkType1_18 extends Type<Chunk> {
             Type.BLOCK_ENTITY1_18.write(buffer, blockEntity);
         }
     }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
-    }
 }

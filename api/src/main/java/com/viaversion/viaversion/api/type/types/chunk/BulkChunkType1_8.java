@@ -24,29 +24,23 @@ package com.viaversion.viaversion.api.type.types.chunk;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 
-public class BulkChunkType1_8 extends PartialType<Chunk[], ClientWorld> {
+public class BulkChunkType1_8 extends Type<Chunk[]> {
 
+    public static final Type<Chunk[]> TYPE = new BulkChunkType1_8();
     private static final int BLOCKS_PER_SECTION = 16 * 16 * 16;
     private static final int BLOCKS_BYTES = BLOCKS_PER_SECTION * 2;
     private static final int LIGHT_BYTES = BLOCKS_PER_SECTION / 2;
     private static final int BIOME_BYTES = 16 * 16;
 
-    public BulkChunkType1_8(final ClientWorld clientWorld) {
-        super(clientWorld, Chunk[].class);
+    public BulkChunkType1_8() {
+        super(Chunk[].class);
     }
 
     @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkBulkType.class;
-    }
-
-    @Override
-    public Chunk[] read(ByteBuf input, ClientWorld world) throws Exception {
+    public Chunk[] read(ByteBuf input) throws Exception {
         final boolean skyLight = input.readBoolean();
         final int count = Type.VAR_INT.readPrimitive(input);
         final Chunk[] chunks = new Chunk[count];
@@ -67,11 +61,11 @@ public class BulkChunkType1_8 extends PartialType<Chunk[], ClientWorld> {
     }
 
     @Override
-    public void write(ByteBuf output, ClientWorld world, Chunk[] chunks) throws Exception {
+    public void write(ByteBuf output, Chunk[] chunks) throws Exception {
         boolean skyLight = false;
         loop1:
-        for (Chunk c : chunks) {
-            for (ChunkSection section : c.getSections()) {
+        for (Chunk chunk : chunks) {
+            for (ChunkSection section : chunk.getSections()) {
                 if (section != null && section.getLight().hasSkyLight()) {
                     skyLight = true;
                     break loop1;
@@ -82,14 +76,14 @@ public class BulkChunkType1_8 extends PartialType<Chunk[], ClientWorld> {
         Type.VAR_INT.writePrimitive(output, chunks.length);
 
         // Write metadata
-        for (Chunk c : chunks) {
-            output.writeInt(c.getX());
-            output.writeInt(c.getZ());
-            output.writeShort(c.getBitmask());
+        for (Chunk chunk : chunks) {
+            output.writeInt(chunk.getX());
+            output.writeInt(chunk.getZ());
+            output.writeShort(chunk.getBitmask());
         }
         // Write data
-        for (Chunk c : chunks) {
-            output.writeBytes(ChunkType1_8.serialize(c));
+        for (Chunk chunk : chunks) {
+            output.writeBytes(ChunkType1_8.serialize(chunk));
         }
     }
 

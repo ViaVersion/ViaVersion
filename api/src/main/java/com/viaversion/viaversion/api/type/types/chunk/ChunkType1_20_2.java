@@ -29,8 +29,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_18;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,10 +93,5 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
         for (final BlockEntity blockEntity : chunk.blockEntities()) {
             Type.BLOCK_ENTITY1_20_2.write(buffer, blockEntity);
         }
-    }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
     }
 }

@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
@@ -36,6 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ChunkType1_14 extends Type<Chunk> {
+
+    public static final Type<Chunk> TYPE = new ChunkType1_14();
 
     public ChunkType1_14() {
         super(Chunk.class);
@@ -117,10 +118,5 @@ public class ChunkType1_14 extends Type<Chunk> {
 
         // Write Block Entities
         Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
-    }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
     }
 }

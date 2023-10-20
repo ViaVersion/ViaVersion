@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types.item;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 public class ItemShortArrayType1_8 extends BaseItemArrayType {
@@ -33,19 +34,19 @@ public class ItemShortArrayType1_8 extends BaseItemArrayType {
 
     @Override
     public Item[] read(ByteBuf buffer) throws Exception {
-        int amount = SHORT.readPrimitive(buffer);
+        int amount = Type.SHORT.readPrimitive(buffer);
         Item[] array = new Item[amount];
         for (int i = 0; i < amount; i++) {
-            array[i] = ITEM1_8.read(buffer);
+            array[i] = Type.ITEM1_8.read(buffer);
         }
         return array;
     }
 
     @Override
     public void write(ByteBuf buffer, Item[] object) throws Exception {
-        SHORT.writePrimitive(buffer, (short) object.length);
+        Type.SHORT.writePrimitive(buffer, (short) object.length);
         for (Item o : object) {
-            ITEM1_8.write(buffer, o);
+            Type.ITEM1_8.write(buffer, o);
         }
     }
 }

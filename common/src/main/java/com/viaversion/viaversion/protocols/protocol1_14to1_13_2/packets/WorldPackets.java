@@ -126,8 +126,8 @@ public class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.read(new ChunkType1_13(clientWorld));
-            wrapper.write(new ChunkType1_14(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
+            wrapper.write(ChunkType1_14.TYPE, chunk);
 
             int[] motionBlocking = new int[16 * 16];
             int[] worldSurface = new int[16 * 16];

@@ -22,23 +22,29 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.BitSet;
 
 public class ChunkType1_9_1 extends PartialType<Chunk, ClientWorld> {
 
+    private static final ChunkType1_9_1 WITH_SKYLIGHT = new ChunkType1_9_1(new ClientWorld(Environment.NORMAL));
+    private static final ChunkType1_9_1 WITHOUT_SKYLIGHT = new ChunkType1_9_1(new ClientWorld(Environment.NETHER));
+
     public ChunkType1_9_1(ClientWorld clientWorld) {
         super(clientWorld, Chunk.class);
+    }
+
+    public static ChunkType1_9_1 forEnvironment(Environment environment) {
+        return environment == Environment.NORMAL ? WITH_SKYLIGHT : WITHOUT_SKYLIGHT;
     }
 
     @Override
@@ -114,10 +120,5 @@ public class ChunkType1_9_1 extends PartialType<Chunk, ClientWorld> {
                 output.writeByte((byte) biome);
             }
         }
-    }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
     }
 }

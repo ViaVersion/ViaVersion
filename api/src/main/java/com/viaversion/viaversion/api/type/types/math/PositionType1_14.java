@@ -50,11 +50,6 @@ public class PositionType1_14 extends Type<Position> {
                 | ((((long) object.z()) & 0x3ffffff) << 12));
     }
 
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return PositionType1_8.class;
-    }
-
     public static final class OptionalPosition1_14Type extends OptionalType<Position> {
 
         public OptionalPosition1_14Type() {

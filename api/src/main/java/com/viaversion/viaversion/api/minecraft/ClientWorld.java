@@ -22,25 +22,32 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Stored up until 1.14 to be used in chunk sending.
  */
-public class ClientWorld extends StoredObject {
+public class ClientWorld implements StorableObject {
     private Environment environment;
 
+    @Deprecated/*(forRemoval = true)*/
     public ClientWorld(final UserConnection connection) {
-        super(connection);
+    }
+
+    public ClientWorld() {
+    }
+
+    public ClientWorld(final Environment environment) {
+        this.environment = environment;
     }
 
     public @Nullable Environment getEnvironment() {
         return environment;
     }
 
-    public void setEnvironment(int environmentId) {
+    public void setEnvironment(final int environmentId) {
         this.environment = Environment.getEnvironmentById(environmentId);
     }
 }

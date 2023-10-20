@@ -24,15 +24,14 @@ package com.viaversion.viaversion.api.type.types.chunk;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,8 +39,15 @@ import java.util.List;
 
 public class ChunkType1_9_3 extends PartialType<Chunk, ClientWorld> {
 
-    public ChunkType1_9_3(ClientWorld param) {
-        super(param, Chunk.class);
+    private static final ChunkType1_9_3 WITH_SKYLIGHT = new ChunkType1_9_3(new ClientWorld(Environment.NORMAL));
+    private static final ChunkType1_9_3 WITHOUT_SKYLIGHT = new ChunkType1_9_3(new ClientWorld(Environment.NETHER));
+
+    public ChunkType1_9_3(ClientWorld clientWorld) {
+        super(clientWorld, Chunk.class);
+    }
+
+    public static ChunkType1_9_3 forEnvironment(Environment environment) {
+        return environment == Environment.NORMAL ? WITH_SKYLIGHT : WITHOUT_SKYLIGHT;
     }
 
     @Override
@@ -121,10 +127,5 @@ public class ChunkType1_9_3 extends PartialType<Chunk, ClientWorld> {
 
         // Write Block Entities
         Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(new CompoundTag[0]));
-    }
-
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
     }
 }

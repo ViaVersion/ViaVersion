@@ -110,7 +110,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            ChunkType1_9_3 type = new ChunkType1_9_3(clientWorld);
+            ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
             Chunk chunk = wrapper.passthrough(type);
 
             for (int s = 0; s < chunk.getSections().length; s++) {
@@ -245,7 +245,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_12.EntityType.PLAYER));
         if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
+            userConnection.put(new ClientWorld());
         }
     }
 

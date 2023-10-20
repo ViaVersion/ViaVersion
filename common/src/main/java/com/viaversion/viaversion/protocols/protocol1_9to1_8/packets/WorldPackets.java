@@ -122,7 +122,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk chunk = wrapper.read(new ChunkType1_8(clientWorld));
+            Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(clientWorld.getEnvironment()));
 
             long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
 
@@ -152,7 +152,7 @@ public class WorldPackets {
                     }
                 }
             } else {
-                Type<Chunk> chunkType = new ChunkType1_9_1(clientWorld);
+                Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
                 wrapper.write(chunkType, chunk);
 
                 clientChunks.getLoadedChunks().add(chunkHash);
@@ -177,9 +177,9 @@ public class WorldPackets {
             wrapper.cancel(); // Cancel the packet from being sent
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk[] chunks = wrapper.read(new BulkChunkType1_8(clientWorld));
+            Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 
-            Type<Chunk> chunkType = new ChunkType1_9_1(clientWorld);
+            Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
             // Split into multiple chunk packets
             for (Chunk chunk : chunks) {
                 PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);

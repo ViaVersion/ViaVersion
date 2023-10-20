@@ -179,7 +179,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         // Chunk Data
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.passthrough(new ChunkType1_9_3(clientWorld));
+            Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
             if (Via.getConfig().isReplacePistons()) {
                 int replacementId = Via.getConfig().getPistonReplacementId();
@@ -237,7 +237,7 @@ public class Protocol1_10To1_9_3_4 extends AbstractProtocol<ClientboundPackets1_
         userConnection.put(new ResourcePackTracker());
 
         if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
+            userConnection.put(new ClientWorld());
         }
     }
 
