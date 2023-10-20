@@ -26,20 +26,21 @@ import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 
-public class ChunkType1_8 extends PartialType<Chunk, Environment> {
+public class ChunkType1_8 extends Type<Chunk> {
 
-    private static final ChunkType1_8 WITH_SKYLIGHT = new ChunkType1_8(Environment.NORMAL);
-    private static final ChunkType1_8 WITHOUT_SKYLIGHT = new ChunkType1_8(Environment.NETHER);
+    private static final ChunkType1_8 WITH_SKYLIGHT = new ChunkType1_8(true);
+    private static final ChunkType1_8 WITHOUT_SKYLIGHT = new ChunkType1_8(false);
+    private final boolean hasSkyLight;
 
-    public ChunkType1_8(Environment environment) {
-        super(environment, Chunk.class);
+    public ChunkType1_8(boolean hasSkyLight) {
+        super(Chunk.class);
+        this.hasSkyLight = hasSkyLight;
     }
 
     public static ChunkType1_8 forEnvironment(Environment environment) {
@@ -47,7 +48,7 @@ public class ChunkType1_8 extends PartialType<Chunk, Environment> {
     }
 
     @Override
-    public Chunk read(ByteBuf input, Environment environment) throws Exception {
+    public Chunk read(ByteBuf input) throws Exception {
         final int chunkX = input.readInt();
         final int chunkZ = input.readInt();
         final boolean fullChunk = input.readBoolean();
@@ -61,11 +62,11 @@ public class ChunkType1_8 extends PartialType<Chunk, Environment> {
             return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
         }
 
-        return deserialize(chunkX, chunkZ, fullChunk, environment == Environment.NORMAL, bitmask, data);
+        return deserialize(chunkX, chunkZ, fullChunk, hasSkyLight, bitmask, data);
     }
 
     @Override
-    public void write(ByteBuf output, Environment environment, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         output.writeBoolean(chunk.isFullChunk());

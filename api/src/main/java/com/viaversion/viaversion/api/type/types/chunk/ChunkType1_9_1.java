@@ -26,20 +26,21 @@ import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class ChunkType1_9_1 extends PartialType<Chunk, Environment> {
+public class ChunkType1_9_1 extends Type<Chunk> {
 
-    private static final ChunkType1_9_1 WITH_SKYLIGHT = new ChunkType1_9_1(Environment.NORMAL);
-    private static final ChunkType1_9_1 WITHOUT_SKYLIGHT = new ChunkType1_9_1(Environment.NETHER);
+    private static final ChunkType1_9_1 WITH_SKYLIGHT = new ChunkType1_9_1(true);
+    private static final ChunkType1_9_1 WITHOUT_SKYLIGHT = new ChunkType1_9_1(false);
+    private final boolean hasSkyLight;
 
-    public ChunkType1_9_1(Environment environment) {
-        super(environment, Chunk.class);
+    public ChunkType1_9_1(boolean hasSkyLight) {
+        super(Chunk.class);
+        this.hasSkyLight = hasSkyLight;
     }
 
     public static ChunkType1_9_1 forEnvironment(Environment environment) {
@@ -47,7 +48,7 @@ public class ChunkType1_9_1 extends PartialType<Chunk, Environment> {
     }
 
     @Override
-    public Chunk read(ByteBuf input, Environment environment) throws Exception {
+    public Chunk read(ByteBuf input) throws Exception {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
@@ -71,7 +72,7 @@ public class ChunkType1_9_1 extends PartialType<Chunk, Environment> {
             ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
             sections[i] = section;
             section.getLight().readBlockLight(input);
-            if (environment == Environment.NORMAL) {
+            if (hasSkyLight) {
                 section.getLight().readSkyLight(input);
             }
         }
@@ -87,7 +88,7 @@ public class ChunkType1_9_1 extends PartialType<Chunk, Environment> {
     }
 
     @Override
-    public void write(ByteBuf output, Environment environment, Chunk chunk) throws Exception {
+    public void write(ByteBuf output, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
