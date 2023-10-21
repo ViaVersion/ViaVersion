@@ -18,17 +18,15 @@
 package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
 import com.github.steveice10.opennbt.stringified.SNBT;
-import com.github.steveice10.opennbt.tag.builtin.ByteTag;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
+import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
+import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
+import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19_0;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -46,9 +44,11 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceSto
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.UUID;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
@@ -135,8 +135,28 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 map(Type.STRING); // Message
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                map(Type.BOOLEAN); // Signed preview
+                read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                read(Type.BOOLEAN); // Signed preview
+                handler(wrapper -> {
+                    final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
+
+                    if (chatSession != null) {
+                        final UUID sender = wrapper.user().getProtocolInfo().getUuid();
+                        final String message = wrapper.get(Type.STRING, 0);
+                        final long timestamp = wrapper.get(Type.LONG, 0);
+                        final long salt = wrapper.get(Type.LONG, 1);
+
+                        final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
+                        final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
+                        final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage);
+
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                        wrapper.write(Type.BOOLEAN, decoratableMessage.isDecorated()); // Signed preview
+                    } else {
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, new byte[0]); // Signature
+                        wrapper.write(Type.BOOLEAN, false); // Signed preview
+                    }
+                });
                 read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
                 read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
@@ -202,10 +222,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Type.STRING); // Name
                 handler(wrapper -> {
-                    // Profile keys are not compatible; replace it with an empty one
-                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY);
-                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
-                    if (profileKey == null) {
+                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY); // Profile Key
+
+                    final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, chatSession == null ? null : chatSession.getProfileKey()); // Profile Key
+
+                    if (profileKey == null || chatSession != null) {
                         // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
                         wrapper.user().put(new NonceStorage(null));
                     }
