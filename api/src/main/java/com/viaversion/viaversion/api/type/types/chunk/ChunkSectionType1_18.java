@@ -34,7 +34,7 @@ public final class ChunkSectionType1_18 extends Type<ChunkSection> {
     private final PaletteType1_18 biomePaletteType;
 
     public ChunkSectionType1_18(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
-        super("Chunk Section Type", ChunkSection.class);
+        super(ChunkSection.class);
         this.blockPaletteType = new PaletteType1_18(PaletteType.BLOCKS, globalPaletteBlockBits);
         this.biomePaletteType = new PaletteType1_18(PaletteType.BIOMES, globalPaletteBiomeBits);
     }

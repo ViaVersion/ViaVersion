@@ -20,17 +20,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft;
 
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Particle {
-    private List<ParticleData> arguments = new ArrayList<>(4);
+public final class Particle {
+    private final List<ParticleData<?>> arguments = new ArrayList<>(4);
     private int id;
 
-    public Particle(int id) {
+    public Particle(final int id) {
         this.id = id;
     }
 
@@ -38,50 +40,50 @@ public class Particle {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(final int id) {
         this.id = id;
     }
 
-    public List<ParticleData> getArguments() {
+    public <T> ParticleData<T> getArgument(final int id) {
+        //noinspection unchecked
+        return (ParticleData<T>) arguments.get(id);
+    }
+
+    public List<ParticleData<?>> getArguments() {
         return arguments;
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public void setArguments(List<ParticleData> arguments) {
-        this.arguments = arguments;
+    public <T> void add(final Type<T> type, final T value) {
+        arguments.add(new ParticleData<>(type, value));
     }
 
-    public <T> void add(Type<T> type, T value) {
-        arguments.add(new ParticleData(type, value));
-    }
+    public static final class ParticleData<T> {
+        private final Type<T> type;
+        private T value;
 
-    public static class ParticleData {
-        private Type type;
-        private Object value;
-
-        public ParticleData(Type type, Object value) {
+        public ParticleData(final Type<T> type, final T value) {
             this.type = type;
             this.value = value;
         }
 
-        public Type getType() {
+        public Type<T> getType() {
             return type;
         }
 
-        public void setType(Type type) {
-            this.type = type;
-        }
-
-        public Object getValue() {
+        public T getValue() {
             return value;
         }
 
-        public <T> T get() {
-            return (T) value;
+        public void setValue(final T value) {
+            this.value = value;
         }
 
-        public void setValue(Object value) {
-            this.value = value;
+        public void write(final ByteBuf buf) throws Exception {
+            type.write(buf, value);
+        }
+
+        public void write(final PacketWrapper wrapper) {
+            wrapper.write(type, value);
         }
 
         @Override

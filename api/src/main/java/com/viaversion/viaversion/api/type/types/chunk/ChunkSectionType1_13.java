@@ -34,7 +34,7 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
     private static final int GLOBAL_PALETTE = 14;
 
     public ChunkSectionType1_13() {
-        super("Chunk Section Type", ChunkSection.class);
+        super(ChunkSection.class);
     }
 
     @Override

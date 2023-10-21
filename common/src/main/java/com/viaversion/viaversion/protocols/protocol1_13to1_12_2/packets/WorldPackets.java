@@ -32,7 +32,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
@@ -507,7 +507,7 @@ public class WorldPackets {
                         return;
                     }
 
-                    //Handle reddust particle color
+                    // Handle reddust particle color
                     if (particle.getId() == 11) {
                         int count = wrapper.get(Type.INT, 1);
                         float speed = wrapper.get(Type.FLOAT, 6);
@@ -516,7 +516,6 @@ public class WorldPackets {
                             wrapper.set(Type.INT, 1, 1);
                             wrapper.set(Type.FLOAT, 6, 0f);
 
-                            List<Particle.ParticleData> arguments = particle.getArguments();
                             for (int i = 0; i < 3; i++) {
                                 //RGB values are represented by the X/Y/Z offset
                                 float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
@@ -524,15 +523,15 @@ public class WorldPackets {
                                     // https://minecraft.gamepedia.com/User:Alphappy/reddust
                                     colorValue = 1;
                                 }
-                                arguments.get(i).setValue(colorValue);
+                                particle.<Float>getArgument(i).setValue(colorValue);
                                 wrapper.set(Type.FLOAT, i + 3, 0f);
                             }
                         }
                     }
 
                     wrapper.set(Type.INT, 0, particle.getId());
-                    for (Particle.ParticleData particleData : particle.getArguments())
-                        wrapper.write(particleData.getType(), particleData.getValue());
+                    for (Particle.ParticleData<?> particleData : particle.getArguments())
+                        particleData.write(wrapper);
 
                 });
             }

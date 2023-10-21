@@ -209,7 +209,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     private final String typeName;
 
     protected Type(Class<? super T> outputClass) {
-        this(outputClass.getSimpleName(), outputClass);
+        this(null, outputClass);
     }
 
     protected Type(String typeName, Class<? super T> outputClass) {
@@ -232,7 +232,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
      * @return type name
      */
     public String getTypeName() {
-        return typeName;
+        return typeName != null ? typeName : this.getClass().getSimpleName();
     }
 
     /**
@@ -247,6 +247,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     @Override
     public String toString() {
-        return typeName;
+        return "Type{" +
+                "outputClass=" + outputClass +
+                ", typeName='" + typeName + '\'' +
+                '}';
     }
 }

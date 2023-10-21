@@ -35,7 +35,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -363,10 +363,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     // Remove the position
                     particle.getArguments().remove(0);
 
-                    final String resourceLocation = Key.stripMinecraftNamespace(particle.getArguments().get(0).get());
+                    final String resourceLocation = Key.stripMinecraftNamespace(particle.<String>getArgument(0).getValue());
                     if (resourceLocation.equals("entity")) {
                         // Add Y offset
-                        particle.getArguments().add(2, new Particle.ParticleData(Type.FLOAT, 0F));
+                        particle.getArguments().add(2, new Particle.ParticleData<>(Type.FLOAT, 0F));
                     }
                 }
 

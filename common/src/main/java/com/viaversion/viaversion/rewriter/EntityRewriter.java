@@ -40,7 +40,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
@@ -580,11 +580,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.getId();
         if (mappings.isBlockParticle(id)) {
-            Particle.ParticleData data = particle.getArguments().get(0);
-            data.setValue(protocol.getMappingData().getNewBlockStateId(data.get()));
+            Particle.ParticleData<Integer> data = particle.getArgument(0);
+            data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id) && protocol.getItemRewriter() != null) {
-            Particle.ParticleData data = particle.getArguments().get(0);
-            Item item = data.get();
+            Particle.ParticleData<Item> data = particle.getArgument(0);
+            Item item = data.getValue();
             protocol.getItemRewriter().handleItemToClient(item);
         }
 

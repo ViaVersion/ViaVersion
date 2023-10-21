@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemType1_13 extends Type<Item> {
     public ItemType1_13() {
-        super("FlatItem", Item.class);
+        super(Item.class);
     }
 
     @Override

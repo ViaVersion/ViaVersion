@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import java.util.ArrayList;
@@ -121,10 +121,10 @@ public class ParticleRewriter {
     // Randomized because the previous one was a lot of different colors at once! :)
     private static ParticleDataHandler reddustHandler() {
         return (particle, data) -> {
-            particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Red 0 - 1
-            particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0f)); // Green 0 - 1
-            particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Blue 0 - 1
-            particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1f));// Scale 0.01 - 4
+            particle.add(Type.FLOAT, randomBool() ? 1f : 0f); // Red 0 - 1
+            particle.add(Type.FLOAT, 0f); // Green 0 - 1
+            particle.add(Type.FLOAT, randomBool() ? 1f : 0f); // Blue 0 - 1
+            particle.add(Type.FLOAT, 1f);// Scale 0.01 - 4
             return particle;
         };
     }
@@ -148,7 +148,7 @@ public class ParticleRewriter {
             // Transform to new Item
             Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
 
-            particle.getArguments().add(new Particle.ParticleData(Type.ITEM1_13, item)); // Item Slot	The item that will be used.
+            particle.add(Type.ITEM1_13, item); // Item Slot	The item that will be used.
             return particle;
         };
     }
@@ -160,7 +160,7 @@ public class ParticleRewriter {
             int combined = (((value & 4095) << 4) | (value >> 12 & 15));
             int newId = WorldPackets.toNewId(combined);
 
-            particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newId)); // BlockState	VarInt	The ID of the block state.
+            particle.add(Type.VAR_INT, newId); // BlockState	VarInt	The ID of the block state.
             return particle;
         };
     }

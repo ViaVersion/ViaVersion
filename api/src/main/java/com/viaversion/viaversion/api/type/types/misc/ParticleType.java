@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -57,8 +57,8 @@ public class ParticleType extends Type<Particle> {
     @Override
     public void write(final ByteBuf buffer, final Particle object) throws Exception {
         Type.VAR_INT.writePrimitive(buffer, object.getId());
-        for (final Particle.ParticleData data : object.getArguments()) {
-            data.getType().write(buffer, data.getValue());
+        for (final Particle.ParticleData<?> data : object.getArguments()) {
+            data.write(buffer);
         }
     }
 

@@ -33,7 +33,7 @@ import java.nio.ByteOrder;
 public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
     public ChunkSectionType1_8() {
-        super("Chunk Section Type", ChunkSection.class);
+        super(ChunkSection.class);
     }
 
     @Override

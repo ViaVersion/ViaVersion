@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
@@ -87,9 +87,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
                 final Particle particle = (Particle) meta.getValue();
                 if (particle.getId() == 2) { // Barrier
                     particle.setId(3); // Block marker
-                    particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, 7754)); // Barrier state
+                    particle.add(Type.VAR_INT, 7754); // Barrier state
                 } else if (particle.getId() == 3) { // Light block
-                    particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, 7786)); // Light block state
+                    particle.add(Type.VAR_INT, 7786); // Light block state
                 } else {
                     rewriteParticle(particle);
                 }
