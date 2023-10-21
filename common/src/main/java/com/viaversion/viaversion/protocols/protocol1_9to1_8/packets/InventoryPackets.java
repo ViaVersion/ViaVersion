@@ -134,10 +134,10 @@ public class InventoryPackets {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM1_8_ARRAY); // 1 - Window Values
+                map(Type.ITEM1_8_SHORT_ARRAY); // 1 - Window Values
 
                 handler(wrapper -> {
-                    Item[] stacks = wrapper.get(Type.ITEM1_8_ARRAY, 0);
+                    Item[] stacks = wrapper.get(Type.ITEM1_8_SHORT_ARRAY, 0);
                     Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
@@ -166,7 +166,7 @@ public class InventoryPackets {
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                        Item[] oldStack = wrapper.get(Type.ITEM1_8_ARRAY, 0);
+                        Item[] oldStack = wrapper.get(Type.ITEM1_8_SHORT_ARRAY, 0);
                         Item[] newStack = new Item[oldStack.length + 1];
                         for (int i = 0; i < newStack.length; i++) {
                             if (i > 4) {
@@ -177,7 +177,7 @@ public class InventoryPackets {
                                 }
                             }
                         }
-                        wrapper.set(Type.ITEM1_8_ARRAY, 0, newStack);
+                        wrapper.set(Type.ITEM1_8_SHORT_ARRAY, 0, newStack);
                     }
                 });
             }

@@ -51,7 +51,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
     public InventoryPackets(Protocol1_13To1_12_2 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, null, null);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM1_8_ARRAY, Type.ITEM1_13_SHORT_ARRAY); // 1 - Window Values
+                map(Type.ITEM1_8_SHORT_ARRAY, Type.ITEM1_13_SHORT_ARRAY); // 1 - Window Values
 
                 handler(itemArrayToClientHandler(Type.ITEM1_13_SHORT_ARRAY));
             }

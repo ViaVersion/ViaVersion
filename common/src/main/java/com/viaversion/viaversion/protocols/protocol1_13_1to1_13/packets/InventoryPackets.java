@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
@@ -28,7 +29,7 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
     public InventoryPackets(Protocol1_13_1To1_13 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, null, null);
     }
 
     @Override
@@ -71,7 +72,17 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
 
         registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.ITEM1_13);
 
-        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
+        RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<ClientboundPackets1_13>(protocol) {
+            @Override
+            protected Type<Item> itemType() {
+                return Type.ITEM1_13;
+            }
+
+            @Override
+            protected Type<Item[]> itemArrayType() {
+                return Type.ITEM1_13_ARRAY;
+            }
+        };
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {

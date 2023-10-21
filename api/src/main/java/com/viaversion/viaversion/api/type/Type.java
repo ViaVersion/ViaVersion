@@ -181,9 +181,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Item> ITEM1_13 = new ItemType1_13();
     public static final Type<Item> ITEM1_13_2 = new ItemType1_13_2();
     public static final Type<Item> ITEM1_20_2 = new ItemType1_20_2();
+    public static final Type<Item[]> ITEM1_8_SHORT_ARRAY = new ItemShortArrayType1_8();
     public static final Type<Item[]> ITEM1_13_SHORT_ARRAY = new ItemShortArrayType1_13();
     public static final Type<Item[]> ITEM1_13_2_SHORT_ARRAY = new ItemShortArrayType1_13_2();
-    public static final Type<Item[]> ITEM1_8_ARRAY = new ItemShortArrayType1_8();
     public static final Type<Item[]> ITEM1_13_ARRAY = new ArrayType<>(ITEM1_13);
     public static final Type<Item[]> ITEM1_13_2_ARRAY = new ArrayType<>(ITEM1_13_2);
     public static final Type<Item[]> ITEM1_20_2_ARRAY = new ArrayType<>(ITEM1_20_2);
@@ -194,7 +194,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Deprecated/*(forRemoval=true)*/
     public static final Type<Item> FLAT_VAR_INT_ITEM = ITEM1_13_2;
     @Deprecated/*(forRemoval=true)*/
-    public static final Type<Item[]> ITEM_ARRAY = ITEM1_8_ARRAY;
+    public static final Type<Item[]> ITEM_ARRAY = ITEM1_8_SHORT_ARRAY;
     @Deprecated/*(forRemoval=true)*/
     public static final Type<Item[]> FLAT_ITEM_ARRAY = ITEM1_13_SHORT_ARRAY;
     @Deprecated/*(forRemoval=true)*/

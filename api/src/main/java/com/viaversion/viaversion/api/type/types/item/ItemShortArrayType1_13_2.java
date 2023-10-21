@@ -28,10 +28,6 @@ import io.netty.buffer.ByteBuf;
 
 public class ItemShortArrayType1_13_2 extends BaseItemArrayType {
 
-    public ItemShortArrayType1_13_2() {
-        super("Flat Item Array");
-    }
-
     @Override
     public Item[] read(ByteBuf buffer) throws Exception {
         int amount = Type.SHORT.readPrimitive(buffer);
