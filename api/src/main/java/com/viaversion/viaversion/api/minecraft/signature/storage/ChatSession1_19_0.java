@@ -44,12 +44,11 @@ public class ChatSession1_19_0 extends ChatSession {
         return this.sign(signer -> {
             final byte[] data = new byte[32];
             final ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
-            buffer.putLong(metadata.getSalt());
-            buffer.putLong(metadata.getSender().getMostSignificantBits()).putLong(metadata.getSender().getLeastSignificantBits());
-            buffer.putLong(metadata.getTimestamp().getEpochSecond());
+            buffer.putLong(metadata.salt());
+            buffer.putLong(metadata.sender().getMostSignificantBits()).putLong(metadata.sender().getLeastSignificantBits());
+            buffer.putLong(metadata.timestamp().getEpochSecond());
             signer.accept(data);
-            //signer.accept(JsonUtils.toSortedString(TextComponentSerializer.V1_18.serializeJson(content.getDecorated()), null).getBytes(StandardCharsets.UTF_8));
-            signer.accept(GsonUtil.toSortedString(content.getDecorated(), null).getBytes(StandardCharsets.UTF_8));
+            signer.accept(GsonUtil.toSortedString(content.decorated(), null).getBytes(StandardCharsets.UTF_8));
         });
     }
 

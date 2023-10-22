@@ -41,15 +41,15 @@ public class MessageMetadata {
         this(sender, Instant.ofEpochMilli(timestamp), salt);
     }
 
-    public UUID getSender() {
+    public UUID sender() {
         return this.sender;
     }
 
-    public Instant getTimestamp() {
+    public Instant timestamp() {
         return this.timestamp;
     }
 
-    public long getSalt() {
+    public long salt() {
         return this.salt;
     }
 

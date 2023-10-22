@@ -37,6 +37,8 @@ import java.time.Instant;
 
 public class MessageBody {
 
+    private static final byte HASH_SEPARATOR_BYTE = 70;
+
     private final DecoratableMessage content;
     private final Instant timestamp;
     private final long salt;
@@ -57,15 +59,14 @@ public class MessageBody {
             dataOutputStream.writeLong(this.salt);
             dataOutputStream.writeLong(this.timestamp.getEpochSecond());
 
-            dataOutputStream.write(this.content.getPlain().getBytes(StandardCharsets.UTF_8));
-            dataOutputStream.write(70);
+            dataOutputStream.write(this.content.plain().getBytes(StandardCharsets.UTF_8));
+            dataOutputStream.write(HASH_SEPARATOR_BYTE);
             if (this.content.isDecorated()) {
-                //dataOutputStream.write(JsonUtils.toSortedString(TextComponentSerializer.V1_18.serializeJson(this.content.getDecorated()), null).getBytes(StandardCharsets.UTF_8));
-                dataOutputStream.write(GsonUtil.toSortedString(this.content.getDecorated(), null).getBytes(StandardCharsets.UTF_8));
+                dataOutputStream.write(GsonUtil.toSortedString(this.content.decorated(), null).getBytes(StandardCharsets.UTF_8));
             }
 
             for (PlayerMessageSignature lastSeenMessage : this.lastSeenMessages) {
-                dataOutputStream.writeByte(70);
+                dataOutputStream.writeByte(HASH_SEPARATOR_BYTE);
                 dataOutputStream.writeLong(lastSeenMessage.uuid().getMostSignificantBits());
                 dataOutputStream.writeLong(lastSeenMessage.uuid().getLeastSignificantBits());
                 dataOutputStream.write(lastSeenMessage.signatureBytes());

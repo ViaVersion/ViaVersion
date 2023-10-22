@@ -43,8 +43,8 @@ public class ChatSession1_19_1 extends ChatSession {
 
     public byte[] signChatMessage(final MessageMetadata metadata, final DecoratableMessage content, final PlayerMessageSignature[] lastSeenMessages) throws SignatureException {
         final byte[] signature = this.sign(signer -> {
-            final MessageHeader messageHeader = new MessageHeader(this.precedingSignature, metadata.getSender());
-            final MessageBody messageBody = new MessageBody(content, metadata.getTimestamp(), metadata.getSalt(), lastSeenMessages);
+            final MessageHeader messageHeader = new MessageHeader(this.precedingSignature, metadata.sender());
+            final MessageBody messageBody = new MessageBody(content, metadata.timestamp(), metadata.salt(), lastSeenMessages);
             messageHeader.update(signer);
             messageBody.update(signer);
         });

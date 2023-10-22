@@ -39,16 +39,16 @@ public class DecoratableMessage {
         this.decorated = decorated;
     }
 
-    public boolean isDecorated() {
-        return !this.decorated.equals(createLiteralText(plain));
-    }
-
-    public String getPlain() {
+    public String plain() {
         return this.plain;
     }
 
-    public JsonElement getDecorated() {
+    public JsonElement decorated() {
         return this.decorated;
+    }
+
+    public boolean isDecorated() {
+        return !this.decorated.equals(createLiteralText(plain));
     }
 
     private static JsonElement createLiteralText(final String text) {
