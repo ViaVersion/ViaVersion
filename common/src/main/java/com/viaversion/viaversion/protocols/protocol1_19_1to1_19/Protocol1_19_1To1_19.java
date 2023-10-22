@@ -174,12 +174,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
 
                     final int signatures = wrapper.read(Type.VAR_INT);
-                    if (chatSession != null && argumentsProvider != null) {
-                        for (int i = 0; i < signatures; i++) {
-                            wrapper.read(Type.STRING); // Argument name
-                            wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                        }
+                    for (int i = 0; i < signatures; i++) {
+                        wrapper.read(Type.STRING); // Argument name
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                    }
 
+                    if (chatSession != null && argumentsProvider != null) {
                         final UUID sender = wrapper.user().getProtocolInfo().getUuid();
                         final String message = wrapper.get(Type.STRING, 0);
                         final long timestamp = wrapper.get(Type.LONG, 0);
@@ -187,7 +187,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
 
                         final List<Pair<String, String>> arguments = argumentsProvider.getSignableArguments(message);
 
-                        wrapper.write(Type.VAR_INT, arguments.size());
+                        wrapper.write(Type.VAR_INT, arguments.size()); // Signature count
                         for (Pair<String, String> argument : arguments) {
                             final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                             final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
@@ -198,12 +198,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                             wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
                         }
                     } else {
-                        // No signatures
-                        wrapper.write(Type.VAR_INT, 0);
-                        for (int i = 0; i < signatures; i++) {
-                            wrapper.read(Type.STRING); // Argument name
-                            wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                        }
+                        wrapper.write(Type.VAR_INT, 0); // Signature count
                     }
                 });
                 map(Type.BOOLEAN); // Signed preview
