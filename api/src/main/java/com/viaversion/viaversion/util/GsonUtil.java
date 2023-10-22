@@ -22,8 +22,12 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public final class GsonUtil {
     private static final Gson GSON = new GsonBuilder().create();
@@ -36,4 +40,53 @@ public final class GsonUtil {
     public static Gson getGson() {
         return GSON;
     }
+
+    /**
+     * Convert a json element to a sorted string.<br>
+     * If the {@code comparator} is null, {@link Comparator#naturalOrder()} will be used.
+     *
+     * @param element    The element to convert
+     * @param comparator The comparator to use
+     * @return The sorted string
+     */
+    public static String toSortedString(@Nullable final JsonElement element, @Nullable final Comparator<String> comparator) {
+        if (element == null) {
+            return null;
+        } else if (comparator != null) {
+            return sort(element, comparator).toString();
+        } else {
+            return sort(element, Comparator.naturalOrder()).toString();
+        }
+    }
+
+    /**
+     * Sort a json element.
+     *
+     * @param element    The element to sort
+     * @param comparator The comparator to use
+     * @return The sorted element
+     */
+    public static JsonElement sort(@Nullable final JsonElement element, final Comparator<String> comparator) {
+        if (element == null) {
+            return null;
+        } else if (element.isJsonArray()) {
+            final JsonArray array = element.getAsJsonArray();
+            for (int i = 0; i < array.size(); i++) {
+                array.set(i, sort(array.get(i), comparator));
+            }
+            return array;
+        } else if (element.isJsonObject()) {
+            final JsonObject object = element.getAsJsonObject();
+            final JsonObject sorted = new JsonObject();
+            final List<String> keys = new ArrayList<>(object.keySet());
+            keys.sort(comparator);
+            for (String key : keys) {
+                sorted.add(key, sort(object.get(key), comparator));
+            }
+            return sorted;
+        } else {
+            return element;
+        }
+    }
+
 }
