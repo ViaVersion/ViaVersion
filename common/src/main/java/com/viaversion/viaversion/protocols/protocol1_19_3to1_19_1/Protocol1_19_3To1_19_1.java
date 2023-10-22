@@ -19,12 +19,14 @@ package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1;
 
 import com.google.common.primitives.Longs;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
+import com.viaversion.viaversion.api.minecraft.signature.SignableCommandArgumentsProvider;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
 import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
 import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19_1;
@@ -51,7 +53,9 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.Pair;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -217,16 +221,40 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
                 handler(wrapper -> {
+                    final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
+                    final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
+
                     final int signatures = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, 0);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Type.STRING); // Argument name
                         wrapper.read(Type.SIGNATURE_BYTES); // Signature
                     }
 
+                    final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
+                    if (chatSession != null && argumentsProvider != null) {
+                        final UUID sender = wrapper.user().getProtocolInfo().getUuid();
+                        final String message = wrapper.get(Type.STRING, 0);
+                        final long timestamp = wrapper.get(Type.LONG, 0);
+                        final long salt = wrapper.get(Type.LONG, 1);
+
+                        final List<Pair<String, String>> arguments = argumentsProvider.getSignableArguments(message);
+                        wrapper.write(Type.VAR_INT, arguments.size()); // Signature count
+
+                        for (Pair<String, String> argument : arguments) {
+                            final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
+                            final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
+
+                            final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+
+                            wrapper.write(Type.STRING, argument.key()); // Argument name
+                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                        }
+                    } else {
+                        wrapper.write(Type.VAR_INT, 0); // Signature count
+                    }
+
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 
-                    final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
                     messagesStorage.resetUnacknowledgedCount();
                     wrapper.write(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY, messagesStorage.lastSignatures());
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
