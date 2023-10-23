@@ -450,9 +450,17 @@ public interface ViaVersionConfig extends Config {
      */
     WorldIdentifiers get1_16WorldNamesMap();
 
+    /**
+     * Caches light until chunks are unloaded to allow subsequent chunk update packets as opposed to instantly uncaching when the first chunk data is sent.
+     *
+     * @return true if enabled
+     */
     boolean cache1_17Light();
 
-    @Nullable String chatTypeFormat(String translationKey);
-
+    /**
+     * Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
+     *
+     * @return true if enabled
+     */
     boolean isArmorToggleFix();
 }
