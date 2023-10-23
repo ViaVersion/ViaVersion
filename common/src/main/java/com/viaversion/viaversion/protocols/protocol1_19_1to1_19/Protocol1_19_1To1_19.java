@@ -135,8 +135,8 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 map(Type.STRING); // Message
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
-                read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                read(Type.BOOLEAN); // Signed preview
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                map(Type.BOOLEAN); // Signed preview
                 handler(wrapper -> {
                     final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
 
@@ -150,11 +150,8 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                         final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
                         final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage);
 
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
-                        wrapper.write(Type.BOOLEAN, decoratableMessage.isDecorated()); // Signed preview
-                    } else {
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, new byte[0]); // Signature
-                        wrapper.write(Type.BOOLEAN, false); // Signed preview
+                        wrapper.set(Type.BYTE_ARRAY_PRIMITIVE, 0, signature); // Signature
+                        wrapper.set(Type.BOOLEAN, 0, decoratableMessage.isDecorated()); // Signed preview
                     }
                 });
                 read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
