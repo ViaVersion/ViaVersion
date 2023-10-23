@@ -71,7 +71,6 @@ public class DebugSubCmd extends ViaSubCommand {
     @Override
     public List<String> onTabComplete(final ViaCommandSender sender, final String[] args) {
         if (args.length == 1) {
-            //TODO match current input
             return Arrays.asList("clear", "logposttransform", "add", "remove");
         }
         return Collections.emptyList();

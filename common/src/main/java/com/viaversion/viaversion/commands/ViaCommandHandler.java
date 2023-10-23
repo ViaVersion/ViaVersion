@@ -125,7 +125,15 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
                 List<String> tab = sub.onTabComplete(sender, subArgs);
                 Collections.sort(tab);
-                return tab;
+                if (!tab.isEmpty()) {
+                    final String currArg = subArgs[subArgs.length - 1];
+                    for (String s : tab) {
+                        if (s.toLowerCase(Locale.ROOT).startsWith(currArg.toLowerCase(Locale.ROOT))) {
+                            output.add(s);
+                        }
+                    }
+                }
+                return output;
             }
         }
         return output;
