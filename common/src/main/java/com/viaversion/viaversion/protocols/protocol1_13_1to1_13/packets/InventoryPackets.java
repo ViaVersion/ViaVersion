@@ -25,6 +25,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
@@ -44,8 +45,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             public void register() {
                 map(Type.STRING); // Channel
                 handler(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
-                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                    String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:trader_list")) {
                         wrapper.passthrough(Type.INT); // Passthrough Window ID
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);

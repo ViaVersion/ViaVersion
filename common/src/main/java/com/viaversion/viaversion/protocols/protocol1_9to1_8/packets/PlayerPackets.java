@@ -19,12 +19,12 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -268,7 +268,6 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equalsIgnoreCase("MC|BOpen")) {
-                        wrapper.clearInputBuffer();
                         wrapper.write(Type.VAR_INT, 0);
                     } else if (name.equalsIgnoreCase("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // ID
