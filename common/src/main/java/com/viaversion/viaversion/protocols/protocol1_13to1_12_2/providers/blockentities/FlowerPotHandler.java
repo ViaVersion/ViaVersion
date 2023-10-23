@@ -20,7 +20,9 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.block
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,7 +68,7 @@ public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler 
 
         // Convert item to String without namespace or to Byte
         if (item instanceof String) {
-            item = ((String) item).replace("minecraft:", "");
+            item = Key.stripMinecraftNamespace((String) item);
         } else if (item instanceof Number) {
             item = ((Number) item).byteValue();
         } else {

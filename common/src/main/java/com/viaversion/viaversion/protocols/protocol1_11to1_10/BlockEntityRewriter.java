@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_11to1_10;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.viaversion.viaversion.util.Key;
 
 public class BlockEntityRewriter {
     private static BiMap<String, String> oldToNewNames = HashBiMap.create();
@@ -51,7 +52,7 @@ public class BlockEntityRewriter {
     }
 
     private static void rewrite(String oldName, String newName) {
-        oldToNewNames.put(oldName, "minecraft:" + newName);
+        oldToNewNames.put(oldName, Key.namespaced(newName));
     }
 
     public static BiMap<String, String> inverse() {

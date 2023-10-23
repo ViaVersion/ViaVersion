@@ -18,13 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.conversion.ConverterRegistry;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.ShortTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
 import com.viaversion.viaversion.api.Via;
@@ -41,6 +35,8 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SoundSource;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.util.Key;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -364,7 +360,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put(NBT_TAG_NAME + "|CanPlaceOn", ConverterRegistry.convertToTag(ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String oldId = value.toString().replace("minecraft:", "");
+                    String oldId = Key.stripMinecraftNamespace(value.toString());
                     String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
                     if (numberConverted != null) {
                         oldId = numberConverted;
@@ -386,7 +382,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put(NBT_TAG_NAME + "|CanDestroy", ConverterRegistry.convertToTag(ConverterRegistry.convertToValue(old))); // There will be data losing
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
-                    String oldId = value.toString().replace("minecraft:", "");
+                    String oldId = Key.stripMinecraftNamespace(value.toString());
                     String numberConverted = BlockIdData.numberIdToString.get(Ints.tryParse(oldId));
                     if (numberConverted != null) {
                         oldId = numberConverted;
@@ -629,7 +625,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
+                            ? Key.stripMinecraftNamespace((String) value)
                             : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {
@@ -652,7 +648,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
-                            ? ((String) value).replace("minecraft:", "")
+                            ? Key.stripMinecraftNamespace((String) value)
                             : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {

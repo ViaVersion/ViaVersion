@@ -22,8 +22,10 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -177,7 +179,7 @@ public class ItemRewriter {
                 int data = 0;
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
                     StringTag potion = tag.get("Potion");
-                    String potionName = potion.getValue().replace("minecraft:", "");
+                    String potionName = Key.stripMinecraftNamespace(potion.getValue());
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName);
                     }
@@ -193,7 +195,7 @@ public class ItemRewriter {
                 item.setIdentifier(373); // Potion
                 if (tag != null && tag.get("Potion") instanceof StringTag) {
                     StringTag potion = tag.get("Potion");
-                    String potionName = potion.getValue().replace("minecraft:", "");
+                    String potionName = Key.stripMinecraftNamespace(potion.getValue());
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName) + 8192;
                     }
@@ -275,7 +277,7 @@ public class ItemRewriter {
                     item.setData((short) (item.data() - 8192));
                 }
                 String name = potionNameFromDamage(item.data());
-                StringTag potion = new StringTag("minecraft:" + name);
+                StringTag potion = new StringTag(Key.namespaced(name));
                 tag.put("Potion", potion);
                 item.setTag(tag);
                 item.setData((short) 0);
