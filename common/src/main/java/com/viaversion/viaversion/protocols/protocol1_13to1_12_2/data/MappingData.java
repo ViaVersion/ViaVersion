@@ -28,21 +28,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.BiMappings;
-import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
-import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.data.Mappings;
+import com.viaversion.viaversion.api.data.*;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Key;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
     private final Map<String, int[]> blockTags = new HashMap<>();
@@ -86,7 +83,7 @@ public class MappingData extends MappingDataBase {
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 String oldChannel = entry.getKey();
                 String newChannel = entry.getValue().getAsString();
-                if (!isValid1_13Channel(newChannel)) {
+                if (!Key.isValid(newChannel)) {
                     Via.getPlatform().getLogger().warning("Channel '" + newChannel + "' is not a valid 1.13 plugin channel, please check your configuration!");
                     continue;
                 }
@@ -156,21 +153,11 @@ public class MappingData extends MappingDataBase {
     }
 
     public static String validateNewChannel(String newId) {
-        if (!isValid1_13Channel(newId)) {
+        if (!Key.isValid(newId)) {
             return null; // Not valid
         }
-        int separatorIndex = newId.indexOf(':');
-        // Vanilla parses an empty and a missing namespace as the minecraft namespace
-        if (separatorIndex == -1) {
-            return "minecraft:" + newId;
-        } else if (separatorIndex == 0) {
-            return "minecraft" + newId;
-        }
-        return newId;
-    }
 
-    public static boolean isValid1_13Channel(String channelId) {
-        return channelId.matches("([0-9a-z_.-]+:)?[0-9a-z_/.-]+");
+        return Key.namespaced(newId);
     }
 
     private void loadTags(Map<String, int[]> output, CompoundTag newTags) {

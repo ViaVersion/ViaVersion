@@ -17,13 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.ByteTag;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.FloatTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.LongTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
@@ -38,6 +32,8 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.util.Key;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -242,8 +238,8 @@ public class EntityPackets {
                 String key = wrapper.read(Type.STRING);
                 String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
                 if (attributeIdentifier == null) {
-                    attributeIdentifier = "minecraft:" + key;
-                    if (!com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
+                    attributeIdentifier = Key.namespaced(key);
+                    if (!Key.isValid(attributeIdentifier)) {
                         if (!Via.getConfig().isSuppressConversionWarnings()) {
                             Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
                         }

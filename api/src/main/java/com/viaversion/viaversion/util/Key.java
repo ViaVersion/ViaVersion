@@ -35,14 +35,24 @@ public final class Key {
     public static String stripMinecraftNamespace(final String identifier) {
         if (identifier.startsWith("minecraft:")) {
             return identifier.substring(10);
+        } else if (identifier.startsWith(":")) {
+            return identifier.substring(1);
         }
         return identifier;
     }
 
     public static String namespaced(final String identifier) {
-        if (identifier.indexOf(':') == -1) {
+        final int index = identifier.indexOf(':');
+        if (index == -1) {
             return "minecraft:" + identifier;
+        } else if (index == 0) {
+            return "minecraft" + identifier;
         }
         return identifier;
     }
+
+    public static boolean isValid(final String identifier) {
+        return identifier.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*");
+    }
+
 }

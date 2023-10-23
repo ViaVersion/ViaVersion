@@ -24,6 +24,8 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -32,7 +34,8 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
@@ -44,14 +47,11 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRew
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 public class WorldPackets {
@@ -320,7 +320,7 @@ public class WorldPackets {
             public void register() {
                 map(Type.STRING);
                 handler(wrapper -> {
-                    String sound = wrapper.get(Type.STRING, 0).replace("minecraft:", "");
+                    String sound = Key.stripMinecraftNamespace(wrapper.get(Type.STRING, 0));
                     String newSoundId = NamedSoundRewriter.getNewId(sound);
                     wrapper.set(Type.STRING, 0, newSoundId);
                 });
@@ -445,7 +445,7 @@ public class WorldPackets {
                 final Tag idTag = tag.get("id");
                 if (idTag instanceof StringTag) {
                     // No longer block entities
-                    final String id = ((StringTag) idTag).getValue();
+                    final String id = Key.namespaced(((StringTag) idTag).getValue());
                     if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
                         iterator.remove();
                     }

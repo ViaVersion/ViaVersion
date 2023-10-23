@@ -25,6 +25,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
@@ -88,7 +89,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             for (int i = 0; i < size; i++) {
                 // First id, then type
                 wrapper.passthrough(Type.STRING); // Id
-                String type = wrapper.passthrough(Type.STRING).replace("minecraft:", "");
+                String type = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
                 recipeRewriter.handleRecipeType(wrapper, type);
             }
         });

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
+import com.viaversion.viaversion.util.Key;
 
 public class InventoryPackets {
 
@@ -74,7 +75,7 @@ public class InventoryPackets {
                 // There is a horse parameter after this, we don't handle it and let it passthrough
                 // Inventory tracking
                 handler(wrapper -> {
-                    String inventory = wrapper.get(Type.STRING, 0);
+                    String inventory = Key.namespaced(wrapper.get(Type.STRING, 0));
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     inventoryTracker.setInventory(inventory);
                 });
