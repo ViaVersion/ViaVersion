@@ -58,7 +58,7 @@ public abstract class ViaSubCommand {
      * @return The permission required to use the commands
      */
     public String permission() {
-        return "viaversion.admin";
+        return "viaversion.admin." + name();
     }
 
     /**

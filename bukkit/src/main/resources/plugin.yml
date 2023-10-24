@@ -9,6 +9,49 @@ loadbefore: [ ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer ]
 softdepend: [ ProtocolSupport, PacketListenerApi ]
 commands:
   viaversion:
-    permission: viaversion.admin # The permission is also referenced here to filter root suggestions (/via<tab>)
     description: Shows ViaVersion Version and more.
     aliases: [ viaver, vvbukkit ]
+  viaversion autoteam:
+    permission: viaversion.admin.autoteam
+    description: Automatically team players up based on their version.
+    aliases: [ autoteam ]
+  viaversion debug:
+    permission: viaversion.admin.debug
+    description: Toggles debug mode.
+    aliases: /viaversion debug [clear/logposttransform/add/remove]
+  viaversion displayleaks:
+    permission: viaversion.admin.displayleaks
+    description: Toggles display of memory leaks.
+    aliases: [ displayleaks ]
+  viaversion dontbugme:
+    permission: viaversion.admin.dontbugme
+    description: Toggle checking for updates
+    aliases: [ dontbugme ]
+  viaversion dump:
+    permission: viaversion.admin.dump
+    description: Dump information about your server, this is helpful if you report bugs.
+    aliases: [ dump ]
+  viaversion list:
+    permission: viaversion.admin.list
+    description: Lists all players with their protocol version.
+    aliases: [ list ]
+  viaversion pps:
+    permission: viaversion.admin.pps
+    description: Shows the packets per second of online players
+    aliases: [ pps ]
+  viaversion reload:
+    permission: viaversion.admin.reload
+    description: Reloads the config.
+    aliases: [ reload ]
+permissions:
+  viaversion.admin:
+    default: op
+    children:
+      viaversion.admin.autoteam: true
+      viaversion.admin.debug: true
+      viaversion.admin.displayleaks: true
+      viaversion.admin.dontbugme: true
+      viaversion.admin.dump: true
+      viaversion.admin.list: true
+      viaversion.admin.pps: true
+      viaversion.admin.reload: true
