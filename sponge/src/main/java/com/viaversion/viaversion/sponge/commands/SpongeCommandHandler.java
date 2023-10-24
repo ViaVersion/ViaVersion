@@ -46,7 +46,7 @@ public class SpongeCommandHandler extends ViaCommandHandler implements Command.R
 
     @Override
     public boolean canExecute(CommandCause cause) {
-        return cause.hasPermission("viaversion.admin");
+        return cause.hasPermission("viaversion.command");
     }
 
     @Override
