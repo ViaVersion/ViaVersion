@@ -69,13 +69,15 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
     @Override
     public boolean onCommand(ViaCommandSender sender, String[] args) {
-        final AtomicBoolean hasPermissions = new AtomicBoolean(sender.hasPermission("viaversion.admin"));
-        commandMap.values().forEach(command -> {
+        boolean hasPermissions = sender.hasPermission("viaversion.admin");
+        for (ViaSubCommand command : commandMap.values()) {
             if (sender.hasPermission(command.permission())) {
-                hasPermissions.set(true);
+                hasPermissions = true;
+                break;
             }
-        });
-        if (!hasPermissions.get()) {
+        }
+
+        if (!hasPermissions) {
             sender.sendMessage(color("&cYou are not allowed to use this command!"));
             return false;
         }
