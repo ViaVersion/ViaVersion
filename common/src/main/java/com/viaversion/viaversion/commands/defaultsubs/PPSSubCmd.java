@@ -36,7 +36,7 @@ public class PPSSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Shows the packets per second of online players";
+        return "Shows the packets per second of online players.";
     }
 
     @Override

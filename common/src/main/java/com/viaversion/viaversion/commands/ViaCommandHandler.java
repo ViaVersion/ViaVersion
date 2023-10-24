@@ -27,7 +27,6 @@ import com.viaversion.viaversion.commands.defaultsubs.DebugSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DisplayLeaksSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DontBugMeSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.DumpSubCmd;
-import com.viaversion.viaversion.commands.defaultsubs.HelpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ReloadSubCmd;
@@ -40,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.viaversion.viaversion.api.command.ViaSubCommand.color;
 
@@ -69,6 +69,19 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
 
     @Override
     public boolean onCommand(ViaCommandSender sender, String[] args) {
+        boolean hasPermissions = sender.hasPermission("viaversion.admin");
+        for (ViaSubCommand command : commandMap.values()) {
+            if (sender.hasPermission(command.permission())) {
+                hasPermissions = true;
+                break;
+            }
+        }
+
+        if (!hasPermissions) {
+            sender.sendMessage(color("&cYou are not allowed to use this command!"));
+            return false;
+        }
+
         if (args.length == 0) {
             showHelp(sender);
             return false;
@@ -170,7 +183,7 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
     }
 
     private boolean hasPermission(ViaCommandSender sender, String permission) {
-        return permission == null || sender.hasPermission(permission);
+        return permission == null || sender.hasPermission("viaversion.admin") || sender.hasPermission(permission);
     }
 
     private void registerDefaults() {
@@ -181,7 +194,6 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         registerSubCommand(new DisplayLeaksSubCmd());
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
-        registerSubCommand(new HelpSubCmd());
         registerSubCommand(new ReloadSubCmd());
     }
 }
