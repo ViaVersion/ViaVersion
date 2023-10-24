@@ -43,6 +43,6 @@ public class VelocityCommandHandler extends ViaCommandHandler implements SimpleC
 
     @Override
     public boolean hasPermission(Invocation invocation) {
-        return true;
+        return invocation.source().hasPermission("viaversion.command"); // The permission is also referenced here to filter root suggestions (/via<tab>)
     }
 }

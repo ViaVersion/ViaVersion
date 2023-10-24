@@ -9,49 +9,50 @@ loadbefore: [ ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer ]
 softdepend: [ ProtocolSupport, PacketListenerApi ]
 commands:
   viaversion:
+    permission: viaversion.command # The permission is also referenced here to filter root suggestions (/via<tab>)
     description: Shows ViaVersion Version and more.
     aliases: [ viaver, vvbukkit ]
   viaversion autoteam:
-    permission: viaversion.admin.autoteam
+    permission: viaversion.command.autoteam
     description: Toggle automatically teaming to prevent colliding.
     aliases: [ autoteam ]
   viaversion debug:
-    permission: viaversion.admin.debug
+    permission: viaversion.command.debug
     description: Toggles various debug modes.
     aliases: /viaversion debug [clear/logposttransform/add/remove]
   viaversion displayleaks:
-    permission: viaversion.admin.displayleaks
+    permission: viaversion.command.displayleaks
     description: Toggles display of memory leaks.
     aliases: [ displayleaks ]
   viaversion dontbugme:
-    permission: viaversion.admin.dontbugme
+    permission: viaversion.command.dontbugme
     description: Toggle checking for updates.
     aliases: [ dontbugme ]
   viaversion dump:
-    permission: viaversion.admin.dump
+    permission: viaversion.command.dump
     description: Dump information about your server, this is helpful if you report bugs.
     aliases: [ dump ]
   viaversion list:
-    permission: viaversion.admin.list
+    permission: viaversion.command.list
     description: Lists all players with their protocol version.
     aliases: [ list ]
   viaversion pps:
-    permission: viaversion.admin.pps
+    permission: viaversion.command.pps
     description: Shows the packets per second of online players.
     aliases: [ pps ]
   viaversion reload:
-    permission: viaversion.admin.reload
+    permission: viaversion.command.reload
     description: Reloads all config files.
     aliases: [ reload ]
 permissions:
   viaversion.admin:
     default: op
     children:
-      viaversion.admin.autoteam: true
-      viaversion.admin.debug: true
-      viaversion.admin.displayleaks: true
-      viaversion.admin.dontbugme: true
-      viaversion.admin.dump: true
-      viaversion.admin.list: true
-      viaversion.admin.pps: true
-      viaversion.admin.reload: true
+      viaversion.command.autoteam: true
+      viaversion.command.debug: true
+      viaversion.command.displayleaks: true
+      viaversion.command.dontbugme: true
+      viaversion.command.dump: true
+      viaversion.command.list: true
+      viaversion.command.pps: true
+      viaversion.command.reload: true
