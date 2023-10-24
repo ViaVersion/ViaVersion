@@ -50,8 +50,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.Configur
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import java.util.UUID;
+import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.UUID;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
@@ -73,14 +75,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
         registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, wrapper -> {
-            final String channel = wrapper.passthrough(Type.STRING);
+            final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
             if (channel.equals("minecraft:brand")) {
                 wrapper.passthrough(Type.STRING);
                 wrapper.clearInputBuffer();
             }
         });
         registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, wrapper -> {
-            final String channel = wrapper.passthrough(Type.STRING);
+            final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
             if (channel.equals("minecraft:brand")) {
                 wrapper.passthrough(Type.STRING);
                 wrapper.clearInputBuffer();

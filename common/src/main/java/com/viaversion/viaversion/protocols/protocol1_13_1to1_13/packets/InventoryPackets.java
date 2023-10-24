@@ -45,8 +45,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             public void register() {
                 map(Type.STRING); // Channel
                 handler(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
-                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                    String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:trader_list")) {
                         wrapper.passthrough(Type.INT); // Passthrough Window ID
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);

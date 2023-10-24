@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_2to1_13_1.Protocol1_13_2To1_13_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
+import com.viaversion.viaversion.util.Key;
 
 public class InventoryPackets {
 
@@ -47,8 +48,8 @@ public class InventoryPackets {
             public void register() {
                 map(Type.STRING); // Channel
                 handler(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
-                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                    String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:trader_list")) {
                         wrapper.passthrough(Type.INT); // Passthrough Window ID
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);

@@ -17,11 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -41,6 +37,8 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTr
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.Key;
+
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -143,8 +141,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             public void register() {
                 map(Type.STRING); // Channel
                 handler(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
-                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                    String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:trader_list")) {
                         wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
                         wrapper.resetReader();
                         wrapper.read(Type.STRING); // Remove channel
@@ -178,7 +176,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         wrapper.write(Type.VAR_INT, 0);
                         wrapper.write(Type.VAR_INT, 0);
                         wrapper.write(Type.BOOLEAN, false);
-                    } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
+                        wrapper.clearInputBuffer();
+                    } else if (channel.equals("minecraft:book_open")) {
                         int hand = wrapper.read(Type.VAR_INT);
                         wrapper.clearPacket();
                         wrapper.setPacketType(ClientboundPackets1_14.OPEN_BOOK);
