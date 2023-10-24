@@ -57,38 +57,29 @@ public class ChunkType1_9_3 extends Type<Chunk> {
 
         boolean fullChunk = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
-        Type.VAR_INT.readPrimitive(input);
+        ByteBuf data = input.readSlice(Type.VAR_INT.readPrimitive(input));
 
         // Read sections
         ChunkSection[] sections = new ChunkSection[16];
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
 
-            ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
+            ChunkSection section = Types1_9.CHUNK_SECTION.read(data);
             sections[i] = section;
-            section.getLight().readBlockLight(input);
+            section.getLight().readBlockLight(data);
             if (hasSkyLight) {
-                section.getLight().readSkyLight(input);
+                section.getLight().readSkyLight(data);
             }
         }
 
         int[] biomeData = fullChunk ? new int[256] : null;
         if (fullChunk) {
             for (int i = 0; i < 256; i++) {
-                biomeData[i] = input.readByte() & 0xFF;
+                biomeData[i] = data.readByte() & 0xFF;
             }
         }
 
         List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
-
-        // Read all the remaining bytes (workaround for #681)
-        if (input.readableBytes() > 0) {
-            byte[] array = Type.REMAINING_BYTES.read(input);
-            if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-            }
-        }
-
         return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, nbtData);
     }
 

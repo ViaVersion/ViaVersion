@@ -85,15 +85,6 @@ public class ChunkType1_13 extends Type<Chunk> {
         }
 
         List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
-
-        // Read all the remaining bytes (workaround for #681)
-        if (input.readableBytes() > 0) {
-            byte[] array = Type.REMAINING_BYTES.read(input);
-            if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-            }
-        }
-
         return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, nbtData);
     }
 

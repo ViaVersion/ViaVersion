@@ -54,8 +54,7 @@ public class ChunkType1_9_1 extends Type<Chunk> {
 
         boolean groundUp = input.readBoolean();
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
-        // Size (unused)
-        Type.VAR_INT.readPrimitive(input);
+        ByteBuf data = input.readSlice(Type.VAR_INT.readPrimitive(input));
 
         BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
@@ -69,18 +68,18 @@ public class ChunkType1_9_1 extends Type<Chunk> {
         // Read sections
         for (int i = 0; i < 16; i++) {
             if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection section = Types1_9.CHUNK_SECTION.read(input);
+            ChunkSection section = Types1_9.CHUNK_SECTION.read(data);
             sections[i] = section;
-            section.getLight().readBlockLight(input);
+            section.getLight().readBlockLight(data);
             if (hasSkyLight) {
-                section.getLight().readSkyLight(input);
+                section.getLight().readSkyLight(data);
             }
         }
 
         int[] biomeData = groundUp ? new int[256] : null;
         if (groundUp) {
             for (int i = 0; i < 256; i++) {
-                biomeData[i] = input.readByte() & 0xFF;
+                biomeData[i] = data.readByte() & 0xFF;
             }
         }
 

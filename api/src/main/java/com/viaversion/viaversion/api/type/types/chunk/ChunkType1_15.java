@@ -58,29 +58,20 @@ public class ChunkType1_15 extends Type<Chunk> {
             }
         }
 
-        Type.VAR_INT.readPrimitive(input); // data size in bytes
+        ByteBuf data = input.readSlice(Type.VAR_INT.readPrimitive(input));
 
         // Read sections
         ChunkSection[] sections = new ChunkSection[16];
         for (int i = 0; i < 16; i++) {
             if ((primaryBitmask & (1 << i)) == 0) continue; // Section not set
 
-            short nonAirBlocksCount = input.readShort();
-            ChunkSection section = Types1_13.CHUNK_SECTION.read(input);
+            short nonAirBlocksCount = data.readShort();
+            ChunkSection section = Types1_13.CHUNK_SECTION.read(data);
             section.setNonAirBlocksCount(nonAirBlocksCount);
             sections[i] = section;
         }
 
         List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
-
-        // Read all the remaining bytes (workaround for #681)
-        if (input.readableBytes() > 0) {
-            byte[] array = Type.REMAINING_BYTES.read(input);
-            if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Found " + array.length + " more bytes than expected while reading the chunk: " + chunkX + "/" + chunkZ);
-            }
-        }
-
         return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitmask, sections, biomeData, heightMap, nbtData);
     }
 
