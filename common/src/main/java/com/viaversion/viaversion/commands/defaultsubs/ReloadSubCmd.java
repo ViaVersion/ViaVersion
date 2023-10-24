@@ -29,7 +29,7 @@ public class ReloadSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Reload the config from the disk";
+        return "Reload the config from the disk.";
     }
 
     @Override

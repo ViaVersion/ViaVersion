@@ -31,7 +31,7 @@ public class DontBugMeSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Toggle checking for updates";
+        return "Toggle checking for updates.";
     }
 
     @Override

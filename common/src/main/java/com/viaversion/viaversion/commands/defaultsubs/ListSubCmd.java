@@ -34,7 +34,7 @@ public class ListSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Shows lists of the versions from logged in players";
+        return "Shows lists of the versions from logged in players.";
     }
 
     @Override

@@ -13,11 +13,11 @@ commands:
     aliases: [ viaver, vvbukkit ]
   viaversion autoteam:
     permission: viaversion.admin.autoteam
-    description: Automatically team players up based on their version.
+    description: Toggle automatically teaming to prevent colliding.
     aliases: [ autoteam ]
   viaversion debug:
     permission: viaversion.admin.debug
-    description: Toggles debug mode.
+    description: Toggles various debug modes.
     aliases: /viaversion debug [clear/logposttransform/add/remove]
   viaversion displayleaks:
     permission: viaversion.admin.displayleaks
@@ -25,7 +25,7 @@ commands:
     aliases: [ displayleaks ]
   viaversion dontbugme:
     permission: viaversion.admin.dontbugme
-    description: Toggle checking for updates
+    description: Toggle checking for updates.
     aliases: [ dontbugme ]
   viaversion dump:
     permission: viaversion.admin.dump
@@ -37,11 +37,11 @@ commands:
     aliases: [ list ]
   viaversion pps:
     permission: viaversion.admin.pps
-    description: Shows the packets per second of online players
+    description: Shows the packets per second of online players.
     aliases: [ pps ]
   viaversion reload:
     permission: viaversion.admin.reload
-    description: Reloads the config.
+    description: Reloads all config files.
     aliases: [ reload ]
 permissions:
   viaversion.admin:
