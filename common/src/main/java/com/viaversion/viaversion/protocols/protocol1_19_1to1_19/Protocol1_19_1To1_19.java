@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
+import com.viaversion.viaversion.api.minecraft.signature.SignableCommandArgumentsProvider;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
 import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
 import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19_0;
@@ -44,6 +45,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceSto
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
+import com.viaversion.viaversion.util.Pair;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -165,10 +167,35 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
                 handler(wrapper -> {
-                    final int signatures = wrapper.passthrough(Type.VAR_INT);
+                    final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
+                    final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
+
+                    final int signatures = wrapper.read(Type.VAR_INT);
                     for (int i = 0; i < signatures; i++) {
-                        wrapper.passthrough(Type.STRING); // Argument name
-                        wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.read(Type.STRING); // Argument name
+                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                    }
+
+                    if (chatSession != null && argumentsProvider != null) {
+                        final UUID sender = wrapper.user().getProtocolInfo().getUuid();
+                        final String message = wrapper.get(Type.STRING, 0);
+                        final long timestamp = wrapper.get(Type.LONG, 0);
+                        final long salt = wrapper.get(Type.LONG, 1);
+
+                        final List<Pair<String, String>> arguments = argumentsProvider.getSignableArguments(message);
+
+                        wrapper.write(Type.VAR_INT, arguments.size()); // Signature count
+                        for (Pair<String, String> argument : arguments) {
+                            final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
+                            final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
+
+                            final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage);
+
+                            wrapper.write(Type.STRING, argument.key()); // Argument name
+                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                        }
+                    } else {
+                        wrapper.write(Type.VAR_INT, 0); // Signature count
                     }
                 });
                 map(Type.BOOLEAN); // Signed preview
