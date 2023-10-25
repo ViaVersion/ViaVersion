@@ -2,7 +2,6 @@
 # Ensure you look through all these options
 # If you need help:
 # Discord - https://viaversion.com/discord
-# viaversion.com - Discussion tab
 # Docs - https://docs.viaversion.com/display/VIAVERSION/Configuration
 #
 #----------------------------------------------------------#
@@ -48,7 +47,7 @@ bungee-ping-save: true
 # The format for the following is:
 #  servername: protocolversion
 # You can find protocol ids on https://wiki.vg/Protocol_version_numbers
-# It will fallback to the default option if none found.
+# It will use the default option if none found.
 bungee-servers: {}
 #
 #----------------------------------------------------------#
@@ -170,6 +169,12 @@ cache-1_17-light: true
 # Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
 armor-toggle-fix: true
 #
+# Get the world names which should be returned for each vanilla dimension
+map-1_16-world-names:
+  overworld: "minecraft:overworld"
+  nether: "minecraft:the_nether"
+  end: "minecraft:the_end"
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
@@ -217,8 +222,3 @@ force-json-transform: false
 minimize-cooldown: true
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
-# Get the world names which should be returned for each vanilla dimension
-map-1_16-world-names:
-  overworld: "minecraft:overworld"
-  nether: "minecraft:the_nether"
-  end: "minecraft:the_end"
