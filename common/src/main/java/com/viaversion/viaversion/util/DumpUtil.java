@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.dump.DumpTemplate;
+import com.viaversion.viaversion.dump.RuntimeInfo;
 import com.viaversion.viaversion.dump.VersionInfo;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +67,7 @@ public final class DumpUtil {
                 Via.getManager().getSubPlatforms()
         );
         final Map<String, Object> configuration = ((Config) Via.getConfig()).getValues();
-        final DumpTemplate template = new DumpTemplate(version, configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(playerToSample));
+        final DumpTemplate template = new DumpTemplate(version, new RuntimeInfo(), configuration, Via.getPlatform().getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(playerToSample));
         final CompletableFuture<String> result = new CompletableFuture<>();
         Via.getPlatform().runAsync(() -> {
             final HttpURLConnection con;
