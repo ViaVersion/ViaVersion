@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.Protocol1_20_3To1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPacketRewriter1_20_3 extends EntityRewriter<ClientboundPackets1_20_2, Protocol1_20_3To1_20_2> {
@@ -87,7 +88,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         wrapper.cancel();
 
         // Make sure the loading screen is closed, continues old client behavior
-        final PacketWrapper gameEventPacket = wrapper.create(ClientboundPackets1_20_2.GAME_EVENT);
+        final PacketWrapper gameEventPacket = wrapper.create(ClientboundPackets1_20_3.GAME_EVENT);
         gameEventPacket.write(Type.UNSIGNED_BYTE, (short) 13);
         gameEventPacket.write(Type.FLOAT, 0F);
         gameEventPacket.send(Protocol1_20_3To1_20_2.class);

@@ -56,6 +56,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.BlockItemPacketRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
@@ -70,7 +71,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_2, ServerboundPackets1_20_3> {
+public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_3, ServerboundPackets1_20_2, ServerboundPackets1_20_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
     private static final Set<String> BOOLEAN_TYPES = new HashSet<>(Arrays.asList(
@@ -85,7 +86,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
 
     public Protocol1_20_3To1_20_2() {
-        super(ClientboundPackets1_20_2.class, ClientboundPackets1_20_2.class, ServerboundPackets1_20_2.class, ServerboundPackets1_20_3.class);
+        super(ClientboundPackets1_20_2.class, ClientboundPackets1_20_3.class, ServerboundPackets1_20_2.class, ServerboundPackets1_20_3.class);
     }
 
     @Override
@@ -102,6 +103,17 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         soundRewriter.registerSound(ClientboundPackets1_20_2.ENTITY_SOUND);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.STATISTICS);
+
+        registerServerbound(ServerboundPackets1_20_3.UPDATE_JIGSAW_BLOCK, wrapper -> {
+            wrapper.passthrough(Type.POSITION1_14); // Position
+            wrapper.passthrough(Type.STRING); // Name
+            wrapper.passthrough(Type.STRING); // Target
+            wrapper.passthrough(Type.STRING); // Pool
+            wrapper.passthrough(Type.STRING); // Final state
+            wrapper.passthrough(Type.STRING); // Joint type
+            wrapper.read(Type.VAR_INT); // Selection priority
+            wrapper.read(Type.VAR_INT); // Placement priority
+        });
 
         // Components are now (mostly) written as nbt instead of json strings
         registerClientbound(ClientboundPackets1_20_2.ADVANCEMENTS, wrapper -> {
