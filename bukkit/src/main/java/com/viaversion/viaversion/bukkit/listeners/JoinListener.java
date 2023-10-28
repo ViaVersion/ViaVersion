@@ -63,8 +63,8 @@ public class JoinListener implements Listener {
     }
 
     // Loosely search a field with any name, as long as it matches a type name.
-    private static Field findField(boolean all, Class<?> clazz, String... types) throws NoSuchFieldException {
-        for (Field field : all ? clazz.getFields() : clazz.getDeclaredFields()) {
+    private static Field findField(boolean checkSuperClass, Class<?> clazz, String... types) throws NoSuchFieldException {
+        for (Field field : clazz.getDeclaredFields()) {
             String fieldTypeName = field.getType().getSimpleName();
             for (String type : types) {
                 if (!fieldTypeName.equals(type)) {
@@ -77,6 +77,11 @@ public class JoinListener implements Listener {
                 return field;
             }
         }
+
+        if (checkSuperClass && clazz != Object.class && clazz.getSuperclass() != null) {
+            return findField(true, clazz.getSuperclass(), types);
+        }
+
         throw new NoSuchFieldException(types[0]);
     }
 
