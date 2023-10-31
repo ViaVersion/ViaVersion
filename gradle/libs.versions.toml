@@ -4,7 +4,7 @@ metadata.format.version = "1.1"
 
 adventure = "4.14.0"
 gson = "2.10.1"
-fastutil = "8.5.12"
+fastutil = "8.5.13"
 flare = "2.0.1"
 vianbt = "3.2.0"
 
@@ -15,7 +15,7 @@ snakeYaml = "1.18"
 snakeYaml2 = "2.0"
 
 junit = "5.9.3"
-checkerQual = "3.34.0"
+checkerQual = "3.39.0"
 
 # Platforms
 paper = "1.16.5-R0.1-SNAPSHOT"
