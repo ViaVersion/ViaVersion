@@ -53,7 +53,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    protected void registerPackets() {
+    protected synchronized void registerPackets() {
         // This is a pipeline so we register basic pipes
         final Protocol<?, ?, ?, ?> baseProtocol = Via.getManager().getProtocolManager().getBaseProtocol();
         protocolList.add(baseProtocol);
@@ -177,7 +177,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
     }
 
     @Override
-    public void cleanPipes() {
+    public synchronized void cleanPipes() {
         protocolList.clear();
         reversedProtocolList.clear();
         protocolSet.clear();
