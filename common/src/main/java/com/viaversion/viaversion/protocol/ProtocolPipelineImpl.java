@@ -39,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements ProtocolPipeline {
     private final UserConnection userConnection;
     /**
-     * Protocol list ordered from client to server transforation with the base protocols at the end.
+     * Protocol list ordered from client to server transformation with the base protocols at the end.
      */
     private final List<Protocol> protocolList = new CopyOnWriteArrayList<>();
     private final Set<Class<? extends Protocol>> protocolSet = new HashSet<>();
@@ -178,6 +178,18 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
     @Override
     public void cleanPipes() {
+        protocolList.clear();
+        reversedProtocolList.clear();
+        protocolSet.clear();
+        baseProtocols = 0;
+
         registerPackets();
+    }
+
+    @Override
+    public String toString() {
+        return "ProtocolPipelineImpl{" +
+                "protocolList=" + protocolList +
+                '}';
     }
 }

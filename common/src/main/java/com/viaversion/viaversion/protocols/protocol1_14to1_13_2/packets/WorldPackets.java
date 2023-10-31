@@ -314,7 +314,7 @@ public class WorldPackets {
     }
 
     static void sendViewDistancePacket(UserConnection connection) throws Exception {
-        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, null, connection);
+        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, connection);
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_14To1_13_2.class);
     }

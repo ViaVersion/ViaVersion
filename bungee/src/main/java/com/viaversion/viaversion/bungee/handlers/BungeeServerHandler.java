@@ -54,15 +54,16 @@ import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 
+// All of this is madness
 public class BungeeServerHandler implements Listener {
-    private static Method getHandshake;
-    private static Method getRegisteredChannels;
-    private static Method getBrandMessage;
-    private static Method setProtocol;
-    private static Method getEntityMap = null;
-    private static Method setVersion = null;
-    private static Field entityRewrite = null;
-    private static Field channelWrapper = null;
+    private static final Method getHandshake;
+    private static final Method getRegisteredChannels;
+    private static final Method getBrandMessage;
+    private static final Method setProtocol;
+    private static final Method getEntityMap;
+    private static final Method setVersion;
+    private static final Field entityRewrite;
+    private static final Field channelWrapper;
 
     static {
         try {
@@ -76,52 +77,58 @@ public class BungeeServerHandler implements Listener {
             channelWrapper.setAccessible(true);
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
             entityRewrite.setAccessible(true);
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     // Set the handshake version every time someone connects to any server
     @EventHandler(priority = 120)
-    public void onServerConnect(ServerConnectEvent e) {
-        if (e.isCancelled()) {
+    public void onServerConnect(ServerConnectEvent event) {
+        if (event.isCancelled()) {
             return;
         }
 
-        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
-        if (user == null) return;
-        if (!user.has(BungeeStorage.class)) {
-            user.put(new BungeeStorage(e.getPlayer()));
+        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
+        if (user == null) {
+            return;
         }
 
-        int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(e.getTarget().getName());
-        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
+        if (!user.has(BungeeStorage.class)) {
+            user.put(new BungeeStorage(event.getPlayer()));
+        }
+
+        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
+        int clientProtocolVersion = user.getProtocolInfo().getProtocolVersion();
+        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
 
         // Check if ViaVersion can support that version
         try {
-            //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
-            Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? user.getProtocolInfo().getProtocolVersion() : protocolId);
-        } catch (InvocationTargetException | IllegalAccessException e1) {
-            e1.printStackTrace();
+            Object handshake = getHandshake.invoke(event.getPlayer().getPendingConnection());
+            setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion : serverProtocolVersion);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
     @EventHandler(priority = -120)
-    public void onServerConnected(ServerConnectedEvent e) {
+    public void onServerConnected(ServerConnectedEvent event) {
         try {
-            checkServerChange(e, Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId()));
-        } catch (Exception e1) {
-            e1.printStackTrace();
+            checkServerChange(event, Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @EventHandler(priority = -120)
-    public void onServerSwitch(ServerSwitchEvent e) {
+    public void onServerSwitch(ServerSwitchEvent event) {
         // Update entity id
-        UserConnection userConnection = Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
-        if (userConnection == null) return;
+        UserConnection userConnection = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
+        if (userConnection == null) {
+            return;
+        }
+
         int playerId;
         try {
             playerId = Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(userConnection);
@@ -142,17 +149,20 @@ public class BungeeServerHandler implements Listener {
     }
 
     public void checkServerChange(ServerConnectedEvent event, UserConnection user) throws Exception {
-        if (user == null || !user.has(BungeeStorage.class)) {
+        if (user == null) {
             return;
         }
 
-        // Auto-team handling
-        // Handle server/version change
         BungeeStorage storage = user.get(BungeeStorage.class);
+        if (storage == null) {
+            return;
+        }
+
         Server server = event.getServer();
         if (server == null || server.getInfo().getName().equals(storage.getCurrentServer())) {
             return;
         }
+
 
         // Clear auto-team
         EntityTracker1_9 oldEntityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
@@ -162,8 +172,8 @@ public class BungeeServerHandler implements Listener {
 
         String serverName = server.getInfo().getName();
         storage.setCurrentServer(serverName);
-        int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
-        if (protocolId <= ProtocolVersion.v1_8.getVersion() && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
+        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
+        if (serverProtocolVersion <= ProtocolVersion.v1_8.getVersion() && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                 for (UUID uuid : storage.getBossbar()) {
@@ -180,13 +190,13 @@ public class BungeeServerHandler implements Listener {
         int previousServerProtocol = info.getServerProtocolVersion();
 
         // Refresh the pipes
-        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
+        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocolVersion);
         ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
         user.clearStoredObjects(true);
         pipeline.cleanPipes();
         if (protocolPath == null) {
             // TODO Check Bungee Supported Protocols? *shrugs*
-            protocolId = info.getProtocolVersion();
+            serverProtocolVersion = info.getProtocolVersion();
         } else {
             List<Protocol> protocols = new ArrayList<>(protocolPath.size());
             for (ProtocolPathEntry entry : protocolPath) {
@@ -195,14 +205,14 @@ public class BungeeServerHandler implements Listener {
             pipeline.add(protocols);
         }
 
-        info.setServerProtocolVersion(protocolId);
+        info.setServerProtocolVersion(serverProtocolVersion);
         // Add version-specific base Protocol
-        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(protocolId));
+        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
 
         // Workaround 1.13 server change
         int id1_13 = ProtocolVersion.v1_13.getVersion();
-        boolean toNewId = previousServerProtocol < id1_13 && protocolId >= id1_13;
-        boolean toOldId = previousServerProtocol >= id1_13 && protocolId < id1_13;
+        boolean toNewId = previousServerProtocol < id1_13 && serverProtocolVersion >= id1_13;
+        boolean toOldId = previousServerProtocol >= id1_13 && serverProtocolVersion < id1_13;
         if (previousServerProtocol != -1 && (toNewId || toOldId)) {
             Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(event.getPlayer().getPendingConnection());
             if (!registeredChannels.isEmpty()) {
@@ -274,9 +284,9 @@ public class BungeeServerHandler implements Listener {
         }
 
         Object wrapper = channelWrapper.get(player);
-        setVersion.invoke(wrapper, protocolId);
+        setVersion.invoke(wrapper, serverProtocolVersion);
 
-        Object entityMap = getEntityMap.invoke(null, protocolId);
+        Object entityMap = getEntityMap.invoke(null, serverProtocolVersion);
         entityRewrite.set(player, entityMap);
     }
 }
