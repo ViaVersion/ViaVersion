@@ -61,7 +61,9 @@ public class StringType extends Type<String> {
 
     @Override
     public void write(ByteBuf buffer, String object) throws Exception {
-        Preconditions.checkArgument(object.length() <= maxLength, "Cannot send string longer than Short.MAX_VALUE (got %s characters)", object.length());
+        if (object.length() > maxLength) {
+            throw new IllegalArgumentException("Cannot send string longer than Short.MAX_VALUE characters (got " + object.length() + " characters)");
+        }
 
         byte[] b = object.getBytes(StandardCharsets.UTF_8);
         Type.VAR_INT.writePrimitive(buffer, b.length);

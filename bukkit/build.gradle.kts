@@ -1,6 +1,6 @@
 dependencies {
     implementation(projects.viaversionBukkitLegacy)
-    implementation(projects.viaversionCommon)
+    compileOnlyApi(projects.viaversionCommon)
     compileOnly(libs.paper) {
         exclude("junit", "junit")
         exclude("com.google.code.gson", "gson")

@@ -1,3 +1,2 @@
 dependencies {
-    implementation(projects.viaversionCommon)
 }

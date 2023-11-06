@@ -72,7 +72,7 @@ public final class ProtocolSupportCompat {
         } catch (NoSuchMethodException ignored) {
         }
 
-        // Check for obfusacted b/c methods
+        // Check for obfuscated b/c methods
         try {
             if (clazz.getMethod("b").getReturnType() == int.class) {
                 return HandshakeProtocolType.OBFUSCATED_B;

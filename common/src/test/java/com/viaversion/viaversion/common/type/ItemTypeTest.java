@@ -38,7 +38,7 @@ public class ItemTypeTest {
 
         // Test item read
         Assertions.assertEquals(
-                new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null),
+                new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null),
                 Type.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{
                         127, -1,
                         -128,
@@ -83,7 +83,7 @@ public class ItemTypeTest {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item write
-        Type.ITEM1_8.write(buf, new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null));
+        Type.ITEM1_8.write(buf, new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 127, -1,
                 -128,

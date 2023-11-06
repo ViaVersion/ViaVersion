@@ -1,3 +1,3 @@
 dependencies {
-    implementation(projects.viaversionCommon)
+    compileOnly(projects.viaversionCommon)
 }

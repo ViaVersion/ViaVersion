@@ -22,7 +22,6 @@ paper = "1.16.5-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 bungee = "1.19-R0.1-SNAPSHOT"
 sponge = "8.0.0"
-legacySponge = "4.0.0"
 velocity = "3.1.1"
 
 
@@ -52,7 +51,6 @@ paper = { group = "com.destroystokyo.paper", name = "paper-api", version.ref = "
 legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
 bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
 sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
-legacySponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "legacySponge" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 
