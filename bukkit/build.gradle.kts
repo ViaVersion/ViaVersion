@@ -8,3 +8,5 @@ dependencies {
     }
     compileOnly(projects.compat.protocolsupportCompat)
 }
+
+publishShadowJar()

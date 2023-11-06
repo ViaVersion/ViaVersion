@@ -21,8 +21,6 @@ tasks {
     }
 }
 
-publishShadowJar()
-
 fun ShadowJar.configureRelocations() {
     relocate("com.google.gson", "com.viaversion.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "com.viaversion.viaversion.libs.opennbt")

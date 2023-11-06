@@ -6,3 +6,5 @@ dependencies {
     }
     annotationProcessor(libs.velocity)
 }
+
+publishShadowJar()

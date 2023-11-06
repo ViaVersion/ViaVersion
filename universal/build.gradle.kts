@@ -16,10 +16,12 @@ dependencies {
 
 tasks {
     shadowJar {
+        archiveClassifier.set("")
         archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
     }
     sourcesJar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         rootProject.subprojects.forEach { subproject ->
             if (subproject == project) return@forEach
             val platformSourcesJarTask = subproject.tasks.findByName("sourcesJar") as? Jar ?: return@forEach
@@ -28,6 +30,8 @@ tasks {
         }
     }
 }
+
+publishShadowJar()
 
 val branch = rootProject.branchName()
 val baseVersion = project.version as String
