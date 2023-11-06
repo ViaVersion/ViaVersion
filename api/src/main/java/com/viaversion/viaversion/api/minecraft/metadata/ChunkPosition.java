@@ -28,12 +28,12 @@ public final class ChunkPosition {
     private final int chunkX;
     private final int chunkZ;
 
-    public ChunkPosition(int chunkX, int chunkZ) {
+    public ChunkPosition(final int chunkX, final int chunkZ) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
     }
 
-    public ChunkPosition(long chunkKey) {
+    public ChunkPosition(final long chunkKey) {
         this.chunkX = (int) chunkKey;
         this.chunkZ = (int) (chunkKey >> 32);
     }
@@ -46,15 +46,31 @@ public final class ChunkPosition {
         return chunkZ;
     }
 
+    /**
+     * Returns a long key for this chunk position.
+     *
+     * @return the chunk key
+     */
     public long chunkKey() {
+        return chunkKey(chunkX, chunkZ);
+    }
+
+    /**
+     * Returns a long key for the given chunk coordinates.
+     *
+     * @param chunkX the chunk X coordinate
+     * @param chunkZ the chunk Z coordinate
+     * @return the chunk key
+     */
+    public static long chunkKey(final int chunkX, final int chunkZ) {
         return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChunkPosition that = (ChunkPosition) o;
+        final ChunkPosition that = (ChunkPosition) o;
         return chunkX == that.chunkX && chunkZ == that.chunkZ;
     }
 
