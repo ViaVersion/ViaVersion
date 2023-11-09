@@ -33,8 +33,8 @@ public final class MetaTypes1_20_3 extends AbstractMetaTypes {
     public final MetaType longType = add(2, Type.VAR_LONG);
     public final MetaType floatType = add(3, Type.FLOAT);
     public final MetaType stringType = add(4, Type.STRING);
-    public final MetaType componentType = add(5, Type.COMPOUND_TAG);
-    public final MetaType optionalComponentType = add(6, Type.OPTIONAL_COMPOUND_TAG);
+    public final MetaType componentType = add(5, Type.TAG);
+    public final MetaType optionalComponentType = add(6, Type.OPTIONAL_TAG);
     public final MetaType itemType = add(7, Type.ITEM1_20_2);
     public final MetaType booleanType = add(8, Type.BOOLEAN);
     public final MetaType rotationType = add(9, Type.ROTATION);
