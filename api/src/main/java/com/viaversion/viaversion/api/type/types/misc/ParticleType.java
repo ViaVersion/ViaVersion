@@ -83,8 +83,9 @@ public class ParticleType extends Type<Particle> {
         public static final ParticleReader BLOCK = (buf, particle) -> {
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Flat Block
         };
-        public static final ParticleReader ITEM = itemHandler(Type.ITEM1_13);
-        public static final ParticleReader VAR_INT_ITEM = itemHandler(Type.ITEM1_13_2);
+        public static final ParticleReader ITEM1_13 = itemHandler(Type.ITEM1_13);
+        public static final ParticleReader ITEM1_13_2 = itemHandler(Type.ITEM1_13_2);
+        public static final ParticleReader ITEM1_20_2 = itemHandler(Type.ITEM1_20_2);
         public static final ParticleReader DUST = (buf, particle) -> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green 0-1
@@ -128,6 +129,19 @@ public class ParticleType extends Type<Particle> {
                 particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Y offset
             } else {
                 Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + resourceLocation);
+            }
+            particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
+        };
+        public static final ParticleReader VIBRATION1_20_3 = (buf, particle) -> {
+            final int sourceTypeId = Type.VAR_INT.readPrimitive(buf);
+            particle.add(Type.VAR_INT, sourceTypeId);
+            if (sourceTypeId == 0) { // Block
+                particle.add(Type.POSITION1_14, Type.POSITION1_14.read(buf)); // Target block pos
+            } else if (sourceTypeId == 1) { // Entity
+                particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Target entity
+                particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Y offset
+            } else {
+                Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + sourceTypeId);
             }
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };

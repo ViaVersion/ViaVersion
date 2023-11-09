@@ -44,9 +44,14 @@ public final class Particle {
         this.id = id;
     }
 
-    public <T> ParticleData<T> getArgument(final int id) {
+    public <T> ParticleData<T> getArgument(final int index) {
         //noinspection unchecked
-        return (ParticleData<T>) arguments.get(id);
+        return (ParticleData<T>) arguments.get(index);
+    }
+
+    public <T> ParticleData<T> removeArgument(final int index) {
+        //noinspection unchecked
+        return (ParticleData<T>) arguments.remove(index);
     }
 
     public List<ParticleData<?>> getArguments() {
@@ -55,6 +60,10 @@ public final class Particle {
 
     public <T> void add(final Type<T> type, final T value) {
         arguments.add(new ParticleData<>(type, value));
+    }
+
+    public <T> void add(final int index, final Type<T> type, final T value) {
+        arguments.add(index, new ParticleData<>(type, value));
     }
 
     public static final class ParticleData<T> {

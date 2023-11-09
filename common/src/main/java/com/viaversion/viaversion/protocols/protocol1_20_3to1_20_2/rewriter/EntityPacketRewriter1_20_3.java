@@ -17,8 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter;
 
+import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -31,6 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.Protocol1_20_3To1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_20_3 extends EntityRewriter<ClientboundPackets1_20_2, Protocol1_20_3To1_20_2> {
 
@@ -40,7 +43,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_2.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_20_2.SPAWN_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_20_2.ENTITY_METADATA, Types1_20_2.METADATA_LIST, Types1_20_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
@@ -102,6 +105,21 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 meta.setTypeAndValue(Types1_20_3.META_TYPES.componentType, Protocol1_20_3To1_20_2.jsonComponentToTag(meta.value()));
             } else if (type == Types1_20_2.META_TYPES.optionalComponentType) {
                 meta.setTypeAndValue(Types1_20_3.META_TYPES.optionalComponentType, Protocol1_20_3To1_20_2.jsonComponentToTag(meta.value()));
+            } else if (type == Types1_20_2.META_TYPES.particleType) {
+                final Particle particle = (Particle) meta.getValue();
+                final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+                if (particle.getId() == particleMappings.id("vibration")) {
+                    // Change the type of the resource key argument
+                    final String resourceLocation = particle.<String>removeArgument(0).getValue();
+                    if (Key.stripMinecraftNamespace(resourceLocation).equals("block")) {
+                        particle.add(0, Type.VAR_INT, 0);
+                    } else { // Entity
+                        particle.add(0, Type.VAR_INT, 1);
+                    }
+                }
+
+                rewriteParticle(particle);
+                meta.setMetaType(Types1_20_3.META_TYPES.particleType);
             } else {
                 meta.setMetaType(Types1_20_3.META_TYPES.byId(type.typeId()));
             }
@@ -114,14 +132,19 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 Types1_20_3.META_TYPES.particleType
         );
 
-        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_20_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
     }
 
     @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
+    }
+
+    @Override
     public EntityType typeFromId(final int type) {
-        return EntityTypes1_19_4.getTypeFromId(type);
+        return EntityTypes1_20_3.getTypeFromId(type);
     }
 }

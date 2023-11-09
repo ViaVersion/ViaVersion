@@ -39,7 +39,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -373,7 +373,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     }
 
     private static ListTag convertJsonArray(final JsonElement element) {
-        // TODO Number arrays
+        // TODO Number arrays?
         final ListTag listTag = new ListTag();
         boolean singleType = true;
         for (final JsonElement entry : element.getAsJsonArray()) {
@@ -513,21 +513,23 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+        EntityTypes1_20_3.initialize(this);
         Types1_20_3.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
-                .reader("vibration", ParticleType.Readers.VIBRATION)
+                .reader("item", ParticleType.Readers.ITEM1_20_2)
+                .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
     }
 
     @Override
     public void init(final UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_19_4.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_3.PLAYER));
     }
 
     @Override

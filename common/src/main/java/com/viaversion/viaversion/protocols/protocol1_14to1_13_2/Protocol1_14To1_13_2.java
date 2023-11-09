@@ -149,12 +149,12 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+                .reader("item", ParticleType.Readers.ITEM1_13_2);
         Types1_14.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+                .reader("item", ParticleType.Readers.ITEM1_13_2);
     }
 
     @Override

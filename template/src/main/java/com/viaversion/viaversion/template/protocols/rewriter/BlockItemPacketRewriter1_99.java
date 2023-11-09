@@ -18,10 +18,10 @@
 package com.viaversion.viaversion.template.protocols.rewriter;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.RecipeRewriter1_20_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
@@ -62,7 +62,7 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_2.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_20_2.SPAWN_PARTICLE);
 
-        new RecipeRewriter1_20_2<>(protocol).register(ClientboundPackets1_20_2.DECLARE_RECIPES);
+        new RecipeRewriter1_20_3<>(protocol).register(ClientboundPackets1_20_2.DECLARE_RECIPES);
         // OR do this if serialization of recipes changed and override the relevant method
         // Add new serializers to RecipeRewriter, or extend the last one for changes
         // new RecipeRewriter1_20_2<ClientboundPackets1_20_2>(this) {}.register(ClientboundPackets1_20_2.DECLARE_RECIPES);

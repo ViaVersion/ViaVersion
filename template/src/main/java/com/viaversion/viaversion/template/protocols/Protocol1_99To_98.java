@@ -20,7 +20,7 @@ package com.viaversion.viaversion.template.protocols;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -32,8 +32,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Serverb
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewriter1_99;
 import com.viaversion.viaversion.template.protocols.rewriter.BlockItemPacketRewriter1_99;
+import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewriter1_99;
 
 // Placeholders to replace (in the entire package):
 //   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99
@@ -89,7 +89,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         super.onMappingDataLoaded(); // Calls load methods on rewriters
 
         // Uncomment this if the entity types enum has been newly added specificly for this Protocol
-        // Entity1_19_4Types.initialize(this);
+        // Entity1_20_3Types.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
         /*Types1_20_3.PARTICLE.filler(this)
@@ -98,8 +98,8 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
-                .reader("vibration", ParticleType.Readers.VIBRATION)
+                .reader("item", ParticleType.Readers.ITEM1_20_2)
+                .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);*/
     }
@@ -107,7 +107,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
     @Override
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/metadata rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_19_4.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_3.PLAYER));
     }
 
     // Overriding these three methods is important as they are relied on various rewriter classes

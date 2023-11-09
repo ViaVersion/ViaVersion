@@ -260,7 +260,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+                .reader("item", ParticleType.Readers.ITEM1_13_2);
     }
 
     @Override

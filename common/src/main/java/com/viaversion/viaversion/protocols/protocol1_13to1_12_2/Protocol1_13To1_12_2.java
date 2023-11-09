@@ -855,7 +855,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader(3, ParticleType.Readers.BLOCK)
                 .reader(20, ParticleType.Readers.DUST)
                 .reader(11, ParticleType.Readers.DUST)
-                .reader(27, ParticleType.Readers.ITEM);
+                .reader(27, ParticleType.Readers.ITEM1_13);
 
         if (Via.getConfig().isServersideBlockConnections() && Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
             BlockConnectionStorage.init();
