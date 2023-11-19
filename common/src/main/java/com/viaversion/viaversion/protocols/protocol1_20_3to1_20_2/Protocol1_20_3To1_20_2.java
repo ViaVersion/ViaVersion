@@ -112,12 +112,12 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             final byte action = wrapper.read(Type.BYTE);
             wrapper.passthrough(Type.STRING); // Objective name
 
-            // Write or pass through value
-            if (action != -1) {
-                wrapper.passthrough(Type.VAR_INT);
-            } else {
-                wrapper.write(Type.VAR_INT, 0);
+            if (action == 1) { // Reset score
+                wrapper.setPacketType(ClientboundPackets1_20_3.RESET_SCORE);
+                return;
             }
+
+            wrapper.passthrough(Type.VAR_INT); // Score
 
             // Null display and number format
             wrapper.write(Type.OPTIONAL_TAG, null);
