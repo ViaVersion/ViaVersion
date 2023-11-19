@@ -52,6 +52,7 @@ import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
@@ -103,6 +104,34 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         soundRewriter.registerSound(ClientboundPackets1_20_2.ENTITY_SOUND);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.STATISTICS);
+        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_2.DECLARE_COMMANDS);
+
+        registerClientbound(ClientboundPackets1_20_2.UPDATE_SCORE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Owner
+
+            final byte action = wrapper.read(Type.BYTE);
+            wrapper.passthrough(Type.STRING); // Objective name
+
+            // Write or pass through value
+            if (action != -1) {
+                wrapper.passthrough(Type.VAR_INT);
+            } else {
+                wrapper.write(Type.VAR_INT, 0);
+            }
+
+            // Null display and number format
+            wrapper.write(Type.OPTIONAL_TAG, null);
+            wrapper.write(Type.BOOLEAN, false);
+        });
+        registerClientbound(ClientboundPackets1_20_2.SCOREBOARD_OBJECTIVE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Objective Name
+            final byte action = wrapper.passthrough(Type.BYTE); // Method
+            if (action == 0 || action == 2) {
+                convertComponent(wrapper); // Display Name
+                wrapper.passthrough(Type.VAR_INT); // Render type
+                wrapper.write(Type.BOOLEAN, false); // Null number format
+            }
+        });
 
         registerServerbound(ServerboundPackets1_20_3.UPDATE_JIGSAW_BLOCK, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
@@ -209,13 +238,6 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Type.VAR_INT); // Chat type
             convertComponent(wrapper); // Sender
             convertOptionalComponent(wrapper); // Target
-        });
-        registerClientbound(ClientboundPackets1_20_2.SCOREBOARD_OBJECTIVE, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Objective Name
-            final byte action = wrapper.passthrough(Type.BYTE); // Mode
-            if (action == 0 || action == 2) {
-                convertComponent(wrapper); // Display Name
-            }
         });
         registerClientbound(ClientboundPackets1_20_2.TEAMS, wrapper -> {
             wrapper.passthrough(Type.STRING); // Team Name
