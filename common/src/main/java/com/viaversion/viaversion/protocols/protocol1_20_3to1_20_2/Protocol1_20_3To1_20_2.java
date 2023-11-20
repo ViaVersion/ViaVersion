@@ -57,6 +57,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.BlockItemPacketRewriter1_20_3;
@@ -254,7 +255,6 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         });
 
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), this::convertComponent);
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), resourcePackHandler());
         registerClientbound(ClientboundPackets1_20_2.DISCONNECT, this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.RESOURCE_PACK, resourcePackHandler());
         registerClientbound(ClientboundPackets1_20_2.SERVER_DATA, this::convertComponent);
@@ -316,6 +316,15 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 }
             }
         });
+
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, wrapper -> wrapper.read(Type.UUID));
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), wrapper -> {
+            wrapper.write(Type.UUID, UUID.randomUUID());
+            resourcePackHandler().handle(wrapper);
+        });
+        // TODO Auto map via packet types provider
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_ENABLED_FEATURES.getId());
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId());
     }
 
     private PacketHandler resourcePackHandler() {
