@@ -327,6 +327,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId());
     }
 
+    // TODO Drop old resource packs
     private PacketHandler resourcePackHandler() {
         return wrapper -> {
             wrapper.write(Type.UUID, UUID.randomUUID());

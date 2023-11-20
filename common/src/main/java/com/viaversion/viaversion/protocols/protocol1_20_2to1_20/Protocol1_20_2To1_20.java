@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
@@ -304,7 +305,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             lastTags.sendLastTags(connection);
         }
 
-        if (lastResourcePack != null) {
+        if (lastResourcePack != null && connection.getProtocolInfo().getProtocolVersion() == ProtocolVersion.v1_20_2.getVersion()) {
             // The client for some reason drops the resource pack when reentering the configuration state
             final PacketWrapper resourcePackPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, connection);
             resourcePackPacket.write(Type.STRING, lastResourcePack.url());
