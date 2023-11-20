@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,8 +100,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             injector.inject();
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to inject:");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to inject:", e);
             return;
         }
 
@@ -196,8 +196,7 @@ public class ViaManagerImpl implements ViaManager {
 
             protocolManager.setServerProtocol(versionInfo);
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to get the server protocol!");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to get the server protocol!", e);
         }
     }
 
@@ -207,8 +206,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             injector.uninject();
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to uninject:");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to uninject:", e);
         }
 
         loader.unload();
@@ -228,8 +226,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             version = Integer.parseInt(versionString);
         } catch (NumberFormatException e) {
-            platform.getLogger().warning("Failed to determine Java version; could not parse: " + versionString);
-            e.printStackTrace();
+            platform.getLogger().log(Level.WARNING, "Failed to determine Java version; could not parse: " + versionString, e);
             return;
         }
 

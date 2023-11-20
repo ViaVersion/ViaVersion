@@ -32,6 +32,7 @@ import io.netty.channel.ChannelPipeline;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class LegacyViaInjector implements ViaInjector {
@@ -141,8 +142,7 @@ public abstract class LegacyViaInjector implements ViaInjector {
                     ReflectionUtil.set(bootstrapAcceptor, "childHandler", ((WrappedChannelInitializer) initializer).original());
                 }
             } catch (Exception e) {
-                Via.getPlatform().getLogger().severe("Failed to remove injection handler, reload won't work with connections, please reboot!");
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to remove injection handler, reload won't work with connections, please reboot!", e);
             }
         }
 

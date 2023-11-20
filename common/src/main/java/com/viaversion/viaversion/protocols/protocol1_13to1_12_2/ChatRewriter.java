@@ -26,6 +26,7 @@ import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import java.util.logging.Level;
 
 public final class ChatRewriter {
     public static final GsonComponentSerializer HOVER_GSON_SERIALIZER = GsonComponentSerializer.builder().emitLegacyHoverEvent().legacyHoverEventSerializer(NBTLegacyHoverEventSerializer.get()).build();
@@ -62,8 +63,7 @@ public final class ChatRewriter {
             Component component = HOVER_GSON_SERIALIZER.deserialize(value);
             return LegacyComponentSerializer.legacySection().serialize(component);
         } catch (Exception e) {
-            Via.getPlatform().getLogger().warning("Error converting json text to legacy: " + value);
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Error converting json text to legacy: " + value, e);
             return "";
         }
     }

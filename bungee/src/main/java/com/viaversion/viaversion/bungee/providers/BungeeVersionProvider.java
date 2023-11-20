@@ -28,27 +28,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.protocol.ProtocolConstants;
 
 public class BungeeVersionProvider extends BaseVersionProvider {
-    private static Class<?> ref;
-
-    static {
-        try {
-            ref = Class.forName("net.md_5.bungee.protocol.ProtocolConstants");
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("Could not detect the ProtocolConstants class");
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public int getClosestServerProtocol(UserConnection user) throws Exception {
-        if (ref == null) {
-            return super.getClosestServerProtocol(user);
-        }
-
         // TODO Have one constant list forever until restart? (Might limit plugins if they change this)
-        List<Integer> list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
+        List<Integer> list = ReflectionUtil.getStatic(ProtocolConstants.class, "SUPPORTED_VERSION_IDS", List.class);
         List<Integer> sorted = new ArrayList<>(list);
         Collections.sort(sorted);
 
@@ -79,7 +66,7 @@ public class BungeeVersionProvider extends BaseVersionProvider {
     public static int getLowestSupportedVersion() {
         List<Integer> list;
         try {
-            list = ReflectionUtil.getStatic(ref, "SUPPORTED_VERSION_IDS", List.class);
+            list = ReflectionUtil.getStatic(ProtocolConstants.class, "SUPPORTED_VERSION_IDS", List.class);
             return list.get(0);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();

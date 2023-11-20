@@ -48,6 +48,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -111,8 +112,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 try {
                     new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix()).register();
                 } catch (ReflectiveOperationException e) {
-                    Via.getPlatform().getLogger().warning("Could not load hitbox fix - please report this on our GitHub");
-                    e.printStackTrace();
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Could not load hitbox fix - please report this on our GitHub", e);
                 }
             }
         }
@@ -165,9 +165,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                             return null;
                         }).get(10, TimeUnit.SECONDS);
                     } catch (Exception e) {
-                        Via.getPlatform().getLogger().severe("Error fetching hand item: " + e.getClass().getName());
-                        if (Via.getManager().isDebug())
-                            e.printStackTrace();
+                        Via.getPlatform().getLogger().log(Level.SEVERE, "Error fetching hand item", e);
                         return null;
                     }
                 }

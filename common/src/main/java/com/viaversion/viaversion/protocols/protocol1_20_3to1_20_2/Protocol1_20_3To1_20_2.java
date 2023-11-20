@@ -71,6 +71,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_3, ServerboundPackets1_20_2, ServerboundPackets1_20_3> {
@@ -348,8 +349,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         try {
             return convertToJson(null, tag);
         } catch (final Exception e) {
-            Via.getPlatform().getLogger().severe("Error converting component: " + tag);
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + tag, e);
             return new JsonPrimitive("<error>");
         }
     }
@@ -358,8 +358,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         try {
             return convertToTag(component);
         } catch (final Exception e) {
-            Via.getPlatform().getLogger().severe("Error converting component: " + component);
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + component, e);
             return new StringTag("<error>");
         }
     }

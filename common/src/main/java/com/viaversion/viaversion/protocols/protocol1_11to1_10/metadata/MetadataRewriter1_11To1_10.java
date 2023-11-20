@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_11To1_10> {
 
@@ -230,7 +231,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
             if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("An error occurred with entity type rewriter");
                 Via.getPlatform().getLogger().warning("Metadata: " + metadata);
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error: ", e);
             }
         }
 

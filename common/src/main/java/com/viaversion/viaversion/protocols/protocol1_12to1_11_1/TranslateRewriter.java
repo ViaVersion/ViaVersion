@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.data.AchievementTranslationMapping;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import java.util.logging.Level;
 
 public class TranslateRewriter {
 
@@ -91,8 +92,7 @@ public class TranslateRewriter {
                 hoverEvent.addProperty("action", "show_text");
                 hoverEvent.add("value", baseArray);
             } catch (Exception e) {
-                Via.getPlatform().getLogger().warning("Error rewriting show_achievement: " + hoverEvent);
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");
                 invalidText.addProperty("color", "red");

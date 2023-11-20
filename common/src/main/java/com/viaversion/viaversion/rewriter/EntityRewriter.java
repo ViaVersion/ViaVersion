@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -598,7 +599,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
             logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
                     .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error: ", e);
         }
     }
 }

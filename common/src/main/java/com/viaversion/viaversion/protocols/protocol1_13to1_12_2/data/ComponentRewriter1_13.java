@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import java.util.logging.Level;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
@@ -56,8 +57,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
             tag = SNBT.deserializeCompoundTag(text);
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading NBT in show_item:" + text, e);
             }
             return;
         }
@@ -89,8 +89,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
             object.addProperty("text", serializedNBT);
             hoverEvent.add("value", array);
         } catch (Exception e) {
-            Via.getPlatform().getLogger().warning("Error writing NBT in show_item:" + text);
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Error writing NBT in show_item:" + text, e);
         }
     }
 

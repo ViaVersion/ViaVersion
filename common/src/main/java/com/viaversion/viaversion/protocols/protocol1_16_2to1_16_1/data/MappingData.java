@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.data.MappingDataLoader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class MappingData extends MappingDataBase {
     private final Map<String, CompoundTag> dimensionDataMap = new HashMap<>();
@@ -42,8 +43,7 @@ public class MappingData extends MappingDataBase {
         try {
             dimensionRegistry = NBTIO.readTag(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
         } catch (final IOException e) {
-            Via.getPlatform().getLogger().severe("Error loading dimension registry:");
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error loading dimension registry:", e);
         }
 
         // Data of each dimension
