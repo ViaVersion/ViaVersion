@@ -317,6 +317,8 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             }
         });
 
+        registerServerbound(ServerboundPackets1_20_3.RESOURCE_PACK_STATUS, wrapper -> wrapper.read(Type.UUID));
+
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, wrapper -> wrapper.read(Type.UUID));
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler());
         // TODO Auto map via packet types provider
