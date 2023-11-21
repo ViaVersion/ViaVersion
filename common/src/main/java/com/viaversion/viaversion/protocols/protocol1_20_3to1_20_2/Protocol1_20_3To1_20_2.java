@@ -257,7 +257,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), ClientboundConfigurationPackets1_20_2.DISCONNECT.getId(), this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.DISCONNECT, this::convertComponent);
-        registerClientbound(ClientboundPackets1_20_2.RESOURCE_PACK, ClientboundPackets1_20_3.RESOURCE_PACK_PUSH, resourcePackHandler());
+        registerClientbound(ClientboundPackets1_20_2.RESOURCE_PACK, ClientboundPackets1_20_3.RESOURCE_PACK_PUSH, resourcePackHandler(ClientboundPackets1_20_3.RESOURCE_PACK_POP));
         registerClientbound(ClientboundPackets1_20_2.SERVER_DATA, this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.ACTIONBAR, this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.TITLE_TEXT, this::convertComponent);
@@ -321,20 +321,24 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         registerServerbound(ServerboundPackets1_20_3.RESOURCE_PACK_STATUS, wrapper -> wrapper.read(Type.UUID));
 
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, wrapper -> wrapper.read(Type.UUID));
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler());
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
         // TODO Auto map via packet types provider
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_ENABLED_FEATURES.getId());
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId());
     }
 
-    // TODO Drop old resource packs
-    private PacketHandler resourcePackHandler() {
+    private PacketHandler resourcePackHandler(final ClientboundPacketType popType) {
         return wrapper -> {
             wrapper.write(Type.UUID, UUID.randomUUID());
             wrapper.passthrough(Type.STRING); // Url
             wrapper.passthrough(Type.STRING); // Hash
             wrapper.passthrough(Type.BOOLEAN); // Required
             convertOptionalComponent(wrapper);
+
+            // Drop old resource packs first
+            final PacketWrapper dropPacksPacket = wrapper.create(popType);
+            dropPacksPacket.write(Type.OPTIONAL_UUID, null);
+            dropPacksPacket.send(Protocol1_20_3To1_20_2.class);
         };
     }
 
