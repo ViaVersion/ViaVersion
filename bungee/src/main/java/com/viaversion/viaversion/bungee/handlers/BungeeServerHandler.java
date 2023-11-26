@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.UUID;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -90,6 +91,43 @@ public class BungeeServerHandler implements Listener {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
         }
+    }
+
+    @EventHandler
+    public void onPostLogin(PostLoginEvent event) {
+        // On 1.20.2, bungeecord does not eagerly send out
+        // ClientboundLoginPackets.GAME_PROFILE before connecting to the game
+        // server. However, this leads to skipping over the pipeline handling
+        // that typically initializes connections, which in turn leads to
+        // ConnectionManager::getConnectedClient returning null in the code
+        // below.
+        //
+        // To work around this, we emulate the successful login here for 1.20.2+
+        // clients.
+        int clientVer = event.getPlayer().getPendingConnection().getVersion();
+        if (clientVer < ProtocolVersion.v1_20_2.getVersion()) {
+            return;
+        }
+
+        Channel c;
+        try {
+            Object ch = channelWrapper.get(event.getPlayer());
+            c = (Channel) channelWrapperChannel.get(ch);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        BungeeEncodeHandler encoder = (BungeeEncodeHandler) c.pipeline()
+                .get("via-encoder");
+
+        UserConnection userConnection = encoder.getInfo();
+        userConnection.getProtocolInfo().setUuid(
+                event.getPlayer().getUniqueId());
+        userConnection.getProtocolInfo().setUsername(
+                event.getPlayer().getName());
+
+        Via.getManager().getConnectionManager().onLoginSuccess(userConnection);
     }
 
     // Set the handshake version every time someone connects to any server
