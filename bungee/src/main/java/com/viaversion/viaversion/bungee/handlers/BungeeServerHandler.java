@@ -35,6 +35,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -65,6 +67,8 @@ public class BungeeServerHandler implements Listener {
     private static final Field entityRewrite;
     private static final Field channelWrapper;
 
+    private static final Field channelWrapperChannel;
+
     static {
         try {
             getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
@@ -77,6 +81,11 @@ public class BungeeServerHandler implements Listener {
             channelWrapper.setAccessible(true);
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
             entityRewrite.setAccessible(true);
+
+            channelWrapperChannel = Class
+                    .forName("net.md_5.bungee.netty.ChannelWrapper")
+                    .getDeclaredField("ch");
+            channelWrapperChannel.setAccessible(true);
         } catch (ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
@@ -109,6 +118,22 @@ public class BungeeServerHandler implements Listener {
             setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion : serverProtocolVersion);
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
+            return;
+        }
+
+        try {
+            Object ch = channelWrapper.get(event.getPlayer());
+            Channel c = (Channel) channelWrapperChannel.get(ch);
+
+            // Eagerly fix up compression order to avoid surprises when sending
+            // packets.
+            ChannelPipeline pipeline = c.pipeline();
+            if (BungeeEncodeHandler.shouldFixCompressionOrder(pipeline)) {
+                BungeeEncodeHandler.fixCompressionPipeline(pipeline);
+            }
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+            return;
         }
     }
 

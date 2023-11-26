@@ -24,6 +24,7 @@ import com.viaversion.viaversion.exception.CancelEncoderException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import java.util.List;
 
@@ -65,7 +66,8 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
 
     private boolean handleCompressionOrder(ChannelHandlerContext ctx, ByteBuf buf) {
         boolean needsCompress = false;
-        if (!handledCompression && ctx.pipeline().names().indexOf("compress") > ctx.pipeline().names().indexOf("via-encoder")) {
+        ChannelPipeline pipeline = ctx.pipeline();
+        if (!handledCompression && shouldFixCompressionOrder(pipeline)) {
             // Need to decompress this packet due to bad order
             ByteBuf decompressed = BungeePipelineUtil.decompress(ctx, buf);
 
@@ -79,16 +81,24 @@ public class BungeeEncodeHandler extends MessageToMessageEncoder<ByteBuf> {
             }
 
             // Reorder the pipeline
-            ChannelHandler decoder = ctx.pipeline().get("via-decoder");
-            ChannelHandler encoder = ctx.pipeline().get("via-encoder");
-            ctx.pipeline().remove(decoder);
-            ctx.pipeline().remove(encoder);
-            ctx.pipeline().addAfter("decompress", "via-decoder", decoder);
-            ctx.pipeline().addAfter("compress", "via-encoder", encoder);
+            fixCompressionPipeline(pipeline);
             needsCompress = true;
             handledCompression = true;
         }
         return needsCompress;
+    }
+
+    public static boolean shouldFixCompressionOrder(ChannelPipeline pipeline) {
+        return pipeline.names().indexOf("compress") > pipeline.names().indexOf("via-encoder");
+    }
+
+    public static void fixCompressionPipeline(ChannelPipeline pipeline) {
+        ChannelHandler decoder = pipeline.get("via-decoder");
+        ChannelHandler encoder = pipeline.get("via-encoder");
+        pipeline.remove(decoder);
+        pipeline.remove(encoder);
+        pipeline.addAfter("decompress", "via-decoder", decoder);
+        pipeline.addAfter("compress", "via-encoder", encoder);
     }
 
     private void recompress(ChannelHandlerContext ctx, ByteBuf buf) {
