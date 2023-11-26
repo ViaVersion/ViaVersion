@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
@@ -69,6 +70,9 @@ public class BungeeServerHandler implements Listener {
     private static final Field channelWrapper;
 
     private static final Field channelWrapperChannel;
+    private static final Object GAME;
+    private static final Method setEncodeProtocol;
+    private static final Method setDecodeProtocol;
 
     static {
         try {
@@ -78,6 +82,11 @@ public class BungeeServerHandler implements Listener {
             setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
             getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
             setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
+
+            Class<?> clazzProtocol = Class.forName("net.md_5.bungee.protocol.Protocol");
+            setEncodeProtocol = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setEncodeProtocol", clazzProtocol);
+            setDecodeProtocol = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setDecodeProtocol", clazzProtocol);
+            GAME = clazzProtocol.getField("GAME").get(null);
             channelWrapper = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("ch");
             channelWrapper.setAccessible(true);
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
@@ -168,6 +177,16 @@ public class BungeeServerHandler implements Listener {
             ChannelPipeline pipeline = c.pipeline();
             if (BungeeEncodeHandler.shouldFixCompressionOrder(pipeline)) {
                 BungeeEncodeHandler.fixCompressionPipeline(pipeline);
+            }
+
+            if (serverProtocolVersion < ProtocolVersion.v1_20_2.getVersion()
+                    && ProtocolVersion.v1_20_2.getVersion() <= clientProtocolVersion
+                    && event.getPlayer().getServer() == null
+                    && user.getProtocolInfo().getClientState() == State.LOGIN) {
+                // Bungeecord does not set itself to the right mode if it was
+                // initially in 1.20.2+ mode
+                setEncodeProtocol.invoke(ch, GAME);
+                setDecodeProtocol.invoke(ch, GAME);
             }
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
