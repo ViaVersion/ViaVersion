@@ -31,7 +31,9 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
@@ -365,10 +367,29 @@ public class BungeeServerHandler implements Listener {
             }
         }
 
-        Object wrapper = channelWrapper.get(player);
-        setVersion.invoke(wrapper, serverProtocolVersion);
+        {
+            Object wrapper = channelWrapper.get(player);
+            setVersion.invoke(wrapper, serverProtocolVersion);
+        }
 
         Object entityMap = getEntityMap.invoke(null, serverProtocolVersion);
         entityRewrite.set(player, entityMap);
+
+        // Complete the login process if bungeecord has skipped it
+        if (serverProtocolVersion < ProtocolVersion.v1_20_2.getVersion()
+                && event.getPlayer().getServer() == null
+                && user.getProtocolInfo().getClientState() == State.LOGIN) {
+            PacketWrapper wrapper = PacketWrapper.create(
+                    ClientboundLoginPackets.GAME_PROFILE,
+                    user);
+            wrapper.write(Type.UUID, event.getPlayer().getUniqueId());
+            wrapper.write(Type.STRING, event.getPlayer().getName());
+            wrapper.write(Type.VAR_INT, 0); // TODO: Properties
+            try {
+                wrapper.send(Protocol1_20_2To1_20.class, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

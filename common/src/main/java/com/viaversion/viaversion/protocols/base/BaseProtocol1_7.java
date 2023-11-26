@@ -121,6 +121,10 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
             if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) { // On 1.20.2+, wait for the login ack
                 info.setState(State.PLAY);
+            } else {
+                // FIXME: Hack to not break on the UUID type when we send it
+                // manually.
+                return;
             }
 
             UUID uuid = passthroughLoginUUID(wrapper);
