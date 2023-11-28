@@ -120,7 +120,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 return;
             }
 
-            wrapper.write(Type.STRING, objectiveName != null ? objectiveName : "");
+            wrapper.write(Type.STRING, objectiveName);
             wrapper.passthrough(Type.VAR_INT); // Score
 
             // Null display and number format
