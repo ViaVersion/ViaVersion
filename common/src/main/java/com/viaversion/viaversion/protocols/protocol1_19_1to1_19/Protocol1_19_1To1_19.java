@@ -210,7 +210,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 handler(wrapper -> {

@@ -18,11 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
@@ -45,7 +45,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NAMED_COMPOUND_TAG); // Registry

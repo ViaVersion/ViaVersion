@@ -22,9 +22,9 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
-import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -70,7 +70,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NAMED_COMPOUND_TAG); // Registry

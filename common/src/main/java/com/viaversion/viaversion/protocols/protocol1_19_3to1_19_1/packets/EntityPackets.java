@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -29,6 +29,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+
 import java.util.BitSet;
 import java.util.UUID;
 
@@ -49,7 +50,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
             public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NAMED_COMPOUND_TAG); // Dimension registry

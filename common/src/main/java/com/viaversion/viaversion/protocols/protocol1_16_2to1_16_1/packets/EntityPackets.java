@@ -44,9 +44,7 @@ public class EntityPackets {
                 handler(wrapper -> {
                     short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
                     wrapper.write(Type.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
-
-                    gamemode &= ~0x08;
-                    wrapper.write(Type.UNSIGNED_BYTE, gamemode);
+                    wrapper.write(Type.BYTE, (byte) (gamemode & ~0x08)); // Gamemode
                 });
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List

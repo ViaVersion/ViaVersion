@@ -17,15 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20to1_19_4.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.FloatTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -54,7 +49,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
             public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NAMED_COMPOUND_TAG); // Dimension registry

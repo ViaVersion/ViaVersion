@@ -27,15 +27,15 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -46,11 +46,8 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.Dimensio
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
 
@@ -199,7 +196,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 map(Type.NAMED_COMPOUND_TAG); // Registry

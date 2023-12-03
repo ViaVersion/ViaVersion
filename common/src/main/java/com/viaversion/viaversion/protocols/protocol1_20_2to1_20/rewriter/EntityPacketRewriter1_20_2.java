@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -71,7 +71,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                     wrapper.passthrough(Type.INT); // Entity id
                     wrapper.passthrough(Type.BOOLEAN); // Hardcore
 
-                    final byte gamemode = wrapper.read(Type.UNSIGNED_BYTE).byteValue();
+                    final byte gamemode = wrapper.read(Type.BYTE);
                     final byte previousGamemode = wrapper.read(Type.BYTE);
 
                     wrapper.passthrough(Type.STRING_ARRAY); // World List
