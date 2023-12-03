@@ -22,15 +22,19 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.util.ChunkUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class ChunkType1_8 extends Type<Chunk> {
 
@@ -62,7 +66,12 @@ public class ChunkType1_8 extends Type<Chunk> {
             return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
         }
 
-        return deserialize(chunkX, chunkZ, fullChunk, hasSkyLight, bitmask, data);
+        try {
+            return deserialize(chunkX, chunkZ, fullChunk, hasSkyLight, bitmask, data);
+        } catch (Throwable e) {
+            Via.getPlatform().getLogger().log(Level.WARNING, "The server sent an invalid chunk data packet, returning an empty chunk instead", e);
+            return ChunkUtil.createEmptyChunk(chunkX, chunkZ);
+        }
     }
 
     @Override
