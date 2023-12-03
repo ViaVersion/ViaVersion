@@ -36,11 +36,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRew
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.Triple;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {
@@ -153,6 +150,14 @@ public class EntityPackets {
                     public Integer transform(PacketWrapper wrapper, Short slot) throws Exception {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         int receiverId = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId();
+
+                        // Cancel invalid slots as they would cause a packet read error in 1.9
+                        // 1.8 handled invalid slots gracefully, but 1.9 does not
+                        if (slot < 0 || slot > 4 || (entityId == receiverId && slot > 3)) {
+                            wrapper.cancel();
+                            return 0;
+                        }
+
                         // Normally, 0 = hand and 1-4 = armor
                         // ... but if the sent id is equal to the receiver's id, 0-3 will instead mark the armor slots
                         // (In 1.9+, every client treats the received the same: 0=hand, 1=offhand, 2-5=armor)
