@@ -582,8 +582,8 @@ public class WorldPackets {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
             Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         }
-        // Default stone
-        return 1;
+        // Default air
+        return 0;
     }
 
     private static int checkStorage(UserConnection user, Position position, int newId) {
