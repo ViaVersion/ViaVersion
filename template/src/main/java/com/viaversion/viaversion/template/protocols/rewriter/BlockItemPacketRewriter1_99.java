@@ -28,7 +28,7 @@ import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 
 // To replace if needed:
 //   ChunkType1_20_2
-//   RecipeRewriter1_20_2
+//   RecipeRewriter1_20_3
 public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPackets1_20_2, ServerboundPackets1_20_3, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
@@ -62,9 +62,11 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_2.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_20_2.SPAWN_PARTICLE);
 
+        // TODO Explosion contains particles now
+
         new RecipeRewriter1_20_3<>(protocol).register(ClientboundPackets1_20_2.DECLARE_RECIPES);
         // OR do this if serialization of recipes changed and override the relevant method
         // Add new serializers to RecipeRewriter, or extend the last one for changes
-        // new RecipeRewriter1_20_2<ClientboundPackets1_20_2>(this) {}.register(ClientboundPackets1_20_2.DECLARE_RECIPES);
+        // new RecipeRewriter1_20_3<ClientboundPackets1_20_2>(this) {}.register(ClientboundPackets1_20_2.DECLARE_RECIPES);
     }
 }

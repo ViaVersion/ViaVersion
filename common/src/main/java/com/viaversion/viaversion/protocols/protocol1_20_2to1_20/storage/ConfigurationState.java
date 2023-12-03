@@ -34,6 +34,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ConfigurationState implements StorableObject {
 
+    private static final QueuedPacket[] EMPTY_PACKET_ARRAY = new QueuedPacket[0];
     private final List<QueuedPacket> packetQueue = new ArrayList<>();
     private BridgePhase bridgePhase = BridgePhase.NONE;
     private QueuedPacket joinGamePacket;
@@ -117,7 +118,7 @@ public class ConfigurationState implements StorableObject {
             packetQueue.add(hasJoinGamePacket ? 1 : 0, toQueuedPacket(clientInformationPacket, false, true));
         }
 
-        final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(new ConfigurationState.QueuedPacket[0]);
+        final ConfigurationState.QueuedPacket[] queuedPackets = packetQueue.toArray(EMPTY_PACKET_ARRAY);
         packetQueue.clear();
 
         for (final ConfigurationState.QueuedPacket packet : queuedPackets) {

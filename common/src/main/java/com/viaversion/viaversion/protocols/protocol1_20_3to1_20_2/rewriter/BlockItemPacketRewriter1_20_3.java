@@ -18,10 +18,12 @@
 package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter;
 
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.rewriter.RecipeRewriter1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.Protocol1_20_3To1_20_2;
@@ -117,8 +119,8 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.FLOAT); // Knockback Z
 
             wrapper.write(Type.VAR_INT, 1); // Block interaction type - Destroy
-            wrapper.write(Type.VAR_INT, protocol.getMappingData().getParticleMappings().mappedId("explosion")); // Small explosion particle
-            wrapper.write(Type.VAR_INT, protocol.getMappingData().getParticleMappings().mappedId("explosion_emitter")); // Large explosion particle
+            wrapper.write(Types1_20_3.PARTICLE, new Particle(protocol.getMappingData().getParticleMappings().mappedId("explosion"))); // Small explosion particle
+            wrapper.write(Types1_20_3.PARTICLE, new Particle(protocol.getMappingData().getParticleMappings().mappedId("explosion_emitter"))); // Large explosion particle
             wrapper.write(Type.STRING, "minecraft:entity.generic.explode"); // Explosion sound
             wrapper.write(Type.OPTIONAL_FLOAT, null); // Sound range
         });

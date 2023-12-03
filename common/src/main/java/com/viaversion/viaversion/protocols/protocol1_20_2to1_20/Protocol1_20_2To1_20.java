@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -52,9 +51,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastReso
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Key;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
 
@@ -75,20 +73,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, wrapper -> {
-            final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
-            if (channel.equals("minecraft:brand")) {
-                wrapper.passthrough(Type.STRING);
-                wrapper.clearInputBuffer();
-            }
-        });
-        registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, wrapper -> {
-            final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
-            if (channel.equals("minecraft:brand")) {
-                wrapper.passthrough(Type.STRING);
-                wrapper.clearInputBuffer();
-            }
-        });
+        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
+        registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Type.STRING);
@@ -164,9 +150,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.setClientInformation(clientInformation);
             wrapper.cancel();
         });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, wrapper -> {
+            wrapper.setPacketType(ServerboundPackets1_19_4.PLUGIN_MESSAGE);
+            sanitizeCustomPayload(wrapper);
+        });
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, wrapper -> wrapper.setPacketType(ServerboundPackets1_19_4.KEEP_ALIVE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, wrapper -> wrapper.setPacketType(ServerboundPackets1_19_4.PONG));
 
         // Cancel this, as it will always just be the response to a re-sent pack from us
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, PacketWrapper::cancel);
@@ -197,14 +186,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             responsePacket.write(Type.LONG, time);
             responsePacket.sendFuture(Protocol1_20_2To1_20.class);
         });
-    }
-
-    private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
-        return wrapper -> {
-            wrapper.setPacketType(packetType);
-            wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
-            wrapper.cancel();
-        };
     }
 
     @Override
@@ -319,6 +300,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
 
         protocolInfo.setServerState(State.PLAY);
+    }
+
+    private void sanitizeCustomPayload(final PacketWrapper wrapper) throws Exception {
+        final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
+        if (channel.equals("minecraft:brand")) {
+            wrapper.passthrough(Type.STRING);
+            wrapper.clearInputBuffer();
+        }
     }
 
     @Override
