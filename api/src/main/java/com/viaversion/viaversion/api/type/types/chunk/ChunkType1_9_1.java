@@ -22,15 +22,19 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.util.ChunkUtil;
 import io.netty.buffer.ByteBuf;
+
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.logging.Level;
 
 public class ChunkType1_9_1 extends Type<Chunk> {
 
@@ -56,31 +60,36 @@ public class ChunkType1_9_1 extends Type<Chunk> {
         int primaryBitmask = Type.VAR_INT.readPrimitive(input);
         ByteBuf data = input.readSlice(Type.VAR_INT.readPrimitive(input));
 
-        BitSet usedSections = new BitSet(16);
         ChunkSection[] sections = new ChunkSection[16];
-        // Calculate section count from bitmask
-        for (int i = 0; i < 16; i++) {
-            if ((primaryBitmask & (1 << i)) != 0) {
-                usedSections.set(i);
-            }
-        }
-
-        // Read sections
-        for (int i = 0; i < 16; i++) {
-            if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection section = Types1_9.CHUNK_SECTION.read(data);
-            sections[i] = section;
-            section.getLight().readBlockLight(data);
-            if (hasSkyLight) {
-                section.getLight().readSkyLight(data);
-            }
-        }
-
         int[] biomeData = groundUp ? new int[256] : null;
-        if (groundUp) {
-            for (int i = 0; i < 256; i++) {
-                biomeData[i] = data.readByte() & 0xFF;
+        try {
+            BitSet usedSections = new BitSet(16);
+            // Calculate section count from bitmask
+            for (int i = 0; i < 16; i++) {
+                if ((primaryBitmask & (1 << i)) != 0) {
+                    usedSections.set(i);
+                }
             }
+
+            // Read sections
+            for (int i = 0; i < 16; i++) {
+                if (!usedSections.get(i)) continue; // Section not set
+                ChunkSection section = Types1_9.CHUNK_SECTION.read(data);
+                sections[i] = section;
+                section.getLight().readBlockLight(data);
+                if (hasSkyLight) {
+                    section.getLight().readSkyLight(data);
+                }
+            }
+
+            if (groundUp) {
+                for (int i = 0; i < 256; i++) {
+                    biomeData[i] = data.readByte() & 0xFF;
+                }
+            }
+        } catch (Throwable e) {
+            Via.getPlatform().getLogger().log(Level.WARNING, "The server sent an invalid chunk data packet, returning an empty chunk instead", e);
+            return ChunkUtil.createEmptyChunk(chunkX, chunkZ);
         }
 
         return new BaseChunk(chunkX, chunkZ, groundUp, false, primaryBitmask, sections, biomeData, new ArrayList<>());
