@@ -320,13 +320,28 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        registerServerbound(ServerboundPackets1_20_3.RESOURCE_PACK_STATUS, wrapper -> wrapper.read(Type.UUID));
+        registerServerbound(ServerboundPackets1_20_3.RESOURCE_PACK_STATUS, resourcePackStatusHandler());
 
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, wrapper -> wrapper.read(Type.UUID));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, resourcePackStatusHandler());
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
         // TODO Auto map via packet types provider
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_ENABLED_FEATURES.getId());
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId());
+    }
+
+    private PacketHandler resourcePackStatusHandler() {
+        return wrapper -> {
+            wrapper.read(Type.UUID); // Pack UUID
+
+            final int action = wrapper.read(Type.VAR_INT);
+            if (action == 4) { // Downloaded
+                wrapper.cancel();
+            } else if (action > 4) { // Invalid url, failed reload, and discarded
+                wrapper.write(Type.VAR_INT, 2); // Failed download
+            } else {
+                wrapper.write(Type.VAR_INT, action);
+            }
+        };
     }
 
     private PacketHandler resourcePackHandler(final ClientboundPacketType popType) {
