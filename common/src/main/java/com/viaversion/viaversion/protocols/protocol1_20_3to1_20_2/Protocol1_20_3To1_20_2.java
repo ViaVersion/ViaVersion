@@ -200,7 +200,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             if (wrapper.passthrough(Type.BOOLEAN)) {
                 final int icons = wrapper.passthrough(Type.VAR_INT);
                 for (int i = 0; i < icons; i++) {
-                    wrapper.passthrough(Type.BYTE); // Type
+                    wrapper.passthrough(Type.VAR_INT); // Type
                     wrapper.passthrough(Type.BYTE); // X
                     wrapper.passthrough(Type.BYTE); // Y
                     wrapper.passthrough(Type.BYTE); // Rotation
