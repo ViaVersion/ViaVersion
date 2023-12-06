@@ -35,6 +35,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.internal.LazilyParsedNumber;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -418,8 +419,10 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 return new DoubleTag(number.doubleValue());
             } else if (number instanceof Float) {
                 return new FloatTag(number.floatValue());
+            } else if (number instanceof LazilyParsedNumber) {
+                return new IntTag(number.intValue());
             }
-            return new StringTag(primitive.getAsString()); // ???
+            return new IntTag(number.intValue()); // ???
         }
         throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName() + " with value " + element.getAsString());
     }
