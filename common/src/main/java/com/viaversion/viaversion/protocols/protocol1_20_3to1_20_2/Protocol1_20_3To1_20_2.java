@@ -100,6 +100,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
         final TagRewriter<ClientboundPackets1_20_2> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.TAGS);
+        tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_2.SOUND);

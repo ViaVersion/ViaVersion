@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
@@ -61,6 +62,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         // Registers renames etc. as well as registry type id changes
         final TagRewriter<ClientboundPackets1_20_2> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.TAGS);
+        tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
 
         // Registers sound id changes
         final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
