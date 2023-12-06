@@ -391,10 +391,12 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             return null;
         } else if (element.isJsonObject()) {
             final CompoundTag tag = new CompoundTag();
-            for (final Map.Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
-                // Not strictly needed, but might as well make it more compact
+            final JsonObject jsonObject = element.getAsJsonObject();
+            for (final Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
                 convertObjectEntry(entry.getKey(), entry.getValue(), tag);
             }
+
+            addComponentType(jsonObject, tag);
             return tag;
         } else if (element.isJsonArray()) {
             return convertJsonArray(element);
@@ -420,11 +422,34 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             } else if (number instanceof Float) {
                 return new FloatTag(number.floatValue());
             } else if (number instanceof LazilyParsedNumber) {
+                // TODO: This might need better handling
                 return new IntTag(number.intValue());
             }
             return new IntTag(number.intValue()); // ???
         }
         throw new IllegalArgumentException("Unhandled json type " + element.getClass().getSimpleName() + " with value " + element.getAsString());
+    }
+
+    private static void addComponentType(final JsonObject object, final CompoundTag tag) {
+        if (object.has("type")) {
+            return;
+        }
+
+        // Add the type to speed up deserialization and make DFU errors slightly more useful
+        // Order is important
+        if (object.has("text")) {
+            tag.put("type", new StringTag("text"));
+        } else if (object.has("translate")) {
+            tag.put("type", new StringTag("translatable"));
+        } else if (object.has("score")) {
+            tag.put("type", new StringTag("score"));
+        } else if (object.has("selector")) {
+            tag.put("type", new StringTag("selector"));
+        } else if (object.has("keybind")) {
+            tag.put("type", new StringTag("keybind"));
+        } else if (object.has("nbt")) {
+            tag.put("type", new StringTag("nbt"));
+        }
     }
 
     private static ListTag convertJsonArray(final JsonElement element) {
@@ -457,29 +482,38 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
             // Wrap all entries in compound tags as lists can only consist of one type of tag
             final CompoundTag compoundTag = new CompoundTag();
+            compoundTag.put("type", new StringTag("text"));
             compoundTag.put("text", new StringTag());
             compoundTag.put("extra", convertedTag);
         }
         return processedListTag;
     }
 
-    private static void convertObjectEntry(final String key, final JsonElement element, final CompoundTag tag) {
-        if ((key.equals("contents")) && element.isJsonObject()) {
+    /**
+     * Converts a json object entry to a tag entry.
+     *
+     * @param key   key of the entry
+     * @param value value of the entry
+     * @param tag   the resulting compound tag
+     */
+    private static void convertObjectEntry(final String key, final JsonElement value, final CompoundTag tag) {
+        if ((key.equals("contents")) && value.isJsonObject()) {
             // Store show_entity id as int array instead of uuid string
-            final JsonObject hoverEvent = element.getAsJsonObject();
+            // Not really required, but we might as well make it more compact
+            final JsonObject hoverEvent = value.getAsJsonObject();
             final JsonElement id = hoverEvent.get("id");
             final UUID uuid;
             if (id != null && id.isJsonPrimitive() && (uuid = parseUUID(id.getAsString())) != null) {
                 hoverEvent.remove("id");
 
-                final CompoundTag convertedTag = (CompoundTag) convertToTag(element);
+                final CompoundTag convertedTag = (CompoundTag) convertToTag(value);
                 convertedTag.put("id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(uuid)));
                 tag.put(key, convertedTag);
                 return;
             }
         }
 
-        tag.put(key, convertToTag(element));
+        tag.put(key, convertToTag(value));
     }
 
     private static @Nullable UUID parseUUID(final String uuidString) {
