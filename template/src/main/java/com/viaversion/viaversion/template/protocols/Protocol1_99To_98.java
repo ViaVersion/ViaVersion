@@ -26,9 +26,9 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -40,7 +40,7 @@ import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewrite
 //   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99
 //   ClientboundPackets1_20_2
 //   ServerboundPackets1_20_3
-//   ClientboundConfigurationPackets1_20_2
+//   ClientboundConfigurationPackets1_20_3
 //   ServerboundConfigurationPackets1_20_2
 //   Entity1_19_4Types (MAPPED type)
 //   1.99, 1.98
@@ -62,7 +62,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         // Registers renames etc. as well as registry type id changes
         final TagRewriter<ClientboundPackets1_20_2> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.TAGS);
-        tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
+        tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
 
         // Registers sound id changes
         final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
@@ -130,7 +130,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
 
     @Override
     protected ClientboundPacketType clientboundFinishConfigurationPacket() {
-        return ClientboundConfigurationPackets1_20_2.FINISH_CONFIGURATION;
+        return ClientboundConfigurationPackets1_20_3.FINISH_CONFIGURATION;
     }
 
     @Override

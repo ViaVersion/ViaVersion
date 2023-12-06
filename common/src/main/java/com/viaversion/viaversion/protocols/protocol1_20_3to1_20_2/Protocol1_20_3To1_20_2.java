@@ -100,7 +100,6 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
         final TagRewriter<ClientboundPackets1_20_2> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.TAGS);
-        tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_2.SOUND);
@@ -327,7 +326,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
         // TODO Auto map via packet types provider
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_ENABLED_FEATURES.getId());
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId());
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId(), tagRewriter.getGenericHandler());
     }
 
     private PacketHandler resourcePackStatusHandler() {

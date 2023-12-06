@@ -23,8 +23,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 
@@ -44,7 +44,7 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         registerMetadataRewriter(ClientboundPackets1_20_2.ENTITY_METADATA, /*Types1_OLD.METADATA_LIST, */Types1_20_3.METADATA_LIST); // Specify old and new metadata list if changed
         registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, new PacketHandlers() {
+        protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
             @Override
             protected void register() {
                 map(Type.COMPOUND_TAG); // Registry data
