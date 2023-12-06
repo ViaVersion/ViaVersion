@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -150,12 +151,9 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.setClientInformation(clientInformation);
             wrapper.cancel();
         });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, wrapper -> {
-            wrapper.setPacketType(ServerboundPackets1_19_4.PLUGIN_MESSAGE);
-            sanitizeCustomPayload(wrapper);
-        });
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, wrapper -> wrapper.setPacketType(ServerboundPackets1_19_4.KEEP_ALIVE));
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, wrapper -> wrapper.setPacketType(ServerboundPackets1_19_4.PONG));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
 
         // Cancel this, as it will always just be the response to a re-sent pack from us
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), -1, PacketWrapper::cancel);
@@ -300,6 +298,14 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         finishConfigurationPacket.send(Protocol1_20_2To1_20.class);
 
         protocolInfo.setServerState(State.PLAY);
+    }
+
+    private PacketHandler queueServerboundPacket(final ServerboundPackets1_20_2 packetType) {
+        return wrapper -> {
+            wrapper.setPacketType(packetType);
+            wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
+            wrapper.cancel();
+        };
     }
 
     private void sanitizeCustomPayload(final PacketWrapper wrapper) throws Exception {
