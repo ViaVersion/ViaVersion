@@ -273,12 +273,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         registryDataPacket.write(Type.COMPOUND_TAG, dimensionRegistry);
         registryDataPacket.send(Protocol1_20_2To1_20.class);
 
-        // Enabling features is only possible during the configuration phase
-        // TODO Sad emoji
-        final PacketWrapper enableFeaturesPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES, connection);
-        enableFeaturesPacket.write(Type.VAR_INT, 1);
-        enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
-        enableFeaturesPacket.send(Protocol1_20_2To1_20.class);
+        // If we tracked enables features, they'd be sent here
+        // The client includes vanilla as the default feature when initially leaving the login phase
 
         final LastTags lastTags = connection.get(LastTags.class);
         if (lastTags != null) {
