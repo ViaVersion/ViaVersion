@@ -66,6 +66,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.Entit
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -352,16 +353,19 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
     private PacketHandler resourcePackHandler(final ClientboundPacketType popType) {
         return wrapper -> {
-            wrapper.write(Type.UUID, UUID.randomUUID());
-            wrapper.passthrough(Type.STRING); // Url
-            wrapper.passthrough(Type.STRING); // Hash
-            wrapper.passthrough(Type.BOOLEAN); // Required
-            convertOptionalComponent(wrapper);
-
             // Drop old resource packs first
             final PacketWrapper dropPacksPacket = wrapper.create(popType);
             dropPacksPacket.write(Type.OPTIONAL_UUID, null);
             dropPacksPacket.send(Protocol1_20_3To1_20_2.class);
+
+            // Use the hash to write a pack uuid
+            final String url = wrapper.read(Type.STRING);
+            final String hash = wrapper.read(Type.STRING);
+            wrapper.write(Type.UUID, UUID.nameUUIDFromBytes(hash.getBytes(StandardCharsets.UTF_8)));
+            wrapper.write(Type.STRING, url);
+            wrapper.write(Type.STRING, hash);
+            wrapper.passthrough(Type.BOOLEAN); // Required
+            convertOptionalComponent(wrapper);
         };
     }
 

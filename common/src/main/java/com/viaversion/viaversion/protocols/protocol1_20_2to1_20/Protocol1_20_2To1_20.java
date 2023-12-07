@@ -151,6 +151,8 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             configurationState.setClientInformation(clientInformation);
             wrapper.cancel();
         });
+
+        // If these are not queued, they may be received before the server switched its listener state to play
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
