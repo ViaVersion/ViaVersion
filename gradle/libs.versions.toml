@@ -6,7 +6,7 @@ adventure = "4.14.0"
 gson = "2.10.1"
 fastutil = "8.5.12"
 flare = "2.0.1"
-vianbt = "3.2.0"
+vianbt = "3.2.1"
 
 # Common provided
 netty = "4.0.20.Final"
