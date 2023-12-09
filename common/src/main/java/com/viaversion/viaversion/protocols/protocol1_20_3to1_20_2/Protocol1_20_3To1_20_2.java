@@ -361,7 +361,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             // Use the hash to write a pack uuid
             final String url = wrapper.read(Type.STRING);
             final String hash = wrapper.read(Type.STRING);
-            wrapper.write(Type.UUID, UUID.nameUUIDFromBytes(hash.getBytes(StandardCharsets.UTF_8)));
+            wrapper.write(Type.UUID, UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)));
             wrapper.write(Type.STRING, url);
             wrapper.write(Type.STRING, hash);
             wrapper.passthrough(Type.BOOLEAN); // Required
@@ -485,15 +485,20 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         for (final JsonElement entry : element.getAsJsonArray()) {
             final Tag convertedTag = convertToTag(entry);
             if (convertedTag instanceof CompoundTag) {
-                processedListTag.add(listTag);
+                processedListTag.add(convertedTag);
                 continue;
             }
 
-            // Wrap all entries in compound tags as lists can only consist of one type of tag
+            // Wrap all entries in compound tags, as lists can only consist of one type of tag
             final CompoundTag compoundTag = new CompoundTag();
             compoundTag.put("type", new StringTag("text"));
-            compoundTag.put("text", new StringTag());
-            compoundTag.put("extra", convertedTag);
+            if (convertedTag instanceof ListTag) {
+                compoundTag.put("text", new StringTag());
+                compoundTag.put("extra", convertedTag);
+            } else {
+                compoundTag.put("text", new StringTag(convertedTag.toString()));
+            }
+            processedListTag.add(compoundTag);
         }
         return processedListTag;
     }
