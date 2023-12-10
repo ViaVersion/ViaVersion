@@ -408,7 +408,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             addComponentType(jsonObject, tag);
             return tag;
         } else if (element.isJsonArray()) {
-            return convertJsonArray(element);
+            return convertJsonArray(element.getAsJsonArray());
         } else if (element.isJsonPrimitive()) {
             final JsonPrimitive primitive = element.getAsJsonPrimitive();
             if (primitive.isString()) {
@@ -461,11 +461,11 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         }
     }
 
-    private static ListTag convertJsonArray(final JsonElement element) {
+    private static ListTag convertJsonArray(final JsonArray array) {
         // TODO Number arrays?
         final ListTag listTag = new ListTag();
         boolean singleType = true;
-        for (final JsonElement entry : element.getAsJsonArray()) {
+        for (final JsonElement entry : array) {
             final Tag convertedEntryTag = convertToTag(entry);
             if (listTag.getElementType() != null && listTag.getElementType() != convertedEntryTag.getClass()) {
                 singleType = false;
@@ -482,7 +482,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         // Generally, vanilla-esque serializers should not produce this format, so it should be rare
         // Lists are only used for lists of components ("extra" and "with")
         final ListTag processedListTag = new ListTag();
-        for (final JsonElement entry : element.getAsJsonArray()) {
+        for (final JsonElement entry : array) {
             final Tag convertedTag = convertToTag(entry);
             if (convertedTag instanceof CompoundTag) {
                 processedListTag.add(convertedTag);
@@ -496,7 +496,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 compoundTag.put("text", new StringTag());
                 compoundTag.put("extra", convertedTag);
             } else {
-                compoundTag.put("text", new StringTag(convertedTag.toString()));
+                compoundTag.put("text", new StringTag(convertedTag.asRawString()));
             }
             processedListTag.add(compoundTag);
         }
