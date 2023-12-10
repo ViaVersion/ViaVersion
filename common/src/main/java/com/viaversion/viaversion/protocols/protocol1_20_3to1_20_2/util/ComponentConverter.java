@@ -289,7 +289,7 @@ public final class ComponentConverter {
 
     private static void removeComponentType(final JsonObject object) {
         final JsonElement type = object.remove("type");
-        if (!type.isJsonPrimitive()) {
+        if (type == null || !type.isJsonPrimitive()) {
             return;
         }
 
