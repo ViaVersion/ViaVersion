@@ -29,13 +29,13 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.Map;
 import java.util.UUID;
 
@@ -112,13 +112,13 @@ public class WorldPackets {
 
             // target_uuid -> Target
             UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
-            compoundTag.put("Target", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(targetUuid)));
+            compoundTag.put("Target", new IntArrayTag(UUIDUtil.toIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
             CompoundTag ownerTag = compoundTag.remove("Owner");
             StringTag ownerUuidTag = ownerTag.remove("Id");
             if (ownerUuidTag != null) {
                 UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
-                ownerTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+                ownerTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(ownerUuid)));
             }
 
             // Owner -> SkullOwner

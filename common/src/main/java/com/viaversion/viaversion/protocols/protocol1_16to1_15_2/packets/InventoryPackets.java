@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
@@ -38,6 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.Inventor
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.UUID;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_16To1_15_2> {
@@ -153,7 +153,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof StringTag) {
                     UUID id = UUID.fromString((String) idTag.getValue());
-                    ownerCompundTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(id)));
+                    ownerCompundTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(id)));
                 }
             }
         } else if (item.identifier() == 759 && tag != null) {
@@ -187,7 +187,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof IntArrayTag) {
-                    UUID id = UUIDIntArrayType.uuidFromIntArray((int[]) idTag.getValue());
+                    UUID id = UUIDUtil.fromIntArray((int[]) idTag.getValue());
                     ownerCompundTag.put("Id", new StringTag(id.toString()));
                 }
             }
@@ -210,7 +210,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             Tag leastTag = attribute.get("UUIDLeast");
             if (leastTag != null) {
                 Tag mostTag = attribute.get("UUIDMost");
-                int[] uuidIntArray = UUIDIntArrayType.bitsToIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
+                int[] uuidIntArray = UUIDUtil.toIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
                 attribute.put("UUID", new IntArrayTag(uuidIntArray));
             }
         }
@@ -228,7 +228,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             rewriteAttributeName(attribute, "Name", true);
             IntArrayTag uuidTag = attribute.get("UUID");
             if (uuidTag != null && uuidTag.getValue().length == 4) {
-                UUID uuid = UUIDIntArrayType.uuidFromIntArray(uuidTag.getValue());
+                UUID uuid = UUIDUtil.fromIntArray(uuidTag.getValue());
                 attribute.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
                 attribute.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
             }
