@@ -30,7 +30,7 @@ import com.viaversion.viaversion.util.Key;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
     public InventoryPackets(Protocol1_13_1To1_13 protocol) {
-        super(protocol, null, null);
+        super(protocol, Type.ITEM1_13, Type.ITEM1_13_ARRAY);
     }
 
     @Override
