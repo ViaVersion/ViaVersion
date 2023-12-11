@@ -50,6 +50,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ComponentConverter {
 
+    private static final boolean DEBUG = Boolean.getBoolean("viaversion.debug.components");
     private static final Set<String> BOOLEAN_TYPES = new HashSet<>(Arrays.asList(
             "interpret",
             "bold",
@@ -69,6 +70,10 @@ public final class ComponentConverter {
     );
 
     public static @Nullable JsonElement tagComponentToJson(@Nullable final Tag tag) {
+        if (DEBUG) {
+            Via.getPlatform().getLogger().info("Converting tag to json: " + tag);
+        }
+
         try {
             return convertToJson(null, tag);
         } catch (final Exception e) {
@@ -78,6 +83,10 @@ public final class ComponentConverter {
     }
 
     public static @Nullable Tag jsonComponentToTag(@Nullable final JsonElement component) {
+        if (DEBUG) {
+            Via.getPlatform().getLogger().info("Converting json to tag: " + component);
+        }
+
         try {
             return convertToTag(component);
         } catch (final Exception e) {
