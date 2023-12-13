@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,14 +29,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UpdateUtil {
 
     private static final String PREFIX = "§a§l[ViaVersion] §a";
-    private static final String URL = "https://api.spiget.org/v2/resources/";
-    private static final int PLUGIN = 19254;
-    private static final String LATEST_VERSION = "/versions/latest";
+    private static final String URL = "https://api.github.com/repos/ViaVersion/";
+    private static final String PLUGIN = "ViaVersion";
+    private static final String LATEST_VERSION = "/releases/latest";
 
     public static void sendUpdateMessage(final UUID uuid) {
         Via.getPlatform().runAsync(() -> {
@@ -91,8 +93,9 @@ public final class UpdateUtil {
         try {
             URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setUseCaches(true);
+            connection.setUseCaches(false);
             connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
+            connection.addRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String input;
