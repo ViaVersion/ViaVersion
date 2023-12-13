@@ -157,7 +157,7 @@ public final class ComponentConverter {
             return listTag;
         }
 
-        // Generally, vanilla-esque serializers should not produce this format, so it should be rare
+        // Generally, modern vanilla-esque serializers should not produce this format, so it should be rare
         // Lists are only used for lists of components ("extra" and "with")
         final ListTag processedListTag = new ListTag();
         for (final JsonElement entry : array) {

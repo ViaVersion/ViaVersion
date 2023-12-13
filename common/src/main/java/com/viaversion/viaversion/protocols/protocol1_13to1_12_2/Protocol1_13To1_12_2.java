@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -59,7 +60,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.Player
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -499,13 +499,6 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             String displayName = wrapper.read(Type.STRING); // Display Name
             displayName = rewriteTeamMemberName(displayName);
             wrapper.write(Type.STRING, displayName);
-
-            byte action = wrapper.read(Type.BYTE);
-            wrapper.write(Type.BYTE, action);
-            wrapper.passthrough(Type.STRING); // Objective Name
-            if (action != 1) {
-                wrapper.passthrough(Type.VAR_INT); // Value
-            }
         });
 
         componentRewriter.registerTitle(ClientboundPackets1_12_1.TITLE);

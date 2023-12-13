@@ -79,7 +79,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_2.UPDATE_SCORE, wrapper -> {
             wrapper.passthrough(Type.STRING); // Owner
 
-            final byte action = wrapper.read(Type.BYTE);
+            final int action = wrapper.read(Type.VAR_INT);
             final String objectiveName = wrapper.read(Type.STRING);
 
             if (action == 1) { // Reset score
