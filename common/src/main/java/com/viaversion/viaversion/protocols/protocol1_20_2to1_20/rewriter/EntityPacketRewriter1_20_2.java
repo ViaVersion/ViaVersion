@@ -103,7 +103,9 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
                         // No change, so no need to re-enter the configuration state - just let this one through
                         final PacketWrapper clientInformationPacket = configurationBridge.clientInformationPacket(wrapper.user());
                         if (clientInformationPacket != null) {
-                            clientInformationPacket.sendToServer(Protocol1_20_2To1_20.class);
+                            // Schedule the sending to ensure it arrives later, this fixes an issue where on
+                            // servers running < 1.20.2 a client changing servers on a proxy lost skin layers
+                            clientInformationPacket.scheduleSendToServer(Protocol1_20_2To1_20.class);
                         }
                         return;
                     }
