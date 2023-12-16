@@ -35,9 +35,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class UpdateUtil {
 
     private static final String PREFIX = "§a§l[ViaVersion] §a";
-    private static final String URL = "https://api.github.com/repos/ViaVersion/";
-    private static final String PLUGIN = "ViaVersion";
-    private static final String LATEST_VERSION = "/releases/latest";
+    private static final String URL = "https://update.viaversion.com";
+    private static final String PLUGIN = "/ViaVersion/";
 
     public static void sendUpdateMessage(final UUID uuid) {
         Via.getPlatform().runAsync(() -> {
@@ -91,7 +90,7 @@ public final class UpdateUtil {
 
     private static @Nullable String getNewestVersion() {
         try {
-            URL url = new URL(URL + PLUGIN + LATEST_VERSION + "?" + System.currentTimeMillis());
+            URL url = new URL(URL + PLUGIN);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setUseCaches(false);
             connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
