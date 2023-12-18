@@ -38,7 +38,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPackets1_20_3, ClientboundPackets1_20_3, ServerboundPackets1_20_3, ServerboundPackets1_20_3> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.20.5", "1.20.3");
+    public static final MappingData MAPPINGS = new MappingDataBase("1.20.3", "1.20.5");
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
 
