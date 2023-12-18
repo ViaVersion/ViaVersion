@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
@@ -39,7 +40,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_20_3.SPAWN_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, Types1_20_3.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, Types1_20_3.METADATA_LIST, Types1_20_5.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
@@ -110,11 +111,20 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
+        filter().handler((event, meta) -> {
+            int id = meta.metaType().typeId();
+            if (id >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
+                id++;
+            }
+
+            meta.setMetaType(Types1_20_5.META_TYPES.byId(id));
+        });
+
         registerMetaTypeHandler(
-                Types1_20_3.META_TYPES.itemType,
-                Types1_20_3.META_TYPES.blockStateType,
-                Types1_20_3.META_TYPES.optionalBlockStateType,
-                Types1_20_3.META_TYPES.particleType
+                Types1_20_5.META_TYPES.itemType,
+                Types1_20_5.META_TYPES.blockStateType,
+                Types1_20_5.META_TYPES.optionalBlockStateType,
+                Types1_20_5.META_TYPES.particleType
         );
 
         filter().filterFamily(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {

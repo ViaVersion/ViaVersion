@@ -18,11 +18,11 @@
 package com.viaversion.viaversion.template.protocols.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -30,7 +30,7 @@ import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 
 // Replace if needed
 //  Types1_OLD
-//  Types1_20_3
+//  Types1_20_5
 public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPackets1_20_3, Protocol1_99To_98> {
 
     public EntityPacketRewriter1_99(final Protocol1_99To_98 protocol) {
@@ -40,8 +40,8 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         // Tracks entities, applies metadata rewrites registered below, untracks entities
-        registerTrackerWithData1_19(ClientboundPackets1_20_3.SPAWN_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, /*Types1_OLD.METADATA_LIST, */Types1_20_3.METADATA_LIST); // Specify old and new metadata list if changed
+        registerTrackerWithData1_19(ClientboundPackets1_20_3.SPAWN_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
+        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, /*Types1_OLD.METADATA_LIST, */Types1_20_5.METADATA_LIST); // Specify old and new metadata list if changed
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
@@ -85,23 +85,23 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
     protected void registerRewrites() {
         /* Uncomment if metatype classes changed
         filter().handler((event, meta) -> {
-            int id = meta.metaType().typeId();
+            final int id = meta.metaType().typeId();
             if (id >= SomeAddedIndex) {
                 id++;
             }
-            meta.setMetaType(Types1_20_3.META_TYPES.byId(id));
+            meta.setMetaType(Types1_20_5.META_TYPES.byId(id));
         });*/
 
         // Registers registry type id changes
         registerMetaTypeHandler(
-                Types1_20_3.META_TYPES.itemType,
-                Types1_20_3.META_TYPES.blockStateType,
-                Types1_20_3.META_TYPES.optionalBlockStateType,
-                Types1_20_3.META_TYPES.particleType
+                Types1_20_5.META_TYPES.itemType,
+                Types1_20_5.META_TYPES.blockStateType,
+                Types1_20_5.META_TYPES.optionalBlockStateType,
+                Types1_20_5.META_TYPES.particleType
         );
 
         // Minecarts are special
-        filter().filterFamily(EntityTypes1_20_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
@@ -115,6 +115,6 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
 
     @Override
     public EntityType typeFromId(final int type) {
-        return EntityTypes1_20_3.getTypeFromId(type);
+        return EntityTypes1_20_5.getTypeFromId(type);
     }
 }

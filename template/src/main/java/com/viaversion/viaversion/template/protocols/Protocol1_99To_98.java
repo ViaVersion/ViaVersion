@@ -20,7 +20,7 @@ package com.viaversion.viaversion.template.protocols;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -93,10 +93,10 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         super.onMappingDataLoaded(); // Calls load methods on rewriters
 
         // Uncomment this if the entity types enum has been newly added specificly for this Protocol
-        // EntityTypes1_20_3.initialize(this);
+        // EntityTypes1_20_5.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
-        /*Types1_20_3.PARTICLE.filler(this)
+        /*Types1_20_5.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
@@ -111,7 +111,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
     @Override
     public void init(final UserConnection connection) {
         // Register the entity tracker - used for entity id/metadata rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_3.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
     }
 
     // Overriding these three methods is important as they are relied on various rewriter classes
