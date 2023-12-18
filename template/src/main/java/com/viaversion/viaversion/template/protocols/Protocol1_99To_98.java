@@ -26,9 +26,9 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -38,13 +38,13 @@ import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewrite
 
 // Placeholders to replace (in the entire package):
 //   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99
-//   ClientboundPackets1_20_2
+//   ClientboundPackets1_20_3
 //   ServerboundPackets1_20_3
 //   ClientboundConfigurationPackets1_20_3
 //   ServerboundConfigurationPackets1_20_2
 //   Entity1_19_4Types (MAPPED type)
 //   1.99, 1.98
-public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets1_20_2, ClientboundPackets1_20_2, ServerboundPackets1_20_3, ServerboundPackets1_20_3> {
+public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets1_20_3, ClientboundPackets1_20_3, ServerboundPackets1_20_3, ServerboundPackets1_20_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
@@ -52,7 +52,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
 
     public Protocol1_99To_98() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
-        super(ClientboundPackets1_20_2.class, ClientboundPackets1_20_2.class, ServerboundPackets1_20_3.class, ServerboundPackets1_20_3.class);
+        super(ClientboundPackets1_20_3.class, ClientboundPackets1_20_3.class, ServerboundPackets1_20_3.class, ServerboundPackets1_20_3.class);
     }
 
     @Override
@@ -60,20 +60,20 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         super.registerPackets();
 
         // Registers renames etc. as well as registry type id changes
-        final TagRewriter<ClientboundPackets1_20_2> tagRewriter = new TagRewriter<>(this);
-        tagRewriter.registerGeneric(ClientboundPackets1_20_2.TAGS);
+        final TagRewriter<ClientboundPackets1_20_3> tagRewriter = new TagRewriter<>(this);
+        tagRewriter.registerGeneric(ClientboundPackets1_20_3.TAGS);
         tagRewriter.registerGeneric(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
 
         // Registers sound id changes
-        final SoundRewriter<ClientboundPackets1_20_2> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_2.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_20_2.ENTITY_SOUND);
+        final SoundRewriter<ClientboundPackets1_20_3> soundRewriter = new SoundRewriter<>(this);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND);
+        soundRewriter.registerSound(ClientboundPackets1_20_3.ENTITY_SOUND);
 
         // Registers registry type id changes as well as stat id changes if also included in the json mappings
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_2.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.STATISTICS);
 
         // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
-        /*final CommandRewriter1_19_4<ClientboundPackets1_20_2> commandRewriter = new CommandRewriter1_19_4<ClientboundPackets1_20_2>(this) {
+        /*final CommandRewriter1_19_4<ClientboundPackets1_20_3> commandRewriter = new CommandRewriter1_19_4<ClientboundPackets1_20_3>(this) {
             @Override
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) throws Exception {
                 if (argumentType.equals("minecraft:abc")) {
@@ -83,7 +83,9 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-        }.registerDeclareCommands1_19(ClientboundPackets1_20_2.DECLARE_COMMANDS);*/
+        }.registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);*/
+
+        // TODO Attributes
     }
 
     @Override
@@ -91,7 +93,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPackets
         super.onMappingDataLoaded(); // Calls load methods on rewriters
 
         // Uncomment this if the entity types enum has been newly added specificly for this Protocol
-        // Entity1_20_3Types.initialize(this);
+        // EntityTypes1_20_3.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
         /*Types1_20_3.PARTICLE.filler(this)

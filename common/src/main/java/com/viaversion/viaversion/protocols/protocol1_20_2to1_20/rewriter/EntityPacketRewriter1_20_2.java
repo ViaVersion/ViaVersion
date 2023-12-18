@@ -161,9 +161,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Type.BYTE); // Amplifier
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.passthrough(Type.BYTE); // Flags
-            if (wrapper.passthrough(Type.BOOLEAN)) {
-                wrapper.write(Type.COMPOUND_TAG, wrapper.read(Type.NAMED_COMPOUND_TAG)); // Factor data
-            }
+            wrapper.write(Type.OPTIONAL_COMPOUND_TAG, wrapper.read(Type.OPTIONAL_NAMED_COMPOUND_TAG)); // Factor data
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.REMOVE_ENTITY_EFFECT, wrapper -> {

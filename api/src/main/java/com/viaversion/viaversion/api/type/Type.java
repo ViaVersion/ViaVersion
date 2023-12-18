@@ -142,6 +142,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<Quaternion> QUATERNION = new QuaternionType();
 
     public static final Type<CompoundTag> NAMED_COMPOUND_TAG = new NamedCompoundTagType();
+    public static final Type<CompoundTag> OPTIONAL_NAMED_COMPOUND_TAG = new NamedCompoundTagType.OptionalNamedCompoundTagType();
     public static final Type<CompoundTag[]> NAMED_COMPOUND_TAG_ARRAY = new ArrayType<>(Type.NAMED_COMPOUND_TAG);
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = new CompoundTagType.OptionalCompoundTagType();

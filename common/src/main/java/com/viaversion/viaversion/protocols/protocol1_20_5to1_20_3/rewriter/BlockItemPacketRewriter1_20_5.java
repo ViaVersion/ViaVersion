@@ -15,31 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.template.protocols.rewriter;
+package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
-import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 
-// To replace if needed:
-//   ChunkType1_20_2
-//   RecipeRewriter1_20_3
-public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPackets1_20_3, ServerboundPackets1_20_3, Protocol1_99To_98> {
+public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPackets1_20_3, ServerboundPackets1_20_3, Protocol1_20_5To1_20_3> {
 
-    public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
+    public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        // Register block and block state id changes
-        // Other places using block state id mappings: Spawn particle, entity metadata, entity spawn (falling blocks)
-        // Tags and statistics use block (!) ids
         final BlockRewriter<ClientboundPackets1_20_3> blockRewriter = BlockRewriter.for1_20_2(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_20_3.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_CHANGE);
@@ -48,9 +42,7 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA);
 
-        // Registers item id changes
-        // Other places using item ids are: Entity metadata, tags, statistics, effect
-        // registerOpenWindow(ClientboundPackets1_20_3.OPEN_WINDOW); - If a new container type was added
+        // registerOpenWindow(ClientboundPackets1_20_3.OPEN_WINDOW);
         registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_20_3.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_20_3.SET_SLOT);
@@ -65,8 +57,5 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         // TODO Explosion contains particles now
 
         new RecipeRewriter1_20_3<>(protocol).register(ClientboundPackets1_20_3.DECLARE_RECIPES);
-        // OR do this if serialization of recipes changed and override the relevant method
-        // Add new serializers to RecipeRewriter, or extend the last one for changes
-        // new RecipeRewriter1_20_3<ClientboundPackets1_20_3>(this) {}.register(ClientboundPackets1_20_3.DECLARE_RECIPES);
     }
 }

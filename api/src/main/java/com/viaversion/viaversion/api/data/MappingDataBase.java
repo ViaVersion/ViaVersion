@@ -53,6 +53,7 @@ public class MappingDataBase implements MappingData {
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
     protected Mappings menuMappings;
+    protected Mappings attributeMappings;
     protected Map<RegistryType, List<TagData>> tags;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
@@ -75,6 +76,7 @@ public class MappingDataBase implements MappingData {
         menuMappings = loadMappings(data, "menus");
         enchantmentMappings = loadMappings(data, "enchantments");
         paintingMappings = loadMappings(data, "paintings");
+        attributeMappings = loadMappings(data, "attributes");
         itemMappings = loadBiMappings(data, "items");
 
         final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt", true);

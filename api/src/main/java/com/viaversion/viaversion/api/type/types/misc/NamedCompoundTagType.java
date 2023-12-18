@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.github.steveice10.opennbt.tag.limiter.TagLimiter;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
@@ -82,5 +83,12 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
             out.writeUTF(name);
         }
         tag.write(out);
+    }
+
+    public static final class OptionalNamedCompoundTagType extends OptionalType<CompoundTag> {
+
+        public OptionalNamedCompoundTagType() {
+            super(Type.NAMED_COMPOUND_TAG);
+        }
     }
 }
