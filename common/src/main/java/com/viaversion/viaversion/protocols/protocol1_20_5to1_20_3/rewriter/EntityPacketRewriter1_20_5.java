@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.AttributeMappings;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 
@@ -37,9 +38,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        // Tracks entities, applies metadata rewrites registered below, untracks entities
         registerTrackerWithData1_19(ClientboundPackets1_20_3.SPAWN_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, /*Types1_OLD.METADATA_LIST, */Types1_20_3.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, Types1_20_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
@@ -54,7 +54,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_20_3.JOIN_GAME, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity id
+                map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
                 map(Type.STRING_ARRAY); // World List
                 map(Type.VAR_INT); // Max players
@@ -79,8 +79,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_EFFECT, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity id
-            wrapper.passthrough(Type.VAR_INT); // Effect id
+            wrapper.passthrough(Type.VAR_INT); // Entity ID
+            wrapper.passthrough(Type.VAR_INT); // Effect ID
             wrapper.passthrough(Type.BYTE); // Amplifier
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.passthrough(Type.BYTE); // Flags
@@ -88,17 +88,19 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_PROPERTIES, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity id
+            wrapper.passthrough(Type.VAR_INT); // Entity ID
 
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final String attributeIdentifier = Key.namespaced(wrapper.read(Type.STRING));
-                wrapper.write(Type.VAR_INT, protocol.getMappingData());
+                // From a string to a registry int ID
+                final String attributeIdentifier = Key.stripMinecraftNamespace(wrapper.read(Type.STRING));
+                final int id = AttributeMappings.id(attributeIdentifier);
+                wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewAttributeId(id));
 
                 wrapper.passthrough(Type.DOUBLE); // Base
                 final int modifierSize = wrapper.passthrough(Type.VAR_INT);
                 for (int j = 0; j < modifierSize; j++) {
-                    wrapper.passthrough(Type.UUID); // Id
+                    wrapper.passthrough(Type.UUID); // ID
                     wrapper.passthrough(Type.DOUBLE); // Amount
                     wrapper.passthrough(Type.BYTE); // Operation
                 }
@@ -108,15 +110,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        /* Uncomment if metatype classes changed
-        filter().handler((event, meta) -> {
-            int id = meta.metaType().typeId();
-            if (id >= SomeAddedIndex) {
-                id++;
-            }
-            meta.setMetaType(Types1_20_3.META_TYPES.byId(id));
-        });*/
-
         registerMetaTypeHandler(
                 Types1_20_3.META_TYPES.itemType,
                 Types1_20_3.META_TYPES.blockStateType,

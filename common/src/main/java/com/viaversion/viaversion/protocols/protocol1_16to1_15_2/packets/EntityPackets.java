@@ -236,7 +236,7 @@ public class EntityPackets {
             for (int i = 0; i < size; i++) {
                 // Attributes have been renamed and are now namespaced identifiers
                 String key = wrapper.read(Type.STRING);
-                String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
+                String attributeIdentifier = protocol.getMappingData().attributeIdentifierMappings().get(key);
                 if (attributeIdentifier == null) {
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {

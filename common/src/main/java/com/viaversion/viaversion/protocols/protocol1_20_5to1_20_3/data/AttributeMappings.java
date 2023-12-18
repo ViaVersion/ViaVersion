@@ -17,20 +17,44 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * String to/from int ID mappings for 1.20.3 attributes.
+ */
 public final class AttributeMappings {
 
-    private static final String[] ATTRIBUTES;
+    private static final String[] ATTRIBUTES = {
+            "generic.armor",
+            "generic.armor_toughness",
+            "generic.attack_damage",
+            "generic.attack_knockback",
+            "generic.attack_speed",
+            "generic.flying_speed",
+            "generic.follow_range",
+            "horse.jump_strength",
+            "generic.knockback_resistance",
+            "generic.luck",
+            "generic.max_absorption",
+            "generic.max_health",
+            "generic.movement_speed",
+            "zombie.spawn_reinforcements"
+    };
+    private static final Object2IntMap<String> STRING_TO_ID = new Object2IntOpenHashMap<>();
 
     static {
-
+        for (int i = 0; i < ATTRIBUTES.length; i++) {
+            STRING_TO_ID.put(ATTRIBUTES[i], i);
+        }
     }
 
-    public @Nullable String attribute(final int id) {
+    public static @Nullable String attribute(final int id) {
         return id >= 0 && id < ATTRIBUTES.length ? ATTRIBUTES[id] : null;
     }
 
-    public int id(final String attribute) {
+    public static int id(final String attribute) {
+        return STRING_TO_ID.getOrDefault(attribute, -1);
     }
 }

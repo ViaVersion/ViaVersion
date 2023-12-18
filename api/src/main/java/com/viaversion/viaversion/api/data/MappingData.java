@@ -79,6 +79,8 @@ public interface MappingData {
      */
     int getNewParticleId(int id);
 
+    int getNewAttributeId(int id);
+
     /**
      * Returns a list of tags to send if present.
      *
@@ -104,6 +106,8 @@ public interface MappingData {
     @Nullable Mappings getMenuMappings();
 
     @Nullable Mappings getEnchantmentMappings();
+
+    @Nullable Mappings getAttributeMappings();
 
     @Nullable FullMappings getEntityMappings();
 

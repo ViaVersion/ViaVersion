@@ -167,6 +167,11 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
+    public int getNewAttributeId(final int id) {
+        return checkValidity(id, attributeMappings.getNewId(id), "attributes");
+    }
+
+    @Override
     public @Nullable List<TagData> getTags(final RegistryType type) {
         return tags != null ? tags.get(type) : null;
     }
@@ -214,6 +219,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getEnchantmentMappings() {
         return enchantmentMappings;
+    }
+
+    @Override
+    public @Nullable Mappings getAttributeMappings() {
+        return attributeMappings;
     }
 
     @Override

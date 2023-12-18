@@ -44,7 +44,7 @@ public class MappingData extends MappingDataBase {
         attributeMappings.put("generic.armorToughness", "minecraft:generic.armor_toughness");
     }
 
-    public BiMap<String, String> getAttributeMappings() {
+    public BiMap<String, String> attributeIdentifierMappings() {
         return attributeMappings;
     }
 }

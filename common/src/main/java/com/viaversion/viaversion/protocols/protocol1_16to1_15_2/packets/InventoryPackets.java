@@ -244,8 +244,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             attributeName = Key.namespaced(attributeName);
         }
 
-        String mappedAttribute = (inverse ? Protocol1_16To1_15_2.MAPPINGS.getAttributeMappings().inverse()
-                : Protocol1_16To1_15_2.MAPPINGS.getAttributeMappings()).get(attributeName);
+        String mappedAttribute = (inverse ? Protocol1_16To1_15_2.MAPPINGS.attributeIdentifierMappings().inverse()
+                : Protocol1_16To1_15_2.MAPPINGS.attributeIdentifierMappings()).get(attributeName);
         if (mappedAttribute == null) return;
 
         attributeNameTag.setValue(mappedAttribute);
