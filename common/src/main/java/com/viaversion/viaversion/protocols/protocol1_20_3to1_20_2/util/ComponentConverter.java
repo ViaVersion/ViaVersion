@@ -193,16 +193,17 @@ public final class ComponentConverter {
             // Store show_entity id as int array instead of uuid string
             // Not really required, but we might as well make it more compact
             final JsonObject hoverEvent = value.getAsJsonObject();
+            final CompoundTag convertedTag = (CompoundTag) convertToTag(value);
+
             final JsonElement id = hoverEvent.get("id");
             final UUID uuid;
             if (id != null && id.isJsonPrimitive() && (uuid = UUIDUtil.parseUUID(id.getAsString())) != null) {
-                hoverEvent.remove("id");
-
-                final CompoundTag convertedTag = (CompoundTag) convertToTag(value);
+                convertedTag.remove("id");
                 convertedTag.put("id", new IntArrayTag(UUIDUtil.toIntArray(uuid)));
-                tag.put(key, convertedTag);
-                return;
             }
+
+            tag.put(key, convertedTag);
+            return;
         }
 
         tag.put(key, convertToTag(value));
