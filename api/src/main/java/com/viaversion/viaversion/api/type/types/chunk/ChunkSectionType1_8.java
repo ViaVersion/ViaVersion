@@ -46,7 +46,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
         ByteBuf littleEndianView = buffer.order(ByteOrder.LITTLE_ENDIAN);
         for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
-            blocks.setIdAt(idx, littleEndianView.readShort());
+            blocks.setIdAt(idx, littleEndianView.readUnsignedShort());
         }
 
         return chunkSection;
