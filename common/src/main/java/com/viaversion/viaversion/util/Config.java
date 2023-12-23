@@ -18,12 +18,15 @@
 package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.compatibility.YamlCompat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,9 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
@@ -167,7 +167,7 @@ public abstract class Config {
 
     public boolean getBoolean(String key, boolean def) {
         Object o = this.config.get(key);
-        if (o != null) {
+        if (o instanceof Boolean) {
             return (boolean) o;
         } else {
             return def;
@@ -176,7 +176,7 @@ public abstract class Config {
 
     public @Nullable String getString(String key, @Nullable String def) {
         final Object o = this.config.get(key);
-        if (o != null) {
+        if (o instanceof String) {
             return (String) o;
         } else {
             return def;
@@ -185,12 +185,8 @@ public abstract class Config {
 
     public int getInt(String key, int def) {
         Object o = this.config.get(key);
-        if (o != null) {
-            if (o instanceof Number) {
-                return ((Number) o).intValue();
-            } else {
-                return def;
-            }
+        if (o instanceof Number) {
+            return ((Number) o).intValue();
         } else {
             return def;
         }
@@ -198,12 +194,8 @@ public abstract class Config {
 
     public double getDouble(String key, double def) {
         Object o = this.config.get(key);
-        if (o != null) {
-            if (o instanceof Number) {
-                return ((Number) o).doubleValue();
-            } else {
-                return def;
-            }
+        if (o instanceof Number) {
+            return ((Number) o).doubleValue();
         } else {
             return def;
         }
