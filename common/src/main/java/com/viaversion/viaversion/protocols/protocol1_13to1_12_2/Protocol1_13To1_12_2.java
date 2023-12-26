@@ -62,6 +62,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockSto
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.TabCompleteTracker;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -435,7 +436,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     // On create or update
                     if (mode == 0 || mode == 2) {
                         String value = wrapper.read(Type.STRING); // Value
-                        wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(value));
+                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(value));
 
                         String type = wrapper.read(Type.STRING);
                         // integer or hearts
@@ -456,7 +457,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
                     if (action == 0 || action == 2) {
                         String displayName = wrapper.read(Type.STRING); // Display Name
-                        wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(displayName));
+                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(displayName));
 
                         String prefix = wrapper.read(Type.STRING); // Prefix moved
                         String suffix = wrapper.read(Type.STRING); // Suffix moved
@@ -480,8 +481,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
                         wrapper.write(Type.VAR_INT, colour);
 
-                        wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(prefix)); // Prefix
-                        wrapper.write(Type.COMPONENT, ChatRewriter.legacyTextToJson(suffix)); // Suffix
+                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(prefix)); // Prefix
+                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(suffix)); // Suffix
                     }
 
                     if (action == 0 || action == 3 || action == 4) {

@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
@@ -40,6 +39,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SoundSource;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -315,7 +315,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     display.put(NBT_TAG_NAME + "|Name", new StringTag(name.getValue()));
-                    name.setValue(ChatRewriter.legacyTextToJsonString(name.getValue(), true));
+                    name.setValue(ComponentUtil.legacyToJsonString(name.getValue(), true));
                 }
             }
             // ench is now Enchantments and now uses identifiers
@@ -573,7 +573,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 if (display.get("Name") instanceof StringTag) {
                     StringTag name = display.get("Name");
                     StringTag via = display.remove(NBT_TAG_NAME + "|Name");
-                    name.setValue(via != null ? via.getValue() : ChatRewriter.jsonToLegacyText(name.getValue()));
+                    name.setValue(via != null ? via.getValue() : ComponentUtil.jsonToLegacy(name.getValue()));
                 }
             }
 

@@ -26,6 +26,7 @@ fun ShadowJar.configureRelocations() {
     relocate("com.github.steveice10.opennbt", "com.viaversion.viaversion.libs.opennbt")
     relocate("it.unimi.dsi.fastutil", "com.viaversion.viaversion.libs.fastutil")
     relocate("space.vectrix.flare", "com.viaversion.viaversion.libs.flare")
+    relocate("net.lenni0451.mcstructs", "com.viaversion.viaversion.libs.mcstructs")
 }
 
 fun ShadowJar.configureExcludes() {

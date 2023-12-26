@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
@@ -34,6 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_19_4, Protocol1_20To1_19_4> {
@@ -173,7 +173,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         final ListTag messages = new ListTag(StringTag.class);
         for (int i = 1; i < 5; i++) {
             final Tag text = tag.remove("Text" + i);
-            messages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+            messages.add(text != null ? text : new StringTag(ComponentUtil.emptyJsonComponentString()));
         }
         frontText.put("messages", messages);
 

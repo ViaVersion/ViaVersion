@@ -17,7 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.DoubleTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
@@ -37,8 +40,8 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTr
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
-
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -248,7 +251,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                 display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.clone().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
-                        String jsonText = ChatRewriter.legacyTextToJsonString(((StringTag) loreEntry).getValue(), true);
+                        String jsonText = ComponentUtil.legacyToJsonString(((StringTag) loreEntry).getValue(), true);
                         ((StringTag) loreEntry).setValue(jsonText);
                     }
                 }
@@ -277,7 +280,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                 } else {
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {
-                            ((StringTag) loreEntry).setValue(ChatRewriter.jsonToLegacyText(((StringTag) loreEntry).getValue()));
+                            ((StringTag) loreEntry).setValue(ComponentUtil.jsonToLegacy(((StringTag) loreEntry).getValue()));
                         }
                     }
                 }

@@ -18,12 +18,9 @@
 package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.compatibility.YamlCompat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -239,7 +236,7 @@ public abstract class Config {
     public @Nullable JsonElement getSerializedComponent(String key) {
         final Object o = this.config.get(key);
         if (o != null && !((String) o).isEmpty()) {
-            return GsonComponentSerializer.gson().serializeToTree(LegacyComponentSerializer.legacySection().deserialize((String) o));
+            return ComponentUtil.legacyToJson((String) o);
         } else {
             return null;
         }

@@ -18,7 +18,12 @@
 package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
 import com.github.steveice10.opennbt.stringified.SNBT;
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
@@ -32,12 +37,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.TranslatableComponent;
-import com.viaversion.viaversion.libs.kyori.adventure.text.format.NamedTextColor;
-import com.viaversion.viaversion.libs.kyori.adventure.text.format.Style;
-import com.viaversion.viaversion.libs.kyori.adventure.text.format.TextDecoration;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.ChatTypeStorage;
@@ -46,11 +45,16 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import net.lenni0451.mcstructs.core.TextFormatting;
+import net.lenni0451.mcstructs.text.ATextComponent;
+import net.lenni0451.mcstructs.text.Style;
+import net.lenni0451.mcstructs.text.components.TranslationComponent;
+import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
@@ -350,32 +354,45 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         final String translationKey = (String) decoaration.get("translation_key").getValue();
-        final TranslatableComponent.Builder componentBuilder = Component.translatable().key(translationKey);
+        final Style style = new Style();
 
         // Add the style
-        final CompoundTag style = decoaration.get("style");
-        if (style != null) {
-            final Style.Builder styleBuilder = Style.style();
-            final StringTag color = style.get("color");
+        final CompoundTag styleTag = decoaration.get("style");
+        if (styleTag != null) {
+            final StringTag color = styleTag.get("color");
             if (color != null) {
-                final NamedTextColor textColor = NamedTextColor.NAMES.value(color.getValue());
+                final TextFormatting textColor = TextFormatting.getByName(color.getValue());
                 if (textColor != null) {
-                    styleBuilder.color(NamedTextColor.NAMES.value(color.getValue()));
+                    style.setFormatting(textColor);
                 }
             }
 
-            for (final String key : TextDecoration.NAMES.keys()) {
-                if (style.contains(key)) {
-                    styleBuilder.decoration(TextDecoration.NAMES.value(key), style.<ByteTag>get(key).asByte() == 1);
+            for (final Map.Entry<String, TextFormatting> entry : TextFormatting.FORMATTINGS.entrySet()) {
+                final Tag tag = styleTag.get(entry.getKey());
+                if (!(tag instanceof ByteTag)) {
+                    continue;
+                }
+
+                final boolean value = ((NumberTag) tag).asBoolean();
+                final TextFormatting formatting = entry.getValue();
+                if (formatting == TextFormatting.OBFUSCATED) {
+                    style.setObfuscated(value);
+                } else if (formatting == TextFormatting.BOLD) {
+                    style.setBold(value);
+                } else if (formatting == TextFormatting.STRIKETHROUGH) {
+                    style.setStrikethrough(value);
+                } else if (formatting == TextFormatting.UNDERLINE) {
+                    style.setUnderlined(value);
+                } else if (formatting == TextFormatting.ITALIC) {
+                    style.setItalic(value);
                 }
             }
-            componentBuilder.style(styleBuilder.build());
         }
 
         // Add the replacements
         final ListTag parameters = decoaration.get("parameters");
+        final List<ATextComponent> arguments = new ArrayList<>();
         if (parameters != null) {
-            final List<Component> arguments = new ArrayList<>();
             for (final Tag element : parameters) {
                 JsonElement argument = null;
                 switch ((String) element.getValue()) {
@@ -393,11 +410,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                         Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
-                    arguments.add(GsonComponentSerializer.gson().deserializeFromTree(argument));
+                    arguments.add(TextComponentSerializer.LATEST.deserialize(argument));
                 }
             }
-            componentBuilder.args(arguments);
         }
-        return new ChatDecorationResult(GsonComponentSerializer.gson().serializeToTree(componentBuilder.build()), overlay);
+
+        final TranslationComponent translatable = new TranslationComponent(translationKey, arguments);
+        return new ChatDecorationResult(TextComponentSerializer.LATEST.serializeJson(translatable), overlay);
     }
 }

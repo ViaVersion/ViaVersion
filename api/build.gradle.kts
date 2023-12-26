@@ -15,9 +15,6 @@ sourceSets {
 }
 
 dependencies {
-    api(projects.adventure) {
-        targetConfiguration = "shadow"
-    }
     api(libs.fastutil)
     api(libs.flare)
     api(libs.flareFastutil)
