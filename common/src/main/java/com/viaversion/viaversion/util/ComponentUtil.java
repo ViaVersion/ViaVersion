@@ -59,4 +59,8 @@ public final class ComponentUtil {
     public static String jsonToLegacy(final String value) {
         return TextComponentSerializer.LATEST.deserialize(value).asLegacyFormatString();
     }
+
+    public static String jsonToLegacy(final JsonElement value) {
+        return TextComponentSerializer.LATEST.deserialize(value).asLegacyFormatString();
+    }
 }

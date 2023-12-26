@@ -348,16 +348,20 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             overlay = true;
         }
 
-        final CompoundTag decoaration = chatData.get("decoration");
-        if (decoaration == null) {
+        final CompoundTag decoration = chatData.get("decoration");
+        if (decoration == null) {
             return new ChatDecorationResult(message, overlay);
         }
 
-        final String translationKey = (String) decoaration.get("translation_key").getValue();
+        return new ChatDecorationResult(translatabaleComponentFromTag(decoration, senderName, teamName, message), overlay);
+    }
+
+    public static JsonElement translatabaleComponentFromTag(final CompoundTag tag, final JsonElement senderName, @Nullable final JsonElement targetName, final JsonElement message) {
+        final String translationKey = (String) tag.get("translation_key").getValue();
         final Style style = new Style();
 
         // Add the style
-        final CompoundTag styleTag = decoaration.get("style");
+        final CompoundTag styleTag = tag.get("style");
         if (styleTag != null) {
             final StringTag color = styleTag.get("color");
             if (color != null) {
@@ -368,12 +372,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
 
             for (final Map.Entry<String, TextFormatting> entry : TextFormatting.FORMATTINGS.entrySet()) {
-                final Tag tag = styleTag.get(entry.getKey());
-                if (!(tag instanceof ByteTag)) {
+                final Tag formattingTag = styleTag.get(entry.getKey());
+                if (!(formattingTag instanceof ByteTag)) {
                     continue;
                 }
 
-                final boolean value = ((NumberTag) tag).asBoolean();
+                final boolean value = ((NumberTag) formattingTag).asBoolean();
                 final TextFormatting formatting = entry.getValue();
                 if (formatting == TextFormatting.OBFUSCATED) {
                     style.setObfuscated(value);
@@ -390,7 +394,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         // Add the replacements
-        final ListTag parameters = decoaration.get("parameters");
+        final ListTag parameters = tag.get("parameters");
         final List<ATextComponent> arguments = new ArrayList<>();
         if (parameters != null) {
             for (final Tag element : parameters) {
@@ -403,8 +407,9 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                         argument = message;
                         break;
                     case "team_name":
-                        Preconditions.checkNotNull(teamName, "Team name is null");
-                        argument = teamName;
+                    case "target": // So that this method can also be used in VB
+                        Preconditions.checkNotNull(targetName, "Team name is null");
+                        argument = targetName;
                         break;
                     default:
                         Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
@@ -415,7 +420,6 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
         }
 
-        final TranslationComponent translatable = new TranslationComponent(translationKey, arguments);
-        return new ChatDecorationResult(TextComponentSerializer.LATEST.serializeJson(translatable), overlay);
+        return TextComponentSerializer.LATEST.serializeJson(new TranslationComponent(translationKey, arguments));
     }
 }
