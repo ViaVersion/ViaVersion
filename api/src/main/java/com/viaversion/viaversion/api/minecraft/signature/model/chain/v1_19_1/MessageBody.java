@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.minecraft.signature.model.chain.v1_19_1;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
 import com.viaversion.viaversion.api.minecraft.signature.util.DataConsumer;
-import com.viaversion.viaversion.util.GsonUtil;
+import net.lenni0451.mcstructs.text.utils.JsonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -62,7 +62,7 @@ public class MessageBody {
             dataOutputStream.write(this.content.plain().getBytes(StandardCharsets.UTF_8));
             dataOutputStream.write(HASH_SEPARATOR_BYTE);
             if (this.content.isDecorated()) {
-                dataOutputStream.write(GsonUtil.toSortedString(this.content.decorated(), null).getBytes(StandardCharsets.UTF_8));
+                dataOutputStream.write(JsonUtils.toSortedString(this.content.decorated(), null).getBytes(StandardCharsets.UTF_8));
             }
 
             for (PlayerMessageSignature lastSeenMessage : this.lastSeenMessages) {

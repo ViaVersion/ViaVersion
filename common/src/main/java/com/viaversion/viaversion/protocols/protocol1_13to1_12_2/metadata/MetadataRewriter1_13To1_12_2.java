@@ -18,19 +18,19 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.List;
 
 public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPackets1_12_1, Protocol1_13To1_12_2> {
@@ -51,7 +51,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         // Handle String -> Chat DisplayName
         if (metadata.id() == 2) {
             if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ChatRewriter.legacyTextToJson((String) metadata.getValue()));
+                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) metadata.getValue()));
             } else {
                 metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
             }

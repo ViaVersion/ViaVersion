@@ -15,14 +15,14 @@ sourceSets {
 }
 
 dependencies {
-    api(projects.adventure) {
-        targetConfiguration = "shadow"
-    }
     api(libs.fastutil)
     api(libs.flare)
     api(libs.flareFastutil)
     api(libs.vianbt)
     api(libs.gson)
+    implementation(rootProject.libs.text) {
+        exclude("com.google.code.gson", "gson")
+    }
 
     compileOnlyApi(libs.snakeYaml)
     compileOnlyApi(libs.netty)

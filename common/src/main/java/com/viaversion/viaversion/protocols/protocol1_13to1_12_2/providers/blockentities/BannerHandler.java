@@ -26,9 +26,9 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
+import com.viaversion.viaversion.util.ComponentUtil;
 
 public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
     private static final int WALL_BANNER_START = 7110; // 4 each
@@ -78,7 +78,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         Tag name = tag.get("CustomName");
         if (name instanceof StringTag) {
-            ((StringTag) name).setValue(ChatRewriter.legacyTextToJsonString(((StringTag) name).getValue()));
+            ((StringTag) name).setValue(ComponentUtil.legacyToJsonString(((StringTag) name).getValue()));
         }
 
         return blockId;

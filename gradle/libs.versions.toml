@@ -2,11 +2,11 @@ metadata.format.version = "1.1"
 
 [versions]
 
-adventure = "4.14.0"
 gson = "2.10.1"
 fastutil = "8.5.12"
 flare = "2.0.1"
 vianbt = "3.3.0"
+mcstructs = "2.4.1"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -27,16 +27,12 @@ velocity = "3.1.1"
 
 [libraries]
 
-adventureApi = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
-adventureTextSerializerGson = { group = "net.kyori", name = "adventure-text-serializer-gson", version.ref = "adventure" }
-adventureTextSerializerGsonLegacy = { group = "net.kyori", name = "adventure-text-serializer-gson-legacy-impl", version.ref = "adventure" }
-adventureTextSerializerLegacy = { group = "net.kyori", name = "adventure-text-serializer-legacy", version.ref = "adventure" }
-
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
 flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
 flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
 vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
+text = { group = "net.lenni0451.mcstructs", name = "text", version.ref = "mcstructs" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
@@ -56,5 +52,4 @@ velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref =
 
 [bundles]
 
-adventure = ["adventureApi", "adventureTextSerializerGson", "adventureTextSerializerGsonLegacy", "adventureTextSerializerLegacy"]
 junit = ["jupiterApi", "jupiterEngine"]
