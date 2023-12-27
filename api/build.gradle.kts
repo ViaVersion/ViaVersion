@@ -20,6 +20,9 @@ dependencies {
     api(libs.flareFastutil)
     api(libs.vianbt)
     api(libs.gson)
+    implementation(rootProject.libs.text) {
+        exclude("com.google.code.gson", "gson")
+    }
 
     compileOnlyApi(libs.snakeYaml)
     compileOnlyApi(libs.netty)

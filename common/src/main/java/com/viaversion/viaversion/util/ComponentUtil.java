@@ -22,7 +22,6 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
-import java.util.logging.Level;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
@@ -32,6 +31,8 @@ import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
 import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.util.logging.Level;
 
 /**
  * Component conversion utility, trying to divert most calls to the component library to this class instead for easy replacement.
@@ -105,7 +106,7 @@ public final class ComponentUtil {
     }
 
     public static String jsonToLegacy(final String value) {
-        return TextComponentSerializer.V1_12.deserialize(value).asLegacyFormatString();
+        return TextComponentSerializer.V1_12.deserializeReader(value).asLegacyFormatString();
     }
 
     public static String jsonToLegacy(final JsonElement value) {
