@@ -187,7 +187,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 map(Type.BYTE); // Amplifier
                 map(Type.VAR_INT); // Duration
                 map(Type.BYTE); // Flags
-                create(Type.OPTIONAL_COMPOUND_TAG, null); // No factor data
+                create(Type.OPTIONAL_NAMED_COMPOUND_TAG, null); // No factor data
             }
         });
 
