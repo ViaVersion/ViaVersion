@@ -35,9 +35,9 @@ import java.util.Map;
 import net.lenni0451.mcstructs.nbt.INbtTag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-final class NBTConverter {
+public final class NBTConverter {
 
-    static @Nullable Tag mcStructsToVia(@Nullable final INbtTag nbtTag) {
+    public static @Nullable Tag mcStructsToVia(@Nullable final INbtTag nbtTag) {
         if (nbtTag == null) {
             return null;
         } else if (nbtTag.isByteTag()) {
@@ -78,7 +78,7 @@ final class NBTConverter {
         }
     }
 
-    static @Nullable INbtTag viaToMcStructs(@Nullable final Tag tag) {
+    public static @Nullable INbtTag viaToMcStructs(@Nullable final Tag tag) {
         if (tag == null) {
             return null;
         } else if (tag instanceof ByteTag) {
