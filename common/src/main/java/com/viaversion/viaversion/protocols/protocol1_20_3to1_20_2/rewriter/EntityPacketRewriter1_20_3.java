@@ -32,8 +32,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.Clientbou
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ClientboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.Protocol1_20_3To1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.util.ComponentConverter;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_20_3 extends EntityRewriter<ClientboundPackets1_20_2, Protocol1_20_3To1_20_2> {
@@ -103,9 +103,9 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         filter().handler((event, meta) -> {
             final MetaType type = meta.metaType();
             if (type == Types1_20_2.META_TYPES.componentType) {
-                meta.setTypeAndValue(Types1_20_3.META_TYPES.componentType, ComponentConverter.jsonComponentToTag(meta.value()));
+                meta.setTypeAndValue(Types1_20_3.META_TYPES.componentType, ComponentUtil.jsonToTag(meta.value()));
             } else if (type == Types1_20_2.META_TYPES.optionalComponentType) {
-                meta.setTypeAndValue(Types1_20_3.META_TYPES.optionalComponentType, ComponentConverter.jsonComponentToTag(meta.value()));
+                meta.setTypeAndValue(Types1_20_3.META_TYPES.optionalComponentType, ComponentUtil.jsonToTag(meta.value()));
             } else if (type == Types1_20_2.META_TYPES.particleType) {
                 final Particle particle = (Particle) meta.getValue();
                 final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();

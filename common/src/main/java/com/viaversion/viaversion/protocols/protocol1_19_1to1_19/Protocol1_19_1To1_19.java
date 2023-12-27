@@ -330,7 +330,13 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         connection.put(new ChatTypeStorage());
     }
 
-    public static @Nullable ChatDecorationResult decorateChatMessage(final CompoundTag chatType, final int chatTypeId, final JsonElement senderName, @Nullable final JsonElement teamName, final JsonElement message) {
+    public static @Nullable ChatDecorationResult decorateChatMessage(
+            final CompoundTag chatType,
+            final int chatTypeId,
+            final JsonElement senderName,
+            @Nullable final JsonElement teamName,
+            final JsonElement message
+    ) {
         if (chatType == null) {
             Via.getPlatform().getLogger().warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
             return null;
@@ -356,7 +362,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         return new ChatDecorationResult(translatabaleComponentFromTag(decoration, senderName, teamName, message), overlay);
     }
 
-    public static JsonElement translatabaleComponentFromTag(final CompoundTag tag, final JsonElement senderName, @Nullable final JsonElement targetName, final JsonElement message) {
+    public static JsonElement translatabaleComponentFromTag(
+            final CompoundTag tag,
+            final JsonElement senderName,
+            @Nullable final JsonElement targetName,
+            final JsonElement message
+    ) {
         final String translationKey = (String) tag.get("translation_key").getValue();
         final Style style = new Style();
 
@@ -415,11 +426,11 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                         Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
-                    arguments.add(TextComponentSerializer.LATEST.deserialize(argument));
+                    arguments.add(TextComponentSerializer.V1_18.deserialize(argument));
                 }
             }
         }
 
-        return TextComponentSerializer.LATEST.serializeJson(new TranslationComponent(translationKey, arguments));
+        return TextComponentSerializer.V1_18.serializeJson(new TranslationComponent(translationKey, arguments));
     }
 }

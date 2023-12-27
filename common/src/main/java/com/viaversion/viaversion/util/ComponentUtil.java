@@ -17,27 +17,43 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
 import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
+import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Component conversion utility, trying to divert most calls to the component library to this class instead for easy replacement.
+ */
 public final class ComponentUtil {
 
     public static JsonObject emptyJsonComponent() {
-        return plainTextToJson("");
+        return plainToJson("");
     }
 
     public static String emptyJsonComponentString() {
         return "{\"text\":\"\"}";
     }
 
-    public static JsonObject plainTextToJson(final String message) {
+    public static JsonObject plainToJson(final String message) {
         final JsonObject object = new JsonObject();
         object.addProperty("text", message);
         return object;
+    }
+
+    public static @Nullable JsonElement tagToJson(@Nullable final Tag tag) {
+        final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(NBTConverter.viaToMcStructs(tag));
+        return component != null ? TextComponentSerializer.V1_19_4.serializeJson(component) : null;
+    }
+
+    public static @Nullable Tag jsonToTag(@Nullable final JsonElement element) {
+        final ATextComponent component = TextComponentSerializer.V1_19_4.deserialize(element);
+        return component != null ? NBTConverter.mcStructsToVia(TextComponentCodec.V1_20_3.serializeNbt(component)) : null;
     }
 
     public static JsonElement legacyToJson(final String message) {
@@ -57,10 +73,44 @@ public final class ComponentUtil {
     }
 
     public static String jsonToLegacy(final String value) {
-        return TextComponentSerializer.LATEST.deserialize(value).asLegacyFormatString();
+        return TextComponentSerializer.V1_12.deserialize(value).asLegacyFormatString();
     }
 
     public static String jsonToLegacy(final JsonElement value) {
-        return TextComponentSerializer.LATEST.deserialize(value).asLegacyFormatString();
+        return TextComponentSerializer.V1_12.deserialize(value).asLegacyFormatString();
+    }
+
+    public enum SerializerVersion {
+        V1_8(TextComponentSerializer.V1_8),
+        V1_9(TextComponentSerializer.V1_9),
+        V1_12(TextComponentSerializer.V1_12),
+        V1_14(TextComponentSerializer.V1_14),
+        V1_15(TextComponentSerializer.V1_15),
+        V1_16(TextComponentSerializer.V1_16),
+        V1_17(TextComponentSerializer.V1_17),
+        V1_18(TextComponentSerializer.V1_18),
+        V1_19_4(TextComponentSerializer.V1_19_4),
+        V1_20_3(TextComponentCodec.V1_20_3);
+
+        private final TextComponentSerializer serializer;
+        private final TextComponentCodec codec;
+
+        SerializerVersion(final TextComponentSerializer serializer) {
+            this.serializer = serializer;
+            this.codec = null;
+        }
+
+        SerializerVersion(final TextComponentCodec codec) {
+            this.serializer = codec.asSerializer();
+            this.codec = codec;
+        }
+
+        public TextComponentSerializer serializer() {
+            return serializer;
+        }
+
+        public @Nullable TextComponentCodec codec() {
+            return codec;
+        }
     }
 }

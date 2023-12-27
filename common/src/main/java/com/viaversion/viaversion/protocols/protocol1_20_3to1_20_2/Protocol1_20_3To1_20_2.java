@@ -42,10 +42,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.BlockItemPacketRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.util.ComponentConverter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 import java.util.UUID;
@@ -336,11 +336,11 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
     }
 
     private void convertComponent(final PacketWrapper wrapper) throws Exception {
-        wrapper.write(Type.TAG, ComponentConverter.jsonComponentToTag(wrapper.read(Type.COMPONENT)));
+        wrapper.write(Type.TAG, ComponentUtil.jsonToTag(wrapper.read(Type.COMPONENT)));
     }
 
     private void convertOptionalComponent(final PacketWrapper wrapper) throws Exception {
-        wrapper.write(Type.OPTIONAL_TAG, ComponentConverter.jsonComponentToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
+        wrapper.write(Type.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
     }
 
     @Override

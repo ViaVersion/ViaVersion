@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.util;
+package com.viaversion.viaversion.util;
 
 import com.github.steveice10.opennbt.tag.builtin.ByteArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class NBTConverter {
 
-    public static @Nullable Tag mcStructsToVia(@Nullable final INbtTag nbtTag) {
+    static @Nullable Tag mcStructsToVia(@Nullable final INbtTag nbtTag) {
         if (nbtTag == null) {
             return null;
         } else if (nbtTag.isByteTag()) {
@@ -78,7 +78,7 @@ final class NBTConverter {
         }
     }
 
-    public static @Nullable INbtTag viaToMcStructs(@Nullable final Tag tag) {
+    static @Nullable INbtTag viaToMcStructs(@Nullable final Tag tag) {
         if (tag == null) {
             return null;
         } else if (tag instanceof ByteTag) {

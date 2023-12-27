@@ -198,7 +198,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                         decoratedMessage = unsignedMessage;
                     }
                     if (decoratedMessage == null) {
-                        decoratedMessage = ComponentUtil.plainTextToJson(plainMessage);
+                        decoratedMessage = ComponentUtil.plainToJson(plainMessage);
                     }
 
                     final int filterMaskType = wrapper.read(Type.VAR_INT);
