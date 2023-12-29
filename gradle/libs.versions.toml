@@ -6,7 +6,7 @@ gson = "2.10.1"
 fastutil = "8.5.12"
 flare = "2.0.1"
 vianbt = "3.3.0"
-mcstructs = "2.4.1"
+mcstructs = "2.4.2-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -32,7 +32,8 @@ fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil"
 flare = { group = "space.vectrix.flare", name = "flare", version.ref = "flare" }
 flareFastutil = { group = "space.vectrix.flare", name = "flare-fastutil", version.ref = "flare" }
 vianbt = { group = "com.viaversion", name = "nbt", version.ref = "vianbt" }
-text = { group = "net.lenni0451.mcstructs", name = "text", version.ref = "mcstructs" }
+# Custom version that uses ViaNBT instead of its own inbuilt NBT library
+text = { group = "com.viaversion.mcstructs", name = "text", version.ref = "mcstructs" }
 
 netty = { group = "io.netty", name = "netty-all", version.ref = "netty" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }

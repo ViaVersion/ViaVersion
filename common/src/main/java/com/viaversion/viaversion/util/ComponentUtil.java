@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import java.util.logging.Level;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
@@ -31,8 +32,6 @@ import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
 import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.logging.Level;
 
 /**
  * Component conversion utility, trying to divert most calls to the component library to this class instead for easy replacement.
@@ -54,7 +53,7 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement tagToJson(@Nullable final Tag tag) {
-        final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(NBTConverter.viaToMcStructs(tag));
+        final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(tag);
         return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
     }
 
@@ -65,7 +64,7 @@ public final class ComponentUtil {
 
         try {
             final ATextComponent component = TextComponentSerializer.V1_19_4.deserialize(element);
-            return NBTConverter.mcStructsToVia(TextComponentCodec.V1_20_3.serializeNbt(component));
+            return TextComponentCodec.V1_20_3.serializeNbt(component);
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + element, e);
             return new StringTag("<error>");
