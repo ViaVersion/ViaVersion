@@ -42,16 +42,16 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(final ByteBuf buffer) throws Exception {
+    public CompoundTag read(final ByteBuf buffer) throws IOException {
         return read(buffer, true);
     }
 
     @Override
-    public void write(final ByteBuf buffer, final CompoundTag object) throws Exception {
+    public void write(final ByteBuf buffer, final CompoundTag object) throws IOException {
         write(buffer, object, "");
     }
 
-    public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws Exception {
+    public static CompoundTag read(final ByteBuf buffer, final boolean readName) throws IOException {
         final byte id = buffer.readByte();
         if (id == 0) {
             return null;
@@ -65,12 +65,10 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
         }
 
         final TagLimiter tagLimiter = TagLimiter.create(MAX_NBT_BYTES, MAX_NESTING_LEVEL);
-        final CompoundTag tag = new CompoundTag();
-        tag.read(new ByteBufInputStream(buffer), tagLimiter);
-        return tag;
+        return CompoundTag.read(new ByteBufInputStream(buffer), tagLimiter, 0);
     }
 
-    public static void write(final ByteBuf buffer, final Tag tag, final @Nullable String name) throws Exception {
+    public static void write(final ByteBuf buffer, final Tag tag, final @Nullable String name) throws IOException {
         if (tag == null) {
             buffer.writeByte(0);
             return;

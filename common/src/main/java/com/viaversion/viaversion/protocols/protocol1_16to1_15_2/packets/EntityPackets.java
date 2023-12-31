@@ -210,7 +210,7 @@ public class EntityPackets {
                 handler(wrapper -> {
                     wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
                     wrapper.write(Type.STRING_ARRAY, Arrays.copyOf(WORLD_NAMES, WORLD_NAMES.length)); // World list - only used for command completion
-                    wrapper.write(Type.NAMED_COMPOUND_TAG, DIMENSIONS_TAG.clone()); // Dimension registry
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, DIMENSIONS_TAG.copy()); // Dimension registry
                 });
                 handler(DIMENSION_HANDLER); // Dimension
                 map(Type.LONG); // Seed

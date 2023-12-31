@@ -230,7 +230,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     }
 
                     // Replace chat types - they won't actually be used
-                    registry.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                    registry.put("minecraft:chat_type", CHAT_REGISTRY.copy());
                 });
             }
         });

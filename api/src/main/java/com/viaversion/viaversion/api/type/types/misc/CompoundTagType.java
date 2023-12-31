@@ -26,6 +26,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 
 
 /**
@@ -41,12 +42,12 @@ public class CompoundTagType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(final ByteBuf buffer) throws Exception {
+    public CompoundTag read(final ByteBuf buffer) throws IOException {
         return NamedCompoundTagType.read(buffer, false);
     }
 
     @Override
-    public void write(final ByteBuf buffer, final CompoundTag object) throws Exception {
+    public void write(final ByteBuf buffer, final CompoundTag object) throws IOException {
         NamedCompoundTagType.write(buffer, object, null);
     }
 

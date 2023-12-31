@@ -70,7 +70,7 @@ public class FakeTileEntity {
     public static CompoundTag createTileEntity(int x, int y, int z, int block) {
         CompoundTag originalTag = tileEntities.get(block);
         if (originalTag != null) {
-            CompoundTag tag = originalTag.clone();
+            CompoundTag tag = originalTag.copy();
             tag.put("x", new IntTag(x));
             tag.put("y", new IntTag(y));
             tag.put("z", new IntTag(z));

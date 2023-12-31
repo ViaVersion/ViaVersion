@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import java.io.IOException;
 
 public class TagType extends Type<Tag> {
 
@@ -37,20 +38,18 @@ public class TagType extends Type<Tag> {
     }
 
     @Override
-    public Tag read(final ByteBuf buffer) throws Exception {
+    public Tag read(final ByteBuf buffer) throws IOException {
         final byte id = buffer.readByte();
         if (id == 0) {
             return null;
         }
 
         final TagLimiter tagLimiter = TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL);
-        final Tag tag = TagRegistry.createInstance(id);
-        tag.read(new ByteBufInputStream(buffer), tagLimiter);
-        return tag;
+        return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Tag tag) throws Exception {
+    public void write(final ByteBuf buffer, final Tag tag) throws IOException {
         NamedCompoundTagType.write(buffer, tag, null);
     }
 

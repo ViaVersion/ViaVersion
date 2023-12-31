@@ -361,7 +361,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (tag.get("CanPlaceOn") instanceof ListTag) {
                 ListTag old = tag.get("CanPlaceOn");
                 ListTag newCanPlaceOn = new ListTag(StringTag.class);
-                tag.put(NBT_TAG_NAME + "|CanPlaceOn", old.clone());
+                tag.put(NBT_TAG_NAME + "|CanPlaceOn", old.copy());
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String oldId = Key.stripMinecraftNamespace(value.toString());
@@ -383,7 +383,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (tag.get("CanDestroy") instanceof ListTag) {
                 ListTag old = tag.get("CanDestroy");
                 ListTag newCanDestroy = new ListTag(StringTag.class);
-                tag.put(NBT_TAG_NAME + "|CanDestroy", old.clone());
+                tag.put(NBT_TAG_NAME + "|CanDestroy", old.copy());
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String oldId = Key.stripMinecraftNamespace(value.toString());

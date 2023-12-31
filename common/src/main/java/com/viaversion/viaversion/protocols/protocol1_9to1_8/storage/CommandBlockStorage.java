@@ -69,7 +69,7 @@ public class CommandBlockStorage implements StorableObject {
         if (tag == null)
             return Optional.empty();
 
-        tag = tag.clone();
+        tag = tag.copy();
         tag.put("powered", new ByteTag((byte) 0));
         tag.put("auto", new ByteTag((byte) 0));
         tag.put("conditionMet", new ByteTag((byte) 0));
