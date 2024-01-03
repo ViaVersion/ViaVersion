@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     @Override
@@ -59,7 +59,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
     }
 
     @Override
@@ -67,7 +67,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredient(wrapper);
-        rewrite(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+        rewrite(wrapper.passthrough(itemType())); // Result
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
     }

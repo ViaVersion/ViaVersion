@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -194,11 +193,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     }
 
     @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
-    }
-
-    @Override
     public File getDataFolder() {
         return configDir.toFile();
     }
@@ -226,11 +220,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
 
         return platformSpecific;
-    }
-
-    @Override
-    public boolean isOldClientsAllowed() {
-        return true;
     }
 
     @Override

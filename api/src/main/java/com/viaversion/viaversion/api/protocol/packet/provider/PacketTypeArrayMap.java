@@ -25,9 +25,11 @@ package com.viaversion.viaversion.api.protocol.packet.provider;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-final class PacketTypeArrayMap<P> implements PacketTypeMap<P> {
+final class PacketTypeArrayMap<P extends PacketType> implements PacketTypeMap<P> {
     private final Map<String, P> packetsByName;
     private final P[] packets;
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,15 +37,18 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         this.idRewriter = idRewriter;
     }
 
-    // The same for entity sound
     public void registerSound(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Sound Id
+                map(Type.VAR_INT); // Sound id
                 handler(getSoundHandler());
             }
         });
+    }
+
+    public void registerEntitySound(C packetType) {
+        this.registerSound(packetType);
     }
 
     // Not for entity sounds

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -95,7 +95,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, user());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
-        wrapper.write(Type.ITEM, this.itemInSecondHand = item);
+        wrapper.write(Type.ITEM1_8, this.itemInSecondHand = item);
         try {
             wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
@@ -117,7 +117,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         // Update if there is no sword in the main hand or if the player has no shield in the second hand but a sword in the main hand
         if (!swordInHand || this.itemInSecondHand == null) {
 
-            // Update shield in off hand depending if a sword is in the main hand
+            // Update shield in off-hand depending on whether a sword is in the main hand
             setSecondHand(swordInHand ? new DataItem(442, (byte) 1, (short) 0, null) : null);
         }
     }

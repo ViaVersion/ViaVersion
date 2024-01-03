@@ -32,9 +32,10 @@ public class ProtocolVersionTest {
 
     @Test
     void testVersionRange() {
-        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7"));
-        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.0"));
-        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.1"));
+        Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20"));
+        Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20.0"));
+        Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20.1"));
+        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.2"));
         Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.5"));
     }
 

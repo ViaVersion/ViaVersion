@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
-import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -40,7 +40,7 @@ import java.util.List;
 public final class WorldPackets {
 
     public static void register(Protocol1_17To1_16_4 protocol) {
-        BlockRewriter<ClientboundPackets1_16_2> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_CHANGE);
@@ -122,7 +122,7 @@ public final class WorldPackets {
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new Chunk1_16_2Type());
+            Chunk chunk = wrapper.read(ChunkType1_16_2.TYPE);
             if (!chunk.isFullChunk()) {
                 // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
                 // Construct multi block change packets instead
@@ -134,7 +134,7 @@ public final class WorldPackets {
             }
 
             // Normal full chunk writing
-            wrapper.write(new Chunk1_17Type(chunk.getSections().length), chunk);
+            wrapper.write(new ChunkType1_17(chunk.getSections().length), chunk);
 
             // 1.17 uses a bitset for the mask
             chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));

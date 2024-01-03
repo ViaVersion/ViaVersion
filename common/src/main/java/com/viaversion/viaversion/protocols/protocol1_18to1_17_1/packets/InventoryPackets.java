@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_1, ServerboundPackets1_17, Protocol1_18To1_17_1> {
 
     public InventoryPackets(Protocol1_18To1_17_1 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_
         registerWindowItems1_17_1(ClientboundPackets1_17_1.WINDOW_ITEMS);
         registerTradeList(ClientboundPackets1_17_1.TRADE_LIST);
         registerSetSlot1_17_1(ClientboundPackets1_17_1.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS, Type.ITEM1_13_2);
         registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketHandlers() {
@@ -86,7 +86,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_
                         int data = wrapper.passthrough(Type.VAR_INT);
                         wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (mappings.isItemParticle(id)) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                     }
 
                     int newId = protocol.getMappingData().getNewParticleId(id);
@@ -100,6 +100,6 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_17_
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.DECLARE_RECIPES);
 
         registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
     }
 }

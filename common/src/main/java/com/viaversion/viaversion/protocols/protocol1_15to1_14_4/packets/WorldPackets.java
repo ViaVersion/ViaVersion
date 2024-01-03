@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,15 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3.ClientboundPackets1_14_4;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public final class WorldPackets {
 
     public static void register(Protocol1_15To1_14_4 protocol) {
-        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_CHANGE);
@@ -40,8 +40,8 @@ public final class WorldPackets {
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_14_4.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new Chunk1_14Type());
-            wrapper.write(new Chunk1_15Type(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
+            wrapper.write(ChunkType1_15.TYPE, chunk);
 
             if (chunk.isFullChunk()) {
                 int[] biomeData = chunk.getBiomeData();
@@ -99,7 +99,7 @@ public final class WorldPackets {
                         int data = wrapper.passthrough(Type.VAR_INT);
                         wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (id == 32) {
-                        protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                        protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                     }
                 });
             }

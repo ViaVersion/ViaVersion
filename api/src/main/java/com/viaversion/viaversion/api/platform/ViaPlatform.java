@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
@@ -180,13 +181,10 @@ public interface ViaPlatform<T> {
      */
     ViaVersionConfig getConf();
 
-    /**
-     * Get the backend configuration provider for this platform.
-     * (On some platforms this returns the same as getConf())
-     *
-     * @return The configuration provider
-     */
-    ConfigurationProvider getConfigurationProvider();
+    @Deprecated/*(forRemoval = true)*/
+    default ConfigurationProvider getConfigurationProvider() {
+        return Via.getManager().getConfigurationProvider();
+    }
 
     /**
      * Get ViaVersions's data folder.
@@ -208,12 +206,13 @@ public interface ViaPlatform<T> {
     JsonObject getDump();
 
     /**
-     * Get if older clients are allowed to be used using ViaVersion.
-     * (Only 1.9 on 1.9.2 server is supported by ViaVersion alone)
+     * Get if older clients are allowed using ViaVersion.
      *
      * @return True if allowed
      */
-    boolean isOldClientsAllowed();
+    default boolean isOldClientsAllowed() {
+        return true;
+    }
 
     /**
      * Returns an immutable collection of classes to be checked as unsupported software with their software name.

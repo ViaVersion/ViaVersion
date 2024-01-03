@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class FakeTileEntity {
     public static CompoundTag createTileEntity(int x, int y, int z, int block) {
         CompoundTag originalTag = tileEntities.get(block);
         if (originalTag != null) {
-            CompoundTag tag = originalTag.clone();
+            CompoundTag tag = originalTag.copy();
             tag.put("x", new IntTag(x));
             tag.put("y", new IntTag(y));
             tag.put("z", new IntTag(z));

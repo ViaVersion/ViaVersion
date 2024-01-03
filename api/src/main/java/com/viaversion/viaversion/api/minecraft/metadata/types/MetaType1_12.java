@@ -31,15 +31,15 @@ public enum MetaType1_12 implements MetaType {
     Float(2, Type.FLOAT),
     String(3, Type.STRING),
     Chat(4, Type.COMPONENT),
-    Slot(5, Type.ITEM),
+    Slot(5, Type.ITEM1_8),
     Boolean(6, Type.BOOLEAN),
     Vector3F(7, Type.ROTATION),
-    Position(8, Type.POSITION),
-    OptPosition(9, Type.OPTIONAL_POSITION),
+    Position(8, Type.POSITION1_8),
+    OptPosition(9, Type.OPTIONAL_POSITION1_8),
     Direction(10, Type.VAR_INT),
     OptUUID(11, Type.OPTIONAL_UUID),
     BlockID(12, Type.VAR_INT),
-    NBTTag(13, Type.NBT);
+    NBTTag(13, Type.NAMED_COMPOUND_TAG);
 
     private final int typeID;
     private final Type type;

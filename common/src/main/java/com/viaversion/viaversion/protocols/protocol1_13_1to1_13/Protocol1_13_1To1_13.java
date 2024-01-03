@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -35,7 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
@@ -74,10 +74,10 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLAT_ITEM);
+                map(Type.ITEM1_13);
                 map(Type.BOOLEAN);
                 handler(wrapper -> {
-                    Item item = wrapper.get(Type.FLAT_ITEM, 0);
+                    Item item = wrapper.get(Type.ITEM1_13, 0);
                     itemRewriter.handleItemToServer(item);
                 });
                 handler(wrapper -> {
@@ -103,10 +103,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     int count = wrapper.get(Type.VAR_INT, 3);
                     for (int i = 0; i < count; i++) {
                         wrapper.passthrough(Type.STRING);
-                        boolean hasTooltip = wrapper.passthrough(Type.BOOLEAN);
-                        if (hasTooltip) {
-                            wrapper.passthrough(Type.STRING); // JSON Tooltip
-                        }
+                        wrapper.passthrough(Type.OPTIONAL_COMPONENT); // Tooltip
                     }
                 });
             }
@@ -138,9 +135,9 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, Entity1_13Types.EntityType.PLAYER));
+        userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
         if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
+            userConnection.put(new ClientWorld());
         }
     }
 

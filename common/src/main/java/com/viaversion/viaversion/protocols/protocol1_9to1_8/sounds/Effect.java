@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ public class Effect {
         addRewrite(1020, 1029); //Anvil break
         addRewrite(1021, 1030); //Anvil use
         addRewrite(1022, 1031); //Anvil land
-        addRewrite(1013, 1023);
-        addRewrite(1018, 1028);
+        addRewrite(1013, 1023); //Wither spawn
+        addRewrite(1018, 1028); //EnderDragon end
     }
 
     public static int getNewId(int id) {

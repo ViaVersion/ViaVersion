@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,20 +29,20 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.types.Chunk1_15Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.Map;
 import java.util.UUID;
 
 public class WorldPackets {
 
     public static void register(Protocol1_16To1_15_2 protocol) {
-        BlockRewriter<ClientboundPackets1_15> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_15> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_CHANGE);
@@ -59,8 +59,8 @@ public class WorldPackets {
         });
 
         protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new Chunk1_15Type());
-            wrapper.write(new Chunk1_16Type(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_15.TYPE);
+            wrapper.write(ChunkType1_16.TYPE, chunk);
 
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
 
@@ -94,7 +94,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.UNSIGNED_BYTE); // Action
-            CompoundTag tag = wrapper.passthrough(Type.NBT);
+            CompoundTag tag = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
             handleBlockEntity(protocol, tag);
         });
 
@@ -112,13 +112,13 @@ public class WorldPackets {
 
             // target_uuid -> Target
             UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
-            compoundTag.put("Target", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(targetUuid)));
+            compoundTag.put("Target", new IntArrayTag(UUIDUtil.toIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
             CompoundTag ownerTag = compoundTag.remove("Owner");
             StringTag ownerUuidTag = ownerTag.remove("Id");
             if (ownerUuidTag != null) {
                 UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
-                ownerTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(ownerUuid)));
+                ownerTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(ownerUuid)));
             }
 
             // Owner -> SkullOwner

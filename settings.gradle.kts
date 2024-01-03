@@ -17,8 +17,9 @@ dependencyResolutionManagement {
 pluginManagement {
     // default plugin versions
     plugins {
-        id("net.kyori.blossom") version "1.2.0"
-        id("com.github.johnrengelman.shadow") version "8.1.0"
+        id("net.kyori.blossom") version "2.1.0"
+        id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+        id("com.github.johnrengelman.shadow") version "8.1.1"
     }
 }
 
@@ -26,7 +27,6 @@ rootProject.name = "viaversion-parent"
 
 includeBuild("build-logic")
 
-include("adventure")
 include("compat", "compat:snakeyaml-compat-common", "compat:snakeyaml2-compat", "compat:snakeyaml1-compat", "compat:protocolsupport-compat")
 
 setupViaSubproject("api")
@@ -38,6 +38,7 @@ setupViaSubproject("bungee")
 setupViaSubproject("velocity")
 setupViaSubproject("sponge")
 setupViaSubproject("fabric")
+setupViaSubproject("template")
 
 setupSubproject("viaversion") {
     projectDir = file("universal")

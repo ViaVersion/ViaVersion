@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
@@ -208,13 +208,13 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION);
     }
 
     @Override
     public void init(UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_17Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_17.PLAYER));
         user.put(new InventoryAcknowledgements());
     }
 

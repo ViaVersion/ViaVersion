@@ -28,9 +28,9 @@ public class ItemTypeTest {
     @Test
     public void testEmptyItemRead() throws Exception {
         // Test empty item read
-        Assertions.assertNull(Type.ITEM.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
-        Assertions.assertNull(Type.FLAT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
-        Assertions.assertNull(Type.FLAT_VAR_INT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{0})));
+        Assertions.assertNull(Type.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
+        Assertions.assertNull(Type.ITEM1_13.read(Unpooled.wrappedBuffer(new byte[]{-1, -1})));
+        Assertions.assertNull(Type.ITEM1_13_2.read(Unpooled.wrappedBuffer(new byte[]{0})));
     }
 
     @Test
@@ -38,8 +38,8 @@ public class ItemTypeTest {
 
         // Test item read
         Assertions.assertEquals(
-                new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null),
-                Type.ITEM.read(Unpooled.wrappedBuffer(new byte[]{
+                new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null),
+                Type.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{
                         127, -1,
                         -128,
                         1, 1,
@@ -48,7 +48,7 @@ public class ItemTypeTest {
         );
         Assertions.assertEquals(
                 new DataItem(420, (byte) 53, (short) 0, null),
-                Type.FLAT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{
+                Type.ITEM1_13.read(Unpooled.wrappedBuffer(new byte[]{
                         1, (byte) 164,
                         53,
                         0
@@ -56,7 +56,7 @@ public class ItemTypeTest {
         );
         Assertions.assertEquals(
                 new DataItem(268435456, (byte) 127, (short) 0, null),
-                Type.FLAT_VAR_INT_ITEM.read(Unpooled.wrappedBuffer(new byte[]{
+                Type.ITEM1_13_2.read(Unpooled.wrappedBuffer(new byte[]{
                         1,
                         -128, -128, -128, -128, 1,
                         127,
@@ -70,11 +70,11 @@ public class ItemTypeTest {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item empty write
-        Type.ITEM.write(buf, null);
+        Type.ITEM1_8.write(buf, null);
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{-1, -1});
-        Type.FLAT_ITEM.write(buf, null);
+        Type.ITEM1_13.write(buf, null);
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{-1, -1});
-        Type.FLAT_VAR_INT_ITEM.write(buf, null);
+        Type.ITEM1_13_2.write(buf, null);
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{0});
     }
 
@@ -83,20 +83,20 @@ public class ItemTypeTest {
         ByteBuf buf = Unpooled.buffer();
 
         // Test item write
-        Type.ITEM.write(buf, new DataItem((int) Short.MAX_VALUE, (byte) -128, (short) 257, null));
+        Type.ITEM1_8.write(buf, new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 127, -1,
                 -128,
                 1, 1,
                 0
         });
-        Type.FLAT_ITEM.write(buf, new DataItem(420, (byte) 53, (short) 0, null));
+        Type.ITEM1_13.write(buf, new DataItem(420, (byte) 53, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 1, (byte) 164,
                 53,
                 0
         });
-        Type.FLAT_VAR_INT_ITEM.write(buf, new DataItem(268435456, (byte) 127, (short) 0, null));
+        Type.ITEM1_13_2.write(buf, new DataItem(268435456, (byte) 127, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
                 1,
                 -128, -128, -128, -128, 1,

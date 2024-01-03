@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11To1_10> {
 
     public InventoryPackets(Protocol1_11To1_10 protocol) {
-        super(protocol);
+        super(protocol, null, null);
     }
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM_ARRAY);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM);
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM1_8);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM1_8_SHORT_ARRAY);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM1_8);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
@@ -50,12 +50,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
-                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Input Item
-                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Output Item
+                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Input Item
+                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Output Item
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem)
-                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM)); // Second Item
+                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Second Item
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                             wrapper.passthrough(Type.INT); // Number of tools uses
@@ -66,8 +66,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
             }
         });
 
-        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW, Type.ITEM);
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW, Type.ITEM1_8);
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         boolean newItem = item.identifier() >= 218 && item.identifier() <= 234;
         newItem |= item.identifier() == 449 || item.identifier() == 450;
         if (newItem) { // Replace server-side unknown items
-            item.setIdentifier((short) 1);
+            item.setIdentifier(1);
             item.setData((short) 0);
         }
         return item;

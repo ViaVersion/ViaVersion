@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 public class MovementTracker implements StorableObject {
     private static final long IDLE_PACKET_DELAY = 50L; // Update every 50ms (20tps)
     private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
-    private long nextIdlePacket = 0L;
-    private boolean ground = true;
+    private long nextIdlePacket;
+    private boolean ground;
 
     public void incrementIdlePacket() {
         // Notify of next update

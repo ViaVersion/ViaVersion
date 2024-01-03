@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -65,13 +65,13 @@ public class SpawnPackets {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     int typeID = wrapper.get(Type.BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, true));
+                    tracker.addEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 3 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 6 - Pitch
                 map(Type.BYTE); // 7 - Yaw
@@ -82,7 +82,9 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int data = wrapper.get(Type.INT, 0); // Data (1st Integer)
 
-                    short vX = 0, vY = 0, vZ = 0;
+                    short vX = 0;
+                    short vY = 0;
+                    short vZ = 0;
                     if (data > 0) {
                         vX = wrapper.read(Type.SHORT);
                         vY = wrapper.read(Type.SHORT);
@@ -100,7 +102,7 @@ public class SpawnPackets {
                     final int data = wrapper.get(Type.INT, 0); // Data
 
                     int typeID = wrapper.get(Type.BYTE, 0);
-                    if (Entity1_10Types.getTypeFromId(typeID, true) == Entity1_10Types.EntityType.SPLASH_POTION) {
+                    if (EntityTypes1_10.getTypeFromId(typeID, true) == EntityTypes1_10.EntityType.SPLASH_POTION) {
                         // Convert this to meta data, woo!
                         PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.ENTITY_METADATA, wrapper1 -> {
                             wrapper1.write(Type.VAR_INT, entityID);
@@ -130,13 +132,13 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 1 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 2 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 1 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 2 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Z - Needs to be divided by 32
 
                 map(Type.SHORT); // 4 - Amount to spawn
             }
@@ -152,13 +154,13 @@ public class SpawnPackets {
                     // Currently only lightning uses this
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.LIGHTNING);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.LIGHTNING);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 2 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divided by 32
             }
         });
 
@@ -179,13 +181,13 @@ public class SpawnPackets {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.getTypeFromId(typeID, false));
+                    tracker.addEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, false));
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 3 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 3 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 5 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 6 - Yaw
                 map(Type.BYTE); // 7 - Pitch
@@ -226,7 +228,7 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.PAINTING);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.PAINTING);
                     tracker.sendMetadataBuffer(entityID);
                 });
                 handler(wrapper -> {
@@ -236,7 +238,7 @@ public class SpawnPackets {
                 });
 
                 map(Type.STRING); // 2 - Title
-                map(Type.POSITION); // 3 - Position
+                map(Type.POSITION1_8); // 3 - Position
                 map(Type.BYTE); // 4 - Direction
             }
         });
@@ -251,13 +253,13 @@ public class SpawnPackets {
                 handler(wrapper -> {
                     int entityID = wrapper.get(Type.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityID, Entity1_10Types.EntityType.PLAYER);
+                    tracker.addEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
                     tracker.sendMetadataBuffer(entityID);
                 });
 
-                map(Type.INT, toNewDouble); // 2 - X - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divide by 32
-                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divide by 32
+                map(Type.INT, toNewDouble); // 2 - X - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 3 - Y - Needs to be divided by 32
+                map(Type.INT, toNewDouble); // 4 - Z - Needs to be divided by 32
 
                 map(Type.BYTE); // 5 - Yaw
                 map(Type.BYTE); // 6 - Pitch
@@ -269,7 +271,7 @@ public class SpawnPackets {
                         PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, wrapper.user());
                         packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                         packet.write(Type.VAR_INT, 0);
-                        packet.write(Type.ITEM, new DataItem(item, (byte) 1, (short) 0, null));
+                        packet.write(Type.ITEM1_8, new DataItem(item, (byte) 1, (short) 0, null));
                         try {
                             packet.send(Protocol1_9To1_8.class);
                         } catch (Exception e) {

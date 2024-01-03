@@ -9,6 +9,18 @@ loadbefore: [ ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer ]
 softdepend: [ ProtocolSupport, PacketListenerApi ]
 commands:
   viaversion:
-    permission: viaversion.admin # The permission is also referenced here to filter root suggestions (/via<tab>)
+    permission: viaversion.command # The permission is also referenced here to filter root suggestions (/via<tab>)
     description: Shows ViaVersion Version and more.
     aliases: [ viaver, vvbukkit ]
+permissions:
+  viaversion.admin:
+    default: op
+    children:
+      viaversion.command.autoteam: true
+      viaversion.command.debug: true
+      viaversion.command.displayleaks: true
+      viaversion.command.dontbugme: true
+      viaversion.command.dump: true
+      viaversion.command.list: true
+      viaversion.command.pps: true
+      viaversion.command.reload: true

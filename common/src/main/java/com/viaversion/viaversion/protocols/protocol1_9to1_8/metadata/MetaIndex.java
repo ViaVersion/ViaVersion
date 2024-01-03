@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType.*;
+import static com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType.*;
 
 public enum MetaIndex {
 
@@ -158,20 +158,20 @@ public enum MetaIndex {
     ENDERDRAGON_FLAG(ENDER_DRAGON, 15, MetaType1_8.Byte, null),
     ENDERDRAGON_PHASE(ENDER_DRAGON, 11, MetaType1_8.Byte, MetaType1_9.VarInt);
 
-    private static final HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
+    private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
     static {
         for (MetaIndex index : MetaIndex.values())
             metadataRewrites.put(new Pair<>(index.clazz, index.index), index);
     }
 
-    private final Entity1_10Types.EntityType clazz;
+    private final EntityTypes1_10.EntityType clazz;
     private final int newIndex;
     private final MetaType1_9 newType;
     private final MetaType1_8 oldType;
     private final int index;
 
-    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, @Nullable MetaType1_9 newType) {
+    MetaIndex(EntityTypes1_10.EntityType type, int index, MetaType1_8 oldType, @Nullable MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.newIndex = index;
@@ -179,7 +179,7 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    MetaIndex(Entity1_10Types.EntityType type, int index, MetaType1_8 oldType, int newIndex, @Nullable MetaType1_9 newType) {
+    MetaIndex(EntityTypes1_10.EntityType type, int index, MetaType1_8 oldType, int newIndex, @Nullable MetaType1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.oldType = oldType;
@@ -187,7 +187,7 @@ public enum MetaIndex {
         this.newType = newType;
     }
 
-    public Entity1_10Types.EntityType getClazz() {
+    public EntityTypes1_10.EntityType getClazz() {
         return clazz;
     }
 

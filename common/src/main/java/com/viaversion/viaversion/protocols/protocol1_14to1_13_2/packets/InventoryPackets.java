@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
@@ -41,13 +40,15 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTr
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Key;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_14, Protocol1_14To1_13_2> {
     private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_14To1_13_2.class.getSimpleName();
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
-    private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<ClientboundPackets1_13>() {
+    private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<ClientboundPackets1_13>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             super.handleTranslate(object, translate);
@@ -59,13 +60,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     };
 
     public InventoryPackets(Protocol1_14To1_13_2 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.ITEM1_13_2);
 
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, wrapper -> {
             Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
@@ -135,16 +136,16 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.ITEM1_13_2);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Channel
                 handler(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
-                    if (channel.equals("minecraft:trader_list") || channel.equals("trader_list")) {
+                    String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:trader_list")) {
                         wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
                         wrapper.resetReader();
                         wrapper.read(Type.STRING); // Remove channel
@@ -157,14 +158,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
                             // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                             // Output Item
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
-                                handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                                handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -178,7 +179,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         wrapper.write(Type.VAR_INT, 0);
                         wrapper.write(Type.VAR_INT, 0);
                         wrapper.write(Type.BOOLEAN, false);
-                    } else if (channel.equals("minecraft:book_open") || channel.equals("book_open")) {
+                        wrapper.clearInputBuffer();
+                    } else if (channel.equals("minecraft:book_open")) {
                         int hand = wrapper.read(Type.VAR_INT);
                         wrapper.clearPacket();
                         wrapper.setPacketType(ClientboundPackets1_14.OPEN_BOOK);
@@ -188,7 +190,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.ITEM1_13_2);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
@@ -210,7 +212,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         });
 
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.ITEM1_13_2);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
@@ -223,13 +225,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             resyncPacket.write(Type.VAR_INT, 5); // 4 - Mode - Drag
             CompoundTag tag = new CompoundTag();
             tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
-            resyncPacket.write(Type.FLAT_VAR_INT_ITEM, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+            resyncPacket.write(Type.ITEM1_13_2, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
             resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
         });
 
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.FLOAT);
     }
 
     @Override
@@ -246,10 +248,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             Tag loreTag = display.get("Lore");
             if (loreTag instanceof ListTag) {
                 ListTag lore = (ListTag) loreTag;
-                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.clone().getValue())); // Save old lore
+                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.copy().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
-                        String jsonText = ChatRewriter.legacyTextToJsonString(((StringTag) loreEntry).getValue(), true);
+                        String jsonText = ComponentUtil.legacyToJsonString(((StringTag) loreEntry).getValue(), true);
                         ((StringTag) loreEntry).setValue(jsonText);
                     }
                 }
@@ -278,7 +280,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                 } else {
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {
-                            ((StringTag) loreEntry).setValue(ChatRewriter.jsonToLegacyText(((StringTag) loreEntry).getValue()));
+                            ((StringTag) loreEntry).setValue(ComponentUtil.jsonToLegacy(((StringTag) loreEntry).getValue()));
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -43,8 +43,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -53,7 +53,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Sign Position
+                map(Type.POSITION1_8); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
@@ -65,7 +65,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Effect ID
-                map(Type.POSITION); // 1 - Position
+                map(Type.POSITION1_8); // 1 - Position
                 map(Type.INT); // 2 - Data
                 map(Type.BOOLEAN); // 3 - Disable relative volume
 
@@ -92,7 +92,7 @@ public class WorldPackets {
             public void register() {
                 map(Type.STRING); // 0 - Sound Name
                 // 1 - Sound Category ID
-                // Everything else get's written through
+                // Everything else gets written through
 
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
@@ -122,7 +122,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk chunk = wrapper.read(new Chunk1_8Type(clientWorld));
+            Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(clientWorld.getEnvironment()));
 
             long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
 
@@ -152,7 +152,7 @@ public class WorldPackets {
                     }
                 }
             } else {
-                Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+                Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
                 wrapper.write(chunkType, chunk);
 
                 clientChunks.getLoadedChunks().add(chunkHash);
@@ -177,9 +177,9 @@ public class WorldPackets {
             wrapper.cancel(); // Cancel the packet from being sent
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
-            Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(clientWorld));
+            Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 
-            Type<Chunk> chunkType = new Chunk1_9_1_2Type(clientWorld);
+            Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
             // Split into multiple chunk packets
             for (Chunk chunk : chunks) {
                 PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
@@ -207,13 +207,13 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Block Position
+                map(Type.POSITION1_8); // 0 - Block Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT (Might not be present)
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT (Might not be present)
                 handler(wrapper -> {
                     int action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     if (action == 1) { // Update Spawner
-                        CompoundTag tag = wrapper.get(Type.NBT, 0);
+                        CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                         if (tag != null) {
                             if (tag.contains("EntityId")) {
                                 String entity = (String) tag.get("EntityId").getValue();
@@ -229,7 +229,7 @@ public class WorldPackets {
                     }
                     if (action == 2) { // Update Command Block
                         CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION, 0), wrapper.get(Type.NBT, 0));
+                        provider.addOrUpdateBlock(wrapper.user(), wrapper.get(Type.POSITION1_8, 0), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
 
                         // To prevent window issues don't send updates
                         wrapper.cancel();
@@ -243,7 +243,7 @@ public class WorldPackets {
         protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Sign Position
+                map(Type.POSITION1_8); // 0 - Sign Position
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
@@ -255,7 +255,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
-                map(Type.POSITION); // Position
+                map(Type.POSITION1_8); // Position
                 handler(wrapper -> {
                     int status = wrapper.get(Type.VAR_INT, 0);
                     if (status == 6)
@@ -282,7 +282,7 @@ public class WorldPackets {
             // Wipe the input buffer
             wrapper.clearInputBuffer();
             wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
-            wrapper.write(Type.POSITION, new Position(-1, (short) -1, -1));
+            wrapper.write(Type.POSITION1_8, new Position(-1, (short) -1, -1));
             wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
             Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
@@ -298,17 +298,15 @@ public class WorldPackets {
                         : item != null && Protocol1_9To1_8.isSword(item.identifier());
 
                 if (isSword) {
-                    if (hand == 0) {
-                        if (!tracker.isBlocking()) {
-                            tracker.setBlocking(true);
+                    if (hand == 0 && !tracker.isBlocking()) {
+                        tracker.setBlocking(true);
 
-                            // Check if the shield is already in the offhand
-                            if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
+                        // Check if the shield is already in the offhand
+                        if (!showShieldWhenSwordInHand && tracker.getItemInSecondHand() == null) {
 
-                                // Set shield in offhand when interacting with main hand
-                                Item shield = new DataItem(442, (byte) 1, (short) 0, null);
-                                tracker.setSecondHand(shield);
-                            }
+                            // Set shield in offhand when interacting with main hand
+                            Item shield = new DataItem(442, (byte) 1, (short) 0, null);
+                            tracker.setSecondHand(shield);
                         }
                     }
 
@@ -327,7 +325,7 @@ public class WorldPackets {
                     tracker.setBlocking(false);
                 }
             }
-            wrapper.write(Type.ITEM, item);
+            wrapper.write(Type.ITEM1_8, item);
 
             wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
             wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
@@ -337,7 +335,7 @@ public class WorldPackets {
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // 1 - Block Face
                 handler(wrapper -> {
                     final int hand = wrapper.read(Type.VAR_INT); // 2 - Hand
@@ -345,7 +343,7 @@ public class WorldPackets {
                 });
                 handler(wrapper -> {
                     Item item = Protocol1_9To1_8.getHandItem(wrapper.user());
-                    wrapper.write(Type.ITEM, item); // 3 - Item
+                    wrapper.write(Type.ITEM1_8, item); // 3 - Item
                 });
                 map(Type.UNSIGNED_BYTE); // 4 - X
                 map(Type.UNSIGNED_BYTE); // 5 - Y
@@ -356,7 +354,7 @@ public class WorldPackets {
                     int face = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     if (face == 255)
                         return;
-                    Position p = wrapper.get(Type.POSITION, 0);
+                    Position p = wrapper.get(Type.POSITION1_8, 0);
                     int x = p.x();
                     int y = p.y();
                     int z = p.z();
@@ -388,15 +386,15 @@ public class WorldPackets {
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
 
-                    Position pos = wrapper.get(Type.POSITION, 0);
+                    Position pos = wrapper.get(Type.POSITION1_8, 0);
                     Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
                     // Send the Update Block Entity packet if present
                     if (tag.isPresent()) {
                         PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
 
-                        updateBlockEntity.write(Type.POSITION, pos);
+                        updateBlockEntity.write(Type.POSITION1_8, pos);
                         updateBlockEntity.write(Type.UNSIGNED_BYTE, (short) 2);
-                        updateBlockEntity.write(Type.NBT, tag.get());
+                        updateBlockEntity.write(Type.NAMED_COMPOUND_TAG, tag.get());
 
                         updateBlockEntity.scheduleSend(Protocol1_9To1_8.class);
                     }

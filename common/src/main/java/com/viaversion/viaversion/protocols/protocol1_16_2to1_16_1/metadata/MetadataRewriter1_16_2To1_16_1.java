@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
@@ -34,7 +34,7 @@ public class MetadataRewriter1_16_2To1_16_1 extends EntityRewriter<ClientboundPa
 
     public MetadataRewriter1_16_2To1_16_1(Protocol1_16_2To1_16_1 protocol) {
         super(protocol);
-        mapTypes(Entity1_16Types.values(), Entity1_16_2Types.class);
+        mapTypes(EntityTypes1_16.values(), EntityTypes1_16_2.class);
     }
 
     @Override
@@ -50,14 +50,14 @@ public class MetadataRewriter1_16_2To1_16_1 extends EntityRewriter<ClientboundPa
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_16_2Types.MINECART_ABSTRACT)
+        if (type.isOrHasParent(EntityTypes1_16_2.MINECART_ABSTRACT)
                 && metadata.id() == 10) {
             // Convert to new block id
             int data = (int) metadata.getValue();
             metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
         }
 
-        if (type.isOrHasParent(Entity1_16_2Types.ABSTRACT_PIGLIN)) {
+        if (type.isOrHasParent(EntityTypes1_16_2.ABSTRACT_PIGLIN)) {
             if (metadata.id() == 15) {
                 metadata.setId(16);
             } else if (metadata.id() == 16) {
@@ -68,6 +68,6 @@ public class MetadataRewriter1_16_2To1_16_1 extends EntityRewriter<ClientboundPa
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_16_2Types.getTypeFromId(type);
+        return EntityTypes1_16_2.getTypeFromId(type);
     }
 }

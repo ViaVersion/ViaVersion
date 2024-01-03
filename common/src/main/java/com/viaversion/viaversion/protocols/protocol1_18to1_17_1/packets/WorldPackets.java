@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
-import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.types.Chunk1_17Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public final class WorldPackets {
                     final int newId = BlockEntityIds.newId(id);
                     wrapper.write(Type.VAR_INT, newId);
 
-                    handleSpawners(newId, wrapper.passthrough(Type.NBT));
+                    handleSpawners(newId, wrapper.passthrough(Type.NAMED_COMPOUND_TAG));
                 });
             }
         });
@@ -103,7 +103,7 @@ public final class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_17_1.CHUNK_DATA, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            final Chunk oldChunk = wrapper.read(new Chunk1_17Type(tracker.currentWorldSectionHeight()));
+            final Chunk oldChunk = wrapper.read(new ChunkType1_17(tracker.currentWorldSectionHeight()));
 
             final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
             for (final CompoundTag tag : oldChunk.getBlockEntities()) {
@@ -155,7 +155,7 @@ public final class WorldPackets {
             }
 
             final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), sections, oldChunk.getHeightMap(), blockEntities);
-            wrapper.write(new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+            wrapper.write(new ChunkType1_18(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 

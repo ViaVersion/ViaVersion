@@ -27,6 +27,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class Int2IntBiHashMap implements Int2IntBiMap {
@@ -89,6 +90,13 @@ public class Int2IntBiHashMap implements Int2IntBiMap {
     @Override
     public boolean isEmpty() {
         return map.isEmpty();
+    }
+
+    @Override
+    public void putAll(@NonNull Map<? extends Integer, ? extends Integer> m) {
+        for (final Map.Entry<? extends Integer, ? extends Integer> entry : m.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     @Override

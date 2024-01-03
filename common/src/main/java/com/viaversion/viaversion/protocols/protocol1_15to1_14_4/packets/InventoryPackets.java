@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,21 +27,21 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_14_4, ServerboundPackets1_14, Protocol1_15To1_14_4> {
 
     public InventoryPackets(Protocol1_15To1_14_4 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_14_4.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_14_4.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerWindowItems(ClientboundPackets1_14_4.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
         registerTradeList(ClientboundPackets1_14_4.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_14_4.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        registerEntityEquipment(ClientboundPackets1_14_4.ENTITY_EQUIPMENT, Type.FLAT_VAR_INT_ITEM);
-        registerAdvancements(ClientboundPackets1_14_4.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_14_4.SET_SLOT, Type.ITEM1_13_2);
+        registerEntityEquipment(ClientboundPackets1_14_4.ENTITY_EQUIPMENT, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_14_4.ADVANCEMENTS, Type.ITEM1_13_2);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_14_4.DECLARE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
     }
 }

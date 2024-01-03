@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -32,7 +32,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,39 +62,39 @@ public class EntityPackets {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     int typeId = wrapper.get(Type.VAR_INT, 1);
 
-                    Entity1_13Types.EntityType type1_13 = Entity1_13Types.getTypeFromId(typeId, true);
+                    EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
                     typeId = metadataRewriter.newEntityId(type1_13.getId());
-                    EntityType type1_14 = Entity1_14Types.getTypeFromId(typeId);
+                    EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
 
                     if (type1_14 != null) {
                         int data = wrapper.get(Type.INT, 0);
-                        if (type1_14.is(Entity1_14Types.FALLING_BLOCK)) {
+                        if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
                             wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                        } else if (type1_14.is(Entity1_14Types.MINECART)) {
+                        } else if (type1_14.is(EntityTypes1_14.MINECART)) {
                             // default is 0 = rideable minecart
                             switch (data) {
                                 case 1:
-                                    typeId = Entity1_14Types.CHEST_MINECART.getId();
+                                    typeId = EntityTypes1_14.CHEST_MINECART.getId();
                                     break;
                                 case 2:
-                                    typeId = Entity1_14Types.FURNACE_MINECART.getId();
+                                    typeId = EntityTypes1_14.FURNACE_MINECART.getId();
                                     break;
                                 case 3:
-                                    typeId = Entity1_14Types.TNT_MINECART.getId();
+                                    typeId = EntityTypes1_14.TNT_MINECART.getId();
                                     break;
                                 case 4:
-                                    typeId = Entity1_14Types.SPAWNER_MINECART.getId();
+                                    typeId = EntityTypes1_14.SPAWNER_MINECART.getId();
                                     break;
                                 case 5:
-                                    typeId = Entity1_14Types.HOPPER_MINECART.getId();
+                                    typeId = EntityTypes1_14.HOPPER_MINECART.getId();
                                     break;
                                 case 6:
-                                    typeId = Entity1_14Types.COMMAND_BLOCK_MINECART.getId();
+                                    typeId = EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
                                     break;
                             }
-                        } else if ((type1_14.is(Entity1_14Types.ITEM) && data > 0)
-                                || type1_14.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
-                            if (type1_14.isOrHasParent(Entity1_14Types.ABSTRACT_ARROW)) {
+                        } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
+                                || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
+                            if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
                                 wrapper.set(Type.INT, 0, data - 1);
                             }
                             // send velocity in separate packet, 1.14 is now ignoring the velocity
@@ -142,7 +142,7 @@ public class EntityPackets {
                 map(Type.VAR_INT);
                 map(Type.UUID);
                 map(Type.VAR_INT);
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.BYTE);
             }
         });
@@ -159,7 +159,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST, Entity1_14Types.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST, EntityTypes1_14.PLAYER));
             }
         });
 
@@ -233,7 +233,7 @@ public class EntityPackets {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     tracker.setSleeping(entityId, true);
 
-                    Position position = wrapper.read(Type.POSITION);
+                    Position position = wrapper.read(Type.POSITION1_8);
                     List<Metadata> metadataList = new LinkedList<>();
                     metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalPositionType, position));
                     if (tracker.clientEntityId() != entityId) {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
+import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 
 public class DontBugMeSubCmd extends ViaSubCommand {
 
@@ -31,16 +31,16 @@ public class DontBugMeSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Toggle checking for updates";
+        return "Toggle checking for updates.";
     }
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        ConfigurationProvider provider = Via.getPlatform().getConfigurationProvider();
-        boolean newValue = !Via.getConfig().isCheckForUpdates();
+        final ViaVersionConfig config = Via.getConfig();
+        boolean newValue = !config.isCheckForUpdates();
 
-        Via.getConfig().setCheckForUpdates(newValue);
-        provider.saveConfig();
+        config.setCheckForUpdates(newValue);
+        config.save();
         sendMessage(sender, "&6We will %snotify you about updates.", (newValue ? "&a" : "&cnot "));
 
         return true;

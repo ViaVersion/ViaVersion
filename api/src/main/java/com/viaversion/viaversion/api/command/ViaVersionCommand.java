@@ -32,7 +32,7 @@ public interface ViaVersionCommand {
      * @param command Your own SubCommand instance to handle it.
      * @throws Exception throws an exception when the subcommand already exists or if it's not valid, example: spacee
      */
-    void registerSubCommand(ViaSubCommand command) throws Exception;
+    void registerSubCommand(ViaSubCommand command);
 
     /**
      * Check if a subcommand is registered.

@@ -69,9 +69,16 @@ public interface ProtocolPipeline extends SimpleProtocol {
     /**
      * Returns the list of protocols this pipeline contains.
      *
-     * @return list of protocols in this pipe
+     * @return immutable list of protocols in this pipe
      */
     List<Protocol> pipes();
+
+    /**
+     * Returns the list of protocols this pipeline contains in reversed order.
+     *
+     * @return immutable list of protocols in reversed direction
+     */
+    List<Protocol> reversedPipes();
 
     /**
      * Returns whether this pipe has protocols that are not base protocols, as given by {@link Protocol#isBaseProtocol()}.

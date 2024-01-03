@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,10 +61,10 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
                 create(Type.VAR_INT, 0); // Add arbitrary state id
                 handler(wrapper -> {
                     // Length encoded as var int now
-                    wrapper.write(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT, wrapper.read(Type.FLAT_VAR_INT_ITEM_ARRAY));
+                    wrapper.write(Type.ITEM1_13_2_ARRAY, wrapper.read(Type.ITEM1_13_2_SHORT_ARRAY));
 
                     // Carried item - should work like this
-                    wrapper.write(Type.FLAT_VAR_INT_ITEM, null);
+                    wrapper.write(Type.ITEM1_13_2, null);
                 });
             }
         });
@@ -82,7 +82,7 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
             Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
 
             // Write the item, edit the tag down the line
-            wrapper.write(Type.FLAT_VAR_INT_ITEM, item);
+            wrapper.write(Type.ITEM1_13_2, item);
 
             int slot = wrapper.read(Type.VAR_INT);
 

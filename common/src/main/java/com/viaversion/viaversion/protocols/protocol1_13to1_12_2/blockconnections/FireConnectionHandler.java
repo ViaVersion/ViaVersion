@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ public class FireConnectionHandler extends ConnectionHandler {
 
     private static void addWoodTypes(Set<String> set, String suffix) {
         for (String woodType : WOOD_TYPES) {
-            set.add("minecraft:" + woodType + suffix);
+            set.add(Key.namespaced(woodType + suffix));
         }
     }
 

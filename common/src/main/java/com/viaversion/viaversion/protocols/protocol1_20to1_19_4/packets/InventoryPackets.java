@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,7 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
@@ -34,17 +33,18 @@ import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_19_4, Protocol1_20To1_19_4> {
 
     public InventoryPackets(final Protocol1_20To1_19_4 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = BlockRewriter.for1_14(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_19_4.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_19_4.EFFECT, 1010, 2001);
@@ -57,7 +57,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         registerEntityEquipmentArray(ClientboundPackets1_19_4.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_19_4.CLICK_WINDOW);
         registerTradeList1_19(ClientboundPackets1_19_4.TRADE_LIST);
-        registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_4.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_19_4.SPAWN_PARTICLE);
 
@@ -67,15 +67,15 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
 
-                // Parent
-                if (wrapper.passthrough(Type.BOOLEAN))
-                    wrapper.passthrough(Type.STRING);
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.STRING); // Parent
+                }
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.COMPONENT); // Title
                     wrapper.passthrough(Type.COMPONENT); // Description
-                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Icon
+                    handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -85,11 +85,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                     wrapper.passthrough(Type.FLOAT); // Y
                 }
 
-                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+                wrapper.passthrough(Type.STRING_ARRAY); // Critereon triggers
 
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
-                for (int array = 0; array < arrayLength; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                int requirements = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY);
                 }
 
                 wrapper.write(Type.BOOLEAN, false); // Sends telemetry
@@ -111,7 +111,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                handler(blockRewriter.chunkDataHandler1_19(Chunk1_18Type::new, InventoryPackets.this::handleBlockEntity));
+                handler(blockRewriter.chunkDataHandler1_19(ChunkType1_18::new, InventoryPackets.this::handleBlockEntity));
                 read(Type.BOOLEAN); // Trust edges
             }
         });
@@ -145,9 +145,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                 if (cutType.equals("smithing")) {
                     newSize--;
                     wrapper.read(Type.STRING); // Recipe identifier
-                    wrapper.read(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Base
-                    wrapper.read(Type.FLAT_VAR_INT_ITEM_ARRAY_VAR_INT); // Additions
-                    wrapper.read(Type.FLAT_VAR_INT_ITEM); // Result
+                    wrapper.read(Type.ITEM1_13_2_ARRAY); // Base
+                    wrapper.read(Type.ITEM1_13_2_ARRAY); // Additions
+                    wrapper.read(Type.ITEM1_13_2); // Result
                     continue;
                 }
 
@@ -172,17 +172,19 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
 
         final ListTag messages = new ListTag(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final Tag text = tag.get("Text" + i);
-            messages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+            final Tag text = tag.remove("Text" + i);
+            messages.add(text != null ? text : new StringTag(ComponentUtil.emptyJsonComponentString()));
         }
         frontText.put("messages", messages);
 
         final ListTag filteredMessages = new ListTag(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final Tag text = tag.get("FilteredText" + i);
-            filteredMessages.add(text != null ? text : new StringTag(ChatRewriter.emptyComponentString()));
+            final Tag text = tag.remove("FilteredText" + i);
+            filteredMessages.add(text != null ? text : messages.get(i - 1));
         }
-        frontText.put("filtered_messages", filteredMessages);
+        if (!filteredMessages.equals(messages)) {
+            frontText.put("filtered_messages", filteredMessages);
+        }
 
         final Tag color = tag.remove("Color");
         if (color != null) {

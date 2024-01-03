@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,10 +26,8 @@ public class TabCompleteThread implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             if (info.getProtocolInfo() == null) continue;
-            if (info.getProtocolInfo().getPipeline().contains(Protocol1_13To1_12_2.class)) {
-                if (info.getChannel().isOpen()) {
-                    info.get(TabCompleteTracker.class).sendPacketToServer(info);
-                }
+            if (info.getProtocolInfo().getPipeline().contains(Protocol1_13To1_12_2.class) && info.getChannel().isOpen()) {
+                info.get(TabCompleteTracker.class).sendPacketToServer(info);
             }
         }
     }

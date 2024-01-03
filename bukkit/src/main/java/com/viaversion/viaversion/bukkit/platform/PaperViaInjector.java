@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public final class PaperViaInjector {
         try {
             Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");
             return true;
-        } catch (ReflectiveOperationException e) {
+        } catch (final ClassNotFoundException | NoSuchMethodException e) {
             return false;
         }
     }
@@ -75,7 +75,7 @@ public final class PaperViaInjector {
         try {
             Class.forName(className);
             return true;
-        } catch (ReflectiveOperationException e) {
+        } catch (final ClassNotFoundException e) {
             return false;
         }
     }

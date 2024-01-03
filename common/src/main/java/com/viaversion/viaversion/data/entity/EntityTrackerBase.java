@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     private final UserConnection connection;
     private final EntityType playerType;
     private int clientEntityId = -1;
-    private int currentWorldSectionHeight = 16;
+    private int currentWorldSectionHeight = -1;
     private int currentMinY;
     private String currentWorld;
     private int biomesSent = -1;

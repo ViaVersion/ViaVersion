@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,27 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 
+import com.google.common.collect.EvictingQueue;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+
+import com.viaversion.viaversion.api.minecraft.Position;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {
     private static Constructor<?> fastUtilLongObjectHashMap;
 
     private final Map<Long, SectionData> blockStorage = createLongObjectMap();
+    @SuppressWarnings("UnstableApiUsage")
+    private final Queue<Position> modified = EvictingQueue.create(5);
 
     // Cache to retrieve section quicker
-    private Long lastIndex;
+    private long lastIndex = -1;
     private SectionData lastSection;
 
     static {
@@ -88,10 +94,27 @@ public class BlockConnectionStorage implements StorableObject {
         }
     }
 
+    public void markModified(Position pos) {
+        // Avoid saving the same pos twice
+        if (!modified.contains(pos)) {
+            this.modified.add(pos);
+        }
+    }
+
+    public boolean recentlyModified(Position pos) {
+        for (Position p : modified) {
+            if (Math.abs(pos.x() - p.x()) + Math.abs(pos.y() - p.y()) + Math.abs(pos.z() - p.z()) <= 2) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void clear() {
         blockStorage.clear();
         lastSection = null;
-        lastIndex = null;
+        lastIndex = -1;
+        modified.clear();
     }
 
     public void unloadChunk(int x, int z) {
@@ -105,7 +128,7 @@ public class BlockConnectionStorage implements StorableObject {
     }
 
     private @Nullable SectionData getSection(long index) {
-        if (lastIndex != null && lastIndex == index) {
+        if (lastIndex == index) {
             return lastSection;
         }
         lastIndex = index;
@@ -114,8 +137,8 @@ public class BlockConnectionStorage implements StorableObject {
 
     private void removeSection(long index) {
         blockStorage.remove(index);
-        if (lastIndex != null && lastIndex == index) {
-            lastIndex = null;
+        if (lastIndex == index) {
+            lastIndex = -1;
             lastSection = null;
         }
     }

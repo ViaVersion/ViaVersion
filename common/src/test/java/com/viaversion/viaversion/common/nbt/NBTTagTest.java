@@ -21,35 +21,36 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO.readString;
+import static com.github.steveice10.opennbt.stringified.SNBT.deserialize;
+import static com.github.steveice10.opennbt.stringified.SNBT.deserializeCompoundTag;
 
 public class NBTTagTest {
 
     @Test
     void test() throws IOException {
-        readString("{id:5}");
-        readString("{id:5b}");
-        readString("{id:test,test:1,}");
-        readString("{id:[3.2,64.5,129.5]}");
-        readString("{id:[I;1,2, 3, 4,5]}"); // >=1.11
-        readString("{id:1b,b:true}");
-        readString("{id:[L;1l,2L,3L]}"); // >=1.11
-        readString("{id:[I;1i,2I,3I]}");
-        readString("{id:'minecraft:stone'}"); // >=1.13
-        readString("{id:1,id:2}");
-        readString("{id:-20b,test:3.19f}");
-        readString("{id:[I;1,2,3,]}");
-        readString("{id:[1,2,3,]}");
+        deserialize("{id:5}");
+        deserialize("{id:5b}");
+        deserialize("{id:test,test:1,}");
+        deserialize("{id:[3.2,64.5,129.5]}");
+        deserialize("{id:[I;1,2, 3, 4,5]}"); // >=1.11
+        deserialize("{id:1b,b:true}");
+        deserialize("{id:[L;1l,2L,3L]}"); // >=1.11
+        deserialize("{id:[I;1i,2I,3I]}");
+        deserialize("{id:'minecraft:stone'}"); // >=1.13
+        deserialize("{id:1,id:2}");
+        deserialize("{id:-20b,test:3.19f}");
+        deserialize("{id:[I;1,2,3,]}");
+        deserialize("{id:[1,2,3,]}");
 
-        Assertions.assertEquals("0da", readString("{id:0da}").get("id").getValue());
-        Assertions.assertEquals("NaNd", readString("{id:NaNd}").get("id").getValue());
-        Assertions.assertEquals("Infinityd", readString("{id:Infinityd}").get("id").getValue());
-        Assertions.assertEquals("2147483649", readString("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
-        Assertions.assertEquals((byte) 1, readString("{thisisabyte:true}").get("thisisabyte").getValue());
-        Assertions.assertEquals((byte) 0, readString("{thisisabyte:false}").get("thisisabyte").getValue());
+        Assertions.assertEquals("0da", deserializeCompoundTag("{id:0da}").get("id").getValue());
+        Assertions.assertEquals("NaNd", deserializeCompoundTag("{id:NaNd}").get("id").getValue());
+        Assertions.assertEquals("Infinityd", deserializeCompoundTag("{id:Infinityd}").get("id").getValue());
+        Assertions.assertEquals("2147483649", deserializeCompoundTag("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
+        Assertions.assertEquals((byte) 1, deserializeCompoundTag("{thisisabyte:true}").get("thisisabyte").getValue());
+        Assertions.assertEquals((byte) 0, deserializeCompoundTag("{thisisabyte:false}").get("thisisabyte").getValue());
 
         //TODO fix legacy < 1.12
-        // readString("{id:minecraft:stone}");
-        // readString("{id:[1,2, 3, 4,5]}");
+        // deserialize("{id:minecraft:stone}");
+        // deserialize("{id:[1,2, 3, 4,5]}");
     }
 }

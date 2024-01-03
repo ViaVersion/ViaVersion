@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,6 +83,11 @@ public class BaseProtocol extends AbstractProtocol {
 
             // Add Base Protocol
             pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
+
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().info("User connected with protocol: " + info.getProtocolVersion() + " and serverProtocol: " + info.getServerProtocolVersion());
+                Via.getPlatform().getLogger().info("Protocol pipeline: " + pipeline.pipes());
+            }
 
             // Change state
             if (state == 1) {

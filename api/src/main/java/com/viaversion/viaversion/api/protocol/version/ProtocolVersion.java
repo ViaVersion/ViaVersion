@@ -83,7 +83,9 @@ public class ProtocolVersion {
     public static final ProtocolVersion v1_19_1 = register(760, "1.19.1/2", new VersionRange("1.19", 1, 2));
     public static final ProtocolVersion v1_19_3 = register(761, "1.19.3");
     public static final ProtocolVersion v1_19_4 = register(762, "1.19.4");
-    public static final ProtocolVersion v1_20 = register(763, "1.20");
+    public static final ProtocolVersion v1_20 = register(763, "1.20/1.20.1", new VersionRange("1.20", 0, 1));
+    public static final ProtocolVersion v1_20_2 = register(764, "1.20.2");
+    public static final ProtocolVersion v1_20_3 = register(765, "1.20.3/1.20.4", new VersionRange("1.20", 3, 4));
     public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
 
     public static ProtocolVersion register(int version, String name) {
@@ -105,7 +107,7 @@ public class ProtocolVersion {
      * @param snapshotVersion snapshot protocol version, or -1 if not a snapshot
      * @param name            version name
      * @param versionRange    range of versions that are supported by this protocol version, null if not a range
-     * @return registered {@link ProtocolVersion}
+     * @return registered ProtocolVersion
      */
     public static ProtocolVersion register(int version, int snapshotVersion, String name, @Nullable VersionRange versionRange) {
         ProtocolVersion protocol = new ProtocolVersion(version, snapshotVersion, name, versionRange);
@@ -128,11 +130,11 @@ public class ProtocolVersion {
     }
 
     /**
-     * Returns a {@link ProtocolVersion} instance, even if this protocol version
+     * Returns a ProtocolVersion instance, even if this protocol version
      * has not been registered. See {@link #isRegistered(int)} berorehand or {@link #isKnown()}.
      *
      * @param version protocol version
-     * @return registered or unknown {@link ProtocolVersion}
+     * @return registered or unknown ProtocolVersion
      */
     public static @NonNull ProtocolVersion getProtocol(int version) {
         ProtocolVersion protocolVersion = VERSIONS.get(version);
@@ -183,10 +185,8 @@ public class ProtocolVersion {
                 if (majorVersion.equals(protocol) || (protocol.startsWith(name.substring(0, name.length() - 1)))) {
                     return version;
                 }
-            } else if (version.isRange()) {
-                if (version.getIncludedVersions().contains(protocol)) {
-                    return version;
-                }
+            } else if (version.isRange() && version.getIncludedVersions().contains(protocol)) {
+                return version;
             }
         }
         return null;
@@ -246,7 +246,7 @@ public class ProtocolVersion {
      * Returns the snapshot protocol version without the snapshot indicator bit if this is a snapshot protocol version.
      *
      * @return snapshot protocol version without the snapshot indicator bit
-     * @throws IllegalArgumentException if the version if not a snapshot version
+     * @throws IllegalArgumentException if the version is not a snapshot version
      * @see #isSnapshot()
      */
     public int getSnapshotVersion() {
@@ -258,7 +258,7 @@ public class ProtocolVersion {
      * Returns the snapshot protocol version with the snapshot indicator bit if this is a snapshot protocol version.
      *
      * @return snapshot protocol version with the snapshot indicator bit
-     * @throws IllegalArgumentException if the version if not a snapshot version
+     * @throws IllegalArgumentException if the version is not a snapshot version
      * @see #isSnapshot()
      */
     public int getFullSnapshotVersion() {

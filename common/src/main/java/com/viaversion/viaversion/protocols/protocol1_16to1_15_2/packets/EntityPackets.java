@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.ByteTag;
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.FloatTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.LongTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -38,6 +32,8 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.util.Key;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -167,10 +163,10 @@ public class EntityPackets {
                 return;
             }
 
-            wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, Entity1_16Types.LIGHTNING_BOLT);
+            wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(entityId, EntityTypes1_16.LIGHTNING_BOLT);
 
             wrapper.write(Type.UUID, UUID.randomUUID()); // uuid
-            wrapper.write(Type.VAR_INT, Entity1_16Types.LIGHTNING_BOLT.getId()); // entity type
+            wrapper.write(Type.VAR_INT, EntityTypes1_16.LIGHTNING_BOLT.getId()); // entity type
 
             wrapper.passthrough(Type.DOUBLE); // x
             wrapper.passthrough(Type.DOUBLE); // y
@@ -183,9 +179,9 @@ public class EntityPackets {
             wrapper.write(Type.SHORT, (short) 0); // velocity
         });
 
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, Entity1_16Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, EntityTypes1_16.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, Entity1_16Types.PLAYER);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, EntityTypes1_16.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_16.METADATA_LIST);
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_15.DESTROY_ENTITIES);
 
@@ -214,13 +210,13 @@ public class EntityPackets {
                 handler(wrapper -> {
                     wrapper.write(Type.BYTE, (byte) -1); // Previous gamemode, set to none
                     wrapper.write(Type.STRING_ARRAY, Arrays.copyOf(WORLD_NAMES, WORLD_NAMES.length)); // World list - only used for command completion
-                    wrapper.write(Type.NBT, DIMENSIONS_TAG.clone()); // Dimension registry
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, DIMENSIONS_TAG.copy()); // Dimension registry
                 });
                 handler(DIMENSION_HANDLER); // Dimension
                 map(Type.LONG); // Seed
                 map(Type.UNSIGNED_BYTE); // Max players
                 handler(wrapper -> {
-                    wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(wrapper.get(Type.INT, 0), Entity1_16Types.PLAYER);
+                    wrapper.user().getEntityTracker(Protocol1_16To1_15_2.class).addEntity(wrapper.get(Type.INT, 0), EntityTypes1_16.PLAYER);
 
                     final String type = wrapper.read(Type.STRING);// level type
                     wrapper.passthrough(Type.VAR_INT); // View distance
@@ -242,8 +238,8 @@ public class EntityPackets {
                 String key = wrapper.read(Type.STRING);
                 String attributeIdentifier = protocol.getMappingData().getAttributeMappings().get(key);
                 if (attributeIdentifier == null) {
-                    attributeIdentifier = "minecraft:" + key;
-                    if (!com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.MappingData.isValid1_13Channel(attributeIdentifier)) {
+                    attributeIdentifier = Key.namespaced(key);
+                    if (!Key.isValid(attributeIdentifier)) {
                         if (!Via.getConfig().isSuppressConversionWarnings()) {
                             Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
                         }

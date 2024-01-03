@@ -1,22 +1,29 @@
 plugins {
     id("net.kyori.blossom")
-    id("via.shadow-conventions")
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
-blossom {
-    replaceToken("\$VERSION", project.version)
-    replaceToken("\$IMPL_VERSION", "git-ViaVersion-${project.version}:${rootProject.latestCommitHash()}")
+sourceSets {
+    main {
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+                property("impl_version", "git-ViaVersion-${project.version}:${rootProject.latestCommitHash()}")
+            }
+        }
+    }
 }
 
 dependencies {
-    api(projects.adventure) {
-        targetConfiguration = "shadow"
-    }
     api(libs.fastutil)
     api(libs.flare)
     api(libs.flareFastutil)
-    api(libs.openNBT)
+    api(libs.vianbt)
     api(libs.gson)
+    implementation(rootProject.libs.text) {
+        exclude("com.google.code.gson", "gson")
+        exclude("com.viaversion", "nbt")
+    }
 
     compileOnlyApi(libs.snakeYaml)
     compileOnlyApi(libs.netty)
@@ -27,3 +34,5 @@ dependencies {
 java {
     withJavadocJar()
 }
+
+publishShadowJar()

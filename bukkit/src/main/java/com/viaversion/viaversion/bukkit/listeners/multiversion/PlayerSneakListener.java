@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,12 +74,9 @@ public class PlayerSneakListener extends ViaBukkitListener {
         if (Via.getAPI().getServerVersion().lowestSupportedVersion() >= ProtocolVersion.v1_9.getVersion()) {
             sneaking = new WeakHashMap<>();
             useCache = true;
-            plugin.getServer().getScheduler().runTaskTimer(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    for (Map.Entry<Player, Boolean> entry : sneaking.entrySet()) {
-                        setHeight(entry.getKey(), entry.getValue() ? HEIGHT_1_14 : HEIGHT_1_9);
-                    }
+            plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+                for (Map.Entry<Player, Boolean> entry : sneaking.entrySet()) {
+                    setHeight(entry.getKey(), entry.getValue() ? HEIGHT_1_14 : HEIGHT_1_9);
                 }
             }, 1, 1);
         }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_11To1_10> {
 
@@ -147,12 +148,12 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
     @Override
     public com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
-        return Entity1_11Types.getTypeFromId(type, false);
+        return EntityTypes1_11.getTypeFromId(type, false);
     }
 
     @Override
     public com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
-        return Entity1_11Types.getTypeFromId(type, true);
+        return EntityTypes1_11.getTypeFromId(type, true);
     }
 
     public static EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
@@ -230,7 +231,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
             if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("An error occurred with entity type rewriter");
                 Via.getPlatform().getLogger().warning("Metadata: " + metadata);
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error: ", e);
             }
         }
 

@@ -1,5 +1,3 @@
-import org.gradle.api.plugins.JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME
-
 plugins {
     base
     id("via.build-logic")
@@ -11,7 +9,10 @@ allprojects {
     description = "Allow newer clients to join older server versions."
 }
 
-val platforms = setOf(
+val main = setOf(
+    projects.viaversion,
+    projects.viaversionCommon,
+    projects.viaversionApi,
     projects.viaversionBukkit,
     projects.viaversionBungee,
     projects.viaversionFabric,
@@ -19,24 +20,12 @@ val platforms = setOf(
     projects.viaversionVelocity
 ).map { it.dependencyProject }
 
-val special = setOf(
-    projects.viaversion,
-    projects.viaversionApi,
-    projects.adventure
-).map { it.dependencyProject }
+// val special = setOf().map { it.dependencyProject }
 
 subprojects {
     when (this) {
-        in platforms -> plugins.apply("via.platform-conventions")
-        in special -> plugins.apply("via.base-conventions")
+        in main -> plugins.apply("via.shadow-conventions")
+        // in special -> plugins.apply("via.base-conventions")
         else -> plugins.apply("via.standard-conventions")
-    }
-
-    // Note: If manually starting tests doesn't work for you in IJ, change 'Gradle -> Run Tests Using' to 'IntelliJ IDEA'
-    dependencies {
-        // The alternative to this long boi is writing "testImplementation", including the quotes
-        TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.netty)
-        TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.guava)
-        TEST_IMPLEMENTATION_CONFIGURATION_NAME(rootProject.libs.bundles.junit)
     }
 }

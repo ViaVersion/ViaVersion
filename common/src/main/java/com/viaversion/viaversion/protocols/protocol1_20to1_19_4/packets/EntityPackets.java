@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20to1_19_4.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.FloatTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.github.steveice10.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
@@ -35,13 +32,15 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20To1_19_4> {
 
+    private static final Quaternion Y_FLIPPED_ROTATION = new Quaternion(0, 1, 0, 0);
+
     public EntityPackets(final Protocol1_20To1_19_4 protocol) {
         super(protocol);
     }
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, Entity1_19_4Types.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_19_4.METADATA_LIST, Types1_20.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
@@ -50,10 +49,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
             public void register() {
                 map(Type.INT); // Entity id
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Dimension registry
+                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
                 map(Type.STRING); // Dimension key
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -71,7 +70,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag damageTypeRegistry = registry.get("minecraft:damage_type");
                     final ListTag damageTypes = damageTypeRegistry.get("value");
                     int highestId = -1;
@@ -127,7 +126,22 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
         filter().handler((event, meta) -> meta.setMetaType(Types1_20.META_TYPES.byId(meta.metaType().typeId())));
         registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType);
 
-        filter().filterFamily(Entity1_19_4Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        // Rotate item display by 180 degrees around the Y axis
+        filter().filterFamily(EntityTypes1_19_4.ITEM_DISPLAY).handler((event, meta) -> {
+            if (event.trackedEntity().hasSentMetadata() || event.hasExtraMeta()) {
+                return;
+            }
+
+            if (event.metaAtIndex(12) == null) {
+                event.createExtraMeta(new Metadata(12, Types1_20.META_TYPES.quaternionType, Y_FLIPPED_ROTATION));
+            }
+        });
+        filter().filterFamily(EntityTypes1_19_4.ITEM_DISPLAY).index(12).handler((event, meta) -> {
+            final Quaternion quaternion = meta.value();
+            meta.setValue(rotateY180(quaternion));
+        });
+
+        filter().filterFamily(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
@@ -135,6 +149,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19_4Types.getTypeFromId(type);
+        return EntityTypes1_19_4.getTypeFromId(type);
+    }
+
+    private Quaternion rotateY180(final Quaternion quaternion) {
+        return new Quaternion(-quaternion.z(), quaternion.w(), quaternion.x(), -quaternion.y());
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -101,47 +102,46 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     @Override
-    public void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection) {
+    public void handleMetadata(final int entityId, final List<Metadata> metadataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
-        int i = 0; // Count index for fast removal
-        for (Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
+        for (final Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             // Call handlers implementing the old handleMetadata
             if (!callOldMetaHandler(entityId, type, metadata, metadataList, connection)) {
-                metadataList.remove(i--);
+                metadataList.remove(metadata);
                 continue;
             }
 
             MetaHandlerEvent event = null;
-            for (MetaFilter filter : metadataFilters) {
+            for (final MetaFilter filter : metadataFilters) {
                 if (!filter.isFiltered(type, metadata)) {
                     continue;
                 }
                 if (event == null) {
                     // Only initialize when needed and share event instance
-                    event = new MetaHandlerEventImpl(connection, type, entityId, metadata, metadataList);
+                    event = new MetaHandlerEventImpl(connection, entity, entityId, metadata, metadataList);
                 }
 
                 try {
                     filter.handler().handle(event, metadata);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     logException(e, type, metadataList, metadata);
-                    metadataList.remove(i--);
+                    metadataList.remove(metadata);
                     break;
                 }
 
                 if (event.cancelled()) {
-                    // Remove meta, decrease list index counter, and break current filter loop
-                    metadataList.remove(i--);
+                    // Remove meta, and break current filter loop
+                    metadataList.remove(metadata);
                     break;
                 }
             }
 
-            if (event != null && event.extraMeta() != null) {
+            final List<Metadata> extraMeta = event != null ? event.extraMeta() : null;
+            if (extraMeta != null) {
                 // Finally, add newly created meta
-                metadataList.addAll(event.extraMeta());
+                metadataList.addAll(extraMeta);
             }
-            i++;
         }
 
         if (entity != null) {
@@ -311,6 +311,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 map(Type.VAR_INT); // Data
                 handler(trackerHandler());
                 handler(wrapper -> {
+                    if (protocol.getMappingData() == null) {
+                        return;
+                    }
+
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     EntityType entityType = tracker(wrapper.user()).entityType(entityId);
                     if (entityType == fallingBlockType) {
@@ -419,7 +423,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return wrapper -> {
             EntityTracker tracker = tracker(wrapper.user());
 
-            CompoundTag registryData = wrapper.get(Type.NBT, nbtIndex);
+            CompoundTag registryData = wrapper.get(Type.NAMED_COMPOUND_TAG, nbtIndex);
             Tag height = registryData.get("height");
             if (height instanceof IntTag) {
                 int blockHeight = ((IntTag) height).asInt();
@@ -468,32 +472,40 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public PacketHandler biomeSizeTracker() {
-        return wrapper -> {
-            final CompoundTag registry = wrapper.get(Type.NBT, 0);
-            final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
-            final ListTag biomes = biomeRegistry.get("value");
-            tracker(wrapper.user()).setBiomesSent(biomes.size());
-        };
+        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
+    }
+
+    public PacketHandler configurationBiomeSizeTracker() {
+        return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.COMPOUND_TAG, 0));
+    }
+
+    public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
+        final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
+        final ListTag biomes = biomeRegistry.get("value");
+        tracker(connection).setBiomesSent(biomes.size());
+    }
+
+    public PacketHandler dimensionDataHandler() {
+        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
+    }
+
+    public PacketHandler configurationDimensionDataHandler() {
+        return wrapper -> cacheDimensionData(wrapper.user(), wrapper.get(Type.COMPOUND_TAG, 0));
     }
 
     /**
-     * Returns a handler to cache dimension data, later used to get height values and other important info.
-     *
-     * @return handler to cache dimension data
+     * Caches dimension data, later used to get height values and other important info.
      */
-    public PacketHandler dimensionDataHandler() {
-        return wrapper -> {
-            final CompoundTag tag = wrapper.get(Type.NBT, 0);
-            final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
-            final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
-            for (final Tag dimension : dimensions) {
-                final CompoundTag dimensionCompound = (CompoundTag) dimension;
-                final CompoundTag element = dimensionCompound.get("element");
-                final String name = (String) dimensionCompound.get("name").getValue();
-                dimensionDataMap.put(name, new DimensionDataImpl(element));
-            }
-            tracker(wrapper.user()).setDimensions(dimensionDataMap);
-        };
+    public void cacheDimensionData(final UserConnection connection, final CompoundTag registry) {
+        final ListTag dimensions = ((CompoundTag) registry.get("minecraft:dimension_type")).get("value");
+        final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
+        for (final Tag dimension : dimensions) {
+            final CompoundTag dimensionCompound = (CompoundTag) dimension;
+            final CompoundTag element = dimensionCompound.get("element");
+            final String name = (String) dimensionCompound.get("name").getValue();
+            dimensionDataMap.put(name, new DimensionDataImpl(element));
+        }
+        tracker(connection).setDimensions(dimensionDataMap);
     }
 
     // ---------------------------------------------------------------------------
@@ -569,11 +581,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.getId();
         if (mappings.isBlockParticle(id)) {
-            Particle.ParticleData data = particle.getArguments().get(0);
-            data.setValue(protocol.getMappingData().getNewBlockStateId(data.get()));
+            Particle.ParticleData<Integer> data = particle.getArgument(0);
+            data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id) && protocol.getItemRewriter() != null) {
-            Particle.ParticleData data = particle.getArguments().get(0);
-            Item item = data.get();
+            Particle.ParticleData<Item> data = particle.getArgument(0);
+            Item item = data.getValue();
             protocol.getItemRewriter().handleItemToClient(item);
         }
 
@@ -587,7 +599,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
             logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
                     .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error: ", e);
         }
     }
 }

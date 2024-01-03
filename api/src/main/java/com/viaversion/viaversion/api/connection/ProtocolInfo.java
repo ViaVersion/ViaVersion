@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -33,10 +34,63 @@ public interface ProtocolInfo {
      * Returns the protocol state the user is currently in.
      *
      * @return protocol state
+     * @deprecated server and client can be in different states, use {@link #getClientState()} or {@link #getServerState()}
      */
-    State getState();
+    @Deprecated/*(forRemoval = true)*/
+    default State getState() {
+        return this.getServerState();
+    }
 
-    void setState(State state);
+    /**
+     * Returns the protocol state the client is currently in.
+     *
+     * @return the client protocol state
+     */
+    State getClientState();
+
+    /**
+     * Returns the protocol state the server is currently in.
+     *
+     * @return the server protocol state
+     */
+    State getServerState();
+
+    /**
+     * Returns the protocol state for the given direction.
+     *
+     * @param direction protocol direction
+     * @return state for the given direction
+     */
+    default State getState(final Direction direction) {
+        // Return the state the packet is coming from
+        return direction == Direction.CLIENTBOUND ? this.getServerState() : this.getClientState();
+    }
+
+    /**
+     * Sets both client and server state.
+     *
+     * @param state the new protocol state
+     * @see #setClientState(State)
+     * @see #setServerState(State)
+     */
+    default void setState(final State state) {
+        this.setClientState(state);
+        this.setServerState(state);
+    }
+
+    /**
+     * Sets the client protocol state.
+     *
+     * @param clientState the new client protocol state
+     */
+    void setClientState(State clientState);
+
+    /**
+     * Sets the server protocol state.
+     *
+     * @param serverState the new server protocol state
+     */
+    void setServerState(State serverState);
 
     /**
      * Returns the user's protocol version, or -1 if not set.

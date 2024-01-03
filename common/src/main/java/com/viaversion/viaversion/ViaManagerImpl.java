@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.viaversion.viaversion;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
+import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
 import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.PlatformTask;
@@ -32,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.scheduler.Scheduler;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
+import com.viaversion.viaversion.configuration.ConfigurationProviderImpl;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
@@ -47,12 +49,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ViaManagerImpl implements ViaManager {
     private final ProtocolManagerImpl protocolManager = new ProtocolManagerImpl();
     private final ConnectionManager connectionManager = new ConnectionManagerImpl();
+    private final ConfigurationProvider configurationProvider = new ConfigurationProviderImpl();
     private final DebugHandler debugHandler = new DebugHandlerImpl();
     private final ViaProviders providers = new ViaProviders();
     private final Scheduler scheduler = new TaskScheduler();
@@ -77,6 +81,8 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     public void init() {
+        configurationProvider.register(platform.getConf());
+
         if (System.getProperty("ViaVersion") != null) {
             // Reload?
             platform.onReload();
@@ -94,8 +100,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             injector.inject();
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to inject:");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to inject:", e);
             return;
         }
 
@@ -138,7 +143,7 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("ViaVersion does not have any compatible versions for this server version!");
                 platform.getLogger().warning("Please remember that ViaVersion only adds support for versions newer than the server version.");
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
-                platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://jo0001.github.io/ViaSetup");
+                platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://viaversion.com/setup");
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
             } else if (protocolVersion.highestSupportedVersion() <= ProtocolVersion.v1_12_2.getVersion()) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
@@ -191,8 +196,7 @@ public class ViaManagerImpl implements ViaManager {
 
             protocolManager.setServerProtocol(versionInfo);
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to get the server protocol!");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to get the server protocol!", e);
         }
     }
 
@@ -202,8 +206,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             injector.uninject();
         } catch (Exception e) {
-            platform.getLogger().severe("ViaVersion failed to uninject:");
-            e.printStackTrace();
+            platform.getLogger().log(Level.SEVERE, "ViaVersion failed to uninject:", e);
         }
 
         loader.unload();
@@ -223,8 +226,7 @@ public class ViaManagerImpl implements ViaManager {
         try {
             version = Integer.parseInt(versionString);
         } catch (NumberFormatException e) {
-            platform.getLogger().warning("Failed to determine Java version; could not parse: " + versionString);
-            e.printStackTrace();
+            platform.getLogger().log(Level.WARNING, "Failed to determine Java version; could not parse: " + versionString, e);
             return;
         }
 
@@ -304,6 +306,11 @@ public class ViaManagerImpl implements ViaManager {
     @Override
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    @Override
+    public ConfigurationProvider getConfigurationProvider() {
+        return configurationProvider;
     }
 
     /**

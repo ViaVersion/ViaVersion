@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.packets;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
@@ -47,10 +47,10 @@ public class EntityPackets {
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
                     byte type = wrapper.get(Type.BYTE, 0);
-                    Entity1_13Types.EntityType entType = Entity1_13Types.getTypeFromId(type, true);
+                    EntityTypes1_13.EntityType entType = EntityTypes1_13.getTypeFromId(type, true);
 
                     if (entType != null) {
-                        if (entType.is(Entity1_13Types.EntityType.FALLING_BLOCK)) {
+                        if (entType.is(EntityTypes1_13.EntityType.FALLING_BLOCK)) {
                             int data = wrapper.get(Type.INT, 0);
                             wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         }
@@ -94,7 +94,7 @@ public class EntityPackets {
                 map(Type.BYTE); // 6 - Pitch
                 map(Types1_13.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, Entity1_13Types.EntityType.PLAYER));
+                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
         });
 

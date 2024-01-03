@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +42,29 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class BlockRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
     private final Type<Position> positionType;
+    private final Type<CompoundTag> compoundTagType;
 
+    @Deprecated/*(forRemoval = true)*/
     public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType) {
+        this(protocol, positionType, Type.NAMED_COMPOUND_TAG);
+    }
+
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> compoundTagType) {
         this.protocol = protocol;
         this.positionType = positionType;
+        this.compoundTagType = compoundTagType;
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION1_8, Type.NAMED_COMPOUND_TAG);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_14(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.NAMED_COMPOUND_TAG);
+    }
+
+    public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol) {
+        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.COMPOUND_TAG);
     }
 
     public void registerBlockAction(C packetType) {
@@ -145,9 +164,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
-                    if (id == playRecordId) { // Play record
+                    if (id == playRecordId && protocol.getMappingData().getItemMappings() != null) {
                         wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
-                    } else if (id == blockBreakId) { // Block break + block break sound
+                    } else if (id == blockBreakId && protocol.getMappingData().getBlockStateMappings() != null) {
                         wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
@@ -166,8 +185,8 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
         return wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
+            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
             final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
@@ -203,7 +222,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
 
     public void registerBlockEntityData(C packetType, @Nullable Consumer<BlockEntity> blockEntityHandler) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final Position position = wrapper.passthrough(Type.POSITION1_14);
+            final Position position = wrapper.passthrough(positionType);
 
             final int blockEntityId = wrapper.read(Type.VAR_INT);
             final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
@@ -214,7 +233,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             }
 
             final CompoundTag tag;
-            if (blockEntityHandler != null && (tag = wrapper.passthrough(Type.NBT)) != null) {
+            if (blockEntityHandler != null && (tag = wrapper.passthrough(compoundTagType)) != null) {
                 final BlockEntity blockEntity = new BlockEntityImpl(BlockEntity.pack(position.x(), position.z()), (short) position.y(), blockEntityId, tag);
                 blockEntityHandler.accept(blockEntity);
             }

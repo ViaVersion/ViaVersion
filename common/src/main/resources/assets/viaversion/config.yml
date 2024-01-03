@@ -2,7 +2,6 @@
 # Ensure you look through all these options
 # If you need help:
 # Discord - https://viaversion.com/discord
-# viaversion.com - Discussion tab
 # Docs - https://docs.viaversion.com/display/VIAVERSION/Configuration
 #
 #----------------------------------------------------------#
@@ -18,7 +17,7 @@ send-supported-versions: false
 # You can use both this and the block-protocols option at the same time as well.
 block-versions: []
 # Block specific Minecraft protocol version numbers.
-# List of all Minecraft protocol versions: http://wiki.vg/Protocol_version_numbers, or use a generator: https://via.krusic22.com
+# List of all Minecraft protocol versions: https://wiki.vg/Protocol_version_numbers, or use a generator: https://via.krusic22.com
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
@@ -26,7 +25,7 @@ block-disconnect-msg: "You are using an unsupported Minecraft version!"
 # (We don't suggest using reload either, use a plugin manager)
 # You can customise the message we kick people with if you use ProtocolLib here.
 reload-disconnect-msg: "Server reload, please rejoin!"
-# We warn when there's a error converting item and block data over versions, should we suppress these? (Only suggested if spamming)
+# We warn when there's an error converting item and block data over versions, should we suppress these? (Only suggested if spamming)
 suppress-conversion-warnings: false
 #
 #----------------------------------------------------------#
@@ -41,14 +40,14 @@ suppress-conversion-warnings: false
 bungee-ping-interval: 60
 # If the above is enabled, should we save the info to the config (in the section below)
 bungee-ping-save: true
-# To get a servers protocol, ViaVersion will do the following:
+# To get a server's protocol, ViaVersion will do the following:
 # Look for the server in the following section, then look for the last ping if bungee-ping is enabled
 # otherwise use default.
 #
 # The format for the following is:
 #  servername: protocolversion
-# You can find protocol ids on http://wiki.vg/Protocol_version_numbers
-# It will fallback to the default option if none found.
+# You can find protocol ids on https://wiki.vg/Protocol_version_numbers
+# It will use the default option if none found.
 bungee-servers: {}
 #
 #----------------------------------------------------------#
@@ -63,14 +62,14 @@ bungee-servers: {}
 velocity-ping-interval: 60
 # If the above is enabled, should we save the info to the config (in the section below)
 velocity-ping-save: true
-# To get a servers protocol, ViaVersion will do the following:
+# To get a server's protocol, ViaVersion will do the following:
 # Look for the server in the following section, then look for the last ping if velocity-ping is enabled
 # otherwise use default.
 #
 # The format for the following is:
 #  servername: protocolversion
-# You can find protocol ids on http://wiki.vg/Protocol_version_numbers
-# It will fallback to the default option if none found.
+# You can find protocol ids on https://wiki.vg/Protocol_version_numbers
+# It will fall back to the default option if none found.
 velocity-servers: {}
 #
 #----------------------------------------------------------#
@@ -135,14 +134,14 @@ change-1_9-hitbox: false
 # WARNING: This gives 1.14+ players the ability to sneak under blocks, that players under that version cannot (sneaking in places that are only 1.5 blocks high)!
 # Another thing to remember is that those players might be missed by projectiles and other hits directed at the very top of their head whilst sneaking.
 change-1_14-hitbox: false
-# Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non full blocks.
+# Fixes 1.14+ clients on sub 1.14 servers having a light value of 0 for non-full blocks.
 fix-non-full-blocklight: true
 # Fixes walk animation not shown when health is set to Float.NaN
 fix-1_14-health-nan: true
 # Should 1.15+ clients respawn instantly / without showing a death screen?
 use-1_15-instant-respawn: false
 #
-# Enable serverside block-connections for 1.13+ clients - all of the options in this section are built around this option
+# Enable serverside block-connections for 1.13+ clients - all the options in this section are built around this option
 serverside-blockconnections: true
 # Sets the method for the block connections (world for highly experimental (USE AT OWN RISK) world-level or packet for packet-level)
 blockconnection-method: packet
@@ -167,16 +166,14 @@ resource-pack-1_17-prompt: ''
 # Only disable this if you know what you are doing.
 cache-1_17-light: true
 #
-# 1.19 chat type formats used for 1.19.1+ clients.
-chat-types-1_19:
-  chat.type.text: "<%s> %s"
-  chat.type.announcement: "[%s] %s"
-  commands.message.display.incoming: "%s whispers to you: %s"
-  chat.type.team.text: "%s <%s> %s"
-  chat.type.emote: "* %s %s"
-#
 # Force-update 1.19.4+ player's inventory when they try to swap armor in a pre-occupied slot.
 armor-toggle-fix: true
+#
+# Get the world names which should be returned for each vanilla dimension
+map-1_16-world-names:
+  overworld: "minecraft:overworld"
+  nether: "minecraft:the_nether"
+  end: "minecraft:the_end"
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
@@ -191,7 +188,7 @@ auto-team: true
 suppress-metadata-errors: false
 # When enabled 1.9+ will be able to block by using shields
 shield-blocking: true
-# If this setting is active, the main hand is used instead of the off hand to trigger the blocking of the player.
+# If this setting is active, the main hand is used instead of the off-hand to trigger the blocking of the player.
 # With the main hand the blocking starts way faster.
 # (Requires "show-shield-when-sword-in-hand" to be disabled)
 no-delay-shield-blocking: false
@@ -225,8 +222,3 @@ force-json-transform: false
 minimize-cooldown: true
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
-# Get the world names which should be returned for each vanilla dimension
-map-1_16-world-names:
-  overworld: "minecraft:overworld"
-  nether: "minecraft:the_nether"
-  end: "minecraft:the_end"

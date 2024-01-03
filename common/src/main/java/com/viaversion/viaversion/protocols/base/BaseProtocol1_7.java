@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,9 +45,6 @@ public class BaseProtocol1_7 extends AbstractProtocol {
 
     @Override
     protected void registerPackets() {
-        /* Outgoing Packets */
-
-        // Status Response Packet
         registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() { // Status Response Packet
             @Override
             public void register() {
@@ -122,7 +119,9 @@ public class BaseProtocol1_7 extends AbstractProtocol {
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.PLAY);
+            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) { // On 1.20.2+, wait for the login ack
+                info.setState(State.PLAY);
+            }
 
             UUID uuid = passthroughLoginUUID(wrapper);
             info.setUuid(uuid);
@@ -147,7 +146,6 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             }
         });
 
-        /* Incoming Packets */
         // Login Start Packet
         registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
             int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
@@ -163,6 +161,11 @@ public class BaseProtocol1_7 extends AbstractProtocol {
                 ChannelFuture future = disconnectPacket.sendFuture(BaseProtocol.class);
                 future.addListener(f -> wrapper.user().getChannel().close());
             }
+        });
+
+        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
+            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+            info.setState(State.CONFIGURATION);
         });
     }
 

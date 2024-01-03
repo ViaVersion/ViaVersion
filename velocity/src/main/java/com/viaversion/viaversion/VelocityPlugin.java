@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.dump.PluginInfo;
@@ -194,11 +193,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
-    }
-
-    @Override
     public File getDataFolder() {
         return configDir.toFile();
     }
@@ -227,18 +221,13 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
                     true,
                     p.getDescription().getName().orElse(p.getDescription().getId()),
                     p.getDescription().getVersion().orElse("Unknown Version"),
-                    p.getInstance().isPresent() ? p.getInstance().get().getClass().getCanonicalName() : "Unknown",
+                    p.getInstance().map(instance -> instance.getClass().getCanonicalName()).orElse("Unknown"),
                     p.getDescription().getAuthors()
             ));
         }
         extra.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
         extra.add("servers", GsonUtil.getGson().toJsonTree(protocolDetectorService.detectedProtocolVersions()));
         return extra;
-    }
-
-    @Override
-    public boolean isOldClientsAllowed() {
-        return true;
     }
 
     @Override

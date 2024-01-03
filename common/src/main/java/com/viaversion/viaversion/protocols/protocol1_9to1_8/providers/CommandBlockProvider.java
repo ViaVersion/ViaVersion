@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,21 +33,17 @@ public class CommandBlockProvider implements Provider {
 
     public void addOrUpdateBlock(UserConnection user, Position position, CompoundTag tag) throws Exception {
         checkPermission(user);
-        if (isEnabled())
-            getStorage(user).addOrUpdateBlock(position, tag);
+        getStorage(user).addOrUpdateBlock(position, tag);
     }
 
     public Optional<CompoundTag> get(UserConnection user, Position position) throws Exception {
         checkPermission(user);
-        if (isEnabled())
-            return getStorage(user).getCommandBlock(position);
-        return Optional.empty();
+        return getStorage(user).getCommandBlock(position);
     }
 
     public void unloadChunk(UserConnection user, int x, int z) throws Exception {
         checkPermission(user);
-        if (isEnabled())
-            getStorage(user).unloadChunk(x, z);
+        getStorage(user).unloadChunk(x, z);
     }
 
     private CommandBlockStorage getStorage(UserConnection connection) {
@@ -55,8 +51,6 @@ public class CommandBlockProvider implements Provider {
     }
 
     public void sendPermission(UserConnection user) throws Exception {
-        if (!isEnabled())
-            return;
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_STATUS, null, user); // Entity status
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
@@ -70,20 +64,13 @@ public class CommandBlockProvider implements Provider {
 
     // Fix for Bungee since the join game is not sent after the first one
     private void checkPermission(UserConnection user) throws Exception {
-        if (!isEnabled())
-            return;
         CommandBlockStorage storage = getStorage(user);
         if (!storage.isPermissions()) {
             sendPermission(user);
         }
     }
 
-    public boolean isEnabled() {
-        return true;
-    }
-
     public void unloadChunks(UserConnection userConnection) {
-        if (isEnabled())
-            getStorage(userConnection).unloadChunks();
+        getStorage(userConnection).unloadChunks();
     }
 }

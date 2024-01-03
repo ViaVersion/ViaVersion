@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -53,15 +54,16 @@ import net.md_5.bungee.api.score.Team;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.protocol.packet.PluginMessage;
 
+// All of this is madness
 public class BungeeServerHandler implements Listener {
-    private static Method getHandshake;
-    private static Method getRegisteredChannels;
-    private static Method getBrandMessage;
-    private static Method setProtocol;
-    private static Method getEntityMap = null;
-    private static Method setVersion = null;
-    private static Field entityRewrite = null;
-    private static Field channelWrapper = null;
+    private static final Method getHandshake;
+    private static final Method getRegisteredChannels;
+    private static final Method getBrandMessage;
+    private static final Method setProtocol;
+    private static final Method getEntityMap;
+    private static final Method setVersion;
+    private static final Field entityRewrite;
+    private static final Field channelWrapper;
 
     static {
         try {
@@ -75,57 +77,63 @@ public class BungeeServerHandler implements Listener {
             channelWrapper.setAccessible(true);
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
             entityRewrite.setAccessible(true);
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     // Set the handshake version every time someone connects to any server
     @EventHandler(priority = 120)
-    public void onServerConnect(ServerConnectEvent e) {
-        if (e.isCancelled()) {
+    public void onServerConnect(ServerConnectEvent event) {
+        if (event.isCancelled()) {
             return;
         }
 
-        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
-        if (user == null) return;
-        if (!user.has(BungeeStorage.class)) {
-            user.put(new BungeeStorage(e.getPlayer()));
+        UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
+        if (user == null) {
+            return;
         }
 
-        int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(e.getTarget().getName());
-        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(user.getProtocolInfo().getProtocolVersion(), protocolId);
+        if (!user.has(BungeeStorage.class)) {
+            user.put(new BungeeStorage(event.getPlayer()));
+        }
+
+        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
+        int clientProtocolVersion = user.getProtocolInfo().getProtocolVersion();
+        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
 
         // Check if ViaVersion can support that version
         try {
-            //Object pendingConnection = getPendingConnection.invoke(e.getPlayer());
-            Object handshake = getHandshake.invoke(e.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? user.getProtocolInfo().getProtocolVersion() : protocolId);
-        } catch (InvocationTargetException | IllegalAccessException e1) {
-            e1.printStackTrace();
+            Object handshake = getHandshake.invoke(event.getPlayer().getPendingConnection());
+            setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion : serverProtocolVersion);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 
     @EventHandler(priority = -120)
-    public void onServerConnected(ServerConnectedEvent e) {
+    public void onServerConnected(ServerConnectedEvent event) {
         try {
-            checkServerChange(e, Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId()));
-        } catch (Exception e1) {
-            e1.printStackTrace();
+            checkServerChange(event, Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @EventHandler(priority = -120)
-    public void onServerSwitch(ServerSwitchEvent e) {
+    public void onServerSwitch(ServerSwitchEvent event) {
         // Update entity id
-        UserConnection userConnection = Via.getManager().getConnectionManager().getConnectedClient(e.getPlayer().getUniqueId());
-        if (userConnection == null) return;
+        UserConnection userConnection = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
+        if (userConnection == null) {
+            return;
+        }
+
         int playerId;
         try {
             playerId = Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(userConnection);
-        } catch (Exception ex) {
-            return; // Ignored
+        } catch (Exception ignored) {
+            return;
         }
 
         for (EntityTracker tracker : userConnection.getEntityTrackers()) {
@@ -140,150 +148,145 @@ public class BungeeServerHandler implements Listener {
         }
     }
 
-    public void checkServerChange(ServerConnectedEvent e, UserConnection user) throws Exception {
-        if (user == null) return;
-        // Auto-team handling
-        // Handle server/version change
-        if (user.has(BungeeStorage.class)) {
-            BungeeStorage storage = user.get(BungeeStorage.class);
-            ProxiedPlayer player = storage.getPlayer();
+    public void checkServerChange(ServerConnectedEvent event, UserConnection user) throws Exception {
+        if (user == null) {
+            return;
+        }
 
-            if (e.getServer() != null) {
-                if (!e.getServer().getInfo().getName().equals(storage.getCurrentServer())) {
-                    // Clear auto-team
-                    EntityTracker1_9 oldEntityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
-                    if (oldEntityTracker != null) {
-                        if (oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
-                            oldEntityTracker.sendTeamPacket(false, true);
-                        }
-                    }
+        BungeeStorage storage = user.get(BungeeStorage.class);
+        if (storage == null) {
+            return;
+        }
 
-                    String serverName = e.getServer().getInfo().getName();
+        Server server = event.getServer();
+        if (server == null || server.getInfo().getName().equals(storage.getCurrentServer())) {
+            return;
+        }
 
-                    storage.setCurrentServer(serverName);
 
-                    int protocolId = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
+        // Clear auto-team
+        EntityTracker1_9 oldEntityTracker = user.getEntityTracker(Protocol1_9To1_8.class);
+        if (oldEntityTracker != null && oldEntityTracker.isAutoTeam() && oldEntityTracker.isTeamExists()) {
+            oldEntityTracker.sendTeamPacket(false, true);
+        }
 
-                    if (protocolId <= ProtocolVersion.v1_8.getVersion()) { // 1.8 doesn't have BossBar packet
-                        if (storage.getBossbar() != null) {
-                            // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
-                            if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
-                                for (UUID uuid : storage.getBossbar()) {
-                                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, user);
-                                    wrapper.write(Type.UUID, uuid);
-                                    wrapper.write(Type.VAR_INT, 1); // remove
-                                    wrapper.send(Protocol1_9To1_8.class);
-                                }
-                            }
-                            storage.getBossbar().clear();
-                        }
-                    }
+        String serverName = server.getInfo().getName();
+        storage.setCurrentServer(serverName);
+        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
+        if (serverProtocolVersion <= ProtocolVersion.v1_8.getVersion() && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
+            // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
+            if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+                for (UUID uuid : storage.getBossbar()) {
+                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, user);
+                    wrapper.write(Type.UUID, uuid);
+                    wrapper.write(Type.VAR_INT, 1); // remove
+                    wrapper.send(Protocol1_9To1_8.class);
+                }
+            }
+            storage.getBossbar().clear();
+        }
 
-                    ProtocolInfo info = user.getProtocolInfo();
-                    int previousServerProtocol = info.getServerProtocolVersion();
+        ProtocolInfo info = user.getProtocolInfo();
+        int previousServerProtocol = info.getServerProtocolVersion();
 
-                    // Refresh the pipes
-                    List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), protocolId);
-                    ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
-                    user.clearStoredObjects(true);
-                    pipeline.cleanPipes();
-                    if (protocolPath == null) {
-                        // TODO Check Bungee Supported Protocols? *shrugs*
-                        protocolId = info.getProtocolVersion();
+        // Refresh the pipes
+        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocolVersion);
+        ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
+        user.clearStoredObjects(true);
+        pipeline.cleanPipes();
+        if (protocolPath == null) {
+            // TODO Check Bungee Supported Protocols? *shrugs*
+            serverProtocolVersion = info.getProtocolVersion();
+        } else {
+            List<Protocol> protocols = new ArrayList<>(protocolPath.size());
+            for (ProtocolPathEntry entry : protocolPath) {
+                protocols.add(entry.protocol());
+            }
+            pipeline.add(protocols);
+        }
+
+        info.setServerProtocolVersion(serverProtocolVersion);
+        // Add version-specific base Protocol
+        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
+
+        // Workaround 1.13 server change
+        int id1_13 = ProtocolVersion.v1_13.getVersion();
+        boolean toNewId = previousServerProtocol < id1_13 && serverProtocolVersion >= id1_13;
+        boolean toOldId = previousServerProtocol >= id1_13 && serverProtocolVersion < id1_13;
+        if (previousServerProtocol != -1 && (toNewId || toOldId)) {
+            Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(event.getPlayer().getPendingConnection());
+            if (!registeredChannels.isEmpty()) {
+                Collection<String> newChannels = new HashSet<>();
+                for (Iterator<String> iterator = registeredChannels.iterator(); iterator.hasNext(); ) {
+                    String channel = iterator.next();
+                    String oldChannel = channel;
+                    if (toNewId) {
+                        channel = InventoryPackets.getNewPluginChannelId(channel);
                     } else {
-                        List<Protocol> protocols = new ArrayList<>(protocolPath.size());
-                        for (ProtocolPathEntry entry : protocolPath) {
-                            protocols.add(entry.protocol());
-                        }
-                        pipeline.add(protocols);
+                        channel = InventoryPackets.getOldPluginChannelId(channel);
                     }
-
-                    info.setServerProtocolVersion(protocolId);
-                    // Add version-specific base Protocol
-                    pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(protocolId));
-
-                    // Workaround 1.13 server change
-                    int id1_13 = ProtocolVersion.v1_13.getVersion();
-                    boolean toNewId = previousServerProtocol < id1_13 && protocolId >= id1_13;
-                    boolean toOldId = previousServerProtocol >= id1_13 && protocolId < id1_13;
-                    if (previousServerProtocol != -1 && (toNewId || toOldId)) {
-                        Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(e.getPlayer().getPendingConnection());
-                        if (!registeredChannels.isEmpty()) {
-                            Collection<String> newChannels = new HashSet<>();
-                            for (Iterator<String> iterator = registeredChannels.iterator(); iterator.hasNext(); ) {
-                                String channel = iterator.next();
-                                String oldChannel = channel;
-                                if (toNewId) {
-                                    channel = InventoryPackets.getNewPluginChannelId(channel);
-                                } else {
-                                    channel = InventoryPackets.getOldPluginChannelId(channel);
-                                }
-                                if (channel == null) {
-                                    iterator.remove();
-                                    continue;
-                                }
-                                if (!oldChannel.equals(channel)) {
-                                    iterator.remove();
-                                    newChannels.add(channel);
-                                }
-                            }
-                            registeredChannels.addAll(newChannels);
-                        }
-                        PluginMessage brandMessage = (PluginMessage) getBrandMessage.invoke(e.getPlayer().getPendingConnection());
-                        if (brandMessage != null) {
-                            String channel = brandMessage.getTag();
-                            if (toNewId) {
-                                channel = InventoryPackets.getNewPluginChannelId(channel);
-                            } else {
-                                channel = InventoryPackets.getOldPluginChannelId(channel);
-                            }
-                            if (channel != null) {
-                                brandMessage.setTag(channel);
-                            }
-                        }
+                    if (channel == null) {
+                        iterator.remove();
+                        continue;
                     }
-
-                    user.put(storage);
-
-                    user.setActive(protocolPath != null);
-
-                    // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
-                    for (Protocol protocol : pipeline.pipes()) {
-                        protocol.init(user);
+                    if (!oldChannel.equals(channel)) {
+                        iterator.remove();
+                        newChannels.add(channel);
                     }
+                }
+                registeredChannels.addAll(newChannels);
+            }
 
-                    EntityTracker1_9 newTracker = user.getEntityTracker(Protocol1_9To1_8.class);
-                    if (newTracker != null) {
-                        if (Via.getConfig().isAutoTeam()) {
-                            String currentTeam = null;
-                            for (Team team : player.getScoreboard().getTeams()) {
-                                if (team.getPlayers().contains(info.getUsername())) {
-                                    currentTeam = team.getName();
-
-                                }
-                            }
-
-                            // Reinitialize auto-team
-                            newTracker.setAutoTeam(true);
-                            if (currentTeam == null) {
-                                // Send auto-team as it was cleared above
-                                newTracker.sendTeamPacket(true, true);
-                                newTracker.setCurrentTeam("viaversion");
-                            } else {
-                                // Auto-team will be sent when bungee send remove packet
-                                newTracker.setAutoTeam(Via.getConfig().isAutoTeam());
-                                newTracker.setCurrentTeam(currentTeam);
-                            }
-                        }
-                    }
-
-                    Object wrapper = channelWrapper.get(player);
-                    setVersion.invoke(wrapper, protocolId);
-
-                    Object entityMap = getEntityMap.invoke(null, protocolId);
-                    entityRewrite.set(player, entityMap);
+            PluginMessage brandMessage = (PluginMessage) getBrandMessage.invoke(event.getPlayer().getPendingConnection());
+            if (brandMessage != null) {
+                String channel = brandMessage.getTag();
+                if (toNewId) {
+                    channel = InventoryPackets.getNewPluginChannelId(channel);
+                } else {
+                    channel = InventoryPackets.getOldPluginChannelId(channel);
+                }
+                if (channel != null) {
+                    brandMessage.setTag(channel);
                 }
             }
         }
+
+        user.put(storage);
+
+        user.setActive(protocolPath != null);
+
+        // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
+        for (Protocol protocol : pipeline.pipes()) {
+            protocol.init(user);
+        }
+
+        ProxiedPlayer player = storage.getPlayer();
+        EntityTracker1_9 newTracker = user.getEntityTracker(Protocol1_9To1_8.class);
+        if (newTracker != null && Via.getConfig().isAutoTeam()) {
+            String currentTeam = null;
+            for (Team team : player.getScoreboard().getTeams()) {
+                if (team.getPlayers().contains(info.getUsername())) {
+                    currentTeam = team.getName();
+                }
+            }
+
+            // Reinitialize auto-team
+            newTracker.setAutoTeam(true);
+            if (currentTeam == null) {
+                // Send auto-team as it was cleared above
+                newTracker.sendTeamPacket(true, true);
+                newTracker.setCurrentTeam("viaversion");
+            } else {
+                // Auto-team will be sent when bungee send remove packet
+                newTracker.setAutoTeam(Via.getConfig().isAutoTeam());
+                newTracker.setCurrentTeam(currentTeam);
+            }
+        }
+
+        Object wrapper = channelWrapper.get(player);
+        setVersion.invoke(wrapper, serverProtocolVersion);
+
+        Object entityMap = getEntityMap.invoke(null, serverProtocolVersion);
+        entityRewrite.set(player, entityMap);
     }
 }

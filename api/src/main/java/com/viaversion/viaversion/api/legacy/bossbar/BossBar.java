@@ -66,7 +66,7 @@ public interface BossBar {
     BossColor getColor();
 
     /**
-     * Yay colors!
+     * Yay, colors!
      *
      * @param color Whatever color you want!
      * @return The BossBar object

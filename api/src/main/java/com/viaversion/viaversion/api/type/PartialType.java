@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type;
 
 import io.netty.buffer.ByteBuf;
 
+@Deprecated
 public abstract class PartialType<T, X> extends Type<T> {
     private final X param;
 

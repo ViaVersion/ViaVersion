@@ -36,4 +36,5 @@ public final class GsonUtil {
     public static Gson getGson() {
         return GSON;
     }
+
 }

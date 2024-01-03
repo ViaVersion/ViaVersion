@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.UUIDIntArrayType;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
@@ -38,12 +37,13 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.Inventor
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.UUID;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_16To1_15_2> {
 
     public InventoryPackets(Protocol1_16To1_15_2 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.SET_SLOT);
             clearPacket.write(Type.UNSIGNED_BYTE, (short) -1);
             clearPacket.write(Type.SHORT, (short) -1);
-            clearPacket.write(Type.FLAT_VAR_INT_ITEM, null);
+            clearPacket.write(Type.ITEM1_13_2, null);
             clearPacket.send(Protocol1_16To1_15_2.class);
         };
 
@@ -107,10 +107,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         });
 
         registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.FLAT_VAR_INT_ITEM_ARRAY);
+        registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
         registerTradeList(ClientboundPackets1_15.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.FLAT_VAR_INT_ITEM);
-        registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerSetSlot(ClientboundPackets1_15.SET_SLOT, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS, Type.ITEM1_13_2);
 
         protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketHandlers() {
             @Override
@@ -120,24 +120,24 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 handler(wrapper -> {
                     int slot = wrapper.read(Type.VAR_INT);
                     wrapper.write(Type.BYTE, (byte) slot);
-                    handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                    handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                 });
             }
         });
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.DECLARE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.FLAT_VAR_INT_ITEM);
-        registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
 
         protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
             inventoryTracker.setInventoryOpen(false);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)));
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.FLAT_VAR_INT_ITEM, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.DOUBLE);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof StringTag) {
                     UUID id = UUID.fromString((String) idTag.getValue());
-                    ownerCompundTag.put("Id", new IntArrayTag(UUIDIntArrayType.uuidToIntArray(id)));
+                    ownerCompundTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(id)));
                 }
             }
         } else if (item.identifier() == 759 && tag != null) {
@@ -187,7 +187,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
                 Tag idTag = ownerCompundTag.get("Id");
                 if (idTag instanceof IntArrayTag) {
-                    UUID id = UUIDIntArrayType.uuidFromIntArray((int[]) idTag.getValue());
+                    UUID id = UUIDUtil.fromIntArray((int[]) idTag.getValue());
                     ownerCompundTag.put("Id", new StringTag(id.toString()));
                 }
             }
@@ -210,7 +210,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             Tag leastTag = attribute.get("UUIDLeast");
             if (leastTag != null) {
                 Tag mostTag = attribute.get("UUIDMost");
-                int[] uuidIntArray = UUIDIntArrayType.bitsToIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
+                int[] uuidIntArray = UUIDUtil.toIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
                 attribute.put("UUID", new IntArrayTag(uuidIntArray));
             }
         }
@@ -228,7 +228,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             rewriteAttributeName(attribute, "Name", true);
             IntArrayTag uuidTag = attribute.get("UUID");
             if (uuidTag != null && uuidTag.getValue().length == 4) {
-                UUID uuid = UUIDIntArrayType.uuidFromIntArray(uuidTag.getValue());
+                UUID uuid = UUIDUtil.fromIntArray(uuidTag.getValue());
                 attribute.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
                 attribute.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
             }

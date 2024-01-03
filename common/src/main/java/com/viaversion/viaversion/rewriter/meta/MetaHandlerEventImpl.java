@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 package com.viaversion.viaversion.rewriter.meta;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,16 +28,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MetaHandlerEventImpl implements MetaHandlerEvent {
     private final UserConnection connection;
-    private final EntityType entityType;
+    private final TrackedEntity trackedEntity;
     private final int entityId;
     private final List<Metadata> metadataList;
     private final Metadata meta;
     private List<Metadata> extraData;
     private boolean cancel;
 
-    public MetaHandlerEventImpl(UserConnection connection, @Nullable EntityType entityType, int entityId, Metadata meta, List<Metadata> metadataList) {
+    public MetaHandlerEventImpl(UserConnection connection, @Nullable TrackedEntity trackedEntity, int entityId, Metadata meta, List<Metadata> metadataList) {
         this.connection = connection;
-        this.entityType = entityType;
+        this.trackedEntity = trackedEntity;
         this.entityId = entityId;
         this.meta = meta;
         this.metadataList = metadataList;
@@ -54,8 +54,8 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
     }
 
     @Override
-    public @Nullable EntityType entityType() {
-        return entityType;
+    public @Nullable TrackedEntity trackedEntity() {
+        return trackedEntity;
     }
 
     @Override
@@ -95,6 +95,10 @@ public class MetaHandlerEventImpl implements MetaHandlerEvent {
 
     @Override
     public void createExtraMeta(Metadata metadata) {
-        (extraData != null ? extraData : (extraData = new ArrayList<>())).add(metadata);
+        if (extraData == null) {
+            extraData = new ArrayList<>();
+        }
+
+        extraData.add(metadata);
     }
 }

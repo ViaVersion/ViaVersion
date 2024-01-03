@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11_1To1_11> {
 
     public InventoryPackets(Protocol1_11_1To1_11 protocol) {
-        super(protocol);
+        super(protocol, null, null);
     }
 
     @Override
     public void registerPackets() {
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM);
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
         if (item == null) return null;
         boolean newItem = item.identifier() == 452;
         if (newItem) { // Replace server-side unknown items
-            item.setIdentifier((short) 1);
+            item.setIdentifier(1);
             item.setData((short) 0);
         }
         return null;

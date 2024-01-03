@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +19,13 @@ package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_4Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ServerboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data.MappingData;
@@ -37,6 +36,7 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -78,7 +78,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
             if (element != null) {
                 wrapper.write(Type.COMPONENT, element);
             } else {
-                wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
+                wrapper.write(Type.COMPONENT, ComponentUtil.emptyJsonComponent());
             }
 
             final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);
@@ -93,14 +93,14 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded();
-        Entity1_19_4Types.initialize(this);
+        EntityTypes1_19_4.initialize(this);
         Types1_19_4.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION1_19)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
@@ -108,9 +108,9 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     public void init(final UserConnection user) {
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_4Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_4.PLAYER));
 
-        user.put(new PlayerVehicleTracker(user));
+        user.put(new PlayerVehicleTracker());
     }
 
     @Override

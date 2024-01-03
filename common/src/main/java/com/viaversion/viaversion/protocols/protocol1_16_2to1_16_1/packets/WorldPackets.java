@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.Protocol1_16_2To1_16_1;
-import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.types.Chunk1_16_2Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.types.Chunk1_16Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +39,15 @@ public class WorldPackets {
     private static final BlockChangeRecord[] EMPTY_RECORDS = new BlockChangeRecord[0];
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
-        BlockRewriter<ClientboundPackets1_16> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(protocol);
 
         blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_CHANGE);
         blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16.ACKNOWLEDGE_PLAYER_DIGGING);
 
         protocol.registerClientbound(ClientboundPackets1_16.CHUNK_DATA, wrapper -> {
-            Chunk chunk = wrapper.read(new Chunk1_16Type());
-            wrapper.write(new Chunk1_16_2Type(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_16.TYPE);
+            wrapper.write(ChunkType1_16_2.TYPE, chunk);
 
             for (int s = 0; s < chunk.getSections().length; s++) {
                 ChunkSection section = chunk.getSections()[s];

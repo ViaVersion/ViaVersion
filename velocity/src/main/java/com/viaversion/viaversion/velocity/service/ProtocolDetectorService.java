@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,8 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
             setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-            if (((VelocityViaConfig) Via.getConfig()).isVelocityPingSave()) {
+            final VelocityViaConfig config = (VelocityViaConfig) Via.getConfig();
+            if (config.isVelocityPingSave()) {
                 final Map<String, Integer> servers = configuredServers();
                 final Integer protocol = servers.get(serverName);
                 if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
@@ -61,7 +62,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 synchronized (Via.getPlatform().getConfigurationProvider()) {
                     servers.put(serverName, serverPing.getVersion().getProtocol());
                 }
-                Via.getPlatform().getConfigurationProvider().saveConfig();
+                config.save();
             }
         });
     }

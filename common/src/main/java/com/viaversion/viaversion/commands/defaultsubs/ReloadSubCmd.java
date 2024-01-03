@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@ public class ReloadSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Reload the config from the disk";
+        return "Reload the config from the disk.";
     }
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Via.getPlatform().getConfigurationProvider().reloadConfig();
+        Via.getPlatform().getConfigurationProvider().reloadConfigs();
         sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
         return true;
     }

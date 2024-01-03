@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,10 +32,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.chunks.FakeTileEntity;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import java.util.List;
@@ -58,7 +58,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
         // Sign update packet
         registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, wrapper -> {
             //read data
-            Position position = wrapper.read(Type.POSITION);
+            Position position = wrapper.read(Type.POSITION1_8);
             JsonElement[] lines = new JsonElement[4];
             for (int i = 0; i < 4; i++) {
                 lines[i] = wrapper.read(Type.COMPONENT);
@@ -68,7 +68,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
 
             //write data
             wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
-            wrapper.write(Type.POSITION, position); //Block location
+            wrapper.write(Type.POSITION1_8, position); //Block location
             wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
 
             //Create nbt
@@ -81,14 +81,14 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
                 tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
             }
 
-            wrapper.write(Type.NBT, tag);
+            wrapper.write(Type.NAMED_COMPOUND_TAG, tag);
         });
 
         registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk chunk = wrapper.read(new Chunk1_9_1_2Type(clientWorld));
-            wrapper.write(new Chunk1_9_3_4Type(clientWorld), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment()));
+            wrapper.write(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()), chunk);
 
             List<CompoundTag> tags = chunk.getBlockEntities();
             for (int s = 0; s < chunk.getSections().length; s++) {

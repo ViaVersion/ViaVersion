@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import java.util.ArrayList;
@@ -120,15 +120,12 @@ public class ParticleRewriter {
 
     // Randomized because the previous one was a lot of different colors at once! :)
     private static ParticleDataHandler reddustHandler() {
-        return new ParticleDataHandler() {
-            @Override
-            public Particle handler(Particle particle, Integer[] data) {
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Red 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 0f)); // Green 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, randomBool() ? 1f : 0f)); // Blue 0 - 1
-                particle.getArguments().add(new Particle.ParticleData(Type.FLOAT, 1f));// Scale 0.01 - 4
-                return particle;
-            }
+        return (particle, data) -> {
+            particle.add(Type.FLOAT, randomBool() ? 1f : 0f); // Red 0 - 1
+            particle.add(Type.FLOAT, 0f); // Green 0 - 1
+            particle.add(Type.FLOAT, randomBool() ? 1f : 0f); // Blue 0 - 1
+            particle.add(Type.FLOAT, 1f);// Scale 0.01 - 4
+            return particle;
         };
     }
 
@@ -138,38 +135,33 @@ public class ParticleRewriter {
 
     // Rewrite IconCrack items to new format :)
     private static ParticleDataHandler iconcrackHandler() {
-        return new ParticleDataHandler() {
-            @Override
-            public Particle handler(Particle particle, Integer[] data) {
-                Item item;
-                if (data.length == 1)
-                    item = new DataItem(data[0], (byte) 1, (short) 0, null);
-                else if (data.length == 2)
-                    item = new DataItem(data[0], (byte) 1, data[1].shortValue(), null);
-                else
-                    return particle;
-
-                // Transform to new Item
-                Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
-
-                particle.getArguments().add(new Particle.ParticleData(Type.FLAT_ITEM, item)); // Item Slot	The item that will be used.
+        return (particle, data) -> {
+            Item item;
+            if (data.length == 1) {
+                item = new DataItem(data[0], (byte) 1, (short) 0, null);
+            } else if (data.length == 2) {
+                item = new DataItem(data[0], (byte) 1, data[1].shortValue(), null);
+            } else {
                 return particle;
             }
+
+            // Transform to new Item
+            Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
+
+            particle.add(Type.ITEM1_13, item); // Item Slot	The item that will be used.
+            return particle;
         };
     }
 
     // Handle (id+(data<<12)) encoded blocks
     private static ParticleDataHandler blockHandler() {
-        return new ParticleDataHandler() {
-            @Override
-            public Particle handler(Particle particle, Integer[] data) {
-                int value = data[0];
-                int combined = (((value & 4095) << 4) | (value >> 12 & 15));
-                int newId = WorldPackets.toNewId(combined);
+        return (particle, data) -> {
+            int value = data[0];
+            int combined = (((value & 4095) << 4) | (value >> 12 & 15));
+            int newId = WorldPackets.toNewId(combined);
 
-                particle.getArguments().add(new Particle.ParticleData(Type.VAR_INT, newId)); // BlockState	VarInt	The ID of the block state.
-                return particle;
-            }
+            particle.add(Type.VAR_INT, newId); // BlockState	VarInt	The ID of the block state.
+            return particle;
         };
     }
 

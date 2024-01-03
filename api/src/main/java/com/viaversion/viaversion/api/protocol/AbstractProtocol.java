@@ -77,6 +77,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     /**
      * Creates a protocol with automated id mapping if the respective packet type classes are not null.
+     * They are also required to track the CONFIGURATION state.
      */
     protected AbstractProtocol(@Nullable Class<CU> unmappedClientboundPacketType, @Nullable Class<CM> mappedClientboundPacketType,
                                @Nullable Class<SM> mappedServerboundPacketType, @Nullable Class<SU> unmappedServerboundPacketType) {
@@ -95,6 +96,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         initialized = true;
 
         registerPackets();
+        registerConfigurationChangeHandlers();
 
         // Register the rest of the ids with no handlers if necessary
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
@@ -114,6 +116,33 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
                     this::hasRegisteredServerbound,
                     this::registerServerbound
             );
+        }
+    }
+
+    protected void registerConfigurationChangeHandlers() {
+        // Register handlers for protocol state switching
+        // Assuming ids will change too often, it is cleaner to register them here instead of the base protocols,
+        // even if there will be multiple of these handlers
+        final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
+        if (configurationAcknowledgedPacket != null) {
+            registerServerbound(configurationAcknowledgedPacket, setClientStateHandler(State.CONFIGURATION));
+        }
+
+        final CU startConfigurationPacket = startConfigurationPacket();
+        if (startConfigurationPacket != null) {
+            registerClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
+        }
+
+        final ServerboundPacketType finishConfigurationPacket = serverboundFinishConfigurationPacket();
+        if (finishConfigurationPacket != null) {
+            final int id = finishConfigurationPacket.getId();
+            registerServerbound(State.CONFIGURATION, id, id, setClientStateHandler(State.PLAY));
+        }
+
+        final ClientboundPacketType clientboundFinishConfigurationPacket = clientboundFinishConfigurationPacket();
+        if (clientboundFinishConfigurationPacket != null) {
+            final int id = clientboundFinishConfigurationPacket.getId();
+            registerClientbound(State.CONFIGURATION, id, id, setServerStateHandler(State.PLAY));
         }
     }
 
@@ -206,6 +235,28 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             return map;
         }
         return Collections.emptyMap();
+    }
+
+    protected @Nullable SU configurationAcknowledgedPacket() {
+        final Map<State, PacketTypeMap<SU>> packetTypes = packetTypesProvider.unmappedServerboundPacketTypes();
+        final PacketTypeMap<SU> packetTypeMap = packetTypes.get(State.PLAY);
+        return packetTypeMap != null ? packetTypeMap.typeByName("CONFIGURATION_ACKNOWLEDGED") : null;
+    }
+
+    protected @Nullable CU startConfigurationPacket() {
+        final Map<State, PacketTypeMap<CU>> packetTypes = packetTypesProvider.unmappedClientboundPacketTypes();
+        final PacketTypeMap<CU> packetTypeMap = packetTypes.get(State.PLAY);
+        return packetTypeMap != null ? packetTypeMap.typeByName("START_CONFIGURATION") : null;
+    }
+
+    protected @Nullable ServerboundPacketType serverboundFinishConfigurationPacket() {
+        // To be overridden
+        return null;
+    }
+
+    protected @Nullable ClientboundPacketType clientboundFinishConfigurationPacket() {
+        // To be overridden
+        return null;
     }
 
     // ---------------------------------------------------------------------------------
@@ -361,7 +412,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    private void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
+    protected void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
         // Don't print errors during handshake/login/status
         if (state != State.PLAY && direction == Direction.SERVERBOUND && !Via.getManager().debugHandler().enabled()) {
             e.setShouldBePrinted(false);
@@ -373,7 +424,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(unmappedPacketId) + ")");
         } else {
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                    + " IN REMAP OF " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
+                    + " IN REMAP OF " + state + " " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
         }
         throw e;
     }
@@ -402,6 +453,14 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         if (!isValid) {
             throw new IllegalArgumentException("Packet type " + packetType + " in " + packetType.getClass().getSimpleName() + " is taken from the wrong packet types class");
         }
+    }
+
+    protected PacketHandler setClientStateHandler(final State state) {
+        return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
+    }
+
+    protected PacketHandler setServerStateHandler(final State state) {
+        return wrapper -> wrapper.user().getProtocolInfo().setServerState(state);
     }
 
     @Override

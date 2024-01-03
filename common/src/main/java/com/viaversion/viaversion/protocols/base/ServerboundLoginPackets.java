@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 public enum ServerboundLoginPackets implements ServerboundPacketType {
     HELLO, // 0x00
     ENCRYPTION_KEY, // 0x01
-    CUSTOM_QUERY; // 0x02
+    CUSTOM_QUERY_ANSWER, // 0x02
+    LOGIN_ACKNOWLEDGED; // 0x03
 
     @Override
     public final int getId() {

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +76,6 @@ public class BungeeViaInjector implements ViaInjector {
         Via.getPlatform().getLogger().severe("ViaVersion cannot remove itself from Bungee without a reboot!");
     }
 
-    @SuppressWarnings("unchecked")
     private void injectChannel(Channel channel) throws ReflectiveOperationException {
         List<String> names = channel.pipeline().names();
         ChannelHandler bootstrapAcceptor = null;

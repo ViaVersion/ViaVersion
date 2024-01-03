@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,19 +20,18 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.data.MappingData;
@@ -48,6 +47,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
@@ -62,6 +62,14 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     public static boolean isTextComponentNull(final JsonElement element) {
         return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
+    }
+
+    public static JsonElement mapTextComponentIfNull(JsonElement component) {
+        if (!isTextComponentNull(component)) {
+            return component;
+        } else {
+            return ComponentUtil.emptyJsonComponent();
+        }
     }
 
     @Override
@@ -118,16 +126,32 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
-        final PacketHandler titleHandler = wrapper -> {
-            final JsonElement component = wrapper.read(Type.COMPONENT);
-            if (!isTextComponentNull(component)) {
-                wrapper.write(Type.COMPONENT, component);
-            } else {
-                wrapper.write(Type.COMPONENT, ChatRewriter.emptyComponent());
-            }
+        final PacketHandler singleNullTextComponentMapper = wrapper -> {
+            wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
         };
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, titleHandler);
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, titleHandler);
+        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.ACTIONBAR, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Objective Name
+            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+            }
+        });
+        registerClientbound(ClientboundPackets1_18.TEAMS, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Team Name
+            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+                wrapper.passthrough(Type.BYTE); // Flags
+                wrapper.passthrough(Type.STRING); // Name Tag Visibility
+                wrapper.passthrough(Type.STRING); // Collision rule
+                wrapper.passthrough(Type.VAR_INT); // Color
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Prefix
+                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Suffix
+            }
+        });
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, wrapper -> {
@@ -274,11 +298,11 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION1_19)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
-        Entity1_19Types.initialize(this);
+        EntityTypes1_19.initialize(this);
     }
 
     @Override
@@ -292,7 +316,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
             user.put(new DimensionRegistryStorage());
         }
         user.put(new SequenceStorage());
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19.PLAYER));
     }
 
     @Override

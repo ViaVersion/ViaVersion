@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
@@ -65,7 +65,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
-                if (metaIndex == MetaIndex.ENTITY_STATUS && type == Entity1_10Types.EntityType.PLAYER) {
+                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityTypes1_10.EntityType.PLAYER) {
                     Byte val = 0;
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
@@ -136,11 +136,11 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_10Types.getTypeFromId(type, false);
+        return EntityTypes1_10.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return Entity1_10Types.getTypeFromId(type, true);
+        return EntityTypes1_10.getTypeFromId(type, true);
     }
 }

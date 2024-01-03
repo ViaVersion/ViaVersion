@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,21 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BungeePipelineUtil {
-    private static Method DECODE_METHOD;
-    private static Method ENCODE_METHOD;
+    private static final Method DECODE_METHOD;
+    private static final Method ENCODE_METHOD;
 
     static {
         try {
             DECODE_METHOD = MessageToMessageDecoder.class.getDeclaredMethod("decode", ChannelHandlerContext.class, Object.class, List.class);
             DECODE_METHOD.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        try {
             ENCODE_METHOD = MessageToByteEncoder.class.getDeclaredMethod("encode", ChannelHandlerContext.class, Object.class, ByteBuf.class);
             ENCODE_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

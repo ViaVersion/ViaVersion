@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -149,19 +149,19 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+                .reader("item", ParticleType.Readers.ITEM1_13_2);
         Types1_14.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM);
+                .reader("item", ParticleType.Readers.ITEM1_13_2);
     }
 
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_14(userConnection));
         if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
+            userConnection.put(new ClientWorld());
         }
     }
 

@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface PacketTypeMap<P> {
+public interface PacketTypeMap<P extends PacketType> {
 
     /**
      * Returns the packet type by the given name.
@@ -67,11 +67,11 @@ public interface PacketTypeMap<P> {
         return of(byName, types);
     }
 
-    static <T> PacketTypeMap<T> of(final Map<String, T> packetsByName, final Int2ObjectMap<T> packetsById) {
+    static <T extends PacketType> PacketTypeMap<T> of(final Map<String, T> packetsByName, final Int2ObjectMap<T> packetsById) {
         return new PacketTypeMapMap<>(packetsByName, packetsById);
     }
 
-    static <T> PacketTypeMap<T> of(final Map<String, T> packetsByName, final T[] packets) {
+    static <T extends PacketType> PacketTypeMap<T> of(final Map<String, T> packetsByName, final T[] packets) {
         return new PacketTypeArrayMap<>(packetsByName, packets);
     }
 }

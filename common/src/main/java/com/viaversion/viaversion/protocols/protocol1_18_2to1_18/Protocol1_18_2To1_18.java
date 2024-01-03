@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,25 +62,25 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
-                map(Type.NBT); // Current dimension data
+                map(Type.NAMED_COMPOUND_TAG); // Registry
+                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NBT, 0);
+                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag dimensionsHolder = registry.get("minecraft:dimension_type");
                     final ListTag dimensions = dimensionsHolder.get("value");
                     for (final Tag dimension : dimensions) {
                         addTagPrefix(((CompoundTag) dimension).get("element"));
                     }
 
-                    addTagPrefix(wrapper.get(Type.NBT, 1));
+                    addTagPrefix(wrapper.get(Type.NAMED_COMPOUND_TAG, 1));
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.RESPAWN, wrapper -> addTagPrefix(wrapper.passthrough(Type.NBT)));
+        registerClientbound(ClientboundPackets1_18.RESPAWN, wrapper -> addTagPrefix(wrapper.passthrough(Type.NAMED_COMPOUND_TAG)));
     }
 
     private void addTagPrefix(CompoundTag tag) {

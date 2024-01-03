@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -31,9 +31,9 @@ public class EntityPackets {
 
     public static void register(Protocol1_16_2To1_16_1 protocol) {
         MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, Entity1_16_2Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
         metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, Entity1_16_2Types.PLAYER);
+        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, EntityTypes1_16_2.PLAYER);
         metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_16.METADATA_LIST);
         metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.DESTROY_ENTITIES);
 
@@ -44,20 +44,18 @@ public class EntityPackets {
                 handler(wrapper -> {
                     short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
                     wrapper.write(Type.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
-
-                    gamemode &= ~0x08;
-                    wrapper.write(Type.UNSIGNED_BYTE, gamemode);
+                    wrapper.write(Type.BYTE, (byte) (gamemode & ~0x08)); // Gamemode
                 });
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
                 handler(wrapper -> {
                     // Throw away the old dimension registry, extra conversion would be too hard of a hit
-                    wrapper.read(Type.NBT);
-                    wrapper.write(Type.NBT, protocol.getMappingData().getDimensionRegistry());
+                    wrapper.read(Type.NAMED_COMPOUND_TAG);
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, protocol.getMappingData().getDimensionRegistry());
 
                     // Instead of the dimension's resource key, it now just wants the data directly
                     String dimensionType = wrapper.read(Type.STRING);
-                    wrapper.write(Type.NBT, getDimensionData(dimensionType));
+                    wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
                 });
                 map(Type.STRING); // Dimension
                 map(Type.LONG); // Seed
@@ -69,7 +67,7 @@ public class EntityPackets {
 
         protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
             String dimensionType = wrapper.read(Type.STRING);
-            wrapper.write(Type.NBT, getDimensionData(dimensionType));
+            wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
         });
     }
 
@@ -79,6 +77,6 @@ public class EntityPackets {
             Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
             throw new NullPointerException("Dimension data for " + dimensionType + " is null!");
         }
-        return tag.clone();
+        return tag.copy();
     }
 }

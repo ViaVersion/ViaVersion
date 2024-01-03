@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,13 +82,15 @@ public class BlockEntityProvider implements Provider {
 
     private void sendBlockChange(UserConnection user, Position position, int blockId) throws Exception {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
-        wrapper.write(Type.POSITION, position);
+        wrapper.write(Type.POSITION1_8, position);
         wrapper.write(Type.VAR_INT, blockId);
 
         wrapper.send(Protocol1_13To1_12_2.class);
     }
 
+    @FunctionalInterface
     public interface BlockEntityHandler {
+
         int transform(UserConnection user, CompoundTag tag);
     }
 }

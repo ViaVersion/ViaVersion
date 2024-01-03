@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ public class PlayerPackets {
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_SIGN_EDITOR, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
 
@@ -45,12 +45,12 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                map(Type.POSITION1_14, Type.POSITION);
+                map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
 
         protocol.registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> {
-            Item item = wrapper.passthrough(Type.FLAT_VAR_INT_ITEM);
+            Item item = wrapper.passthrough(Type.ITEM1_13_2);
             protocol.getItemRewriter().handleItemToServer(item);
 
             if (item == null) return;
@@ -78,7 +78,7 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
-                map(Type.POSITION1_14, Type.POSITION); // Position
+                map(Type.POSITION1_14, Type.POSITION1_8); // Position
             }
         });
 
@@ -109,19 +109,19 @@ public class PlayerPackets {
         protocol.registerServerbound(ServerboundPackets1_14.UPDATE_COMMAND_BLOCK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_14, Type.POSITION);
+                map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_14.UPDATE_STRUCTURE_BLOCK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_14, Type.POSITION);
+                map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_14.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_14, Type.POSITION);
+                map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
 
@@ -134,7 +134,7 @@ public class PlayerPackets {
             float z = wrapper.read(Type.FLOAT);
             wrapper.read(Type.BOOLEAN);  // new unknown boolean
 
-            wrapper.write(Type.POSITION, position);
+            wrapper.write(Type.POSITION1_8, position);
             wrapper.write(Type.VAR_INT, face);
             wrapper.write(Type.VAR_INT, hand);
             wrapper.write(Type.FLOAT, x);

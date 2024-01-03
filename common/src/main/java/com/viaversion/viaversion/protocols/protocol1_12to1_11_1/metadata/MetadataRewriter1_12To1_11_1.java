@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_12Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_12;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -42,7 +42,7 @@ public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<ClientboundPack
 
         if (type == null) return;
         // Evocation Illager aggressive property became 13
-        if (type == Entity1_12Types.EntityType.EVOCATION_ILLAGER) {
+        if (type == EntityTypes1_12.EntityType.EVOCATION_ILLAGER) {
             if (metadata.id() == 12) {
                 metadata.setId(13);
             }
@@ -51,11 +51,11 @@ public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_12Types.getTypeFromId(type, false);
+        return EntityTypes1_12.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return Entity1_12Types.getTypeFromId(type, true);
+        return EntityTypes1_12.getTypeFromId(type, true);
     }
 }

@@ -1,4 +1,6 @@
 dependencies {
-    implementation(projects.viaversionCommon)
+    compileOnlyApi(projects.viaversionCommon)
     compileOnly(libs.sponge)
 }
+
+publishShadowJar()

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocol.packet;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -45,8 +46,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PacketWrapperImpl implements PacketWrapper {
     private static final Protocol[] PROTOCOL_ARRAY = new Protocol[0];
 
-    private final Deque<PacketValue> readableObjects = new ArrayDeque<>();
-    private final List<PacketValue> packetValues = new ArrayList<>();
+    private final Deque<PacketValue<?>> readableObjects = new ArrayDeque<>();
+    private final List<PacketValue<?>> packetValues = new ArrayList<>();
     private final ByteBuf inputBuffer;
     private final UserConnection userConnection;
     private boolean send = true;
@@ -72,7 +73,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public <T> T get(Type<T> type, int index) throws Exception {
         int currentIndex = 0;
-        for (PacketValue packetValue : packetValues) {
+        for (PacketValue<?> packetValue : packetValues) {
             if (packetValue.type() != type) {
                 continue;
             }
@@ -88,7 +89,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public boolean is(Type type, int index) {
         int currentIndex = 0;
-        for (PacketValue packetValue : packetValues) {
+        for (PacketValue<?> packetValue : packetValues) {
             if (packetValue.type() != type) {
                 continue;
             }
@@ -103,7 +104,7 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public boolean isReadable(Type type, int index) {
         int currentIndex = 0;
-        for (PacketValue packetValue : readableObjects) {
+        for (PacketValue<?> packetValue : readableObjects) {
             if (packetValue.type().getBaseClass() != type.getBaseClass()) {
                 continue;
             }
@@ -134,10 +135,6 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T read(Type<T> type) throws Exception {
-        if (type == Type.NOTHING) {
-            return null;
-        }
-
         if (readableObjects.isEmpty()) {
             Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
             // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
@@ -149,14 +146,12 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         PacketValue readValue = readableObjects.poll();
-        Type readType = readValue.type();
+        Type<?> readType = readValue.type();
         if (readType == type
                 || (type.getBaseClass() == readType.getBaseClass()
                 && type.getOutputClass() == readType.getOutputClass())) {
             //noinspection unchecked
             return (T) readValue.value();
-        } else if (readType == Type.NOTHING) {
-            return read(type); // retry
         } else {
             throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + readValue.type().getTypeName()), type, readableObjects.size());
         }
@@ -164,7 +159,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        packetValues.add(new PacketValue(type, attemptTransform(type, value)));
+        packetValues.add(new PacketValue<>(type, attemptTransform(type, value)));
     }
 
     /**
@@ -174,11 +169,12 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @param value        value
      * @return value if already matching, else the converted value or possibly unmatched value
      */
-    private @Nullable Object attemptTransform(Type<?> expectedType, @Nullable Object value) {
+    private <T> @Nullable T attemptTransform(Type<T> expectedType, @Nullable T value) {
         if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
             // Attempt conversion
-            if (expectedType instanceof TypeConverter) {
-                return ((TypeConverter<?>) expectedType).from(value);
+            if (expectedType instanceof TypeConverter<?>) {
+                //noinspection unchecked
+                return ((TypeConverter<T>) expectedType).from(value);
             }
 
             Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());
@@ -215,10 +211,10 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         int index = 0;
-        for (PacketValue packetValue : packetValues) {
+        for (final PacketValue<?> packetValue : packetValues) {
             try {
-                packetValue.type().write(buffer, packetValue.value());
-            } catch (Exception e) {
+                packetValue.write(buffer);
+            } catch (final Exception e) {
                 throw createInformativeException(e, packetValue.type(), index);
             }
             index++;
@@ -308,12 +304,18 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @throws Exception if it fails to write
      */
     private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
-        // Apply current pipeline - for outgoing protocol, the collection will be reversed in the apply method
-        Protocol[] protocols = user().getProtocolInfo().getPipeline().pipes().toArray(PROTOCOL_ARRAY);
-        boolean reverse = direction == Direction.CLIENTBOUND;
+        final ProtocolInfo protocolInfo = user().getProtocolInfo();
+        final List<Protocol> pipes = direction == Direction.SERVERBOUND ? protocolInfo.getPipeline().pipes() : protocolInfo.getPipeline().reversedPipes();
+        final List<Protocol> protocols = new ArrayList<>();
         int index = -1;
-        for (int i = 0; i < protocols.length; i++) {
-            if (protocols[i].getClass() == packetProtocol) {
+        for (int i = 0; i < pipes.size(); i++) {
+            // Always add base protocols to the head
+            final Protocol protocol = pipes.get(i);
+            if (protocol.isBaseProtocol()) {
+                protocols.add(protocol);
+            }
+
+            if (protocol.getClass() == packetProtocol) {
                 index = i;
                 break;
             }
@@ -325,15 +327,18 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
 
         if (skipCurrentPipeline) {
-            index = reverse ? index - 1 : index + 1;
+            index = Math.min(index + 1, pipes.size());
         }
+
+        // Add remaining protocols on top
+        protocols.addAll(pipes.subList(index, pipes.size()));
 
         // Reset reader before we start
         resetReader();
 
         // Apply other protocols
-        apply(direction, user().getProtocolInfo().getState(), index, protocols, reverse);
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        apply(direction, protocolInfo.getState(direction), 0, protocols);
+        final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);
             return output.retain();
@@ -362,7 +367,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     private void sendRaw(boolean currentThread) throws Exception {
-        if (isCancelled()) return;
+        if (isCancelled()) {
+            return;
+        }
 
         ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
@@ -402,15 +409,22 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     private PacketWrapperImpl apply(Direction direction, State state, int index, Protocol[] pipeline, boolean reverse) throws Exception {
         // Reset the reader after every transformation for the packetWrapper, so it can be recycled across packets
+        State updatedState = state; // The state might change while transforming, so we need to check for that
         if (reverse) {
             for (int i = index; i >= 0; i--) {
-                pipeline[i].transform(direction, state, this);
+                pipeline[i].transform(direction, updatedState, this);
                 resetReader();
+                if (this.packetType != null) {
+                    updatedState = this.packetType.state();
+                }
             }
         } else {
             for (int i = index; i < pipeline.length; i++) {
-                pipeline[i].transform(direction, state, this);
+                pipeline[i].transform(direction, updatedState, this);
                 resetReader();
+                if (this.packetType != null) {
+                    updatedState = this.packetType.state();
+                }
             }
         }
         return this;
@@ -550,16 +564,16 @@ public class PacketWrapperImpl implements PacketWrapper {
                 '}';
     }
 
-    public static final class PacketValue {
-        private final Type type;
-        private Object value;
+    public static final class PacketValue<T> {
+        private final Type<T> type;
+        private T value;
 
-        private PacketValue(Type type, @Nullable Object value) {
+        private PacketValue(final Type<T> type, @Nullable final T value) {
             this.type = type;
             this.value = value;
         }
 
-        public Type type() {
+        public Type<T> type() {
             return type;
         }
 
@@ -567,7 +581,11 @@ public class PacketWrapperImpl implements PacketWrapper {
             return value;
         }
 
-        public void setValue(@Nullable Object value) {
+        public void write(final ByteBuf buffer) throws Exception {
+            type.write(buffer, value);
+        }
+
+        public void setValue(@Nullable final T value) {
             this.value = value;
         }
 
@@ -575,7 +593,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            final PacketValue that = (PacketValue) o;
+            final PacketValue<?> that = (PacketValue<?>) o;
             if (!type.equals(that.type)) return false;
             return Objects.equals(value, that.value);
         }

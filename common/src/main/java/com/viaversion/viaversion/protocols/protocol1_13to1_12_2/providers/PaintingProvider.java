@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers;
 
 import com.viaversion.viaversion.api.platform.providers.Provider;
+import com.viaversion.viaversion.util.Key;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -56,13 +58,10 @@ public class PaintingProvider implements Provider {
     }
 
     private void add(String motive) {
-        paintings.put("minecraft:" + motive, paintings.size());
+        paintings.put(Key.namespaced(motive), paintings.size());
     }
 
     public Optional<Integer> getIntByIdentifier(String motive) {
-        // Handle older versions
-        if (!motive.startsWith("minecraft:"))
-            motive = "minecraft:" + motive.toLowerCase(Locale.ROOT);
-        return Optional.ofNullable(paintings.get(motive));
+        return Optional.ofNullable(paintings.get(Key.namespaced(motive.toLowerCase(Locale.ROOT))));
     }
 }

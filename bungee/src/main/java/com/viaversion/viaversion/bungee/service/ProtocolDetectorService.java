@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,8 +46,9 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
 
             setProtocolVersion(serverName, serverPing.getVersion().getProtocol());
 
-            if (((BungeeViaConfig) Via.getConfig()).isBungeePingSave()) {
-                final Map<String, Integer> servers = ((BungeeViaConfig) Via.getConfig()).getBungeeServerProtocols();
+            final BungeeViaConfig config = (BungeeViaConfig) Via.getConfig();
+            if (config.isBungeePingSave()) {
+                final Map<String, Integer> servers = config.getBungeeServerProtocols();
                 final Integer protocol = servers.get(serverName);
                 if (protocol != null && protocol == serverPing.getVersion().getProtocol()) {
                     return;
@@ -57,7 +58,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 synchronized (Via.getPlatform().getConfigurationProvider()) {
                     servers.put(serverName, serverPing.getVersion().getProtocol());
                 }
-                Via.getPlatform().getConfigurationProvider().saveConfig();
+                config.save();
             }
         });
     }

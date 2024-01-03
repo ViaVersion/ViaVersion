@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.protocol;
 
 import com.google.common.annotations.Beta;
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -56,6 +57,16 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
 
     default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler) {
         registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
+    }
+
+    default void registerClientbound(State state, ClientboundPacketType packetType, PacketHandler handler) {
+        Preconditions.checkArgument(packetType.state() == state);
+        registerClientbound(state, packetType.getId(), packetType.getId(), handler, false);
+    }
+
+    default void registerServerbound(State state, ServerboundPacketType packetType, PacketHandler handler) {
+        Preconditions.checkArgument(packetType.state() == state);
+        registerServerbound(state, packetType.getId(), packetType.getId(), handler, false);
     }
 
     /**

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,18 +25,18 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 
 public class WorldPackets {
 
     public static void register(Protocol1_13_1To1_13 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION);
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.legacy(protocol);
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.passthrough(new Chunk1_13Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null) {
@@ -59,7 +59,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
-                map(Type.POSITION); // Location
+                map(Type.POSITION1_8); // Location
                 map(Type.INT); // Data
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);

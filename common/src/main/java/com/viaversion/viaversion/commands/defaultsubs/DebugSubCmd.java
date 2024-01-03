@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public class DebugSubCmd extends ViaSubCommand {
 
     @Override
     public String description() {
-        return "Toggle debug mode";
+        return "Toggle various debug modes.";
     }
 
     @Override
@@ -71,7 +71,6 @@ public class DebugSubCmd extends ViaSubCommand {
     @Override
     public List<String> onTabComplete(final ViaCommandSender sender, final String[] args) {
         if (args.length == 1) {
-            //TODO match current input
             return Arrays.asList("clear", "logposttransform", "add", "remove");
         }
         return Collections.emptyList();

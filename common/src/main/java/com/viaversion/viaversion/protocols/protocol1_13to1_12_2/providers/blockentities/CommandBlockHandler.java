@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
+import com.viaversion.viaversion.util.ComponentUtil;
 
 public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandler {
 
@@ -36,7 +36,7 @@ public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandl
     public int transform(UserConnection user, CompoundTag tag) {
         Tag name = tag.get("CustomName");
         if (name instanceof StringTag) {
-            ((StringTag) name).setValue(ChatRewriter.legacyTextToJsonString(((StringTag) name).getValue()));
+            ((StringTag) name).setValue(ComponentUtil.legacyToJsonString(((StringTag) name).getValue()));
         }
         Tag out = tag.get("LastOutput");
         if (out instanceof StringTag) {

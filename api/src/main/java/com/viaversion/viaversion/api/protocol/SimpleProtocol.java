@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 
 /**
- * Dummy protocol class when there is no need of any of the
+ * Dummy protocol class when there is no need of the
  * existing packet type enums or automated channel mappings.
  *
  * @see Protocol

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.types.Chunk1_14Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import java.util.Arrays;
@@ -53,26 +53,26 @@ public class WorldPackets {
     }
 
     public static void register(Protocol1_14To1_13_2 protocol) {
-        BlockRewriter<ClientboundPackets1_13> blockRewriter = new BlockRewriter<>(protocol, null);
+        BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(protocol);
 
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.BYTE);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14); // Location
+                map(Type.POSITION1_8, Type.POSITION1_14); // Location
                 map(Type.UNSIGNED_BYTE); // Action id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
@@ -82,7 +82,7 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
                     int id = wrapper.get(Type.VAR_INT, 0);
@@ -126,8 +126,8 @@ public class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            Chunk chunk = wrapper.read(new Chunk1_13Type(clientWorld));
-            wrapper.write(new Chunk1_14Type(), chunk);
+            Chunk chunk = wrapper.read(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
+            wrapper.write(ChunkType1_14.TYPE, chunk);
 
             int[] motionBlocking = new int[16 * 16];
             int[] worldSurface = new int[16 * 16];
@@ -251,7 +251,7 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
-                map(Type.POSITION, Type.POSITION1_14); // Location
+                map(Type.POSITION1_8, Type.POSITION1_14); // Location
                 map(Type.INT); // Data
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
@@ -308,13 +308,13 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Type.POSITION1_14);
+                map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
     }
 
     static void sendViewDistancePacket(UserConnection connection) throws Exception {
-        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, null, connection);
+        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, connection);
         setViewDistance.write(Type.VAR_INT, WorldPackets.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_14To1_13_2.class);
     }

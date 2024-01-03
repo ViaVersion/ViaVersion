@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ public class JoinListener implements Listener {
         Field gamePacketListenerField = null, connectionField = null, channelField = null;
         try {
             getHandleMethod = NMSUtil.obc("entity.CraftPlayer").getDeclaredMethod("getHandle");
-            gamePacketListenerField = findField(getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
-            connectionField = findField(gamePacketListenerField.getType(), "NetworkManager", "Connection");
+            gamePacketListenerField = findField(false, getHandleMethod.getReturnType(), "PlayerConnection", "ServerGamePacketListenerImpl");
+            connectionField = findField(true, gamePacketListenerField.getType(), "NetworkManager", "Connection");
             channelField = findField(connectionField.getType(), Class.forName("io.netty.channel.Channel"));
         } catch (NoSuchMethodException | NoSuchFieldException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(
@@ -63,7 +63,7 @@ public class JoinListener implements Listener {
     }
 
     // Loosely search a field with any name, as long as it matches a type name.
-    private static Field findField(Class<?> clazz, String... types) throws NoSuchFieldException {
+    private static Field findField(boolean checkSuperClass, Class<?> clazz, String... types) throws NoSuchFieldException {
         for (Field field : clazz.getDeclaredFields()) {
             String fieldTypeName = field.getType().getSimpleName();
             for (String type : types) {
@@ -77,6 +77,11 @@ public class JoinListener implements Listener {
                 return field;
             }
         }
+
+        if (checkSuperClass && clazz != Object.class && clazz.getSuperclass() != null) {
+            return findField(true, clazz.getSuperclass(), types);
+        }
+
         throw new NoSuchFieldException(types[0]);
     }
 

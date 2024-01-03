@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ public class WorldPackets {
                 handler(wrapper -> {
                     int id = wrapper.get(Type.INT, 0);
                     if (id == 27) {
-                        wrapper.write(Type.FLAT_VAR_INT_ITEM, wrapper.read(Type.FLAT_ITEM));
+                        wrapper.write(Type.ITEM1_13_2, wrapper.read(Type.ITEM1_13));
                     }
                 });
             }

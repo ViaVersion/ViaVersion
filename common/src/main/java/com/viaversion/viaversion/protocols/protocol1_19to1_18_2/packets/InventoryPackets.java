@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.util.Key;
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_19To1_18_2> {
 
     public InventoryPackets(Protocol1_19To1_18_2 protocol) {
-        super(protocol);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -41,7 +41,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
         registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.FLAT_VAR_INT_ITEM);
+        registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.ITEM1_13_2);
         registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT);
         protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
@@ -69,12 +69,12 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                         }
                     }
                 });
-                handler(getSpawnParticleHandler(Type.VAR_INT, Type.FLAT_VAR_INT_ITEM));
+                handler(getSpawnParticleHandler(Type.VAR_INT));
             }
         });
 
         registerClickWindow1_17_1(ServerboundPackets1_19.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION, Type.FLAT_VAR_INT_ITEM);
+        registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
 
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
 
@@ -86,13 +86,13 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                     final int size = wrapper.read(Type.UNSIGNED_BYTE);
                     wrapper.write(Type.VAR_INT, size);
                     for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // First item
-                        handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM)); // Result
+                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // First item
+                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Result
 
                         if (wrapper.read(Type.BOOLEAN)) {
-                            handleItemToClient(wrapper.passthrough(Type.FLAT_VAR_INT_ITEM));
+                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
                         } else {
-                            wrapper.write(Type.FLAT_VAR_INT_ITEM, null);
+                            wrapper.write(Type.ITEM1_13_2, null);
                         }
 
                         wrapper.passthrough(Type.BOOLEAN); // Out of stock

@@ -50,4 +50,14 @@ public final class Quaternion {
     public float w() {
         return w;
     }
+
+    @Override
+    public String toString() {
+        return "Quaternion{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", w=" + w +
+                '}';
+    }
 }

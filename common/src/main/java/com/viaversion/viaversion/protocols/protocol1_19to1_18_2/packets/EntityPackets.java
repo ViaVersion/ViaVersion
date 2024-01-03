@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
+import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
@@ -26,16 +27,15 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19Types;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -46,12 +46,8 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.Dimensio
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
 
@@ -82,11 +78,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
     public static final CompoundTag CHAT_REGISTRY;
 
     static {
-        try {
-            CHAT_REGISTRY = BinaryTagIO.readString(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
     }
 
     public EntityPackets(final Protocol1_19To1_18_2 protocol) {
@@ -95,7 +87,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     public void registerPackets() {
-        registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, Entity1_19Types.PLAYER);
+        registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, EntityTypes1_19.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
@@ -119,7 +111,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.VAR_INT, 0);
                     final EntityType entityType = tracker(wrapper.user()).entityType(entityId);
-                    if (entityType == Entity1_19Types.FALLING_BLOCK) {
+                    if (entityType == EntityTypes1_19.FALLING_BLOCK) {
                         wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
                     }
                 });
@@ -132,7 +124,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 map(Type.VAR_INT); // Entity id
                 map(Type.UUID); // Entity UUID
                 handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, Entity1_19Types.PAINTING.getId());
+                    wrapper.write(Type.VAR_INT, EntityTypes1_19.PAINTING.getId());
 
                     final int motive = wrapper.read(Type.VAR_INT);
                     final Position blockPosition = wrapper.read(Type.POSITION1_14);
@@ -204,15 +196,15 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             public void register() {
                 map(Type.INT); // Entity ID
                 map(Type.BOOLEAN); // Hardcore
-                map(Type.UNSIGNED_BYTE); // Gamemode
+                map(Type.BYTE); // Gamemode
                 map(Type.BYTE); // Previous Gamemode
                 map(Type.STRING_ARRAY); // World List
-                map(Type.NBT); // Registry
+                map(Type.NAMED_COMPOUND_TAG); // Registry
                 handler(wrapper -> {
-                    final CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     // Add necessary chat types
-                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                    tag.put("minecraft:chat_type", CHAT_REGISTRY.copy());
 
                     // Cache a whole lot of data
                     final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
@@ -224,7 +216,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                         final String name = (String) dimensionCompound.get("name").getValue();
                         addMonsterSpawnData(element);
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
-                        dimensionsMap.put(element.clone(), name);
+                        dimensionsMap.put(element.copy(), name);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);
 
@@ -311,7 +303,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) throws Exception {
         // Find dimension key by data
-        final CompoundTag currentDimension = wrapper.read(Type.NBT);
+        final CompoundTag currentDimension = wrapper.read(Type.NAMED_COMPOUND_TAG);
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
@@ -368,10 +360,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     // Remove the position
                     particle.getArguments().remove(0);
 
-                    final String resourceLocation = Key.stripMinecraftNamespace(particle.getArguments().get(0).get());
+                    final String resourceLocation = Key.stripMinecraftNamespace(particle.<String>getArgument(0).getValue());
                     if (resourceLocation.equals("entity")) {
                         // Add Y offset
-                        particle.getArguments().add(2, new Particle.ParticleData(Type.FLOAT, 0F));
+                        particle.getArguments().add(2, new Particle.ParticleData<>(Type.FLOAT, 0F));
                     }
                 }
 
@@ -381,13 +373,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, null);
 
-        filter().filterFamily(Entity1_19Types.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().filterFamily(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(Entity1_19Types.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
+        filter().type(EntityTypes1_19.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
     }
 
     @Override
@@ -397,6 +389,6 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     public EntityType typeFromId(final int type) {
-        return Entity1_19Types.getTypeFromId(type);
+        return EntityTypes1_19.getTypeFromId(type);
     }
 }

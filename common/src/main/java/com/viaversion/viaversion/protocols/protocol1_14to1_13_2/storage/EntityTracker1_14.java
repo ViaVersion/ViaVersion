@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
@@ -30,10 +30,11 @@ public class EntityTracker1_14 extends EntityTrackerBase {
     private final Int2ObjectMap<Byte> playerEntityFlags = Int2ObjectSyncMap.hashmap();
     private int latestTradeWindowId;
     private boolean forceSendCenterChunk = true;
-    private int chunkCenterX, chunkCenterZ;
+    private int chunkCenterX;
+    private int chunkCenterZ;
 
     public EntityTracker1_14(UserConnection user) {
-        super(user, Entity1_14Types.PLAYER);
+        super(user, EntityTypes1_14.PLAYER);
     }
 
     @Override

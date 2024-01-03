@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,8 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.io.IOException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MappingData extends MappingDataBase {
@@ -39,15 +37,11 @@ public final class MappingData extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag daata) {
-        try {
-            final ListTag chatTypes = BinaryTagIO.readInputStream(MappingDataLoader.getResource("chat-types-1.19.nbt")).get("values");
-            for (final Tag chatType : chatTypes) {
-                final CompoundTag chatTypeCompound = (CompoundTag) chatType;
-                final NumberTag idTag = chatTypeCompound.get("id");
-                defaultChatTypes.put(idTag.asInt(), chatTypeCompound);
-            }
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
+        final ListTag chatTypes = MappingDataLoader.loadNBTFromFile("chat-types-1.19.nbt").get("values");
+        for (final Tag chatType : chatTypes) {
+            final CompoundTag chatTypeCompound = (CompoundTag) chatType;
+            final NumberTag idTag = chatTypeCompound.get("id");
+            defaultChatTypes.put(idTag.asInt(), chatTypeCompound);
         }
     }
 

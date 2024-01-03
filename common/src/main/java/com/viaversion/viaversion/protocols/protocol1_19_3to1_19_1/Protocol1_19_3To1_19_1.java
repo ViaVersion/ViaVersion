@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,42 +17,49 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1;
 
+import com.google.common.primitives.Longs;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_19_3Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
+import com.viaversion.viaversion.api.minecraft.signature.SignableCommandArgumentsProvider;
+import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
+import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
+import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
-import com.viaversion.viaversion.api.type.types.ByteArrayType;
-import com.viaversion.viaversion.api.type.types.minecraft.ParticleType;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.EntityPackets;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Pair;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
-    private static final ByteArrayType.OptionalByteArrayType OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType.OptionalByteArrayType(256);
-    private static final ByteArrayType MESSAGE_SIGNATURE_BYTES_TYPE = new ByteArrayType(256);
     private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
@@ -191,7 +198,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                         decoratedMessage = unsignedMessage;
                     }
                     if (decoratedMessage == null) {
-                        decoratedMessage = GsonComponentSerializer.gson().serializeToTree(Component.text(plainMessage));
+                        decoratedMessage = ComponentUtil.plainToJson(plainMessage);
                     }
 
                     final int filterMaskType = wrapper.read(Type.VAR_INT);
@@ -212,16 +219,40 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 map(Type.LONG); // Timestamp
                 map(Type.LONG); // Salt
                 handler(wrapper -> {
+                    final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
+                    final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
+
                     final int signatures = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, 0);
                     for (int i = 0; i < signatures; i++) {
                         wrapper.read(Type.STRING); // Argument name
-                        wrapper.read(MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
+                        wrapper.read(Type.SIGNATURE_BYTES); // Signature
+                    }
+
+                    final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
+                    if (chatSession != null && argumentsProvider != null) {
+                        final UUID sender = wrapper.user().getProtocolInfo().getUuid();
+                        final String message = wrapper.get(Type.STRING, 0);
+                        final long timestamp = wrapper.get(Type.LONG, 0);
+                        final long salt = wrapper.get(Type.LONG, 1);
+
+                        final List<Pair<String, String>> arguments = argumentsProvider.getSignableArguments(message);
+                        wrapper.write(Type.VAR_INT, arguments.size()); // Signature count
+
+                        for (Pair<String, String> argument : arguments) {
+                            final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
+                            final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
+
+                            final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+
+                            wrapper.write(Type.STRING, argument.key()); // Argument name
+                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                        }
+                    } else {
+                        wrapper.write(Type.VAR_INT, 0); // Signature count
                     }
 
                     wrapper.write(Type.BOOLEAN, false); // No signed preview
 
-                    final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
                     messagesStorage.resetUnacknowledgedCount();
                     wrapper.write(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY, messagesStorage.lastSignatures());
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
@@ -233,18 +264,31 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Command
+                map(Type.STRING); // Message
                 map(Type.LONG); // Timestamp
-                // Salt
-                read(Type.LONG);
-                create(Type.LONG, 0L);
+                map(Type.LONG); // Salt
+                read(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
                 handler(wrapper -> {
-                    // Remove signature
-                    wrapper.read(OPTIONAL_MESSAGE_SIGNATURE_BYTES_TYPE); // Signature
-                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES);
-                    wrapper.write(Type.BOOLEAN, false); // No signed preview
-
+                    final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
                     final ReceivedMessagesStorage messagesStorage = wrapper.user().get(ReceivedMessagesStorage.class);
+
+                    if (chatSession != null) {
+                        final UUID sender = wrapper.user().getProtocolInfo().getUuid();
+                        final String message = wrapper.get(Type.STRING, 0);
+                        final long timestamp = wrapper.get(Type.LONG, 0);
+                        final long salt = wrapper.get(Type.LONG, 1);
+
+                        final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
+                        final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
+                        final byte[] signature = chatSession.signChatMessage(metadata, decoratableMessage, messagesStorage.lastSignatures());
+
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                        wrapper.write(Type.BOOLEAN, decoratableMessage.isDecorated()); // Signed preview
+                    } else {
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, EMPTY_BYTES); // Signature
+                        wrapper.write(Type.BOOLEAN, false); // Signed preview
+                    }
+
                     messagesStorage.resetUnacknowledgedCount();
                     wrapper.write(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY, messagesStorage.lastSignatures());
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
@@ -254,20 +298,50 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        // Remove the key once again
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.STRING); // Server id
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Public key
+                handler(wrapper -> {
+                    if (wrapper.user().has(ChatSession1_19_1.class)) {
+                        wrapper.user().put(new NonceStorage(wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE))); // Nonce
+                    }
+                });
+            }
+        });
         registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Name
-                create(Type.OPTIONAL_PROFILE_KEY, null);
+                handler(wrapper -> {
+                    final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
+                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, chatSession == null ? null : chatSession.getProfileKey()); // Profile Key
+                });
+                map(Type.OPTIONAL_UUID); // Profile uuid
             }
         });
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
-                create(Type.BOOLEAN, true); // Is nonce
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Encrypted challenge
+                map(Type.BYTE_ARRAY_PRIMITIVE); // Public key
+                handler(wrapper -> {
+                    final ChatSession1_19_1 chatSession = wrapper.user().get(ChatSession1_19_1.class);
+
+                    final byte[] verifyToken = wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Verify token
+                    wrapper.write(Type.BOOLEAN, chatSession == null); // Is nonce
+                    if (chatSession != null) {
+                        final long salt = ThreadLocalRandom.current().nextLong();
+                        final byte[] signature = chatSession.sign(signer -> {
+                            signer.accept(wrapper.user().remove(NonceStorage.class).nonce());
+                            signer.accept(Longs.toByteArray(salt));
+                        });
+                        wrapper.write(Type.LONG, salt); // Salt
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                    } else {
+                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, verifyToken); // Nonce
+                    }
+                });
             }
         });
 
@@ -288,17 +362,17 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.VAR_INT_ITEM)
+                .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION1_19)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
-        Entity1_19_3Types.initialize(this);
+        EntityTypes1_19_3.initialize(this);
     }
 
     @Override
     public void init(final UserConnection user) {
         user.put(new ReceivedMessagesStorage());
-        addEntityTracker(user, new EntityTrackerBase(user, Entity1_19_3Types.PLAYER));
+        addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_19_3.PLAYER));
     }
 
     @Override

@@ -23,8 +23,7 @@
 package com.viaversion.viaversion.api.protocol.packet;
 
 /**
- * Interface to be implemented by server outgoing packet type enums,
- * representing PLAY state packets, ordered by their packet id.
+ * Interface to be implemented by server outgoing packet types.
  */
 public interface ClientboundPacketType extends PacketType {
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_11Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -33,10 +33,10 @@ import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMa
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
-import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
 
@@ -94,7 +94,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
                     // Change Type :)
                     int type = wrapper.get(Type.VAR_INT, 1);
 
-                    Entity1_11Types.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    EntityTypes1_11.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
                     if (entType != null) {
                         wrapper.set(Type.VAR_INT, 1, entType.getId());
 
@@ -168,7 +168,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action ID
                 map(Type.UNSIGNED_BYTE); // 2 - Action Param
                 map(Type.VAR_INT); // 3 - Block Type
@@ -188,12 +188,12 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Position
+                map(Type.POSITION1_8); // 0 - Position
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT data
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
                         EntityIdRewriter.toClientSpawner(tag);
 
@@ -208,7 +208,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-            Chunk chunk = wrapper.passthrough(new Chunk1_9_3_4Type(clientWorld));
+            Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
             if (chunk.getBlockEntities() == null) return;
             for (CompoundTag tag : chunk.getBlockEntities()) {
@@ -253,7 +253,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
             @Override
             public void register() {
                 this.map(Type.INT); //effectID
-                this.map(Type.POSITION); //pos
+                this.map(Type.POSITION1_8); //pos
                 this.map(Type.INT); //effectData
                 this.map(Type.BOOLEAN); //serverwide / global
                 handler(packetWrapper -> {
@@ -285,7 +285,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         registerServerbound(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Location
+                map(Type.POSITION1_8); // 0 - Location
                 map(Type.VAR_INT); // 1 - Face
                 map(Type.VAR_INT); // 2 - Hand
 
@@ -346,7 +346,7 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_11(userConnection));
 
         if (!userConnection.has(ClientWorld.class))
-            userConnection.put(new ClientWorld(userConnection));
+            userConnection.put(new ClientWorld());
     }
 
     @Override

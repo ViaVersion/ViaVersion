@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.protocol1_14_4to1_14_3.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
@@ -50,7 +50,7 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
 
         if (type == null) return;
 
-        if (type.isOrHasParent(Entity1_15Types.MINECART_ABSTRACT)
+        if (type.isOrHasParent(EntityTypes1_15.MINECART_ABSTRACT)
                 && metadata.id() == 10) {
             // Convert to new block id
             int data = (int) metadata.getValue();
@@ -58,7 +58,7 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
         }
 
         // Metadata 12 added to abstract_living
-        if (metadata.id() > 11 && type.isOrHasParent(Entity1_15Types.LIVINGENTITY)) {
+        if (metadata.id() > 11 && type.isOrHasParent(EntityTypes1_15.LIVINGENTITY)) {
             metadata.setId(metadata.id() + 1);
         }
 
@@ -66,7 +66,7 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
         //new boolean with id 11 for trident, default = false, added in 19w45a
         //new boolean with id 17 for enderman
 
-        if (type.isOrHasParent(Entity1_15Types.WOLF)) {
+        if (type.isOrHasParent(EntityTypes1_15.WOLF)) {
             if (metadata.id() == 18) {
                 metadatas.remove(metadata);
             } else if (metadata.id() > 18) {
@@ -82,6 +82,6 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_15Types.getTypeFromId(type);
+        return EntityTypes1_15.getTypeFromId(type);
     }
 }

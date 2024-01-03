@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.viaversion.viaversion.util.Key;
+
 import java.util.Optional;
 
 public class SpawnEggRewriter {
@@ -27,57 +29,57 @@ public class SpawnEggRewriter {
     static {
         // Class yz.java in 18w14b
         // Register spawn eggs (generated with GT)
-        registerSpawnEgg("minecraft:bat");
-        registerSpawnEgg("minecraft:blaze");
-        registerSpawnEgg("minecraft:cave_spider");
-        registerSpawnEgg("minecraft:chicken");
-        registerSpawnEgg("minecraft:cow");
-        registerSpawnEgg("minecraft:creeper");
-        registerSpawnEgg("minecraft:donkey");
-        registerSpawnEgg("minecraft:elder_guardian");
-        registerSpawnEgg("minecraft:enderman");
-        registerSpawnEgg("minecraft:endermite");
-        registerSpawnEgg("minecraft:evocation_illager");
-        registerSpawnEgg("minecraft:ghast");
-        registerSpawnEgg("minecraft:guardian");
-        registerSpawnEgg("minecraft:horse");
-        registerSpawnEgg("minecraft:husk");
-        registerSpawnEgg("minecraft:llama");
-        registerSpawnEgg("minecraft:magma_cube");
-        registerSpawnEgg("minecraft:mooshroom");
-        registerSpawnEgg("minecraft:mule");
-        registerSpawnEgg("minecraft:ocelot");
+        registerSpawnEgg("bat");
+        registerSpawnEgg("blaze");
+        registerSpawnEgg("cave_spider");
+        registerSpawnEgg("chicken");
+        registerSpawnEgg("cow");
+        registerSpawnEgg("creeper");
+        registerSpawnEgg("donkey");
+        registerSpawnEgg("elder_guardian");
+        registerSpawnEgg("enderman");
+        registerSpawnEgg("endermite");
+        registerSpawnEgg("evocation_illager");
+        registerSpawnEgg("ghast");
+        registerSpawnEgg("guardian");
+        registerSpawnEgg("horse");
+        registerSpawnEgg("husk");
+        registerSpawnEgg("llama");
+        registerSpawnEgg("magma_cube");
+        registerSpawnEgg("mooshroom");
+        registerSpawnEgg("mule");
+        registerSpawnEgg("ocelot");
 
-        registerSpawnEgg("minecraft:parrot");
-        registerSpawnEgg("minecraft:pig");
-        registerSpawnEgg("minecraft:polar_bear");
-        registerSpawnEgg("minecraft:rabbit");
-        registerSpawnEgg("minecraft:sheep");
-        registerSpawnEgg("minecraft:shulker");
-        registerSpawnEgg("minecraft:silverfish");
-        registerSpawnEgg("minecraft:skeleton");
-        registerSpawnEgg("minecraft:skeleton_horse");
-        registerSpawnEgg("minecraft:slime");
-        registerSpawnEgg("minecraft:spider");
-        registerSpawnEgg("minecraft:squid");
-        registerSpawnEgg("minecraft:stray");
-        registerSpawnEgg("minecraft:vex");
-        registerSpawnEgg("minecraft:villager");
-        registerSpawnEgg("minecraft:vindication_illager");
-        registerSpawnEgg("minecraft:witch");
-        registerSpawnEgg("minecraft:wither_skeleton");
-        registerSpawnEgg("minecraft:wolf");
-        registerSpawnEgg("minecraft:zombie");
-        registerSpawnEgg("minecraft:zombie_horse");
-        registerSpawnEgg("minecraft:zombie_pigman");
-        registerSpawnEgg("minecraft:zombie_villager");
+        registerSpawnEgg("parrot");
+        registerSpawnEgg("pig");
+        registerSpawnEgg("polar_bear");
+        registerSpawnEgg("rabbit");
+        registerSpawnEgg("sheep");
+        registerSpawnEgg("shulker");
+        registerSpawnEgg("silverfish");
+        registerSpawnEgg("skeleton");
+        registerSpawnEgg("skeleton_horse");
+        registerSpawnEgg("slime");
+        registerSpawnEgg("spider");
+        registerSpawnEgg("squid");
+        registerSpawnEgg("stray");
+        registerSpawnEgg("vex");
+        registerSpawnEgg("villager");
+        registerSpawnEgg("vindication_illager");
+        registerSpawnEgg("witch");
+        registerSpawnEgg("wither_skeleton");
+        registerSpawnEgg("wolf");
+        registerSpawnEgg("zombie");
+        registerSpawnEgg("zombie_horse");
+        registerSpawnEgg("zombie_pigman");
+        registerSpawnEgg("zombie_villager");
     }
 
-    private static void registerSpawnEgg(String key) {
-        spawnEggs.put(key, spawnEggs.size());
+    private static void registerSpawnEgg(String name) {
+        spawnEggs.put(Key.namespaced(name), spawnEggs.size());
     }
 
-    // Make it a non existing block id
+    // Make it a non-existing block id
     public static int getSpawnEggId(String entityIdentifier) {
         // Fallback to bat
         if (!spawnEggs.containsKey(entityIdentifier))

@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.common.entities;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_14Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_16_2Types;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_17Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import java.util.function.Function;
 import org.junit.jupiter.api.Assertions;
@@ -34,11 +34,11 @@ public class EntityTypesTest {
 
     @Test
     void testArrayOrder() {
-        testArrayOrder(Entity1_14Types.values(), Entity1_14Types::getTypeFromId);
-        testArrayOrder(Entity1_15Types.values(), Entity1_15Types::getTypeFromId);
-        testArrayOrder(Entity1_16Types.values(), Entity1_16Types::getTypeFromId);
-        testArrayOrder(Entity1_16_2Types.values(), Entity1_16_2Types::getTypeFromId);
-        testArrayOrder(Entity1_17Types.values(), Entity1_17Types::getTypeFromId);
+        testArrayOrder(EntityTypes1_14.values(), EntityTypes1_14::getTypeFromId);
+        testArrayOrder(EntityTypes1_15.values(), EntityTypes1_15::getTypeFromId);
+        testArrayOrder(EntityTypes1_16.values(), EntityTypes1_16::getTypeFromId);
+        testArrayOrder(EntityTypes1_16_2.values(), EntityTypes1_16_2::getTypeFromId);
+        testArrayOrder(EntityTypes1_17.values(), EntityTypes1_17::getTypeFromId);
         // Newer type enums are automatically filled using mappings
     }
 

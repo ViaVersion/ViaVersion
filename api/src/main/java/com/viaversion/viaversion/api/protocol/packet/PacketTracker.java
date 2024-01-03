@@ -81,11 +81,9 @@ public class PacketTracker {
         if (connection.isClientSide()) return false; // Don't apply PPS limiting for client-side
         ViaVersionConfig conf = Via.getConfig();
         // Max PPS Checker
-        if (conf.getMaxPPS() > 0) {
-            if (packetsPerSecond >= conf.getMaxPPS()) {
-                connection.disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
-                return true; // don't send current packet
-            }
+        if (conf.getMaxPPS() > 0 && packetsPerSecond >= conf.getMaxPPS()) {
+            connection.disconnect(conf.getMaxPPSKickMessage().replace("%pps", Long.toString(packetsPerSecond)));
+            return true; // don't send current packet
         }
 
         // Tracking PPS Checker

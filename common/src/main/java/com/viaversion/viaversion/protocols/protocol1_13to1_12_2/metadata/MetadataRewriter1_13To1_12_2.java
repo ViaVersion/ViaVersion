@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,19 +18,19 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_13Types;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.Particle;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.EntityTypeRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.List;
 
 public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPackets1_12_1, Protocol1_13To1_12_2> {
@@ -51,14 +51,14 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         // Handle String -> Chat DisplayName
         if (metadata.id() == 2) {
             if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ChatRewriter.legacyTextToJson((String) metadata.getValue()));
+                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) metadata.getValue()));
             } else {
                 metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
             }
         }
 
         // Remap held block to match new format for remapping to flat block
-        if (type == Entity1_13Types.EntityType.ENDERMAN && metadata.id() == 12) {
+        if (type == EntityTypes1_13.EntityType.ENDERMAN && metadata.id() == 12) {
             int stateId = (int) metadata.getValue();
             int id = stateId & 4095;
             int data = stateId >> 12 & 15;
@@ -78,18 +78,18 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         if (type == null) return;
 
         // Handle new colors
-        if (type == Entity1_13Types.EntityType.WOLF && metadata.id() == 17) {
+        if (type == EntityTypes1_13.EntityType.WOLF && metadata.id() == 17) {
             metadata.setValue(15 - (int) metadata.getValue());
         }
 
         // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
-        if (type.isOrHasParent(Entity1_13Types.EntityType.ZOMBIE)) {
+        if (type.isOrHasParent(EntityTypes1_13.EntityType.ZOMBIE)) {
             if (metadata.id() > 14)
                 metadata.setId(metadata.id() + 1);
         }
 
         // Handle Minecart inner block
-        if (type.isOrHasParent(Entity1_13Types.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
+        if (type.isOrHasParent(EntityTypes1_13.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
             // New block format
             int oldId = (int) metadata.getValue();
             int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
@@ -98,7 +98,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         }
 
         // Handle other changes
-        if (type == Entity1_13Types.EntityType.AREA_EFFECT_CLOUD) {
+        if (type == EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD) {
             if (metadata.id() == 9) {
                 int particleId = (int) metadata.getValue();
                 Metadata parameter1Meta = metaByIndex(10, metadatas);
@@ -130,11 +130,11 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
 
     @Override
     public EntityType typeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, false);
+        return EntityTypes1_13.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return Entity1_13Types.getTypeFromId(type, true);
+        return EntityTypes1_13.getTypeFromId(type, true);
     }
 }

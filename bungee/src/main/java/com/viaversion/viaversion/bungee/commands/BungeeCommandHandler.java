@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,11 @@
  */
 package com.viaversion.viaversion.bungee.commands;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.bungee.commands.subs.ProbeSubCmd;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 
 public class BungeeCommandHandler extends ViaCommandHandler {
     public BungeeCommandHandler() {
-        try {
-            registerSubCommand(new ProbeSubCmd());
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().severe("Failed to register Bungee subcommands");
-            e.printStackTrace();
-        }
+        registerSubCommand(new ProbeSubCmd());
     }
 }

@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
 
+@Deprecated
 public class VoidType extends Type<Void> implements TypeConverter<Void> {
     public VoidType() {
         super(Void.class);

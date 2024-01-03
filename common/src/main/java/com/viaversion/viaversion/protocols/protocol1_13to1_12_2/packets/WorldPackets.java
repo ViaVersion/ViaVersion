@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -32,10 +34,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.Particle;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionHandler;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.NamedSoundRewriter;
@@ -43,20 +47,18 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRew
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.types.Chunk1_13Type;
-import com.viaversion.viaversion.protocols.protocol1_9_1_2to1_9_3_4.types.Chunk1_9_3_4Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 public class WorldPackets {
     private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, .99F);
 
     static {
-        // Client will crash if it receives a invalid biome id
+        // Client will crash if it receives an invalid biome id
         for (int i = 0; i < 50; i++) {
             VALID_BIOMES.add(i);
         }
@@ -100,14 +102,14 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // 0 - Location
+                map(Type.POSITION1_8); // 0 - Location
                 map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NBT); // 2 - NBT data
+                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION, 0);
+                    Position position = wrapper.get(Type.POSITION1_8, 0);
                     short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    CompoundTag tag = wrapper.get(Type.NBT, 0);
+                    CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
                     int newId = provider.transform(wrapper.user(), position, tag, true);
@@ -130,12 +132,12 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION); // Location
+                map(Type.POSITION1_8); // Location
                 map(Type.UNSIGNED_BYTE); // Action Id
                 map(Type.UNSIGNED_BYTE); // Action param
                 map(Type.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
                 handler(wrapper -> {
-                    Position pos = wrapper.get(Type.POSITION, 0);
+                    Position pos = wrapper.get(Type.POSITION1_8, 0);
                     short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     short param = wrapper.get(Type.UNSIGNED_BYTE, 1);
                     int blockId = wrapper.get(Type.VAR_INT, 0);
@@ -163,7 +165,7 @@ public class WorldPackets {
 
                     if (blockId == 73) { // Note block
                         PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_CHANGE);
-                        blockChange.write(Type.POSITION, pos);
+                        blockChange.write(Type.POSITION1_8, pos);
                         blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_13To1_12_2.class);
                     }
@@ -175,10 +177,10 @@ public class WorldPackets {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION);
+                map(Type.POSITION1_8);
                 map(Type.VAR_INT);
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION, 0);
+                    Position position = wrapper.get(Type.POSITION1_8, 0);
                     int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
 
                     UserConnection userConnection = wrapper.user();
@@ -318,7 +320,7 @@ public class WorldPackets {
             public void register() {
                 map(Type.STRING);
                 handler(wrapper -> {
-                    String sound = wrapper.get(Type.STRING, 0).replace("minecraft:", "");
+                    String sound = Key.stripMinecraftNamespace(wrapper.get(Type.STRING, 0));
                     String newSoundId = NamedSoundRewriter.getNewId(sound);
                     wrapper.set(Type.STRING, 0, newSoundId);
                 });
@@ -329,8 +331,8 @@ public class WorldPackets {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
-            Chunk1_9_3_4Type type = new Chunk1_9_3_4Type(clientWorld);
-            Chunk1_13Type type1_13 = new Chunk1_13Type(clientWorld);
+            ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
+            ChunkType1_13 type1_13 = ChunkType1_13.forEnvironment(clientWorld.getEnvironment());
             Chunk chunk = wrapper.read(type);
             wrapper.write(type1_13, chunk);
 
@@ -443,7 +445,7 @@ public class WorldPackets {
                 final Tag idTag = tag.get("id");
                 if (idTag instanceof StringTag) {
                     // No longer block entities
-                    final String id = ((StringTag) idTag).getValue();
+                    final String id = Key.namespaced(((StringTag) idTag).getValue());
                     if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
                         iterator.remove();
                     }
@@ -505,7 +507,7 @@ public class WorldPackets {
                         return;
                     }
 
-                    //Handle reddust particle color
+                    // Handle reddust particle color
                     if (particle.getId() == 11) {
                         int count = wrapper.get(Type.INT, 1);
                         float speed = wrapper.get(Type.FLOAT, 6);
@@ -514,7 +516,6 @@ public class WorldPackets {
                             wrapper.set(Type.INT, 1, 1);
                             wrapper.set(Type.FLOAT, 6, 0f);
 
-                            List<Particle.ParticleData> arguments = particle.getArguments();
                             for (int i = 0; i < 3; i++) {
                                 //RGB values are represented by the X/Y/Z offset
                                 float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
@@ -522,19 +523,45 @@ public class WorldPackets {
                                     // https://minecraft.gamepedia.com/User:Alphappy/reddust
                                     colorValue = 1;
                                 }
-                                arguments.get(i).setValue(colorValue);
+                                particle.<Float>getArgument(i).setValue(colorValue);
                                 wrapper.set(Type.FLOAT, i + 3, 0f);
                             }
                         }
                     }
 
                     wrapper.set(Type.INT, 0, particle.getId());
-                    for (Particle.ParticleData particleData : particle.getArguments())
-                        wrapper.write(particleData.getType(), particleData.getValue());
+                    for (Particle.ParticleData<?> particleData : particle.getArguments())
+                        particleData.write(wrapper);
 
                 });
             }
         });
+
+        // Incoming Packets
+        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+            Position pos = wrapper.passthrough(Type.POSITION1_8);
+            wrapper.passthrough(Type.VAR_INT); // block face
+            wrapper.passthrough(Type.VAR_INT); // hand
+            wrapper.passthrough(Type.FLOAT); // cursor x
+            wrapper.passthrough(Type.FLOAT); // cursor y
+            wrapper.passthrough(Type.FLOAT); // cursor z
+
+            if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
+                ConnectionData.markModified(wrapper.user(), pos);
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_DIGGING, wrapper -> {
+            int status = wrapper.passthrough(Type.VAR_INT); // Status
+            Position pos = wrapper.passthrough(Type.POSITION1_8); // Location
+            wrapper.passthrough(Type.UNSIGNED_BYTE); // block face
+
+            // 0 = Started digging: if in creative this causes the block to break directly
+            // There's no point in storing the finished digging as it may never show-up (creative)
+            if (status == 0 && Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
+                ConnectionData.markModified(wrapper.user(), pos);
+            }
+        });
+
     }
 
     public static int toNewId(int oldId) {
@@ -555,8 +582,8 @@ public class WorldPackets {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
             Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
         }
-        // Default stone
-        return 1;
+        // Default air
+        return 0;
     }
 
     private static int checkStorage(UserConnection user, Position position, int newId) {

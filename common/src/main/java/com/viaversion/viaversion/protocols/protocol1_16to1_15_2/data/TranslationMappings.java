@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ public class TranslationMappings extends ComponentRewriter<ClientboundPackets1_1
     private final Map<String, String> mappings = new HashMap<>();
 
     public TranslationMappings(Protocol1_16To1_15_2 protocol) {
-        super(protocol);
+        super(protocol, ReadType.JSON);
         mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
         mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");
         mappings.put("attribute.name.generic.attackSpeed", "attribute.name.generic.attack_speed");

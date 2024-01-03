@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public abstract class ViaListener {
     }
 
     /**
-     * Get the UserConnection from an UUID
+     * Get the UserConnection from a UUID
      *
      * @param uuid UUID object
      * @return The UserConnection

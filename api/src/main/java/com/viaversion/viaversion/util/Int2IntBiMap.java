@@ -23,8 +23,6 @@
 package com.viaversion.viaversion.util;
 
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import java.util.Map;
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Simple wrapper class for two {@link Int2IntMap}s.
@@ -50,10 +48,4 @@ public interface Int2IntBiMap extends Int2IntMap {
      */
     @Override
     int put(int key, int value);
-
-    @Override
-    @Deprecated
-    default void putAll(@NonNull Map<? extends Integer, ? extends Integer> m) {
-        throw new UnsupportedOperationException();
-    }
 }

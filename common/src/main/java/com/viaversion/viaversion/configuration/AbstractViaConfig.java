@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,15 +89,14 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
-    private Map<String, String> chatTypeFormats;
 
-    protected AbstractViaConfig(File configFile) {
+    protected AbstractViaConfig(final File configFile) {
         super(configFile);
     }
 
     @Override
-    public void reloadConfig() {
-        super.reloadConfig();
+    public void reload() {
+        super.reload();
         loadFields();
     }
 
@@ -158,7 +157,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
-        chatTypeFormats = get("chat-types-1_19", Map.class, new HashMap<String, String>());
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -526,11 +524,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean cache1_17Light() {
         return cache1_17Light;
-    }
-
-    @Override
-    public @Nullable String chatTypeFormat(final String translationKey) {
-        return chatTypeFormats.get(translationKey);
     }
 
     @Override

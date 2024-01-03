@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8.packets;
 
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -173,7 +173,7 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-                    tracker.addEntity(entityId, Entity1_10Types.EntityType.PLAYER);
+                    tracker.addEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setClientEntityId(entityId);
                 });
                 map(Type.UNSIGNED_BYTE); // 1 - Player Gamemode
@@ -195,7 +195,7 @@ public class PlayerPackets {
                     clientWorld.setEnvironment(dimensionId);
                 });
 
-                // Gotta fake their op
+                // Fake their op status
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                     provider.sendPermission(wrapper.user());
@@ -268,25 +268,23 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equalsIgnoreCase("MC|BOpen")) {
-                        wrapper.read(Type.REMAINING_BYTES); // Not used anymore
                         wrapper.write(Type.VAR_INT, 0);
-                    }
-                    if (name.equalsIgnoreCase("MC|TrList")) {
+                    } else if (name.equalsIgnoreCase("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // ID
 
                         Short size = wrapper.passthrough(Type.UNSIGNED_BYTE);
 
                         for (int i = 0; i < size; ++i) {
-                            Item item1 = wrapper.passthrough(Type.ITEM);
+                            Item item1 = wrapper.passthrough(Type.ITEM1_8);
                             ItemRewriter.toClient(item1);
 
-                            Item item2 = wrapper.passthrough(Type.ITEM);
+                            Item item2 = wrapper.passthrough(Type.ITEM1_8);
                             ItemRewriter.toClient(item2);
 
                             boolean present = wrapper.passthrough(Type.BOOLEAN);
 
                             if (present) {
-                                Item item3 = wrapper.passthrough(Type.ITEM);
+                                Item item3 = wrapper.passthrough(Type.ITEM1_8);
                                 ItemRewriter.toClient(item3);
                             }
 
@@ -366,7 +364,7 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Requested Command
-                map(Type.BOOLEAN, Type.NOTHING); // 1 - Is Command Block
+                read(Type.BOOLEAN); // 1 - Is Command Block
             }
         });
 
@@ -382,11 +380,9 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     int hand = wrapper.read(Type.VAR_INT);
 
-                    if (Via.getConfig().isLeftHandedHandling()) {
-                        // Add 0x80 if left handed
-                        if (hand == 0) wrapper.set(Type.UNSIGNED_BYTE, 0,
-                                (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80)
-                        );
+                    // Add 0x80 if left-handed
+                    if (Via.getConfig().isLeftHandedHandling() && hand == 0) {
+                        wrapper.set(Type.UNSIGNED_BYTE, 0, (short) (wrapper.get(Type.UNSIGNED_BYTE, 0).intValue() | 0x80));
                     }
                     wrapper.sendToServer(Protocol1_9To1_8.class);
                     wrapper.cancel();
@@ -398,7 +394,7 @@ public class PlayerPackets {
         protocol.registerServerbound(ServerboundPackets1_9.ANIMATION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT, Type.NOTHING); // 0 - Hand
+                read(Type.VAR_INT); // 0 - Hand
             }
         });
 
@@ -413,7 +409,7 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equalsIgnoreCase("MC|BSign")) {
-                        Item item = wrapper.passthrough(Type.ITEM);
+                        Item item = wrapper.passthrough(Type.ITEM1_8);
                         if (item != null) {
                             item.setIdentifier(387); // Written Book
                             ItemRewriter.rewriteBookToServer(item);

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
-import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.types.Chunk1_18Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -34,7 +34,7 @@ import com.viaversion.viaversion.util.MathUtil;
 public final class WorldPackets {
 
     public static void register(final Protocol1_19To1_18_2 protocol) {
-        final BlockRewriter<ClientboundPackets1_18> blockRewriter = new BlockRewriter<>(protocol, Type.POSITION1_14);
+        final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_14(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_18.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_18.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.MULTI_BLOCK_CHANGE);
@@ -44,9 +44,9 @@ public final class WorldPackets {
 
         protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            Preconditions.checkArgument(tracker.biomesSent() != 0, "Biome count not set");
-            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != 0, "Section height not set");
-            final Chunk1_18Type chunkType = new Chunk1_18Type(tracker.currentWorldSectionHeight(),
+            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
+            final ChunkType1_18 chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
                     MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.passthrough(chunkType);

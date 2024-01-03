@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_15to1_14_4.packets;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_15Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -36,7 +36,7 @@ public final class EntityPackets {
     public static void register(Protocol1_15To1_14_4 protocol) {
         MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
 
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14_4.SPAWN_ENTITY, Entity1_15Types.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14_4.SPAWN_ENTITY, EntityTypes1_15.FALLING_BLOCK);
 
         protocol.registerClientbound(ClientboundPackets1_14_4.SPAWN_MOB, new PacketHandlers() {
             @Override
@@ -72,7 +72,7 @@ public final class EntityPackets {
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_15To1_14_4.class).addEntity(entityId, Entity1_15Types.PLAYER);
+                    wrapper.user().getEntityTracker(Protocol1_15To1_14_4.class).addEntity(entityId, EntityTypes1_15.PLAYER);
 
                     sendMetadataPacket(wrapper, entityId, metadataRewriter);
                 });

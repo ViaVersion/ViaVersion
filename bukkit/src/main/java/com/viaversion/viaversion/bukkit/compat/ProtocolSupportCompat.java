@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ public final class ProtocolSupportCompat {
         } catch (NoSuchMethodException ignored) {
         }
 
-        // Check for obfusacted b/c methods
+        // Check for obfuscated b/c methods
         try {
             if (clazz.getMethod("b").getReturnType() == int.class) {
                 return HandshakeProtocolType.OBFUSCATED_B;

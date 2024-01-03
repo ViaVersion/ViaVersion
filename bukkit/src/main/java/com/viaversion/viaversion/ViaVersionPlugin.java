@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaAPI;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
-import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
@@ -101,6 +100,12 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         if (lateBind) {
             getLogger().info("Registering protocol transformers and injecting...");
             manager.init();
+        }
+
+        if (Via.getConfig().shouldRegisterUserConnectionOnJoin()) {
+            // When event priority ties, registration order is used.
+            // Must register without delay to ensure other plugins on lowest get the fix applied.
+            getServer().getPluginManager().registerEvents(new JoinListener(), this);
         }
 
         if (FOLIA) {
@@ -213,11 +218,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public boolean isPluginEnabled() {
         return Bukkit.getPluginManager().getPlugin("ViaVersion").isEnabled();
-    }
-
-    @Override
-    public ConfigurationProvider getConfigurationProvider() {
-        return conf;
     }
 
     @Override
