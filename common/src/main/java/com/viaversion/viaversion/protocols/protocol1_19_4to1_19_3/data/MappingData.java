@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.data;
 
-import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import java.io.IOException;
 
 public final class MappingData extends MappingDataBase {
 
@@ -33,14 +31,10 @@ public final class MappingData extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag data) {
-        try {
-            damageTypesRegistry = NBTIO.readTag(MappingDataLoader.getResource("damage-types-1.19.4.nbt"));
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        damageTypesRegistry = MappingDataLoader.loadNBTFromFile("damage-types-1.19.4.nbt");
     }
 
     public CompoundTag damageTypesRegistry() {
-        return damageTypesRegistry.clone();
+        return damageTypesRegistry.copy();
     }
 }

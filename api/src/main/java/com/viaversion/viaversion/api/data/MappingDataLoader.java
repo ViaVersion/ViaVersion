@@ -22,12 +22,13 @@
  */
 package com.viaversion.viaversion.api.data;
 
-import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.io.NBTIO;
+import com.github.steveice10.opennbt.tag.io.TagReader;
 import com.google.common.annotations.Beta;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,11 +52,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class MappingDataLoader {
 
+    private static final Map<String, CompoundTag> MAPPINGS_CACHE = new HashMap<>();
+    private static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
-    private static final Map<String, CompoundTag> MAPPINGS_CACHE = new HashMap<>();
     private static boolean cacheValid = true;
 
     @Deprecated/*(forRemoval = true)*/
@@ -131,14 +133,14 @@ public final class MappingDataLoader {
         return loadNBT(name, false);
     }
 
-    private static @Nullable CompoundTag loadNBTFromFile(final String name) {
+    public static @Nullable CompoundTag loadNBTFromFile(final String name) {
         final InputStream resource = getResource(name);
         if (resource == null) {
             return null;
         }
 
         try (final InputStream stream = resource) {
-            return NBTIO.readTag(stream);
+            return MAPPINGS_READER.read(stream);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,8 +53,13 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement tagToJson(@Nullable final Tag tag) {
-        final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(tag);
-        return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
+        try {
+            final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(tag);
+            return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
+        } catch (final Exception e) {
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + tag, e);
+            return plainToJson("<error>");
+        }
     }
 
     public static @Nullable Tag jsonToTag(@Nullable final JsonElement element) {

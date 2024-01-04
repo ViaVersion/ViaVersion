@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data;
 
-import com.github.steveice10.opennbt.NBTIO;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class MappingData extends MappingDataBase {
     private final Map<String, CompoundTag> dimensionDataMap = new HashMap<>();
@@ -40,11 +36,7 @@ public class MappingData extends MappingDataBase {
 
     @Override
     public void loadExtras(final CompoundTag data) {
-        try {
-            dimensionRegistry = NBTIO.readTag(MappingDataLoader.getResource("dimension-registry-1.16.2.nbt"));
-        } catch (final IOException e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error loading dimension registry:", e);
-        }
+        dimensionRegistry = MappingDataLoader.loadNBTFromFile("dimension-registry-1.16.2.nbt");
 
         // Data of each dimension
         final ListTag dimensions = ((CompoundTag) dimensionRegistry.get("minecraft:dimension_type")).get("value");
@@ -61,6 +53,6 @@ public class MappingData extends MappingDataBase {
     }
 
     public CompoundTag getDimensionRegistry() {
-        return dimensionRegistry.clone();
+        return dimensionRegistry.copy();
     }
 }

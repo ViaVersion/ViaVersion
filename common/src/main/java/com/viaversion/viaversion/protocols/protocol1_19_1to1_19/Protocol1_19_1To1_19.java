@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -230,7 +230,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     }
 
                     // Replace chat types - they won't actually be used
-                    registry.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                    registry.put("minecraft:chat_type", CHAT_REGISTRY.copy());
                 });
             }
         });

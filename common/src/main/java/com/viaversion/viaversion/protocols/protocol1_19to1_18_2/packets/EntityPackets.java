@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     // Add necessary chat types
-                    tag.put("minecraft:chat_type", CHAT_REGISTRY.clone());
+                    tag.put("minecraft:chat_type", CHAT_REGISTRY.copy());
 
                     // Cache a whole lot of data
                     final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
@@ -216,7 +216,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                         final String name = (String) dimensionCompound.get("name").getValue();
                         addMonsterSpawnData(element);
                         dimensionDataMap.put(name, new DimensionDataImpl(element));
-                        dimensionsMap.put(element.clone(), name);
+                        dimensionsMap.put(element.copy(), name);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);
 

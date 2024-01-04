@@ -22,6 +22,7 @@ dependencies {
     api(libs.gson)
     implementation(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
+        exclude("com.viaversion", "nbt")
     }
 
     compileOnlyApi(libs.snakeYaml)

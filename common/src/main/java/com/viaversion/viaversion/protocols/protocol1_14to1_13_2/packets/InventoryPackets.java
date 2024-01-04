@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -248,7 +248,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             Tag loreTag = display.get("Lore");
             if (loreTag instanceof ListTag) {
                 ListTag lore = (ListTag) loreTag;
-                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.clone().getValue())); // Save old lore
+                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.copy().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
                         String jsonText = ComponentUtil.legacyToJsonString(((StringTag) loreEntry).getValue(), true);

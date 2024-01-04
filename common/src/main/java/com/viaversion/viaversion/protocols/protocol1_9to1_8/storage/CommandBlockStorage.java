@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class CommandBlockStorage implements StorableObject {
         if (tag == null)
             return Optional.empty();
 
-        tag = tag.clone();
+        tag = tag.copy();
         tag.put("powered", new ByteTag((byte) 0));
         tag.put("auto", new ByteTag((byte) 0));
         tag.put("conditionMet", new ByteTag((byte) 0));
