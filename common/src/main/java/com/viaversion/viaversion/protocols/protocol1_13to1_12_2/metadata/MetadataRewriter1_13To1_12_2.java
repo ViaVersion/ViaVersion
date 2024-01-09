@@ -17,11 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
@@ -31,7 +29,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRew
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
-import java.util.List;
 
 public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPackets1_12_1, Protocol1_13To1_12_2> {
 
@@ -40,87 +37,61 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
     }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
-        // Handle new MetaTypes
-        if (metadata.metaType().typeId() > 4) {
-            metadata.setMetaType(Types1_13.META_TYPES.byId(metadata.metaType().typeId() + 1));
-        } else {
-            metadata.setMetaType(Types1_13.META_TYPES.byId(metadata.metaType().typeId()));
-        }
+    protected void registerRewrites() {
+        filter().mapMetaType(typeId -> Types1_13.META_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
+        filter().metaType(Types1_13.META_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(meta.value())));
+        filter().metaType(Types1_13.META_TYPES.blockStateType).handler(((event, meta) -> meta.setValue(WorldPackets.toNewId(meta.value()))));
 
-        // Handle String -> Chat DisplayName
-        if (metadata.id() == 2) {
-            if (metadata.getValue() != null && !((String) metadata.getValue()).isEmpty()) {
-                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) metadata.getValue()));
+        // Previously unused, now swimming
+        filter().index(0).handler((event, meta) -> meta.setValue((byte) ((byte) meta.getValue() & ~0x10)));
+
+        filter().index(2).handler(((event, meta) -> {
+            if (meta.getValue() != null && !((String) meta.getValue()).isEmpty()) {
+                meta.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) meta.getValue()));
             } else {
-                metadata.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
+                meta.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
             }
-        }
+        }));
 
-        // Remap held block to match new format for remapping to flat block
-        if (type == EntityTypes1_13.EntityType.ENDERMAN && metadata.id() == 12) {
-            int stateId = (int) metadata.getValue();
+        filter().type(EntityTypes1_13.EntityType.ENDERMAN).index(12).handler((event, meta) -> {
+            // Remap held block to match new format for remapping to flat block
+            int stateId = meta.value();
             int id = stateId & 4095;
             int data = stateId >> 12 & 15;
-            metadata.setValue((id << 4) | (data & 0xF));
-        }
+            meta.setValue((id << 4) | (data & 0xF));
+        });
 
-        // 1.13 changed item to flat item (no data)
-        if (metadata.metaType() == Types1_13.META_TYPES.itemType) {
-            metadata.setMetaType(Types1_13.META_TYPES.itemType);
-            protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == Types1_13.META_TYPES.blockStateType) {
-            // Convert to new block id
-            metadata.setValue(WorldPackets.toNewId((int) metadata.getValue()));
-        }
+        filter().type(EntityTypes1_13.EntityType.WOLF).index(17).handler((event, meta) -> {
+            // Handle new colors
+            meta.setValue(15 - (int) meta.getValue());
+        });
 
-        // Skip type related changes when the type is null
-        if (type == null) return;
+        filter().type(EntityTypes1_13.EntityType.ZOMBIE).addIndex(15); // Shaking
 
-        // Handle new colors
-        if (type == EntityTypes1_13.EntityType.WOLF && metadata.id() == 17) {
-            metadata.setValue(15 - (int) metadata.getValue());
-        }
-
-        // Handle new zombie meta (INDEX 15 - Boolean - Zombie is shaking while enabled)
-        if (type.isOrHasParent(EntityTypes1_13.EntityType.ZOMBIE)) {
-            if (metadata.id() > 14)
-                metadata.setId(metadata.id() + 1);
-        }
-
-        // Handle Minecart inner block
-        if (type.isOrHasParent(EntityTypes1_13.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
-            // New block format
-            int oldId = (int) metadata.getValue();
+        filter().type(EntityTypes1_13.EntityType.MINECART_ABSTRACT).index(9).handler((event, meta) -> {
+            int oldId = meta.value();
             int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
             int newId = WorldPackets.toNewId(combined);
-            metadata.setValue(newId);
-        }
+            meta.setValue(newId);
+        });
 
-        // Handle other changes
-        if (type == EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD) {
-            if (metadata.id() == 9) {
-                int particleId = (int) metadata.getValue();
-                Metadata parameter1Meta = metaByIndex(10, metadatas);
-                Metadata parameter2Meta = metaByIndex(11, metadatas);
-                int parameter1 = parameter1Meta != null ? (int) parameter1Meta.getValue() : 0;
-                int parameter2 = parameter2Meta != null ? (int) parameter2Meta.getValue() : 0;
+        filter().type(EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD).handler((event, meta) -> {
+            if (meta.id() == 9) {
+                int particleId = meta.value();
+                Metadata parameter1Meta = event.metaAtIndex(10);
+                Metadata parameter2Meta = event.metaAtIndex(11);
+                int parameter1 = parameter1Meta != null ? parameter1Meta.value() : 0;
+                int parameter2 = parameter2Meta != null ? parameter2Meta.value() : 0;
 
                 Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.getId() != -1) {
-                    metadatas.add(new Metadata(9, Types1_13.META_TYPES.particleType, particle));
+                    event.createExtraMeta(new Metadata(9, Types1_13.META_TYPES.particleType, particle));
                 }
             }
-
-            if (metadata.id() >= 9)
-                metadatas.remove(metadata); // Remove
-        }
-
-        if (metadata.id() == 0) {
-            metadata.setValue((byte) ((byte) metadata.getValue() & ~0x10)); // Previously unused, now swimming
-        }
-
-        // TODO: Boat has changed
+            if (meta.id() >= 9) {
+                event.cancel();
+            }
+        });
     }
 
     @Override

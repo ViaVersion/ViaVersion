@@ -106,24 +106,24 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 meta.setTypeAndValue(Types1_20_3.META_TYPES.componentType, ComponentUtil.jsonToTag(meta.value()));
             } else if (type == Types1_20_2.META_TYPES.optionalComponentType) {
                 meta.setTypeAndValue(Types1_20_3.META_TYPES.optionalComponentType, ComponentUtil.jsonToTag(meta.value()));
-            } else if (type == Types1_20_2.META_TYPES.particleType) {
-                final Particle particle = (Particle) meta.getValue();
-                final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
-                if (particle.getId() == particleMappings.id("vibration")) {
-                    // Change the type of the resource key argument
-                    final String resourceLocation = particle.<String>removeArgument(0).getValue();
-                    if (Key.stripMinecraftNamespace(resourceLocation).equals("block")) {
-                        particle.add(0, Type.VAR_INT, 0);
-                    } else { // Entity
-                        particle.add(0, Type.VAR_INT, 1);
-                    }
-                }
-
-                rewriteParticle(particle);
-                meta.setMetaType(Types1_20_3.META_TYPES.particleType);
             } else {
                 meta.setMetaType(Types1_20_3.META_TYPES.byId(type.typeId()));
             }
+        });
+        filter().metaType(Types1_20_3.META_TYPES.particleType).handler((event, meta) -> {
+            final Particle particle = meta.value();
+            final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+            if (particle.getId() == particleMappings.id("vibration")) {
+                // Change the type of the resource key argument
+                final String resourceLocation = particle.<String>removeArgument(0).getValue();
+                if (Key.stripMinecraftNamespace(resourceLocation).equals("block")) {
+                    particle.add(0, Type.VAR_INT, 0);
+                } else { // Entity
+                    particle.add(0, Type.VAR_INT, 1);
+                }
+            }
+
+            rewriteParticle(particle);
         });
 
         registerMetaTypeHandler(
@@ -133,7 +133,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 Types1_20_3.META_TYPES.particleType
         );
 
-        filter().filterFamily(EntityTypes1_20_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_20_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

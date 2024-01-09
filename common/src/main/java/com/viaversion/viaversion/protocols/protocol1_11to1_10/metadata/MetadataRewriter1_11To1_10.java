@@ -18,11 +18,9 @@
 package com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -43,107 +41,95 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
     }
 
     @Override
-    protected void handleMetadata(int entityId, com.viaversion.viaversion.api.minecraft.entities.EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
-        if (metadata.getValue() instanceof DataItem) {
-            // Apply rewrite
-            EntityIdRewriter.toClientItem((Item) metadata.getValue());
-        }
+    protected void registerRewrites() {
+        filter().handler((event, meta) -> {
+            if (meta.getValue() instanceof DataItem) {
+                // Apply rewrite
+                EntityIdRewriter.toClientItem(meta.value());
+            }
+        });
 
-        if (type == null) return;
-        if (type.is(EntityType.ELDER_GUARDIAN) || type.is(EntityType.GUARDIAN)) { // Guardians
-            int oldid = metadata.id();
-            if (oldid == 12) {
-                boolean val = (((byte) metadata.getValue()) & 0x02) == 0x02;
-                metadata.setTypeAndValue(MetaType1_9.Boolean, val);
-            }
-        }
+        filter().type(EntityType.GUARDIAN).index(12).handler((event, meta) -> {
+            boolean value = (((byte) meta.getValue()) & 0x02) == 0x02;
+            meta.setTypeAndValue(MetaType1_9.Boolean, value);
+        });
 
-        if (type.isOrHasParent(EntityType.ABSTRACT_SKELETON)) { // Skeletons
-            int oldid = metadata.id();
-            if (oldid == 12) {
-                metadatas.remove(metadata);
-            }
-            if (oldid == 13) {
-                metadata.setId(12);
-            }
-        }
+        filter().type(EntityType.ABSTRACT_SKELETON).removeIndex(12);
 
-        if (type.isOrHasParent(EntityType.ZOMBIE)) { // Zombie | Zombie Villager | Husk
-            if ((type == EntityType.ZOMBIE || type == EntityType.HUSK) && metadata.id() == 14) {
-                metadatas.remove(metadata);
-            } else {
-                if (metadata.id() == 15) {
-                    metadata.setId(14);
-                } else {
-                    if (metadata.id() == 14) {
-                        metadata.setId(15);
-                    }
-                }
+        filter().type(EntityType.ZOMBIE).handler((event, meta) -> {
+            if ((event.entityType() == EntityType.ZOMBIE || event.entityType() == EntityType.HUSK) && meta.id() == 14) {
+                event.cancel();
+            } else if (meta.id() == 15) {
+                meta.setId(14);
+            } else if (meta.id() == 14) {
+                meta.setId(15);
             }
-        }
+        });
 
-        if (type.isOrHasParent(EntityType.ABSTRACT_HORSE)) { // Horses
-            // Remap metadata id
-            int oldid = metadata.id();
-            if (oldid == 14) { // Type
-                metadatas.remove(metadata);
+        filter().type(EntityType.ABSTRACT_HORSE).handler((event, metadata) -> {
+            final com.viaversion.viaversion.api.minecraft.entities.EntityType type = event.entityType();
+            int id = metadata.id();
+            if (id == 14) { // Type
+                event.cancel();
+                return;
             }
-            if (oldid == 16) { // Owner
+
+            if (id == 16) { // Owner
                 metadata.setId(14);
-            }
-            if (oldid == 17) { // Armor
+            } else if (id == 17) { // Armor
                 metadata.setId(16);
             }
 
             // Process per type
-            if (type.is(EntityType.HORSE)) {
-                // Normal Horse
-            } else {
-                // Remove 15, 16
-                if (metadata.id() == 15 || metadata.id() == 16) {
-                    metadatas.remove(metadata);
+            if (!type.is(EntityType.HORSE) && metadata.id() == 15 || metadata.id() == 16) {
+                event.cancel();
+                return;
+            }
+
+            if ((type == EntityType.DONKEY || type == EntityType.MULE) && metadata.id() == 13) {
+                if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
+                    event.createExtraMeta(new Metadata(15, MetaType1_9.Boolean, true));
+                } else {
+                    event.createExtraMeta(new Metadata(15, MetaType1_9.Boolean, false));
                 }
             }
-            if (type == EntityType.DONKEY || type == EntityType.MULE) {
-                // Chested Horse
-                if (metadata.id() == 13) {
-                    if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
-                        metadatas.add(new Metadata(15, MetaType1_9.Boolean, true));
-                    } else {
-                        metadatas.add(new Metadata(15, MetaType1_9.Boolean, false));
+        });
+
+        filter().type(EntityType.ARMOR_STAND).index(0).handler((event, meta) -> {
+            if (!Via.getConfig().isHologramPatch()) {
+                return;
+            }
+
+            Metadata flags = event.metaAtIndex(11);
+            Metadata customName = event.metaAtIndex(2);
+            Metadata customNameVisible = event.metaAtIndex(3);
+            if (flags == null || customName == null || customNameVisible == null) {
+                return;
+            }
+
+            byte data = meta.value();
+            // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
+            if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
+                    && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
+                EntityTracker1_11 tracker = tracker(event.user());
+                int entityId = event.entityId();
+                if (tracker.addHologram(entityId)) {
+                    try {
+                        // Send movement
+                        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, event.user());
+                        wrapper.write(Type.VAR_INT, entityId);
+                        wrapper.write(Type.SHORT, (short) 0);
+                        wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
+                        wrapper.write(Type.SHORT, (short) 0);
+                        wrapper.write(Type.BOOLEAN, true);
+
+                        wrapper.send(Protocol1_11To1_10.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }
-        }
-
-        if (type.is(EntityType.ARMOR_STAND) && Via.getConfig().isHologramPatch()) {
-            Metadata flags = metaByIndex(11, metadatas);
-            Metadata customName = metaByIndex(2, metadatas);
-            Metadata customNameVisible = metaByIndex(3, metadatas);
-            if (metadata.id() == 0 && flags != null && customName != null && customNameVisible != null) {
-                byte data = (byte) metadata.getValue();
-                // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
-                if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
-                        && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
-                    EntityTracker1_11 tracker = tracker(connection);
-                    if (tracker.addHologram(entityId)) {
-                        try {
-                            // Send movement
-                            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, connection);
-                            wrapper.write(Type.VAR_INT, entityId);
-                            wrapper.write(Type.SHORT, (short) 0);
-                            wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
-                            wrapper.write(Type.SHORT, (short) 0);
-                            wrapper.write(Type.BOOLEAN, true);
-
-                            wrapper.send(Protocol1_11To1_10.class);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
+        });
     }
 
     @Override

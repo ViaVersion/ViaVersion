@@ -17,10 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
-import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -32,7 +33,6 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.Protocol1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.metadata.MetadataRewriter1_14To1_13_2;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +40,18 @@ public class EntityPackets {
 
     public static void register(Protocol1_14To1_13_2 protocol) {
         MetadataRewriter1_14To1_13_2 metadataRewriter = protocol.get(MetadataRewriter1_14To1_13_2.class);
+
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_EXPERIENCE_ORB, wrapper -> {
+            int entityId = wrapper.passthrough(Type.VAR_INT);
+            metadataRewriter.tracker(wrapper.user()).addEntity(entityId, EntityTypes1_14.EXPERIENCE_ORB);
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_GLOBAL_ENTITY, wrapper -> {
+            int entityId = wrapper.passthrough(Type.VAR_INT);
+            if (wrapper.passthrough(Type.BYTE) == 1) {
+                metadataRewriter.tracker(wrapper.user()).addEntity(entityId, EntityTypes1_14.LIGHTNING_BOLT);
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_13.SPAWN_ENTITY, new PacketHandlers() {
             @Override
@@ -144,6 +156,7 @@ public class EntityPackets {
                 map(Type.VAR_INT);
                 map(Type.POSITION1_8, Type.POSITION1_14);
                 map(Type.BYTE);
+                handler(wrapper -> metadataRewriter.tracker(wrapper.user()).addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_14.PAINTING));
             }
         });
 

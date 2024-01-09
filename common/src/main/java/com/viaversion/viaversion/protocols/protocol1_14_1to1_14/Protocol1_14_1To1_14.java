@@ -36,7 +36,7 @@ public class Protocol1_14_1To1_14 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        metadataRewriter.register();
+        super.registerPackets();
 
         EntityPackets.register(this);
     }

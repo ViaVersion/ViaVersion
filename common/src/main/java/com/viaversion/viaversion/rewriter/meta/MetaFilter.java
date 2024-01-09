@@ -20,20 +20,24 @@ package com.viaversion.viaversion.rewriter.meta;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MetaFilter {
     private final MetaHandler handler;
     private final EntityType type;
+    private final MetaType metaType;
     private final int index;
     private final boolean filterFamily;
 
-    public MetaFilter(@Nullable EntityType type, boolean filterFamily, int index, MetaHandler handler) {
+    public MetaFilter(@Nullable EntityType type, boolean filterFamily, @Nullable MetaType metaType, int index, MetaHandler handler) {
         Preconditions.checkNotNull(handler, "MetaHandler cannot be null");
         this.type = type;
+        this.metaType = metaType;
         this.filterFamily = filterFamily;
         this.index = index;
         this.handler = handler;
@@ -55,6 +59,15 @@ public class MetaFilter {
      */
     public @Nullable EntityType type() {
         return type;
+    }
+
+    /**
+     * Returns the meta type to filter, or null.
+     *
+     * @return the meta type to filter, or null if unset
+     */
+    public @Nullable MetaType metaType() {
+        return metaType;
     }
 
     /**
@@ -86,7 +99,8 @@ public class MetaFilter {
         // Check if no specific index is filtered or the indexes are equal
         // Then check if the filter has no entity type or the type is equal to or part of the filtered parent type
         return (this.index == -1 || metadata.id() == this.index)
-                && (this.type == null || matchesType(type));
+                && (this.type == null || matchesType(type))
+                && (this.metaType == null || metadata.metaType() == this.metaType);
     }
 
     private boolean matchesType(@Nullable EntityType type) {
@@ -101,6 +115,7 @@ public class MetaFilter {
         if (index != that.index) return false;
         if (filterFamily != that.filterFamily) return false;
         if (!handler.equals(that.handler)) return false;
+        if (!Objects.equals(metaType, that.metaType)) return false;
         return Objects.equals(type, that.type);
     }
 
@@ -108,6 +123,7 @@ public class MetaFilter {
     public int hashCode() {
         int result = handler.hashCode();
         result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (metaType != null ? metaType.hashCode() : 0);
         result = 31 * result + index;
         result = 31 * result + (filterFamily ? 1 : 0);
         return result;
@@ -118,6 +134,7 @@ public class MetaFilter {
         return "MetaFilter{" +
                 "type=" + type +
                 ", filterFamily=" + filterFamily +
+                ", metaType=" + metaType +
                 ", index=" + index +
                 ", handler=" + handler +
                 '}';
@@ -126,6 +143,7 @@ public class MetaFilter {
     public static final class Builder {
         private final EntityRewriter<?, ?> rewriter;
         private EntityType type;
+        private MetaType metaType;
         private int index = -1;
         private boolean filterFamily;
         private MetaHandler handler;
@@ -134,22 +152,49 @@ public class MetaFilter {
             this.rewriter = rewriter;
         }
 
+        public Builder metaType(MetaType metaType) {
+            Preconditions.checkArgument(this.metaType == null);
+            this.metaType = metaType;
+            return this;
+        }
+
+        /**
+         * Sets the type to filter, including subtypes.
+         * <p>
+         * You should always register a type when accessing specific indexes,
+         * even if it is the base entity type, to avoid metadata from unregistered
+         * entities causing issues.
+         *
+         * @param type entity type to filter
+         * @return this builder
+         */
         public Builder type(EntityType type) {
             Preconditions.checkArgument(this.type == null);
             this.type = type;
+            this.filterFamily = true;
+            return this;
+        }
+
+        /**
+         * Sets the type to filter, not including subtypes.
+         * <p>
+         * You should always register a type when accessing specific indexes,
+         * even if it is the base entity type, to avoid metadata from unregistered
+         * entities causing issues.
+         *
+         * @param type exact entity type to filter
+         * @return this builder
+         */
+        public Builder exactType(EntityType type) {
+            Preconditions.checkArgument(this.type == null);
+            this.type = type;
+            this.filterFamily = false;
             return this;
         }
 
         public Builder index(int index) {
             Preconditions.checkArgument(this.index == -1);
             this.index = index;
-            return this;
-        }
-
-        public Builder filterFamily(EntityType type) {
-            Preconditions.checkArgument(this.type == null);
-            this.type = type;
-            this.filterFamily = true;
             return this;
         }
 
@@ -170,6 +215,17 @@ public class MetaFilter {
             Preconditions.checkArgument(this.handler == null);
             this.handler = handler;
             register();
+        }
+
+        public void mapMetaType(Int2ObjectFunction<MetaType> updateFunction) {
+            handler((event, meta) -> {
+                MetaType mappedType = updateFunction.apply(meta.metaType().typeId());
+                if (mappedType != null) {
+                    meta.setMetaType(mappedType);
+                } else {
+                    event.cancel();
+                }
+            });
         }
 
         /**
@@ -243,7 +299,7 @@ public class MetaFilter {
          * @return created meta filter
          */
         public MetaFilter build() {
-            return new MetaFilter(type, filterFamily, index, handler);
+            return new MetaFilter(type, filterFamily, metaType, index, handler);
         }
     }
 }

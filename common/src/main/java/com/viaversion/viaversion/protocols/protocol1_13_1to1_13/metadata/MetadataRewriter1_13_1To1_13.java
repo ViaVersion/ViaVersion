@@ -17,17 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_13_1to1_13.metadata;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_13_1to1_13.Protocol1_13_1To1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import java.util.List;
 
 public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<ClientboundPackets1_13, Protocol1_13_1To1_13> {
 
@@ -36,27 +31,13 @@ public class MetadataRewriter1_13_1To1_13 extends EntityRewriter<ClientboundPack
     }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
-        // 1.13 changed item to flat item (no data)
-        if (metadata.metaType() == Types1_13.META_TYPES.itemType) {
-            protocol.getItemRewriter().handleItemToClient((Item) metadata.getValue());
-        } else if (metadata.metaType() == Types1_13.META_TYPES.blockStateType) {
-            // Convert to new block id
-            int data = (int) metadata.getValue();
-            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (metadata.metaType() == Types1_13.META_TYPES.particleType) {
-            rewriteParticle((Particle) metadata.getValue());
-        }
-
-        if (type == null) return;
-
-        if (type.isOrHasParent(EntityTypes1_13.EntityType.MINECART_ABSTRACT) && metadata.id() == 9) {
-            // New block format
-            int data = (int) metadata.getValue();
-            metadata.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        } else if (type.isOrHasParent(EntityTypes1_13.EntityType.ABSTRACT_ARROW) && metadata.id() >= 7) {
-            metadata.setId(metadata.id() + 1); // New shooter UUID
-        }
+    protected void registerRewrites() {
+        registerMetaTypeHandler(Types1_13.META_TYPES.itemType, Types1_13.META_TYPES.blockStateType, null, Types1_13.META_TYPES.particleType);
+        filter().type(EntityTypes1_13.EntityType.MINECART_ABSTRACT).index(9).handler((event, meta) -> {
+            int data = meta.value();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+        filter().type(EntityTypes1_13.EntityType.ABSTRACT_ARROW).addIndex(7); // Shooter UUID
     }
 
     @Override

@@ -58,8 +58,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
     @Override
     protected void registerPackets() {
-        metadataRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketHandlers() {
             @Override

@@ -95,7 +95,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     protected void registerPackets() {
-        metadataRewriter.register();
+        super.registerPackets();
 
         // Disconnect workaround (JSON!)
         registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> {

@@ -42,6 +42,8 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_19_1.SPAWN_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
+        registerTracker(ClientboundPackets1_19_1.SPAWN_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
+        registerTracker(ClientboundPackets1_19_1.SPAWN_PLAYER, EntityTypes1_19_3.PLAYER);
         registerMetadataRewriter(ClientboundPackets1_19_1.ENTITY_METADATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
@@ -59,6 +61,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
                 handler(dimensionDataHandler());
                 handler(biomeSizeTracker());
                 handler(worldDataTrackerHandlerByKey());
+                handler(playerTrackerHandler());
                 handler(wrapper -> {
                     // Also enable vanilla features
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
@@ -149,20 +152,17 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> {
-            final int id = meta.metaType().typeId();
-            meta.setMetaType(Types1_19_3.META_TYPES.byId(id >= 2 ? id + 1 : id)); // long added
-        });
+        filter().mapMetaType(typeId -> Types1_19_3.META_TYPES.byId(typeId >= 2 ? typeId + 1 : typeId)); // Long added
         registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.blockStateType, null, Types1_19_3.META_TYPES.particleType);
 
-        filter().index(6).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, meta) -> {
             // Sitting pose added
             final int pose = meta.value();
             if (pose >= 10) {
                 meta.setValue(pose + 1);
             }
         });
-        filter().filterFamily(EntityTypes1_19_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
