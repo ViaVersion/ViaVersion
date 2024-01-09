@@ -29,11 +29,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface FullMappings extends Mappings {
 
-    @Deprecated
-    default Mappings mappings() {
-        return this;
-    }
-
     /**
      * Returns the unmapped integer id for the given identifier, or -1 if not found.
      *

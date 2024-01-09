@@ -37,11 +37,6 @@ public class IntArrayMappings implements Mappings {
         return new IntArrayMappings(mappings, mappedIds);
     }
 
-    @Deprecated
-    public static Builder<IntArrayMappings> builder() {
-        return Mappings.builder(IntArrayMappings::new);
-    }
-
     @Override
     public int getNewId(int id) {
         return id >= 0 && id < mappings.length ? mappings[id] : -1;

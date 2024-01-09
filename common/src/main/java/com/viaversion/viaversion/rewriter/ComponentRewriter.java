@@ -45,11 +45,6 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final ReadType type;
 
-    @Deprecated/*(forRemoval = true)*/
-    public ComponentRewriter(final Protocol<C, ?, ?, ?> protocol) {
-        this(protocol, ReadType.JSON);
-    }
-
     public ComponentRewriter(final Protocol<C, ?, ?, ?> protocol, final ReadType type) {
         this.protocol = protocol;
         this.type = type;

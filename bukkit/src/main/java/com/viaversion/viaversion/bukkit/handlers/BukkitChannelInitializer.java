@@ -63,11 +63,6 @@ public final class BukkitChannelInitializer extends ChannelInitializer<Channel> 
         this.original = oldInit;
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public ChannelInitializer<Channel> getOriginal() {
-        return original;
-    }
-
     @Override
     protected void initChannel(Channel channel) throws Exception {
         // Add originals

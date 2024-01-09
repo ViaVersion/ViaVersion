@@ -68,11 +68,6 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> implem
         }
     }
 
-    /*@Deprecated(forRemoval = true)*/
-    public ChannelInitializer<Channel> getOriginal() {
-        return original;
-    }
-
     @Override
     public ChannelInitializer<Channel> original() {
         return original;

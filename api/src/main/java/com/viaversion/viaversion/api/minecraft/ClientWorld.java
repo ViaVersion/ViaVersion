@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -31,10 +30,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class ClientWorld implements StorableObject {
     private Environment environment;
-
-    @Deprecated/*(forRemoval = true)*/
-    public ClientWorld(final UserConnection connection) {
-    }
 
     public ClientWorld() {
     }

@@ -53,11 +53,6 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public Mappings mappings() {
-        return mappings;
-    }
-
-    @Override
     public int id(final String identifier) {
         return stringToId.getInt(Key.stripMinecraftNamespace(identifier));
     }

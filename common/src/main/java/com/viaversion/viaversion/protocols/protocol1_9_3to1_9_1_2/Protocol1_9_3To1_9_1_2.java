@@ -155,7 +155,7 @@ public class Protocol1_9_3To1_9_1_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     public void init(UserConnection user) {
         if (!user.has(ClientWorld.class)) {
-            user.put(new ClientWorld(user));
+            user.put(new ClientWorld());
         }
     }
 }

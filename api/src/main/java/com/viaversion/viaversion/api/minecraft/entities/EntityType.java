@@ -63,16 +63,6 @@ public interface EntityType {
      */
     boolean isAbstractType();
 
-    @Deprecated/*(forRemoval = true)*/
-    default boolean is(EntityType... types) {
-        for (EntityType type : types) {
-            if (this == type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     default boolean is(EntityType type) {
         return this == type;
     }

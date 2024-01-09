@@ -55,19 +55,4 @@ public class ParticleMappings extends FullMappingsBase {
     public boolean isItemParticle(final int id) {
         return itemParticleIds.contains(id);
     }
-
-    @Deprecated/*(forRemoval = true)*/
-    public int getBlockId() {
-        return id("block");
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public int getFallingDustId() {
-        return id("falling_dust");
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public int getItemId() {
-        return id("item");
-    }
 }

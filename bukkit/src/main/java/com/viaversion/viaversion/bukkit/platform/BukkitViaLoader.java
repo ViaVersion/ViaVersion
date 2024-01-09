@@ -70,11 +70,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public <T extends Listener> T storeListener(T listener) {
-        return listener;
-    }
-
     @Override
     public void load() {
         registerListener(new UpdateListener());
