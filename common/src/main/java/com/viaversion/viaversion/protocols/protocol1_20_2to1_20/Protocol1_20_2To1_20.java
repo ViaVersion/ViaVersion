@@ -89,10 +89,12 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
         registerClientbound(ClientboundPackets1_19_4.TAGS, wrapper -> {
             tagRewriter.getGenericHandler().handle(wrapper);
+            wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
         });
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), wrapper -> {
             tagRewriter.getGenericHandler().handle(wrapper);
+            wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
         });
 
