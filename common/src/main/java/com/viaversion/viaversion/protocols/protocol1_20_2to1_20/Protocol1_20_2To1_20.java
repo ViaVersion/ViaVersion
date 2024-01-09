@@ -51,6 +51,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.Configur
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Key;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -85,9 +86,15 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
         });
 
-        registerClientbound(ClientboundPackets1_19_4.TAGS, wrapper -> wrapper.user().put(new LastTags(wrapper)));
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(),
-                wrapper -> wrapper.user().put(new LastTags(wrapper)));
+        final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
+        registerClientbound(ClientboundPackets1_19_4.TAGS, wrapper -> {
+            tagRewriter.getGenericHandler().handle(wrapper);
+            wrapper.user().put(new LastTags(wrapper));
+        });
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), wrapper -> {
+            tagRewriter.getGenericHandler().handle(wrapper);
+            wrapper.user().put(new LastTags(wrapper));
+        });
 
         registerClientbound(ClientboundPackets1_19_4.DISPLAY_SCOREBOARD, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
