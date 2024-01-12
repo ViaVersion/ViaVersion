@@ -41,7 +41,7 @@ public class ParticleRewriter {
         add(43); // (5->43) splash -> minecraft:splash
         add(22); // (6->22) wake -> minecraft:fishing
         add(42); // (7->42) suspended -> minecraft:underwater
-        add(42); // (8->42) depthsuspend -> minecraft:underwater (COMPLETELY REMOVED)
+        add(32); // (8->32) depthsuspend -> minecraft:mycelium
         add(6); // (9->6) crit -> minecraft:crit
         add(14); // (10->14) magicCrit -> minecraft:enchanted_hit
         add(37); // (11->37) smoke -> minecraft:smoke
@@ -61,7 +61,7 @@ public class ParticleRewriter {
         add(15); // (25->15) enchantmenttable -> minecraft:enchant
         add(23); // (26->23) flame -> minecraft:flame
         add(31); // (27->31) lava -> minecraft:lava
-        add(-1); // (28->-1) footstap -> REMOVED
+        add(-1); // (28->-1) footstep -> REMOVED
         add(5); // (29->5) cloud -> minecraft:cloud
         add(11, reddustHandler()); // (30->11) reddust -> minecraft:dust
         //    Red	Float	Red value, 0-1
@@ -90,14 +90,6 @@ public class ParticleRewriter {
         // BlockState	VarInt	The ID of the block state.
         add(41); // (47->41) totem -> minecraft:totem_of_undying
         add(38); // (48->38) spit -> minecraft:spit
-
-        /*
-            NEW particles
-            minecraft:squid_ink	39	None
-            minecraft:bubble_pop	45	None
-            minecraft:current_down	46	None
-            minecraft:bubble_column_up	47	None
-         */
     }
 
     public static Particle rewriteParticle(int particleId, Integer[] data) {
