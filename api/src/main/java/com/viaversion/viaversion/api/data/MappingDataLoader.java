@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,11 +59,6 @@ public final class MappingDataLoader {
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
     private static boolean cacheValid = true;
-
-    @Deprecated/*(forRemoval = true)*/
-    public static void enableMappingsCache() {
-        // Always enabled
-    }
 
     public static void clearCache() {
         MAPPINGS_CACHE.clear();
@@ -248,56 +243,6 @@ public final class MappingDataLoader {
                 mappedElements.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList()),
                 mappings
         );
-    }
-
-    @Deprecated
-    public static void mapIdentifiers(final int[] output, final JsonObject unmappedIdentifiers, final JsonObject mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
-        final Object2IntMap<String> newIdentifierMap = MappingDataLoader.indexedObjectToMap(mappedIdentifiers);
-        for (final Map.Entry<String, JsonElement> entry : unmappedIdentifiers.entrySet()) {
-            final int id = Integer.parseInt(entry.getKey());
-            final int mappedId = mapIdentifierEntry(id, entry.getValue().getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (mappedId != -1) {
-                output[id] = mappedId;
-            }
-        }
-    }
-
-    private static int mapIdentifierEntry(final int id, final String val, final Object2IntMap<String> mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
-        int mappedId = mappedIdentifiers.getInt(val);
-        if (mappedId == -1) {
-            // Search in diff mappings
-            if (diffIdentifiers != null) {
-                JsonElement diffElement = diffIdentifiers.get(val);
-                if (diffElement != null || (diffElement = diffIdentifiers.get(Integer.toString(id))) != null) {
-                    final String mappedName = diffElement.getAsString();
-                    if (mappedName.isEmpty()) {
-                        return -1; // "empty" remaps without warnings
-                    }
-
-                    mappedId = mappedIdentifiers.getInt(mappedName);
-
-                }
-            }
-            if (mappedId == -1) {
-                if (warnOnMissing && !Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().warning("No key for " + val + " :( ");
-                }
-                return -1;
-            }
-        }
-        return mappedId;
-    }
-
-    @Deprecated
-    public static void mapIdentifiers(final int[] output, final JsonArray unmappedIdentifiers, final JsonArray mappedIdentifiers, @Nullable final JsonObject diffIdentifiers, final boolean warnOnMissing) {
-        final Object2IntMap<String> newIdentifierMap = MappingDataLoader.arrayToMap(mappedIdentifiers);
-        for (int id = 0; id < unmappedIdentifiers.size(); id++) {
-            final JsonElement unmappedIdentifier = unmappedIdentifiers.get(id);
-            final int mappedId = mapIdentifierEntry(id, unmappedIdentifier.getAsString(), newIdentifierMap, diffIdentifiers, warnOnMissing);
-            if (mappedId != -1) {
-                output[id] = mappedId;
-            }
-        }
     }
 
     /**

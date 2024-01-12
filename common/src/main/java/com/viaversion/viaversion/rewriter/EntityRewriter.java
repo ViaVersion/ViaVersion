@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -30,6 +31,7 @@ import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
@@ -40,7 +42,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
@@ -106,19 +107,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
         for (final Metadata metadata : metadataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
-            // Call handlers implementing the old handleMetadata
-            if (!callOldMetaHandler(entityId, type, metadata, metadataList, connection)) {
-                metadataList.remove(metadata);
-                continue;
-            }
-
             MetaHandlerEvent event = null;
             for (final MetaFilter filter : metadataFilters) {
                 if (!filter.isFiltered(type, metadata)) {
                     continue;
                 }
                 if (event == null) {
-                    // Only initialize when needed and share event instance
+                    // Instantiate lazily and share event instance
                     event = new MetaHandlerEventImpl(connection, entity, entityId, metadata, metadataList);
                 }
 
@@ -137,41 +132,15 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 }
             }
 
-            final List<Metadata> extraMeta = event != null ? event.extraMeta() : null;
-            if (extraMeta != null) {
+            if (event != null && event.hasExtraMeta()) {
                 // Finally, add newly created meta
-                metadataList.addAll(extraMeta);
+                metadataList.addAll(event.extraMeta());
             }
         }
 
         if (entity != null) {
             entity.sentMetadata(true);
         }
-    }
-
-    @Deprecated
-    private boolean callOldMetaHandler(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadataList, UserConnection connection) {
-        try {
-            handleMetadata(entityId, type, metadata, metadataList, connection);
-            return true;
-        } catch (Exception e) {
-            logException(e, type, metadataList, metadata);
-            return false;
-        }
-    }
-
-    /**
-     * To be overridden to handle metadata.
-     *
-     * @param entityId   entity id
-     * @param type       entity type, or null if not tracked
-     * @param metadata   current metadata
-     * @param metadatas  full, mutable list of metadata
-     * @param connection user connection
-     * @deprecated use {@link #filter()}
-     */
-    @Deprecated
-    protected void handleMetadata(int entityId, @Nullable EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
     }
 
     @Override
@@ -566,16 +535,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     // ---------------------------------------------------------------------------
-
-    @Deprecated
-    protected @Nullable Metadata metaByIndex(int index, List<Metadata> metadataList) {
-        for (Metadata metadata : metadataList) {
-            if (metadata.id() == index) {
-                return metadata;
-            }
-        }
-        return null;
-    }
 
     protected void rewriteParticle(Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();

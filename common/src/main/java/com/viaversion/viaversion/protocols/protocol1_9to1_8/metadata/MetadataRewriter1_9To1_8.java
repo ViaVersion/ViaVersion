@@ -17,11 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -30,7 +29,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import java.util.List;
+import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import java.util.UUID;
 
 public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1_8, Protocol1_9To1_8> {
@@ -40,14 +39,21 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
     }
 
     @Override
-    protected void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) throws Exception {
+    protected void registerRewrites() {
+        filter().handler(this::handleMetadata);
+    }
+
+    private void handleMetadata(MetaHandlerEvent event, Metadata metadata) {
+        EntityType type = event.entityType();
         MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.id());
         if (metaIndex == null) {
-            throw new Exception("Could not find valid metadata");
+            // Almost certainly bad data, remove it
+            event.cancel();
+            return;
         }
 
         if (metaIndex.getNewType() == null) {
-            metadatas.remove(metadata);
+            event.cancel();
             return;
         }
 
@@ -72,7 +78,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     }
                     int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
                     MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
-                    metadatas.add(new Metadata(newIndex, metaType, val));
+                    event.createExtraMeta(new Metadata(newIndex, metaType, val));
                 }
                 break;
             case OptUUID:
@@ -129,8 +135,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(((Number) value).intValue());
                 break;
             default:
-                metadatas.remove(metadata);
-                throw new Exception("Unhandled MetaDataType: " + metaIndex.getNewType());
+                throw new RuntimeException("Unhandled MetaDataType: " + metaIndex.getNewType());
         }
     }
 

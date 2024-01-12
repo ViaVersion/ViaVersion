@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Mappings containing the full string identifier mappings.
  */
 public interface FullMappings extends Mappings {
-
-    @Deprecated
-    default Mappings mappings() {
-        return this;
-    }
 
     /**
      * Returns the unmapped integer id for the given identifier, or -1 if not found.

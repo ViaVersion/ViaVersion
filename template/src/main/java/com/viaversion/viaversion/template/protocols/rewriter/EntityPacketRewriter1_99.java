@@ -84,12 +84,12 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
     @Override
     protected void registerRewrites() {
         /* Uncomment if metatype classes changed
-        filter().handler((event, meta) -> {
-            final int id = meta.metaType().typeId();
+        filter().mapMetaType(typeId -> {
+            final int id = typeId;
             if (id >= SomeAddedIndex) {
                 id++;
             }
-            meta.setMetaType(Types1_20_5.META_TYPES.byId(id));
+            return Types1_20_5.META_TYPES.byId(id);
         });*/
 
         // Registers registry type id changes
@@ -101,7 +101,7 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         );
 
         // Minecarts are special
-        filter().filterFamily(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

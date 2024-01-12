@@ -17,14 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_14_1to1_14.metadata;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.protocols.protocol1_14_1to1_14.Protocol1_14_1To1_14;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ClientboundPackets1_14;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import java.util.List;
 
 public class MetadataRewriter1_14_1To1_14 extends EntityRewriter<ClientboundPackets1_14, Protocol1_14_1To1_14> {
 
@@ -33,14 +30,9 @@ public class MetadataRewriter1_14_1To1_14 extends EntityRewriter<ClientboundPack
     }
 
     @Override
-    public void handleMetadata(int entityId, EntityType type, Metadata metadata, List<Metadata> metadatas, UserConnection connection) {
-        if (type == null) return;
-
-        if (type == EntityTypes1_14.VILLAGER || type == EntityTypes1_14.WANDERING_TRADER) {
-            if (metadata.id() >= 15) {
-                metadata.setId(metadata.id() + 1);
-            }
-        }
+    protected void registerRewrites() {
+        filter().type(EntityTypes1_14.VILLAGER).addIndex(15);
+        filter().type(EntityTypes1_14.WANDERING_TRADER).addIndex(15);
     }
 
     @Override

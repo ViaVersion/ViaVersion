@@ -51,8 +51,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        entityRewriter.register();
-        itemRewriter.register();
+        super.registerPackets();
 
         EntityPackets.register(this);
         WorldPackets.register(this);

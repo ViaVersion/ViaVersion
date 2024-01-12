@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,16 +62,6 @@ public interface EntityType {
      * @return whether the type does not represent an actual entity
      */
     boolean isAbstractType();
-
-    @Deprecated/*(forRemoval = true)*/
-    default boolean is(EntityType... types) {
-        for (EntityType type : types) {
-            if (this == type) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     default boolean is(EntityType type) {
         return this == type;

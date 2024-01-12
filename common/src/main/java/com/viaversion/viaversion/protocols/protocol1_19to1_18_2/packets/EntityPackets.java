@@ -46,8 +46,11 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.Dimensio
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
 
@@ -349,37 +352,33 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> {
-            meta.setMetaType(Types1_19.META_TYPES.byId(meta.metaType().typeId()));
+        filter().mapMetaType(Types1_19.META_TYPES::byId);
+        filter().metaType(Types1_19.META_TYPES.particleType).handler((event, meta) -> {
+            final Particle particle = (Particle) meta.getValue();
+            final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+            if (particle.getId() == particleMappings.id("vibration")) {
+                // Remove the position
+                particle.getArguments().remove(0);
 
-            final MetaType type = meta.metaType();
-            if (type == Types1_19.META_TYPES.particleType) {
-                final Particle particle = (Particle) meta.getValue();
-                final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
-                if (particle.getId() == particleMappings.id("vibration")) {
-                    // Remove the position
-                    particle.getArguments().remove(0);
-
-                    final String resourceLocation = Key.stripMinecraftNamespace(particle.<String>getArgument(0).getValue());
-                    if (resourceLocation.equals("entity")) {
-                        // Add Y offset
-                        particle.getArguments().add(2, new Particle.ParticleData<>(Type.FLOAT, 0F));
-                    }
+                final String resourceLocation = Key.stripMinecraftNamespace(particle.<String>getArgument(0).getValue());
+                if (resourceLocation.equals("entity")) {
+                    // Add Y offset
+                    particle.getArguments().add(2, new Particle.ParticleData<>(Type.FLOAT, 0F));
                 }
-
-                rewriteParticle(particle);
             }
+
+            rewriteParticle(particle);
         });
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, null);
 
-        filter().filterFamily(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(EntityTypes1_19.CAT).index(19).handler((event, meta) -> meta.setMetaType(Types1_19.META_TYPES.catVariantType));
+        filter().type(EntityTypes1_19.CAT).index(19).mapMetaType(typeId -> Types1_19.META_TYPES.catVariantType);
     }
 
     @Override
