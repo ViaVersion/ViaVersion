@@ -66,14 +66,26 @@ public abstract class Config {
         return getClass().getClassLoader().getResource("assets/viaversion/config.yml");
     }
 
+    public InputStream getDefaultConfigInputStream() {
+        return getClass().getClassLoader().getResourceAsStream("assets/viaversion/config.yml");
+    }
+
     public Map<String, Object> loadConfig(File location) {
-        return loadConfig(location, getDefaultConfigURL());
+        final URL defaultConfigUrl = getDefaultConfigURL();
+        if (defaultConfigUrl != null) {
+            return loadConfig(location, defaultConfigUrl);
+        }
+        return loadConfig(location, this::getDefaultConfigInputStream);
     }
 
     public synchronized Map<String, Object> loadConfig(File location, URL jarConfigFile) {
+        return loadConfig(location, jarConfigFile::openStream);
+    }
+
+    private synchronized Map<String, Object> loadConfig(File location, InputStreamSupplier configSupplier) {
         List<String> unsupported = getUnsupportedOptions();
         try {
-            commentStore.storeComments(jarConfigFile.openStream());
+            commentStore.storeComments(configSupplier.get());
             for (String option : unsupported) {
                 List<String> comments = commentStore.header(option);
                 if (comments != null) {
@@ -96,7 +108,7 @@ public abstract class Config {
         }
 
         Map<String, Object> defaults = config;
-        try (InputStream stream = jarConfigFile.openStream()) {
+        try (InputStream stream = configSupplier.get()) {
             defaults = (Map<String, Object>) YAML.get().load(stream);
             for (String option : unsupported) {
                 defaults.remove(option);
