@@ -17,16 +17,20 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.util.Key;
+import io.netty.buffer.ByteBuf;
 
-public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPackets1_20_3, ServerboundPackets1_20_3, Protocol1_20_5To1_20_3> {
+public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPackets1_20_3, ServerboundPackets1_20_5, Protocol1_20_5To1_20_3> {
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
@@ -42,20 +46,113 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA);
 
-        // registerOpenWindow(ClientboundPackets1_20_3.OPEN_WINDOW);
         registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_20_3.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_20_3.SET_SLOT);
         registerAdvancements1_20_3(ClientboundPackets1_20_3.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_20_3.ENTITY_EQUIPMENT);
-        registerClickWindow1_17_1(ServerboundPackets1_20_3.CLICK_WINDOW);
-        registerTradeList1_19(ClientboundPackets1_20_3.TRADE_LIST);
-        registerCreativeInvAction(ServerboundPackets1_20_3.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
+        registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
-        registerSpawnParticle1_19(ClientboundPackets1_20_3.SPAWN_PARTICLE);
 
-        // TODO Explosion contains particles now
+        ;
 
-        new RecipeRewriter1_20_3<>(protocol).register(ClientboundPackets1_20_3.DECLARE_RECIPES);
+        protocol.registerClientbound(ClientboundPackets1_20_3.SPAWN_PARTICLE, wrapper -> {
+            final int particleId = wrapper.read(Type.VAR_INT);
+
+            wrapper.passthrough(Type.BOOLEAN); // Long Distance
+            wrapper.passthrough(Type.DOUBLE); // X
+            wrapper.passthrough(Type.DOUBLE); // Y
+            wrapper.passthrough(Type.DOUBLE); // Z
+            wrapper.passthrough(Type.FLOAT); // Offset X
+            wrapper.passthrough(Type.FLOAT); // Offset Y
+            wrapper.passthrough(Type.FLOAT); // Offset Z
+            wrapper.passthrough(Type.FLOAT); // Particle Data
+            wrapper.passthrough(Type.INT); // Particle Count
+
+            final Particle particle = new Particle(particleId);
+            wrapper.read(new ParticleDataReader(particle));
+
+            rewriteParticle(particle);
+            wrapper.write(Types1_20_3.PARTICLE, particle);
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.EXPLOSION, wrapper -> {
+            wrapper.passthrough(Type.DOUBLE); // X
+            wrapper.passthrough(Type.DOUBLE); // Y
+            wrapper.passthrough(Type.DOUBLE); // Z
+            wrapper.passthrough(Type.FLOAT); // Power
+            final int blocks = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < blocks; i++) {
+                wrapper.passthrough(Type.BYTE); // Relative X
+                wrapper.passthrough(Type.BYTE); // Relative Y
+                wrapper.passthrough(Type.BYTE); // Relative Z
+            }
+            wrapper.passthrough(Type.FLOAT); // Knockback X
+            wrapper.passthrough(Type.FLOAT); // Knockback Y
+            wrapper.passthrough(Type.FLOAT); // Knockback Z
+            wrapper.passthrough(Type.VAR_INT); // Block interaction type
+
+            final Particle smallExplosionParticle = wrapper.passthrough(Types1_20_3.PARTICLE);
+            final Particle largeExplosionParticle = wrapper.passthrough(Types1_20_3.PARTICLE);
+            protocol.getEntityRewriter().rewriteParticle(smallExplosionParticle);
+            protocol.getEntityRewriter().rewriteParticle(largeExplosionParticle);
+
+            wrapper.write(Type.VAR_INT, 0); // "Empty" registry id to instead use the resource location that follows after
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.TRADE_LIST, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Container id
+            final int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Input
+                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Output
+                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Second Item
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
+
+                wrapper.write(Type.BOOLEAN, false); // Ignore tags
+            }
+        });
+
+        final RecipeRewriter1_20_3<ClientboundPackets1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol);
+        protocol.registerClientbound(ClientboundPackets1_20_3.DECLARE_RECIPES, wrapper -> {
+            final int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                // Change order and write the type as an int
+                final String type = wrapper.read(Type.STRING);
+                wrapper.passthrough(Type.STRING); // Recipe Identifier
+
+                wrapper.write(Type.VAR_INT, protocol.getMappingData().getRecipeSerializerMappings().mappedId(type));
+                recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
+            }
+        });
+    }
+
+    private static final class ParticleDataReader extends Type<Void> {
+
+        private final Particle particle;
+
+        private ParticleDataReader(Particle particle) {
+            super(Void.class);
+            this.particle = particle;
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final Void value) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Void read(final ByteBuf buffer) throws Exception {
+            // Extract the particle data to put into a particle
+            Types1_20_3.PARTICLE.readData(buffer, particle);
+            return null;
+        }
     }
 }

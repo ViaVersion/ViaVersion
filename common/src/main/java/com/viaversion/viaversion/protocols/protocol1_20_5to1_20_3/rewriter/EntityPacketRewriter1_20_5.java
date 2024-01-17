@@ -66,6 +66,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.BOOLEAN); // Limited crafting
                 map(Type.STRING); // Dimension key
                 map(Type.STRING); // World
+                map(Type.LONG); // Seed
+                map(Type.BYTE); // Gamemode
+                map(Type.BYTE); // Previous gamemode
+                map(Type.BOOLEAN); // Debug
+                map(Type.BOOLEAN); // Flat
+                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
+                create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });

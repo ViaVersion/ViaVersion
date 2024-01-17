@@ -19,6 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -281,6 +282,28 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerTradeList1_20_5(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Container id
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                handleItemToClient(wrapper.passthrough(itemType)); // Input
+                handleItemToClient(wrapper.passthrough(itemType)); // Output
+                handleItemToClient(wrapper.passthrough(itemType)); // Second Item
+
+                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Type.INT); // Number of tools uses
+                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+
+                wrapper.passthrough(Type.INT); // XP
+                wrapper.passthrough(Type.INT); // Special price
+                wrapper.passthrough(Type.FLOAT); // Price multiplier
+                wrapper.passthrough(Type.INT); // Demand
+                wrapper.passthrough(Type.BOOLEAN); // Ignore tags
+            }
+        });
+    }
+
     public void registerAdvancements(C packetType, Type<Item> type) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
@@ -420,6 +443,57 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerSpawnParticle1_20_5(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.BOOLEAN); // Long Distance
+                map(Type.DOUBLE); // X
+                map(Type.DOUBLE); // Y
+                map(Type.DOUBLE); // Z
+                map(Type.FLOAT); // Offset X
+                map(Type.FLOAT); // Offset Y
+                map(Type.FLOAT); // Offset Z
+                map(Type.FLOAT); // Particle Data
+                map(Type.INT); // Particle Count
+                handler(wrapper -> {
+                    final Particle particle = wrapper.read(unmappedParticleType);
+                    rewriteParticle(particle);
+                    wrapper.write(mappedParticleType, particle);
+                });
+            }
+        });
+    }
+
+    public void registerExplosion(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
+        final SoundRewriter<C> cSoundRewriter = new SoundRewriter<>(protocol);
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Type.DOUBLE); // X
+            wrapper.passthrough(Type.DOUBLE); // Y
+            wrapper.passthrough(Type.DOUBLE); // Z
+            wrapper.passthrough(Type.FLOAT); // Power
+            final int blocks = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < blocks; i++) {
+                wrapper.passthrough(Type.BYTE); // Relative X
+                wrapper.passthrough(Type.BYTE); // Relative Y
+                wrapper.passthrough(Type.BYTE); // Relative Z
+            }
+            wrapper.passthrough(Type.FLOAT); // Knockback X
+            wrapper.passthrough(Type.FLOAT); // Knockback Y
+            wrapper.passthrough(Type.FLOAT); // Knockback Z
+            wrapper.passthrough(Type.VAR_INT); // Block interaction type
+
+            final Particle smallExplosionParticle = wrapper.read(unmappedParticleType);
+            final Particle largeExplosionParticle = wrapper.read(unmappedParticleType);
+            wrapper.write(mappedParticleType, smallExplosionParticle);
+            wrapper.write(mappedParticleType, largeExplosionParticle);
+            rewriteParticle(smallExplosionParticle);
+            rewriteParticle(largeExplosionParticle);
+
+            cSoundRewriter.soundHolderHandler().handle(wrapper);
+        });
+    }
+
     public PacketHandler getSpawnParticleHandler() {
         return getSpawnParticleHandler(Type.INT);
     }
@@ -462,4 +536,20 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     public PacketHandler itemToServerHandler(Type<Item> type) {
         return wrapper -> handleItemToServer(wrapper.get(type, 0));
     }
+
+    protected void rewriteParticle(Particle particle) {
+        ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+        int id = particle.getId();
+        if (mappings.isBlockParticle(id)) {
+            Particle.ParticleData<Integer> data = particle.getArgument(0);
+            data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
+        } else if (mappings.isItemParticle(id)) {
+            Particle.ParticleData<Item> data = particle.getArgument(0);
+            Item item = data.getValue();
+            handleItemToClient(item);
+        }
+
+        particle.setId(protocol.getMappingData().getNewParticleId(id));
+    }
+
 }

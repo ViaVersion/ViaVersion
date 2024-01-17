@@ -24,10 +24,10 @@ package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -66,12 +66,15 @@ public class ParticleType extends Type<Particle> {
     public Particle read(final ByteBuf buffer) throws Exception {
         final int type = Type.VAR_INT.readPrimitive(buffer);
         final Particle particle = new Particle(type);
+        readData(buffer, particle);
+        return particle;
+    }
 
-        final ParticleReader reader = readers.get(type);
+    public void readData(final ByteBuf buffer, final Particle particle) throws Exception {
+        final ParticleReader reader = readers.get(particle.getId());
         if (reader != null) {
             reader.read(buffer, particle);
         }
-        return particle;
     }
 
     public static ParticleReader itemHandler(final Type<Item> itemType) {

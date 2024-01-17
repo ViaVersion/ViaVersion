@@ -25,25 +25,32 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundConfigurationPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.BlockItemPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.EntityPacketRewriter1_20_5;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
-public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPackets1_20_3, ClientboundPackets1_20_3, ServerboundPackets1_20_3, ServerboundPackets1_20_3> {
+public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPackets1_20_3, ClientboundPackets1_20_5, ServerboundPackets1_20_3, ServerboundPackets1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.3", "1.20.5");
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
 
     public Protocol1_20_5To1_20_3() {
-        super(ClientboundPackets1_20_3.class, ClientboundPackets1_20_3.class, ServerboundPackets1_20_3.class, ServerboundPackets1_20_3.class);
+        super(ClientboundPackets1_20_3.class, ClientboundPackets1_20_5.class, ServerboundPackets1_20_3.class, ServerboundPackets1_20_5.class);
     }
 
     @Override
@@ -56,9 +63,33 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
         final SoundRewriter<ClientboundPackets1_20_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_20_3.ENTITY_SOUND);
+        registerClientbound(ClientboundPackets1_20_3.ENTITY_SOUND, wrapper -> {
+            // Now also written as a sound event with 0 marking a following resource location string
+            final int soundId = wrapper.read(Type.VAR_INT);
+            wrapper.write(Type.VAR_INT, MAPPINGS.getSoundMappings().getNewId(soundId) + 1);
+        });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.STATISTICS);
+
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Server ID
+            wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE); // Public key
+            wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE); // Challenge
+            wrapper.write(Type.BOOLEAN, true); // Authenticate
+        });
+
+        registerClientbound(ClientboundPackets1_20_3.SERVER_DATA, wrapper -> {
+            wrapper.passthrough(Type.TAG); // MOTD
+            wrapper.passthrough(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Icon
+            wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
+        });
+
+        cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
+        cancelServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE.getId());
+        cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
+
+        registerClientboundPacketIdChanges(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.class, ClientboundConfigurationPackets1_20_5.class);
+        registerServerboundPacketIdChanges(State.CONFIGURATION, ServerboundConfigurationPackets1_20_5.class, ServerboundConfigurationPackets1_20_2.class);
     }
 
     @Override
@@ -95,6 +126,6 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected ServerboundPacketType serverboundFinishConfigurationPacket() {
-        return ServerboundConfigurationPackets1_20_2.FINISH_CONFIGURATION;
+        return ServerboundConfigurationPackets1_20_5.FINISH_CONFIGURATION;
     }
 }

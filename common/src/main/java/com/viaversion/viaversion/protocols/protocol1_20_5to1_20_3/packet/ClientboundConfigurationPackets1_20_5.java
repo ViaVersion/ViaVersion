@@ -15,31 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.base;
+package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 
-public enum ClientboundLoginPackets implements ClientboundPacketType {
-    LOGIN_DISCONNECT, // 0x00
-    HELLO, // 0x01
-    GAME_PROFILE, // 0x02
-    LOGIN_COMPRESSION, // 0x03
-    CUSTOM_QUERY, // 0x04
-    COOKIE_REQUEST; // 0x05
+public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacketType {
+
+    COOKIE_REQUEST, // 0x00
+    CUSTOM_PAYLOAD, // 0x01
+    DISCONNECT, // 0x02
+    FINISH_CONFIGURATION, // 0x03
+    KEEP_ALIVE, // 0x04
+    PING, // 0x05
+    REGISTRY_DATA, // 0x06
+    RESOURCE_PACK_POP, // 0x07
+    RESOURCE_PACK_PUSH, // 0x08
+    STORE_COOKIE, // 0x09
+    TRANSFER, // 0x0A
+    UPDATE_ENABLED_FEATURES, // 0x0B
+    UPDATE_TAGS; // 0x0C
 
     @Override
-    public final int getId() {
+    public int getId() {
         return ordinal();
     }
 
     @Override
-    public final String getName() {
+    public String getName() {
         return name();
     }
 
     @Override
-    public final State state() {
-        return State.LOGIN;
+    public State state() {
+        return State.CONFIGURATION;
     }
 }

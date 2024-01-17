@@ -51,9 +51,13 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         this.registerSound(packetType);
     }
 
-    // Not for entity sounds
+    // Also for entity sounds starting with 1.20.5
     public void register1_19_3Sound(C packetType) {
-        protocol.registerClientbound(packetType, wrapper -> {
+        protocol.registerClientbound(packetType, soundHolderHandler());
+    }
+
+    public PacketHandler soundHolderHandler() {
+        return wrapper -> {
             final int soundId = wrapper.read(Type.VAR_INT);
             if (soundId == 0) {
                 // Is followed by the resource loation
@@ -68,7 +72,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
             }
 
             wrapper.write(Type.VAR_INT, mappedId + 1);
-        });
+        };
     }
 
     public PacketHandler getSoundHandler() {

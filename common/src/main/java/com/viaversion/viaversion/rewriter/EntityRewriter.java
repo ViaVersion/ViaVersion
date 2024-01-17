@@ -536,7 +536,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     // ---------------------------------------------------------------------------
 
-    protected void rewriteParticle(Particle particle) {
+    public void rewriteParticle(Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.getId();
         if (mappings.isBlockParticle(id)) {

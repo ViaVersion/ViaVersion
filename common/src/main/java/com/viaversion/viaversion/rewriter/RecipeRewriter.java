@@ -76,6 +76,19 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void register1_20_5(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            int size = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING);// Recipe Identifier
+
+                final int typeId = wrapper.passthrough(Type.VAR_INT);
+                final String type = protocol.getMappingData().getRecipeSerializerMappings().identifier(typeId);
+                handleRecipeType(wrapper, type);
+            }
+        });
+    }
+
     public void handleCraftingShaped(PacketWrapper wrapper) throws Exception {
         int ingredientsNo = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
         wrapper.passthrough(Type.STRING); // Group

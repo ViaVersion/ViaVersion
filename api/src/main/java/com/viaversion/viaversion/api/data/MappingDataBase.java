@@ -44,6 +44,7 @@ public class MappingDataBase implements MappingData {
     protected BiMappings itemMappings;
     protected FullMappings argumentTypeMappings;
     protected FullMappings entityMappings;
+    protected FullMappings recipeSerializerMappings;
     protected ParticleMappings particleMappings;
     protected Mappings blockMappings;
     protected Mappings blockStateMappings;
@@ -84,6 +85,7 @@ public class MappingDataBase implements MappingData {
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
+            recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
 
             final ListTag unmappedParticles = unmappedIdentifierData.get("particles");
             final ListTag mappedParticles = mappedIdentifierData.get("particles");
@@ -239,6 +241,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable Mappings getPaintingMappings() {
         return paintingMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getRecipeSerializerMappings() {
+        return recipeSerializerMappings;
     }
 
     protected Logger getLogger() {

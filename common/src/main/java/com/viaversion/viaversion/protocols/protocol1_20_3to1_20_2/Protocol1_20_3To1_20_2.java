@@ -42,6 +42,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.BlockItemPacketRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.EntityPacketRewriter1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -297,9 +298,8 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
 
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, resourcePackStatusHandler());
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.RESOURCE_PACK.getId(), ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH.getId(), resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
-        // TODO Auto map via packet types provider
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_ENABLED_FEATURES.getId());
         registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS.getId(), ClientboundConfigurationPackets1_20_3.UPDATE_TAGS.getId(), tagRewriter.getGenericHandler());
+        registerClientboundPacketIdChanges(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.class, ClientboundConfigurationPackets1_20_3.class);
     }
 
     private PacketHandler resourcePackStatusHandler() {
