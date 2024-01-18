@@ -95,8 +95,14 @@ public class BaseProtocol extends AbstractProtocol {
 
             if (state == STATUS_INTENT) {
                 info.setState(State.STATUS);
-            } else if (state == LOGIN_INTENT || state == TRANSFER_INTENT) {
+            } else if (state == LOGIN_INTENT) {
                 info.setState(State.LOGIN);
+            } else if (state == TRANSFER_INTENT) {
+                info.setState(State.LOGIN);
+
+                if (serverProtocol < ProtocolVersion.v1_20_5.getVersion()) {
+                    wrapper.set(Type.VAR_INT, 1, LOGIN_INTENT);
+                }
             }
         });
     }
