@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
+import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -28,7 +30,6 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
-import io.netty.buffer.ByteBuf;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPackets1_20_3, ServerboundPackets1_20_5, Protocol1_20_5To1_20_3> {
 
@@ -55,8 +56,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
 
-        ;
-
         protocol.registerClientbound(ClientboundPackets1_20_3.SPAWN_PARTICLE, wrapper -> {
             final int particleId = wrapper.read(Type.VAR_INT);
 
@@ -70,10 +69,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.FLOAT); // Particle Data
             wrapper.passthrough(Type.INT); // Particle Count
 
+            // Read data and add it to Particle
             final Particle particle = new Particle(particleId);
-            wrapper.read(new ParticleDataReader(particle));
+            final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+            if (mappings.isBlockParticle(particleId)) {
+                final int blockStateId = wrapper.read(Type.VAR_INT);
+                particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
+            } else if (mappings.isItemParticle(particleId)) {
+                final Item item = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                particle.add(Type.ITEM1_20_2, item);
+            }
 
-            rewriteParticle(particle);
             wrapper.write(Types1_20_3.PARTICLE, particle);
         });
 
@@ -132,27 +138,5 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
             }
         });
-    }
-
-    private static final class ParticleDataReader extends Type<Void> {
-
-        private final Particle particle;
-
-        private ParticleDataReader(Particle particle) {
-            super(Void.class);
-            this.particle = particle;
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final Void value) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Void read(final ByteBuf buffer) throws Exception {
-            // Extract the particle data to put into a particle
-            Types1_20_3.PARTICLE.readData(buffer, particle);
-            return null;
-        }
     }
 }
