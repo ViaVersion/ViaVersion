@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -45,7 +46,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_3.EFFECT, 1010, 2001);
         blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new);
-        blockRewriter.registerBlockEntityData(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA);
+        protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
+            wrapper.passthrough(Type.POSITION1_14); // Position
+            wrapper.passthrough(Type.VAR_INT); // Block entity type
+
+            // No longern nullable
+            final CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
+            wrapper.write(Type.COMPOUND_TAG, tag != null ? tag : new CompoundTag());
+        });
 
         registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_20_3.WINDOW_ITEMS);
