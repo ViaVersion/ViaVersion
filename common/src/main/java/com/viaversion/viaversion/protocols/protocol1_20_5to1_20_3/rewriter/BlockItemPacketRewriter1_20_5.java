@@ -50,7 +50,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.VAR_INT); // Block entity type
 
-            // No longern nullable
+            // No longer nullable
             final CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
             wrapper.write(Type.COMPOUND_TAG, tag != null ? tag : new CompoundTag());
         });

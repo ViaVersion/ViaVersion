@@ -35,6 +35,10 @@ import java.util.List;
 
 public class BaseProtocol extends AbstractProtocol {
 
+    private static final int STATUS_INTENT = 1;
+    private static final int LOGIN_INTENT = 2;
+    private static final int TRANSFER_INTENT = 3;
+
     @Override
     protected void registerPackets() {
         // Handshake Packet
@@ -89,10 +93,9 @@ public class BaseProtocol extends AbstractProtocol {
                 Via.getPlatform().getLogger().info("Protocol pipeline: " + pipeline.pipes());
             }
 
-            // Change state
-            if (state == 1) {
+            if (state == STATUS_INTENT) {
                 info.setState(State.STATUS);
-            } else if (state == 2) {
+            } else if (state == LOGIN_INTENT || state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
             }
         });
