@@ -47,11 +47,6 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerEntitySound(C packetType) {
-        this.registerSound(packetType);
-    }
-
-    // Also for entity sounds starting with 1.20.5
     public void register1_19_3Sound(C packetType) {
         protocol.registerClientbound(packetType, soundHolderHandler());
     }

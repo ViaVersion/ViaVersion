@@ -58,7 +58,7 @@ public final class Protocol1_19_4To1_19_3 extends AbstractProtocol<ClientboundPa
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.STATISTICS);
 
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_19_3.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.ENTITY_SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
 
         new CommandRewriter<ClientboundPackets1_19_3>(this) {

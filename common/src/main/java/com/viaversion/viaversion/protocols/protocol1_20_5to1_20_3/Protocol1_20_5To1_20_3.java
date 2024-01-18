@@ -63,11 +63,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
         final SoundRewriter<ClientboundPackets1_20_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND);
-        registerClientbound(ClientboundPackets1_20_3.ENTITY_SOUND, wrapper -> {
-            // Now also written as a sound event with 0 marking a following resource location string
-            final int soundId = wrapper.read(Type.VAR_INT);
-            wrapper.write(Type.VAR_INT, MAPPINGS.getSoundMappings().getNewId(soundId) + 1);
-        });
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.ENTITY_SOUND);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.STATISTICS);
 

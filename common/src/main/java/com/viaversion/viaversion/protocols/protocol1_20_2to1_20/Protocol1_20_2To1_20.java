@@ -73,7 +73,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.registerEntitySound(ClientboundPackets1_19_4.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
         registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
         registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
