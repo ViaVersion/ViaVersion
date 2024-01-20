@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
-
+import com.viaversion.viaversion.util.Pair;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,90 +29,83 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
-
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UpdateUtil {
 
     private static final String PREFIX = "§a§l[ViaVersion] §a";
-    private static final String URL = "https://update.viaversion.com";
-    private static final String PLUGIN = "/ViaVersion/";
+    private static final String URL = "https://update.viaversion.com/";
+    private static final String PLUGIN = "ViaVersion/";
 
     public static void sendUpdateMessage(final UUID uuid) {
         Via.getPlatform().runAsync(() -> {
-            final String message = getUpdateMessage(false);
+            final Pair<Level, String> message = getUpdateMessage(false);
             if (message != null) {
-                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(uuid, PREFIX + message));
+                Via.getPlatform().runSync(() -> Via.getPlatform().sendMessage(uuid, PREFIX + message.value()));
             }
         });
     }
 
     public static void sendUpdateMessage() {
         Via.getPlatform().runAsync(() -> {
-            final String message = getUpdateMessage(true);
+            final Pair<Level, String> message = getUpdateMessage(true);
             if (message != null) {
-                Via.getPlatform().runSync(() -> Via.getPlatform().getLogger().warning(message));
+                Via.getPlatform().runSync(() -> Via.getPlatform().getLogger().log(message.key(), message.value()));
             }
         });
     }
 
-    private static @Nullable String getUpdateMessage(boolean console) {
+    private static @Nullable Pair<Level, String> getUpdateMessage(boolean console) {
         if (Via.getPlatform().getPluginVersion().equals("${version}")) {
-            return "You are using a debug/custom version, consider updating.";
+            return new Pair<>(Level.WARNING, "You are using a debug/custom version, consider updating.");
         }
-        String newestString = getNewestVersion();
-        if (newestString == null) {
-            if (console) {
-                return "Could not check for updates, check your connection.";
-            } else {
-                return null;
-            }
+
+        String newestString;
+        try {
+            newestString = getNewestVersion();
+        } catch (IOException | JsonParseException ignored) {
+            return console ? new Pair<>(Level.WARNING, "Could not check for updates, check your connection.") : null;
         }
+
         Version current;
         try {
             current = new Version(Via.getPlatform().getPluginVersion());
         } catch (IllegalArgumentException e) {
-            return "You are using a custom version, consider updating.";
+            return new Pair<>(Level.INFO, "You are using a custom version, consider updating.");
         }
+
         Version newest = new Version(newestString);
         if (current.compareTo(newest) < 0) {
-            return "There is a newer plugin version available: " + newest + ", you're on: " + current;
+            return new Pair<>(Level.WARNING, "There is a newer plugin version available: " + newest + ", you're on: " + current);
         } else if (console && current.compareTo(newest) != 0) {
             String tag = current.getTag().toLowerCase(Locale.ROOT);
-            if (tag.startsWith("dev") || tag.startsWith("snapshot")) {
-                return "You are running a development version of the plugin, please report any bugs to GitHub.";
+            if (tag.endsWith("dev") || tag.endsWith("snapshot")) {
+                return new Pair<>(Level.INFO, "You are running a development version of the plugin, please report any bugs to GitHub.");
             } else {
-                return "You are running a newer version of the plugin than is released!";
+                return new Pair<>(Level.WARNING, "You are running a newer version of the plugin than is released!");
             }
         }
         return null;
     }
 
-    private static @Nullable String getNewestVersion() {
-        try {
-            URL url = new URL(URL + PLUGIN);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setUseCaches(false);
-            connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
-            connection.addRequestProperty("Accept", "application/json");
-            connection.setDoOutput(true);
-            BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+    private static String getNewestVersion() throws IOException {
+        URL url = new URL(URL + PLUGIN);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setUseCaches(false);
+        connection.addRequestProperty("User-Agent", "ViaVersion " + Via.getPlatform().getPluginVersion() + " " + Via.getPlatform().getPlatformName());
+        connection.addRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+
+        StringBuilder builder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String input;
-            StringBuilder builder = new StringBuilder();
-            while ((input = br.readLine()) != null) {
+            while ((input = reader.readLine()) != null) {
                 builder.append(input);
             }
-            br.close();
-            JsonObject statistics;
-            try {
-                statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
-            } catch (JsonParseException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return statistics.get("name").getAsString();
-        } catch (IOException e) {
-            return null;
         }
+
+        JsonObject statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
+        return statistics.get("name").getAsString();
     }
 }
