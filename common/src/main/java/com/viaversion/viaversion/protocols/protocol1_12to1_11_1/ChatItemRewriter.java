@@ -42,6 +42,15 @@ public class ChatItemRewriter {
                             if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
                                 String newValue = indexRemoval.matcher(value.getAsString()).replaceAll("");
                                 hoverEvent.addProperty("value", newValue);
+                            } else if (value.isJsonObject() && value.getAsJsonObject().has("text")) {
+                                JsonObject newObject = (JsonObject) value;
+                                JsonElement textElement = newObject.get("text");
+
+                                if (textElement.isJsonPrimitive() && textElement.getAsJsonPrimitive().isString()) {
+                                    String newValue = indexRemoval.matcher(textElement.getAsString()).replaceAll("");
+                                    newObject.addProperty("text", newValue);
+                                    hoverEvent.add("value", newObject);
+                                }
                             } else if (value.isJsonArray()) {
                                 JsonArray newArray = new JsonArray();
 
@@ -49,6 +58,15 @@ public class ChatItemRewriter {
                                     if (valueElement.isJsonPrimitive() && valueElement.getAsJsonPrimitive().isString()) {
                                         String newValue = indexRemoval.matcher(valueElement.getAsString()).replaceAll("");
                                         newArray.add(new JsonPrimitive(newValue));
+                                    } else if (valueElement.isJsonObject() && valueElement.getAsJsonObject().has("text")) {
+                                        JsonObject newObject = (JsonObject) valueElement;
+                                        JsonElement textElement = newObject.get("text");
+
+                                        if (textElement.isJsonPrimitive() && textElement.getAsJsonPrimitive().isString()) {
+                                            String newValue = indexRemoval.matcher(textElement.getAsString()).replaceAll("");
+                                            newObject.addProperty("text", newValue);
+                                            newArray.add(newObject);
+                                        }
                                     }
                                 }
 
