@@ -47,9 +47,9 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.COMPOUND_TAG); // Registry data
-                handler(configurationDimensionDataHandler()); // Caches dimensions to access data like height later
-                handler(configurationBiomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
+                map(Type.STRING); // Registry
+                map(Type.REGISTRY_ENTRY_ARRAY); // Data
+                handler(registryDataHandler1_20_5()); // Caches dimensions to access data like height later and tracks the amount of biomes sent for chunk data
             }
         });
 
@@ -65,18 +65,18 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
                 map(Type.BOOLEAN); // Reduced debug info
                 map(Type.BOOLEAN); // Show death screen
                 map(Type.BOOLEAN); // Limited crafting
-                map(Type.STRING); // Dimension key
+                map(Type.VAR_INT); // Dimension id
                 map(Type.STRING); // World
-                handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Dimension
+                map(Type.VAR_INT); // Dimension
                 map(Type.STRING); // World
-                handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
     }

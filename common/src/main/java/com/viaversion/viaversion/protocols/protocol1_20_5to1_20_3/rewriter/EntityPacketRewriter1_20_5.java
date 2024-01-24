@@ -17,8 +17,16 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -28,8 +36,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.AttributeMappings;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.Map;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPackets1_20_3, Protocol1_20_5To1_20_3> {
 
@@ -46,9 +56,31 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         protocol.registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.COMPOUND_TAG); // Registry data
-                handler(configurationDimensionDataHandler()); // Caches dimensions to access data like height later
-                handler(configurationBiomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
+                handler(wrapper -> {
+                    final CompoundTag registryData = wrapper.read(Type.COMPOUND_TAG);
+                    cacheDimensionData(wrapper.user(), registryData);
+                    trackBiomeSize(wrapper.user(), registryData);
+
+                    for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
+                        final CompoundTag entryTag = (CompoundTag) entry.getValue();
+                        final StringTag typeTag = entryTag.get("type");
+                        final ListTag valueTag = entryTag.get("value");
+                        final RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+                        for (final Tag tag : valueTag) {
+                            final CompoundTag compoundTag = (CompoundTag) tag;
+                            final StringTag nameTag = compoundTag.get("name");
+                            final int id = ((NumberTag) compoundTag.get("id")).asInt();
+                            registryEntries[id] = new RegistryEntry(nameTag.getValue(), compoundTag.get("element"));
+                        }
+
+                        final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+                        registryPacket.write(Type.STRING, typeTag.getValue());
+                        registryPacket.write(Type.REGISTRY_ENTRY_ARRAY, registryEntries);
+                        registryPacket.send(Protocol1_20_5To1_20_3.class);
+                    }
+
+                    wrapper.cancel();
+                });
             }
         });
 
@@ -64,7 +96,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.BOOLEAN); // Reduced debug info
                 map(Type.BOOLEAN); // Show death screen
                 map(Type.BOOLEAN); // Limited crafting
-                map(Type.STRING); // Dimension key
+                handler(wrapper -> {
+                    final String dimensionKey = wrapper.read(Type.STRING);
+                    final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
+                    wrapper.write(Type.VAR_INT, data.id());
+                });
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
                 map(Type.BYTE); // Gamemode
@@ -73,16 +109,20 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.BOOLEAN); // Flat
                 map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
                 create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
-                handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Dimension
+                handler(wrapper -> {
+                    final String dimensionKey = wrapper.read(Type.STRING);
+                    final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
+                    wrapper.write(Type.VAR_INT, data.id());
+                });
                 map(Type.STRING); // World
-                handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
 

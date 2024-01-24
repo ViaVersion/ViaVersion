@@ -20,13 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data.entity;
+package com.viaversion.viaversion.api.type.types;
 
-public interface DimensionData {
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
-    int id();
+public class RegistryEntryType extends Type<RegistryEntry> {
 
-    int minY();
+    public RegistryEntryType() {
+        super(RegistryEntry.class);
+    }
 
-    int height();
+    @Override
+    public RegistryEntry read(final ByteBuf buffer) throws Exception {
+        return new RegistryEntry(Type.STRING.read(buffer), Type.TAG.read(buffer));
+    }
+
+    @Override
+    public void write(final ByteBuf buffer, final RegistryEntry entry) throws Exception {
+        Type.STRING.write(buffer, entry.key());
+        Type.TAG.write(buffer, entry.tag());
+    }
 }

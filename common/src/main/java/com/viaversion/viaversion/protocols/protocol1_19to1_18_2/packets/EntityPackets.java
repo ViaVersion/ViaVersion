@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
@@ -215,10 +216,11 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
                     for (final Tag dimension : dimensions) {
                         final CompoundTag dimensionCompound = (CompoundTag) dimension;
+                        final NumberTag idTag = dimensionCompound.get("id");
                         final CompoundTag element = dimensionCompound.get("element");
                         final String name = (String) dimensionCompound.get("name").getValue();
                         addMonsterSpawnData(element);
-                        dimensionDataMap.put(name, new DimensionDataImpl(element));
+                        dimensionDataMap.put(Key.stripMinecraftNamespace(name), new DimensionDataImpl(idTag.asInt(), element));
                         dimensionsMap.put(element.copy(), name);
                     }
                     tracker(wrapper.user()).setDimensions(dimensionDataMap);

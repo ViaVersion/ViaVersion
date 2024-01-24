@@ -20,13 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.data.entity;
+package com.viaversion.viaversion.api.minecraft;
 
-public interface DimensionData {
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 
-    int id();
+public final class RegistryEntry {
+    private final String key;
+    private final Tag tag;
 
-    int minY();
+    public RegistryEntry(String key, Tag tag) {
+        this.key = key;
+        this.tag = tag;
+    }
 
-    int height();
+    public String key() {
+        return key;
+    }
+
+    public Tag tag() {
+        return tag;
+    }
 }

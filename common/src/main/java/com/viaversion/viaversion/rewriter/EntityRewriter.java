@@ -20,8 +20,8 @@ package com.viaversion.viaversion.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
@@ -46,6 +47,7 @@ import com.viaversion.viaversion.data.entity.DimensionDataImpl;
 import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
+import com.viaversion.viaversion.util.Key;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -440,6 +442,29 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         };
     }
 
+    public PacketHandler worldDataTrackerHandlerByKey1_20_5(final int dimensionIdIndex) {
+        return wrapper -> {
+            EntityTracker tracker = tracker(wrapper.user());
+            int dimensionId = wrapper.get(Type.VAR_INT, dimensionIdIndex);
+            DimensionData dimensionData = tracker.dimensionData(dimensionId);
+            if (dimensionData == null) {
+                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + dimensionId + ", falling back to overworld");
+                dimensionData = tracker.dimensionData("minecraft:overworld");
+                Preconditions.checkNotNull(dimensionData, "Overworld data missing");
+            }
+
+            tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
+            tracker.setCurrentMinY(dimensionData.minY());
+
+            String world = wrapper.get(Type.STRING, 0);
+            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+                tracker.clearEntities();
+                tracker.trackClientEntity();
+            }
+            tracker.setCurrentWorld(world);
+        };
+    }
+
     public PacketHandler biomeSizeTracker() {
         return wrapper -> trackBiomeSize(wrapper.user(), wrapper.get(Type.NAMED_COMPOUND_TAG, 0));
     }
@@ -470,11 +495,30 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
         for (final Tag dimension : dimensions) {
             final CompoundTag dimensionCompound = (CompoundTag) dimension;
+            final NumberTag idTag = dimensionCompound.get("id");
             final CompoundTag element = dimensionCompound.get("element");
             final String name = (String) dimensionCompound.get("name").getValue();
-            dimensionDataMap.put(name, new DimensionDataImpl(element));
+            dimensionDataMap.put(Key.stripMinecraftNamespace(name), new DimensionDataImpl(idTag.asInt(), element));
         }
         tracker(connection).setDimensions(dimensionDataMap);
+    }
+
+    public PacketHandler registryDataHandler1_20_5() {
+        return wrapper -> {
+            final String registryKey = Key.stripMinecraftNamespace(wrapper.get(Type.STRING, 0));
+            if (registryKey.equals("worldgen/biome")) {
+                final RegistryEntry[] entries = wrapper.get(Type.REGISTRY_ENTRY_ARRAY, 0);
+                tracker(wrapper.user()).setBiomesSent(entries.length);
+            } else if (registryKey.equals("dimension_type")) {
+                final RegistryEntry[] entries = wrapper.get(Type.REGISTRY_ENTRY_ARRAY, 0);
+                final Map<String, DimensionData> dimensionDataMap = new HashMap<>(entries.length);
+                for (int i = 0; i < entries.length; i++) {
+                    final RegistryEntry entry = entries[i];
+                    dimensionDataMap.put(entry.key(), new DimensionDataImpl(i, (CompoundTag) entry.tag()));
+                }
+                tracker(wrapper.user()).setDimensions(dimensionDataMap);
+            }
+        };
     }
 
     // ---------------------------------------------------------------------------

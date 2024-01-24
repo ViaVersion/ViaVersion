@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.Vector3f;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
@@ -49,6 +50,7 @@ import com.viaversion.viaversion.api.type.types.FloatType;
 import com.viaversion.viaversion.api.type.types.IntType;
 import com.viaversion.viaversion.api.type.types.LongArrayType;
 import com.viaversion.viaversion.api.type.types.LongType;
+import com.viaversion.viaversion.api.type.types.RegistryEntryType;
 import com.viaversion.viaversion.api.type.types.RemainingBytesType;
 import com.viaversion.viaversion.api.type.types.ShortByteArrayType;
 import com.viaversion.viaversion.api.type.types.ShortType;
@@ -177,6 +179,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final BitSetType PROFILE_ACTIONS_ENUM = new BitSetType(6);
     public static final ByteArrayType SIGNATURE_BYTES = new ByteArrayType(256);
     public static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES = new ByteArrayType.OptionalByteArrayType(256);
+
+    public static final Type<RegistryEntry> REGISTRY_ENTRY = new RegistryEntryType();
+    public static final Type<RegistryEntry[]> REGISTRY_ENTRY_ARRAY = new ArrayType<>(REGISTRY_ENTRY);
 
     public static final Type<Item> ITEM1_8 = new ItemType1_8();
     public static final Type<Item> ITEM1_13 = new ItemType1_13();

@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.StoredEntityData;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.Collections;
 import java.util.Map;
@@ -171,7 +172,12 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public @Nullable DimensionData dimensionData(String dimension) {
-        return dimensions.get(dimension);
+        return dimensions.get(Key.stripMinecraftNamespace(dimension));
+    }
+
+    @Override
+    public @Nullable DimensionData dimensionData(int dimensionId) {
+        return dimensions.values().stream().filter(data -> data.id() == dimensionId).findFirst().orElse(null); // TODO Store as array as well
     }
 
     @Override
