@@ -125,43 +125,51 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         // even if there will be multiple of these handlers
         final SU configurationAcknowledgedPacket = configurationAcknowledgedPacket();
         if (configurationAcknowledgedPacket != null) {
-            registerServerbound(configurationAcknowledgedPacket, setClientStateHandler(State.CONFIGURATION));
+            appendServerbound(configurationAcknowledgedPacket, setClientStateHandler(State.CONFIGURATION));
         }
 
         final CU startConfigurationPacket = startConfigurationPacket();
         if (startConfigurationPacket != null) {
-            registerClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
+            appendClientbound(startConfigurationPacket, setServerStateHandler(State.CONFIGURATION));
         }
 
         final ServerboundPacketType finishConfigurationPacket = serverboundFinishConfigurationPacket();
         if (finishConfigurationPacket != null) {
-            final int id = finishConfigurationPacket.getId();
-            final PacketMapping mapping = serverboundMappings.mappedPacket(State.CONFIGURATION, id); // Use existing handler if present
-            registerServerbound(State.CONFIGURATION, id, id, wrapper -> {
-                if (mapping != null) {
-                    mapping.applyType(wrapper);
-                    if (mapping.handler() != null) {
-                        mapping.handler().handle(wrapper);
-                    }
-                }
-                setClientStateHandler(State.PLAY).handle(wrapper);
-            }, true);
+            appendServerbound(finishConfigurationPacket, setClientStateHandler(State.PLAY));
         }
 
         final ClientboundPacketType clientboundFinishConfigurationPacket = clientboundFinishConfigurationPacket();
         if (clientboundFinishConfigurationPacket != null) {
-            final int id = clientboundFinishConfigurationPacket.getId();
-            final PacketMapping mapping = clientboundMappings.mappedPacket(State.CONFIGURATION, id); // Use existing handler if present
-            registerClientbound(State.CONFIGURATION, id, id, wrapper -> {
-                if (mapping != null) {
-                    mapping.applyType(wrapper);
-                    if (mapping.handler() != null) {
-                        mapping.handler().handle(wrapper);
-                    }
-                }
-                setServerStateHandler(State.PLAY).handle(wrapper);
-            }, true);
+            appendClientbound(clientboundFinishConfigurationPacket, setServerStateHandler(State.PLAY));
         }
+    }
+
+    private void appendClientbound(final ClientboundPacketType type, final PacketHandler handler) {
+        final PacketMapping mapping = clientboundMappings.mappedPacket(type.state(), type.getId()); // Use existing handler if present
+        final PacketHandler newHandler;
+        final int mappedPacketId;
+        if (mapping != null) {
+            newHandler = mapping.handler().append(handler);
+            mappedPacketId = mapping.mappedPacketId() != null ? mapping.mappedPacketId() : type.getId();
+        } else {
+            newHandler = handler;
+            mappedPacketId = type.getId();
+        }
+        registerClientbound(type.state(), type.getId(), mappedPacketId, newHandler, true);
+    }
+
+    private void appendServerbound(final ServerboundPacketType type, final PacketHandler handler) {
+        final PacketMapping mapping = serverboundMappings.mappedPacket(type.state(), type.getId()); // Use existing handler if present
+        final PacketHandler newHandler;
+        final int mappedPacketId;
+        if (mapping != null) {
+            newHandler = mapping.handler().append(handler);
+            mappedPacketId = mapping.mappedPacketId() != null ? mapping.mappedPacketId() : type.getId();
+        } else {
+            newHandler = handler;
+            mappedPacketId = type.getId();
+        }
+        registerServerbound(type.state(), type.getId(), mappedPacketId, newHandler, true);
     }
 
     private <U extends PacketType, M extends PacketType> void registerPacketIdChanges(

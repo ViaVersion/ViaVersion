@@ -42,6 +42,11 @@ final class PacketIdMapping implements PacketMapping {
     }
 
     @Override
+    public Integer mappedPacketId() {
+        return mappedPacketId;
+    }
+
+    @Override
     public @Nullable PacketHandler handler() {
         return handler;
     }

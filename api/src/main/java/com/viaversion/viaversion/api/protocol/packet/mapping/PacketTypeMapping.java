@@ -44,6 +44,11 @@ final class PacketTypeMapping implements PacketMapping {
     }
 
     @Override
+    public @Nullable Integer mappedPacketId() {
+        return mappedPacketType != null ? mappedPacketType.getId() : null;
+    }
+
+    @Override
     public @Nullable PacketHandler handler() {
         return handler;
     }

@@ -34,4 +34,11 @@ public interface PacketHandler {
      * @throws Exception if an error occurs during the packet handling
      */
     void handle(PacketWrapper wrapper) throws Exception;
+
+    default PacketHandler append(final PacketHandler handler) {
+        return wrapper -> {
+            this.handle(wrapper);
+            handler.handle(wrapper);
+        };
+    }
 }
