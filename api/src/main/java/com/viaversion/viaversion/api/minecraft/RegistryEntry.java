@@ -40,4 +40,8 @@ public final class RegistryEntry {
     public Tag tag() {
         return tag;
     }
+
+    public RegistryEntry withKey(final String key) {
+        return new RegistryEntry(key, tag.copy());
+    }
 }

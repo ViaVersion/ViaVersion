@@ -22,7 +22,6 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -40,7 +39,9 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attribute
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
 
@@ -66,12 +67,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         final CompoundTag entryTag = (CompoundTag) entry.getValue();
                         final StringTag typeTag = entryTag.get("type");
                         final ListTag valueTag = entryTag.get("value");
-                        final RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+                        RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+                        boolean requiresDummyValues = false;
                         for (final Tag tag : valueTag) {
                             final CompoundTag compoundTag = (CompoundTag) tag;
                             final StringTag nameTag = compoundTag.get("name");
                             final int id = ((NumberTag) compoundTag.get("id")).asInt();
+                            if (id >= registryEntries.length) {
+                                // It was previously possible to have arbitrary ids
+                                registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
+                                requiresDummyValues = true;
+                            }
+
                             registryEntries[id] = new RegistryEntry(nameTag.getValue(), compoundTag.get("element"));
+                        }
+
+                        if (requiresDummyValues) {
+                            fill(registryEntries);
                         }
 
                         final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
@@ -157,6 +169,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
     }
 
+    private void fill(final RegistryEntry[] entries) {
+        // Find the first non-null entry and fill the array with dummy values where needed (which is easier than remapping them to different ids in a new, smaller array)
+        RegistryEntry first = null;
+        for (final RegistryEntry registryEntry : entries) {
+            if (registryEntry != null) {
+                first = registryEntry;
+                break;
+            }
+        }
+
+        for (int i = 0; i < entries.length; i++) {
+            if (entries[i] == null) {
+                entries[i] = first.withKey(UUID.randomUUID().toString());
+            }
+        }
+    }
+
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
@@ -173,6 +202,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 Types1_20_5.META_TYPES.optionalBlockStateType,
                 Types1_20_5.META_TYPES.particleType
         );
+
+        filter().type(EntityTypes1_20_5.WOLF).addIndex(21); // Has armor
 
         filter().type(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
