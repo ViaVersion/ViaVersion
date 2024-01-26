@@ -35,7 +35,13 @@ public interface PacketHandler {
      */
     void handle(PacketWrapper wrapper) throws Exception;
 
-    default PacketHandler append(final PacketHandler handler) {
+    /**
+     * Returns a new packet handler that runs the provided handler after this one.
+     *
+     * @param handler packet handler to run aftet this one
+     * @return a new packet handler that runs the provided handler after this one
+     */
+    default PacketHandler then(final PacketHandler handler) {
         return wrapper -> {
             this.handle(wrapper);
             handler.handle(wrapper);

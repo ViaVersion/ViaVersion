@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Key;
@@ -148,10 +147,6 @@ public class TagRewriter<C extends ClientboundPacketType> {
      */
     public void registerGeneric(C packetType) {
         protocol.registerClientbound(packetType, getGenericHandler());
-    }
-
-    public void registerGeneric(State state, ClientboundPacketType packetType) {
-        protocol.registerClientbound(state, packetType, getGenericHandler());
     }
 
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {

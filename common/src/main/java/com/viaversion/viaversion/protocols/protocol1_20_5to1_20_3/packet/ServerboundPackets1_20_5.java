@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-
-public enum ServerboundPackets1_20_5 implements ServerboundPacketType {
+public enum ServerboundPackets1_20_5 implements ServerboundPacket1_20_5 {
 
     TELEPORT_CONFIRM, // 0x00
     QUERY_BLOCK_NBT, // 0x01

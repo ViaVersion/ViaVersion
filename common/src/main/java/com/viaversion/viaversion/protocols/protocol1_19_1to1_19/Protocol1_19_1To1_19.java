@@ -58,32 +58,32 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
 
-    private static final String CHAT_REGISTRY_SNBT = "{\n" +
-            "  \"minecraft:chat_type\": {\n" +
-            "    \"type\": \"minecraft:chat_type\",\n" +
-            "    \"value\": [\n" +
-            "         {\n" +
-            "            \"name\":\"minecraft:chat\",\n" +
-            "            \"id\":1,\n" +
-            "            \"element\":{\n" +
-            "               \"chat\":{\n" +
-            "                  \"translation_key\":\"chat.type.text\",\n" +
-            "                  \"parameters\":[\n" +
-            "                     \"sender\",\n" +
-            "                     \"content\"\n" +
-            "                  ]\n" +
-            "               },\n" +
-            "               \"narration\":{\n" +
-            "                  \"translation_key\":\"chat.type.text.narrate\",\n" +
-            "                  \"parameters\":[\n" +
-            "                     \"sender\",\n" +
-            "                     \"content\"\n" +
-            "                  ]\n" +
-            "               }\n" +
-            "            }\n" +
+    private static final String CHAT_REGISTRY_SNBT = "{" +
+            "  \"minecraft:chat_type\": {" +
+            "    \"type\": \"minecraft:chat_type\"," +
+            "    \"value\": [" +
+            "         {" +
+            "            \"name\":\"minecraft:chat\"," +
+            "            \"id\":1," +
+            "            \"element\":{" +
+            "               \"chat\":{" +
+            "                  \"translation_key\":\"chat.type.text\"," +
+            "                  \"parameters\":[" +
+            "                     \"sender\"," +
+            "                     \"content\"" +
+            "                  ]" +
+            "               }," +
+            "               \"narration\":{" +
+            "                  \"translation_key\":\"chat.type.text.narrate\"," +
+            "                  \"parameters\":[" +
+            "                     \"sender\"," +
+            "                     \"content\"" +
+            "                  ]" +
+            "               }" +
+            "            }" +
             "         }" +
-            "    ]\n" +
-            "  }\n" +
+            "    ]" +
+            "  }" +
             "}";
     private static final CompoundTag CHAT_REGISTRY;
 

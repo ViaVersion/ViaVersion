@@ -40,18 +40,18 @@ public interface PacketMapping {
     void applyType(PacketWrapper wrapper);
 
     /**
-     * Returns the mapped packet id if present.
-     *
-     * @return mapped packet type, or null if no action has to be taken
-     */
-    @Nullable Integer mappedPacketId();
-
-    /**
      * Returns a packet transformer to transform a packet from one protocol version to another.
      *
      * @return packet transformer, or null if no action has to be taken
      */
     @Nullable PacketHandler handler();
+
+    /**
+     * Appends a packet transformer to the current packet transformer.
+     *
+     * @param handler packet transformer
+     */
+    void appendHandler(PacketHandler handler);
 
     static PacketMapping of(final int mappedPacketId, @Nullable final PacketHandler handler) {
         return new PacketIdMapping(mappedPacketId, handler);

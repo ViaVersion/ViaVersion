@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.Collection;
@@ -54,14 +55,11 @@ public interface PacketTypeMap<P extends PacketType> {
      */
     Collection<P> types();
 
-    static <S extends PacketType, T extends S> PacketTypeMap<S> of(final Class<T> enumClass) {
-        if (!enumClass.isEnum()) {
-            throw new IllegalArgumentException("Given class is not an enum");
-        }
-
-        final S[] types = enumClass.getEnumConstants();
-        final Map<String, S> byName = new HashMap<>(types.length);
-        for (final S type : types) {
+    static <T extends PacketType, E extends T> PacketTypeMap<T> of(final Class<E> enumClass) {
+        final T[] types = enumClass.getEnumConstants();
+        Preconditions.checkArgument(types != null, "%s is not an enum", enumClass);
+        final Map<String, T> byName = new HashMap<>(types.length);
+        for (final T type : types) {
             byName.put(type.getName(), type);
         }
         return of(byName, types);

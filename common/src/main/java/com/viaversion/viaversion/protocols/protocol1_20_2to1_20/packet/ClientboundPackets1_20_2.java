@@ -17,9 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-
-public enum ClientboundPackets1_20_2 implements ClientboundPacketType {
+public enum ClientboundPackets1_20_2 implements ClientboundPacket1_20_2 {
 
     BUNDLE, // 0x00
     SPAWN_ENTITY, // 0x01

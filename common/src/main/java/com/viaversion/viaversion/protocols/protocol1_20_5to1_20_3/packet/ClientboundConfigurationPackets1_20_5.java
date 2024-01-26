@@ -17,10 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 
-public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacketType {
+public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacket1_20_5 {
 
     COOKIE_REQUEST, // 0x00
     CUSTOM_PAYLOAD, // 0x01

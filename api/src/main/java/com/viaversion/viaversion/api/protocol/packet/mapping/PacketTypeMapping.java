@@ -29,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class PacketTypeMapping implements PacketMapping {
     private final PacketType mappedPacketType;
-    private final PacketHandler handler;
+    private PacketHandler handler;
 
     PacketTypeMapping(@Nullable PacketType mappedPacketType, @Nullable PacketHandler handler) {
         this.mappedPacketType = mappedPacketType;
@@ -44,8 +44,12 @@ final class PacketTypeMapping implements PacketMapping {
     }
 
     @Override
-    public @Nullable Integer mappedPacketId() {
-        return mappedPacketType != null ? mappedPacketType.getId() : null;
+    public void appendHandler(final PacketHandler handler) {
+        if (this.handler == null) {
+            this.handler = handler;
+        } else {
+            this.handler = this.handler.then(handler);
+        }
     }
 
     @Override

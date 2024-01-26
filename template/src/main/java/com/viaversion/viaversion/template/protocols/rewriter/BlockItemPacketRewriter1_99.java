@@ -21,7 +21,9 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
@@ -30,7 +32,7 @@ import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 // To replace if needed:
 //   ChunkType1_20_2
 //   RecipeRewriter1_20_3
-public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPackets1_20_5, ServerboundPackets1_20_5, Protocol1_99To_98> {
+public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
@@ -41,7 +43,7 @@ public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundP
         // Register block and block state id changes
         // Other places using block state id mappings: Spawn particle, entity metadata, entity spawn (falling blocks)
         // Tags and statistics use block (!) ids
-        final BlockRewriter<ClientboundPackets1_20_5> blockRewriter = BlockRewriter.for1_20_2(protocol);
+        final BlockRewriter<ClientboundPacket1_20_5> blockRewriter = BlockRewriter.for1_20_2(protocol);
         blockRewriter.registerBlockAction(ClientboundPackets1_20_5.BLOCK_ACTION);
         blockRewriter.registerBlockChange(ClientboundPackets1_20_5.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_5.MULTI_BLOCK_CHANGE);

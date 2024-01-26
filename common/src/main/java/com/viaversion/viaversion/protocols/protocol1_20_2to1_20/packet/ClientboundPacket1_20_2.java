@@ -17,32 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
-public enum ClientboundConfigurationPackets1_20_2 implements ClientboundPacket1_20_2 {
-
-    CUSTOM_PAYLOAD, // 0x00
-    DISCONNECT, // 0x01
-    FINISH_CONFIGURATION, // 0x02
-    KEEP_ALIVE, // 0x03
-    PING, // 0x04
-    REGISTRY_DATA, // 0x05
-    RESOURCE_PACK, // 0x06
-    UPDATE_ENABLED_FEATURES, // 0x07
-    UPDATE_TAGS; // 0x08
-
-    @Override
-    public int getId() {
-        return ordinal();
-    }
-
-    @Override
-    public String getName() {
-        return name();
-    }
-
-    @Override
-    public State state() {
-        return State.CONFIGURATION;
-    }
+public interface ClientboundPacket1_20_2 extends ClientboundPacketType {
 }
