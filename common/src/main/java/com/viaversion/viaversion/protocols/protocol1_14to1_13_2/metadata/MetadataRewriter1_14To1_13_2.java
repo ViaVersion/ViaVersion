@@ -135,9 +135,6 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
         filter().type(EntityTypes1_14.ABSTRACT_ARROW).addIndex(9); // Piercing level added
 
         filter().type(EntityTypes1_14.FIREWORK_ROCKET).index(8).handler((event, meta) -> {
-        });
-
-        filter().type(EntityTypes1_14.HORSE).index(18).handler((event, meta) -> {
             meta.setMetaType(Types1_14.META_TYPES.optionalVarIntType);
             if (meta.getValue().equals(0)) {
                 meta.setValue(null); // https://bugs.mojang.com/browse/MC-111480
