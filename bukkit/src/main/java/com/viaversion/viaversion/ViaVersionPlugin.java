@@ -162,7 +162,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     @Override
     public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
         if (FOLIA) {
-            return new BukkitViaTaskTask(Via.getManager().getScheduler().schedule(runnable, ticks * 50, TimeUnit.MILLISECONDS));
+            return new BukkitViaTaskTask(Via.getManager().getScheduler().scheduleRepeating(runnable, 0, ticks * 50, TimeUnit.MILLISECONDS));
         }
         return new BukkitViaTask(getServer().getScheduler().runTaskTimerAsynchronously(this, runnable, 0, ticks));
     }

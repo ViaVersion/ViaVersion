@@ -54,8 +54,8 @@ public final class TaskScheduler implements Scheduler {
         scheduledExecutorService.shutdown();
 
         try {
-            executorService.awaitTermination(2, TimeUnit.SECONDS);
-            scheduledExecutorService.awaitTermination(2, TimeUnit.SECONDS);
+            executorService.awaitTermination(1, TimeUnit.SECONDS);
+            scheduledExecutorService.awaitTermination(1, TimeUnit.SECONDS);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }

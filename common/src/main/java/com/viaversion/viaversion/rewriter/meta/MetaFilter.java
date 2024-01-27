@@ -103,8 +103,11 @@ public class MetaFilter {
                 && (this.metaType == null || metadata.metaType() == this.metaType);
     }
 
-    private boolean matchesType(@Nullable EntityType type) {
-        return type != null && (this.filterFamily ? type.isOrHasParent(this.type) : this.type == type);
+    private boolean matchesType(EntityType type) {
+        if (type == null) {
+            return false;
+        }
+        return this.filterFamily ? type.isOrHasParent(this.type) : this.type == type;
     }
 
     @Override

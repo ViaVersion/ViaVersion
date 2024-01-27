@@ -55,46 +55,47 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         registerMetadataRewriter(ClientboundPackets1_20_3.ENTITY_METADATA, Types1_20_3.METADATA_LIST, Types1_20_5.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, new PacketHandlers() {
-            @Override
-            protected void register() {
-                handler(wrapper -> {
-                    final CompoundTag registryData = wrapper.read(Type.COMPOUND_TAG);
-                    cacheDimensionData(wrapper.user(), registryData);
-                    trackBiomeSize(wrapper.user(), registryData);
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
+            final CompoundTag registryData = wrapper.read(Type.COMPOUND_TAG);
+            cacheDimensionData(wrapper.user(), registryData);
+            trackBiomeSize(wrapper.user(), registryData);
 
-                    for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
-                        final CompoundTag entryTag = (CompoundTag) entry.getValue();
-                        final StringTag typeTag = entryTag.get("type");
-                        final ListTag valueTag = entryTag.get("value");
-                        RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
-                        boolean requiresDummyValues = false;
-                        for (final Tag tag : valueTag) {
-                            final CompoundTag compoundTag = (CompoundTag) tag;
-                            final StringTag nameTag = compoundTag.get("name");
-                            final int id = ((NumberTag) compoundTag.get("id")).asInt();
-                            if (id >= registryEntries.length) {
-                                // It was previously possible to have arbitrary ids
-                                registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
-                                requiresDummyValues = true;
-                            }
-
-                            registryEntries[id] = new RegistryEntry(nameTag.getValue(), compoundTag.get("element"));
-                        }
-
-                        if (requiresDummyValues) {
-                            fill(registryEntries);
-                        }
-
-                        final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
-                        registryPacket.write(Type.STRING, typeTag.getValue());
-                        registryPacket.write(Type.REGISTRY_ENTRY_ARRAY, registryEntries);
-                        registryPacket.send(Protocol1_20_5To1_20_3.class);
+            for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
+                final CompoundTag entryTag = (CompoundTag) entry.getValue();
+                final StringTag typeTag = entryTag.get("type");
+                final ListTag valueTag = entryTag.get("value");
+                RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+                boolean requiresDummyValues = false;
+                int entriesLength = registryEntries.length;
+                for (final Tag tag : valueTag) {
+                    final CompoundTag compoundTag = (CompoundTag) tag;
+                    final StringTag nameTag = compoundTag.get("name");
+                    final int id = ((NumberTag) compoundTag.get("id")).asInt();
+                    entriesLength = Math.max(entriesLength, id + 1);
+                    if (id >= registryEntries.length) {
+                        // It was previously possible to have arbitrary ids
+                        registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
+                        requiresDummyValues = true;
                     }
 
-                    wrapper.cancel();
-                });
+                    registryEntries[id] = new RegistryEntry(nameTag.getValue(), compoundTag.get("element"));
+                }
+
+                if (requiresDummyValues) {
+                    // Truncate and replace null values
+                    if (registryEntries.length != entriesLength) {
+                        registryEntries = Arrays.copyOf(registryEntries, entriesLength);
+                    }
+                    replaceNullValues(registryEntries);
+                }
+
+                final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+                registryPacket.write(Type.STRING, typeTag.getValue());
+                registryPacket.write(Type.REGISTRY_ENTRY_ARRAY, registryEntries);
+                registryPacket.send(Protocol1_20_5To1_20_3.class);
             }
+
+            wrapper.cancel();
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.JOIN_GAME, new PacketHandlers() {
@@ -126,17 +127,12 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_3.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String dimensionKey = wrapper.read(Type.STRING);
-                    final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
-                    wrapper.write(Type.VAR_INT, data.id());
-                });
-                map(Type.STRING); // World
-                handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
-            }
+        protocol.registerClientbound(ClientboundPackets1_20_3.RESPAWN, wrapper -> {
+            final String dimensionKey = wrapper.read(Type.STRING);
+            final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
+            wrapper.write(Type.VAR_INT, data.id());
+            wrapper.passthrough(Type.STRING); // World
+            worldDataTrackerHandlerByKey1_20_5(0).handle(wrapper); // Tracks world height and name for chunk data and entity (un)tracking
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_EFFECT, wrapper -> {
@@ -169,7 +165,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
     }
 
-    private void fill(final RegistryEntry[] entries) {
+    private void replaceNullValues(final RegistryEntry[] entries) {
         // Find the first non-null entry and fill the array with dummy values where needed (which is easier than remapping them to different ids in a new, smaller array)
         RegistryEntry first = null;
         for (final RegistryEntry registryEntry : entries) {
