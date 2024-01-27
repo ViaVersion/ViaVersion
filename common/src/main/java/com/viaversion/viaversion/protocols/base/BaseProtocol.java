@@ -27,17 +27,25 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
+import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
+import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseProtocol extends AbstractProtocol {
+public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
     private static final int STATUS_INTENT = 1;
     private static final int LOGIN_INTENT = 2;
     private static final int TRANSFER_INTENT = 3;
+
+    public BaseProtocol() {
+        super(BaseClientboundPacket.class, BaseClientboundPacket.class, BaseServerboundPacket.class, BaseServerboundPacket.class);
+    }
 
     @Override
     protected void registerPackets() {
@@ -126,5 +134,10 @@ public class BaseProtocol extends AbstractProtocol {
                 packetWrapper.user().setActive(false);
             }
         }
+    }
+
+    @Override
+    protected PacketTypesProvider<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> createPacketTypesProvider() {
+        return BasePacketTypesProvider.INSTANCE;
     }
 }

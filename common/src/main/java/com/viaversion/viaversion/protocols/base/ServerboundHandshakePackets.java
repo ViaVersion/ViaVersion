@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.base;
 
-import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 
-public enum ServerboundHandshakePackets implements ServerboundPacketType {
+public enum ServerboundHandshakePackets implements BaseServerboundPacket {
     CLIENT_INTENTION; // 0x00
 
     @Override

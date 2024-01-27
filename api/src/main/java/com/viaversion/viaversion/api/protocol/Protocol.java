@@ -51,22 +51,23 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public interface Protocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
 
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
-    }
-
-    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler) {
-        registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
-    }
-
-    default void registerClientbound(State state, ClientboundPacketType packetType, PacketHandler handler) {
+    default void registerClientbound(State state, ClientboundPacketType packetType, @Nullable PacketHandler handler) {
         Preconditions.checkArgument(packetType.state() == state);
         registerClientbound(state, packetType.getId(), packetType.getId(), handler, false);
     }
 
-    default void registerServerbound(State state, ServerboundPacketType packetType, PacketHandler handler) {
+    default void registerServerbound(State state, ServerboundPacketType packetType, @Nullable PacketHandler handler) {
         Preconditions.checkArgument(packetType.state() == state);
         registerServerbound(state, packetType.getId(), packetType.getId(), handler, false);
+    }
+
+    @Deprecated/*(forRemoval = true)*/
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
+    }
+
+    default void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
+        registerServerbound(state, unmappedPacketId, mappedPacketId, handler, false);
     }
 
     /**
@@ -79,15 +80,16 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param override         whether an existing mapper should be overridden
      * @see #registerServerbound(ServerboundPacketType, ServerboundPacketType, PacketHandler, boolean)
      */
-    void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override);
+    void registerServerbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler, boolean override);
 
     void cancelServerbound(State state, int mappedPacketId);
 
+    @Deprecated/*(forRemoval = true)*/
     default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId) {
         registerClientbound(state, unmappedPacketId, mappedPacketId, (PacketHandler) null);
     }
 
-    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler) {
+    default void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler) {
         registerClientbound(state, unmappedPacketId, mappedPacketId, handler, false);
     }
 
@@ -103,7 +105,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param override         whether an existing mapper should be overridden
      * @see #registerClientbound(ClientboundPacketType, ClientboundPacketType, PacketHandler, boolean)
      */
-    void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, PacketHandler handler, boolean override);
+    void registerClientbound(State state, int unmappedPacketId, int mappedPacketId, @Nullable PacketHandler handler, boolean override);
 
     // ---------------------------------------------------------------------------------------
 

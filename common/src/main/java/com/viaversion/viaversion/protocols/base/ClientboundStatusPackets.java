@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.base;
 
-import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 
-public enum ClientboundStatusPackets implements ClientboundPacketType {
+public enum ClientboundStatusPackets implements BaseClientboundPacket {
     STATUS_RESPONSE, // 0x00
     PONG_RESPONSE; // 0x01
 

@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.ConnectionData;
@@ -551,7 +552,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
         // Incoming packets
         // New packet 0x02 - Login Plugin Message
-        cancelServerbound(State.LOGIN, 0x02);
+        cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId());
 
         // New 0x01 - Query Block NBT
         cancelServerbound(ServerboundPackets1_13.QUERY_BLOCK_NBT);

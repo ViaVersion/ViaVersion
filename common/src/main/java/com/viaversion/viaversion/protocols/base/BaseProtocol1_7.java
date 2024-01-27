@@ -27,12 +27,16 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
+import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
+import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.GsonUtil;
@@ -41,11 +45,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class BaseProtocol1_7 extends AbstractProtocol {
+public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
+
+    public BaseProtocol1_7() {
+        super(BaseClientboundPacket.class, BaseClientboundPacket.class, BaseServerboundPacket.class, BaseServerboundPacket.class);
+    }
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() { // Status Response Packet
+        registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING);
@@ -190,5 +198,10 @@ public class BaseProtocol1_7 extends AbstractProtocol {
             uuidString = addDashes(uuidString);
         }
         return UUID.fromString(uuidString);
+    }
+
+    @Override
+    protected PacketTypesProvider<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> createPacketTypesProvider() {
+        return BasePacketTypesProvider.INSTANCE;
     }
 }

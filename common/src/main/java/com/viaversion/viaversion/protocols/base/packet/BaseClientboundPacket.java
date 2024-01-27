@@ -15,27 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.base;
+package com.viaversion.viaversion.protocols.base.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
-public enum ServerboundStatusPackets implements BaseServerboundPacket {
-    STATUS_REQUEST, // 0x00
-    PING_REQUEST; // 0x01
-
-    @Override
-    public final int getId() {
-        return ordinal();
-    }
-
-    @Override
-    public final String getName() {
-        return name();
-    }
-
-    @Override
-    public final State state() {
-        return State.STATUS;
-    }
+public interface BaseClientboundPacket extends ClientboundPacketType {
 }
