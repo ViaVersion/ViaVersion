@@ -165,9 +165,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
                 final JsonElement updatedComponent = ComponentUtil.convertJson(stringTag.getValue(), ComponentUtil.SerializerVersion.V1_19_4, ComponentUtil.SerializerVersion.V1_20_3);
                 stringTag.setValue(updatedComponent.toString());
             } catch (final Exception e) {
-                if (Via.getManager().isDebug()) {
-                    e.printStackTrace();
-                }
+                Via.getManager().debugHandler().error("Error during book conversion", e);
             }
         }
     }
