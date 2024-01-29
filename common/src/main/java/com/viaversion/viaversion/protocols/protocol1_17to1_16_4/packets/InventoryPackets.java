@@ -36,22 +36,22 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_2, ServerboundPackets1_17, Protocol1_17To1_16_4> {
 
     public InventoryPackets(Protocol1_17To1_16_4 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_SHORT_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
+        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS);
         registerTradeList(ClientboundPackets1_16_2.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT, Type.ITEM1_13_2);
-        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS, Type.ITEM1_13_2);
+        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT);
+        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
-        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.DOUBLE);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.DECLARE_RECIPES);
 
-        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
 

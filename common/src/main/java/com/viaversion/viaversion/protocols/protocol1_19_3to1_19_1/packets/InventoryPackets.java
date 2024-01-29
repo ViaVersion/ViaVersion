@@ -50,11 +50,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         registerSetCooldown(ClientboundPackets1_19_1.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_19_1.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_19_1.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_19_1.ADVANCEMENTS, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_19_1.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_19_1.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_19_3.CLICK_WINDOW);
         registerTradeList1_19(ClientboundPackets1_19_1.TRADE_LIST);
-        registerCreativeInvAction(ServerboundPackets1_19_3.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_19_3.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_1.WINDOW_PROPERTY);
         registerSpawnParticle1_19(ClientboundPackets1_19_1.SPAWN_PARTICLE);
 

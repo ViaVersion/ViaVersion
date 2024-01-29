@@ -29,14 +29,14 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11To1_10> {
 
     public InventoryPackets(Protocol1_11To1_10 protocol) {
-        super(protocol, null, null);
+        super(protocol, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM1_8);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM1_8_SHORT_ARRAY);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM1_8);
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
@@ -66,8 +66,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
             }
         });
 
-        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW, Type.ITEM1_8);
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
+        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW);
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION);
     }
 
     @Override

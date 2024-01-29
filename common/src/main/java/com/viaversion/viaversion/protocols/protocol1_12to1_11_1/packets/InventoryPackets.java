@@ -31,16 +31,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_12, Protocol1_12To1_11_1> {
 
     public InventoryPackets(Protocol1_12To1_11_1 protocol) {
-        super(protocol, null, null);
+        super(protocol, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT, Type.ITEM1_8);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS, Type.ITEM1_8_SHORT_ARRAY);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT, Type.ITEM1_8);
+        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT);
+        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS);
+        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT);
 
-        // Plugin message Packet -> Trading
+        // Plugin message -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
@@ -107,8 +107,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
                 }
         );
 
-        // Creative Inventory Action
-        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
+        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION);
     }
 
     @Override

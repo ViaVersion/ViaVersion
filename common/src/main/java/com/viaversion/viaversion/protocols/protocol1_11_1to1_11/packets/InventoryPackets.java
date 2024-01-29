@@ -27,12 +27,12 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11_1To1_11> {
 
     public InventoryPackets(Protocol1_11_1To1_11 protocol) {
-        super(protocol, null, null);
+        super(protocol, Type.ITEM1_8, null);
     }
 
     @Override
     public void registerPackets() {
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION, Type.ITEM1_8);
+        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION);
     }
 
     @Override
