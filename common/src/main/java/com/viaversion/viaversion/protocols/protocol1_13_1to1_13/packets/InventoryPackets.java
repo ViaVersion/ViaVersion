@@ -30,14 +30,14 @@ import com.viaversion.viaversion.util.Key;
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_13, Protocol1_13_1To1_13> {
 
     public InventoryPackets(Protocol1_13_1To1_13 protocol) {
-        super(protocol, Type.ITEM1_13, Type.ITEM1_13_ARRAY);
+        super(protocol, Type.ITEM1_13, Type.ITEM1_13_SHORT_ARRAY);
     }
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.ITEM1_13);
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.ITEM1_13_SHORT_ARRAY);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.ITEM1_13);
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS);
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
@@ -71,7 +71,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.ITEM1_13);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<ClientboundPackets1_13>(protocol) {
             @Override
@@ -94,9 +94,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW, Type.ITEM1_13);
-        registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13);
+        registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW);
+        registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.ITEM1_13, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLOAT);
     }
 }

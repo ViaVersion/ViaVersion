@@ -34,11 +34,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item> itemType;
     private final Type<Item[]> itemArrayType;
 
-    @Deprecated/*(forRemoval = true)*/
-    protected ItemRewriter(T protocol) {
-        this(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
-    }
-
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
         super(protocol);
         this.itemType = itemType;
@@ -65,13 +60,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         return item;
     }
 
-    public void registerWindowItems(C packetType, Type<Item[]> type) {
+    public void registerWindowItems(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
-                map(type); // Items
-                handler(itemArrayToClientHandler(type));
+                map(itemArrayType); // Items
+                handler(itemArrayToClientHandler(itemArrayType));
             }
         });
     }
@@ -113,14 +108,14 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerSetSlot(C packetType, Type<Item> type) {
+    public void registerSetSlot(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.SHORT); // Slot id
-                map(type); // Item
-                handler(itemToClientHandler(type));
+                map(itemType); // Item
+                handler(itemToClientHandler(itemType));
             }
         });
     }
@@ -139,15 +134,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Sub 1.16
-    public void registerEntityEquipment(C packetType, Type<Item> type) {
+    public void registerEntityEquipment(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
                 map(Type.VAR_INT); // 1 - Slot ID
-                map(type); // 2 - Item
+                map(itemType); // 2 - Item
 
-                handler(itemToClientHandler(type));
+                handler(itemToClientHandler(itemType));
             }
         });
     }
@@ -172,21 +167,17 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerCreativeInvAction(S packetType) {
-        registerCreativeInvAction(packetType, itemType);
-    }
-
-    public void registerCreativeInvAction(S packetType, Type<Item> type) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot
-                map(type); // 1 - Clicked Item
-                handler(itemToServerHandler(type));
+                map(itemType); // 1 - Clicked Item
+                handler(itemToServerHandler(itemType));
             }
         });
     }
 
-    public void registerClickWindow(S packetType, Type<Item> type) {
+    public void registerClickWindow(S packetType) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -195,9 +186,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Type.BYTE); // 2 - Button
                 map(Type.SHORT); // 3 - Action number
                 map(Type.VAR_INT); // 4 - Mode
-                map(type); // 5 - Clicked Item
+                map(itemType); // 5 - Clicked Item
 
-                handler(itemToServerHandler(type));
+                handler(itemToServerHandler(itemType));
             }
         });
     }
@@ -281,7 +272,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerAdvancements(C packetType, Type<Item> type) {
+    public void registerAdvancements(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
@@ -296,7 +287,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.COMPONENT); // Title
                     wrapper.passthrough(Type.COMPONENT); // Description
-                    handleItemToClient(wrapper.passthrough(type)); // Icon
+                    handleItemToClient(wrapper.passthrough(itemType)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -382,7 +373,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Not the very best place for this, but has to stay here until *everything* is abstracted
-    public void registerSpawnParticle(C packetType, Type<Item> itemType, Type<?> coordType) {
+    public void registerSpawnParticle(C packetType, Type<?> coordType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -461,5 +452,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public PacketHandler itemToServerHandler(Type<Item> type) {
         return wrapper -> handleItemToServer(wrapper.get(type, 0));
+    }
+
+    public Type<Item> getItemType() {
+        return itemType;
+    }
+
+    public Type<Item[]> getItemArrayType() {
+        return itemArrayType;
     }
 }
