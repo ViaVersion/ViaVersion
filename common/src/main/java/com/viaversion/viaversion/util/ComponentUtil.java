@@ -77,11 +77,14 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
-        final ATextComponent component = from.jsonSerializer.deserialize(element);
-        if (element == null) {
-            return null;
-        }
+        return element != null ? convert(from, to, from.jsonSerializer.deserialize(element)) : null;
+    }
 
+    public static @Nullable JsonElement convertJson(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
+        return json != null ? convert(from, to, from.jsonSerializer.deserialize(json)) : null;
+    }
+
+    private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final ATextComponent component) {
         if (from.ordinal() >= SerializerVersion.V1_16.ordinal() && to.ordinal() < SerializerVersion.V1_16.ordinal()) {
             // Convert hover event to legacy format
             final Style style = component.getStyle();

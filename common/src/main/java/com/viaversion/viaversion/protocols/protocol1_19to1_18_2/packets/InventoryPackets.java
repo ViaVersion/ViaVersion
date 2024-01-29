@@ -41,7 +41,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
         registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT);
         protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketHandlers() {
             @Override
@@ -74,7 +74,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
         });
 
         registerClickWindow1_17_1(ServerboundPackets1_19.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION);
 
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
 

@@ -107,7 +107,8 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         int originalID = packetWrapper.getId();
 
         DebugHandler debugHandler = Via.getManager().debugHandler();
-        if (debugHandler.enabled() && !debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
+        boolean debug = debugHandler.enabled();
+        if (debug && !debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
             logPacket(direction, state, packetWrapper, originalID);
         }
 
@@ -115,13 +116,13 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         packetWrapper.apply(direction, state, 0, protocolListFor(direction));
         super.transform(direction, state, packetWrapper);
 
-        if (debugHandler.enabled() && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
+        if (debug && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
             logPacket(direction, state, packetWrapper, originalID);
         }
     }
 
     private List<Protocol> protocolListFor(final Direction direction) {
-        return Collections.unmodifiableList(direction == Direction.SERVERBOUND ? protocolList : reversedProtocolList);
+        return direction == Direction.SERVERBOUND ? protocolList : reversedProtocolList;
     }
 
     private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID) {

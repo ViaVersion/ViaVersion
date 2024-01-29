@@ -60,13 +60,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     };
 
     public InventoryPackets(Protocol1_14To1_13_2 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_SHORT_ARRAY);
     }
 
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS, Type.ITEM1_13_2);
+        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS);
 
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, wrapper -> {
             Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
@@ -136,8 +136,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS, Type.ITEM1_13_2_SHORT_ARRAY);
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT, Type.ITEM1_13_2);
+        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS);
+        registerSetSlot(ClientboundPackets1_13.SET_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
@@ -190,7 +190,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT, Type.ITEM1_13_2);
+        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
@@ -212,7 +212,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         });
 
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW, Type.ITEM1_13_2);
+        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
@@ -229,9 +229,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             resyncPacket.scheduleSendToServer(Protocol1_14To1_13_2.class);
         });
 
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION, Type.ITEM1_13_2);
+        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.ITEM1_13_2, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLOAT);
     }
 
     @Override

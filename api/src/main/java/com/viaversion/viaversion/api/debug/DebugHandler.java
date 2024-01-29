@@ -23,9 +23,11 @@
 package com.viaversion.viaversion.api.debug;
 
 import com.google.common.annotations.Beta;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import java.util.logging.Level;
 
 @Beta
 public interface DebugHandler {
@@ -100,6 +102,18 @@ public interface DebugHandler {
         setEnabled(true);
         for (final PacketType packetType : packetTypes) {
             addPacketTypeToLog(packetType);
+        }
+    }
+
+    /**
+     * Logs an error if debug mode is enabled or error suppression is disabled.
+     *
+     * @param error error message
+     * @param t     thrown exception
+     */
+    default void error(final String error, final Throwable t) {
+        if (!Via.getConfig().isSuppressConversionWarnings() || enabled()) {
+            Via.getPlatform().getLogger().log(Level.SEVERE, error, t);
         }
     }
 }

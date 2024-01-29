@@ -84,7 +84,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     /**
      * Returns a meta filter builder.
      * <p>
-     * Calling {@link MetaFilter.Builder#register()} will automatically register the filter on this rewriter.
+     * Calling {@link com.viaversion.viaversion.rewriter.meta.MetaFilter.Builder#register()} will automatically register the filter on this rewriter.
      *
      * @return meta filter builder
      */
@@ -94,7 +94,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     /**
      * Registers a metadata filter.
-     * Note that {@link MetaFilter.Builder#register()} already calls this method.
+     * Note that {@link com.viaversion.viaversion.rewriter.meta.MetaFilter.Builder#register()} already calls this method.
      *
      * @param filter filter to register
      * @throws IllegalArgumentException if the filter is already registered
