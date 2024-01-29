@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -160,8 +161,14 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             }
 
             final StringTag stringTag = (StringTag) pageTag;
-            final JsonElement updatedComponent = ComponentUtil.convertJson(stringTag.getValue(), ComponentUtil.SerializerVersion.V1_19_4, ComponentUtil.SerializerVersion.V1_20_3);
-            stringTag.setValue(updatedComponent.toString());
+            try {
+                final JsonElement updatedComponent = ComponentUtil.convertJson(stringTag.getValue(), ComponentUtil.SerializerVersion.V1_19_4, ComponentUtil.SerializerVersion.V1_20_3);
+                stringTag.setValue(updatedComponent.toString());
+            } catch (final Exception e) {
+                if (Via.getManager().isDebug()) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
