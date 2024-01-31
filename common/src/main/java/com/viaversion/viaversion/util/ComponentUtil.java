@@ -81,7 +81,7 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
-        return json != null ? convert(from, to, from.jsonSerializer.deserialize(json)) : null;
+        return json != null ? convert(from, to, from.jsonSerializer.deserializeReader(json)) : null;
     }
 
     private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final ATextComponent component) {
