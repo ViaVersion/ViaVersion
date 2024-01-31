@@ -87,6 +87,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
+        cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
     @Override

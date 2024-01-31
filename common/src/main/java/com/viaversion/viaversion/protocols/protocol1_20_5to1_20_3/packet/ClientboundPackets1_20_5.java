@@ -46,6 +46,7 @@ public enum ClientboundPackets1_20_5 implements ClientboundPacket1_20_5 {
     CUSTOM_CHAT_COMPLETIONS, // 0x18
     PLUGIN_MESSAGE, // 0x19
     DAMAGE_EVENT, // 0x1A
+    DEBUG_SAMPLE, // 0x1B
     DELETE_CHAT_MESSAGE, // 0x1B
     DISCONNECT, // 0x1C
     DISGUISED_CHAT, // 0x1D

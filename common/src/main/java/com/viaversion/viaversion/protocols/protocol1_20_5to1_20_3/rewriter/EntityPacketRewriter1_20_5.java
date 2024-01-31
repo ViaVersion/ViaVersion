@@ -199,7 +199,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 Types1_20_5.META_TYPES.particleType
         );
 
-        filter().type(EntityTypes1_20_5.WOLF).addIndex(21); // Has armor
+        filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
 
         filter().type(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
