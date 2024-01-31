@@ -142,7 +142,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
         }
 
         final CompoundTag tag = item.tag();
-        if (tag != null) {
+        if (tag != null && item.identifier() == 1047) { // Written book
             updatePages(tag, "pages");
             updatePages(tag, "filtered_pages");
         }
