@@ -138,7 +138,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_EFFECT, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity ID
             wrapper.passthrough(Type.VAR_INT); // Effect ID
-            wrapper.passthrough(Type.BYTE); // Amplifier
+
+            final byte amplifier = wrapper.read(Type.BYTE);
+            wrapper.write(Type.VAR_INT, (int) amplifier);
+
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.passthrough(Type.BYTE); // Flags
             wrapper.read(Type.OPTIONAL_COMPOUND_TAG); // Remove factor data
