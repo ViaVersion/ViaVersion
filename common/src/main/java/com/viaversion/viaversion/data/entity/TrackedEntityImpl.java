@@ -57,4 +57,13 @@ public final class TrackedEntityImpl implements TrackedEntity {
     public void sentMetadata(final boolean sentMetadata) {
         this.sentMetadata = sentMetadata;
     }
+
+    @Override
+    public String toString() {
+        return "TrackedEntityImpl{" +
+                "entityType=" + entityType +
+                ", data=" + data +
+                ", sentMetadata=" + sentMetadata +
+                '}';
+    }
 }

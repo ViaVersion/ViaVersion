@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
@@ -90,7 +91,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 particle.add(Type.ITEM1_20_2, item);
             }
 
-            wrapper.write(Types1_20_3.PARTICLE, particle);
+            wrapper.write(Types1_20_5.PARTICLE, particle);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.EXPLOSION, wrapper -> {
@@ -109,10 +110,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.FLOAT); // Knockback Z
             wrapper.passthrough(Type.VAR_INT); // Block interaction type
 
-            final Particle smallExplosionParticle = wrapper.passthrough(Types1_20_3.PARTICLE);
-            final Particle largeExplosionParticle = wrapper.passthrough(Types1_20_3.PARTICLE);
-            protocol.getEntityRewriter().rewriteParticle(smallExplosionParticle);
-            protocol.getEntityRewriter().rewriteParticle(largeExplosionParticle);
+            protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Small explosion particle
+            protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Large explosion particle
 
             wrapper.write(Type.VAR_INT, 0); // "Empty" registry id to instead use the resource location that follows after
         });

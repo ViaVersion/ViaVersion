@@ -34,12 +34,12 @@ public class RegistryEntryType extends Type<RegistryEntry> {
 
     @Override
     public RegistryEntry read(final ByteBuf buffer) throws Exception {
-        return new RegistryEntry(Type.STRING.read(buffer), Type.TAG.read(buffer));
+        return new RegistryEntry(Type.STRING.read(buffer), Type.OPTIONAL_TAG.read(buffer));
     }
 
     @Override
     public void write(final ByteBuf buffer, final RegistryEntry entry) throws Exception {
         Type.STRING.write(buffer, entry.key());
-        Type.TAG.write(buffer, entry.tag());
+        Type.OPTIONAL_TAG.write(buffer, entry.tag());
     }
 }

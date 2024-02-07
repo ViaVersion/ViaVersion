@@ -56,6 +56,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
+            final PacketWrapper knownPacksPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
+            knownPacksPacket.write(Type.VAR_INT, 0); // No known packs, everything is sent here
+            knownPacksPacket.send(Protocol1_20_5To1_20_3.class);
+
             final CompoundTag registryData = wrapper.read(Type.COMPOUND_TAG);
             cacheDimensionData(wrapper.user(), registryData);
             trackBiomeSize(wrapper.user(), registryData);

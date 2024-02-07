@@ -26,6 +26,8 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.misc.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
@@ -86,6 +88,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
+        cancelServerbound(ServerboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
         cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
@@ -95,6 +98,16 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         super.onMappingDataLoaded();
 
         EntityTypes1_20_5.initialize(this);
+        Types1_20_5.PARTICLE.filler(this)
+                .reader("block", ParticleType.Readers.BLOCK)
+                .reader("block_marker", ParticleType.Readers.BLOCK)
+                .reader("dust", ParticleType.Readers.DUST)
+                .reader("falling_dust", ParticleType.Readers.BLOCK)
+                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+                .reader("item", ParticleType.Readers.ITEM1_20_2)
+                .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
+                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+                .reader("shriek", ParticleType.Readers.SHRIEK);
     }
 
     @Override

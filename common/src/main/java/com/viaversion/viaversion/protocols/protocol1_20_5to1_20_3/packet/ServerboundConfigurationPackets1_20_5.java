@@ -27,7 +27,8 @@ public enum ServerboundConfigurationPackets1_20_5 implements ServerboundPacket1_
     FINISH_CONFIGURATION, // 0x03
     KEEP_ALIVE, // 0x04
     PONG, // 0x05
-    RESOURCE_PACK; // 0x06
+    RESOURCE_PACK, // 0x06
+    SELECT_KNOWN_PACKS; // 0x07
 
     @Override
     public int getId() {

@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
@@ -593,6 +594,12 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
+    }
+
+    public void rewriteParticle(PacketWrapper wrapper, Type<Particle> from, Type<Particle> to) throws Exception {
+        final Particle particle = wrapper.read(from);
+        rewriteParticle(particle);
+        wrapper.write(to, particle);
     }
 
     private void logException(Exception e, @Nullable EntityType type, List<Metadata> metadataList, Metadata metadata) {

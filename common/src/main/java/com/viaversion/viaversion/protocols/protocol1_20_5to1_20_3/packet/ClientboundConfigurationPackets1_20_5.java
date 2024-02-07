@@ -33,7 +33,8 @@ public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacket1_
     STORE_COOKIE, // 0x09
     TRANSFER, // 0x0A
     UPDATE_ENABLED_FEATURES, // 0x0B
-    UPDATE_TAGS; // 0x0C
+    UPDATE_TAGS, // 0x0C
+    SELECT_KNOWN_PACKS; // 0x0D
 
     @Override
     public int getId() {
