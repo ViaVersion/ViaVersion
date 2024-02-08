@@ -38,7 +38,7 @@ import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
-    private static final Logger LOGGER = Logger.getLogger("ViaVersion Config");
+    protected static final Logger LOGGER = Logger.getLogger("ViaVersion Config");
     private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
