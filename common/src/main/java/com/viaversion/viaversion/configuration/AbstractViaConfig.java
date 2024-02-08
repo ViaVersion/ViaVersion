@@ -180,12 +180,12 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
                 if (c == '<') {
                     if (lowerBound != -1) {
-                        Via.getPlatform().getLogger().warning("Already set lower bound " + lowerBound + " overridden by " + protocolVersion.getName());
+                        LOGGER.warning("Already set lower bound " + lowerBound + " overridden by " + protocolVersion.getName());
                     }
                     lowerBound = protocolVersion.getVersion();
                 } else {
                     if (upperBound != -1) {
-                        Via.getPlatform().getLogger().warning("Already set upper bound " + upperBound + " overridden by " + protocolVersion.getName());
+                        LOGGER.warning("Already set upper bound " + upperBound + " overridden by " + protocolVersion.getName());
                     }
                     upperBound = protocolVersion.getVersion();
                 }
@@ -199,7 +199,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
             // Add single protocol version and check for duplication
             if (!blockedProtocols.add(protocolVersion.getVersion())) {
-                Via.getPlatform().getLogger().warning("Duplicated blocked protocol version " + protocolVersion.getName() + "/" + protocolVersion.getVersion());
+                LOGGER.warning("Duplicated blocked protocol version " + protocolVersion.getName() + "/" + protocolVersion.getVersion());
             }
         }
 
@@ -210,8 +210,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
             blockedProtocols.removeIf((IntPredicate) version -> {
                 if (finalLowerBound != -1 && version < finalLowerBound || finalUpperBound != -1 && version > finalUpperBound) {
                     ProtocolVersion protocolVersion = ProtocolVersion.getProtocol(version);
-                    Via.getPlatform().getLogger().warning("Blocked protocol version "
-                            + protocolVersion.getName() + "/" + protocolVersion.getVersion() + " already covered by upper or lower bound");
+                    LOGGER.warning("Blocked protocol version " + protocolVersion.getName() + "/" + protocolVersion.getVersion() + " already covered by upper or lower bound");
                     return true;
                 }
                 return false;
@@ -223,7 +222,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private @Nullable ProtocolVersion protocolVersion(String s) {
         ProtocolVersion protocolVersion = ProtocolVersion.getClosest(s);
         if (protocolVersion == null) {
-            Via.getPlatform().getLogger().warning("Unknown protocol version in block-versions: " + s);
+            LOGGER.warning("Unknown protocol version in block-versions: " + s);
             return null;
         }
         return protocolVersion;
