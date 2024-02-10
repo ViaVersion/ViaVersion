@@ -39,7 +39,7 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
         endstone = ConnectionData.getId("minecraft:end_stone");
     }
 
-    public ConnectionData.ConnectorInitAction getExtraAction() {
+    private ConnectionData.ConnectorInitAction getExtraAction() {
         return blockData -> {
             if (blockData.getMinecraftKey().equals("minecraft:chorus_flower")) {
                 getBlockStates().add(blockData.getSavedBlockStateId());

@@ -76,7 +76,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @ConfigDir(sharedRoot = false)
     private Path configDir;
 
-    @SuppressWarnings("SpongeInjection")
     @Inject
     SpongePlugin(final PluginContainer container, final Game game, final org.apache.logging.log4j.Logger logger) {
         this.container = container;

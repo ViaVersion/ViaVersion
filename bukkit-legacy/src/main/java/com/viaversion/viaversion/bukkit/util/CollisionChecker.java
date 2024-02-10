@@ -106,7 +106,7 @@ public class CollisionChecker {
     }
 
     private static class DummyList<T> extends AbstractList<T> {
-        private boolean any = false;
+        private boolean any;
 
         @Override
         public T get(int index) {

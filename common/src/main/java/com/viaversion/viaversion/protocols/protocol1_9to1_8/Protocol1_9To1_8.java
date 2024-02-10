@@ -98,13 +98,16 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     }
 
     public static boolean isSword(int id) {
-        if (id == 267) return true; // Iron
-        if (id == 268) return true; // Wood
-        if (id == 272) return true; // Stone
-        if (id == 276) return true; // Diamond
-        if (id == 283) return true; // Gold
-
-        return false;
+        switch (id) {
+            case 267: // Iron sword
+            case 268: // Wooden sword
+            case 272: // Stone sword
+            case 276: // Diamond sword
+            case 283: // Gold sword
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

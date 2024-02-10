@@ -253,8 +253,6 @@ public class PlayerPackets {
                             String displayName = wrapper.read(Type.OPTIONAL_STRING);
                             wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
                                     Protocol1_9To1_8.FIX_JSON.transform(wrapper, displayName) : null);
-                        } else if (action == 4) { // remove player
-                            // no fields
                         }
                     }
                 });

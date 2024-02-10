@@ -22,7 +22,7 @@ import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.util.Key;
 
 public class BlockEntityRewriter {
-    private static BiMap<String, String> oldToNewNames = HashBiMap.create();
+    private static final BiMap<String, String> OLD_TO_NEW_NAMES = HashBiMap.create();
 
     // Source: https://www.minecraftforum.net/forums/minecraft-java-edition/redstone-discussion-and/commands-command-blocks-and/2724507-1-11-nbt-changes-and-additions#AllTiles
     static {
@@ -52,15 +52,15 @@ public class BlockEntityRewriter {
     }
 
     private static void rewrite(String oldName, String newName) {
-        oldToNewNames.put(oldName, Key.namespaced(newName));
+        OLD_TO_NEW_NAMES.put(oldName, Key.namespaced(newName));
     }
 
     public static BiMap<String, String> inverse() {
-        return oldToNewNames.inverse();
+        return OLD_TO_NEW_NAMES.inverse();
     }
 
     public static String toNewIdentifier(String oldId) {
-        String newName = oldToNewNames.get(oldId);
+        String newName = OLD_TO_NEW_NAMES.get(oldId);
         if (newName != null) {
             return newName;
         }

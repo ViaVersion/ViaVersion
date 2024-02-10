@@ -61,7 +61,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     }
 
     public static boolean isTextComponentNull(final JsonElement element) {
-        return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().size() == 0);
+        return element == null || element.isJsonNull() || (element.isJsonArray() && element.getAsJsonArray().isEmpty());
     }
 
     public static JsonElement mapTextComponentIfNull(JsonElement component) {
@@ -126,9 +126,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
 
-        final PacketHandler singleNullTextComponentMapper = wrapper -> {
-            wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
-        };
+        final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
         registerClientbound(ClientboundPackets1_18.TITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.ACTIONBAR, singleNullTextComponentMapper);

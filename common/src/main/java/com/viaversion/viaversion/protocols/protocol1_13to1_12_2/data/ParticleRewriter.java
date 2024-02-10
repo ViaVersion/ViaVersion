@@ -99,7 +99,7 @@ public class ParticleRewriter {
         }
 
         NewParticle rewrite = particles.get(particleId);
-        return rewrite.handle(new Particle(rewrite.getId()), data);
+        return rewrite.handle(new Particle(rewrite.id()), data);
     }
 
     private static void add(int newId) {
@@ -157,6 +157,7 @@ public class ParticleRewriter {
         };
     }
 
+    @FunctionalInterface
     interface ParticleDataHandler {
         Particle handler(Particle particle, Integer[] data);
     }
@@ -176,11 +177,11 @@ public class ParticleRewriter {
             return particle;
         }
 
-        public int getId() {
+        public int id() {
             return id;
         }
 
-        public ParticleDataHandler getHandler() {
+        public ParticleDataHandler handler() {
             return handler;
         }
     }
