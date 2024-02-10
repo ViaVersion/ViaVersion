@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-
 import java.util.HashSet;
 import java.util.Set;
 

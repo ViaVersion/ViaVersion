@@ -166,7 +166,7 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").get("blockstates");
+        ListTag blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").getListTag("blockstates");
         for (int id = 0; id < blockStates.size(); id++) {
             String key = (String) blockStates.get(id).getValue();
             KEY_TO_ID.put(key, id);
@@ -177,7 +177,7 @@ public final class ConnectionData {
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
 
-            ListTag blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").get("data");
+            ListTag blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").getListTag("data");
             for (Tag blockTag : blockConnectionMappings) {
                 CompoundTag blockCompoundTag = (CompoundTag) blockTag;
                 BlockData blockData = new BlockData();
@@ -198,11 +198,11 @@ public final class ConnectionData {
                     blockData.put(connectionTypeId, attachingFaces);
                 }
 
-                NumberTag idTag = blockCompoundTag.get("id");
+                NumberTag idTag = blockCompoundTag.getNumberTag("id");
                 if (idTag != null) {
                     blockConnectionData.put(idTag.asInt(), blockData);
                 } else {
-                    IntArrayTag idsTag = blockCompoundTag.get("ids");
+                    IntArrayTag idsTag = blockCompoundTag.getIntArrayTag("ids");
                     for (int id : idsTag.getValue()) {
                         blockConnectionData.put(id, blockData);
                     }

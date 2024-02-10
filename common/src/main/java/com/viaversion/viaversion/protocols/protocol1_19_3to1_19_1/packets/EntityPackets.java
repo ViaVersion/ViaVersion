@@ -29,7 +29,6 @@ import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.Protocol1_19_3To1_19_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-
 import java.util.BitSet;
 import java.util.UUID;
 

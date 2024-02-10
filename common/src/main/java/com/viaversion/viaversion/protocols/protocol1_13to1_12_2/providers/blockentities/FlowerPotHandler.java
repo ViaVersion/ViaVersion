@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

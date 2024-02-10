@@ -18,9 +18,7 @@
 package com.viaversion.viaversion.data.entity;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 
 public final class DimensionDataImpl implements DimensionData {
@@ -34,19 +32,17 @@ public final class DimensionDataImpl implements DimensionData {
     }
 
     public DimensionDataImpl(final CompoundTag dimensionData) {
-        final Tag height = dimensionData.get("height");
-        if (height instanceof IntTag) {
-            this.height = ((NumberTag) height).asInt();
-        } else {
+        final NumberTag height = dimensionData.getNumberTag("height");
+        if (height == null) {
             throw new IllegalArgumentException("height missing in dimension data: " + dimensionData);
         }
+        this.height = height.asInt();
 
-        final Tag minY = dimensionData.get("min_y");
-        if (minY instanceof IntTag) {
-            this.minY = ((NumberTag) minY).asInt();
-        } else {
+        final NumberTag minY = dimensionData.getNumberTag("min_y");
+        if (minY == null) {
             throw new IllegalArgumentException("min_y missing in dimension data: " + dimensionData);
         }
+        this.minY = minY.asInt();
     }
 
     @Override

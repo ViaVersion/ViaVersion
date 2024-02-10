@@ -36,11 +36,11 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
@@ -441,14 +441,14 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             return null;
         }
 
-        final IntTag primaryEffect = tag.remove("Primary");
-        if (primaryEffect != null && primaryEffect.asInt() != 0) {
-            tag.put("primary_effect", new StringTag(PotionEffects.idToKeyOrLuck(primaryEffect.asInt())));
+        final Tag primaryEffect = tag.remove("Primary");
+        if (primaryEffect instanceof NumberTag && ((NumberTag) primaryEffect).asInt() != 0) {
+            tag.put("primary_effect", new StringTag(PotionEffects.idToKeyOrLuck(((NumberTag) primaryEffect).asInt())));
         }
 
-        final IntTag secondaryEffect = tag.remove("Secondary");
-        if (secondaryEffect != null && secondaryEffect.asInt() != 0) {
-            tag.put("secondary_effect", new StringTag(PotionEffects.idToKeyOrLuck(secondaryEffect.asInt())));
+        final Tag secondaryEffect = tag.remove("Secondary");
+        if (secondaryEffect instanceof NumberTag && ((NumberTag) secondaryEffect).asInt() != 0) {
+            tag.put("secondary_effect", new StringTag(PotionEffects.idToKeyOrLuck(((NumberTag) secondaryEffect).asInt())));
         }
         return tag;
     }

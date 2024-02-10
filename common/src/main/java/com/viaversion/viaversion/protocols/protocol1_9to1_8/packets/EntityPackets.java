@@ -36,8 +36,11 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRew
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.Triple;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class EntityPackets {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<Byte, Short>(Type.SHORT) {

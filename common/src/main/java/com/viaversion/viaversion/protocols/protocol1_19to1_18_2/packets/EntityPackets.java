@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -210,7 +209,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     tag.put("minecraft:chat_type", CHAT_REGISTRY.copy());
 
                     // Cache a whole lot of data
-                    final ListTag dimensions = ((CompoundTag) tag.get("minecraft:dimension_type")).get("value");
+                    final ListTag dimensions = tag.getCompoundTag("minecraft:dimension_type").get("value");
                     final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
                     final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
                     for (final Tag dimension : dimensions) {

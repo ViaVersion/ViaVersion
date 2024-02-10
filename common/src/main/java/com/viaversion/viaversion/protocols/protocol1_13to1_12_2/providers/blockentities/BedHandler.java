@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.block
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -31,7 +30,7 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position((int) getLong(tag.get("x")), (short) getLong(tag.get("y")), (int) getLong(tag.get("z")));
+        Position position = new Position(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
 
         if (!storage.contains(position)) {
             Via.getPlatform().getLogger().warning("Received an bed color update packet, but there is no bed! O_o " + tag);
@@ -41,15 +40,11 @@ public class BedHandler implements BlockEntityProvider.BlockEntityHandler {
         //                                              RED_BED + FIRST_BED
         int blockId = storage.get(position).getOriginal() - 972 + 748;
 
-        Tag color = tag.get("color");
-        if (color instanceof NumberTag) {
-            blockId += (((NumberTag) color).asInt() * 16);
+        NumberTag color = tag.getNumberTag("color");
+        if (color != null) {
+            blockId += (color.asInt() * 16);
         }
 
         return blockId;
-    }
-
-    private long getLong(NumberTag tag) {
-        return tag.asLong();
     }
 }

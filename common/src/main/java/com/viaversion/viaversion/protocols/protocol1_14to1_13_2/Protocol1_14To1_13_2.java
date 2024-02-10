@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -33,7 +34,6 @@ import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.Inventor
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.PlayerPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.packets.WorldPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.storage.EntityTracker1_14;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;

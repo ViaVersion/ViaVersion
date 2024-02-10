@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.configuration;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;

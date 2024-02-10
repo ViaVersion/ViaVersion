@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.blockentities;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
@@ -40,7 +39,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position((int) getLong(tag.get("x")), (short) getLong(tag.get("y")), (int) getLong(tag.get("z")));
+        Position position = new Position(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
 
         if (!storage.contains(position)) {
             Via.getPlatform().getLogger().warning("Received an banner color update packet, but there is no banner! O_o " + tag);
@@ -49,11 +48,8 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int blockId = storage.get(position).getOriginal();
 
-        Tag base = tag.get("Base");
-        int color = 0;
-        if (base instanceof NumberTag) {
-            color = ((NumberTag) base).asInt();
-        }
+        NumberTag base = tag.getNumberTag("Base");
+        int color = base != null ? base.asInt() : 0;
         // Standing banner
         if (blockId >= BANNER_START && blockId <= BANNER_STOP) {
             blockId += ((15 - color) * 16);
@@ -64,27 +60,26 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
             Via.getPlatform().getLogger().warning("Why does this block have the banner block entity? :(" + tag);
         }
 
-        Tag patterns = tag.get("Patterns");
-        if (patterns instanceof ListTag) {
-            for (Tag pattern : (ListTag) patterns) {
-                if (pattern instanceof CompoundTag) {
-                    Tag c = ((CompoundTag) pattern).get("Color");
-                    if (c instanceof IntTag) {
-                        ((IntTag) c).setValue(15 - (int) c.getValue()); // Invert color id
-                    }
+        ListTag patterns = tag.getListTag("Patterns");
+        if (patterns != null) {
+            for (Tag pattern : patterns) {
+                if (!(pattern instanceof CompoundTag)) {
+                    continue;
+                }
+
+                CompoundTag patternTag = (CompoundTag) pattern;
+                NumberTag colorTag = patternTag.getNumberTag("Color");
+                if (colorTag != null) {
+                    patternTag.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                 }
             }
         }
 
-        Tag name = tag.get("CustomName");
-        if (name instanceof StringTag) {
-            ((StringTag) name).setValue(ComponentUtil.legacyToJsonString(((StringTag) name).getValue()));
+        StringTag name = tag.getStringTag("CustomName");
+        if (name != null) {
+            name.setValue(ComponentUtil.legacyToJsonString(name.getValue()));
         }
 
         return blockId;
-    }
-
-    private long getLong(NumberTag tag) {
-        return tag.asLong();
     }
 }

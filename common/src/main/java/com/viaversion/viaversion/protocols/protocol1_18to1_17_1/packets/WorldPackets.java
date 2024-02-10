@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_18to1_17_1.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
@@ -33,12 +32,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
+import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.ArrayList;
@@ -107,10 +106,10 @@ public final class WorldPackets {
 
             final List<BlockEntity> blockEntities = new ArrayList<>(oldChunk.getBlockEntities().size());
             for (final CompoundTag tag : oldChunk.getBlockEntities()) {
-                final NumberTag xTag = tag.get("x");
-                final NumberTag yTag = tag.get("y");
-                final NumberTag zTag = tag.get("z");
-                final StringTag idTag = tag.get("id");
+                final NumberTag xTag = tag.getNumberTag("x");
+                final NumberTag yTag = tag.getNumberTag("y");
+                final NumberTag zTag = tag.getNumberTag("z");
+                final StringTag idTag = tag.getStringTag("id");
                 if (xTag == null || yTag == null || zTag == null || idTag == null) {
                     continue;
                 }
@@ -203,8 +202,8 @@ public final class WorldPackets {
 
     private static void handleSpawners(int typeId, final CompoundTag tag) {
         if (typeId == 8) {
-            final Tag entity = tag.get("SpawnData");
-            if (entity instanceof CompoundTag) {
+            final CompoundTag entity = tag.getCompoundTag("SpawnData");
+            if (entity != null) {
                 final CompoundTag spawnData = new CompoundTag();
                 tag.put("SpawnData", spawnData);
                 spawnData.put("entity", entity);

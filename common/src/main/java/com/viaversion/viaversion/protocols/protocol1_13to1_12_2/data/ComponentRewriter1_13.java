@@ -62,8 +62,8 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
             return;
         }
 
-        CompoundTag itemTag = tag.get("tag");
-        NumberTag damageTag = tag.get("Damage");
+        CompoundTag itemTag = tag.getCompoundTag("tag");
+        NumberTag damageTag = tag.getNumberTag("Damage");
 
         // Call item converter
         short damage = damageTag != null ? damageTag.asShort() : 0;

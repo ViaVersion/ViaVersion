@@ -267,24 +267,24 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     }
 
     protected void processCompoundTag(final CompoundTag tag) {
-        final Tag translate = tag.get("translate");
-        if (translate instanceof StringTag) {
-            handleTranslate(tag, ((StringTag) translate));
+        final StringTag translate = tag.getStringTag("translate");
+        if (translate != null) {
+            handleTranslate(tag, translate);
 
-            final Tag with = tag.get("with");
-            if (with instanceof ListTag) {
-                processListTag((ListTag) with);
+            final ListTag with = tag.getListTag("with");
+            if (with != null) {
+                processListTag(with);
             }
         }
 
-        final Tag extra = tag.get("extra");
-        if (extra instanceof ListTag) {
-            processListTag((ListTag) extra);
+        final ListTag extra = tag.getListTag("extra");
+        if (extra != null) {
+            processListTag(extra);
         }
 
-        final Tag hoverEvent = tag.get("hoverEvent");
-        if (hoverEvent instanceof CompoundTag) {
-            handleHoverEvent((CompoundTag) hoverEvent);
+        final CompoundTag hoverEvent = tag.getCompoundTag("hoverEvent");
+        if (hoverEvent != null) {
+            handleHoverEvent(hoverEvent);
         }
     }
 
@@ -294,19 +294,19 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
 
     protected void handleHoverEvent(final CompoundTag hoverEventTag) {
         // To override if needed (don't forget to call super)
-        final Tag actionTag = hoverEventTag.get("action");
-        if (!(actionTag instanceof StringTag)) {
+        final StringTag actionTag = hoverEventTag.getStringTag("action");
+        if (actionTag == null) {
             return;
         }
 
-        final String action = ((StringTag) actionTag).getValue();
+        final String action = actionTag.getValue();
         if (action.equals("show_text")) {
             final Tag value = hoverEventTag.get("value");
             processTag(value != null ? value : hoverEventTag.get("contents"));
         } else if (action.equals("show_entity")) {
-            final Tag contents = hoverEventTag.get("contents");
-            if (contents instanceof CompoundTag) {
-                processTag(((CompoundTag) contents).get("name"));
+            final CompoundTag contents = hoverEventTag.getCompoundTag("contents");
+            if (contents != null) {
+                processTag(contents.get("name"));
             }
         }
     }

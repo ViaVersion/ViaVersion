@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -28,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMapping;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
@@ -35,8 +37,6 @@ import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryP
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
 
@@ -193,13 +193,15 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
                 handler(wrapper -> {
                     CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1)
+                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 1) {
                         EntityIdRewriter.toClientSpawner(tag);
+                    }
 
-                    if (tag.contains("id"))
+                    StringTag idTag = tag.getStringTag("id");
+                    if (idTag != null) {
                         // Handle new identifier
-                        ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier((String) tag.get("id").getValue()));
-
+                        idTag.setValue(BlockEntityRewriter.toNewIdentifier(idTag.getValue()));
+                    }
                 });
             }
         });
@@ -211,15 +213,18 @@ public class Protocol1_11To1_10 extends AbstractProtocol<ClientboundPackets1_9_3
 
             if (chunk.getBlockEntities() == null) return;
             for (CompoundTag tag : chunk.getBlockEntities()) {
-                if (tag.contains("id")) {
-                    String identifier = ((StringTag) tag.get("id")).getValue();
-                    if (identifier.equals("MobSpawner")) {
-                        EntityIdRewriter.toClientSpawner(tag);
-                    }
-
-                    // Handle new identifier
-                    ((StringTag) tag.get("id")).setValue(BlockEntityRewriter.toNewIdentifier(identifier));
+                StringTag idTag = tag.getStringTag("id");
+                if (idTag == null) {
+                    continue;
                 }
+
+                String identifier = idTag.getValue();
+                if (identifier.equals("MobSpawner")) {
+                    EntityIdRewriter.toClientSpawner(tag);
+                }
+
+                // Handle new identifier
+                idTag.setValue(BlockEntityRewriter.toNewIdentifier(identifier));
             }
         });
 

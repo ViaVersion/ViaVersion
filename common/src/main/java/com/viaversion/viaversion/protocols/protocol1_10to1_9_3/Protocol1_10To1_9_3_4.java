@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_10to1_9_3;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
@@ -28,13 +29,12 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_10to1_9_3.storage.ResourcePackTracker;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 

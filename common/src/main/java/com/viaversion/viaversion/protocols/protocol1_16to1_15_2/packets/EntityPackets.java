@@ -17,7 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 
-import com.github.steveice10.opennbt.tag.builtin.*;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.FloatTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.LongTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
@@ -33,7 +39,6 @@ import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.util.Key;
-
 import java.util.Arrays;
 import java.util.UUID;
 

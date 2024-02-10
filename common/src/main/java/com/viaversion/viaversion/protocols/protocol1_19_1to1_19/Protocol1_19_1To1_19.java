@@ -222,7 +222,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     chatTypeStorage.clear();
 
                     final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
-                    final ListTag chatTypes = ((CompoundTag) registry.get("minecraft:chat_type")).get("value");
+                    final ListTag chatTypes = registry.getCompoundTag("minecraft:chat_type").get("value");
                     for (final Tag chatType : chatTypes) {
                         final CompoundTag chatTypeCompound = (CompoundTag) chatType;
                         final NumberTag idTag = chatTypeCompound.get("id");
@@ -342,10 +342,10 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             return null;
         }
 
-        CompoundTag chatData = chatType.<CompoundTag>get("element").get("chat");
+        CompoundTag chatData = chatType.getCompoundTag("element").getCompoundTag("chat");
         boolean overlay = false;
         if (chatData == null) {
-            chatData = chatType.<CompoundTag>get("element").get("overlay");
+            chatData = chatType.getCompoundTag("element").getCompoundTag("overlay");
             if (chatData == null) {
                 // Either narration or something we don't know
                 return null;
@@ -354,7 +354,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             overlay = true;
         }
 
-        final CompoundTag decoration = chatData.get("decoration");
+        final CompoundTag decoration = chatData.getCompoundTag("decoration");
         if (decoration == null) {
             return new ChatDecorationResult(message, overlay);
         }
@@ -368,13 +368,13 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             @Nullable final JsonElement targetName,
             final JsonElement message
     ) {
-        final String translationKey = (String) tag.get("translation_key").getValue();
+        final String translationKey = tag.getStringTag("translation_key").getValue();
         final Style style = new Style();
 
         // Add the style
-        final CompoundTag styleTag = tag.get("style");
+        final CompoundTag styleTag = tag.getCompoundTag("style");
         if (styleTag != null) {
-            final StringTag color = styleTag.get("color");
+            final StringTag color = styleTag.getStringTag("color");
             if (color != null) {
                 final TextFormatting textColor = TextFormatting.getByName(color.getValue());
                 if (textColor != null) {
@@ -383,12 +383,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
             }
 
             for (final Map.Entry<String, TextFormatting> entry : TextFormatting.FORMATTINGS.entrySet()) {
-                final Tag formattingTag = styleTag.get(entry.getKey());
+                final NumberTag formattingTag = styleTag.getNumberTag(entry.getKey());
                 if (!(formattingTag instanceof ByteTag)) {
                     continue;
                 }
 
-                final boolean value = ((NumberTag) formattingTag).asBoolean();
+                final boolean value = formattingTag.asBoolean();
                 final TextFormatting formatting = entry.getValue();
                 if (formatting == TextFormatting.OBFUSCATED) {
                     style.setObfuscated(value);
@@ -405,7 +405,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         // Add the replacements
-        final ListTag parameters = tag.get("parameters");
+        final ListTag parameters = tag.getListTag("parameters");
         final List<ATextComponent> arguments = new ArrayList<>();
         if (parameters != null) {
             for (final Tag element : parameters) {

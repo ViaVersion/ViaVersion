@@ -18,10 +18,9 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -393,17 +392,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             EntityTracker tracker = tracker(wrapper.user());
 
             CompoundTag registryData = wrapper.get(Type.NAMED_COMPOUND_TAG, nbtIndex);
-            Tag height = registryData.get("height");
-            if (height instanceof IntTag) {
-                int blockHeight = ((IntTag) height).asInt();
+            NumberTag height = registryData.getNumberTag("height");
+            if (height != null) {
+                int blockHeight = height.asInt();
                 tracker.setCurrentWorldSectionHeight(blockHeight >> 4);
             } else {
                 Via.getPlatform().getLogger().warning("Height missing in dimension data: " + registryData);
             }
 
-            Tag minY = registryData.get("min_y");
-            if (minY instanceof IntTag) {
-                tracker.setCurrentMinY(((IntTag) minY).asInt());
+            NumberTag minY = registryData.getNumberTag("min_y");
+            if (minY != null) {
+                tracker.setCurrentMinY(minY.asInt());
             } else {
                 Via.getPlatform().getLogger().warning("Min Y missing in dimension data: " + registryData);
             }
@@ -466,12 +465,12 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * Caches dimension data, later used to get height values and other important info.
      */
     public void cacheDimensionData(final UserConnection connection, final CompoundTag registry) {
-        final ListTag dimensions = ((CompoundTag) registry.get("minecraft:dimension_type")).get("value");
+        final ListTag dimensions = registry.getCompoundTag("minecraft:dimension_type").get("value");
         final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
         for (final Tag dimension : dimensions) {
             final CompoundTag dimensionCompound = (CompoundTag) dimension;
             final CompoundTag element = dimensionCompound.get("element");
-            final String name = (String) dimensionCompound.get("name").getValue();
+            final String name = dimensionCompound.getStringTag("name").getValue();
             dimensionDataMap.put(name, new DimensionDataImpl(element));
         }
         tracker(connection).setDimensions(dimensionDataMap);

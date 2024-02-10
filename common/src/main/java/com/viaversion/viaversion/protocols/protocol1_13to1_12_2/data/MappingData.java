@@ -28,18 +28,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.*;
+import com.viaversion.viaversion.api.data.BiMappings;
+import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
+import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Int2IntBiHashMap;
 import com.viaversion.viaversion.util.Key;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
     private final Map<String, int[]> blockTags = new HashMap<>();
@@ -56,11 +59,11 @@ public class MappingData extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag data) {
-        loadTags(blockTags, data.get("block_tags"));
-        loadTags(itemTags, data.get("item_tags"));
-        loadTags(fluidTags, data.get("fluid_tags"));
+        loadTags(blockTags, data.getCompoundTag("block_tags"));
+        loadTags(itemTags, data.getCompoundTag("item_tags"));
+        loadTags(fluidTags, data.getCompoundTag("fluid_tags"));
 
-        CompoundTag legacyEnchantments = data.get("legacy_enchantments");
+        CompoundTag legacyEnchantments = data.getCompoundTag("legacy_enchantments");
         loadEnchantments(oldEnchantmentsIds, legacyEnchantments);
 
         // Map minecraft:snow[layers=1] of 1.12 to minecraft:snow[layers=2] in 1.13

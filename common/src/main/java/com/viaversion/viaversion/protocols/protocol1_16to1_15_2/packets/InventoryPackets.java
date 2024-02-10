@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.LongTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
@@ -147,22 +146,22 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         CompoundTag tag = item.tag();
 
         if (item.identifier() == 771 && tag != null) {
-            Tag ownerTag = tag.get("SkullOwner");
-            if (ownerTag instanceof CompoundTag) {
-                CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
-                Tag idTag = ownerCompundTag.get("Id");
-                if (idTag instanceof StringTag) {
-                    UUID id = UUID.fromString((String) idTag.getValue());
-                    ownerCompundTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(id)));
+            CompoundTag ownerTag = tag.getCompoundTag("SkullOwner");
+            if (ownerTag != null) {
+                StringTag idTag = ownerTag.getStringTag("Id");
+                if (idTag != null) {
+                    UUID id = UUID.fromString(idTag.getValue());
+                    ownerTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(id)));
                 }
             }
         } else if (item.identifier() == 759 && tag != null) {
-            Tag pages = tag.get("pages");
-            if (pages instanceof ListTag) {
-                for (Tag pageTag : (ListTag) pages) {
+            ListTag pages = tag.getListTag("pages");
+            if (pages != null) {
+                for (Tag pageTag : pages) {
                     if (!(pageTag instanceof StringTag)) {
                         continue;
                     }
+
                     StringTag page = (StringTag) pageTag;
                     page.setValue(protocol.getComponentRewriter().processText(page.getValue()).toString());
                 }
@@ -182,13 +181,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
 
         if (item.identifier() == 771 && item.tag() != null) {
             CompoundTag tag = item.tag();
-            Tag ownerTag = tag.get("SkullOwner");
-            if (ownerTag instanceof CompoundTag) {
-                CompoundTag ownerCompundTag = (CompoundTag) ownerTag;
-                Tag idTag = ownerCompundTag.get("Id");
-                if (idTag instanceof IntArrayTag) {
-                    UUID id = UUIDUtil.fromIntArray((int[]) idTag.getValue());
-                    ownerCompundTag.put("Id", new StringTag(id.toString()));
+            CompoundTag ownerTag = tag.getCompoundTag("SkullOwner");
+            if (ownerTag != null) {
+                IntArrayTag idTag = ownerTag.getIntArrayTag("Id");
+                if (idTag != null) {
+                    UUID id = UUIDUtil.fromIntArray(idTag.getValue());
+                    ownerTag.putString("Id", id.toString());
                 }
             }
         }
@@ -200,17 +198,19 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     public static void oldToNewAttributes(Item item) {
         if (item.tag() == null) return;
 
-        ListTag attributes = item.tag().get("AttributeModifiers");
+        ListTag attributes = item.tag().getListTag("AttributeModifiers");
         if (attributes == null) return;
 
         for (Tag tag : attributes) {
+            if (!(tag instanceof CompoundTag)) continue;
+
             CompoundTag attribute = (CompoundTag) tag;
             rewriteAttributeName(attribute, "AttributeName", false);
             rewriteAttributeName(attribute, "Name", false);
-            Tag leastTag = attribute.get("UUIDLeast");
-            if (leastTag != null) {
-                Tag mostTag = attribute.get("UUIDMost");
-                int[] uuidIntArray = UUIDUtil.toIntArray(((NumberTag) leastTag).asLong(), ((NumberTag) mostTag).asLong());
+            NumberTag leastTag = attribute.getNumberTag("UUIDLeast");
+            NumberTag mostTag = attribute.getNumberTag("UUIDMost");
+            if (leastTag != null && mostTag != null) {
+                int[] uuidIntArray = UUIDUtil.toIntArray(leastTag.asLong(), mostTag.asLong());
                 attribute.put("UUID", new IntArrayTag(uuidIntArray));
             }
         }
@@ -219,24 +219,26 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     public static void newToOldAttributes(Item item) {
         if (item.tag() == null) return;
 
-        ListTag attributes = item.tag().get("AttributeModifiers");
+        ListTag attributes = item.tag().getListTag("AttributeModifiers");
         if (attributes == null) return;
 
         for (Tag tag : attributes) {
+            if (!(tag instanceof CompoundTag)) continue;
+
             CompoundTag attribute = (CompoundTag) tag;
             rewriteAttributeName(attribute, "AttributeName", true);
             rewriteAttributeName(attribute, "Name", true);
-            IntArrayTag uuidTag = attribute.get("UUID");
+            IntArrayTag uuidTag = attribute.getIntArrayTag("UUID");
             if (uuidTag != null && uuidTag.getValue().length == 4) {
                 UUID uuid = UUIDUtil.fromIntArray(uuidTag.getValue());
-                attribute.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
-                attribute.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
+                attribute.putLong("UUIDLeast", uuid.getLeastSignificantBits());
+                attribute.putLong("UUIDMost", uuid.getMostSignificantBits());
             }
         }
     }
 
     public static void rewriteAttributeName(CompoundTag compoundTag, String entryName, boolean inverse) {
-        StringTag attributeNameTag = compoundTag.get(entryName);
+        StringTag attributeNameTag = compoundTag.getStringTag(entryName);
         if (attributeNameTag == null) return;
 
         String attributeName = attributeNameTag.getValue();

@@ -82,10 +82,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
-import java.util.logging.Level;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -106,6 +102,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
 public class ProtocolManagerImpl implements ProtocolManager {
     private static final Protocol BASE_PROTOCOL = new BaseProtocol();

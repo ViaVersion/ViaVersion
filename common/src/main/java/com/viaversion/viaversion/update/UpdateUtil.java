@@ -21,7 +21,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,7 +28,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UpdateUtil {

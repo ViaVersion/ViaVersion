@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,10 +161,10 @@ public class ItemRewriter {
             if (item.identifier() == 383 && item.data() == 0) { // Monster Egg
                 CompoundTag tag = item.tag();
                 int data = 0;
-                if (tag != null && tag.get("EntityTag") instanceof CompoundTag) {
-                    CompoundTag entityTag = tag.get("EntityTag");
-                    if (entityTag.get("id") instanceof StringTag) {
-                        StringTag id = entityTag.get("id");
+                if (tag != null && tag.getCompoundTag("EntityTag") != null) {
+                    CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+                    StringTag id = entityTag.getStringTag("id");
+                    if (id != null) {
                         if (ENTITY_NAME_TO_ID.containsKey(id.getValue()))
                             data = ENTITY_NAME_TO_ID.get(id.getValue());
                     }
@@ -177,8 +176,8 @@ public class ItemRewriter {
             if (item.identifier() == 373) { // Potion
                 CompoundTag tag = item.tag();
                 int data = 0;
-                if (tag != null && tag.get("Potion") instanceof StringTag) {
-                    StringTag potion = tag.get("Potion");
+                if (tag != null && tag.getStringTag("Potion") != null) {
+                    StringTag potion = tag.getStringTag("Potion");
                     String potionName = Key.stripMinecraftNamespace(potion.getValue());
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName);
@@ -193,8 +192,8 @@ public class ItemRewriter {
                 CompoundTag tag = item.tag();
                 int data = 0;
                 item.setIdentifier(373); // Potion
-                if (tag != null && tag.get("Potion") instanceof StringTag) {
-                    StringTag potion = tag.get("Potion");
+                if (tag != null && tag.getStringTag("Potion") != null) {
+                    StringTag potion = tag.getStringTag("Potion");
                     String potionName = Key.stripMinecraftNamespace(potion.getValue());
                     if (POTION_NAME_TO_ID.containsKey(potionName)) {
                         data = POTION_NAME_TO_ID.get(potionName) + 8192;
@@ -220,11 +219,13 @@ public class ItemRewriter {
         if (id != 387) {
             return;
         }
+
         CompoundTag tag = item.tag();
-        ListTag pages = tag.get("pages");
-        if (pages == null) { // is this even possible?
+        ListTag pages = tag.getListTag("pages");
+        if (pages == null) {
             return;
         }
+
         for (int i = 0; i < pages.size(); i++) {
             Tag pageTag = pages.get(i);
             if (!(pageTag instanceof StringTag)) {
@@ -287,7 +288,8 @@ public class ItemRewriter {
                 if (tag == null) {
                     tag = new CompoundTag();
                 }
-                ListTag pages = tag.get("pages");
+
+                ListTag pages = tag.getListTag("pages");
                 if (pages == null) {
                     pages = new ListTag(Collections.singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
                     tag.put("pages", pages);
