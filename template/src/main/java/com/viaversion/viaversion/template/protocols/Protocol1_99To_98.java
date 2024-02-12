@@ -27,6 +27,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
+import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -56,18 +57,16 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     protected void registerPackets() {
         super.registerPackets();
 
-        // Registers renames etc. as well as registry type id changes
         final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_5.TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
 
-        // Registers sound id changes
         final SoundRewriter<ClientboundPacket1_20_5> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.ENTITY_SOUND);
 
-        // Registers registry type id changes as well as stat id changes if also included in the json mappings
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.STATISTICS);
+        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.ENTITY_PROPERTIES);
 
         // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
         /*final CommandRewriter1_19_4<ClientboundPackets1_20_5> commandRewriter = new CommandRewriter1_19_4<ClientboundPackets1_20_5>(this) {
@@ -82,7 +81,6 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
             }
         }.registerDeclareCommands1_19(ClientboundPackets1_20_5.DECLARE_COMMANDS);*/
 
-        // TODO Attributes
     }
 
     @Override
