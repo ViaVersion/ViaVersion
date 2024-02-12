@@ -20,13 +20,12 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage;
 import com.google.common.collect.EvictingQueue;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.minecraft.Position;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-
-import com.viaversion.viaversion.api.minecraft.Position;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockConnectionStorage implements StorableObject {

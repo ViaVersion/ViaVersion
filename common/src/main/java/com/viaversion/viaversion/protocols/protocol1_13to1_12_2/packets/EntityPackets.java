@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -26,7 +27,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.metadata.MetadataRewriter1_13To1_12_2;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 
 public class EntityPackets {
 

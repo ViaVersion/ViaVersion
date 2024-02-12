@@ -36,7 +36,7 @@ public abstract class AbstractFenceConnectionHandler extends ConnectionHandler {
         Arrays.fill(connectedBlockStates, -1);
     }
 
-    public ConnectionData.ConnectorInitAction getInitAction(final String key) {
+    ConnectionData.ConnectorInitAction getInitAction(final String key) {
         final AbstractFenceConnectionHandler handler = this;
         return blockData -> {
             if (key.equals(blockData.getMinecraftKey())) {

@@ -52,7 +52,7 @@ public class SpongeChannelInitializer extends ChannelInitializer<Channel> implem
         // Ensure ViaVersion is loaded
         if (Via.getAPI().getServerVersion().isKnown()
                 && channel instanceof SocketChannel) { // channel can be LocalChannel on internal server
-            UserConnection info = new UserConnectionImpl((SocketChannel) channel);
+            UserConnection info = new UserConnectionImpl(channel);
             // init protocol
             new ProtocolPipelineImpl(info);
             // Add originals

@@ -18,9 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -50,7 +48,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockSto
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -428,9 +425,9 @@ public class WorldPackets {
                 CompoundTag tag = iterator.next();
                 int newId = provider.transform(wrapper.user(), null, tag, false);
                 if (newId != -1) {
-                    int x = ((NumberTag) tag.get("x")).asInt();
-                    int y = ((NumberTag) tag.get("y")).asInt();
-                    int z = ((NumberTag) tag.get("z")).asInt();
+                    int x = tag.getNumberTag("x").asInt();
+                    int y = tag.getNumberTag("y").asInt();
+                    int z = tag.getNumberTag("z").asInt();
 
                     Position position = new Position(x, (short) y, z);
                     // Store the replacement blocks for blockupdates
@@ -442,10 +439,10 @@ public class WorldPackets {
                     chunk.getSections()[y >> 4].palette(PaletteType.BLOCKS).setIdAt(x & 0xF, y & 0xF, z & 0xF, newId);
                 }
 
-                final Tag idTag = tag.get("id");
-                if (idTag instanceof StringTag) {
+                final StringTag idTag = tag.getStringTag("id");
+                if (idTag != null) {
                     // No longer block entities
-                    final String id = Key.namespaced(((StringTag) idTag).getValue());
+                    final String id = Key.namespaced(idTag.getValue());
                     if (id.equals("minecraft:noteblock") || id.equals("minecraft:flower_pot")) {
                         iterator.remove();
                     }

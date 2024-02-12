@@ -59,13 +59,12 @@ public class RedstoneConnectionHandler extends ConnectionHandler {
     private static int getState(String value) {
         switch (value) {
             case "none":
+            default:
                 return 0;
             case "side":
                 return 1;
             case "up":
                 return 2;
-            default:
-                return 0;
         }
     }
 

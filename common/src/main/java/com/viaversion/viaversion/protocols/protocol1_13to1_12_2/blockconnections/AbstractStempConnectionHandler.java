@@ -38,7 +38,7 @@ public abstract class AbstractStempConnectionHandler extends ConnectionHandler {
         this.baseStateId = ConnectionData.getId(baseStateId);
     }
 
-    public ConnectionData.ConnectorInitAction getInitAction(final String blockId, final String toKey) {
+    ConnectionData.ConnectorInitAction getInitAction(final String blockId, final String toKey) {
         final AbstractStempConnectionHandler handler = this;
         return blockData -> {
             if (blockData.getSavedBlockStateId() == baseStateId || blockId.equals(blockData.getMinecraftKey())) {

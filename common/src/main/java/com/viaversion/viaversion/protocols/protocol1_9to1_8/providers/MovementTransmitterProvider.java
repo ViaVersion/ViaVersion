@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-
 import java.util.logging.Level;
 
 public class MovementTransmitterProvider implements Provider {

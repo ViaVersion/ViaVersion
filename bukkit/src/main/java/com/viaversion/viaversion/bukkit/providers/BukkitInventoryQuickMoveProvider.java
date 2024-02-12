@@ -199,10 +199,6 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
 
     private boolean isSupported() {
         int protocolId = Via.getAPI().getServerVersion().lowestSupportedVersion();
-        if (protocolId >= ProtocolVersion.v1_8.getVersion() && protocolId <= ProtocolVersion.v1_11_1.getVersion()) {
-            return true; // 1.8-1.11.2
-        }
-        // this is not needed on 1.12+ servers
-        return false;
+        return protocolId >= ProtocolVersion.v1_8.getVersion() && protocolId <= ProtocolVersion.v1_11_1.getVersion(); // 1.8-1.11.2, not needed with 1.12
     }
 }

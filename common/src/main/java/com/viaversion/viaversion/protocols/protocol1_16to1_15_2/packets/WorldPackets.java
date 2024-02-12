@@ -29,10 +29,10 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
-import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
+import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -102,7 +102,7 @@ public class WorldPackets {
     }
 
     private static void handleBlockEntity(Protocol1_16To1_15_2 protocol, CompoundTag compoundTag) {
-        StringTag idTag = compoundTag.get("id");
+        StringTag idTag = compoundTag.getStringTag("id");
         if (idTag == null) return;
 
         String id = idTag.getValue();
@@ -113,11 +113,11 @@ public class WorldPackets {
             // target_uuid -> Target
             UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
             compoundTag.put("Target", new IntArrayTag(UUIDUtil.toIntArray(targetUuid)));
-        } else if (id.equals("minecraft:skull") && compoundTag.get("Owner") instanceof CompoundTag) {
+        } else if (id.equals("minecraft:skull") && compoundTag.getCompoundTag("Owner") != null) {
             CompoundTag ownerTag = compoundTag.remove("Owner");
-            StringTag ownerUuidTag = ownerTag.remove("Id");
-            if (ownerUuidTag != null) {
-                UUID ownerUuid = UUID.fromString(ownerUuidTag.getValue());
+            Tag ownerUuidTag = ownerTag.remove("Id");
+            if (ownerUuidTag instanceof StringTag) {
+                UUID ownerUuid = UUID.fromString(((StringTag) ownerUuidTag).getValue());
                 ownerTag.put("Id", new IntArrayTag(UUIDUtil.toIntArray(ownerUuid)));
             }
 
@@ -129,21 +129,18 @@ public class WorldPackets {
             compoundTag.put("SkullOwner", skullOwnerTag);
         } else if (id.equals("minecraft:sign")) {
             for (int i = 1; i <= 4; i++) {
-                Tag line = compoundTag.get("Text" + i);
-                if (line instanceof StringTag) {
-                    JsonElement text = protocol.getComponentRewriter().processText(((StringTag) line).getValue());
-                    compoundTag.put("Text" + i, new StringTag(text.toString()));
+                StringTag line = compoundTag.getStringTag("Text" + i);
+                if (line != null) {
+                    JsonElement text = protocol.getComponentRewriter().processText(line.getValue());
+                    compoundTag.putString("Text" + i, text.toString());
                 }
             }
         } else if (id.equals("minecraft:mob_spawner")) {
-            Tag spawnDataTag = compoundTag.get("SpawnData");
-            if (spawnDataTag instanceof CompoundTag) {
-                Tag spawnDataIdTag = ((CompoundTag) spawnDataTag).get("id");
-                if (spawnDataIdTag instanceof StringTag) {
-                    StringTag spawnDataIdStringTag = ((StringTag) spawnDataIdTag);
-                    if (spawnDataIdStringTag.getValue().equals("minecraft:zombie_pigman")) {
-                        spawnDataIdStringTag.setValue("minecraft:zombified_piglin");
-                    }
+            CompoundTag spawnDataTag = compoundTag.getCompoundTag("SpawnData");
+            if (spawnDataTag != null) {
+                StringTag spawnDataIdTag = spawnDataTag.getStringTag("id");
+                if (spawnDataIdTag != null && spawnDataIdTag.getValue().equals("minecraft:zombie_pigman")) {
+                    spawnDataIdTag.setValue("minecraft:zombified_piglin");
                 }
             }
         }

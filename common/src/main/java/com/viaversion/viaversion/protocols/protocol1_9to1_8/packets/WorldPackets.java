@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -30,10 +31,11 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
@@ -43,8 +45,6 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
-import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -215,14 +215,15 @@ public class WorldPackets {
                     if (action == 1) { // Update Spawner
                         CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                         if (tag != null) {
-                            if (tag.contains("EntityId")) {
-                                String entity = (String) tag.get("EntityId").getValue();
+                            StringTag entityId = tag.getStringTag("EntityId");
+                            if (entityId != null) {
+                                String entity = entityId.getValue();
                                 CompoundTag spawn = new CompoundTag();
-                                spawn.put("id", new StringTag(entity));
+                                spawn.putString("id", entity);
                                 tag.put("SpawnData", spawn);
                             } else { // EntityID does not exist
                                 CompoundTag spawn = new CompoundTag();
-                                spawn.put("id", new StringTag("AreaEffectCloud")); //Make spawners show up as empty when no EntityId is given.
+                                spawn.putString("id", "AreaEffectCloud"); //Make spawners show up as empty when no EntityId is given.
                                 tag.put("SpawnData", spawn);
                             }
                         }

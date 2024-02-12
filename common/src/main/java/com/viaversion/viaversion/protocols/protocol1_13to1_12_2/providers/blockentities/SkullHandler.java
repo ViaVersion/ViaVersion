@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.block
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -33,7 +32,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position((int) getLong(tag.get("x")), (short) getLong(tag.get("y")), (int) getLong(tag.get("z")));
+        Position position = new Position(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
 
         if (!storage.contains(position)) {
             Via.getPlatform().getLogger().warning("Received an head update packet, but there is no head! O_o " + tag);
@@ -42,13 +41,14 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
 
         int id = storage.get(position).getOriginal();
         if (id >= SKULL_WALL_START && id <= SKULL_END) {
-            Tag skullType = tag.get("SkullType");
-            if (skullType instanceof NumberTag) {
-                id += ((NumberTag) skullType).asInt() * 20;
+            NumberTag skullType = tag.getNumberTag("SkullType");
+            if (skullType != null) {
+                id += skullType.asInt() * 20;
             }
-            Tag rot = tag.get("Rot");
-            if (rot instanceof NumberTag) {
-                id += ((NumberTag) rot).asInt();
+
+            NumberTag rot = tag.getNumberTag("Rot");
+            if (rot != null) {
+                id += rot.asInt();
             }
         } else {
             Via.getPlatform().getLogger().warning("Why does this block have the skull block entity? " + tag);
@@ -56,9 +56,5 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         }
 
         return id;
-    }
-
-    private long getLong(NumberTag tag) {
-        return tag.asLong();
     }
 }

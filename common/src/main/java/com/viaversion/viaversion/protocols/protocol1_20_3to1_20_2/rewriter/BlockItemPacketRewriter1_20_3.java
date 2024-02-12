@@ -152,11 +152,11 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
     }
 
     private void updatePages(final CompoundTag tag, final String key) {
-        if (!(tag.get(key) instanceof ListTag)) {
+        final ListTag pages = tag.getListTag(key);
+        if (pages == null) {
             return;
         }
 
-        final ListTag pages = tag.get(key);
         for (final Tag pageTag : pages) {
             if (!(pageTag instanceof StringTag)) {
                 continue;

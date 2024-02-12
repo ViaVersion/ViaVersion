@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.util.Pair;

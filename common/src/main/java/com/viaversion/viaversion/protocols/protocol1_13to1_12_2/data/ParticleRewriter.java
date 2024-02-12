@@ -18,10 +18,10 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.WorldPackets;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class ParticleRewriter {
         }
 
         NewParticle rewrite = particles.get(particleId);
-        return rewrite.handle(new Particle(rewrite.getId()), data);
+        return rewrite.handle(new Particle(rewrite.id()), data);
     }
 
     private static void add(int newId) {
@@ -157,6 +157,7 @@ public class ParticleRewriter {
         };
     }
 
+    @FunctionalInterface
     interface ParticleDataHandler {
         Particle handler(Particle particle, Integer[] data);
     }
@@ -176,11 +177,11 @@ public class ParticleRewriter {
             return particle;
         }
 
-        public int getId() {
+        public int id() {
             return id;
         }
 
-        public ParticleDataHandler getHandler() {
+        public ParticleDataHandler handler() {
             return handler;
         }
     }

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -59,14 +59,13 @@ public class BlockEntityProvider implements Provider {
      * @throws Exception Gotta throw that exception
      */
     public int transform(UserConnection user, Position position, CompoundTag tag, boolean sendUpdate) throws Exception {
-        Tag idTag = tag.get("id");
+        StringTag idTag = tag.getStringTag("id");
         if (idTag == null) return -1;
 
-        String id = (String) idTag.getValue();
-        BlockEntityHandler handler = handlers.get(id);
+        BlockEntityHandler handler = handlers.get(idTag.getValue());
         if (handler == null) {
             if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Unhandled BlockEntity " + id + " full tag: " + tag);
+                Via.getPlatform().getLogger().warning("Unhandled BlockEntity " + idTag.getValue() + " full tag: " + tag);
             }
             return -1;
         }

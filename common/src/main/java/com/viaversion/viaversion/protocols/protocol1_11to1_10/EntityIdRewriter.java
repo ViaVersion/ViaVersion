@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_11to1_10;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -115,12 +114,11 @@ public class EntityIdRewriter {
     }
 
     public static void toClient(CompoundTag tag, boolean backwards) {
-        Tag idTag = tag.get("id");
-        if (idTag instanceof StringTag) {
-            StringTag id = (StringTag) idTag;
-            String newName = backwards ? oldToNewNames.inverse().get(id.getValue()) : oldToNewNames.get(id.getValue());
+        StringTag idTag = tag.getStringTag("id");
+        if (idTag != null) {
+            String newName = backwards ? oldToNewNames.inverse().get(idTag.getValue()) : oldToNewNames.get(idTag.getValue());
             if (newName != null) {
-                id.setValue(newName);
+                idTag.setValue(newName);
             }
         }
     }
@@ -132,9 +130,9 @@ public class EntityIdRewriter {
     public static void toClientSpawner(CompoundTag tag, boolean backwards) {
         if (tag == null) return;
 
-        Tag spawnDataTag = tag.get("SpawnData");
+        CompoundTag spawnDataTag = tag.getCompoundTag("SpawnData");
         if (spawnDataTag != null) {
-            toClient((CompoundTag) spawnDataTag, backwards);
+            toClient(spawnDataTag, backwards);
         }
     }
 
@@ -144,7 +142,7 @@ public class EntityIdRewriter {
 
     public static void toClientItem(Item item, boolean backwards) {
         if (hasEntityTag(item)) {
-            toClient(item.tag().get("EntityTag"), backwards);
+            toClient(item.tag().getCompoundTag("EntityTag"), backwards);
         }
         if (item != null && item.amount() <= 0) item.setAmount(1);
     }
@@ -156,13 +154,12 @@ public class EntityIdRewriter {
     public static void toServerItem(Item item, boolean backwards) {
         if (!hasEntityTag(item)) return;
 
-        CompoundTag entityTag = item.tag().get("EntityTag");
-        Tag idTag = entityTag.get("id");
-        if (idTag instanceof StringTag) {
-            StringTag id = (StringTag) idTag;
-            String newName = backwards ? oldToNewNames.get(id.getValue()) : oldToNewNames.inverse().get(id.getValue());
+        CompoundTag entityTag = item.tag().getCompoundTag("EntityTag");
+        StringTag idTag = entityTag.getStringTag("id");
+        if (idTag != null) {
+            String newName = backwards ? oldToNewNames.get(idTag.getValue()) : oldToNewNames.inverse().get(idTag.getValue());
             if (newName != null) {
-                id.setValue(newName);
+                idTag.setValue(newName);
             }
         }
     }
@@ -173,7 +170,7 @@ public class EntityIdRewriter {
         CompoundTag tag = item.tag();
         if (tag == null) return false;
 
-        Tag entityTag = tag.get("EntityTag");
-        return entityTag instanceof CompoundTag && ((CompoundTag) entityTag).get("id") instanceof StringTag;
+        CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+        return entityTag != null && entityTag.getStringTag("id") != null;
     }
 }

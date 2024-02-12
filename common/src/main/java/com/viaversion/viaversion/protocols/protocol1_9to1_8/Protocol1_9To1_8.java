@@ -32,9 +32,23 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.*;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.*;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.*;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.EntityPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.PlayerPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.SpawnPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.packets.WorldPackets;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.CompressionProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.HandItemProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlockStorage;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 import com.viaversion.viaversion.util.GsonUtil;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
@@ -84,13 +98,16 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     }
 
     public static boolean isSword(int id) {
-        if (id == 267) return true; // Iron
-        if (id == 268) return true; // Wood
-        if (id == 272) return true; // Stone
-        if (id == 276) return true; // Diamond
-        if (id == 283) return true; // Gold
-
-        return false;
+        switch (id) {
+            case 267: // Iron sword
+            case 268: // Wooden sword
+            case 272: // Stone sword
+            case 276: // Diamond sword
+            case 283: // Gold sword
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

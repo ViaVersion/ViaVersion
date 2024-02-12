@@ -36,11 +36,11 @@ public class MappingData extends MappingDataBase {
     @Override
     public void loadExtras(final CompoundTag data) {
         final CompoundTag heightmap = MappingDataLoader.loadNBT("heightmap-1.14.nbt");
-        final IntArrayTag motionBlocking = heightmap.get("motionBlocking");
+        final IntArrayTag motionBlocking = heightmap.getIntArrayTag("motionBlocking");
         this.motionBlocking = new IntOpenHashSet(motionBlocking.getValue());
 
         if (Via.getConfig().isNonFullBlockLightFix()) {
-            final IntArrayTag nonFullBlocks = heightmap.get("nonFullBlocks");
+            final IntArrayTag nonFullBlocks = heightmap.getIntArrayTag("nonFullBlocks");
             this.nonFullBlocks = new IntOpenHashSet(nonFullBlocks.getValue());
         }
     }

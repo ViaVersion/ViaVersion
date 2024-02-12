@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.block
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.viaversion.viaversion.api.Via;
@@ -34,15 +33,16 @@ public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandl
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
-        Tag name = tag.get("CustomName");
-        if (name instanceof StringTag) {
-            ((StringTag) name).setValue(ComponentUtil.legacyToJsonString(((StringTag) name).getValue()));
+        StringTag name = tag.getStringTag("CustomName");
+        if (name != null) {
+            name.setValue(ComponentUtil.legacyToJsonString(name.getValue()));
         }
-        Tag out = tag.get("LastOutput");
-        if (out instanceof StringTag) {
-            JsonElement value = JsonParser.parseString(((StringTag) out).getValue());
+
+        StringTag out = tag.getStringTag("LastOutput");
+        if (out != null) {
+            JsonElement value = JsonParser.parseString(out.getValue());
             protocol.getComponentRewriter().processText(value);
-            ((StringTag) out).setValue(value.toString());
+            out.setValue(value.toString());
         }
         return -1;
     }

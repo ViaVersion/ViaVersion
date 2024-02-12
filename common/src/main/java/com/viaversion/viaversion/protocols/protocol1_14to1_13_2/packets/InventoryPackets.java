@@ -242,12 +242,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         if (item.tag() == null) return item;
 
         // Display Lore now uses JSON
-        Tag displayTag = item.tag().get("display");
-        if (displayTag instanceof CompoundTag) {
-            CompoundTag display = (CompoundTag) displayTag;
-            Tag loreTag = display.get("Lore");
-            if (loreTag instanceof ListTag) {
-                ListTag lore = (ListTag) loreTag;
+        CompoundTag display = item.tag().getCompoundTag("display");
+        if (display != null) {
+            ListTag lore = display.getListTag("Lore");
+            if (lore != null) {
                 display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.copy().getValue())); // Save old lore
                 for (Tag loreEntry : lore) {
                     if (loreEntry instanceof StringTag) {
@@ -268,15 +266,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         if (item.tag() == null) return item;
 
         // Display Name now uses JSON
-        Tag displayTag = item.tag().get("display");
-        if (displayTag instanceof CompoundTag) {
-            CompoundTag display = (CompoundTag) displayTag;
-            Tag loreTag = display.get("Lore");
-            if (loreTag instanceof ListTag) {
-                ListTag lore = (ListTag) loreTag;
-                ListTag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
-                if (savedLore != null) {
-                    display.put("Lore", new ListTag(savedLore.getValue()));
+        CompoundTag display = item.tag().getCompoundTag("display");
+        if (display != null) {
+            ListTag lore = display.getListTag("Lore");
+            if (lore != null) {
+                Tag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
+                if (savedLore instanceof ListTag) {
+                    display.put("Lore", new ListTag(((ListTag) savedLore).getValue()));
                 } else {
                     for (Tag loreEntry : lore) {
                         if (loreEntry instanceof StringTag) {
