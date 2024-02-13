@@ -22,39 +22,27 @@
  */
 package com.viaversion.viaversion.api.protocol.version;
 
+import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import java.util.SortedSet;
 
 public interface ServerProtocolVersion {
 
     /**
      * Returns the lowest supported protocol version by this server.
-     * This and {@link #highestSupportedVersion()} should only differ on proxy servers supporting multiple versions.
+     * This and {@link #highestSupportedProtocolVersion()} should only differ on proxy servers supporting multiple versions.
      *
      * @return lowest supported protocol version
      */
-    int lowestSupportedVersion();
-
-    /**
-     * @see #highestSupportedVersion()
-     */
-    default ProtocolVersion lowestSupportedProtocolVersion() {
-        return ProtocolVersion.getProtocol(lowestSupportedVersion());
-    }
+    ProtocolVersion lowestSupportedProtocolVersion();
 
     /**
      * Returns the highest supported protocol version by this server.
-     * This and {@link #lowestSupportedVersion()} should only differ on proxy servers supporting multiple versions.
+     * This and {@link #lowestSupportedProtocolVersion()} should only differ on proxy servers supporting multiple versions.
      *
      * @return highest supported protocol version
      */
-    int highestSupportedVersion();
-
-    /**
-     * @see #lowestSupportedVersion()
-     */
-    default ProtocolVersion highestSupportedProtocolVersion() {
-        return ProtocolVersion.getProtocol(highestSupportedVersion());
-    }
+    ProtocolVersion highestSupportedProtocolVersion();
 
     /**
      * Returns a sorted set of all supported protocol version by this server.
@@ -62,7 +50,7 @@ public interface ServerProtocolVersion {
      *
      * @return sorted set of supported protocol versions
      */
-    IntSortedSet supportedVersions();
+    SortedSet<ProtocolVersion> supportedProtocolVersions();
 
     /**
      * Returns true if the actual protocol version has not yet been identified.
@@ -71,6 +59,22 @@ public interface ServerProtocolVersion {
      * @return true if set, false if unknown (yet)
      */
     default boolean isKnown() {
-        return lowestSupportedVersion() != -1 && highestSupportedVersion() != -1;
+        return lowestSupportedProtocolVersion().isKnown() && highestSupportedProtocolVersion().isKnown();
+    }
+
+    @Deprecated
+    default int lowestSupportedVersion() {
+        return lowestSupportedProtocolVersion().getVersion();
+    }
+
+    @Deprecated
+    default int highestSupportedVersion() {
+        return highestSupportedProtocolVersion().getVersion();
+    }
+
+    @Deprecated
+    default IntSortedSet supportedVersions() {
+        return supportedProtocolVersions().stream().mapToInt(ProtocolVersion::getVersion)
+            .collect(IntLinkedOpenHashSet::new, IntSortedSet::add, IntSortedSet::addAll);
     }
 }

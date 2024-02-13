@@ -86,7 +86,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
                         if (!Via.getAPI().getServerVersion().isKnown()) { // Set the Server protocol if the detection on startup failed
                             ProtocolManagerImpl protocolManager = (ProtocolManagerImpl) Via.getManager().getProtocolManager();
-                            protocolManager.setServerProtocol(new ServerProtocolVersionSingleton(ProtocolVersion.getProtocol(protocolVersion).getVersion()));
+                            protocolManager.setServerProtocol(new ServerProtocolVersionSingleton(ProtocolVersion.getProtocol(protocolVersion)));
                         }
 
                         // Ensure the server has a version provider
@@ -96,23 +96,23 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                             return;
                         }
 
-                        int closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+                        ProtocolVersion closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
                         List<ProtocolPathEntry> protocols = null;
-                        if (info.getProtocolVersion() >= closestServerProtocol || Via.getPlatform().isOldClientsAllowed()) {
-                            protocols = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), closestServerProtocol);
+                        if (info.protocolVersion().higherThanOrEquals(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+                            protocols = Via.getManager().getProtocolManager()
+                                .getProtocolPath(info.protocolVersion().getVersion(), closestServerProtocol.getVersion());
                         }
 
                         if (protocols != null) {
-                            if (protocolVersion == closestServerProtocol || protocolVersion == 0) { // Fix ServerListPlus
-                                ProtocolVersion prot = ProtocolVersion.getProtocol(info.getProtocolVersion());
-                                version.addProperty("protocol", prot.getOriginalVersion());
+                            if (protocolVersion == closestServerProtocol.getVersion() || protocolVersion == 0) { // Fix ServerListPlus
+                                version.addProperty("protocol", info.protocolVersion().getOriginalVersion());
                             }
                         } else {
                             // not compatible :(, *plays very sad violin*
                             wrapper.user().setActive(false);
                         }
 
-                        if (Via.getConfig().blockedProtocolVersions().contains(info.getProtocolVersion())) {
+                        if (Via.getConfig().blockedProtocolVersions().contains(info.protocolVersion().getVersion())) {
                             version.addProperty("protocol", -1); // Show blocked versions as outdated
                         }
 
@@ -148,7 +148,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                 Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
                         new Object[]{
                                 username,
-                                info.getProtocolVersion(),
+                                info.protocolVersion().getName(),
                                 Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
                         });
             }
@@ -156,7 +156,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
         // Login Start Packet
         registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
-            int protocol = wrapper.user().getProtocolInfo().getProtocolVersion();
+            int protocol = wrapper.user().getProtocolInfo().protocolVersion().getVersion();
             if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
                 if (!wrapper.user().getChannel().isOpen()) return;
                 if (!wrapper.user().shouldApplyBlockProtocol()) return;

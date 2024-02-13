@@ -57,7 +57,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             int state = wrapper.passthrough(Type.VAR_INT);
 
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setProtocolVersion(protocolVersion);
+            info.setProtocolVersion(ProtocolVersion.getProtocol(protocolVersion));
             // Ensure the server has a version provider
             VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
             if (versionProvider == null) {
@@ -66,13 +66,14 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             // Choose the pipe
-            int serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
+            ProtocolVersion serverProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
             info.setServerProtocolVersion(serverProtocol);
             List<ProtocolPathEntry> protocolPath = null;
 
             // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
-            if (info.getProtocolVersion() >= serverProtocol || Via.getPlatform().isOldClientsAllowed()) {
-                protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocol);
+            if (info.protocolVersion().higherThanOrEquals(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+                protocolPath = Via.getManager().getProtocolManager()
+                    .getProtocolPath(info.protocolVersion().getVersion(), serverProtocol.getVersion());
             }
 
             ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
@@ -89,15 +90,14 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
                 pipeline.add(protocols);
 
                 // Set the original snapshot version if present
-                ProtocolVersion protocol = ProtocolVersion.getProtocol(serverProtocol);
-                wrapper.set(Type.VAR_INT, 0, protocol.getOriginalVersion());
+                wrapper.set(Type.VAR_INT, 0, serverProtocol.getOriginalVersion());
             }
 
             // Add Base Protocol
-            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
+            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol.getVersion()));
 
             if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().info("User connected with protocol: " + info.getProtocolVersion() + " and serverProtocol: " + info.getServerProtocolVersion());
+                Via.getPlatform().getLogger().info("User connected with protocol: " + info.protocolVersion() + " and serverProtocol: " + info.serverProtocolVersion());
                 Via.getPlatform().getLogger().info("Protocol pipeline: " + pipeline.pipes());
             }
 
@@ -108,7 +108,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             } else if (state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
 
-                if (serverProtocol < ProtocolVersion.v1_20_5.getVersion()) {
+                if (serverProtocol.lowerThan(ProtocolVersion.v1_20_5)) {
                     wrapper.set(Type.VAR_INT, 1, LOGIN_INTENT);
                 }
             }

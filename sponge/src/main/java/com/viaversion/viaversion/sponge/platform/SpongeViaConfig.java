@@ -28,9 +28,8 @@ public class SpongeViaConfig extends AbstractViaConfig {
             "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
             "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
 
-    public SpongeViaConfig(File configFile) {
-        super(new File(configFile, "config.yml"));
-        reload();
+    public SpongeViaConfig(File folder) {
+        super(new File(folder, "config.yml"));
     }
 
     @Override

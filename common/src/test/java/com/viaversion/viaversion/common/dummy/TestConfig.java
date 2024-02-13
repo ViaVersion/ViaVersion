@@ -26,8 +26,8 @@ import java.util.Map;
 
 public final class TestConfig extends AbstractViaConfig {
 
-    public TestConfig(File configFile) {
-        super(configFile);
+    public TestConfig(File file) {
+        super(file);
     }
 
     @Override

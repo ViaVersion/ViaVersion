@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,12 +132,12 @@ public class ViaManagerImpl implements ViaManager {
         if (protocolVersion.isKnown()) {
             if (platform.isProxy()) {
                 platform.getLogger().info("ViaVersion detected lowest supported version by the proxy: " + protocolVersion.lowestSupportedProtocolVersion());
-                platform.getLogger().info("Highest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
+                platform.getLogger().info("Highest supported version by the proxy: " + protocolVersion.highestSupportedProtocolVersion());
                 if (debugHandler.enabled()) {
-                    platform.getLogger().info("Supported version range: " + Arrays.toString(protocolVersion.supportedVersions().toArray(new int[0])));
+                    platform.getLogger().info("Supported version range: " + Arrays.toString(protocolVersion.supportedProtocolVersions().toArray(new ProtocolVersion[0])));
                 }
             } else {
-                platform.getLogger().info("ViaVersion detected server version: " + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
+                platform.getLogger().info("ViaVersion detected server version: " + protocolVersion.highestSupportedProtocolVersion());
             }
 
             if (!protocolManager.isWorkingPipe()) {
@@ -185,13 +186,13 @@ public class ViaManagerImpl implements ViaManager {
 
     private void loadServerProtocol() {
         try {
-            ProtocolVersion serverProtocolVersion = ProtocolVersion.getProtocol(injector.getServerProtocolVersion());
+            ProtocolVersion serverProtocolVersion = injector.getServerProtocolVersion();
             ServerProtocolVersion versionInfo;
             if (platform.isProxy()) {
-                IntSortedSet supportedVersions = injector.getServerProtocolVersions();
-                versionInfo = new ServerProtocolVersionRange(supportedVersions.firstInt(), supportedVersions.lastInt(), supportedVersions);
+                SortedSet<ProtocolVersion> supportedVersions = injector.getServerProtocolVersions();
+                versionInfo = new ServerProtocolVersionRange(supportedVersions.first(), supportedVersions.last(), supportedVersions);
             } else {
-                versionInfo = new ServerProtocolVersionSingleton(serverProtocolVersion.getVersion());
+                versionInfo = new ServerProtocolVersionSingleton(serverProtocolVersion);
             }
 
             protocolManager.setServerProtocol(versionInfo);

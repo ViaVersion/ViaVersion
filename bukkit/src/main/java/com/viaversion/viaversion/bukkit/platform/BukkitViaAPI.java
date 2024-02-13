@@ -43,7 +43,7 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     public int getPlayerVersion(UUID uuid) {
         UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
         if (connection != null) {
-            return connection.getProtocolInfo().getProtocolVersion();
+            return connection.getProtocolInfo().protocolVersion().getVersion();
         }
 
         if (isProtocolSupport()) {

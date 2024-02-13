@@ -80,6 +80,8 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
                 .loader(new BungeeViaLoader(this))
                 .commandHandler(commandHandler)
                 .build());
+
+        config.reload();
     }
 
     @Override

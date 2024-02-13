@@ -94,34 +94,36 @@ public interface ProtocolInfo {
     void setServerState(State serverState);
 
     /**
-     * Returns the user's release protocol version, or -1 if not set.
+     * Returns the user's protocol version, or null if not set.
      * This is set during the {@link State#HANDSHAKE} state.
      *
-     * @return release protocol version, or -1 if not set
-     * @see ProtocolVersion
+     * @return protocol version, may be unknown
+     * @see ProtocolVersion#isKnown()
      */
+    ProtocolVersion protocolVersion();
+
+    void setProtocolVersion(ProtocolVersion protocolVersion);
+
+    /**
+     * Returns the server protocol version the user is connected to.
+     * This is set during the {@link State#HANDSHAKE} state.
+     *
+     * @return the server protocol version the user is connected to, may be unknown
+     * @see ProtocolVersion#isKnown()
+     */
+    ProtocolVersion serverProtocolVersion();
+
+    void setServerProtocolVersion(ProtocolVersion protocolVersion);
+
+    @Deprecated
     default int getProtocolVersion() {
         return protocolVersion() != null ? protocolVersion().getVersion() : -1;
     }
 
-    /**
-     * Returns the user's protocol version, or null if not set.
-     *
-     * @return protocol version if set
-     */
-    @Nullable ProtocolVersion protocolVersion();
-
-    void setProtocolVersion(int protocolVersion);
-
-    /**
-     * Returns the server protocol version the user is connected to, or -1 if not set.
-     * This is set during the {@link State#HANDSHAKE} state.
-     *
-     * @return server protocol version, or -1 if not set
-     */
-    int getServerProtocolVersion();
-
-    void setServerProtocolVersion(int serverProtocolVersion);
+    @Deprecated
+    default int getServerProtocolVersion() {
+        return serverProtocolVersion() != null ? serverProtocolVersion().getVersion() : -1;
+    }
 
     /**
      * Returns the username associated with this connection.

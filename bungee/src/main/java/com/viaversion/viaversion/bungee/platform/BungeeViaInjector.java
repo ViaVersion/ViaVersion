@@ -21,18 +21,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bungee.handlers.BungeeChannelInitializer;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import com.viaversion.viaversion.util.SetWrapper;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
-import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import net.md_5.bungee.api.ProxyServer;
 
 public class BungeeViaInjector implements ViaInjector {
@@ -111,13 +112,17 @@ public class BungeeViaInjector implements ViaInjector {
     }
 
     @Override
-    public int getServerProtocolVersion() throws Exception {
-        return getBungeeSupportedVersions().get(0);
+    public ProtocolVersion getServerProtocolVersion() throws Exception {
+        return ProtocolVersion.getProtocol(getBungeeSupportedVersions().get(0));
     }
 
     @Override
-    public IntSortedSet getServerProtocolVersions() throws Exception {
-        return new IntLinkedOpenHashSet(getBungeeSupportedVersions());
+    public SortedSet<ProtocolVersion> getServerProtocolVersions() throws Exception {
+        final SortedSet<ProtocolVersion> versions = new ObjectLinkedOpenHashSet<>();
+        for (final Integer version : getBungeeSupportedVersions()) {
+            versions.add(ProtocolVersion.getProtocol(version));
+        }
+        return versions;
     }
 
     @SuppressWarnings("unchecked")

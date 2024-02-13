@@ -88,7 +88,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
     @Override
     protected int lowestSupportedProtocolVersion() {
         try {
-            return ProtocolVersion.getProtocol(Via.getManager().getInjector().getServerProtocolVersion()).getVersion();
+            return Via.getManager().getInjector().getServerProtocolVersion().getVersion();
         } catch (final Exception e) {
             e.printStackTrace();
             return ProtocolVersion.v1_8.getVersion();

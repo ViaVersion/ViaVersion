@@ -291,7 +291,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             lastTags.sendLastTags(connection);
         }
 
-        if (lastResourcePack != null && connection.getProtocolInfo().getProtocolVersion() == ProtocolVersion.v1_20_2.getVersion()) {
+        if (lastResourcePack != null && connection.getProtocolInfo().protocolVersion() == ProtocolVersion.v1_20_2) {
             // The client for some reason drops the resource pack when reentering the configuration state
             final PacketWrapper resourcePackPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, connection);
             resourcePackPacket.write(Type.STRING, lastResourcePack.url());

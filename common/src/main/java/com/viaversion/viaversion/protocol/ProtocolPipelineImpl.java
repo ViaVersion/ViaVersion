@@ -137,7 +137,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
                         AbstractSimpleProtocol.toNiceHex(originalID),
                         packetWrapper.getId(),
                         AbstractSimpleProtocol.toNiceHex(packetWrapper.getId()),
-                        Integer.toString(userConnection.getProtocolInfo().getProtocolVersion()),
+                        userConnection.getProtocolInfo().protocolVersion().getName(),
                         packetWrapper
                 });
     }

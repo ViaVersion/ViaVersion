@@ -35,5 +35,5 @@ public interface VersionProvider extends Provider {
      * @param connection connection
      * @return closest server protocol version to the user's protocol version
      */
-    int getClosestServerProtocol(UserConnection connection) throws Exception;
+    ProtocolVersion getClosestServerProtocol(UserConnection connection) throws Exception;
 }
