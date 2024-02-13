@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.protocol1_17_1to1_17.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.BlockEntityIds;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.Protocol1_18To1_17_1;
+import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.data.BlockEntities;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.storage.ChunkLightStorage;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.MathUtil;
@@ -115,7 +116,7 @@ public final class WorldPackets {
                 }
 
                 final String id = idTag.getValue();
-                final int typeId = protocol.getMappingData().blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
+                final int typeId = BlockEntities.blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
                 if (typeId == -1) {
                     Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
                 }

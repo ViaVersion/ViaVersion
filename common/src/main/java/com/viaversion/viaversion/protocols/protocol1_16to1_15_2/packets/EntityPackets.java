@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.AttributeMappings;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.metadata.MetadataRewriter1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.util.Key;
@@ -241,7 +242,7 @@ public class EntityPackets {
             for (int i = 0; i < size; i++) {
                 // Attributes have been renamed and are now namespaced identifiers
                 String key = wrapper.read(Type.STRING);
-                String attributeIdentifier = protocol.getMappingData().attributeIdentifierMappings().get(key);
+                String attributeIdentifier = AttributeMappings.attributeIdentifierMappings().get(key);
                 if (attributeIdentifier == null) {
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {

@@ -32,6 +32,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.ServerboundPackets1_16;
+import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.AttributeMappings;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
@@ -246,8 +247,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             attributeName = Key.namespaced(attributeName);
         }
 
-        String mappedAttribute = (inverse ? Protocol1_16To1_15_2.MAPPINGS.attributeIdentifierMappings().inverse()
-                : Protocol1_16To1_15_2.MAPPINGS.attributeIdentifierMappings()).get(attributeName);
+        String mappedAttribute = (inverse ? AttributeMappings.attributeIdentifierMappings().inverse()
+                : AttributeMappings.attributeIdentifierMappings()).get(attributeName);
         if (mappedAttribute == null) return;
 
         attributeNameTag.setValue(mappedAttribute);
