@@ -32,9 +32,8 @@ public class VelocityViaConfig extends AbstractViaConfig {
     private boolean velocityPingSave;
     private Map<String, Integer> velocityServerProtocols;
 
-    public VelocityViaConfig(File configFile) {
-        super(new File(configFile, "config.yml"));
-        reload();
+    public VelocityViaConfig(File folder) {
+        super(new File(folder, "config.yml"));
     }
 
     @Override

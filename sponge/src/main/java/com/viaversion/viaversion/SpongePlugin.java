@@ -95,6 +95,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
                 .injector(new SpongeViaInjector())
                 .loader(new SpongeViaLoader(this))
                 .build());
+        conf.reload();
     }
 
     @Listener

@@ -33,9 +33,8 @@ public class BungeeViaConfig extends AbstractViaConfig {
     private boolean bungeePingSave;
     private Map<String, Integer> bungeeServerProtocols;
 
-    public BungeeViaConfig(File configFile) {
-        super(new File(configFile, "config.yml"));
-        reload();
+    public BungeeViaConfig(File folder) {
+        super(new File(folder, "config.yml"));
     }
 
     @Override

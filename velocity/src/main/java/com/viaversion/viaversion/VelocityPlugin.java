@@ -103,6 +103,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
                 .commandHandler(commandHandler)
                 .loader(new VelocityViaLoader())
                 .injector(new VelocityViaInjector()).build());
+        conf.reload();
     }
 
     @Subscribe(order = PostOrder.LAST)

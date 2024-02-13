@@ -17,13 +17,11 @@
  */
 package com.viaversion.viaversion.bukkit.platform;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.plugin.Plugin;
 
 public class BukkitViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval", "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers");
@@ -34,9 +32,8 @@ public class BukkitViaConfig extends AbstractViaConfig {
     private boolean armorToggleFix;
     private boolean registerUserConnectionOnJoin;
 
-    public BukkitViaConfig() {
-        super(new File(((Plugin) Via.getPlatform()).getDataFolder(), "config.yml"));
-        reload();
+    public BukkitViaConfig(final File folder) {
+        super(new File(folder, "config.yml"));
     }
 
     @Override
