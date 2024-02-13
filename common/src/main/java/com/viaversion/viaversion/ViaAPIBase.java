@@ -42,7 +42,7 @@ public abstract class ViaAPIBase<T> implements ViaAPI<T> {
     @Override
     public int getPlayerVersion(UUID uuid) {
         UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
-        return connection != null ? connection.getProtocolInfo().getProtocolVersion() : -1;
+        return connection != null ? connection.getProtocolInfo().protocolVersion().getVersion() : -1;
     }
 
     @Override

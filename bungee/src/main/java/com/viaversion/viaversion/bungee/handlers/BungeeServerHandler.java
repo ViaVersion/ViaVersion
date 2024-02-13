@@ -100,7 +100,7 @@ public class BungeeServerHandler implements Listener {
         }
 
         int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
-        int clientProtocolVersion = user.getProtocolInfo().getProtocolVersion();
+        int clientProtocolVersion = user.getProtocolInfo().protocolVersion().getVersion();
         List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
 
         // Check if ViaVersion can support that version
@@ -172,8 +172,8 @@ public class BungeeServerHandler implements Listener {
 
         String serverName = server.getInfo().getName();
         storage.setCurrentServer(serverName);
-        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
-        if (serverProtocolVersion <= ProtocolVersion.v1_8.getVersion() && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
+        ProtocolVersion serverProtocolVersion = ProtocolVersion.getProtocol(Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName));
+        if (serverProtocolVersion.lowerThanOrEquals(ProtocolVersion.v1_8) && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                 for (UUID uuid : storage.getBossbar()) {
@@ -187,16 +187,17 @@ public class BungeeServerHandler implements Listener {
         }
 
         ProtocolInfo info = user.getProtocolInfo();
-        int previousServerProtocol = info.getServerProtocolVersion();
+        ProtocolVersion previousServerProtocol = info.serverProtocolVersion();
 
         // Refresh the pipes
-        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.getProtocolVersion(), serverProtocolVersion);
+        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager()
+            .getProtocolPath(info.protocolVersion().getVersion(), serverProtocolVersion.getVersion());
         ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
         user.clearStoredObjects(true);
         pipeline.cleanPipes();
         if (protocolPath == null) {
             // TODO Check Bungee Supported Protocols? *shrugs*
-            serverProtocolVersion = info.getProtocolVersion();
+            serverProtocolVersion = info.protocolVersion();
         } else {
             List<Protocol> protocols = new ArrayList<>(protocolPath.size());
             for (ProtocolPathEntry entry : protocolPath) {
@@ -207,13 +208,12 @@ public class BungeeServerHandler implements Listener {
 
         info.setServerProtocolVersion(serverProtocolVersion);
         // Add version-specific base Protocol
-        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
+        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion.getVersion()));
 
         // Workaround 1.13 server change
-        int id1_13 = ProtocolVersion.v1_13.getVersion();
-        boolean toNewId = previousServerProtocol < id1_13 && serverProtocolVersion >= id1_13;
-        boolean toOldId = previousServerProtocol >= id1_13 && serverProtocolVersion < id1_13;
-        if (previousServerProtocol != -1 && (toNewId || toOldId)) {
+        boolean toNewId = previousServerProtocol.lowerThan(ProtocolVersion.v1_13) && serverProtocolVersion.higherThanOrEquals(ProtocolVersion.v1_13);
+        boolean toOldId = previousServerProtocol.higherThanOrEquals(ProtocolVersion.v1_13) && serverProtocolVersion.lowerThan(ProtocolVersion.v1_13);
+        if (previousServerProtocol.isKnown() && (toNewId || toOldId)) {
             Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(event.getPlayer().getPendingConnection());
             if (!registeredChannels.isEmpty()) {
                 Collection<String> newChannels = new HashSet<>();

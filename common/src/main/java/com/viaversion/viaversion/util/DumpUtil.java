@@ -137,7 +137,7 @@ public final class DumpUtil {
         playerSample.add("versions", versions);
         final Map<ProtocolVersion, Integer> playerVersions = new TreeMap<>(ProtocolVersion::compareTo);
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-            final ProtocolVersion protocolVersion = ProtocolVersion.getProtocol(connection.getProtocolInfo().getProtocolVersion());
+            final ProtocolVersion protocolVersion = connection.getProtocolInfo().protocolVersion();
             playerVersions.compute(protocolVersion, (v, num) -> num != null ? num + 1 : 1);
         }
         for (final Map.Entry<ProtocolVersion, Integer> entry : playerVersions.entrySet()) {

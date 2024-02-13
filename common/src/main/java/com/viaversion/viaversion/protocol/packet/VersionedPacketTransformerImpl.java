@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
 
-    private final int inputProtocolVersion;
+    private final int inputProtocolVersion; // TODO Use ProtocolVersion
     private final Class<C> clientboundPacketsClass;
     private final Class<S> serverboundPacketsClass;
 
@@ -142,8 +142,8 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         PacketType packetType = packet.getPacketType();
         UserConnection connection = packet.user();
         boolean clientbound = packetType.direction() == Direction.CLIENTBOUND;
-        int serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().getServerProtocolVersion();
-        int clientProtocolVersion = clientbound ? connection.getProtocolInfo().getProtocolVersion() : this.inputProtocolVersion;
+        int serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().serverProtocolVersion().getVersion();
+        int clientProtocolVersion = clientbound ? connection.getProtocolInfo().protocolVersion().getVersion() : this.inputProtocolVersion;
 
         // Construct protocol pipeline
         List<ProtocolPathEntry> path = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);

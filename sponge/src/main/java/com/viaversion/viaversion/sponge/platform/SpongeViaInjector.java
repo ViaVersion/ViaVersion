@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.sponge.platform;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.platform.LegacyViaInjector;
 import com.viaversion.viaversion.platform.WrappedChannelInitializer;
 import com.viaversion.viaversion.sponge.handlers.SpongeChannelInitializer;
@@ -30,14 +31,14 @@ import org.spongepowered.api.Sponge;
 public class SpongeViaInjector extends LegacyViaInjector {
 
     @Override
-    public int getServerProtocolVersion() throws ReflectiveOperationException {
+    public ProtocolVersion getServerProtocolVersion() throws ReflectiveOperationException {
         MinecraftVersion version = Sponge.platform().minecraftVersion();
 
         // 'protocolVersion' method was exposed to the API in a 1.19.4 build and 'getProtocol' no longer exists in the impl.
         try {
-            return (int) version.getClass().getDeclaredMethod("getProtocol").invoke(version);
+            return ProtocolVersion.getProtocol((int) version.getClass().getDeclaredMethod("getProtocol").invoke(version));
         } catch (NoSuchMethodException e) {
-            return (int) version.getClass().getDeclaredMethod("protocolVersion").invoke(version);
+            return ProtocolVersion.getProtocol((int) version.getClass().getDeclaredMethod("protocolVersion").invoke(version));
         }
     }
 

@@ -17,29 +17,32 @@
  */
 package com.viaversion.viaversion.protocol;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSets;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import java.util.SortedSet;
 
 public class ServerProtocolVersionSingleton implements ServerProtocolVersion {
-    private final int protocolVersion;
+    private final ProtocolVersion protocolVersion;
 
-    public ServerProtocolVersionSingleton(int protocolVersion) {
+    public ServerProtocolVersionSingleton(ProtocolVersion protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
 
     @Override
-    public int lowestSupportedVersion() {
+    public ProtocolVersion lowestSupportedProtocolVersion() {
         return protocolVersion;
     }
 
     @Override
-    public int highestSupportedVersion() {
+    public ProtocolVersion highestSupportedProtocolVersion() {
         return protocolVersion;
     }
 
     @Override
-    public IntSortedSet supportedVersions() {
-        return IntSortedSets.singleton(protocolVersion);
+    public SortedSet<ProtocolVersion> supportedProtocolVersions() {
+        final SortedSet<ProtocolVersion> set = new ObjectLinkedOpenHashSet<>();
+        set.add(protocolVersion);
+        return set;
     }
 }

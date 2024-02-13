@@ -122,7 +122,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private ThreadPoolExecutor mappingLoaderExecutor;
     private boolean mappingsLoaded;
 
-    private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(-1);
+    private ServerProtocolVersion serverProtocolVersion = new ServerProtocolVersionSingleton(ProtocolVersion.unknown);
     private int maxPathDeltaIncrease; // Only allow lowering path entries by default
     private int maxProtocolPathSize = 50;
 
@@ -381,8 +381,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public boolean isWorkingPipe() {
         for (Int2ObjectMap<Protocol> map : registryMap.values()) {
-            for (int protocolVersion : serverProtocolVersion.supportedVersions()) {
-                if (map.containsKey(protocolVersion)) {
+            for (ProtocolVersion protocolVersion : serverProtocolVersion.supportedProtocolVersions()) {
+                if (map.containsKey(protocolVersion.getVersion())) {
                     return true;
                 }
             }

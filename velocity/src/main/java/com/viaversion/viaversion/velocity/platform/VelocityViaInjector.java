@@ -25,12 +25,11 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import com.viaversion.viaversion.velocity.handlers.VelocityChannelInitializer;
 import io.netty.channel.ChannelInitializer;
-import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.SortedSet;
 import org.jetbrains.annotations.Nullable;
-
 
 public class VelocityViaInjector implements ViaInjector {
     public static final Method GET_PLAYER_INFO_FORWARDING_MODE = getPlayerInfoForwardingModeMethod();
@@ -78,18 +77,18 @@ public class VelocityViaInjector implements ViaInjector {
     }
 
     @Override
-    public int getServerProtocolVersion() throws Exception {
-        return getLowestSupportedProtocolVersion();
+    public ProtocolVersion getServerProtocolVersion() {
+        return ProtocolVersion.getProtocol(getLowestSupportedProtocolVersion());
     }
 
     @Override
-    public IntSortedSet getServerProtocolVersions() throws Exception {
+    public SortedSet<ProtocolVersion> getServerProtocolVersions() {
         int lowestSupportedProtocolVersion = getLowestSupportedProtocolVersion();
 
-        IntSortedSet set = new IntLinkedOpenHashSet();
+        SortedSet<ProtocolVersion> set = new ObjectLinkedOpenHashSet<>();
         for (com.velocitypowered.api.network.ProtocolVersion version : com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS) {
             if (version.getProtocol() >= lowestSupportedProtocolVersion) {
-                set.add(version.getProtocol());
+                set.add(ProtocolVersion.getProtocol(version.getProtocol()));
             }
         }
         return set;

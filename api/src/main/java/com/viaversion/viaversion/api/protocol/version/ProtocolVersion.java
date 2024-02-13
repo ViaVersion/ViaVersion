@@ -28,8 +28,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,7 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
     // These need to be at the top of the class to be initialized first
-    private static final Int2ObjectMap<ProtocolVersion> VERSIONS = new Int2ObjectOpenHashMap<>();
+    private static final Map<VersionType, Int2ObjectMap<ProtocolVersion>> VERSIONS = new EnumMap<>(VersionType.class);
     private static final List<ProtocolVersion> VERSION_LIST = new ArrayList<>();
 
     public static final ProtocolVersion v1_7_1 = register(4, "1.7.2-1.7.5", new VersionRange("1.7", 2, 5));
@@ -106,9 +108,11 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      */
     public static void register(ProtocolVersion protocolVersion) {
         VERSION_LIST.add(protocolVersion);
-        VERSIONS.put(protocolVersion.getVersion(), protocolVersion);
+
+        final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.computeIfAbsent(protocolVersion.versionType, $ -> new Int2ObjectOpenHashMap<>());
+        versions.put(protocolVersion.version, protocolVersion);
         if (protocolVersion.isSnapshot()) {
-            VERSIONS.put(protocolVersion.getFullSnapshotVersion(), protocolVersion);
+            versions.put(protocolVersion.getFullSnapshotVersion(), protocolVersion);
         }
     }
 
@@ -118,24 +122,36 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param version protocol version
      * @return true if this protocol version has been registered
      */
+    public static boolean isRegistered(final VersionType versionType, final int version) {
+        final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.get(versionType);
+        return versions != null && versions.containsKey(version);
+    }
+
     public static boolean isRegistered(int version) {
-        return VERSIONS.containsKey(version);
+        return isRegistered(VersionType.RELEASE, version);
     }
 
     /**
      * Returns a ProtocolVersion instance, even if this protocol version
-     * has not been registered. See {@link #isRegistered(int)} berorehand or {@link #isKnown()}.
+     * has not been registered. See {@link #isRegistered(VersionType, int)} berorehand or {@link #isKnown()}.
      *
-     * @param version protocol version
+     * @param versionType protocol version type
+     * @param version     protocol version
      * @return registered or unknown ProtocolVersion
      */
-    public static @NonNull ProtocolVersion getProtocol(final int version) {
-        final ProtocolVersion protocolVersion = VERSIONS.get(version);
-        if (protocolVersion != null) {
-            return protocolVersion;
-        } else {
-            return new ProtocolVersion(VersionType.SPECIAL, version, -1, "Unknown (" + version + ")", null);
+    public static @NonNull ProtocolVersion getProtocol(final VersionType versionType, final int version) {
+        final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.get(versionType);
+        if (versions != null) {
+            final ProtocolVersion protocolVersion = versions.get(version);
+            if (protocolVersion != null) {
+                return protocolVersion;
+            }
         }
+        return new ProtocolVersion(VersionType.SPECIAL, version, -1, "Unknown (" + version + ")", null);
+    }
+
+    public static @NonNull ProtocolVersion getProtocol(final int version) {
+        return getProtocol(VersionType.RELEASE, version);
     }
 
     /**
@@ -168,7 +184,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @return registered protocol version if present, else null
      */
     public static @Nullable ProtocolVersion getClosest(String protocol) {
-        for (ProtocolVersion version : VERSIONS.values()) {
+        for (ProtocolVersion version : VERSION_LIST) {
             String name = version.getName();
             if (name.equals(protocol) || version.isRange() && version.getIncludedVersions().contains(protocol)) {
                 return version;

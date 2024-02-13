@@ -23,8 +23,9 @@
 package com.viaversion.viaversion.api.platform;
 
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import it.unimi.dsi.fastutil.ints.IntSortedSets;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+import java.util.SortedSet;
 
 public interface ViaInjector {
 
@@ -60,7 +61,7 @@ public interface ViaInjector {
      * @throws Exception if there is an error with getting this info, e.g. not binded
      * @see ViaPlatform#isProxy()
      */
-    int getServerProtocolVersion() throws Exception;
+    ProtocolVersion getServerProtocolVersion() throws Exception;
 
     /**
      * Returns the supported server protocol versions.
@@ -69,8 +70,10 @@ public interface ViaInjector {
      * @throws Exception if there is an error with getting this info, e.g. not binded
      * @see ViaPlatform#isProxy()
      */
-    default IntSortedSet getServerProtocolVersions() throws Exception {
-        return IntSortedSets.singleton(getServerProtocolVersion());
+    default SortedSet<ProtocolVersion> getServerProtocolVersions() throws Exception {
+        final SortedSet<ProtocolVersion> versions = new ObjectLinkedOpenHashSet<>();
+        versions.add(getServerProtocolVersion());
+        return versions;
     }
 
     /**

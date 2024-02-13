@@ -43,19 +43,20 @@ public class VelocityVersionProvider extends BaseVersionProvider {
     }
 
     @Override
-    public int getClosestServerProtocol(UserConnection user) throws Exception {
+    public ProtocolVersion getClosestServerProtocol(UserConnection user) throws Exception {
         return user.isClientSide() ? getBackProtocol(user) : getFrontProtocol(user);
     }
 
-    private int getBackProtocol(UserConnection user) throws Exception {
+    private ProtocolVersion getBackProtocol(UserConnection user) throws Exception {
         //TODO use newly added Velocity netty event
         ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
         ServerConnection serverConnection = (ServerConnection) GET_ASSOCIATION.invoke(mcHandler);
-        return Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverConnection.getServerInfo().getName());
+        final int protocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverConnection.getServerInfo().getName());
+        return ProtocolVersion.getProtocol(protocolVersion);
     }
 
-    private int getFrontProtocol(UserConnection user) throws Exception {
-        int playerVersion = user.getProtocolInfo().getProtocolVersion();
+    private ProtocolVersion getFrontProtocol(UserConnection user) throws Exception {
+        ProtocolVersion playerVersion = user.getProtocolInfo().protocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
                 .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);
@@ -68,14 +69,14 @@ public class VelocityVersionProvider extends BaseVersionProvider {
         }
         int[] compatibleProtocols = versions.toArray();
 
-        if (Arrays.binarySearch(compatibleProtocols, playerVersion) >= 0) {
+        if (Arrays.binarySearch(compatibleProtocols, playerVersion.getVersion()) >= 0) {
             // Velocity supports it
             return playerVersion;
         }
 
-        if (playerVersion < compatibleProtocols[0]) {
+        if (playerVersion.getVersion() < compatibleProtocols[0]) {
             // Older than Velocity supports, get the lowest version
-            return compatibleProtocols[0];
+            return ProtocolVersion.getProtocol(compatibleProtocols[0]);
         }
 
         // Loop through all protocols to get the closest protocol id that Velocity supports (and that Via does too)
@@ -84,8 +85,8 @@ public class VelocityVersionProvider extends BaseVersionProvider {
         // This is more of a workaround for snapshot support
         for (int i = compatibleProtocols.length - 1; i >= 0; i--) {
             int protocol = compatibleProtocols[i];
-            if (playerVersion > protocol && ProtocolVersion.isRegistered(protocol)) {
-                return protocol;
+            if (playerVersion.getVersion() > protocol && ProtocolVersion.isRegistered(protocol)) {
+                return ProtocolVersion.getProtocol(protocol);
             }
         }
 

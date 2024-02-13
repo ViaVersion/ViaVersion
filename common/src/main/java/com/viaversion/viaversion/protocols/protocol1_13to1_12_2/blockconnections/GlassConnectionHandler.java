@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnection
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
         if (states != 0) return states;
 
         ProtocolInfo protocolInfo = user.getProtocolInfo();
-        return protocolInfo.getServerProtocolVersion() <= 47
-                && protocolInfo.getServerProtocolVersion() != -1 ? 0xF : states;
+        return protocolInfo.serverProtocolVersion().lowerThanOrEquals(ProtocolVersion.v1_8)
+                && protocolInfo.serverProtocolVersion().isKnown() ? 0xF : states;
     }
 }

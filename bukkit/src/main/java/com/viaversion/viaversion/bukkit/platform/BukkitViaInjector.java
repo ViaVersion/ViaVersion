@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.bukkit.platform;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.platform.LegacyViaInjector;
@@ -61,13 +62,13 @@ public class BukkitViaInjector extends LegacyViaInjector {
     }
 
     @Override
-    public int getServerProtocolVersion() throws ReflectiveOperationException {
+    public ProtocolVersion getServerProtocolVersion() throws ReflectiveOperationException {
         if (PaperViaInjector.PAPER_PROTOCOL_METHOD) {
             //noinspection deprecation
-            return Bukkit.getUnsafe().getProtocolVersion();
+            return ProtocolVersion.getProtocol(Bukkit.getUnsafe().getProtocolVersion());
         }
 
-        return HAS_WORLD_VERSION_PROTOCOL_VERSION ? cursedProtocolDetection() : veryCursedProtocolDetection();
+        return ProtocolVersion.getProtocol(HAS_WORLD_VERSION_PROTOCOL_VERSION ? cursedProtocolDetection() : veryCursedProtocolDetection());
     }
 
     private int cursedProtocolDetection() throws ReflectiveOperationException {
