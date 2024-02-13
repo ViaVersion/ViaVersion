@@ -71,7 +71,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             List<ProtocolPathEntry> protocolPath = null;
 
             // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
-            if (info.protocolVersion().higherThanOrEquals(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+            if (info.protocolVersion().newerThanOrEquals(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
                 protocolPath = Via.getManager().getProtocolManager()
                     .getProtocolPath(info.protocolVersion().getVersion(), serverProtocol.getVersion());
             }
@@ -108,7 +108,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             } else if (state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
 
-                if (serverProtocol.lowerThan(ProtocolVersion.v1_20_5)) {
+                if (serverProtocol.olderThan(ProtocolVersion.v1_20_5)) {
                     wrapper.set(Type.VAR_INT, 1, LOGIN_INTENT);
                 }
             }

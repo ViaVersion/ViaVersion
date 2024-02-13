@@ -36,7 +36,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
                 .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-        if (protocolVersion.lowerThan(ProtocolVersion.v1_9)) {
+        if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {
             Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
         }
 

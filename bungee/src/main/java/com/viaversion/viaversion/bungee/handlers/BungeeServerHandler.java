@@ -173,7 +173,7 @@ public class BungeeServerHandler implements Listener {
         String serverName = server.getInfo().getName();
         storage.setCurrentServer(serverName);
         ProtocolVersion serverProtocolVersion = ProtocolVersion.getProtocol(Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName));
-        if (serverProtocolVersion.lowerThanOrEquals(ProtocolVersion.v1_8) && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
+        if (serverProtocolVersion.olderThanOrEquals(ProtocolVersion.v1_8) && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
                 for (UUID uuid : storage.getBossbar()) {
@@ -211,8 +211,8 @@ public class BungeeServerHandler implements Listener {
         pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion.getVersion()));
 
         // Workaround 1.13 server change
-        boolean toNewId = previousServerProtocol.lowerThan(ProtocolVersion.v1_13) && serverProtocolVersion.higherThanOrEquals(ProtocolVersion.v1_13);
-        boolean toOldId = previousServerProtocol.higherThanOrEquals(ProtocolVersion.v1_13) && serverProtocolVersion.lowerThan(ProtocolVersion.v1_13);
+        boolean toNewId = previousServerProtocol.olderThan(ProtocolVersion.v1_13) && serverProtocolVersion.newerThanOrEquals(ProtocolVersion.v1_13);
+        boolean toOldId = previousServerProtocol.newerThanOrEquals(ProtocolVersion.v1_13) && serverProtocolVersion.olderThan(ProtocolVersion.v1_13);
         if (previousServerProtocol.isKnown() && (toNewId || toOldId)) {
             Collection<String> registeredChannels = (Collection<String>) getRegisteredChannels.invoke(event.getPlayer().getPendingConnection());
             if (!registeredChannels.isEmpty()) {
