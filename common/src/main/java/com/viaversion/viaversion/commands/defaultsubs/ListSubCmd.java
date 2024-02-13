@@ -44,7 +44,7 @@ public class ListSubCmd extends ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Map<ProtocolVersion, Set<String>> playerVersions = new TreeMap<>((o1, o2) -> ProtocolVersion.getIndex(o2) - ProtocolVersion.getIndex(o1));
+        Map<ProtocolVersion, Set<String>> playerVersions = new TreeMap<>(ProtocolVersion::compareTo);
 
         for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
             int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());

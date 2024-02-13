@@ -87,10 +87,10 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             return;
         }
 
-        int serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedVersion();
+        ProtocolVersion serverProtocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
 
         /* 1.9 client to 1.8 server */
-        if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_9)) {
             new ArmorListener(plugin).register();
             new DeathListener(plugin).register();
             new BlockListener(plugin).register();
@@ -101,8 +101,8 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_14.getVersion()) {
-            boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && serverProtocolVersion < ProtocolVersion.v1_9.getVersion();
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_14)) {
+            boolean use1_9Fix = plugin.getConf().is1_9HitboxFix() && serverProtocolVersion.lowerThan(ProtocolVersion.v1_9);
             if (use1_9Fix || plugin.getConf().is1_14HitboxFix()) {
                 try {
                     new PlayerSneakListener(plugin, use1_9Fix, plugin.getConf().is1_14HitboxFix()).register();
@@ -112,7 +112,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_15.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_15)) {
             try {
                 Class.forName("org.bukkit.event.entity.EntityToggleGlideEvent");
                 new EntityToggleGlideListener(plugin).register();
@@ -120,7 +120,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_12.getVersion() && !Boolean.getBoolean("com.viaversion.ignorePaperBlockPlacePatch")) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_12) && !Boolean.getBoolean("com.viaversion.ignorePaperBlockPlacePatch")) {
             boolean paper = true;
             try {
                 Class.forName("org.github.paperspigot.PaperSpigotConfig"); // Paper 1.8 ?
@@ -136,12 +136,12 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             }
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_19_4.getVersion() && plugin.getConf().isArmorToggleFix() && hasGetHandMethod()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_19_4) && plugin.getConf().isArmorToggleFix() && hasGetHandMethod()) {
             new ArmorToggleListener(plugin).register();
         }
 
         /* Providers */
-        if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_9)) {
             Via.getManager().getProviders().use(MovementTransmitterProvider.class, new BukkitViaMovementTransmitter());
 
             Via.getManager().getProviders().use(HandItemProvider.class, new HandItemProvider() {
@@ -167,19 +167,19 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             });
         }
 
-        if (serverProtocolVersion < ProtocolVersion.v1_12.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_12)) {
             if (plugin.getConf().is1_12QuickMoveActionFix()) {
                 Via.getManager().getProviders().use(InventoryQuickMoveProvider.class, new BukkitInventoryQuickMoveProvider());
             }
         }
-        if (serverProtocolVersion < ProtocolVersion.v1_13.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_13)) {
             if (Via.getConfig().getBlockConnectionMethod().equalsIgnoreCase("world")) {
                 BukkitBlockConnectionProvider blockConnectionProvider = new BukkitBlockConnectionProvider();
                 Via.getManager().getProviders().use(BlockConnectionProvider.class, blockConnectionProvider);
                 ConnectionData.blockConnectionProvider = blockConnectionProvider;
             }
         }
-        if (serverProtocolVersion < ProtocolVersion.v1_19.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_19)) {
             Via.getManager().getProviders().use(AckSequenceProvider.class, new BukkitAckSequenceProvider(plugin));
             new BlockBreakListener(plugin).register();
         }

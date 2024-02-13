@@ -35,12 +35,26 @@ public interface ServerProtocolVersion {
     int lowestSupportedVersion();
 
     /**
+     * @see #highestSupportedVersion()
+     */
+    default ProtocolVersion lowestSupportedProtocolVersion() {
+        return ProtocolVersion.getProtocol(lowestSupportedVersion());
+    }
+
+    /**
      * Returns the highest supported protocol version by this server.
      * This and {@link #lowestSupportedVersion()} should only differ on proxy servers supporting multiple versions.
      *
      * @return highest supported protocol version
      */
     int highestSupportedVersion();
+
+    /**
+     * @see #lowestSupportedVersion()
+     */
+    default ProtocolVersion highestSupportedProtocolVersion() {
+        return ProtocolVersion.getProtocol(highestSupportedVersion());
+    }
 
     /**
      * Returns a sorted set of all supported protocol version by this server.

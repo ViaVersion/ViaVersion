@@ -22,6 +22,7 @@ import io.netty.channel.Channel;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import net.kyori.adventure.key.Key;
+import org.bukkit.Bukkit;
 
 public final class PaperViaInjector {
     public static final boolean PAPER_INJECTION_METHOD = hasPaperInjectionMethod();
@@ -29,6 +30,14 @@ public final class PaperViaInjector {
     public static final boolean PAPER_PACKET_LIMITER = hasPacketLimiter();
 
     private PaperViaInjector() {
+    }
+
+    public static int getServerProtocolVersion() {
+        if (!PaperViaInjector.PAPER_PROTOCOL_METHOD) {
+            throw new UnsupportedOperationException("Paper method not available");
+        }
+        //noinspection deprecation
+        return Bukkit.getUnsafe().getProtocolVersion();
     }
 
     public static void setPaperChannelInitializeListener() throws ReflectiveOperationException {

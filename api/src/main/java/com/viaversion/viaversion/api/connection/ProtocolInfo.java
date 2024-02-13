@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.connection;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -93,12 +94,22 @@ public interface ProtocolInfo {
     void setServerState(State serverState);
 
     /**
-     * Returns the user's protocol version, or -1 if not set.
+     * Returns the user's release protocol version, or -1 if not set.
      * This is set during the {@link State#HANDSHAKE} state.
      *
-     * @return protocol version, or -1 if not set
+     * @return release protocol version, or -1 if not set
+     * @see ProtocolVersion
      */
-    int getProtocolVersion();
+    default int getProtocolVersion() {
+        return protocolVersion() != null ? protocolVersion().getVersion() : -1;
+    }
+
+    /**
+     * Returns the user's protocol version, or null if not set.
+     *
+     * @return protocol version if set
+     */
+    @Nullable ProtocolVersion protocolVersion();
 
     void setProtocolVersion(int protocolVersion);
 

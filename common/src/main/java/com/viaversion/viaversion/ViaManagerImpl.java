@@ -130,7 +130,7 @@ public class ViaManagerImpl implements ViaManager {
         ServerProtocolVersion protocolVersion = protocolManager.getServerProtocolVersion();
         if (protocolVersion.isKnown()) {
             if (platform.isProxy()) {
-                platform.getLogger().info("ViaVersion detected lowest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.lowestSupportedVersion()));
+                platform.getLogger().info("ViaVersion detected lowest supported version by the proxy: " + protocolVersion.lowestSupportedProtocolVersion());
                 platform.getLogger().info("Highest supported version by the proxy: " + ProtocolVersion.getProtocol(protocolVersion.highestSupportedVersion()));
                 if (debugHandler.enabled()) {
                     platform.getLogger().info("Supported version range: " + Arrays.toString(protocolVersion.supportedVersions().toArray(new int[0])));
@@ -145,7 +145,7 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("If you need support for older versions you may need to use one or more ViaVersion addons too.");
                 platform.getLogger().warning("In that case please read the ViaVersion resource page carefully or use https://viaversion.com/setup");
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
-            } else if (protocolVersion.highestSupportedVersion() <= ProtocolVersion.v1_12_2.getVersion()) {
+            } else if (protocolVersion.highestSupportedProtocolVersion().lowerThan(ProtocolVersion.v1_13)) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
                         + "You will still be able to run Via on this Minecraft version, but we are unlikely to provide any further fixes or help with problems specific to legacy Minecraft versions. "
                         + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
@@ -167,13 +167,13 @@ public class ViaManagerImpl implements ViaManager {
             }
         }, 10L);
 
-        int serverProtocolVersion = protocolManager.getServerProtocolVersion().lowestSupportedVersion();
-        if (serverProtocolVersion < ProtocolVersion.v1_9.getVersion()) {
+        final ProtocolVersion serverProtocolVersion = protocolManager.getServerProtocolVersion().lowestSupportedProtocolVersion();
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_9)) {
             if (Via.getConfig().isSimulatePlayerTick()) {
                 Via.getPlatform().runRepeatingSync(new ViaIdleThread(), 1L);
             }
         }
-        if (serverProtocolVersion < ProtocolVersion.v1_13.getVersion()) {
+        if (serverProtocolVersion.lowerThan(ProtocolVersion.v1_13)) {
             if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
                 Via.getPlatform().runRepeatingSync(new TabCompleteThread(), 1L);
             }

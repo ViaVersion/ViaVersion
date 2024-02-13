@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.configuration;
 
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
@@ -100,6 +101,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     protected void loadFields() {
+        final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         checkForUpdates = getBoolean("checkforupdates", true);
         preventCollision = getBoolean("prevent-collision", true);
         useNewEffectIndicator = getBoolean("use-new-effect-indicator", true);
@@ -136,7 +138,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
-        serversideBlockConnections = getBoolean("serverside-blockconnections", true);
+        serversideBlockConnections = getBoolean("serverside-blockconnections", true) && protocolVersion.lowerThan(ProtocolVersion.v1_13);
         reduceBlockStorageMemory = getBoolean("reduce-blockstorage-memory", false);
         flowerStemWhenBlockAbove = getBoolean("flowerstem-when-block-above", false);
         vineClimbFix = getBoolean("vine-climb-fix", false);

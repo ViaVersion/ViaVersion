@@ -29,8 +29,8 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     private final UserConnection connection;
     private State clientState = State.HANDSHAKE;
     private State serverState = State.HANDSHAKE;
-    private int protocolVersion = -1;
     private int serverProtocolVersion = -1;
+    private ProtocolVersion protocolVersion;
     private String username;
     private UUID uuid;
     private ProtocolPipeline pipeline;
@@ -66,15 +66,13 @@ public class ProtocolInfoImpl implements ProtocolInfo {
     }
 
     @Override
-    public int getProtocolVersion() {
+    public ProtocolVersion protocolVersion() {
         return protocolVersion;
     }
 
     @Override
     public void setProtocolVersion(int protocolVersion) {
-        // Map snapshot versions to the higher/orderer release version
-        ProtocolVersion protocol = ProtocolVersion.getProtocol(protocolVersion);
-        this.protocolVersion = protocol.getVersion();
+        this.protocolVersion = ProtocolVersion.getProtocol(protocolVersion);
     }
 
     @Override
