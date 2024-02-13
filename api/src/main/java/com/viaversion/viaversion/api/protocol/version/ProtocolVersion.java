@@ -210,7 +210,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
         this.versionType = versionType;
         this.version = version;
         this.snapshotVersion = snapshotVersion;
-        this.name = name;;
+        this.name = name;
 
         Preconditions.checkArgument(!(isVersionWildcard() && versionRange == null), "A wildcard name must have a version range");
         if (versionRange != null) {
@@ -375,6 +375,29 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      */
     public boolean lowerThanOrEquals(final ProtocolVersion other) {
         return this.compareTo(other) <= 0;
+    }
+
+
+    /**
+     * Returns whether this protocol version is between the given protocol versions, inclusive.
+     *
+     * @param min minimum version
+     * @param max maximum version
+     * @return true if this protocol version is between the given protocol versions, inclusive
+     */
+    public boolean betweenInclusive(final ProtocolVersion min, final ProtocolVersion max) {
+        return this.higherThanOrEquals(min) && this.lowerThanOrEquals(max);
+    }
+
+    /**
+     * Returns whether this protocol version is between the given protocol versions, exclusive.
+     *
+     * @param min minimum version
+     * @param max maximum version
+     * @return true if this protocol version is between the given protocol versions, exclusive
+     */
+    public boolean betweenExclusive(final ProtocolVersion min, final ProtocolVersion max) {
+        return this.higherThan(min) && this.lowerThan(max);
     }
 
     /**
