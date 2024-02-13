@@ -124,7 +124,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
     /**
      * Returns a ProtocolVersion instance, even if this protocol version
-     * has not been registered. See {@link #isRegistered(int)} berorehand or {@link #isKnown()}.
+     * has not been registered. See {@link #isRegistered(int)} beforehand or {@link #isKnown()}.
      *
      * @param version protocol version
      * @return registered or unknown ProtocolVersion

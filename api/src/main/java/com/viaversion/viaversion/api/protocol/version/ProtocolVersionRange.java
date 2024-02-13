@@ -147,7 +147,7 @@ public class ProtocolVersionRange {
         return Objects.hash(min, max, ranges);
     }
 
-    public static ProtocolVersionRange fromString(String str) {
+    public static ProtocolVersionRange fromString(final String str) {
         if ("*".equals(str)) return all();
         else if (str.contains(",")) {
             String[] rangeParts = str.split(", ");
@@ -163,7 +163,7 @@ public class ProtocolVersionRange {
         }
     }
 
-    private static ProtocolVersionRange parseSinglePart(String part) {
+    private static ProtocolVersionRange parseSinglePart(final String part) {
         if (part.startsWith("<= ")) return andOlder(ProtocolVersion.getClosest(part.substring(3)));
         else if (part.startsWith(">= ")) return andNewer(ProtocolVersion.getClosest(part.substring(3)));
         else if (part.contains(" - ")) {
