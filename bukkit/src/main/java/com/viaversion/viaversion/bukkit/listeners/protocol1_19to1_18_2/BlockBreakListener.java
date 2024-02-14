@@ -54,7 +54,7 @@ public final class BlockBreakListener extends ViaBukkitListener {
 
         // We need to resend the block entity data after an ack has been sent out
         final ProtocolVersion serverProtocolVersion = Via.getAPI().getServerVersion().highestSupportedProtocolVersion();
-        final long delay = serverProtocolVersion.higherThan(ProtocolVersion.v1_8) && serverProtocolVersion.lowerThan(ProtocolVersion.v1_14) ? 2 : 1;
+        final long delay = serverProtocolVersion.newerThan(ProtocolVersion.v1_8) && serverProtocolVersion.olderThan(ProtocolVersion.v1_14) ? 2 : 1;
         getPlugin().getServer().getScheduler().runTaskLater(getPlugin(), () -> {
             final BlockState state = block.getState();
             if (isBlockEntity(state)) {

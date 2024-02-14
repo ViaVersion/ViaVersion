@@ -106,7 +106,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                         }
 
                         if (protocols != null) {
-                            if (protocolVersion.equals(closestServerProtocol) || protocolVersion.getVersion() == 0) { // Fix ServerListPlus
+                            if (protocolVersion.equalTo(closestServerProtocol) || protocolVersion.getVersion() == 0) { // Fix ServerListPlus
                                 version.addProperty("protocol", info.protocolVersion().getOriginalVersion());
                             }
                         } else {

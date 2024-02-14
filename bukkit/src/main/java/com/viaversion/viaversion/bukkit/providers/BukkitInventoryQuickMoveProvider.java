@@ -71,7 +71,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             if (slotId >= 36 && slotId <= 45) {
                 final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
                 // this seems to be working just fine.
-                if (protocol.equals(ProtocolVersion.v1_8)) { // TODO | use equalTo here
+                if (protocol.equalTo(ProtocolVersion.v1_8)) {
                     return false;
                 }
             }
@@ -102,7 +102,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         InventoryType tinvtype = tinv == null ? null : tinv.getType(); // can this even be null?
         if (tinvtype != null) {
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-            if (protocol.equals(ProtocolVersion.v1_8)) { // TODO | use equalTo here
+            if (protocol.equalTo(ProtocolVersion.v1_8)) {
                 if (tinvtype == InventoryType.BREWING) {
                     // 1.9 added the blaze powder slot to brewing stand fix for 1.8 servers
                     if (slotId >= 5 && slotId <= 40) {
@@ -131,9 +131,9 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             ReflectionUtil.set(packet, "d", storage.getActionId());
             ReflectionUtil.set(packet, "item", nmsItem);
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-            if (protocol.equals(ProtocolVersion.v1_8)) { // TODO | use equalTo here
+            if (protocol.equalTo(ProtocolVersion.v1_8)) {
                 ReflectionUtil.set(packet, "shift", 1);
-            } else if (protocol.higherThanOrEquals(ProtocolVersion.v1_9)) {
+            } else if (protocol.newerThanOrEquals(ProtocolVersion.v1_9)) {
                 ReflectionUtil.set(packet, "shift", clickTypeEnum);
             }
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         try {
             this.windowClickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-            if (protocol.higherThanOrEquals(ProtocolVersion.v1_9)) {
+            if (protocol.newerThanOrEquals(ProtocolVersion.v1_9)) {
                 Class<?> eclassz = NMSUtil.nms("InventoryClickType");
                 Object[] constants = eclassz.getEnumConstants();
                 this.clickTypeEnum = constants[1]; // QUICK_MOVE
@@ -199,6 +199,6 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
 
     private boolean isSupported() {
         final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-        return protocol.higherThanOrEquals(ProtocolVersion.v1_8) && protocol.lowerThanOrEquals(ProtocolVersion.v1_11_1);
+        return protocol.newerThanOrEquals(ProtocolVersion.v1_8) && protocol.olderThanOrEquals(ProtocolVersion.v1_11_1);
     }
 }

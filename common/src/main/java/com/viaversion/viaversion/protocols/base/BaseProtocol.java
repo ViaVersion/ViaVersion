@@ -93,7 +93,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             // Add Base Protocol
-            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol.getVersion()));
+            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
 
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().info("User connected with protocol: " + info.protocolVersion() + " and serverProtocol: " + info.serverProtocolVersion());
@@ -107,7 +107,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             } else if (state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
 
-                if (serverProtocol.lowerThan(ProtocolVersion.v1_20_5)) {
+                if (serverProtocol.olderThan(ProtocolVersion.v1_20_5)) {
                     wrapper.set(Type.VAR_INT, 1, LOGIN_INTENT);
                 }
             }

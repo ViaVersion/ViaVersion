@@ -34,8 +34,8 @@ public class BlockedProtocolVersionsImpl implements BlockedProtocolVersions {
 
     @Override
     public boolean contains(final ProtocolVersion protocolVersion) {
-        return blocksBelow.isKnown() && protocolVersion.lowerThan(blocksBelow)
-                || blocksAbove.isKnown() && protocolVersion.higherThan(blocksAbove)
+        return blocksBelow.isKnown() && protocolVersion.olderThan(blocksBelow)
+                || blocksAbove.isKnown() && protocolVersion.newerThan(blocksAbove)
                 || singleBlockedVersions.contains(protocolVersion);
     }
 

@@ -208,7 +208,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
             final ProtocolVersion finalLowerBound = lowerBound;
             final ProtocolVersion finalUpperBound = upperBound;
             blockedProtocols.removeIf(version -> {
-                if (finalLowerBound.isKnown() && version.lowerThan(finalLowerBound) || finalUpperBound.isKnown() && version.higherThan(finalUpperBound)) {
+                if (finalLowerBound.isKnown() && version.olderThan(finalLowerBound) || finalUpperBound.isKnown() && version.newerThan(finalUpperBound)) {
                     LOGGER.warning("Blocked protocol version " + version + " already covered by upper or lower bound");
                     return true;
                 }
