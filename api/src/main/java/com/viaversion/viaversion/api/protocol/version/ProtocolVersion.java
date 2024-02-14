@@ -108,8 +108,10 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param protocolVersion protocol version to register
      */
     public static void register(ProtocolVersion protocolVersion) {
-        VERSION_LIST.add(protocolVersion);
-        VERSION_LIST.sort(ProtocolVersion::compareTo);
+        if (protocolVersion != unknown) {
+            VERSION_LIST.add(protocolVersion);
+            VERSION_LIST.sort(ProtocolVersion::compareTo);
+        }
 
         final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.computeIfAbsent(protocolVersion.versionType, $ -> new Int2ObjectOpenHashMap<>());
         versions.put(protocolVersion.version, protocolVersion);
