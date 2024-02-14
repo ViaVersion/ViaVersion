@@ -56,7 +56,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
             }
 
             final ProtocolVersion oldProtocolVersion = serverProtocolVersion(serverName);
-            if (oldProtocolVersion.isKnown() && oldProtocolVersion.getVersion() == serverPing.getVersion().getProtocol()) {
+            if (oldProtocolVersion.isKnown() && oldProtocolVersion.getVersion() == serverPing.getVersion().getProtocol()) { // TODO | use equalTo here
                 // Same value as previously
                 return;
             }
