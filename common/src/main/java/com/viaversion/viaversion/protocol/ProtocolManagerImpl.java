@@ -323,8 +323,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
             if (current.containsKey(translatedToVersion)) continue;
 
             // Check if the new version is farther away than the current client version
-            if (maxPathDeltaIncrease != -1 && serverVersion.compareTo(translatedToVersion) - serverVersion.compareTo(clientVersion) > maxPathDeltaIncrease) {
-                continue;
+            if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == clientVersion.getVersionType()) {
+                final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - clientVersion.getVersion());
+                if (delta > maxPathDeltaIncrease) {
+                    continue;
+                }
             }
 
             // Create a copy
