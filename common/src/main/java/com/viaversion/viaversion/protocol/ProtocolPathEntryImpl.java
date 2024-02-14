@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import java.util.Objects;
 
 public class ProtocolPathEntryImpl implements ProtocolPathEntry {
     private final ProtocolVersion outputProtocolVersion;
@@ -51,7 +52,7 @@ public class ProtocolPathEntryImpl implements ProtocolPathEntry {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(outputProtocolVersion, protocol);
     }
 
     @Override
