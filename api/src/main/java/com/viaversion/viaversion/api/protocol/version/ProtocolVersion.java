@@ -354,12 +354,22 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     }
 
     /**
+     * Returns whether this protocol version is equal to the other protocol version.
+     *
+     * @param other other protocol version
+     * @return true if this protocol version is equal to the other protocol version
+     */
+    public boolean equalTo(final ProtocolVersion other) {
+        return this.compareTo(other) == 0;
+    }
+
+    /**
      * Returns whether this protocol version is higher than the other protocol version.
      *
      * @param other other protocol version
      * @return true if this protocol version is higher than the other protocol version
      */
-    public boolean higherThan(final ProtocolVersion other) {
+    public boolean newerThan(final ProtocolVersion other) {
         return this.compareTo(other) > 0;
     }
 
@@ -369,7 +379,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param other other protocol version
      * @return true if this protocol version is higher than or equal to the other protocol version
      */
-    public boolean higherThanOrEquals(final ProtocolVersion other) {
+    public boolean newerThanOrEquals(final ProtocolVersion other) {
         return this.compareTo(other) >= 0;
     }
 
@@ -379,7 +389,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param other other protocol version
      * @return true if this protocol version is lower than the other protocol version
      */
-    public boolean lowerThan(final ProtocolVersion other) {
+    public boolean olderThan(final ProtocolVersion other) {
         return this.compareTo(other) < 0;
     }
 
@@ -389,7 +399,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param other other protocol version
      * @return true if this protocol version is lower than or equal to the other protocol version
      */
-    public boolean lowerThanOrEquals(final ProtocolVersion other) {
+    public boolean olderThanOrEquals(final ProtocolVersion other) {
         return this.compareTo(other) <= 0;
     }
 
@@ -402,7 +412,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @return true if this protocol version is between the given protocol versions, inclusive
      */
     public boolean betweenInclusive(final ProtocolVersion min, final ProtocolVersion max) {
-        return this.higherThanOrEquals(min) && this.lowerThanOrEquals(max);
+        return this.newerThanOrEquals(min) && this.olderThanOrEquals(max);
     }
 
     /**
@@ -413,7 +423,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @return true if this protocol version is between the given protocol versions, exclusive
      */
     public boolean betweenExclusive(final ProtocolVersion min, final ProtocolVersion max) {
-        return this.higherThan(min) && this.lowerThan(max);
+        return this.newerThan(min) && this.olderThan(max);
     }
 
     /**
