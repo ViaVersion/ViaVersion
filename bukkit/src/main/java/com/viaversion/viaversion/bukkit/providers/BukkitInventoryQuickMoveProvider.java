@@ -133,7 +133,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
             if (protocol.equalTo(ProtocolVersion.v1_8)) {
                 ReflectionUtil.set(packet, "shift", 1);
-            } else if (protocol.newerThanOrEquals(ProtocolVersion.v1_9)) {
+            } else if (protocol.newerThanOrEqualTo(ProtocolVersion.v1_9)) {
                 ReflectionUtil.set(packet, "shift", clickTypeEnum);
             }
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         try {
             this.windowClickPacketClass = NMSUtil.nms("PacketPlayInWindowClick");
             final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-            if (protocol.newerThanOrEquals(ProtocolVersion.v1_9)) {
+            if (protocol.newerThanOrEqualTo(ProtocolVersion.v1_9)) {
                 Class<?> eclassz = NMSUtil.nms("InventoryClickType");
                 Object[] constants = eclassz.getEnumConstants();
                 this.clickTypeEnum = constants[1]; // QUICK_MOVE
@@ -199,6 +199,6 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
 
     private boolean isSupported() {
         final ProtocolVersion protocol = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
-        return protocol.newerThanOrEquals(ProtocolVersion.v1_8) && protocol.olderThanOrEquals(ProtocolVersion.v1_11_1);
+        return protocol.newerThanOrEqualTo(ProtocolVersion.v1_8) && protocol.olderThanOrEqualTo(ProtocolVersion.v1_11_1);
     }
 }

@@ -100,7 +100,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
                         ProtocolVersion closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
                         List<ProtocolPathEntry> protocols = null;
-                        if (info.protocolVersion().newerThanOrEquals(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+                        if (info.protocolVersion().newerThanOrEqualTo(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
                             protocols = Via.getManager().getProtocolManager()
                                 .getProtocolPath(info.protocolVersion(), closestServerProtocol);
                         }

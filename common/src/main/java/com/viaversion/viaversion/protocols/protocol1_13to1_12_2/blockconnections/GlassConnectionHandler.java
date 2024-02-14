@@ -59,7 +59,7 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
         if (states != 0) return states;
 
         ProtocolInfo protocolInfo = user.getProtocolInfo();
-        return protocolInfo.serverProtocolVersion().olderThanOrEquals(ProtocolVersion.v1_8)
+        return protocolInfo.serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)
                 && protocolInfo.serverProtocolVersion().isKnown() ? 0xF : states;
     }
 }
