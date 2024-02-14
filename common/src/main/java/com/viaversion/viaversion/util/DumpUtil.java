@@ -42,6 +42,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class DumpUtil {
@@ -57,8 +58,8 @@ public final class DumpUtil {
         final VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
-                Via.getAPI().getServerVersion().lowestSupportedProtocolVersion(),
-                Via.getManager().getProtocolManager().getSupportedVersions(),
+                Via.getAPI().getServerVersion().lowestSupportedProtocolVersion().toString(),
+                Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toSet()),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),
