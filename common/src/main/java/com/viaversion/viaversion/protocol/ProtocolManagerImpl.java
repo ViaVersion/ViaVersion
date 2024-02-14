@@ -134,8 +134,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void registerProtocols() {
         // Base Protocol
-        registerBaseProtocol(BASE_PROTOCOL, null);
-        registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_16));
+        BASE_PROTOCOL.initialize();
+        registerBaseProtocol(new BaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_1, ProtocolVersion.v1_16));
         registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16));
 
         registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
@@ -355,7 +355,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public Protocol getBaseProtocol(ProtocolVersion serverVersion) {
         for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
-            if (rangeProtocol.key() != null && rangeProtocol.key().contains(serverVersion)) {
+            if (rangeProtocol.key().contains(serverVersion)) {
                 return rangeProtocol.value();
             }
         }
