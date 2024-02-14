@@ -386,7 +386,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public boolean isWorkingPipe() {
         for (Object2ObjectMap<ProtocolVersion, Protocol> map : registryMap.values()) {
             for (ProtocolVersion protocolVersion : serverProtocolVersion.supportedProtocolVersions()) {
-                if (map.containsKey(protocolVersion.getVersion())) {
+                if (map.containsKey(protocolVersion)) {
                     return true;
                 }
             }

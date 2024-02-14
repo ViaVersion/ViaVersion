@@ -84,7 +84,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_20_2 = register(764, "1.20.2");
     public static final ProtocolVersion v1_20_3 = register(765, "1.20.3/1.20.4", new SubVersionRange("1.20", 3, 4));
     public static final ProtocolVersion v1_20_5 = register(766, 177, "1.20.5");
-    public static final ProtocolVersion unknown = register(-1, "UNKNOWN");
+    public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
     public static ProtocolVersion register(int version, String name) {
         return register(version, -1, name);
@@ -108,10 +108,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @param protocolVersion protocol version to register
      */
     public static void register(ProtocolVersion protocolVersion) {
-        if (protocolVersion != unknown) {
-            VERSION_LIST.add(protocolVersion);
-            VERSION_LIST.sort(ProtocolVersion::compareTo);
-        }
+        VERSION_LIST.add(protocolVersion);
+        VERSION_LIST.sort(ProtocolVersion::compareTo);
 
         final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.computeIfAbsent(protocolVersion.versionType, $ -> new Int2ObjectOpenHashMap<>());
         versions.put(protocolVersion.version, protocolVersion);
@@ -463,11 +461,14 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
 
     @Override
     public int compareTo(final ProtocolVersion other) {
-        if (customComparator() != null) {
+        // Cursed custom comparators
+        if (this.versionType == VersionType.SPECIAL && customComparator() != null) {
             return customComparator().compare(this, other);
-        } else if (other.customComparator() != null) {
-            return other.customComparator().compare(other, this);
-        } else if (this.versionType != other.versionType) {
+        } else if (other.versionType == VersionType.SPECIAL && other.customComparator() != null) {
+            return other.customComparator().compare(this, other);
+        }
+
+        if (this.versionType != other.versionType) {
             // Compare by version type first since version ids have reset multiple times
             return this.versionType.ordinal() < other.versionType.ordinal() ? -1 : 1;
         } else if (this.version != other.version) {
