@@ -71,7 +71,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
         }
         // Ensure default exists
         if (!servers.containsKey("default")) {
-            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion());
+            servers.put("default", BungeeVersionProvider.getLowestSupportedVersion().getVersion());
         }
         // Put back
         config.put("bungee-servers", servers);
