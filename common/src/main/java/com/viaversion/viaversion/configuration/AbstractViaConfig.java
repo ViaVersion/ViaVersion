@@ -152,7 +152,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         ignoreLongChannelNames = getBoolean("ignore-long-1_16-channel-names", true);
         forcedUse1_17ResourcePack = getBoolean("forced-use-1_17-resource-pack", false);
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
-        Map<String, String> worlds = get("map-1_16-world-names", Map.class, new HashMap<String, String>());
+        Map<String, String> worlds = get("map-1_16-world-names", new HashMap<>());
         map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.OVERWORLD_DEFAULT),
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));

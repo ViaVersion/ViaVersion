@@ -41,7 +41,7 @@ public class VelocityViaConfig extends AbstractViaConfig {
         super.loadFields();
         velocityPingInterval = getInt("velocity-ping-interval", 60);
         velocityPingSave = getBoolean("velocity-ping-save", true);
-        velocityServerProtocols = get("velocity-servers", Map.class, new HashMap<>());
+        velocityServerProtocols = get("velocity-servers", new HashMap<>());
     }
 
     @Override

@@ -42,7 +42,7 @@ public class BungeeViaConfig extends AbstractViaConfig {
         super.loadFields();
         bungeePingInterval = getInt("bungee-ping-interval", 60);
         bungeePingSave = getBoolean("bungee-ping-save", true);
-        bungeeServerProtocols = get("bungee-servers", Map.class, new HashMap<>());
+        bungeeServerProtocols = get("bungee-servers", new HashMap<>());
     }
 
     @Override
