@@ -42,7 +42,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     private static final Map<VersionType, Int2ObjectMap<ProtocolVersion>> VERSIONS = new EnumMap<>(VersionType.class);
     private static final List<ProtocolVersion> VERSION_LIST = new ArrayList<>();
 
-    public static final ProtocolVersion v1_7_1 = register(4, "1.7.2-1.7.5", new SubVersionRange("1.7", 2, 5));
+    public static final ProtocolVersion v1_7_2 = register(4, "1.7.2-1.7.5", new SubVersionRange("1.7", 2, 5));
+    @Deprecated/*(forRemoval=true)*/ public static final ProtocolVersion v1_7_1 = v1_7_2;
     public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new SubVersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x", new SubVersionRange("1.8", 0, 9));
     public static final ProtocolVersion v1_9 = register(107, "1.9");

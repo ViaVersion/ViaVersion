@@ -37,8 +37,8 @@ public class ProtocolVersionTest {
         Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20"));
         Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20.0"));
         Assertions.assertEquals(ProtocolVersion.v1_20, ProtocolVersion.getClosest("1.20.1"));
-        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.2"));
-        Assertions.assertEquals(ProtocolVersion.v1_7_1, ProtocolVersion.getClosest("1.7.5"));
+        Assertions.assertEquals(ProtocolVersion.v1_7_2, ProtocolVersion.getClosest("1.7.2"));
+        Assertions.assertEquals(ProtocolVersion.v1_7_2, ProtocolVersion.getClosest("1.7.5"));
     }
 
     @Test
@@ -49,10 +49,10 @@ public class ProtocolVersionTest {
     @Test
     void testProtocolVersionRange() {
         Assertions.assertTrue(ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_8)).contains(ProtocolVersion.v1_10));
-        Assertions.assertFalse(ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_8)).contains(ProtocolVersion.v1_7_1));
+        Assertions.assertFalse(ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_8)).contains(ProtocolVersion.v1_7_2));
         Assertions.assertTrue(ProtocolVersionRange.of(ProtocolVersion.v1_8, ProtocolVersion.v1_10).contains(ProtocolVersion.v1_9));
 
-        final ProtocolVersionRange complexRange = ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_11)).add(Range.singleton(ProtocolVersion.v1_8)).add(Range.lessThan(ProtocolVersion.v1_7_1));
+        final ProtocolVersionRange complexRange = ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_11)).add(Range.singleton(ProtocolVersion.v1_8)).add(Range.lessThan(ProtocolVersion.v1_7_2));
         Assertions.assertEquals(complexRange.toString(), ProtocolVersionRange.fromString(complexRange.toString()).toString());
     }
 }
