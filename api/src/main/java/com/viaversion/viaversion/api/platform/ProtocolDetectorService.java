@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.platform;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 public interface ProtocolDetectorService {
@@ -32,7 +33,7 @@ public interface ProtocolDetectorService {
      * @param serverName name of the proxied server
      * @return protocol version of the proxied server, or -1 if unknown
      */
-    int serverProtocolVersion(String serverName);
+    ProtocolVersion serverProtocolVersion(String serverName);
 
     /**
      * Probes all registered proxied servers for their protocol version.

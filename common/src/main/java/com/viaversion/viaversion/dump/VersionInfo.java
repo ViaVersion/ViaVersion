@@ -17,20 +17,21 @@
  */
 package com.viaversion.viaversion.dump;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.Set;
 
 public class VersionInfo {
     private final String javaVersion;
     private final String operatingSystem;
-    private final int serverProtocol;
-    private final Set<Integer> enabledProtocols;
+    private final ProtocolVersion serverProtocol;
+    private final Set<ProtocolVersion> enabledProtocols;
     private final String platformName;
     private final String platformVersion;
     private final String pluginVersion;
     private final String implementationVersion;
     private final Set<String> subPlatforms;
 
-    public VersionInfo(String javaVersion, String operatingSystem, int serverProtocol, Set<Integer> enabledProtocols,
+    public VersionInfo(String javaVersion, String operatingSystem, ProtocolVersion serverProtocol, Set<ProtocolVersion> enabledProtocols,
                        String platformName, String platformVersion, String pluginVersion, String implementationVersion, Set<String> subPlatforms) {
         this.javaVersion = javaVersion;
         this.operatingSystem = operatingSystem;
@@ -51,11 +52,11 @@ public class VersionInfo {
         return operatingSystem;
     }
 
-    public int getServerProtocol() {
+    public ProtocolVersion getServerProtocol() {
         return serverProtocol;
     }
 
-    public Set<Integer> getEnabledProtocols() {
+    public Set<ProtocolVersion> getEnabledProtocols() {
         return enabledProtocols;
     }
 

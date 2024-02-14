@@ -19,13 +19,14 @@ package com.viaversion.viaversion.velocity.platform;
 
 import com.velocitypowered.api.proxy.Player;
 import com.viaversion.viaversion.ViaAPIBase;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
 
 public class VelocityViaAPI extends ViaAPIBase<Player> {
 
     @Override
-    public int getPlayerVersion(Player player) {
-        return getPlayerVersion(player.getUniqueId());
+    public ProtocolVersion getPlayerProtocolVersion(Player player) {
+        return getPlayerProtocolVersion(player.getUniqueId());
     }
 
     @Override

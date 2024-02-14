@@ -57,7 +57,7 @@ public final class DumpUtil {
         final VersionInfo version = new VersionInfo(
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
-                Via.getAPI().getServerVersion().lowestSupportedVersion(),
+                Via.getAPI().getServerVersion().lowestSupportedProtocolVersion(),
                 Via.getManager().getProtocolManager().getSupportedVersions(),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),

@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.protocol.version;
 
-import it.unimi.dsi.fastutil.ints.IntSet;
+import java.util.Set;
 
 public interface BlockedProtocolVersions {
 
@@ -32,26 +32,26 @@ public interface BlockedProtocolVersions {
      * @param protocolVersion protocol version
      * @return whether the given protocol version is blocked
      */
-    boolean contains(int protocolVersion);
+    boolean contains(ProtocolVersion protocolVersion);
 
     /**
      * Returns the boundary below which protocol versions are blocked, or -1 if none is set.
      *
      * @return exclusive boundary below which protocol versions are blocked, or -1 if none
      */
-    int blocksBelow();
+    ProtocolVersion blocksBelow();
 
     /**
      * Returns the boundary above which protocol versions are blocked, or -1 if none is set.
      *
      * @return exclusive boundary above which protocol versions are blocked, or -1 if none
      */
-    int blocksAbove();
+    ProtocolVersion blocksAbove();
 
     /**
      * Returns a set of blocked protocol versions between the outer block ranges.
      *
      * @return set of blocked protocol versions between the outer block ranges
      */
-    IntSet singleBlockedVersions();
+    Set<ProtocolVersion> singleBlockedVersions();
 }

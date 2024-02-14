@@ -99,14 +99,14 @@ public class BungeeServerHandler implements Listener {
             user.put(new BungeeStorage(event.getPlayer()));
         }
 
-        int serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
-        int clientProtocolVersion = user.getProtocolInfo().protocolVersion().getVersion();
+        ProtocolVersion serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(event.getTarget().getName());
+        ProtocolVersion clientProtocolVersion = user.getProtocolInfo().protocolVersion();
         List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
 
         // Check if ViaVersion can support that version
         try {
             Object handshake = getHandshake.invoke(event.getPlayer().getPendingConnection());
-            setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion : serverProtocolVersion);
+            setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion.getVersion() : serverProtocolVersion.getVersion());
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -172,7 +172,7 @@ public class BungeeServerHandler implements Listener {
 
         String serverName = server.getInfo().getName();
         storage.setCurrentServer(serverName);
-        ProtocolVersion serverProtocolVersion = ProtocolVersion.getProtocol(Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName));
+        ProtocolVersion serverProtocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverName);
         if (serverProtocolVersion.olderThanOrEquals(ProtocolVersion.v1_8) && storage.getBossbar() != null) { // 1.8 doesn't have BossBar packet
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
@@ -190,8 +190,7 @@ public class BungeeServerHandler implements Listener {
         ProtocolVersion previousServerProtocol = info.serverProtocolVersion();
 
         // Refresh the pipes
-        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager()
-            .getProtocolPath(info.protocolVersion().getVersion(), serverProtocolVersion.getVersion());
+        List<ProtocolPathEntry> protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.protocolVersion(), serverProtocolVersion);
         ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
         user.clearStoredObjects(true);
         pipeline.cleanPipes();
@@ -208,7 +207,7 @@ public class BungeeServerHandler implements Listener {
 
         info.setServerProtocolVersion(serverProtocolVersion);
         // Add version-specific base Protocol
-        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion.getVersion()));
+        pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
 
         // Workaround 1.13 server change
         boolean toNewId = previousServerProtocol.olderThan(ProtocolVersion.v1_13) && serverProtocolVersion.newerThanOrEquals(ProtocolVersion.v1_13);

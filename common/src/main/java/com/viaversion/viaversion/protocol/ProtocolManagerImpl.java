@@ -79,10 +79,6 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.Protocol1_9_3T
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -104,6 +100,10 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.logging.Level;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import us.myles.ViaVersion.api.protocol.ProtocolRegistry;
 
@@ -111,11 +111,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private static final Protocol BASE_PROTOCOL = new BaseProtocol();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
-    private final Int2ObjectMap<Int2ObjectMap<Protocol>> registryMap = new Int2ObjectOpenHashMap<>(32);
+    private final Object2ObjectMap<ProtocolVersion, Object2ObjectMap<ProtocolVersion, Protocol>> registryMap = new Object2ObjectOpenHashMap<>(32);
     private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>(64);
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
-    private final Set<Integer> supportedVersions = new HashSet<>();
-    private final List<Pair<Range<Integer>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
+    private final Set<ProtocolVersion> supportedVersions = new HashSet<>();
+    private final List<Pair<Range<ProtocolVersion>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
     private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
@@ -134,12 +134,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     public void registerProtocols() {
         // Base Protocol
-        registerBaseProtocol(BASE_PROTOCOL, Range.lessThan(Integer.MIN_VALUE));
-        registerBaseProtocol(new BaseProtocol1_7(), Range.lessThan(ProtocolVersion.v1_16.getVersion()));
-        registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16.getVersion()));
+        BASE_PROTOCOL.initialize();
+        registerBaseProtocol(new BaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_1, ProtocolVersion.v1_16));
+        registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16));
 
         registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
-        registerProtocol(new Protocol1_9_1To1_9(), Arrays.asList(ProtocolVersion.v1_9_1.getVersion(), ProtocolVersion.v1_9_2.getVersion()), ProtocolVersion.v1_9.getVersion());
+        registerProtocol(new Protocol1_9_1To1_9(), Arrays.asList(ProtocolVersion.v1_9_1, ProtocolVersion.v1_9_2), ProtocolVersion.v1_9);
         registerProtocol(new Protocol1_9_3To1_9_1_2(), ProtocolVersion.v1_9_3, ProtocolVersion.v1_9_2);
 
         registerProtocol(new Protocol1_10To1_9_3_4(), ProtocolVersion.v1_10, ProtocolVersion.v1_9_3);
@@ -190,11 +190,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public void registerProtocol(Protocol protocol, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
-        registerProtocol(protocol, Collections.singletonList(clientVersion.getVersion()), serverVersion.getVersion());
+        registerProtocol(protocol, Collections.singletonList(clientVersion), serverVersion);
     }
 
     @Override
-    public void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion) {
+    public void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion) {
         // Register the protocol's handlers
         protocol.initialize();
 
@@ -205,11 +205,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         protocols.put(protocol.getClass(), protocol);
 
-        for (int clientVersion : supportedClientVersion) {
+        for (ProtocolVersion clientVersion : supportedClientVersion) {
             // Throw an error if supported client version = server version
-            Preconditions.checkArgument(clientVersion != serverVersion);
+            Preconditions.checkArgument(!clientVersion.equals(serverVersion));
 
-            Int2ObjectMap<Protocol> protocolMap = registryMap.computeIfAbsent(clientVersion, s -> new Int2ObjectOpenHashMap<>(2));
+            Object2ObjectMap<ProtocolVersion, Protocol> protocolMap = registryMap.computeIfAbsent(clientVersion, s -> new Object2ObjectOpenHashMap<>(2));
             protocolMap.put(serverVersion, protocol);
         }
 
@@ -230,7 +230,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols) {
+    public void registerBaseProtocol(Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols) {
         Preconditions.checkArgument(baseProtocol.isBaseProtocol(), "Protocol is not a base protocol");
         baseProtocol.initialize();
 
@@ -244,12 +244,12 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void refreshVersions() {
         supportedVersions.clear();
 
-        supportedVersions.add(serverProtocolVersion.lowestSupportedVersion());
+        supportedVersions.add(serverProtocolVersion.lowestSupportedProtocolVersion());
         for (ProtocolVersion version : ProtocolVersion.getProtocols()) {
-            List<ProtocolPathEntry> protocolPath = getProtocolPath(version.getVersion(), serverProtocolVersion.lowestSupportedVersion());
+            List<ProtocolPathEntry> protocolPath = getProtocolPath(version, serverProtocolVersion.lowestSupportedProtocolVersion());
             if (protocolPath == null) continue;
 
-            supportedVersions.add(version.getVersion());
+            supportedVersions.add(version);
             for (ProtocolPathEntry pathEntry : protocolPath) {
                 supportedVersions.add(pathEntry.outputProtocolVersion());
             }
@@ -257,7 +257,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
+    public @Nullable List<ProtocolPathEntry> getProtocolPath(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
         if (clientVersion == serverVersion) return null; // Nothing to do!
 
         // Check cache
@@ -268,14 +268,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
 
         // Calculate path
-        Int2ObjectSortedMap<Protocol> outputPath = getProtocolPath(new Int2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
+        Object2ObjectSortedMap<ProtocolVersion, Protocol> outputPath = getProtocolPath(new Object2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
         if (outputPath == null) {
             return null;
         }
 
         List<ProtocolPathEntry> path = new ArrayList<>(outputPath.size());
-        for (Int2ObjectMap.Entry<Protocol> entry : outputPath.int2ObjectEntrySet()) {
-            path.add(new ProtocolPathEntryImpl(entry.getIntKey(), entry.getValue()));
+        for (Map.Entry<ProtocolVersion, Protocol> entry : outputPath.entrySet()) {
+            path.add(new ProtocolPathEntryImpl(entry.getKey(), entry.getValue()));
         }
         pathCache.put(protocolKey, path);
         return path;
@@ -299,11 +299,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
      * @param serverVersion desired output version
      * @return path that has been generated, null if failed
      */
-    private @Nullable Int2ObjectSortedMap<Protocol> getProtocolPath(Int2ObjectSortedMap<Protocol> current, int clientVersion, int serverVersion) {
+    private @Nullable Object2ObjectSortedMap<ProtocolVersion, Protocol> getProtocolPath(Object2ObjectSortedMap<ProtocolVersion, Protocol> current, ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
         if (current.size() > maxProtocolPathSize) return null; // Fail-safe, protocol too complicated.
 
         // First, check if there is any protocols for this
-        Int2ObjectMap<Protocol> toServerProtocolMap = registryMap.get(clientVersion);
+        Object2ObjectMap<ProtocolVersion, Protocol> toServerProtocolMap = registryMap.get(clientVersion);
         if (toServerProtocolMap == null) {
             return null; // Not supported
         }
@@ -316,19 +316,22 @@ public class ProtocolManagerImpl implements ProtocolManager {
         }
 
         // There might be a more advanced solution... So we'll see if any of the others can get us there
-        Int2ObjectSortedMap<Protocol> shortest = null;
-        for (Int2ObjectMap.Entry<Protocol> entry : toServerProtocolMap.int2ObjectEntrySet()) {
+        Object2ObjectSortedMap<ProtocolVersion, Protocol> shortest = null;
+        for (Map.Entry<ProtocolVersion, Protocol> entry : toServerProtocolMap.entrySet()) {
             // Ensure we don't go back to already contained versions
-            int translatedToVersion = entry.getIntKey();
+            ProtocolVersion translatedToVersion = entry.getKey();
             if (current.containsKey(translatedToVersion)) continue;
 
             // Check if the new version is farther away than the current client version
-            if (maxPathDeltaIncrease != -1 && Math.abs(serverVersion - translatedToVersion) - Math.abs(serverVersion - clientVersion) > maxPathDeltaIncrease) {
-                continue;
+            if (maxPathDeltaIncrease != -1 && translatedToVersion.getVersionType() == clientVersion.getVersionType()) {
+                final int delta = Math.abs(serverVersion.getVersion() - translatedToVersion.getVersion()) - Math.abs(serverVersion.getVersion() - clientVersion.getVersion());
+                if (delta > maxPathDeltaIncrease) {
+                    continue;
+                }
             }
 
             // Create a copy
-            Int2ObjectSortedMap<Protocol> newCurrent = new Int2ObjectLinkedOpenHashMap<>(current);
+            Object2ObjectSortedMap<ProtocolVersion, Protocol> newCurrent = new Object2ObjectLinkedOpenHashMap<>(current);
             newCurrent.put(translatedToVersion, entry.getValue());
 
             // Calculate the rest of the protocol starting from translatedToVersion and take the shortest
@@ -347,14 +350,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public @Nullable Protocol getProtocol(int clientVersion, int serverVersion) {
-        Int2ObjectMap<Protocol> map = registryMap.get(clientVersion);
+    public @Nullable Protocol getProtocol(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
+        Object2ObjectMap<ProtocolVersion, Protocol> map = registryMap.get(clientVersion);
         return map != null ? map.get(serverVersion) : null;
     }
 
     @Override
-    public Protocol getBaseProtocol(int serverVersion) {
-        for (Pair<Range<Integer>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
+    public Protocol getBaseProtocol(ProtocolVersion serverVersion) {
+        for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
             if (rangeProtocol.key().contains(serverVersion)) {
                 return rangeProtocol.value();
             }
@@ -380,7 +383,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public boolean isWorkingPipe() {
-        for (Int2ObjectMap<Protocol> map : registryMap.values()) {
+        for (Object2ObjectMap<ProtocolVersion, Protocol> map : registryMap.values()) {
             for (ProtocolVersion protocolVersion : serverProtocolVersion.supportedProtocolVersions()) {
                 if (map.containsKey(protocolVersion.getVersion())) {
                     return true;
@@ -391,7 +394,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public SortedSet<Integer> getSupportedVersions() {
+    public SortedSet<ProtocolVersion> getSupportedVersions() {
         return Collections.unmodifiableSortedSet(new TreeSet<>(supportedVersions));
     }
 

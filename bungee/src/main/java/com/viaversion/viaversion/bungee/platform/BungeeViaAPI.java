@@ -19,6 +19,7 @@ package com.viaversion.viaversion.bungee.platform;
 
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bungee.service.ProtocolDetectorService;
 import io.netty.buffer.ByteBuf;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -27,8 +28,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 public class BungeeViaAPI extends ViaAPIBase<ProxiedPlayer> {
 
     @Override
-    public int getPlayerVersion(ProxiedPlayer player) {
-        return getPlayerVersion(player.getUniqueId());
+    public ProtocolVersion getPlayerProtocolVersion(ProxiedPlayer player) {
+        return getPlayerProtocolVersion(player.getUniqueId());
     }
 
     @Override

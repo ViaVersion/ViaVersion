@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+
 public interface ProtocolPathEntry {
 
     /**
@@ -30,7 +32,7 @@ public interface ProtocolPathEntry {
      *
      * @return output protocol version after transformation
      */
-    int outputProtocolVersion();
+    ProtocolVersion outputProtocolVersion();
 
     /**
      * Returns the protocol to be applied with this entry.
@@ -39,13 +41,4 @@ public interface ProtocolPathEntry {
      */
     Protocol<?, ?, ?, ?> protocol();
 
-    @Deprecated/*(forRemoval = true)*/
-    default int getOutputProtocolVersion() {
-        return outputProtocolVersion();
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default Protocol getProtocol() {
-        return protocol();
-    }
 }

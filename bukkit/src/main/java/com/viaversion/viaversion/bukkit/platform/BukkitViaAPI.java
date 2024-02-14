@@ -21,6 +21,7 @@ import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
@@ -35,15 +36,15 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
     }
 
     @Override
-    public int getPlayerVersion(Player player) {
-        return getPlayerVersion(player.getUniqueId());
+    public ProtocolVersion getPlayerProtocolVersion(Player player) {
+        return getPlayerProtocolVersion(player.getUniqueId());
     }
 
     @Override
-    public int getPlayerVersion(UUID uuid) {
+    public ProtocolVersion getPlayerProtocolVersion(UUID uuid) {
         UserConnection connection = Via.getManager().getConnectionManager().getConnectedClient(uuid);
         if (connection != null) {
-            return connection.getProtocolInfo().protocolVersion().getVersion();
+            return connection.getProtocolInfo().protocolVersion();
         }
 
         if (isProtocolSupport()) {
@@ -52,7 +53,7 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
                 return ProtocolSupportUtil.getProtocolVersion(player);
             }
         }
-        return -1;
+        return ProtocolVersion.unknown;
     }
 
     @Override

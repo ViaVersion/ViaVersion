@@ -18,14 +18,15 @@
 package com.viaversion.viaversion.sponge.platform;
 
 import com.viaversion.viaversion.ViaAPIBase;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class SpongeViaAPI extends ViaAPIBase<Player> {
 
     @Override
-    public int getPlayerVersion(Player player) {
-        return getPlayerVersion(player.uniqueId());
+    public ProtocolVersion getPlayerProtocolVersion(Player player) {
+        return getPlayerProtocolVersion(player.uniqueId());
     }
 
     @Override
