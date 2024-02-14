@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
 import java.io.File;
 import java.util.UUID;
@@ -102,8 +103,8 @@ public final class TestPlatform implements ViaPlatform {
     public ViaAPI getApi() {
         return new ViaAPIBase() {
             @Override
-            public int getPlayerVersion(Object player) {
-                return 0;
+            public ProtocolVersion getPlayerProtocolVersion(Object player) {
+                return ProtocolVersion.unknown;
             }
 
             @Override

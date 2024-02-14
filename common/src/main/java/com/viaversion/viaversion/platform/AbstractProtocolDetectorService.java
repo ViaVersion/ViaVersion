@@ -18,6 +18,8 @@
 package com.viaversion.viaversion.platform;
 
 import com.viaversion.viaversion.api.platform.ProtocolDetectorService;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.Map;
@@ -33,7 +35,7 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
     }
 
     @Override
-    public int serverProtocolVersion(final String serverName) {
+    public ProtocolVersion serverProtocolVersion(final String serverName) {
         // Step 1. Check detected
         lock.readLock().lock();
         final int detectedProtocol;
@@ -43,20 +45,20 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
             lock.readLock().unlock();
         }
         if (detectedProtocol != -1) {
-            return detectedProtocol;
+            return ProtocolVersion.getProtocol(VersionType.RELEASE, detectedProtocol);
         }
 
         // Step 2. Check config (CME moment?)
         final Map<String, Integer> servers = configuredServers();
         final Integer protocol = servers.get(serverName);
         if (protocol != null) {
-            return protocol;
+            return ProtocolVersion.getProtocol(VersionType.RELEASE, protocol);
         }
 
         // Step 3. Use Default (CME moment intensifies?)
         final Integer defaultProtocol = servers.get("default");
         if (defaultProtocol != null) {
-            return defaultProtocol;
+            return ProtocolVersion.getProtocol(VersionType.RELEASE, defaultProtocol);
         }
 
         // Step 4: Use the proxy's lowest supported... *cries*
@@ -95,5 +97,5 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
 
     protected abstract Map<String, Integer> configuredServers();
 
-    protected abstract int lowestSupportedProtocolVersion();
+    protected abstract ProtocolVersion lowestSupportedProtocolVersion();
 }

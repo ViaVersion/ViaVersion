@@ -37,7 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
 
-    private final int inputProtocolVersion; // TODO Use ProtocolVersion
+    private final ProtocolVersion inputProtocolVersion;
     private final Class<C> clientboundPacketsClass;
     private final Class<S> serverboundPacketsClass;
 
@@ -45,7 +45,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         Preconditions.checkNotNull(inputVersion);
         Preconditions.checkArgument(clientboundPacketsClass != null || serverboundPacketsClass != null,
                 "Either the clientbound or serverbound packets class has to be non-null");
-        this.inputProtocolVersion = inputVersion.getVersion();
+        this.inputProtocolVersion = inputVersion;
         this.clientboundPacketsClass = clientboundPacketsClass;
         this.serverboundPacketsClass = serverboundPacketsClass;
     }
@@ -142,8 +142,8 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         PacketType packetType = packet.getPacketType();
         UserConnection connection = packet.user();
         boolean clientbound = packetType.direction() == Direction.CLIENTBOUND;
-        int serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().serverProtocolVersion().getVersion();
-        int clientProtocolVersion = clientbound ? connection.getProtocolInfo().protocolVersion().getVersion() : this.inputProtocolVersion;
+        ProtocolVersion serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().serverProtocolVersion();
+        ProtocolVersion clientProtocolVersion = clientbound ? connection.getProtocolInfo().protocolVersion() : this.inputProtocolVersion;
 
         // Construct protocol pipeline
         List<ProtocolPathEntry> path = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);

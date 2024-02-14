@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+
 public interface ProtocolPathKey {
 
     /**
@@ -29,22 +31,13 @@ public interface ProtocolPathKey {
      *
      * @return client protocol version
      */
-    int clientProtocolVersion();
+    ProtocolVersion clientProtocolVersion();
 
     /**
      * Returns the server protocol version.
      *
      * @return server protocol version
      */
-    int serverProtocolVersion();
+    ProtocolVersion serverProtocolVersion();
 
-    @Deprecated/*(forRemoval = true)*/
-    default int getClientProtocolVersion() {
-        return clientProtocolVersion();
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    default int getServerProtocolVersion() {
-        return serverProtocolVersion();
-    }
 }

@@ -55,8 +55,8 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 return;
             }
 
-            final int oldProtocolVersion = serverProtocolVersion(serverName);
-            if (oldProtocolVersion != -1 && oldProtocolVersion == serverPing.getVersion().getProtocol()) {
+            final ProtocolVersion oldProtocolVersion = serverProtocolVersion(serverName);
+            if (oldProtocolVersion.isKnown() && oldProtocolVersion.getVersion() == serverPing.getVersion().getProtocol()) {
                 // Same value as previously
                 return;
             }
@@ -86,12 +86,12 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
     }
 
     @Override
-    protected int lowestSupportedProtocolVersion() {
+    protected ProtocolVersion lowestSupportedProtocolVersion() {
         try {
-            return Via.getManager().getInjector().getServerProtocolVersion().getVersion();
+            return Via.getManager().getInjector().getServerProtocolVersion();
         } catch (final Exception e) {
             e.printStackTrace();
-            return ProtocolVersion.v1_8.getVersion();
+            return ProtocolVersion.v1_8;
         }
     }
 }

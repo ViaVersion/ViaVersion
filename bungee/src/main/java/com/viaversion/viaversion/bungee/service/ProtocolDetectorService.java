@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.bungee.service;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bungee.platform.BungeeViaConfig;
 import com.viaversion.viaversion.bungee.providers.BungeeVersionProvider;
 import com.viaversion.viaversion.platform.AbstractProtocolDetectorService;
@@ -38,7 +39,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
                 return;
             }
 
-            final int oldProtocolVersion = serverProtocolVersion(serverName);
+            final int oldProtocolVersion = serverProtocolVersion(serverName).getVersion();
             if (oldProtocolVersion == serverPing.getVersion().getProtocol()) {
                 // Same value as previously
                 return;
@@ -87,7 +88,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
     }
 
     @Override
-    protected int lowestSupportedProtocolVersion() {
+    protected ProtocolVersion lowestSupportedProtocolVersion() {
         return BungeeVersionProvider.getLowestSupportedVersion();
     }
 }

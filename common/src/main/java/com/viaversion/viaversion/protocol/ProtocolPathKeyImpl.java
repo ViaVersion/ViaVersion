@@ -18,23 +18,25 @@
 package com.viaversion.viaversion.protocol;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import java.util.Objects;
 
 public class ProtocolPathKeyImpl implements ProtocolPathKey {
-    private final int clientProtocolVersion;
-    private final int serverProtocolVersion;
+    private final ProtocolVersion clientProtocolVersion;
+    private final ProtocolVersion serverProtocolVersion;
 
-    public ProtocolPathKeyImpl(int clientProtocolVersion, int serverProtocolVersion) {
+    public ProtocolPathKeyImpl(ProtocolVersion clientProtocolVersion, ProtocolVersion serverProtocolVersion) {
         this.clientProtocolVersion = clientProtocolVersion;
         this.serverProtocolVersion = serverProtocolVersion;
     }
 
     @Override
-    public int clientProtocolVersion() {
+    public ProtocolVersion clientProtocolVersion() {
         return clientProtocolVersion;
     }
 
     @Override
-    public int serverProtocolVersion() {
+    public ProtocolVersion serverProtocolVersion() {
         return serverProtocolVersion;
     }
 
@@ -49,8 +51,6 @@ public class ProtocolPathKeyImpl implements ProtocolPathKey {
 
     @Override
     public int hashCode() {
-        int result = clientProtocolVersion;
-        result = 31 * result + serverProtocolVersion;
-        return result;
+        return Objects.hash(clientProtocolVersion, serverProtocolVersion);
     }
 }

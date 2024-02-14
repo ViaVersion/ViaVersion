@@ -19,6 +19,8 @@ package com.viaversion.viaversion.bukkit.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import org.bukkit.entity.Player;
 
 public final class ProtocolSupportUtil {
@@ -38,16 +40,19 @@ public final class ProtocolSupportUtil {
         GET_ID_METHOD = getIdMethod;
     }
 
-    public static int getProtocolVersion(Player player) {
+    public static ProtocolVersion getProtocolVersion(Player player) {
         if (PROTOCOL_VERSION_METHOD == null) {
-            return -1;
+            return ProtocolVersion.unknown;
         }
         try {
-            Object version = PROTOCOL_VERSION_METHOD.invoke(null, player);
-            return (int) GET_ID_METHOD.invoke(version);
+            final Object version = PROTOCOL_VERSION_METHOD.invoke(null, player);
+            final int id = (int) GET_ID_METHOD.invoke(version);
+            final boolean preNetty = id == 78 || id == 74 || id == 73 || id == 61 || id == 60 || id == 51;
+
+            return ProtocolVersion.getProtocol(preNetty ? VersionType.RELEASE_INITIAL : VersionType.RELEASE, id);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return -1;
+        return ProtocolVersion.unknown;
     }
 }

@@ -63,13 +63,13 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                     try {
                         JsonElement json = GsonUtil.getGson().fromJson(originalStatus, JsonElement.class);
                         JsonObject version;
-                        int protocolVersion = 0; // Unknown!
+                        int protocol = 0; // Unknown!
 
                         if (json.isJsonObject()) {
                             if (json.getAsJsonObject().has("version")) {
                                 version = json.getAsJsonObject().get("version").getAsJsonObject();
                                 if (version.has("protocol")) {
-                                    protocolVersion = ((Long) version.get("protocol").getAsLong()).intValue();
+                                    protocol = ((Long) version.get("protocol").getAsLong()).intValue();
                                 }
                             } else {
                                 json.getAsJsonObject().add("version", version = new JsonObject());
@@ -80,13 +80,15 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                             json.getAsJsonObject().add("version", version = new JsonObject());
                         }
 
+                        final ProtocolVersion protocolVersion = ProtocolVersion.getProtocol(protocol);
+
                         if (Via.getConfig().isSendSupportedVersions()) { // Send supported versions
                             version.add("supportedVersions", GsonUtil.getGson().toJsonTree(Via.getAPI().getSupportedVersions()));
                         }
 
                         if (!Via.getAPI().getServerVersion().isKnown()) { // Set the Server protocol if the detection on startup failed
                             ProtocolManagerImpl protocolManager = (ProtocolManagerImpl) Via.getManager().getProtocolManager();
-                            protocolManager.setServerProtocol(new ServerProtocolVersionSingleton(ProtocolVersion.getProtocol(protocolVersion)));
+                            protocolManager.setServerProtocol(new ServerProtocolVersionSingleton(protocolVersion));
                         }
 
                         // Ensure the server has a version provider
@@ -100,11 +102,11 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                         List<ProtocolPathEntry> protocols = null;
                         if (info.protocolVersion().higherThanOrEquals(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
                             protocols = Via.getManager().getProtocolManager()
-                                .getProtocolPath(info.protocolVersion().getVersion(), closestServerProtocol.getVersion());
+                                .getProtocolPath(info.protocolVersion(), closestServerProtocol);
                         }
 
                         if (protocols != null) {
-                            if (protocolVersion == closestServerProtocol.getVersion() || protocolVersion == 0) { // Fix ServerListPlus
+                            if (protocolVersion.equals(closestServerProtocol) || !protocolVersion.isKnown()) { // Fix ServerListPlus
                                 version.addProperty("protocol", info.protocolVersion().getOriginalVersion());
                             }
                         } else {
@@ -112,7 +114,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                             wrapper.user().setActive(false);
                         }
 
-                        if (Via.getConfig().blockedProtocolVersions().contains(info.protocolVersion().getVersion())) {
+                        if (Via.getConfig().blockedProtocolVersions().contains(info.protocolVersion())) {
                             version.addProperty("protocol", -1); // Show blocked versions as outdated
                         }
 
@@ -156,7 +158,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
         // Login Start Packet
         registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
-            int protocol = wrapper.user().getProtocolInfo().protocolVersion().getVersion();
+            ProtocolVersion protocol = wrapper.user().getProtocolInfo().protocolVersion();
             if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
                 if (!wrapper.user().getChannel().isOpen()) return;
                 if (!wrapper.user().shouldApplyBlockProtocol()) return;

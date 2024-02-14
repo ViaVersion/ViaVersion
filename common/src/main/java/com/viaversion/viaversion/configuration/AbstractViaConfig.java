@@ -22,15 +22,16 @@ import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntPredicate;
+import java.util.function.Predicate;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
@@ -161,9 +162,9 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
         List<Integer> blockProtocols = getListSafe("block-protocols", Integer.class, "Invalid blocked version protocol found in config: '%s'");
         List<String> blockVersions = getListSafe("block-versions", String.class, "Invalid blocked version found in config: '%s'");
-        IntSet blockedProtocols = new IntOpenHashSet(blockProtocols);
-        int lowerBound = -1;
-        int upperBound = -1;
+        ObjectSet<ProtocolVersion> blockedProtocols = blockProtocols.stream().map(integer -> ProtocolVersion.getProtocol(VersionType.RELEASE, integer)).collect(ObjectOpenHashSet::of, ObjectSet::add, ObjectSet::addAll);
+        ProtocolVersion lowerBound = ProtocolVersion.unknown;
+        ProtocolVersion upperBound = ProtocolVersion.unknown;
         for (String s : blockVersions) {
             if (s.isEmpty()) {
                 continue;
@@ -178,15 +179,15 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 }
 
                 if (c == '<') {
-                    if (lowerBound != -1) {
+                    if (lowerBound.isKnown()) {
                         LOGGER.warning("Already set lower bound " + lowerBound + " overridden by " + protocolVersion.getName());
                     }
-                    lowerBound = protocolVersion.getVersion();
+                    lowerBound = protocolVersion;
                 } else {
-                    if (upperBound != -1) {
+                    if (upperBound.isKnown()) {
                         LOGGER.warning("Already set upper bound " + upperBound + " overridden by " + protocolVersion.getName());
                     }
-                    upperBound = protocolVersion.getVersion();
+                    upperBound = protocolVersion;
                 }
                 continue;
             }
@@ -197,19 +198,18 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
             }
 
             // Add single protocol version and check for duplication
-            if (!blockedProtocols.add(protocolVersion.getVersion())) {
-                LOGGER.warning("Duplicated blocked protocol version " + protocolVersion.getName() + "/" + protocolVersion.getVersion());
+            if (!blockedProtocols.add(protocolVersion)) {
+                LOGGER.warning("Duplicated blocked protocol version " + protocolVersion);
             }
         }
 
         // Check for duplicated entries
-        if (lowerBound != -1 || upperBound != -1) {
-            final int finalLowerBound = lowerBound;
-            final int finalUpperBound = upperBound;
-            blockedProtocols.removeIf((IntPredicate) version -> {
-                if (finalLowerBound != -1 && version < finalLowerBound || finalUpperBound != -1 && version > finalUpperBound) {
-                    ProtocolVersion protocolVersion = ProtocolVersion.getProtocol(version);
-                    LOGGER.warning("Blocked protocol version " + protocolVersion.getName() + "/" + protocolVersion.getVersion() + " already covered by upper or lower bound");
+        if (lowerBound.isKnown() || upperBound.isKnown()) {
+            final ProtocolVersion finalLowerBound = lowerBound;
+            final ProtocolVersion finalUpperBound = upperBound;
+            blockedProtocols.removeIf((Predicate<? super ProtocolVersion>) version -> {
+                if (finalLowerBound.isKnown() && version.lowerThan(finalLowerBound) || finalUpperBound.isKnown() && version.higherThan(finalUpperBound)) {
+                    LOGGER.warning("Blocked protocol version " + version.getName() + "/" + version.getVersion() + " already covered by upper or lower bound");
                     return true;
                 }
                 return false;

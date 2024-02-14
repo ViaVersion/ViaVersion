@@ -18,38 +18,39 @@
 package com.viaversion.viaversion.protocol;
 
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
-import it.unimi.dsi.fastutil.ints.IntSet;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import java.util.Set;
 
 public class BlockedProtocolVersionsImpl implements BlockedProtocolVersions {
-    private final IntSet singleBlockedVersions;
-    private final int blocksBelow;
-    private final int blocksAbove;
+    private final Set<ProtocolVersion> singleBlockedVersions;
+    private final ProtocolVersion blocksBelow;
+    private final ProtocolVersion blocksAbove;
 
-    public BlockedProtocolVersionsImpl(final IntSet singleBlockedVersions, final int blocksBelow, final int blocksAbove) {
+    public BlockedProtocolVersionsImpl(final Set<ProtocolVersion> singleBlockedVersions, final ProtocolVersion blocksBelow, final ProtocolVersion blocksAbove) {
         this.singleBlockedVersions = singleBlockedVersions;
         this.blocksBelow = blocksBelow;
         this.blocksAbove = blocksAbove;
     }
 
     @Override
-    public boolean contains(final int protocolVersion) {
-        return blocksBelow != -1 && protocolVersion < blocksBelow
-                || blocksAbove != -1 && protocolVersion > blocksAbove
+    public boolean contains(final ProtocolVersion protocolVersion) {
+        return blocksBelow.isKnown() && protocolVersion.lowerThan(blocksBelow)
+                || blocksAbove.isKnown() && protocolVersion.higherThan(blocksAbove)
                 || singleBlockedVersions.contains(protocolVersion);
     }
 
     @Override
-    public int blocksBelow() {
+    public ProtocolVersion blocksBelow() {
         return blocksBelow;
     }
 
     @Override
-    public int blocksAbove() {
+    public ProtocolVersion blocksAbove() {
         return blocksAbove;
     }
 
     @Override
-    public IntSet singleBlockedVersions() {
+    public Set<ProtocolVersion> singleBlockedVersions() {
         return singleBlockedVersions;
     }
 }

@@ -273,17 +273,6 @@ public interface ViaVersionConfig extends Config {
     BlockedProtocolVersions blockedProtocolVersions();
 
     /**
-     * Get the blocked protocols
-     *
-     * @return An Integer list
-     * @deprecated use {@link #blockedProtocolVersions()}
-     */
-    @Deprecated/*(forRemoval = true)*/
-    default IntSet getBlockedProtocols() {
-        return blockedProtocolVersions().singleBlockedVersions();
-    }
-
-    /**
      * Get the custom disconnect message
      *
      * @return Disconnect message

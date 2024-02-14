@@ -72,8 +72,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
 
             // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
             if (info.protocolVersion().higherThanOrEquals(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
-                protocolPath = Via.getManager().getProtocolManager()
-                    .getProtocolPath(info.protocolVersion().getVersion(), serverProtocol.getVersion());
+                protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.protocolVersion(), serverProtocol);
             }
 
             ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
@@ -94,7 +93,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             // Add Base Protocol
-            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol.getVersion()));
+            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
 
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().info("User connected with protocol: " + info.protocolVersion() + " and serverProtocol: " + info.serverProtocolVersion());

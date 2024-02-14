@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import io.netty.buffer.ByteBuf;
 import java.util.Collection;
 import java.util.List;
@@ -62,21 +63,8 @@ public interface ProtocolManager {
      * @param clientVersion client protocol version
      * @param serverVersion server protocol version
      * @return protocol if present, else null
-     * @see #getProtocolPath(int, int) to get a full path of Protocols between a larger gap of versions
      */
-    default @Nullable Protocol getProtocol(ProtocolVersion clientVersion, ProtocolVersion serverVersion) {
-        return getProtocol(clientVersion.getVersion(), serverVersion.getVersion());
-    }
-
-    /**
-     * Returns a protocol transforming packets for server version to the given client version.
-     *
-     * @param clientVersion client protocol version
-     * @param serverVersion server protocol version
-     * @return protocol if present, else null
-     * @see #getProtocolPath(int, int) to get a full path of Protocols between a larger gap of versions
-     */
-    @Nullable Protocol getProtocol(int clientVersion, int serverVersion);
+    @Nullable Protocol getProtocol(ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
     /**
      * Returns the base protocol handling serverbound handshake packets.
@@ -93,7 +81,7 @@ public interface ProtocolManager {
      * @return base protocol for the given server protocol version
      * @throws IllegalStateException if no base protocol could be found
      */
-    Protocol getBaseProtocol(int serverVersion);
+    Protocol getBaseProtocol(ProtocolVersion serverVersion);
 
     /**
      * Returns an immutable collection of registered protocols.
@@ -128,7 +116,7 @@ public interface ProtocolManager {
      * @param serverVersion          output server protocol version the protocol converts to
      * @throws IllegalArgumentException if a supported client protocol version is equal to the server protocol version
      */
-    void registerProtocol(Protocol protocol, List<Integer> supportedClientVersion, int serverVersion);
+    void registerProtocol(Protocol protocol, List<ProtocolVersion> supportedClientVersion, ProtocolVersion serverVersion);
 
     /**
      * Registers and initializes a base protocol. Base Protocols registered later have higher priority.
@@ -138,7 +126,7 @@ public interface ProtocolManager {
      * @param supportedProtocols protocol versions supported by the base protocol
      * @throws IllegalArgumentException if the protocol is not a base protocol as given by {@link Protocol#isBaseProtocol()}
      */
-    void registerBaseProtocol(Protocol baseProtocol, Range<Integer> supportedProtocols);
+    void registerBaseProtocol(Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols);
 
     /**
      * Calculates and returns the protocol path from a client protocol version to server protocol version.
@@ -148,7 +136,7 @@ public interface ProtocolManager {
      * @param serverVersion desired output server protocol version
      * @return path generated, or null if not supported or the length exceeds {@link #getMaxProtocolPathSize()}
      */
-    @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion);
+    @Nullable List<ProtocolPathEntry> getProtocolPath(ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
     /**
      * Returns a versioned packet transformer to transform and send packets from a given base version to any client version supported by Via.
@@ -226,14 +214,14 @@ public interface ProtocolManager {
     }
 
     /**
-     * Returns the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.
+     * Returns the maximum protocol path size applied to {@link #getProtocolPath(ProtocolVersion, ProtocolVersion)}.
      *
      * @return maximum protocol path size
      */
     int getMaxProtocolPathSize();
 
     /**
-     * Sets the maximum protocol path size applied to {@link #getProtocolPath(int, int)}.
+     * Sets the maximum protocol path size applied to {@link #getProtocolPath(ProtocolVersion, ProtocolVersion)}.
      * Its default is 50.
      *
      * @param maxProtocolPathSize maximum protocol path size
@@ -245,7 +233,7 @@ public interface ProtocolManager {
      *
      * @return sorted, immutable set of supported protocol versions
      */
-    SortedSet<Integer> getSupportedVersions();
+    SortedSet<ProtocolVersion> getSupportedVersions();
 
     /**
      * Check if this plugin is useful to the server.

@@ -27,10 +27,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.LegacyViaAPI;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import io.netty.buffer.ByteBuf;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -80,7 +83,18 @@ public interface ViaAPI<T> {
      * @param player the platform's player object, e.g. Bukkit this is Player
      * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if no longer connected
      */
-    int getPlayerVersion(T player);
+    default int getPlayerVersion(T player) {
+        return getPlayerProtocolVersion(player).getVersion();
+    }
+
+    /**
+     * Returns the protocol version of a player.
+     * This will also retrieve the version from ProtocolSupport if it's being used.
+     *
+     * @param player the platform's player object, e.g. Bukkit this is Player
+     * @return the protocol version object (see {@link ProtocolVersion}), or ProtocolVersion.unknown if not connected
+     */
+    ProtocolVersion getPlayerProtocolVersion(T player);
 
     /**
      * Returns the protocol version of a player.
@@ -88,7 +102,19 @@ public interface ViaAPI<T> {
      * @param uuid UUID of a player
      * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if not connected
      */
-    int getPlayerVersion(UUID uuid);
+    default int getPlayerVersion(UUID uuid) {
+        return getPlayerProtocolVersion(uuid).getVersion();
+    }
+
+
+    /**
+     * Returns the protocol version of a player.
+     * This will also retrieve the version from ProtocolSupport if it's being used.
+     *
+     * @param uuid UUID of a player
+     * @return the protocol version object (see {@link ProtocolVersion}), or ProtocolVersion.unknown if not connected
+     */
+    ProtocolVersion getPlayerProtocolVersion(UUID uuid);
 
     /**
      * Returns whether Via injected into this player connection.
@@ -131,6 +157,16 @@ public interface ViaAPI<T> {
      */
     void sendRawPacket(UUID uuid, ByteBuf packet);
 
+    @Deprecated
+    default SortedSet<Integer> getSupportedVersions() {
+        return getSupportedProtocolVersions().stream().map(ProtocolVersion::getVersion).collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    @Deprecated
+    default SortedSet<Integer> getFullSupportedVersions() {
+        return getFullSupportedProtocolVersions().stream().map(ProtocolVersion::getVersion).collect(Collectors.toCollection(TreeSet::new));
+    }
+
     /**
      * Returns the supported protocol versions.
      * This method removes any blocked protocol versions.
@@ -138,14 +174,15 @@ public interface ViaAPI<T> {
      * @return a sorted set of protocol versions
      * @see #getFullSupportedVersions() for a full list
      */
-    SortedSet<Integer> getSupportedVersions();
+    SortedSet<ProtocolVersion> getSupportedProtocolVersions();
+
 
     /**
      * Returns the supported protocol versions, including blocked protocols.
      *
      * @return a sorted set of protocol versions
      */
-    SortedSet<Integer> getFullSupportedVersions();
+    SortedSet<ProtocolVersion> getFullSupportedProtocolVersions();
 
     /**
      * Returns legacy api only applicable on/to legacy versions.

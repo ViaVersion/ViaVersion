@@ -51,8 +51,7 @@ public class VelocityVersionProvider extends BaseVersionProvider {
         //TODO use newly added Velocity netty event
         ChannelHandler mcHandler = user.getChannel().pipeline().get("handler");
         ServerConnection serverConnection = (ServerConnection) GET_ASSOCIATION.invoke(mcHandler);
-        final int protocolVersion = Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverConnection.getServerInfo().getName());
-        return ProtocolVersion.getProtocol(protocolVersion);
+        return Via.proxyPlatform().protocolDetectorService().serverProtocolVersion(serverConnection.getServerInfo().getName());
     }
 
     private ProtocolVersion getFrontProtocol(UserConnection user) throws Exception {

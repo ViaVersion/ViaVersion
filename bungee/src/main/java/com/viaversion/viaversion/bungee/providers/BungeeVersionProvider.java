@@ -50,7 +50,7 @@ public class BungeeVersionProvider extends BaseVersionProvider {
 
         // Older than bungee supports, get the lowest version
         if (clientProtocolVersion.getVersion() < sorted.get(0)) {
-            return ProtocolVersion.getProtocol(getLowestSupportedVersion());
+            return getLowestSupportedVersion();
         }
 
         // Loop through all protocols to get the closest protocol id that bungee supports (and that viaversion does too)
@@ -67,15 +67,15 @@ public class BungeeVersionProvider extends BaseVersionProvider {
         return clientProtocolVersion;
     }
 
-    public static int getLowestSupportedVersion() {
+    public static ProtocolVersion getLowestSupportedVersion() {
         List<Integer> list;
         try {
             list = ReflectionUtil.getStatic(ProtocolConstants.class, "SUPPORTED_VERSION_IDS", List.class);
-            return list.get(0);
+            return ProtocolVersion.getProtocol(list.get(0));
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
         // Fallback
-        return ProxyServer.getInstance().getProtocolVersion();
+        return ProtocolVersion.getProtocol(ProxyServer.getInstance().getProtocolVersion());
     }
 }
