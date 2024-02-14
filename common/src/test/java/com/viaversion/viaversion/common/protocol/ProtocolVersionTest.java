@@ -17,7 +17,9 @@
  */
 package com.viaversion.viaversion.common.protocol;
 
+import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersionRange;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -42,5 +44,15 @@ public class ProtocolVersionTest {
     @Test
     void testGet() {
         Assertions.assertEquals(ProtocolVersion.v1_16_3, ProtocolVersion.getProtocol(753));
+    }
+
+    @Test
+    void testProtocolVersionRange() {
+        Assertions.assertTrue(ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_8)).contains(ProtocolVersion.v1_10));
+        Assertions.assertFalse(ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_8)).contains(ProtocolVersion.v1_7_1));
+        Assertions.assertTrue(ProtocolVersionRange.of(ProtocolVersion.v1_8, ProtocolVersion.v1_10).contains(ProtocolVersion.v1_9));
+
+        final ProtocolVersionRange complexRange = ProtocolVersionRange.of(Range.atLeast(ProtocolVersion.v1_11)).add(Range.singleton(ProtocolVersion.v1_8)).add(Range.lessThan(ProtocolVersion.v1_7_1));
+        Assertions.assertEquals(complexRange.toString(), ProtocolVersionRange.fromString(complexRange.toString()).toString());
     }
 }

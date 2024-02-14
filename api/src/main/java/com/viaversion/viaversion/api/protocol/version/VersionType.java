@@ -32,11 +32,11 @@ public enum VersionType {
      */
     CLASSIC,
     /**
-     * Alpha versions of Minecraft (Alpha 1.0.0 to 1.0.16).
+     * Alpha versions of Minecraft (Alpha 1.0.0 to 1.0.17).
      */
     ALPHA_INITIAL,
     /**
-     * Alpha versions of Minecraft (Alpha 1.0.17 to 1.2.6).
+     * Alpha versions of Minecraft (Alpha 1.1.0 to 1.2.6).
      */
     ALPHA_LATER,
     /**

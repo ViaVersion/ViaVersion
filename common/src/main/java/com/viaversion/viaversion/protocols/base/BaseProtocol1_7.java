@@ -100,7 +100,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
                         ProtocolVersion closestServerProtocol = versionProvider.getClosestServerProtocol(wrapper.user());
                         List<ProtocolPathEntry> protocols = null;
-                        if (info.protocolVersion().higherThanOrEquals(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+                        if (info.protocolVersion().newerThanOrEquals(closestServerProtocol) || Via.getPlatform().isOldClientsAllowed()) {
                             protocols = Via.getManager().getProtocolManager()
                                 .getProtocolPath(info.protocolVersion(), closestServerProtocol);
                         }
@@ -129,7 +129,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
         // Login Success Packet
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             ProtocolInfo info = wrapper.user().getProtocolInfo();
-            if (info.protocolVersion().lowerThan(ProtocolVersion.v1_20_2)) { // On 1.20.2+, wait for the login ack
+            if (info.protocolVersion().olderThan(ProtocolVersion.v1_20_2)) { // On 1.20.2+, wait for the login ack
                 info.setState(State.PLAY);
             }
 
