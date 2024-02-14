@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.protocol.version;
 
 import com.google.common.base.Preconditions;
 
-public class VersionRange {
+public class SubVersionRange {
     private final String baseVersion;
     private final int rangeFrom;
     private final int rangeTo;
@@ -36,7 +36,7 @@ public class VersionRange {
      * @param rangeFrom   minor version the range begins at, must be greater than or equal to 0
      * @param rangeTo     minor version the range ends at, must be greater than {@code rangeFrom}
      */
-    public VersionRange(String baseVersion, int rangeFrom, int rangeTo) {
+    public SubVersionRange(String baseVersion, int rangeFrom, int rangeTo) {
         Preconditions.checkNotNull(baseVersion);
         Preconditions.checkArgument(rangeFrom >= 0);
         Preconditions.checkArgument(rangeTo > rangeFrom);
@@ -72,18 +72,4 @@ public class VersionRange {
         return rangeTo;
     }
 
-    @Deprecated/*(forRemoval = true)*/
-    public String getBaseVersion() {
-        return baseVersion;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public int getRangeFrom() {
-        return rangeFrom;
-    }
-
-    @Deprecated/*(forRemoval = true)*/
-    public int getRangeTo() {
-        return rangeTo;
-    }
 }
