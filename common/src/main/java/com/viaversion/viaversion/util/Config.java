@@ -165,7 +165,7 @@ public abstract class Config {
         return this.config;
     }
 
-    public @Nullable <T> T get(String key, Class<T> clazz, T def) {
+    public @Nullable <T> T get(String key, T def) {
         Object o = this.config.get(key);
         if (o != null) {
             return (T) o;
