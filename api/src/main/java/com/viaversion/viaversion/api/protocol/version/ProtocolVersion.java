@@ -108,6 +108,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      */
     public static void register(ProtocolVersion protocolVersion) {
         VERSION_LIST.add(protocolVersion);
+        VERSION_LIST.sort(ProtocolVersion::compareTo);
 
         final Int2ObjectMap<ProtocolVersion> versions = VERSIONS.computeIfAbsent(protocolVersion.versionType, $ -> new Int2ObjectOpenHashMap<>());
         versions.put(protocolVersion.version, protocolVersion);
@@ -402,7 +403,6 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public boolean olderThanOrEquals(final ProtocolVersion other) {
         return this.compareTo(other) <= 0;
     }
-
 
     /**
      * Returns whether this protocol version is between the given protocol versions, inclusive.

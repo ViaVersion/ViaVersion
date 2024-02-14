@@ -135,6 +135,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public void registerProtocols() {
         // Base Protocol
         BASE_PROTOCOL.initialize();
+        BASE_PROTOCOL.register(Via.getManager().getProviders());
         registerBaseProtocol(new BaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_1, ProtocolVersion.v1_16));
         registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16));
 
