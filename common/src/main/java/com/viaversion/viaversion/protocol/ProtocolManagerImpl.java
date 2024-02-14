@@ -355,7 +355,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public Protocol getBaseProtocol(ProtocolVersion serverVersion) {
         for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
-            if (rangeProtocol.key().contains(serverVersion)) {
+            if (rangeProtocol.key() != null && rangeProtocol.key().contains(serverVersion)) {
                 return rangeProtocol.value();
             }
         }
