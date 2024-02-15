@@ -168,10 +168,10 @@ public interface ProtocolManager {
      * @throws IllegalArgumentException if both packet classes are null
      */
     <C extends ClientboundPacketType,
-            S extends ServerboundPacketType
-            > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
-                                                                       @Nullable Class<C> clientboundPacketsClass,
-                                                                       @Nullable Class<S> serverboundPacketsClass);
+        S extends ServerboundPacketType
+        > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
+                                                                   @Nullable Class<C> clientboundPacketsClass,
+                                                                   @Nullable Class<S> serverboundPacketsClass);
 
     /**
      * Sets the max delta the path calculation allows the distance to the target protocol version to increase.
@@ -311,4 +311,11 @@ public interface ProtocolManager {
      */
     @Deprecated
     PacketWrapper createPacketWrapper(int packetId, @Nullable ByteBuf buf, UserConnection connection);
+
+    /**
+     * Returns whether the mappings have been loaded and the mapping loader executor shutdown.
+     *
+     * @return whether the mappings have been loaded
+     */
+    boolean hasLoadedMappings();
 }

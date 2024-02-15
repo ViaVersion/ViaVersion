@@ -503,6 +503,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
         return new PacketWrapperImpl(packetId, buf, connection);
     }
 
+    @Override
+    public boolean hasLoadedMappings() {
+        return mappingsLoaded;
+    }
+
     public void shutdownLoaderExecutor() {
         Preconditions.checkArgument(!mappingsLoaded);
 
