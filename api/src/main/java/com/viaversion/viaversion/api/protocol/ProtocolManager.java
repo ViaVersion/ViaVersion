@@ -138,6 +138,11 @@ public interface ProtocolManager {
      */
     @Nullable List<ProtocolPathEntry> getProtocolPath(ProtocolVersion clientVersion, ProtocolVersion serverVersion);
 
+    @Deprecated
+    default @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
+        return getProtocolPath(ProtocolVersion.getProtocol(VersionType.RELEASE, clientVersion), ProtocolVersion.getProtocol(VersionType.RELEASE, serverVersion));
+    }
+
     /**
      * Returns a versioned packet transformer to transform and send packets from a given base version to any client version supported by Via.
      * The used packet types have to match the given protocol version.
