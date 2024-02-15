@@ -27,14 +27,19 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,6 +51,7 @@ import java.util.List;
 import java.util.UUID;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
@@ -65,6 +71,11 @@ public class BungeeServerHandler implements Listener {
     private static final Field entityRewrite;
     private static final Field channelWrapper;
 
+    private static final Field channelWrapperChannel;
+    private static final Object GAME;
+    private static final Method setEncodeProtocol;
+    private static final Method setDecodeProtocol;
+
     static {
         try {
             getHandshake = Class.forName("net.md_5.bungee.connection.InitialHandler").getDeclaredMethod("getHandshake");
@@ -73,14 +84,61 @@ public class BungeeServerHandler implements Listener {
             setProtocol = Class.forName("net.md_5.bungee.protocol.packet.Handshake").getDeclaredMethod("setProtocolVersion", int.class);
             getEntityMap = Class.forName("net.md_5.bungee.entitymap.EntityMap").getDeclaredMethod("getEntityMap", int.class);
             setVersion = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setVersion", int.class);
+
+            Class<?> clazzProtocol = Class.forName("net.md_5.bungee.protocol.Protocol");
+            setEncodeProtocol = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setEncodeProtocol", clazzProtocol);
+            setDecodeProtocol = Class.forName("net.md_5.bungee.netty.ChannelWrapper").getDeclaredMethod("setDecodeProtocol", clazzProtocol);
+            GAME = clazzProtocol.getField("GAME").get(null);
             channelWrapper = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("ch");
             channelWrapper.setAccessible(true);
             entityRewrite = Class.forName("net.md_5.bungee.UserConnection").getDeclaredField("entityRewrite");
             entityRewrite.setAccessible(true);
+
+            channelWrapperChannel = Class
+                    .forName("net.md_5.bungee.netty.ChannelWrapper")
+                    .getDeclaredField("ch");
+            channelWrapperChannel.setAccessible(true);
         } catch (ReflectiveOperationException e) {
             Via.getPlatform().getLogger().severe("Error initializing BungeeServerHandler, try updating BungeeCord or ViaVersion!");
             throw new RuntimeException(e);
         }
+    }
+
+    @EventHandler
+    public void onPostLogin(PostLoginEvent event) {
+        // On 1.20.2, bungeecord does not eagerly send out
+        // ClientboundLoginPackets.GAME_PROFILE before connecting to the game
+        // server. However, this leads to skipping over the pipeline handling
+        // that typically initializes connections, which in turn leads to
+        // ConnectionManager::getConnectedClient returning null in the code
+        // below.
+        //
+        // To work around this, we emulate the successful login here for 1.20.2+
+        // clients.
+        int clientVer = event.getPlayer().getPendingConnection().getVersion();
+        if (clientVer < ProtocolVersion.v1_20_2.getVersion()) {
+            return;
+        }
+
+        Channel c;
+        try {
+            Object ch = channelWrapper.get(event.getPlayer());
+            c = (Channel) channelWrapperChannel.get(ch);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        BungeeEncodeHandler encoder = (BungeeEncodeHandler) c.pipeline()
+                .get("via-encoder");
+
+        UserConnection userConnection = encoder.getInfo();
+        userConnection.getProtocolInfo().setUuid(
+                event.getPlayer().getUniqueId());
+        userConnection.getProtocolInfo().setUsername(
+                event.getPlayer().getName());
+
+        Via.getManager().getConnectionManager().onLoginSuccess(userConnection);
     }
 
     // Set the handshake version every time someone connects to any server
@@ -109,6 +167,32 @@ public class BungeeServerHandler implements Listener {
             setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion.getVersion() : serverProtocolVersion.getVersion());
         } catch (InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
+            return;
+        }
+
+        try {
+            Object ch = channelWrapper.get(event.getPlayer());
+            Channel c = (Channel) channelWrapperChannel.get(ch);
+
+            // Eagerly fix up compression order to avoid surprises when sending
+            // packets.
+            ChannelPipeline pipeline = c.pipeline();
+            if (BungeeEncodeHandler.shouldFixCompressionOrder(pipeline)) {
+                BungeeEncodeHandler.fixCompressionPipeline(pipeline);
+            }
+
+            if (serverProtocolVersion < ProtocolVersion.v1_20_2.getVersion()
+                    && ProtocolVersion.v1_20_2.getVersion() <= clientProtocolVersion
+                    && event.getPlayer().getServer() == null
+                    && user.getProtocolInfo().getClientState() == State.LOGIN) {
+                // Bungeecord does not set itself to the right mode if it was
+                // initially in 1.20.2+ mode
+                setEncodeProtocol.invoke(ch, GAME);
+                setDecodeProtocol.invoke(ch, GAME);
+            }
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+            return;
         }
     }
 
@@ -282,10 +366,29 @@ public class BungeeServerHandler implements Listener {
             }
         }
 
-        Object wrapper = channelWrapper.get(player);
-        setVersion.invoke(wrapper, serverProtocolVersion);
+        {
+            Object wrapper = channelWrapper.get(player);
+            setVersion.invoke(wrapper, serverProtocolVersion);
+        }
 
         Object entityMap = getEntityMap.invoke(null, serverProtocolVersion);
         entityRewrite.set(player, entityMap);
+
+        // Complete the login process if bungeecord has skipped it
+        if (serverProtocolVersion < ProtocolVersion.v1_20_2.getVersion()
+                && event.getPlayer().getServer() == null
+                && user.getProtocolInfo().getClientState() == State.LOGIN) {
+            PacketWrapper wrapper = PacketWrapper.create(
+                    ClientboundLoginPackets.GAME_PROFILE,
+                    user);
+            wrapper.write(Type.UUID, event.getPlayer().getUniqueId());
+            wrapper.write(Type.STRING, event.getPlayer().getName());
+            wrapper.write(Type.VAR_INT, 0); // TODO: Properties
+            try {
+                wrapper.send(Protocol1_20_2To1_20.class, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
