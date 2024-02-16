@@ -58,7 +58,7 @@ import org.slf4j.Logger;
         name = "ViaVersion",
         version = VersionInfo.VERSION,
         authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv"},
-        description = "Allow newer Minecraft versions to connect to an older server version.",
+        description = "Allows newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )
 public class VelocityPlugin implements ViaServerProxyPlatform<Player> {

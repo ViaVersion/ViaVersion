@@ -6,7 +6,7 @@ plugins {
 allprojects {
     group = "com.viaversion"
     version = property("projectVersion") as String // from gradle.properties
-    description = "Allow newer clients to join older server versions."
+    description = "Allows newer clients to join older server versions."
 }
 
 val main = setOf(
