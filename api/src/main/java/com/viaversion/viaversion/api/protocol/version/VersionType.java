@@ -59,6 +59,7 @@ public enum VersionType {
      * Any version that doesn't fit in the above categories (e.g. April Fools).
      * <p>
      * Protocol versions using this type must override the compareTo method.
+     * Protocol versions using this type must add base protocols to the pipeline manually.
      */
     SPECIAL
 }
