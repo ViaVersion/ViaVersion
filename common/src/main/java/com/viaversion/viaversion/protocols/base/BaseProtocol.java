@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
@@ -93,7 +94,9 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             // Add Base Protocol
-            pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
+            if (!serverProtocol.getVersionType().equals(VersionType.SPECIAL)) {
+                pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
+            }
 
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().info("User connected with protocol: " + info.protocolVersion() + " and serverProtocol: " + info.serverProtocolVersion());
