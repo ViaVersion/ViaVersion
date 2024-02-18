@@ -283,9 +283,9 @@ public class BungeeServerHandler implements Listener {
         }
 
         Object wrapper = channelWrapper.get(player);
-        setVersion.invoke(wrapper, serverProtocolVersion);
+        setVersion.invoke(wrapper, serverProtocolVersion.getVersion());
 
-        Object entityMap = getEntityMap.invoke(null, serverProtocolVersion);
+        Object entityMap = getEntityMap.invoke(null, serverProtocolVersion.getVersion());
         entityRewrite.set(player, entityMap);
     }
 }
