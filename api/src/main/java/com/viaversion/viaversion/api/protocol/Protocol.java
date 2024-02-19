@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.protocol;
 
-import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -257,7 +256,6 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      *
      * @return the packet types provider
      */
-    @Beta
     PacketTypesProvider<CU, CM, SM, SU> getPacketTypesProvider();
 
     /**
@@ -267,6 +265,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @param <T>         type
      * @return object if present, else null
      */
+    @Deprecated
     @Nullable <T> T get(Class<T> objectClass);
 
     /**
@@ -274,6 +273,7 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      *
      * @param object object to cache
      */
+    @Deprecated
     void put(Object object);
 
     /**

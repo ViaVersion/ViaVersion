@@ -41,14 +41,15 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
-import java.util.Collections;
-import java.util.EnumMap;
+import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 /**
  * Abstract protocol class to handle packet transformation between two protocol versions.
@@ -171,22 +172,19 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         for (Map.Entry<State, PacketTypeMap<M>> entry : mappedPacketTypes.entrySet()) {
             PacketTypeMap<M> mappedTypes = entry.getValue();
             PacketTypeMap<U> unmappedTypes = unmappedPacketTypes.get(entry.getKey());
-            registerPacketIdChanges(unmappedTypes, mappedTypes, registeredPredicate, registerConsumer);
-        }
-    }
+            for (U unmappedType : unmappedTypes.types()) {
+                M mappedType = mappedTypes.typeByName(unmappedType.getName());
+                if (mappedType == null) {
+                    // No mapped packet of the same name exists
+                    Preconditions.checkArgument(registeredPredicate.test(unmappedType), "Packet %s in %s has no mapping - it needs to be manually cancelled or remapped", unmappedType, getClass());
+                    continue;
+                }
 
-    protected <U extends PacketType, M extends PacketType> void registerPacketIdChanges(PacketTypeMap<U> unmappedTypes, PacketTypeMap<M> mappedTypes, Predicate<U> registeredPredicate, BiConsumer<U, M> registerConsumer) {
-        for (U unmappedType : unmappedTypes.types()) {
-            M mappedType = mappedTypes.typeByName(unmappedType.getName());
-            if (mappedType == null) {
-                // No mapped packet of the same name exists
-                Preconditions.checkArgument(registeredPredicate.test(unmappedType), "Packet %s in %s has no mapping - it needs to be manually cancelled or remapped", unmappedType, getClass());
-                continue;
-            }
+                // Register if no custom handler exists and ids are different
+                if (unmappedType.getId() != mappedType.getId() && !registeredPredicate.test(unmappedType)) {
+                    registerConsumer.accept(unmappedType, mappedType);
 
-            // Register if no custom handler exists and ids are different
-            if (unmappedType.getId() != mappedType.getId() && !registeredPredicate.test(unmappedType)) {
-                registerConsumer.accept(unmappedType, mappedType);
+                }
             }
         }
     }
@@ -248,50 +246,20 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         return PacketMappings.arrayMappings();
     }
 
-    /**
-     * Returns a map of packet types by state.
-     *
-     * @param parent            parent packet type class as given by the Protocol generics
-     * @param packetTypeClasses packet type enum classes belonging to the parent type
-     * @param <P>               packet type class
-     * @return map of packet types by state
-     */
-    @SafeVarargs
-    protected final <P extends PacketType> Map<State, PacketTypeMap<P>> packetTypeMap(@Nullable Class<P> parent, Class<? extends P>... packetTypeClasses) {
-        if (parent == null) {
-            return Collections.emptyMap();
-        }
-
-        final Map<State, PacketTypeMap<P>> map = new EnumMap<>(State.class);
-        for (final Class<? extends P> packetTypeClass : packetTypeClasses) {
-            // Get state from first enum type
-            final P[] types = packetTypeClass.getEnumConstants();
-            Preconditions.checkArgument(types != null, "%s not an enum", packetTypeClass);
-            Preconditions.checkArgument(types.length > 0, "Enum %s has no types", packetTypeClass);
-            final State state = types[0].state();
-            map.put(state, PacketTypeMap.of(packetTypeClass));
-        }
-        return map;
-    }
-
     protected @Nullable SU configurationAcknowledgedPacket() {
-        final PacketTypeMap<SU> packetTypeMap = packetTypesProvider.unmappedServerboundPacketTypes().get(State.PLAY);
-        return packetTypeMap != null ? packetTypeMap.typeByName("CONFIGURATION_ACKNOWLEDGED") : null;
+        return packetTypesProvider.unmappedServerboundType(State.PLAY, "CONFIGURATION_ACKNOWLEDGED");
     }
 
     protected @Nullable CU startConfigurationPacket() {
-        final PacketTypeMap<CU> packetTypeMap = packetTypesProvider.unmappedClientboundPacketTypes().get(State.PLAY);
-        return packetTypeMap != null ? packetTypeMap.typeByName("START_CONFIGURATION") : null;
+        return packetTypesProvider.unmappedClientboundType(State.PLAY, "START_CONFIGURATION");
     }
 
     protected @Nullable SU serverboundFinishConfigurationPacket() {
-        final PacketTypeMap<SU> packetTypeMap = packetTypesProvider.unmappedServerboundPacketTypes().get(State.CONFIGURATION);
-        return packetTypeMap != null ? packetTypeMap.typeByName("FINISH_CONFIGURATION") : null;
+        return packetTypesProvider.unmappedServerboundType(State.CONFIGURATION, "FINISH_CONFIGURATION");
     }
 
     protected @Nullable CU clientboundFinishConfigurationPacket() {
-        final PacketTypeMap<CU> packetTypeMap = packetTypesProvider.unmappedClientboundPacketTypes().get(State.CONFIGURATION);
-        return packetTypeMap != null ? packetTypeMap.typeByName("FINISH_CONFIGURATION") : null;
+        return packetTypesProvider.unmappedClientboundType(State.CONFIGURATION, "FINISH_CONFIGURATION");
     }
 
     // ---------------------------------------------------------------------------------
@@ -426,19 +394,17 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             try {
                 handler.handle(packetWrapper);
             } catch (CancelException e) {
-                // Pass through CancelExceptions
-                throw e;
+                throw e; // Pass through CancelExceptions
             } catch (InformativeException e) {
-                // Catch InformativeExceptions
                 e.addSource(handler.getClass());
-                throwRemapError(direction, state, unmappedId, packetWrapper.getId(), e);
-                return;
+                printRemapError(direction, state, unmappedId, packetWrapper.getId(), e);
+                throw e;
             } catch (Exception e) {
                 // Wrap other exceptions during packet handling
                 InformativeException ex = new InformativeException(e);
                 ex.addSource(handler.getClass());
-                throwRemapError(direction, state, unmappedId, packetWrapper.getId(), ex);
-                return;
+                printRemapError(direction, state, unmappedId, packetWrapper.getId(), ex);
+                throw ex;
             }
 
             if (packetWrapper.isCancelled()) {
@@ -447,36 +413,22 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    protected void throwRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) throws InformativeException {
+    private void printRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) {
         // Don't print errors during handshake/login/status
         if (state != State.PLAY && direction == Direction.SERVERBOUND && !Via.getManager().debugHandler().enabled()) {
             e.setShouldBePrinted(false);
-            throw e;
+            return;
         }
 
-        PacketType packetType = direction == Direction.CLIENTBOUND ? unmappedClientboundPacketType(state, unmappedPacketId) : unmappedServerboundPacketType(state, unmappedPacketId);
+        PacketType packetType = direction == Direction.CLIENTBOUND
+            ? packetTypesProvider.unmappedClientboundType(state, unmappedPacketId)
+            : packetTypesProvider.unmappedServerboundType(state, unmappedPacketId);
         if (packetType != null) {
-            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + toNiceHex(unmappedPacketId) + ")");
+            Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + ProtocolUtil.toNiceHex(unmappedPacketId) + ")");
         } else {
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                    + " IN REMAP OF " + state + " " + toNiceHex(unmappedPacketId) + "->" + toNiceHex(mappedPacketId));
+                    + " IN REMAP OF " + state + " " + ProtocolUtil.toNiceHex(unmappedPacketId) + "->" + ProtocolUtil.toNiceHex(mappedPacketId));
         }
-        throw e;
-    }
-
-    private @Nullable CU unmappedClientboundPacketType(final State state, final int packetId) {
-        PacketTypeMap<CU> map = packetTypesProvider.unmappedClientboundPacketTypes().get(state);
-        return map != null ? map.typeById(packetId) : null;
-    }
-
-    private @Nullable SU unmappedServerboundPacketType(final State state, final int packetId) {
-        PacketTypeMap<SU> map = packetTypesProvider.unmappedServerboundPacketTypes().get(state);
-        return map != null ? map.typeById(packetId) : null;
-    }
-
-    public static String toNiceHex(int id) {
-        String hex = Integer.toHexString(id).toUpperCase();
-        return (hex.length() == 1 ? "0x0" : "0x") + hex;
     }
 
     /**
@@ -490,11 +442,11 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    protected PacketHandler setClientStateHandler(final State state) {
+    private PacketHandler setClientStateHandler(final State state) {
         return wrapper -> wrapper.user().getProtocolInfo().setClientState(state);
     }
 
-    protected PacketHandler setServerStateHandler(final State state) {
+    private PacketHandler setServerStateHandler(final State state) {
         return wrapper -> wrapper.user().getProtocolInfo().setServerState(state);
     }
 

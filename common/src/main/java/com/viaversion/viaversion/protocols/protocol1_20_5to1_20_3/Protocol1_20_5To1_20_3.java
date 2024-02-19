@@ -50,6 +50,8 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
+
 public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPacket1_20_3, ClientboundPacket1_20_5, ServerboundPacket1_20_3, ServerboundPacket1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.3", "1.20.5");

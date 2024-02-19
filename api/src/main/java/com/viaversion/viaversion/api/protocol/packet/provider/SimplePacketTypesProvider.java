@@ -22,13 +22,11 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
-import com.google.common.annotations.Beta;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.Map;
 
-@Beta
 public final class SimplePacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements PacketTypesProvider<CU, CM, SM, SU> {
     private final Map<State, PacketTypeMap<CU>> unmappedClientboundPacketTypes;
     private final Map<State, PacketTypeMap<CM>> mappedClientboundPacketTypes;

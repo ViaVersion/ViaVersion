@@ -22,11 +22,11 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
-import com.google.common.annotations.Beta;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Provides unmapped and mapped packet types for a Protocol.
@@ -37,7 +37,6 @@ import java.util.Map;
  * @param <SU> unmapped serverbound packet type
  * @see SimplePacketTypesProvider
  */
-@Beta
 public interface PacketTypesProvider<CU extends ClientboundPacketType, CM extends ClientboundPacketType, SM extends ServerboundPacketType, SU extends ServerboundPacketType> {
 
     /**
@@ -69,4 +68,24 @@ public interface PacketTypesProvider<CU extends ClientboundPacketType, CM extend
      * @return map of mapped serverbound packet types
      */
     Map<State, PacketTypeMap<SM>> mappedServerboundPacketTypes();
+
+    default @Nullable CU unmappedClientboundType(final State state, final String typeName) {
+        PacketTypeMap<CU> map = unmappedClientboundPacketTypes().get(state);
+        return map != null ? map.typeByName(typeName) : null;
+    }
+
+    default @Nullable SU unmappedServerboundType(final State state, final String typeName) {
+        PacketTypeMap<SU> map = unmappedServerboundPacketTypes().get(state);
+        return map != null ? map.typeByName(typeName) : null;
+    }
+
+    default @Nullable CU unmappedClientboundType(final State state, final int packetId) {
+        PacketTypeMap<CU> map = unmappedClientboundPacketTypes().get(state);
+        return map != null ? map.typeById(packetId) : null;
+    }
+
+    default @Nullable SU unmappedServerboundType(final State state, final int packetId) {
+        PacketTypeMap<SU> map = unmappedServerboundPacketTypes().get(state);
+        return map != null ? map.typeById(packetId) : null;
+    }
 }

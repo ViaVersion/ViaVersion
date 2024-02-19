@@ -34,6 +34,7 @@ public interface EntityTracker {
      *
      * @return user connection
      */
+    @Deprecated
     UserConnection user();
 
     /**

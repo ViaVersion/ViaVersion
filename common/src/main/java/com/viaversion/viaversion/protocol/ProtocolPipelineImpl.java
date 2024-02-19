@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -138,9 +139,9 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
                 direction,
                 state,
                 originalID,
-                AbstractSimpleProtocol.toNiceHex(originalID),
+                ProtocolUtil.toNiceHex(originalID),
                 packetWrapper.getId(),
-                AbstractSimpleProtocol.toNiceHex(packetWrapper.getId()),
+                ProtocolUtil.toNiceHex(packetWrapper.getId()),
                 protocolInfo.protocolVersion().getName(),
                 packetWrapper
             });

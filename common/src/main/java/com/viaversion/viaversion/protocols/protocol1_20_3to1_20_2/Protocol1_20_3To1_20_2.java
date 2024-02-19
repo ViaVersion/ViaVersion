@@ -54,6 +54,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 import java.util.UUID;
 
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
+
 public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPacket1_20_2, ClientboundPacket1_20_3, ServerboundPacket1_20_2, ServerboundPacket1_20_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
