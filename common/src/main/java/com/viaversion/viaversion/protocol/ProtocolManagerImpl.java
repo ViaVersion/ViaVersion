@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
+import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
 import com.viaversion.viaversion.protocols.base.BaseProtocol;
@@ -233,6 +234,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void registerBaseProtocol(Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols) {
         Preconditions.checkArgument(baseProtocol.isBaseProtocol(), "Protocol is not a base protocol");
+        final ProtocolVersion lower = supportedProtocols.hasLowerBound() ? supportedProtocols.lowerEndpoint() : null;
+        final ProtocolVersion upper = supportedProtocols.hasUpperBound() ? supportedProtocols.upperEndpoint() : null;
+        Preconditions.checkArgument(lower == null || lower.getVersionType() != VersionType.SPECIAL, "Base protocol versions cannot contain a special version");
+        Preconditions.checkArgument(upper == null || upper.getVersionType() != VersionType.SPECIAL, "Base protocol versions cannot contain a special version");
+
         baseProtocol.initialize();
 
         baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
