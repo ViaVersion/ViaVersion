@@ -39,26 +39,28 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
     public static final String DRAGON_TRANSLATABLE = "{\"translate\":\"entity.EnderDragon.name\"}";
-    private final Int2ObjectMap<UUID> uuidMap = Int2ObjectSyncMap.hashmap();
-    private final Int2ObjectMap<List<Metadata>> metadataBuffer = Int2ObjectSyncMap.hashmap();
-    private final Int2ObjectMap<Integer> vehicleMap = Int2ObjectSyncMap.hashmap();
-    private final Int2ObjectMap<BossBar> bossBarMap = Int2ObjectSyncMap.hashmap();
-    private final IntSet validBlocking = Int2ObjectSyncMap.hashset();
-    private final Set<Integer> knownHolograms = Int2ObjectSyncMap.hashset();
+    private final Int2ObjectMap<UUID> uuidMap = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<List<Metadata>> metadataBuffer = new Int2ObjectOpenHashMap<>();
+    private final Int2IntMap vehicleMap = new Int2IntOpenHashMap();
+    private final Int2ObjectMap<BossBar> bossBarMap = new Int2ObjectOpenHashMap<>();
+    private final IntSet validBlocking = new IntOpenHashSet();
+    private final IntSet knownHolograms = new IntOpenHashSet();
     private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(250, TimeUnit.MILLISECONDS)
@@ -368,27 +370,27 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
     }
 
-    public Map<Integer, UUID> getUuidMap() {
+    public Int2ObjectMap<UUID> getUuidMap() {
         return uuidMap;
     }
 
-    public Map<Integer, List<Metadata>> getMetadataBuffer() {
+    public Int2ObjectMap<List<Metadata>> getMetadataBuffer() {
         return metadataBuffer;
     }
 
-    public Map<Integer, Integer> getVehicleMap() {
+    public Int2IntMap getVehicleMap() {
         return vehicleMap;
     }
 
-    public Map<Integer, BossBar> getBossBarMap() {
+    public Int2ObjectMap<BossBar> getBossBarMap() {
         return bossBarMap;
     }
 
-    public Set<Integer> getValidBlocking() {
+    public IntSet getValidBlocking() {
         return validBlocking;
     }
 
-    public Set<Integer> getKnownHolograms() {
+    public IntSet getKnownHolograms() {
         return knownHolograms;
     }
 

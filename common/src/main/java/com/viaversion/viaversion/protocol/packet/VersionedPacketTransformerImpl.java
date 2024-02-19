@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S extends ServerboundPacketType> implements VersionedPacketTransformer<C, S> {
@@ -44,7 +45,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
     public VersionedPacketTransformerImpl(ProtocolVersion inputVersion, @Nullable Class<C> clientboundPacketsClass, @Nullable Class<S> serverboundPacketsClass) {
         Preconditions.checkNotNull(inputVersion);
         Preconditions.checkArgument(clientboundPacketsClass != null || serverboundPacketsClass != null,
-                "Either the clientbound or serverbound packets class has to be non-null");
+            "Either the clientbound or serverbound packets class has to be non-null");
         this.inputProtocolVersion = inputVersion;
         this.clientboundPacketsClass = clientboundPacketsClass;
         this.serverboundPacketsClass = serverboundPacketsClass;
@@ -108,7 +109,7 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
         }
 
         Class<? extends PacketType> expectedPacketClass =
-                packet.getPacketType().direction() == Direction.CLIENTBOUND ? clientboundPacketsClass : serverboundPacketsClass;
+            packet.getPacketType().direction() == Direction.CLIENTBOUND ? clientboundPacketsClass : serverboundPacketsClass;
         if (packet.getPacketType().getClass() != expectedPacketClass) {
             throw new IllegalArgumentException("PacketWrapper packet type is of the wrong packet class");
         }
@@ -139,34 +140,40 @@ public class VersionedPacketTransformerImpl<C extends ClientboundPacketType, S e
     private void transformPacket(PacketWrapper packet) throws Exception {
         // If clientbound: Constructor given inputProtocolVersion → Client version
         // If serverbound: Constructor given inputProtocolVersion → Server version
-        PacketType packetType = packet.getPacketType();
         UserConnection connection = packet.user();
+        PacketType packetType = packet.getPacketType();
         boolean clientbound = packetType.direction() == Direction.CLIENTBOUND;
         ProtocolVersion serverProtocolVersion = clientbound ? this.inputProtocolVersion : connection.getProtocolInfo().serverProtocolVersion();
         ProtocolVersion clientProtocolVersion = clientbound ? connection.getProtocolInfo().protocolVersion() : this.inputProtocolVersion;
 
         // Construct protocol pipeline
         List<ProtocolPathEntry> path = Via.getManager().getProtocolManager().getProtocolPath(clientProtocolVersion, serverProtocolVersion);
-        List<Protocol> protocolList = null;
-        if (path != null) {
-            protocolList = new ArrayList<>(path.size());
+        if (path == null) {
+            if (serverProtocolVersion != clientProtocolVersion) {
+                throw new RuntimeException("No protocol path between client version " + clientProtocolVersion + " and server version " + serverProtocolVersion);
+            }
+            return;
+        }
+
+        final List<Protocol> protocolList = new ArrayList<>(path.size());
+        if (clientbound) {
+            for (int i = path.size() - 1; i >= 0; i--) {
+                protocolList.add(path.get(i).protocol());
+            }
+        } else {
             for (ProtocolPathEntry entry : path) {
                 protocolList.add(entry.protocol());
             }
-        } else if (serverProtocolVersion != clientProtocolVersion) {
-            throw new RuntimeException("No protocol path between client version " + clientProtocolVersion + " and server version " + serverProtocolVersion);
         }
 
-        if (protocolList != null) {
-            // Reset reader and apply pipeline
-            packet.resetReader();
+        // Reset reader and apply pipeline
+        packet.resetReader();
 
-            try {
-                packet.apply(packetType.direction(), State.PLAY, 0, protocolList, clientbound);
-            } catch (Exception e) {
-                throw new Exception("Exception trying to transform packet between client version " + clientProtocolVersion
-                        + " and server version " + serverProtocolVersion + ". Are you sure you used the correct input version and packet write types?", e);
-            }
+        try {
+            packet.apply(packetType.direction(), packetType.state(), protocolList);
+        } catch (Exception e) {
+            throw new Exception("Exception trying to transform packet between client version " + clientProtocolVersion
+                + " and server version " + serverProtocolVersion + ". Are you sure you used the correct input version and packet write types?", e);
         }
     }
 

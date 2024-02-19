@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -72,18 +73,25 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             List<ProtocolPathEntry> protocolPath = null;
 
             // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
+            ProtocolManager protocolManager = Via.getManager().getProtocolManager();
             if (info.protocolVersion().newerThanOrEqualTo(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
-                protocolPath = Via.getManager().getProtocolManager().getProtocolPath(info.protocolVersion(), serverProtocol);
+                protocolPath = protocolManager.getProtocolPath(info.protocolVersion(), serverProtocol);
             }
 
-            ProtocolPipeline pipeline = wrapper.user().getProtocolInfo().getPipeline();
+            // Add Base Protocol
+            ProtocolPipeline pipeline = info.getPipeline();
+            if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
+                pipeline.add(protocolManager.getBaseProtocol(serverProtocol));
+            }
+
+            // Add other protocols
             if (protocolPath != null) {
                 List<Protocol> protocols = new ArrayList<>(protocolPath.size());
                 for (ProtocolPathEntry entry : protocolPath) {
                     protocols.add(entry.protocol());
 
                     // Ensure mapping data has already been loaded
-                    Via.getManager().getProtocolManager().completeMappingDataLoading(entry.protocol().getClass());
+                    protocolManager.completeMappingDataLoading(entry.protocol().getClass());
                 }
 
                 // Add protocols to pipeline
@@ -91,11 +99,6 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
 
                 // Set the original snapshot version if present
                 wrapper.set(Type.VAR_INT, 0, serverProtocol.getOriginalVersion());
-            }
-
-            // Add Base Protocol
-            if (!serverProtocol.getVersionType().equals(VersionType.SPECIAL)) {
-                pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocol));
             }
 
             if (Via.getManager().isDebug()) {

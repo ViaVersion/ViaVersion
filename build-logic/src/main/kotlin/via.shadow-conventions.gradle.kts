@@ -25,7 +25,6 @@ fun ShadowJar.configureRelocations() {
     relocate("com.google.gson", "com.viaversion.viaversion.libs.gson")
     relocate("com.github.steveice10.opennbt", "com.viaversion.viaversion.libs.opennbt")
     relocate("it.unimi.dsi.fastutil", "com.viaversion.viaversion.libs.fastutil")
-    relocate("space.vectrix.flare", "com.viaversion.viaversion.libs.flare")
     relocate("net.lenni0451.mcstructs", "com.viaversion.viaversion.libs.mcstructs")
 }
 
@@ -49,9 +48,4 @@ fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/*/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Synchronized*")
     exclude("it/unimi/dsi/fastutil/*/*Unmodifiable*")
-    // Flare - only need int maps
-    exclude("space/vectrix/flare/fastutil/*Double*")
-    exclude("space/vectrix/flare/fastutil/*Float*")
-    exclude("space/vectrix/flare/fastutil/*Long*")
-    exclude("space/vectrix/flare/fastutil/*Short*")
 }

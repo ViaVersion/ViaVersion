@@ -39,13 +39,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PacketWrapperImpl implements PacketWrapper {
-    private static final Protocol[] PROTOCOL_ARRAY = new Protocol[0];
-
     private final Deque<PacketValue<?>> readableObjects = new ArrayDeque<>();
     private final List<PacketValue<?>> packetValues = new ArrayList<>();
     private final ByteBuf inputBuffer;
@@ -148,8 +145,8 @@ public class PacketWrapperImpl implements PacketWrapper {
         PacketValue readValue = readableObjects.poll();
         Type<?> readType = readValue.type();
         if (readType == type
-                || (type.getBaseClass() == readType.getBaseClass()
-                && type.getOutputClass() == readType.getOutputClass())) {
+            || (type.getBaseClass() == readType.getBaseClass()
+            && type.getOutputClass() == readType.getOutputClass())) {
             //noinspection unchecked
             return (T) readValue.value();
         } else {
@@ -210,25 +207,24 @@ public class PacketWrapperImpl implements PacketWrapper {
             readableObjects.clear();
         }
 
-        int index = 0;
-        for (final PacketValue<?> packetValue : packetValues) {
+        for (int i = 0; i < packetValues.size(); i++) {
+            PacketValue<?> packetValue = packetValues.get(i);
             try {
                 packetValue.write(buffer);
             } catch (final Exception e) {
-                throw createInformativeException(e, packetValue.type(), index);
+                throw createInformativeException(e, packetValue.type(), i);
             }
-            index++;
         }
         writeRemaining(buffer);
     }
 
     private InformativeException createInformativeException(final Exception cause, final Type<?> type, final int index) {
         return new InformativeException(cause)
-                .set("Index", index)
-                .set("Type", type.getTypeName())
-                .set("Packet ID", this.id)
-                .set("Packet Type", this.packetType)
-                .set("Data", this.packetValues);
+            .set("Index", index)
+            .set("Type", type.getTypeName())
+            .set("Packet ID", this.id)
+            .set("Packet Type", this.packetType)
+            .set("Data", this.packetValues);
     }
 
     @Override
@@ -298,46 +294,17 @@ public class PacketWrapperImpl implements PacketWrapper {
     /**
      * Let the packet go through the protocol pipes and write it to ByteBuf
      *
-     * @param packetProtocol      The protocol version of the packet.
-     * @param skipCurrentPipeline Skip the current pipeline
-     * @return Packet buffer
+     * @param protocolClass       protocol class to send the packet from, or null to go through the full pipeline
+     * @param skipCurrentPipeline whether to start from the next protocol in the pipeline, or the provided one
+     * @return created packet buffer
      * @throws Exception if it fails to write
      */
-    private ByteBuf constructPacket(Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, Direction direction) throws Exception {
+    private ByteBuf constructPacket(@Nullable Class<? extends Protocol> protocolClass, boolean skipCurrentPipeline, Direction direction) throws Exception {
+        resetReader(); // Reset reader before we start
+
         final ProtocolInfo protocolInfo = user().getProtocolInfo();
-        final List<Protocol> pipes = direction == Direction.SERVERBOUND ? protocolInfo.getPipeline().pipes() : protocolInfo.getPipeline().reversedPipes();
-        final List<Protocol> protocols = new ArrayList<>();
-        int index = -1;
-        for (int i = 0; i < pipes.size(); i++) {
-            // Always add base protocols to the head
-            final Protocol protocol = pipes.get(i);
-            if (protocol.isBaseProtocol()) {
-                protocols.add(protocol);
-            }
-
-            if (protocol.getClass() == packetProtocol) {
-                index = i;
-                break;
-            }
-        }
-
-        if (index == -1) {
-            // The given protocol is not in the pipeline
-            throw new NoSuchElementException(packetProtocol.getCanonicalName());
-        }
-
-        if (skipCurrentPipeline) {
-            index = Math.min(index + 1, pipes.size());
-        }
-
-        // Add remaining protocols on top
-        protocols.addAll(pipes.subList(index, pipes.size()));
-
-        // Reset reader before we start
-        resetReader();
-
-        // Apply other protocols
-        apply(direction, protocolInfo.getState(direction), 0, protocols);
+        final List<Protocol> protocols = protocolInfo.getPipeline().pipes(protocolClass, skipCurrentPipeline, direction);
+        apply(direction, protocolInfo.getState(direction), protocols);
         final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
         try {
             writeToBuffer(output);
@@ -348,9 +315,9 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception {
+    public ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws Exception {
         if (!isCancelled()) {
-            ByteBuf output = constructPacket(packetProtocol, true, Direction.CLIENTBOUND);
+            ByteBuf output = constructPacket(protocolClass, true, Direction.CLIENTBOUND);
             return user().sendRawPacketFuture(output);
         }
         return user().getChannel().newFailedFuture(new Exception("Cancelled packet"));
@@ -397,33 +364,36 @@ public class PacketWrapperImpl implements PacketWrapper {
     }
 
     @Override
-    public PacketWrapperImpl apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception {
-        Protocol[] array = pipeline.toArray(PROTOCOL_ARRAY);
-        return apply(direction, state, reverse ? array.length - 1 : index, array, reverse); // Copy to prevent from removal
+    public void apply(Direction direction, State state, List<Protocol> pipeline) throws Exception {
+        // Indexed loop to allow additions to the tail
+        for (int i = 0, size = pipeline.size(); i < size; i++) {
+            Protocol<?, ?, ?, ?> protocol = pipeline.get(i);
+            protocol.transform(direction, state, this);
+            resetReader();
+            if (this.packetType != null) {
+                state = this.packetType.state();
+            }
+        }
     }
 
     @Override
-    public PacketWrapperImpl apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
-        return apply(direction, state, index, pipeline.toArray(PROTOCOL_ARRAY), false);
-    }
-
-    private PacketWrapperImpl apply(Direction direction, State state, int index, Protocol[] pipeline, boolean reverse) throws Exception {
+    @Deprecated
+    public PacketWrapperImpl apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception {
         // Reset the reader after every transformation for the packetWrapper, so it can be recycled across packets
-        State updatedState = state; // The state might change while transforming, so we need to check for that
         if (reverse) {
             for (int i = index; i >= 0; i--) {
-                pipeline[i].transform(direction, updatedState, this);
+                pipeline.get(i).transform(direction, state, this);
                 resetReader();
                 if (this.packetType != null) {
-                    updatedState = this.packetType.state();
+                    state = this.packetType.state();
                 }
             }
         } else {
-            for (int i = index; i < pipeline.length; i++) {
-                pipeline[i].transform(direction, updatedState, this);
+            for (int i = index; i < pipeline.size(); i++) {
+                pipeline.get(i).transform(direction, state, this);
                 resetReader();
                 if (this.packetType != null) {
-                    updatedState = this.packetType.state();
+                    state = this.packetType.state();
                 }
             }
         }
@@ -447,7 +417,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public void resetReader() {
-        // Move all packet values to the readable for next packet.
+        // Move all packet values to the readable for next Protocol
         for (int i = packetValues.size() - 1; i >= 0; i--) {
             this.readableObjects.addFirst(this.packetValues.get(i));
         }
@@ -557,11 +527,11 @@ public class PacketWrapperImpl implements PacketWrapper {
     @Override
     public String toString() {
         return "PacketWrapper{" +
-                "type=" + packetType +
-                ", id=" + id +
-                ", values=" + packetValues +
-                ", readable=" + readableObjects +
-                '}';
+            "type=" + packetType +
+            ", id=" + id +
+            ", values=" + packetValues +
+            ", readable=" + readableObjects +
+            '}';
     }
 
     public static final class PacketValue<T> {

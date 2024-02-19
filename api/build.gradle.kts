@@ -16,8 +16,6 @@ sourceSets {
 
 dependencies {
     api(libs.fastutil)
-    api(libs.flare)
-    api(libs.flareFastutil)
     api(libs.vianbt)
     api(libs.gson)
     implementation(rootProject.libs.text) {

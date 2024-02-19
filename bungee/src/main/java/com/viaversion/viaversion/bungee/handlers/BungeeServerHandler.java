@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -194,18 +195,15 @@ public class BungeeServerHandler implements Listener {
         ProtocolPipeline pipeline = user.getProtocolInfo().getPipeline();
         user.clearStoredObjects(true);
         pipeline.cleanPipes();
-        if (protocolPath == null) {
+        if (protocolPath != null) {
+            info.setServerProtocolVersion(serverProtocolVersion);
+            pipeline.add(protocolPath.stream().map(ProtocolPathEntry::protocol).collect(Collectors.toList()));
+        } else {
             // TODO Check Bungee Supported Protocols? *shrugs*
             serverProtocolVersion = info.protocolVersion();
-        } else {
-            List<Protocol> protocols = new ArrayList<>(protocolPath.size());
-            for (ProtocolPathEntry entry : protocolPath) {
-                protocols.add(entry.protocol());
-            }
-            pipeline.add(protocols);
+            info.setServerProtocolVersion(serverProtocolVersion);
         }
 
-        info.setServerProtocolVersion(serverProtocolVersion);
         // Add version-specific base Protocol
         pipeline.add(Via.getManager().getProtocolManager().getBaseProtocol(serverProtocolVersion));
 
@@ -253,11 +251,6 @@ public class BungeeServerHandler implements Listener {
         user.put(storage);
 
         user.setActive(protocolPath != null);
-
-        // Init all protocols TODO check if this can get moved up to the previous for loop, and doesn't require the pipeline to already exist.
-        for (Protocol protocol : pipeline.pipes()) {
-            protocol.init(user);
-        }
 
         ProxiedPlayer player = storage.getPlayer();
         EntityTracker1_9 newTracker = user.getEntityTracker(Protocol1_9To1_8.class);

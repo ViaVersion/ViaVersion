@@ -168,7 +168,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                 wrapper.cancel(); // cancel current
 
                 // Send and close
-                ChannelFuture future = disconnectPacket.sendFuture(BaseProtocol.class);
+                ChannelFuture future = disconnectPacket.sendFuture(null);
                 future.addListener(f -> wrapper.user().getChannel().close());
             }
         });

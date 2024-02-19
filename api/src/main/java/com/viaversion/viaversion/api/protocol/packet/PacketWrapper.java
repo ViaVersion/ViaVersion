@@ -92,6 +92,7 @@ public interface PacketWrapper {
      * @param index The index of the part (relative to the type)
      * @return True if the type is at the index
      */
+    @Deprecated
     boolean is(Type type, int index);
 
     /**
@@ -212,11 +213,11 @@ public interface PacketWrapper {
      * (Sends it after current)
      * Also returns the packets ChannelFuture
      *
-     * @param packetProtocol The protocol version of the packet.
-     * @return The packets ChannelFuture
+     * @param protocolClass the protocol class to start from in the pipeline
+     * @return new ChannelFuture for the write operation
      * @throws Exception if it fails to write
      */
-    ChannelFuture sendFuture(Class<? extends Protocol> packetProtocol) throws Exception;
+    ChannelFuture sendFuture(Class<? extends Protocol> protocolClass) throws Exception;
 
     /**
      * @deprecated misleading; use {@link #sendRaw()}. This method will be removed in 5.0.0
@@ -287,18 +288,24 @@ public interface PacketWrapper {
      *
      * @param direction protocol direction
      * @param state     protocol state
-     * @param index     index to start from, will be reversed depending on the reverse parameter
      * @param pipeline  protocol pipeline
-     * @param reverse   whether the array should be looped in reverse, will also reverse the given index
-     * @return The current packetwrapper
      * @throws Exception If it fails to transform a packet, exception will be thrown
      */
+    void apply(Direction direction, State state, List<Protocol> pipeline) throws Exception;
+
+    /**
+     * @deprecated use {@link #apply(Direction, State, List)}
+     */
+    @Deprecated
     PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline, boolean reverse) throws Exception;
 
     /**
-     * @see #apply(Direction, State, int, List, boolean)
+     * @deprecated use {@link #apply(Direction, State, List)}
      */
-    PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception;
+    @Deprecated
+    default PacketWrapper apply(Direction direction, State state, int index, List<Protocol> pipeline) throws Exception {
+        return apply(direction, state, index, pipeline, false);
+    }
 
     /**
      * Check if this packet is cancelled.
