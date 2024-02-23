@@ -363,13 +363,13 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public Protocol getBaseProtocol(ProtocolVersion serverVersion) {
+    public @Nullable Protocol getBaseProtocol(ProtocolVersion serverVersion) {
         for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
             if (rangeProtocol.key().contains(serverVersion)) {
                 return rangeProtocol.value();
             }
         }
-        throw new IllegalStateException("No Base Protocol for " + serverVersion);
+        return null;
     }
 
     @Override
