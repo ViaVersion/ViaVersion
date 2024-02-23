@@ -83,10 +83,10 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
 
             // Special versions might compare equal to normal versions and would break this getter
             if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
-                try {
-                    pipeline.add(protocolManager.getBaseProtocol(serverProtocol));
-                } catch (Exception ignored) {
-                    // Platforms might add their base protocol manually (e.g. SPECIAL versions)
+                final Protocol baseProtocol = protocolManager.getBaseProtocol(serverProtocol);
+                // Platforms might add their base protocol manually (e.g. SPECIAL versions)
+                if (baseProtocol != null) {
+                    pipeline.add(baseProtocol);
                 }
             }
 

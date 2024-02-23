@@ -78,10 +78,9 @@ public interface ProtocolManager {
      * The standard base protocols deal with status and login packets for userconnection initialization.
      *
      * @param serverVersion server protocol version
-     * @return base protocol for the given server protocol version
-     * @throws IllegalStateException if no base protocol could be found
+     * @return base protocol for the given server protocol version if present, else null
      */
-    Protocol getBaseProtocol(ProtocolVersion serverVersion);
+    @Nullable Protocol getBaseProtocol(ProtocolVersion serverVersion);
 
     /**
      * Returns an immutable collection of registered protocols.
