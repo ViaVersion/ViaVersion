@@ -126,6 +126,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.BOOLEAN); // Debug
                 map(Type.BOOLEAN); // Flat
                 map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
+                map(Type.VAR_INT); // Portal cooldown
                 create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
             }
