@@ -81,8 +81,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.INT); // Particle Count
 
             // Read data and add it to Particle
-            final Particle particle = new Particle(particleId);
             final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+            final Particle particle = new Particle(mappings.getNewId(particleId));
             if (mappings.isBlockParticle(particleId)) {
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
