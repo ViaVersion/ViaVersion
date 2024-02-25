@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -54,6 +55,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.3", "1.20.5");
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
+    private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_20_5To1_20_3() {
         super(ClientboundPacket1_20_3.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_3.class, ServerboundPacket1_20_5.class);
@@ -63,7 +65,6 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_3.TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
 
@@ -108,6 +109,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
                 .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
+
+        tagRewriter.addTag(RegistryType.ITEM, "minecraft:dyeable", 853, 854, 855, 856, 1120);
     }
 
     @Override
