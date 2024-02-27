@@ -162,7 +162,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
         List<Integer> blockProtocols = getListSafe("block-protocols", Integer.class, "Invalid blocked version protocol found in config: '%s'");
         List<String> blockVersions = getListSafe("block-versions", String.class, "Invalid blocked version found in config: '%s'");
-        ObjectSet<ProtocolVersion> blockedProtocols = blockProtocols.stream().map(integer -> ProtocolVersion.getProtocol(VersionType.RELEASE, integer)).collect(ObjectOpenHashSet::of, ObjectSet::add, ObjectSet::addAll);
+        ObjectSet<ProtocolVersion> blockedProtocols = blockProtocols.stream().map(ProtocolVersion::getProtocol).collect(ObjectOpenHashSet::of, ObjectSet::add, ObjectSet::addAll);
         ProtocolVersion lowerBound = ProtocolVersion.unknown;
         ProtocolVersion upperBound = ProtocolVersion.unknown;
         for (String s : blockVersions) {

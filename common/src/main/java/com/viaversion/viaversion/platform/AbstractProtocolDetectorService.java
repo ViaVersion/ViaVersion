@@ -45,20 +45,20 @@ public abstract class AbstractProtocolDetectorService implements ProtocolDetecto
             lock.readLock().unlock();
         }
         if (detectedProtocol != -1) {
-            return ProtocolVersion.getProtocol(VersionType.RELEASE, detectedProtocol);
+            return ProtocolVersion.getProtocol(detectedProtocol);
         }
 
         // Step 2. Check config (CME moment?)
         final Map<String, Integer> servers = configuredServers();
         final Integer protocol = servers.get(serverName);
         if (protocol != null) {
-            return ProtocolVersion.getProtocol(VersionType.RELEASE, protocol);
+            return ProtocolVersion.getProtocol(protocol);
         }
 
         // Step 3. Use Default (CME moment intensifies?)
         final Integer defaultProtocol = servers.get("default");
         if (defaultProtocol != null) {
-            return ProtocolVersion.getProtocol(VersionType.RELEASE, defaultProtocol);
+            return ProtocolVersion.getProtocol(defaultProtocol);
         }
 
         // Step 4: Use the proxy's lowest supported... *cries*

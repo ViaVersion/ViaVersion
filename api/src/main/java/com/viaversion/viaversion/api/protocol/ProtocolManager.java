@@ -139,7 +139,7 @@ public interface ProtocolManager {
 
     @Deprecated
     default @Nullable List<ProtocolPathEntry> getProtocolPath(int clientVersion, int serverVersion) {
-        return getProtocolPath(ProtocolVersion.getProtocol(VersionType.RELEASE, clientVersion), ProtocolVersion.getProtocol(VersionType.RELEASE, serverVersion));
+        return getProtocolPath(ProtocolVersion.getProtocol(clientVersion), ProtocolVersion.getProtocol(serverVersion));
     }
 
     /**
