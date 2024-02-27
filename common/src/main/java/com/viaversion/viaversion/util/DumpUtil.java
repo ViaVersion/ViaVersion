@@ -35,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class DumpUtil {
 
     /**
-     * Creates a platform dump and posts it to ViaVersion's dump server asychronously.
+     * Creates a platform dump and posts it to ViaVersion's dump server asynchronously.
      * May complete exceptionally with {@link DumpException}.
      *
      * @param playerToSample uuid of the player to include the pipeline of
@@ -59,7 +60,7 @@ public final class DumpUtil {
                 System.getProperty("java.version"),
                 System.getProperty("os.name"),
                 Via.getAPI().getServerVersion().lowestSupportedProtocolVersion().toString(),
-                Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toSet()),
+                Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toCollection(LinkedHashSet::new)),
                 Via.getPlatform().getPlatformName(),
                 Via.getPlatform().getPlatformVersion(),
                 Via.getPlatform().getPluginVersion(),
