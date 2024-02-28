@@ -16,13 +16,11 @@
     "_MylesC",
     "creeper123123321",
     "Gerrygames",
-    "KennyTV",
+    "kennytv",
     "Matsv"
   ],
   "depends": {
-    "fabricloader": ">=0.14.0"
-  },
-  "recommends": {
+    "fabricloader": ">=0.14.0",
     "viafabric": ">=0.4.10"
   },
   "custom": {
