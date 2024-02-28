@@ -23,13 +23,14 @@
 package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DynamicItem implements Item {
-    private final Int2ObjectMap<Optional<ItemData<?>>> data;
+    private final Int2ObjectMap<Optional<StructuredData<?>>> data;
     private int identifier;
     private byte amount;
 
@@ -37,7 +38,7 @@ public class DynamicItem implements Item {
         this(0, (byte) 0, new Int2ObjectOpenHashMap<>());
     }
 
-    public DynamicItem(int identifier, byte amount, Int2ObjectMap<Optional<ItemData<?>>> data) {
+    public DynamicItem(int identifier, byte amount, Int2ObjectMap<Optional<StructuredData<?>>> data) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
@@ -77,15 +78,16 @@ public class DynamicItem implements Item {
     }
 
     @Override
-    public Int2ObjectMap<Optional<ItemData<?>>> itemData() {
+    public Int2ObjectMap<Optional<StructuredData<?>>> itemData() {
         return data;
     }
 
-    public void addData(ItemData<?> data) {
+    public void addData(StructuredData<?> data) {
         this.data.put(data.id(), Optional.of(data));
     }
 
-    public void addMarkerData(int id) {
+    public void removeDefault(int id) {
+        // Empty optional to override the Minecraft default
         this.data.put(id, Optional.empty());
     }
 

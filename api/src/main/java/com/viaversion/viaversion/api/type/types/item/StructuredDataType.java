@@ -23,39 +23,39 @@
 package com.viaversion.viaversion.api.type.types.item;
 
 import com.viaversion.viaversion.api.data.FullMappings;
-import com.viaversion.viaversion.api.minecraft.item.ItemData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class ItemDataType extends Type<ItemData<?>> {
+public class StructuredDataType extends Type<StructuredData<?>> {
 
     private final Int2ObjectMap<Type<?>> types = new Int2ObjectOpenHashMap<>();
 
-    public ItemDataType() {
-        super(ItemData.class);
+    public StructuredDataType() {
+        super(StructuredData.class);
     }
 
     @Override
-    public void write(final ByteBuf buffer, final ItemData<?> object) throws Exception {
+    public void write(final ByteBuf buffer, final StructuredData<?> object) throws Exception {
         Type.VAR_INT.writePrimitive(buffer, object.id());
         object.write(buffer);
     }
 
     @Override
-    public ItemData<?> read(final ByteBuf buffer) throws Exception {
+    public StructuredData<?> read(final ByteBuf buffer) throws Exception {
         final int id = Type.VAR_INT.readPrimitive(buffer);
         final Type<?> type = this.types.get(id);
         if (type != null) {
-            return readItemData(buffer, type, id);
+            return readData(buffer, type, id);
         }
         throw new IllegalArgumentException("Unknown item data type id: " + id);
     }
 
-    private <T> ItemData<T> readItemData(final ByteBuf buffer, final Type<T> type, final int id) throws Exception {
-        return new ItemData<>(type, type.read(buffer), id);
+    private <T> StructuredData<T> readData(final ByteBuf buffer, final Type<T> type, final int id) throws Exception {
+        return new StructuredData<>(type, type.read(buffer), id);
     }
 
     public DataFiller filler(final Protocol<?, ?, ?, ?> protocol) {
@@ -72,7 +72,7 @@ public class ItemDataType extends Type<ItemData<?>> {
         private final boolean useMappedNames;
 
         private DataFiller(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
-            this.mappings = protocol.getMappingData().getItemDataSerializerMappings();
+            this.mappings = protocol.getMappingData().getDataComponentSerializerMappings();
             this.useMappedNames = useMappedNames;
         }
 

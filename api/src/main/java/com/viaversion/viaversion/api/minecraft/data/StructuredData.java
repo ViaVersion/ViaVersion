@@ -20,27 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item;
+package com.viaversion.viaversion.api.minecraft.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdHolder;
 import com.viaversion.viaversion.util.Unit;
 import io.netty.buffer.ByteBuf;
 
-public final class ItemData<T> implements IdHolder {
+public final class StructuredData<T> implements IdHolder {
 
     private final Type<T> type;
     private T value;
     private int id;
 
-    public ItemData(final Type<T> type, final T value, final int id) {
+    public StructuredData(final Type<T> type, final T value, final int id) {
         this.type = type;
         this.value = value;
         this.id = id;
     }
 
-    public static ItemData<?> empty(final int id) {
-        return new ItemData<>(Type.UNIT, Unit.INSTANCE, id);
+    public static StructuredData<?> empty(final int id) {
+        // Indicates empty structures, whereas an empty optional is used to remove default values
+        return new StructuredData<>(Type.UNIT, Unit.INSTANCE, id);
     }
 
     public boolean isEmpty() {

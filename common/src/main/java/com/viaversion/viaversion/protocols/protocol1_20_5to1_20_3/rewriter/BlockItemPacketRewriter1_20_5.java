@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.DynamicItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.ItemData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -202,11 +202,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        item.addData(new ItemData<>(type, value, id));
+        item.addData(new StructuredData<>(type, value, id));
     }
 
     private int serializerId(final String type) {
-        return protocol.getMappingData().getItemDataSerializerMappings().mappedId(type);
+        return protocol.getMappingData().getDataComponentSerializerMappings().mappedId(type);
     }
 
     @Override

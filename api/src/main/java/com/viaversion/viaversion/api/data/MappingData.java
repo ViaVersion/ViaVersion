@@ -115,7 +115,7 @@ public interface MappingData {
 
     @Nullable FullMappings getRecipeSerializerMappings();
 
-    FullMappings getItemDataSerializerMappings();
+    FullMappings getDataComponentSerializerMappings();
 
     @Nullable Mappings getPaintingMappings();
 }

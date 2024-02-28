@@ -87,7 +87,7 @@ public class MappingDataBase implements MappingData {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
-            itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "item_serializers");
+            itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "data_component_type");
 
             final ListTag unmappedParticles = unmappedIdentifierData.get("particles");
             final ListTag mappedParticles = mappedIdentifierData.get("particles");
@@ -241,7 +241,7 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
-    public @Nullable FullMappings getItemDataSerializerMappings() {
+    public @Nullable FullMappings getDataComponentSerializerMappings() {
         return itemDataSerializerMappings;
     }
 
