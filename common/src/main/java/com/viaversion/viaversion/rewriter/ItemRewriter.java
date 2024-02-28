@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -31,14 +32,22 @@ import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
-        T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
+    T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
     private final Type<Item> itemType;
+    private final Type<Item> mappedItemType;
     private final Type<Item[]> itemArrayType;
+    private final Type<Item[]> mappedItemArrayType;
 
-    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
+    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
         super(protocol);
         this.itemType = itemType;
         this.itemArrayType = itemArrayType;
+        this.mappedItemType = mappedItemType;
+        this.mappedItemArrayType = mappedItemArrayType;
+    }
+
+    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
+        this(protocol, itemType, itemArrayType, itemType, itemArrayType);
     }
 
     // These two methods always return the same item instance *for now*
@@ -66,8 +75,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
-                map(itemArrayType); // Items
-                handler(itemArrayToClientHandler(itemArrayType));
+                handler(wrapper -> {
+                    Item[] items = wrapper.read(itemArrayType);
+                    wrapper.write(mappedItemArrayType, items);
+                    for (Item item : items) {
+                        handleItemToClient(item);
+                    }
+                });
             }
         });
     }
@@ -79,12 +93,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 handler(wrapper -> {
-                    Item[] items = wrapper.passthrough(itemArrayType);
+                    Item[] items = wrapper.read(itemArrayType);
+                    wrapper.write(mappedItemArrayType, items);
                     for (Item item : items) {
                         handleItemToClient(item);
                     }
 
-                    handleItemToClient(wrapper.passthrough(itemType)); // Carried item
+                    handleClientboundItem(wrapper);
                 });
             }
         });
@@ -115,8 +130,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.SHORT); // Slot id
-                map(itemType); // Item
-                handler(itemToClientHandler(itemType));
+                handler(wrapper -> handleClientboundItem(wrapper));
             }
         });
     }
@@ -128,8 +142,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Type.UNSIGNED_BYTE); // Window id
                 map(Type.VAR_INT); // State id
                 map(Type.SHORT); // Slot id
-                map(itemType); // Item
-                handler(itemToClientHandler(itemType));
+                handler(wrapper -> handleClientboundItem(wrapper));
             }
         });
     }
@@ -139,11 +152,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(itemType); // 2 - Item
-
-                handler(itemToClientHandler(itemType));
+                map(Type.VAR_INT); // Entity ID
+                map(Type.VAR_INT); // Slot ID
+                handler(wrapper -> handleClientboundItem(wrapper));
             }
         });
     }
@@ -160,7 +171,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     do {
                         slot = wrapper.passthrough(Type.BYTE);
                         // & 0x7F into an extra variable if slot is needed
-                        handleItemToClient(wrapper.passthrough(itemType));
+                        handleClientboundItem(wrapper);
                     } while (slot < 0);
                 });
             }
@@ -172,8 +183,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot
-                map(itemType); // 1 - Clicked Item
-                handler(itemToServerHandler(itemType));
+                handler(wrapper -> handleServerboundItem(wrapper));
             }
         });
     }
@@ -187,9 +197,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Type.BYTE); // 2 - Button
                 map(Type.SHORT); // 3 - Action number
                 map(Type.VAR_INT); // 4 - Mode
-                map(itemType); // 5 - Clicked Item
-
-                handler(itemToServerHandler(itemType));
+                handler(wrapper -> handleServerboundItem(wrapper));
             }
         });
     }
@@ -209,11 +217,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     int length = wrapper.passthrough(Type.VAR_INT);
                     for (int i = 0; i < length; i++) {
                         wrapper.passthrough(Type.SHORT); // Slot
-                        handleItemToServer(wrapper.passthrough(itemType));
+                        handleServerboundItem(wrapper);
                     }
 
                     // Carried item
-                    handleItemToServer(wrapper.passthrough(itemType));
+                    handleServerboundItem(wrapper);
                 });
             }
         });
@@ -232,11 +240,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Type.VAR_INT);
             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
             for (int i = 0; i < size; i++) {
-                handleItemToClient(wrapper.passthrough(itemType)); // Input
-                handleItemToClient(wrapper.passthrough(itemType)); // Output
+                handleClientboundItem(wrapper); // Input
+                handleClientboundItem(wrapper); // Output
 
                 if (wrapper.passthrough(Type.BOOLEAN)) { // Has second item
-                    handleItemToClient(wrapper.passthrough(itemType)); // Second Item
+                    handleClientboundItem(wrapper); // Second item
                 }
 
                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -257,9 +265,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Type.VAR_INT); // Container id
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                handleItemToClient(wrapper.passthrough(itemType)); // Input
-                handleItemToClient(wrapper.passthrough(itemType)); // Output
-                handleItemToClient(wrapper.passthrough(itemType)); // Second Item
+                handleClientboundItem(wrapper); // Input
+                handleClientboundItem(wrapper); // Output
+                handleClientboundItem(wrapper); // Second item
 
                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -278,9 +286,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Type.VAR_INT); // Container id
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                handleItemToClient(wrapper.passthrough(itemType)); // Input
-                handleItemToClient(wrapper.passthrough(itemType)); // Output
-                handleItemToClient(wrapper.passthrough(itemType)); // Second Item
+                handleClientboundItem(wrapper); // Input
+                handleClientboundItem(wrapper); // Output
+                handleClientboundItem(wrapper); // Second item
 
                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                 wrapper.passthrough(Type.INT); // Number of tools uses
@@ -310,7 +318,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.COMPONENT); // Title
                     wrapper.passthrough(Type.COMPONENT); // Description
-                    handleItemToClient(wrapper.passthrough(itemType)); // Icon
+                    handleClientboundItem(wrapper); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -354,7 +362,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(componentType); // Title
                     wrapper.passthrough(componentType); // Description
-                    handleItemToClient(wrapper.passthrough(itemType)); // Icon
+                    handleClientboundItem(wrapper); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {
@@ -501,7 +509,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 int data = wrapper.read(Type.VAR_INT);
                 wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
             } else if (mappings.isItemParticle(id)) {
-                handleItemToClient(wrapper.passthrough(itemType));
+                handleClientboundItem(wrapper);
             }
 
             int mappedId = protocol.getMappingData().getNewParticleId(id);
@@ -526,6 +534,16 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public PacketHandler itemToServerHandler(Type<Item> type) {
         return wrapper -> handleItemToServer(wrapper.get(type, 0));
+    }
+
+    private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
+        final Item item = handleItemToClient(wrapper.read(itemType));
+        wrapper.write(mappedItemType, item);
+    }
+
+    private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
+        final Item item = handleItemToServer(wrapper.read(mappedItemType));
+        wrapper.write(itemType, item);
     }
 
     protected void rewriteParticle(Particle particle) {

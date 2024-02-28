@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.metadata;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.Type;
 
 public interface MetaType {
@@ -49,6 +50,7 @@ public interface MetaType {
         private final Type<?> type;
 
         MetaTypeImpl(final int typeId, final Type<?> type) {
+            Preconditions.checkNotNull(type);
             this.typeId = typeId;
             this.type = type;
         }

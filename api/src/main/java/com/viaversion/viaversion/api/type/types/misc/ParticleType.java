@@ -23,40 +23,23 @@
 package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
-public class ParticleType extends Type<Particle> {
-
-    private final Int2ObjectMap<ParticleReader> readers;
-
-    public ParticleType(final Int2ObjectMap<ParticleReader> readers) {
-        super("Particle", Particle.class);
-        this.readers = readers;
-    }
+public class ParticleType extends DynamicType<Particle> {
 
     public ParticleType() {
-        this(new Int2ObjectArrayMap<>());
-    }
-
-    public ParticleTypeFiller filler(final Protocol<?, ?, ?, ?> protocol) {
-        return filler(protocol, true);
-    }
-
-    public ParticleTypeFiller filler(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
-        return new ParticleTypeFiller(protocol, useMappedNames);
+        super(Particle.class);
     }
 
     @Override
     public void write(final ByteBuf buffer, final Particle object) throws Exception {
-        Type.VAR_INT.writePrimitive(buffer, object.getId());
+        Type.VAR_INT.writePrimitive(buffer, object.id());
         for (final Particle.ParticleData<?> data : object.getArguments()) {
             data.write(buffer);
         }
@@ -70,32 +53,30 @@ public class ParticleType extends Type<Particle> {
         return particle;
     }
 
-    public void readData(final ByteBuf buffer, final Particle particle) throws Exception {
-        final ParticleReader reader = readers.get(particle.getId());
-        if (reader != null) {
-            reader.read(buffer, particle);
-        }
+    @Override
+    protected FullMappings mappings(final Protocol<?, ?, ?, ?> protocol) {
+        return protocol.getMappingData().getParticleMappings();
     }
 
-    public static ParticleReader itemHandler(final Type<Item> itemType) {
+    public static DataReader<Particle> itemHandler(final Type<Item> itemType) {
         return (buf, particle) -> particle.add(itemType, itemType.read(buf));
     }
 
     public static final class Readers {
 
-        public static final ParticleReader BLOCK = (buf, particle) -> {
+        public static final DataReader<Particle> BLOCK = (buf, particle) -> {
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Flat Block
         };
-        public static final ParticleReader ITEM1_13 = itemHandler(Type.ITEM1_13);
-        public static final ParticleReader ITEM1_13_2 = itemHandler(Type.ITEM1_13_2);
-        public static final ParticleReader ITEM1_20_2 = itemHandler(Type.ITEM1_20_2);
-        public static final ParticleReader DUST = (buf, particle) -> {
+        public static final DataReader<Particle> ITEM1_13 = itemHandler(Type.ITEM1_13);
+        public static final DataReader<Particle> ITEM1_13_2 = itemHandler(Type.ITEM1_13_2);
+        public static final DataReader<Particle> ITEM1_20_2 = itemHandler(Type.ITEM1_20_2);
+        public static final DataReader<Particle> DUST = (buf, particle) -> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Blue 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Scale 0.01-4
         };
-        public static final ParticleReader DUST_TRANSITION = (buf, particle) -> {
+        public static final DataReader<Particle> DUST_TRANSITION = (buf, particle) -> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Blue 0-1
@@ -104,7 +85,7 @@ public class ParticleType extends Type<Particle> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Blue
         };
-        public static final ParticleReader VIBRATION = (buf, particle) -> {
+        public static final DataReader<Particle> VIBRATION = (buf, particle) -> {
             particle.add(Type.POSITION1_14, Type.POSITION1_14.read(buf)); // From block pos
 
             String resourceLocation = Type.STRING.read(buf);
@@ -120,7 +101,7 @@ public class ParticleType extends Type<Particle> {
             }
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
-        public static final ParticleReader VIBRATION1_19 = (buf, particle) -> {
+        public static final DataReader<Particle> VIBRATION1_19 = (buf, particle) -> {
             String resourceLocation = Type.STRING.read(buf);
             particle.add(Type.STRING, resourceLocation);
 
@@ -135,7 +116,7 @@ public class ParticleType extends Type<Particle> {
             }
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
-        public static final ParticleReader VIBRATION1_20_3 = (buf, particle) -> {
+        public static final DataReader<Particle> VIBRATION1_20_3 = (buf, particle) -> {
             final int sourceTypeId = Type.VAR_INT.readPrimitive(buf);
             particle.add(Type.VAR_INT, sourceTypeId);
             if (sourceTypeId == 0) { // Block
@@ -148,45 +129,11 @@ public class ParticleType extends Type<Particle> {
             }
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Arrival in ticks
         };
-        public static final ParticleReader SCULK_CHARGE = (buf, particle) -> {
+        public static final DataReader<Particle> SCULK_CHARGE = (buf, particle) -> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Roll
         };
-        public static final ParticleReader SHRIEK = (buf, particle) -> {
+        public static final DataReader<Particle> SHRIEK = (buf, particle) -> {
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Delay
         };
-    }
-
-    public final class ParticleTypeFiller {
-
-        private final ParticleMappings mappings;
-        private final boolean useMappedNames;
-
-        private ParticleTypeFiller(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
-            this.mappings = protocol.getMappingData().getParticleMappings();
-            this.useMappedNames = useMappedNames;
-        }
-
-        public ParticleTypeFiller reader(final String identifier, final ParticleReader reader) {
-            readers.put(useMappedNames ? mappings.mappedId(identifier) : mappings.id(identifier), reader);
-            return this;
-        }
-
-        public ParticleTypeFiller reader(final int id, final ParticleReader reader) {
-            readers.put(id, reader);
-            return this;
-        }
-    }
-
-    @FunctionalInterface
-    public interface ParticleReader {
-
-        /**
-         * Reads particle data from the buffer and adds it to the particle data.
-         *
-         * @param buf      buffer
-         * @param particle particle
-         * @throws Exception if an error occurs during buffer reading
-         */
-        void read(ByteBuf buf, Particle particle) throws Exception;
     }
 }

@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -48,7 +49,8 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredients(wrapper);
-        rewrite(wrapper.passthrough(itemType())); // Result
+        final Item result = rewrite(wrapper.read(itemType()));
+        wrapper.write(mappedItemType(), result);
     }
 
     @Override
@@ -59,7 +61,8 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
-        rewrite(wrapper.passthrough(itemType())); // Result
+        final Item result = rewrite(wrapper.read(itemType()));
+        wrapper.write(mappedItemType(), result);
     }
 
     @Override
@@ -67,7 +70,8 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Type.STRING); // Group
         wrapper.passthrough(Type.VAR_INT); // Crafting book category
         handleIngredient(wrapper);
-        rewrite(wrapper.passthrough(itemType())); // Result
+        final Item result = rewrite(wrapper.read(itemType()));
+        wrapper.write(mappedItemType(), result);
         wrapper.passthrough(Type.FLOAT); // EXP
         wrapper.passthrough(Type.VAR_INT); // Cooking time
     }

@@ -23,6 +23,8 @@
 package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Item {
@@ -87,6 +89,8 @@ public interface Item {
      * @param tag item tag
      */
     void setTag(@Nullable CompoundTag tag);
+
+    Int2ObjectMap<Optional<ItemData<?>>> itemData();
 
     /**
      * Returns a copy of the item.

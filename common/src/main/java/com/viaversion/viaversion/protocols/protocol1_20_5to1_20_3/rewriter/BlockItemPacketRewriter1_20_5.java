@@ -18,9 +18,14 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
+import com.viaversion.viaversion.api.minecraft.item.DynamicItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.ItemData;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -34,11 +39,13 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
+        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
     }
 
     @Override
@@ -88,7 +95,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
                 final Item item = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                particle.add(Type.ITEM1_20_2, item);
+                particle.add(Types1_20_5.ITEM, item);
             }
 
             wrapper.write(Types1_20_5.PARTICLE, particle);
@@ -120,9 +127,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.VAR_INT); // Container id
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Input
-                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Output
-                handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Second Item
+                final Item input = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item output = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item secondItem = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                wrapper.write(Types1_20_5.ITEM, input);
+                wrapper.write(Types1_20_5.ITEM, output);
+                wrapper.write(Types1_20_5.ITEM, secondItem);
+
                 wrapper.passthrough(Type.BOOLEAN); // Trade disabled
                 wrapper.passthrough(Type.INT); // Number of tools uses
                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
@@ -135,7 +146,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         });
 
-        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol);
+        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<ClientboundPacket1_20_3>(protocol) {
+            @Override
+            protected Type<Item> mappedItemType() {
+                return Types1_20_5.ITEM;
+            }
+
+            @Override
+            protected Type<Item[]> mappedItemArrayType() {
+                return Types1_20_5.ITEM_ARRAY;
+            }
+        };
         protocol.registerClientbound(ClientboundPackets1_20_3.DECLARE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
@@ -147,5 +168,54 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
             }
         });
+    }
+
+    @Override
+    public @Nullable Item handleItemToClient(@Nullable final Item item) {
+        if (item == null) return null;
+
+        super.handleItemToClient(item);
+
+        final CompoundTag tag = item.tag();
+        final DynamicItem dynamicItem = new DynamicItem(item.identifier(), (byte) item.amount(), new Int2ObjectOpenHashMap<>());
+        if (tag == null) {
+            return dynamicItem;
+        }
+
+        // Rewrite nbt to new data structures
+        final NumberTag damage = tag.getNumberTag("Damage");
+        if (damage != null) {
+            addData(dynamicItem, "damage", Type.VAR_INT, damage.asInt());
+        }
+
+        final NumberTag repairCost = tag.getNumberTag("RepairCost");
+        if (repairCost != null) {
+            addData(dynamicItem, "repair_cost", Type.VAR_INT, repairCost.asInt());
+        }
+        return dynamicItem;
+    }
+
+    private <T> void addData(final DynamicItem item, final String serializer, final Type<T> type, final T value) {
+        final int id = serializerId(serializer);
+        if (id == -1) {
+            Via.getPlatform().getLogger().severe("Could not find item data serializer for type " + type);
+            return;
+        }
+
+        item.addData(new ItemData<>(type, value, id));
+    }
+
+    private int serializerId(final String type) {
+        return protocol.getMappingData().getItemDataSerializerMappings().mappedId(type);
+    }
+
+    @Override
+    public @Nullable Item handleItemToServer(@Nullable final Item item) {
+        if (item == null) return null;
+
+        super.handleItemToServer(item);
+
+        final CompoundTag tag = new CompoundTag();
+        return new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
     }
 }

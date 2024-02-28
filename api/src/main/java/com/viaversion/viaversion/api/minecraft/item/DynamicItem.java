@@ -23,32 +23,24 @@
 package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.google.gson.annotations.SerializedName;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.Objects;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class DataItem implements Item {
-    @SerializedName(value = "identifier", alternate = "id")
+public class DynamicItem implements Item {
+    private final Int2ObjectMap<Optional<ItemData<?>>> data;
     private int identifier;
     private byte amount;
-    private short data;
-    private CompoundTag tag;
 
-    public DataItem() {
+    public DynamicItem() {
+        this(0, (byte) 0, new Int2ObjectOpenHashMap<>());
     }
 
-    public DataItem(int identifier, byte amount, short data, @Nullable CompoundTag tag) {
+    public DynamicItem(int identifier, byte amount, Int2ObjectMap<Optional<ItemData<?>>> data) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
-        this.tag = tag;
-    }
-
-    public DataItem(Item toCopy) {
-        this(toCopy.identifier(), (byte) toCopy.amount(), toCopy.data(), toCopy.tag());
     }
 
     @Override
@@ -75,62 +67,48 @@ public class DataItem implements Item {
     }
 
     @Override
-    public short data() {
-        return data;
-    }
-
-    @Override
-    public void setData(short data) {
-        this.data = data;
-    }
-
-    @Override
     public @Nullable CompoundTag tag() {
-        return tag;
+        return null;
     }
 
     @Override
     public void setTag(@Nullable CompoundTag tag) {
-        this.tag = tag;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Int2ObjectMap<Optional<ItemData<?>>> itemData() {
-        return new Int2ObjectOpenHashMap<>();
+        return data;
+    }
+
+    public void addData(ItemData<?> data) {
+        this.data.put(data.id(), Optional.of(data));
+    }
+
+    public void addMarkerData(int id) {
+        this.data.put(id, Optional.empty());
     }
 
     @Override
     public Item copy() {
-        return new DataItem(identifier, amount, data, tag);
+        return new DynamicItem(identifier, amount, data);
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DataItem item = (DataItem) o;
-        if (identifier != item.identifier) return false;
-        if (amount != item.amount) return false;
-        if (data != item.data) return false;
-        return Objects.equals(tag, item.tag);
+        final DynamicItem that = (DynamicItem) o;
+        if (identifier != that.identifier) return false;
+        if (amount != that.amount) return false;
+        return data.equals(that.data);
     }
 
     @Override
     public int hashCode() {
-        int result = identifier;
-        result = 31 * result + (int) amount;
-        result = 31 * result + (int) data;
-        result = 31 * result + (tag != null ? tag.hashCode() : 0);
+        int result = data.hashCode();
+        result = 31 * result + identifier;
+        result = 31 * result + amount;
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Item{" +
-            "identifier=" + identifier +
-            ", amount=" + amount +
-            ", data=" + data +
-            ", tag=" + tag +
-            '}';
     }
 }

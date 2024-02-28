@@ -56,6 +56,7 @@ import com.viaversion.viaversion.api.type.types.ShortByteArrayType;
 import com.viaversion.viaversion.api.type.types.ShortType;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.api.type.types.UUIDType;
+import com.viaversion.viaversion.api.type.types.UnitType;
 import com.viaversion.viaversion.api.type.types.UnsignedByteType;
 import com.viaversion.viaversion.api.type.types.UnsignedShortType;
 import com.viaversion.viaversion.api.type.types.VarIntArrayType;
@@ -87,6 +88,7 @@ import com.viaversion.viaversion.api.type.types.block.VarLongBlockChangeRecordTy
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
 import com.viaversion.viaversion.api.type.types.misc.VillagerDataType;
+import com.viaversion.viaversion.util.Unit;
 import java.util.UUID;
 
 /**
@@ -95,6 +97,8 @@ import java.util.UUID;
  * @param <T> read/written type
  */
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
+
+    public static final Type<Unit> UNIT = new UnitType();
 
     public static final ByteType BYTE = new ByteType();
     public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
@@ -149,6 +153,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<CompoundTag> COMPOUND_TAG = new CompoundTagType();
     public static final Type<CompoundTag> OPTIONAL_COMPOUND_TAG = new CompoundTagType.OptionalCompoundTagType();
     public static final Type<Tag> TAG = new TagType();
+    public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
     @Deprecated/*(forRemoval=true)*/
     public static final Type<CompoundTag> NBT = NAMED_COMPOUND_TAG;

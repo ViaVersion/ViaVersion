@@ -22,9 +22,13 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_5;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.types.item.ItemType1_20_5;
+import com.viaversion.viaversion.api.type.types.item.ItemDataType;
 import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
 import com.viaversion.viaversion.api.type.types.metadata.MetadataType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -32,7 +36,12 @@ import java.util.List;
 
 public final class Types1_20_5 {
 
-    public static final ParticleType PARTICLE = new ParticleType(); // Only safe to use after protocol loading
+    // Only safe to use after protocol loading
+    public static final ParticleType PARTICLE = new ParticleType();
+    public static final ItemDataType ITEM_DATA = new ItemDataType();
+    public static final Type<Item> ITEM = new ItemType1_20_5(ITEM_DATA);
+    public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
+
     public static final MetaTypes1_20_5 META_TYPES = new MetaTypes1_20_5(PARTICLE);
     public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
     public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);

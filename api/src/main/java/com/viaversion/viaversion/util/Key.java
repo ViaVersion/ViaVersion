@@ -22,7 +22,12 @@
  */
 package com.viaversion.viaversion.util;
 
+import java.util.regex.Pattern;
+
 public final class Key {
+
+    private static final Pattern PATTERN = Pattern.compile("([0-9a-z_.-]*:)?[0-9a-z_/.-]*");
+    private static final int MINECRAFT_NAMESPACE_LENGTH = "minecraft:".length();
 
     public static String stripNamespace(final String identifier) {
         int index = identifier.indexOf(':');
@@ -34,11 +39,15 @@ public final class Key {
 
     public static String stripMinecraftNamespace(final String identifier) {
         if (identifier.startsWith("minecraft:")) {
-            return identifier.substring(10);
-        } else if (identifier.startsWith(":")) {
+            return identifier.substring(MINECRAFT_NAMESPACE_LENGTH);
+        } else if (!identifier.isEmpty() && identifier.charAt(0) == ':') {
             return identifier.substring(1);
         }
         return identifier;
+    }
+
+    public static boolean equals(final String firstIdentifier, final String secondIdentifier) {
+        return stripNamespace(firstIdentifier).equals(stripNamespace(secondIdentifier));
     }
 
     public static String namespaced(final String identifier) {
@@ -52,7 +61,6 @@ public final class Key {
     }
 
     public static boolean isValid(final String identifier) {
-        return identifier.matches("([0-9a-z_.-]*:)?[0-9a-z_/.-]*");
+        return PATTERN.matcher(identifier).matches();
     }
-
 }
