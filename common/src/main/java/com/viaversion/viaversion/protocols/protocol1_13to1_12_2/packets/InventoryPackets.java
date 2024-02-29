@@ -99,7 +99,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 handler(wrapper -> {
                     String channel = wrapper.get(Type.STRING, 0);
                     // Handle stopsound change
-                    if (channel.equalsIgnoreCase("MC|StopSound")) {
+                    if (channel.equals("MC|StopSound")) {
                         String originalSource = wrapper.read(Type.STRING);
                         String originalSound = wrapper.read(Type.STRING);
 
@@ -129,7 +129,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
 
                         wrapper.set(Type.BYTE, 0, flags); // Update flags
                         return;
-                    } else if (channel.equalsIgnoreCase("MC|TrList")) {
+                    } else if (channel.equals("MC|TrList")) {
                         channel = "minecraft:trader_list";
                         wrapper.passthrough(Type.INT); // Passthrough Window ID
 

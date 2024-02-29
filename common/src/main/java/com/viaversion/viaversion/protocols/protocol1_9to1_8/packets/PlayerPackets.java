@@ -265,9 +265,9 @@ public class PlayerPackets {
                 map(Type.STRING); // 0 - Channel Name
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
-                    if (name.equalsIgnoreCase("MC|BOpen")) {
+                    if (name.equals("MC|BOpen")) {
                         wrapper.write(Type.VAR_INT, 0);
-                    } else if (name.equalsIgnoreCase("MC|TrList")) {
+                    } else if (name.equals("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // ID
 
                         Short size = wrapper.passthrough(Type.UNSIGNED_BYTE);
@@ -406,14 +406,14 @@ public class PlayerPackets {
                 map(Type.STRING); // 0 - Channel Name
                 handler(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
-                    if (name.equalsIgnoreCase("MC|BSign")) {
+                    if (name.equals("MC|BSign")) {
                         Item item = wrapper.passthrough(Type.ITEM1_8);
                         if (item != null) {
                             item.setIdentifier(387); // Written Book
                             ItemRewriter.rewriteBookToServer(item);
                         }
                     }
-                    if (name.equalsIgnoreCase("MC|AutoCmd")) {
+                    if (name.equals("MC|AutoCmd")) {
                         wrapper.set(Type.STRING, 0, "MC|AdvCdm");
                         wrapper.write(Type.BYTE, (byte) 0);
                         wrapper.passthrough(Type.INT); // X
@@ -423,7 +423,7 @@ public class PlayerPackets {
                         wrapper.passthrough(Type.BOOLEAN); // Flag
                         wrapper.clearInputBuffer();
                     }
-                    if (name.equalsIgnoreCase("MC|AdvCmd")) {
+                    if (name.equals("MC|AdvCmd")) {
                         wrapper.set(Type.STRING, 0, "MC|AdvCdm");
                     }
                 });
