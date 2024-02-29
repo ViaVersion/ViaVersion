@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types.item;
 
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
@@ -32,7 +33,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class StructuredDataType extends Type<StructuredData<?>> {
 
-    private final Int2ObjectMap<Type<?>> types = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<StructuredDataKey<?>> types = new Int2ObjectOpenHashMap<>();
 
     public StructuredDataType() {
         super(StructuredData.class);
@@ -47,15 +48,15 @@ public class StructuredDataType extends Type<StructuredData<?>> {
     @Override
     public StructuredData<?> read(final ByteBuf buffer) throws Exception {
         final int id = Type.VAR_INT.readPrimitive(buffer);
-        final Type<?> type = this.types.get(id);
-        if (type != null) {
-            return readData(buffer, type, id);
+        final StructuredDataKey<?> key = this.types.get(id);
+        if (key != null) {
+            return readData(buffer, key, id);
         }
-        throw new IllegalArgumentException("Unknown item data type id: " + id);
+        throw new IllegalArgumentException("No data component serializer found for id " + id);
     }
 
-    private <T> StructuredData<T> readData(final ByteBuf buffer, final Type<T> type, final int id) throws Exception {
-        return new StructuredData<>(type, type.read(buffer), id);
+    private <T> StructuredData<T> readData(final ByteBuf buffer, final StructuredDataKey<T> key, final int id) throws Exception {
+        return new StructuredData<>(key, key.type().read(buffer), id);
     }
 
     public DataFiller filler(final Protocol<?, ?, ?, ?> protocol) {
@@ -76,13 +77,8 @@ public class StructuredDataType extends Type<StructuredData<?>> {
             this.useMappedNames = useMappedNames;
         }
 
-        public DataFiller reader(final String identifier, final Type<?> reader) {
-            types.put(useMappedNames ? mappings.mappedId(identifier) : mappings.id(identifier), reader);
-            return this;
-        }
-
-        public DataFiller reader(final int id, final Type<?> type) {
-            types.put(id, type);
+        public DataFiller add(final StructuredDataKey<?> reader) {
+            types.put(useMappedNames ? mappings.mappedId(reader.identifier()) : mappings.id(reader.identifier()), reader);
             return this;
         }
     }

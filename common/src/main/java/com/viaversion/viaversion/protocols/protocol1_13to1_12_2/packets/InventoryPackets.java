@@ -71,7 +71,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.ITEM1_8_SHORT_ARRAY, Type.ITEM1_13_SHORT_ARRAY); // 1 - Window Values
 
-                handler(itemArrayToClientHandler(Type.ITEM1_13_SHORT_ARRAY));
+                handler(wrapper -> {
+                    Item[] items = wrapper.get(Type.ITEM1_13_SHORT_ARRAY, 0);
+                    for (Item item : items) {
+                        handleItemToClient(item);
+                    }
+                });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketHandlers() {

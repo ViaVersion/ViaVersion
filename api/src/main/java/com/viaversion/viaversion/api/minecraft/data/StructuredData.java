@@ -29,43 +29,38 @@ import io.netty.buffer.ByteBuf;
 
 public final class StructuredData<T> implements IdHolder {
 
-    private final Type<T> type;
+    private final StructuredDataKey<T> key;
     private T value;
     private int id;
 
-    public StructuredData(final Type<T> type, final T value, final int id) {
-        this.type = type;
+    public StructuredData(final StructuredDataKey<T> key, final T value, final int id) {
+        this.key = key;
         this.value = value;
         this.id = id;
     }
 
-    public static StructuredData<?> empty(final int id) {
-        // Indicates empty structures, whereas an empty optional is used to remove default values
-        return new StructuredData<>(Type.UNIT, Unit.INSTANCE, id);
-    }
-
     public boolean isEmpty() {
-        return type == Type.UNIT;
+        return key.type() == Type.UNIT;
     }
 
     public void setValue(final T value) {
-        if (value != null && !type.getOutputClass().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Item data type and value are incompatible. Type=" + type
+        if (value != null && !key.type().getOutputClass().isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Item data type and value are incompatible. Type=" + key
                 + ", value=" + value + " (" + value.getClass().getSimpleName() + ")");
         }
         this.value = value;
     }
 
     public void write(final ByteBuf buffer) throws Exception {
-        type.write(buffer, value);
+        key.type().write(buffer, value);
     }
 
     public void setId(final int id) {
         this.id = id;
     }
 
-    public Type<T> type() {
-        return type;
+    public StructuredDataKey<T> key() {
+        return key;
     }
 
     public T value() {

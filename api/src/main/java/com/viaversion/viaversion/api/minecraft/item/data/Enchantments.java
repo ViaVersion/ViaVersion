@@ -47,7 +47,7 @@ public final class Enchantments {
         public void write(final ByteBuf buffer, final Enchantments value) {
             Type.VAR_INT.writePrimitive(buffer, value.enchantments.size());
             for (final Int2IntMap.Entry entry : value.enchantments.int2IntEntrySet()) {
-                Type.VAR_INT.writePrimitive(buffer, entry.getIntValue());
+                Type.VAR_INT.writePrimitive(buffer, entry.getIntKey());
                 Type.VAR_INT.writePrimitive(buffer, entry.getIntValue());
             }
             buffer.writeBoolean(value.showInTooltip());
@@ -64,6 +64,10 @@ public final class Enchantments {
 
     public Int2IntMap enchantments() {
         return enchantments;
+    }
+
+    public int size() {
+        return enchantments.size();
     }
 
     public boolean showInTooltip() {

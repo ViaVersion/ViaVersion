@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
@@ -120,47 +121,53 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK);
         Types1_20_5.ITEM_DATA.filler(this)
-            .reader("damage", Type.VAR_INT)
-            .reader("unbreakable", Type.BOOLEAN)
-            .reader("custom_name", Type.TAG)
-            .reader("lore", Type.TAG_ARRAY)
-            .reader("enchantments", Enchantments.TYPE)
-            .reader("can_place_on", Type.UNIT) // TODO
-            .reader("can_break", Type.UNIT) // TODO
-            .reader("attribute_modifiers", Type.UNIT) // TODO
-            .reader("custom_model_data", Type.VAR_INT)
-            .reader("hide_additional_tooltip", Type.UNIT)
-            .reader("repair_cost", Type.VAR_INT)
-            .reader("creative_slot_lock", Type.UNIT)
-            .reader("enchantment_glint_override", Type.BOOLEAN)
-            .reader("intangible_projectile", Type.UNIT)
-            .reader("stored_enchantments", Enchantments.TYPE)
-            .reader("dyed_color", DyedColor.TYPE)
-            .reader("map_color", Type.INT)
-            .reader("map_id", Type.VAR_INT)
-            .reader("map_post_processing", Type.VAR_INT)
-            .reader("charged_projectiles", Types1_20_5.ITEM_ARRAY)
-            .reader("bundle_contents", Types1_20_5.ITEM_ARRAY)
-            .reader("potion_contents", Type.UNIT) // TODO
-            .reader("suspicious_stew_effects", Type.UNIT) // TODO
-            .reader("writable_book_content", Type.STRING_ARRAY)
-            .reader("written_book_content", WrittenBook.TYPE)
-            .reader("trim", Type.UNIT) // TODO
-            .reader("entity_data", Type.COMPOUND_TAG)
-            .reader("bucket_entity_data", Type.COMPOUND_TAG)
-            .reader("block_entity_data", Type.COMPOUND_TAG)
-            .reader("instrument", Type.VAR_INT) // TODO
-            .reader("lodestone_target", LodestoneTarget.TYPE)
-            .reader("firework_explosion", Type.UNIT) // TODO
-            .reader("fireworks", Type.UNIT) // TODO
-            .reader("profile", GameProfile.TYPE)
-            .reader("note_block_sound", Type.STRING)
-            .reader("banner_patterns", BannerPattern.ARRAY_TYPE)
-            .reader("base_color", Type.VAR_INT)
-            .reader("pot_decorations", Types1_20_5.ITEM_ARRAY)
-            .reader("container", Types1_20_5.ITEM_ARRAY)
-            .reader("block_state", BlockStateProperties.TYPE)
-            .reader("bees", Bee.ARRAY_TYPE);
+            .add(StructuredDataKey.CUSTOM_DATA)
+            .add(StructuredDataKey.DAMAGE)
+            .add(StructuredDataKey.UNBREAKABLE)
+            .add(StructuredDataKey.CUSTOM_NAME)
+            .add(StructuredDataKey.LORE)
+            .add(StructuredDataKey.ENCHANTMENTS)
+            .add(StructuredDataKey.CAN_PLACE_ON)
+            .add(StructuredDataKey.CAN_BREAK)
+            .add(StructuredDataKey.ATTRIBUTE_MODIFIERS)
+            .add(StructuredDataKey.CUSTOM_MODEL_DATA)
+            .add(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP)
+            .add(StructuredDataKey.REPAIR_COST)
+            .add(StructuredDataKey.CREATIVE_SLOT_LOCK)
+            .add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE)
+            .add(StructuredDataKey.INTANGIBLE_PROJECTILE)
+            .add(StructuredDataKey.STORED_ENCHANTMENTS)
+            .add(StructuredDataKey.DYED_COLOR)
+            .add(StructuredDataKey.MAP_COLOR)
+            .add(StructuredDataKey.MAP_ID)
+            .add(StructuredDataKey.MAP_DECORATIONS)
+            .add(StructuredDataKey.MAP_POST_PROCESSING)
+            .add(StructuredDataKey.CHARGED_PROJECTILES)
+            .add(StructuredDataKey.BUNDLE_CONTENTS)
+            .add(StructuredDataKey.POTION_CONTENTS)
+            .add(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS)
+            .add(StructuredDataKey.WRITABLE_BOOK_CONTENT)
+            .add(StructuredDataKey.WRITTEN_BOOK_CONTENT)
+            .add(StructuredDataKey.TRIM)
+            .add(StructuredDataKey.DEBUG_STICK_STATE)
+            .add(StructuredDataKey.ENTITY_DATA)
+            .add(StructuredDataKey.BUCKET_ENTITY_DATA)
+            .add(StructuredDataKey.BLOCK_ENTITY_DATA)
+            .add(StructuredDataKey.INSTRUMENT)
+            .add(StructuredDataKey.RECIPES)
+            .add(StructuredDataKey.LODESTONE_TARGET)
+            .add(StructuredDataKey.FIREWORK_EXPLOSION)
+            .add(StructuredDataKey.FIREWORKS)
+            .add(StructuredDataKey.PROFILE)
+            .add(StructuredDataKey.NOTE_BLOCK_SOUND)
+            .add(StructuredDataKey.BANNER_PATTERNS)
+            .add(StructuredDataKey.BASE_COLOR)
+            .add(StructuredDataKey.POT_DECORATIONS)
+            .add(StructuredDataKey.CONTAINER)
+            .add(StructuredDataKey.BLOCK_STATE)
+            .add(StructuredDataKey.BEES)
+            .add(StructuredDataKey.LOCK)
+            .add(StructuredDataKey.CONTAINER_LOOT);
 
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:dyeable", 853, 854, 855, 856, 1120);
     }

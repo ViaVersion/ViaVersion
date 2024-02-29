@@ -23,22 +23,19 @@
 package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.Optional;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItem implements Item {
-    private final Int2ObjectMap<Optional<StructuredData<?>>> data;
+    private final StructuredDataContainer data;
     private int identifier;
     private byte amount;
 
     public StructuredItem() {
-        this(0, (byte) 0, new Int2ObjectOpenHashMap<>());
+        this(0, (byte) 0, new StructuredDataContainer());
     }
 
-    public StructuredItem(final int identifier, final byte amount, final Int2ObjectMap<Optional<StructuredData<?>>> data) {
+    public StructuredItem(final int identifier, final byte amount, final StructuredDataContainer data) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
@@ -78,24 +75,13 @@ public class StructuredItem implements Item {
     }
 
     @Override
-    public Int2ObjectMap<Optional<StructuredData<?>>> structuredData() {
+    public StructuredDataContainer structuredData() {
         return data;
     }
 
     @Override
-    public void addData(final StructuredData<?> data) {
-        this.data.put(data.id(), Optional.of(data));
-    }
-
-    @Override
-    public void removeDefaultData(final int id) {
-        // Empty optional to override the Minecraft default
-        this.data.put(id, Optional.empty());
-    }
-
-    @Override
     public StructuredItem copy() {
-        return new StructuredItem(identifier, amount, new Int2ObjectOpenHashMap<>(data));
+        return new StructuredItem(identifier, amount, data.copy());
     }
 
     @Override

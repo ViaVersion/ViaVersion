@@ -109,13 +109,13 @@ public interface MappingData {
 
     @Nullable Mappings getAttributeMappings();
 
+    @Nullable Mappings getPaintingMappings();
+
     @Nullable FullMappings getEntityMappings();
 
     @Nullable FullMappings getArgumentTypeMappings();
 
     @Nullable FullMappings getRecipeSerializerMappings();
 
-    FullMappings getDataComponentSerializerMappings();
-
-    @Nullable Mappings getPaintingMappings();
+    @Nullable FullMappings getDataComponentSerializerMappings();
 }

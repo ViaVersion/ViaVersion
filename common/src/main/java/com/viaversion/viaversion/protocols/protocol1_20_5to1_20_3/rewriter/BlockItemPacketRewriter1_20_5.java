@@ -18,14 +18,20 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.viaversion.viaversion.api.Via;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -34,12 +40,16 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EnchantmentMappings;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -186,44 +196,128 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return toOldItem(item);
     }
 
-    public static Item toOldItem(final Item item) {
-        final CompoundTag tag = new CompoundTag();
+    public Item toOldItem(final Item item) {
+        final StructuredDataContainer data = item.structuredData();
+        final Optional<StructuredData<CompoundTag>> customData = data.get(protocol, StructuredDataKey.CUSTOM_DATA);
+
+        // Start out with custom data and add the rest on top
+        final CompoundTag tag = customData.map(StructuredData::value).orElse(new CompoundTag());
+
         // TODO
+
         return new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
     }
 
-    public static Item toStructuredItem(final Item old) {
+    public Item toStructuredItem(final Item old) {
         final CompoundTag tag = old.tag();
-        final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new Int2ObjectOpenHashMap<>());
+        final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
+        final StructuredDataContainer data = item.structuredData();
         if (tag == null) {
             return item;
         }
 
         // Rewrite nbt to new data structures
         final NumberTag damage = tag.getNumberTag("Damage");
-        if (damage != null) {
-            addData(item, "damage", Type.VAR_INT, damage.asInt());
+        if (damage != null && damage.asInt() != 0) {
+            tag.remove("Damage");
+            data.add(protocol, StructuredDataKey.DAMAGE, damage.asInt());
         }
 
         final NumberTag repairCost = tag.getNumberTag("RepairCost");
-        if (repairCost != null) {
-            addData(item, "repair_cost", Type.VAR_INT, repairCost.asInt());
+        if (repairCost != null && repairCost.asInt() != 0) {
+            tag.remove("RepairCost");
+            data.add(protocol, StructuredDataKey.REPAIR_COST, repairCost.asInt());
         }
+
+        final NumberTag customModelData = tag.getNumberTag("CustomModelData");
+        if (customModelData != null) {
+            tag.remove("CustomModelData");
+            data.add(protocol, StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
+        }
+
+        final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
+        if (blockState != null) {
+            tag.remove("BlockStateTag");
+            final Map<String, String> properties = new HashMap<>();
+            for (final Map.Entry<String, Tag> entry : blockState.entrySet()) {
+                if (entry.getValue() instanceof StringTag) {
+                    properties.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
+                }
+            }
+            data.add(protocol, StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
+        }
+
+        final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+        if (entityTag != null) {
+            tag.remove("EntityTag");
+            data.add(protocol, StructuredDataKey.ENTITY_DATA, entityTag);
+        }
+
+        final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+        if (blockEntityTag != null) {
+            // TODO lots of stuff
+            // item.structuredData().add(protocol, "block_entity_data", Type.COMPOUND_TAG, blockEntityTag);
+        }
+
+        final NumberTag hideFlags = tag.getNumberTag("HideFlags");
+        final int hideFlagsValue = hideFlags != null ? hideFlags.asInt() : 0;
+        tag.remove("HideFlags");
+
+        final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
+        if (unbreakable != null && unbreakable.asBoolean()) {
+            tag.remove("Unbreakable");
+            if ((hideFlagsValue & 0x04) != 0) {
+                data.add(protocol, StructuredDataKey.UNBREAKABLE, true); // TODO Value is hide, should have a wrapper
+            } else {
+                data.addEmpty(protocol, StructuredDataKey.UNBREAKABLE);
+            }
+        }
+
+        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) != 0);
+        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) != 0);
+
         // TODO
+
+        // Add the rest as custom data
+        data.add(protocol, StructuredDataKey.CUSTOM_DATA, tag);
         return item;
     }
 
-    private static <T> void addData(final StructuredItem item, final String serializer, final Type<T> type, final T value) {
-        final int id = serializerId(serializer);
-        if (id == -1) {
-            Via.getPlatform().getLogger().severe("Could not find item data serializer for type " + type);
+    private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
+                                    final StructuredDataKey<Enchantments> newKey, final boolean hide) {
+        final ListTag enchantmentsTag = tag.getListTag(key);
+        if (enchantmentsTag == null) {
             return;
         }
 
-        item.addData(new StructuredData<>(type, value, id));
-    }
+        tag.remove(key);
 
-    private static int serializerId(final String type) {
-        return Protocol1_20_5To1_20_3.MAPPINGS.getDataComponentSerializerMappings().mappedId(type);
+        final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), !hide);
+        for (final Tag enchantment : enchantmentsTag) {
+            if (!(enchantment instanceof CompoundTag)) {
+                continue;
+            }
+
+            final CompoundTag compound = (CompoundTag) enchantment;
+            final StringTag id = compound.getStringTag("id");
+            final NumberTag lvl = compound.getNumberTag("lvl");
+            if (id == null || lvl == null) {
+                continue;
+            }
+
+            final int intId = EnchantmentMappings.id(id.getValue());
+            if (intId == -1) {
+                continue;
+            }
+
+            enchantments.enchantments().put(intId, lvl.asInt());
+        }
+
+        data.add(protocol, newKey, enchantments);
+
+        // Add glint if none of the enchantments were valid
+        if (enchantments.size() == 0 && !enchantmentsTag.isEmpty()) {
+            data.add(protocol, StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
+        }
     }
 }

@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.item;
 
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
@@ -50,7 +51,7 @@ public class ItemType1_20_5 extends Type<Item> {
 
         final int id = Type.VAR_INT.readPrimitive(buffer);
         final Int2ObjectMap<Optional<StructuredData<?>>> data = readData(buffer);
-        return new StructuredItem(id, amount, data);
+        return new StructuredItem(id, amount, new StructuredDataContainer(data));
     }
 
     private Int2ObjectMap<Optional<StructuredData<?>>> readData(final ByteBuf buffer) throws Exception {
@@ -83,7 +84,7 @@ public class ItemType1_20_5 extends Type<Item> {
         buffer.writeByte(object.amount());
         Type.VAR_INT.writePrimitive(buffer, object.identifier());
 
-        final Int2ObjectMap<Optional<StructuredData<?>>> data = object.structuredData();
+        final Int2ObjectMap<Optional<StructuredData<?>>> data = object.structuredData().data();
         int valuesSize = 0;
         int markersSize = 0;
         for (final Int2ObjectMap.Entry<Optional<StructuredData<?>>> entry : data.int2ObjectEntrySet()) {

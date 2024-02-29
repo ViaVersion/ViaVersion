@@ -24,10 +24,8 @@ package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import java.util.Objects;
-import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class DataItem implements Item {
@@ -95,17 +93,7 @@ public class DataItem implements Item {
     }
 
     @Override
-    public Int2ObjectMap<Optional<StructuredData<?>>> structuredData() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void addData(final StructuredData<?> data) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void removeDefaultData(final int id) {
+    public StructuredDataContainer structuredData() {
         throw new UnsupportedOperationException();
     }
 

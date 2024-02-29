@@ -23,9 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import java.util.Optional;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface Item {
@@ -91,11 +89,7 @@ public interface Item {
      */
     void setTag(@Nullable CompoundTag tag);
 
-    Int2ObjectMap<Optional<StructuredData<?>>> structuredData();
-
-    void addData(StructuredData<?> data);
-
-    void removeDefaultData(int id);
+    StructuredDataContainer structuredData();
 
     /**
      * Returns a copy of the item.

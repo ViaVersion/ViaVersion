@@ -78,8 +78,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 handler(wrapper -> {
                     Item[] items = wrapper.read(itemArrayType);
                     wrapper.write(mappedItemArrayType, items);
-                    for (Item item : items) {
-                        handleItemToClient(item);
+                    for (int i = 0; i < items.length; i++) {
+                        items[i] = handleItemToClient(items[i]);
                     }
                 });
             }
@@ -95,8 +95,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 handler(wrapper -> {
                     Item[] items = wrapper.read(itemArrayType);
                     wrapper.write(mappedItemArrayType, items);
-                    for (Item item : items) {
-                        handleItemToClient(item);
+                    for (int i = 0; i < items.length; i++) {
+                        items[i] = handleItemToClient(items[i]);
                     }
 
                     handleClientboundItem(wrapper);
@@ -519,15 +519,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         };
     }
 
-    public PacketHandler itemArrayToClientHandler(Type<Item[]> type) {
-        return wrapper -> {
-            Item[] items = wrapper.get(type, 0);
-            for (Item item : items) {
-                handleItemToClient(item);
-            }
-        };
-    }
-
     private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
         final Item item = handleItemToClient(wrapper.read(itemType));
         wrapper.write(mappedItemType, item);
@@ -540,14 +531,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     protected void rewriteParticle(Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        int id = particle.getId();
+        int id = particle.id();
         if (mappings.isBlockParticle(id)) {
             Particle.ParticleData<Integer> data = particle.getArgument(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id)) {
             Particle.ParticleData<Item> data = particle.getArgument(0);
-            Item item = data.getValue();
-            handleItemToClient(item);
+            data.setValue(handleItemToClient(data.getValue()));
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));

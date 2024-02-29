@@ -4,7 +4,7 @@ metadata.format.version = "1.1"
 
 gson = "2.10.1"
 fastutil = "8.5.12"
-vianbt = "4.2.0"
+vianbt = "4.3.0"
 mcstructs = "2.4.2-SNAPSHOT"
 
 # Common provided
