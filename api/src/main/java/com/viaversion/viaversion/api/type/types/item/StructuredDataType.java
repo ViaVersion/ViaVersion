@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredDataType extends Type<StructuredData<?>> {
 
@@ -55,8 +56,12 @@ public class StructuredDataType extends Type<StructuredData<?>> {
         throw new IllegalArgumentException("No data component serializer found for id " + id);
     }
 
+    public @Nullable StructuredDataKey<?> key(final int id) {
+        return types.get(id);
+    }
+
     private <T> StructuredData<T> readData(final ByteBuf buffer, final StructuredDataKey<T> key, final int id) throws Exception {
-        return new StructuredData<>(key, key.type().read(buffer), id);
+        return StructuredData.of(key, key.type().read(buffer), id);
     }
 
     public DataFiller filler(final Protocol<?, ?, ?, ?> protocol) {

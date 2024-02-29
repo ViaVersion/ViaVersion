@@ -23,19 +23,11 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
-import com.viaversion.viaversion.api.minecraft.item.data.Bee;
-import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
-import com.viaversion.viaversion.api.minecraft.item.data.GameProfile;
-import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTarget;
-import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -120,7 +112,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK);
-        Types1_20_5.ITEM_DATA.filler(this)
+        Types1_20_5.STRUCTURED_DATA.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA)
             .add(StructuredDataKey.DAMAGE)
             .add(StructuredDataKey.UNBREAKABLE)

@@ -23,96 +23,106 @@
 package com.viaversion.viaversion.api.minecraft.data;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.Optional;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class StructuredDataContainer {
 
-    private final Int2ObjectMap<Optional<StructuredData<?>>> data; // Bless Optionals in a map
+    private final Map<StructuredDataKey<?>, StructuredData<?>> data;
+    private FullMappings lookup;
+    private boolean mappedNames;
 
-    public StructuredDataContainer(final Int2ObjectMap<Optional<StructuredData<?>>> data) {
+    public StructuredDataContainer(final Map<StructuredDataKey<?>, StructuredData<?>> data) {
         this.data = data;
     }
 
     public StructuredDataContainer() {
-        this(new Int2ObjectOpenHashMap<>());
+        this(new Reference2ObjectOpenHashMap<>());
     }
 
     /**
-     * Returns structured data by id. You might want to call {@link #contains(int)} first.
+     * Returns structured data by id if present.
      *
-     * @param id  serializer id
+     * @param key serializer id
      * @param <T> data type
      * @return structured data
      */
-    public Optional<StructuredData<?>> get(final int id) {
-        return this.data.getOrDefault(id, Optional.empty());
+    public @Nullable <T> StructuredData<T> get(final StructuredDataKey<T> key) {
+        //noinspection unchecked
+        return (StructuredData<T>) this.data.get(key);
     }
 
     /**
-     * Returns structured data by id. You might want to call {@link #contains(Protocol, StructuredDataKey)} first.
+     * Returns structured data by id if not empty.
      *
-     * @param protocol protocol to retreive the id of the serializer from
-     * @param key      serializer id
-     * @param <T>      data type
-     * @return structured data
+     * @param key serializer id
+     * @param <T> data type
+     * @return structured data if not empty
      */
-    public <T> Optional<StructuredData<T>> get(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<T> key) {
-        final Optional<StructuredData<?>> data = this.data.getOrDefault(serializerId(protocol, key), Optional.empty());
+    public @Nullable <T> StructuredData<T> getNonEmpty(final StructuredDataKey<T> key) {
         //noinspection unchecked
-        return data.map(value -> (StructuredData<T>) value);
+        final StructuredData<T> data = (StructuredData<T>) this.data.get(key);
+        return data != null && data.isPresent() ? data : null;
     }
 
-    public void add(final StructuredData<?> data) {
-        this.data.put(data.id(), Optional.of(data));
-    }
-
-    public <T> void add(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<T> key, final T value) {
-        final int id = serializerId(protocol, key);
+    public <T> void add(final StructuredDataKey<T> key, final T value) {
+        final int id = serializerId(key);
         if (id != -1) {
-            add(new StructuredData<>(key, value, id));
+            this.data.put(key, StructuredData.of(key, value, id));
         }
     }
 
-    public void addEmpty(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<?> key) {
-        final int id = serializerId(protocol, key);
-        if (id != -1) {
-            this.data.put(id, Optional.empty());
-        }
-    }
-
-    public void remove(final int id) {
-        this.data.remove(id);
-    }
-
-    public void removeDefault(final int id) {
+    public void addEmpty(final StructuredDataKey<?> key) {
         // Empty optional to override the Minecraft default
-        this.data.put(id, Optional.empty());
+        this.data.put(key, StructuredData.empty(key, serializerId(key)));
     }
 
-    public boolean contains(final int id) {
-        return this.data.containsKey(id);
+    /**
+     * Removes and returns structured data by the given key.
+     *
+     * @param key serializer key
+     * @param <T> data type
+     * @return removed structured data
+     */
+    public @Nullable <T> StructuredData<T> remove(final StructuredDataKey<T> key) {
+        final StructuredData<?> data = this.data.remove(key);
+        //noinspection unchecked
+        return data != null ? (StructuredData<T>) data : null;
     }
 
-    public boolean contains(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<?> key) {
-        return this.data.containsKey(serializerId(protocol, key));
+    public boolean contains(final StructuredDataKey<?> key) {
+        return this.data.containsKey(key);
+    }
+
+    /**
+     * Sets the lookup for serializer ids. Required to call most of the other methods.
+     *
+     * @param protocol    protocol to retreive the id of the serializer from
+     * @param mappedNames if the names are mapped (true if structures from the mapped version are added, false for the unmapped version)
+     */
+    public void setIdLookup(final Protocol<?, ?, ?, ?> protocol, final boolean mappedNames) {
+        this.lookup = protocol.getMappingData().getDataComponentSerializerMappings();
+        this.mappedNames = mappedNames;
     }
 
     public StructuredDataContainer copy() {
-        return new StructuredDataContainer(new Int2ObjectOpenHashMap<>(data));
+        final StructuredDataContainer copy = new StructuredDataContainer(new Reference2ObjectOpenHashMap<>(data));
+        copy.lookup = this.lookup;
+        return copy;
     }
 
-    private int serializerId(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<?> key) {
-        final int id = protocol.getMappingData().getDataComponentSerializerMappings().mappedId(key.identifier());
+    private int serializerId(final StructuredDataKey<?> key) {
+        final int id = mappedNames ? lookup.mappedId(key.identifier()) : lookup.id(key.identifier());
         if (id == -1) {
             Via.getPlatform().getLogger().severe("Could not find item data serializer for type " + key);
         }
         return id;
     }
 
-    public Int2ObjectMap<Optional<StructuredData<?>>> data() {
+    public Map<StructuredDataKey<?>, StructuredData<?>> data() {
         return data;
     }
 }

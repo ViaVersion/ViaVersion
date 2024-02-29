@@ -22,53 +22,59 @@
  */
 package com.viaversion.viaversion.api.minecraft.data;
 
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdHolder;
-import com.viaversion.viaversion.util.Unit;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class StructuredData<T> implements IdHolder {
+public interface StructuredData<T> extends IdHolder {
 
-    private final StructuredDataKey<T> key;
-    private T value;
-    private int id;
-
-    public StructuredData(final StructuredDataKey<T> key, final T value, final int id) {
-        this.key = key;
-        this.value = value;
-        this.id = id;
+    /**
+     * Returns filled structured data, equivalent to an Optional with a value in vanilla.
+     *
+     * @param key   serializer key
+     * @param value value
+     * @param id    serializer id
+     * @param <T>   serializer type
+     * @return filled structured data
+     */
+    static <T> StructuredData<T> of(final StructuredDataKey<T> key, final T value, final int id) {
+        return new FilledStructuredData<>(key, value, id);
     }
 
-    public boolean isEmpty() {
-        return key.type() == Type.UNIT;
+    /**
+     * Returns empty structured data, equivalent to an empty Optional in vanilla.
+     *
+     * @param key serializer key
+     * @param id  serializer id
+     * @return empty structured data
+     */
+    static <T> StructuredData<T> empty(final StructuredDataKey<T> key, final int id) {
+        return new EmptyStructuredData<>(key, id);
     }
 
-    public void setValue(final T value) {
-        if (value != null && !key.type().getOutputClass().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Item data type and value are incompatible. Type=" + key
-                + ", value=" + value + " (" + value.getClass().getSimpleName() + ")");
-        }
-        this.value = value;
+    void setValue(final T value);
+
+    void write(final ByteBuf buffer) throws Exception;
+
+    void setId(final int id);
+
+    StructuredDataKey<T> key();
+
+    @Nullable T value();
+
+    /**
+     * Returns whether the structured data is present. Even if true, the value may be null.
+     *
+     * @return true if the structured data is present
+     */
+    default boolean isPresent() {
+        return !isEmpty();
     }
 
-    public void write(final ByteBuf buffer) throws Exception {
-        key.type().write(buffer, value);
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
-
-    public StructuredDataKey<T> key() {
-        return key;
-    }
-
-    public T value() {
-        return value;
-    }
-
-    @Override
-    public int id() {
-        return id;
-    }
+    /**
+     * Returns whether the structured data is empty. Not to be confused with a null value.
+     *
+     * @return true if the structured data is empty
+     */
+    boolean isEmpty();
 }

@@ -50,8 +50,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this(protocol, itemType, itemArrayType, itemType, itemArrayType);
     }
 
-    // These two methods always return the same item instance *for now*
-    // It is made this way, so it's easy to handle new instance creation/implementation changes
     @Override
     public @Nullable Item handleItemToClient(@Nullable Item item) {
         if (item == null) return null;

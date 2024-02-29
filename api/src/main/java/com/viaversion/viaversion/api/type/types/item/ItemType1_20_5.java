@@ -22,24 +22,25 @@
  */
 package com.viaversion.viaversion.api.type.types.item;
 
-import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
-import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import java.util.Optional;
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemType1_20_5 extends Type<Item> {
 
-    private final Type<StructuredData<?>> dataType;
+    private final StructuredDataType dataType;
 
-    public ItemType1_20_5(final Type<StructuredData<?>> itemDataType) {
+    public ItemType1_20_5(final StructuredDataType dataType) {
         super(Item.class);
-        this.dataType = itemDataType;
+        this.dataType = dataType;
     }
 
     @Override
@@ -50,26 +51,30 @@ public class ItemType1_20_5 extends Type<Item> {
         }
 
         final int id = Type.VAR_INT.readPrimitive(buffer);
-        final Int2ObjectMap<Optional<StructuredData<?>>> data = readData(buffer);
+        final Map<StructuredDataKey<?>, StructuredData<?>> data = readData(buffer);
         return new StructuredItem(id, amount, new StructuredDataContainer(data));
     }
 
-    private Int2ObjectMap<Optional<StructuredData<?>>> readData(final ByteBuf buffer) throws Exception {
+    private Map<StructuredDataKey<?>, StructuredData<?>> readData(final ByteBuf buffer) throws Exception {
         final int valuesSize = Type.VAR_INT.readPrimitive(buffer);
         final int markersSize = Type.VAR_INT.readPrimitive(buffer);
         if (valuesSize == 0 && markersSize == 0) {
-            return new Int2ObjectOpenHashMap<>();
+            return new Reference2ObjectOpenHashMap<>();
         }
 
-        final Int2ObjectMap<Optional<StructuredData<?>>> map = new Int2ObjectOpenHashMap<>(valuesSize + markersSize);
+        final Map<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(valuesSize + markersSize);
         for (int i = 0; i < valuesSize; i++) {
             final StructuredData<?> value = dataType.read(buffer);
-            map.put(value.id(), Optional.of(value));
+            final StructuredDataKey<?> key = dataType.key(value.id());
+            Preconditions.checkNotNull(key, "No data component serializer found for $s", value);
+            map.put(key, value);
         }
 
         for (int i = 0; i < markersSize; i++) {
-            final int key = Type.VAR_INT.readPrimitive(buffer);
-            map.put(key, Optional.empty());
+            final int id = Type.VAR_INT.readPrimitive(buffer);
+            final StructuredDataKey<?> key = dataType.key(id);
+            Preconditions.checkNotNull(key, "No data component serializer found for empty id $s", id);
+            map.put(key, StructuredData.empty(key, id));
         }
         return map;
     }
@@ -84,11 +89,11 @@ public class ItemType1_20_5 extends Type<Item> {
         buffer.writeByte(object.amount());
         Type.VAR_INT.writePrimitive(buffer, object.identifier());
 
-        final Int2ObjectMap<Optional<StructuredData<?>>> data = object.structuredData().data();
+        final Map<StructuredDataKey<?>, StructuredData<?>> data = object.structuredData().data();
         int valuesSize = 0;
         int markersSize = 0;
-        for (final Int2ObjectMap.Entry<Optional<StructuredData<?>>> entry : data.int2ObjectEntrySet()) {
-            if (entry.getValue().isPresent()) {
+        for (final StructuredData<?> value : data.values()) {
+            if (value.isPresent()) {
                 valuesSize++;
             } else {
                 markersSize++;
@@ -98,14 +103,14 @@ public class ItemType1_20_5 extends Type<Item> {
         Type.VAR_INT.writePrimitive(buffer, valuesSize);
         Type.VAR_INT.writePrimitive(buffer, markersSize);
 
-        for (final Int2ObjectMap.Entry<Optional<StructuredData<?>>> entry : data.int2ObjectEntrySet()) {
-            if (entry.getValue().isPresent()) {
-                dataType.write(buffer, entry.getValue().get());
+        for (final StructuredData<?> value : data.values()) {
+            if (value.isPresent()) {
+                dataType.write(buffer, value);
             }
         }
-        for (final Int2ObjectMap.Entry<Optional<StructuredData<?>>> entry : data.int2ObjectEntrySet()) {
-            if (!entry.getValue().isPresent()) {
-                Type.VAR_INT.writePrimitive(buffer, entry.getIntKey());
+        for (final StructuredData<?> value : data.values()) {
+            if (value.isEmpty()) {
+                Type.VAR_INT.writePrimitive(buffer, value.id());
             }
         }
     }

@@ -49,7 +49,6 @@ import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -189,7 +188,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     public Item toOldItem(final Item item) {
         // Start out with custom data and add the rest on top
         final StructuredDataContainer data = item.structuredData();
-        final CompoundTag tag = data.get(protocol, StructuredDataKey.CUSTOM_DATA).map(StructuredData::value).orElse(new CompoundTag());
+        data.setIdLookup(protocol, true);
+
+        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
+        final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
 
         // TODO
 
@@ -200,6 +202,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
+        data.setIdLookup(protocol, true);
         if (tag == null) {
             return item;
         }
@@ -208,19 +211,19 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final NumberTag damage = tag.getNumberTag("Damage");
         if (damage != null && damage.asInt() != 0) {
             tag.remove("Damage");
-            data.add(protocol, StructuredDataKey.DAMAGE, damage.asInt());
+            data.add(StructuredDataKey.DAMAGE, damage.asInt());
         }
 
         final NumberTag repairCost = tag.getNumberTag("RepairCost");
         if (repairCost != null && repairCost.asInt() != 0) {
             tag.remove("RepairCost");
-            data.add(protocol, StructuredDataKey.REPAIR_COST, repairCost.asInt());
+            data.add(StructuredDataKey.REPAIR_COST, repairCost.asInt());
         }
 
         final NumberTag customModelData = tag.getNumberTag("CustomModelData");
         if (customModelData != null) {
             tag.remove("CustomModelData");
-            data.add(protocol, StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
+            data.add(StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
         }
 
         final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
@@ -232,13 +235,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     properties.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
                 }
             }
-            data.add(protocol, StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
+            data.add(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
         }
 
         final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
             tag.remove("EntityTag");
-            data.add(protocol, StructuredDataKey.ENTITY_DATA, entityTag);
+            data.add(StructuredDataKey.ENTITY_DATA, entityTag);
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
@@ -255,62 +258,62 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (unbreakable != null && unbreakable.asBoolean()) {
             tag.remove("Unbreakable");
             if ((hideFlagsValue & 0x04) != 0) {
-                data.add(protocol, StructuredDataKey.UNBREAKABLE, true); // TODO Value is hide, should have a wrapper
+                data.add(StructuredDataKey.UNBREAKABLE, true); // TODO Value is hide, should have a wrapper
             } else {
-                data.addEmpty(protocol, StructuredDataKey.UNBREAKABLE);
+                data.addEmpty(StructuredDataKey.UNBREAKABLE);
             }
         }
 
-        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) != 0);
-        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) != 0);
+        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
+        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
 
         // TODO
-        //  tructuredDataKey.CUSTOM_NAME
-        //  tructuredDataKey.LORE
-        //  tructuredDataKey.CAN_PLACE_ON
-        //  tructuredDataKey.CAN_BREAK
-        //  tructuredDataKey.ATTRIBUTE_MODIFIERS
-        //  tructuredDataKey.HIDE_ADDITIONAL_TOOLTIP
-        //  tructuredDataKey.REPAIR_COST
-        //  tructuredDataKey.CREATIVE_SLOT_LOCK
-        //  tructuredDataKey.INTANGIBLE_PROJECTILE
-        //  tructuredDataKey.DYED_COLOR
-        //  tructuredDataKey.MAP_COLOR
-        //  tructuredDataKey.MAP_ID
-        //  tructuredDataKey.MAP_DECORATIONS
-        //  tructuredDataKey.MAP_POST_PROCESSING
-        //  tructuredDataKey.CHARGED_PROJECTILES
-        //  tructuredDataKey.BUNDLE_CONTENTS
-        //  tructuredDataKey.POTION_CONTENTS
-        //  tructuredDataKey.SUSPICIOUS_STEW_EFFECTS
-        //  tructuredDataKey.WRITABLE_BOOK_CONTENT
-        //  tructuredDataKey.WRITTEN_BOOK_CONTENT
-        //  tructuredDataKey.TRIM
-        //  tructuredDataKey.DEBUG_STICK_STATE
-        //  tructuredDataKey.BUCKET_ENTITY_DATA
-        //  tructuredDataKey.BLOCK_ENTITY_DATA
-        //  tructuredDataKey.INSTRUMENT
-        //  tructuredDataKey.RECIPES
-        //  tructuredDataKey.LODESTONE_TARGET
-        //  tructuredDataKey.FIREWORK_EXPLOSION
-        //  tructuredDataKey.FIREWORKS
-        //  tructuredDataKey.PROFILE
-        //  tructuredDataKey.NOTE_BLOCK_SOUND
-        //  tructuredDataKey.BANNER_PATTERNS
-        //  tructuredDataKey.BASE_COLOR
-        //  tructuredDataKey.POT_DECORATIONS
-        //  tructuredDataKey.CONTAINER
-        //  tructuredDataKey.BEES
-        //  tructuredDataKey.LOCK
-        //  tructuredDataKey.CONTAINER_LOOT
+        //  StructuredDataKey.CUSTOM_NAME
+        //  StructuredDataKey.LORE
+        //  StructuredDataKey.CAN_PLACE_ON
+        //  StructuredDataKey.CAN_BREAK
+        //  StructuredDataKey.ATTRIBUTE_MODIFIERS
+        //  StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP
+        //  StructuredDataKey.REPAIR_COST
+        //  StructuredDataKey.CREATIVE_SLOT_LOCK
+        //  StructuredDataKey.INTANGIBLE_PROJECTILE
+        //  StructuredDataKey.DYED_COLOR
+        //  StructuredDataKey.MAP_COLOR
+        //  StructuredDataKey.MAP_ID
+        //  StructuredDataKey.MAP_DECORATIONS
+        //  StructuredDataKey.MAP_POST_PROCESSING
+        //  StructuredDataKey.CHARGED_PROJECTILES
+        //  StructuredDataKey.BUNDLE_CONTENTS
+        //  StructuredDataKey.POTION_CONTENTS
+        //  StructuredDataKey.SUSPICIOUS_STEW_EFFECTS
+        //  StructuredDataKey.WRITABLE_BOOK_CONTENT
+        //  StructuredDataKey.WRITTEN_BOOK_CONTENT
+        //  StructuredDataKey.TRIM
+        //  StructuredDataKey.DEBUG_STICK_STATE
+        //  StructuredDataKey.BUCKET_ENTITY_DATA
+        //  StructuredDataKey.BLOCK_ENTITY_DATA
+        //  StructuredDataKey.INSTRUMENT
+        //  StructuredDataKey.RECIPES
+        //  StructuredDataKey.LODESTONE_TARGET
+        //  StructuredDataKey.FIREWORK_EXPLOSION
+        //  StructuredDataKey.FIREWORKS
+        //  StructuredDataKey.PROFILE
+        //  StructuredDataKey.NOTE_BLOCK_SOUND
+        //  StructuredDataKey.BANNER_PATTERNS
+        //  StructuredDataKey.BASE_COLOR
+        //  StructuredDataKey.POT_DECORATIONS
+        //  StructuredDataKey.CONTAINER
+        //  StructuredDataKey.BEES
+        //  StructuredDataKey.LOCK
+        //  StructuredDataKey.CONTAINER_LOOT
 
         // Add the rest as custom data
-        data.add(protocol, StructuredDataKey.CUSTOM_DATA, tag);
+        data.add(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
-                                    final StructuredDataKey<Enchantments> newKey, final boolean hide) {
+                                    final StructuredDataKey<Enchantments> newKey, final boolean show) {
         final ListTag enchantmentsTag = tag.getListTag(key);
         if (enchantmentsTag == null) {
             return;
@@ -318,7 +321,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         tag.remove(key);
 
-        final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), !hide);
+        final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), show);
         for (final Tag enchantment : enchantmentsTag) {
             if (!(enchantment instanceof CompoundTag)) {
                 continue;
@@ -339,11 +342,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             enchantments.enchantments().put(intId, lvl.asInt());
         }
 
-        data.add(protocol, newKey, enchantments);
+        data.add(newKey, enchantments);
 
         // Add glint if none of the enchantments were valid
         if (enchantments.size() == 0 && !enchantmentsTag.isEmpty()) {
-            data.add(protocol, StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
+            data.add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
     }
 }

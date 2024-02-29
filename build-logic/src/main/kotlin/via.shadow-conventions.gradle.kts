@@ -29,9 +29,10 @@ fun ShadowJar.configureRelocations() {
 }
 
 fun ShadowJar.configureExcludes() {
-    // FastUtil - we only want object, int, and reference maps
+    // FastUtil - we only want object, int, and certain reference maps
     // Object types
-    exclude("it/unimi/dsi/fastutil/*/*Reference*")
+    exclude("it/unimi/dsi/fastutil/*/*2Reference*")
+    exclude("it/unimi/dsi/fastutil/*/*Reference2Int*")
     exclude("it/unimi/dsi/fastutil/*/*Boolean*")
     exclude("it/unimi/dsi/fastutil/*/*Byte*")
     exclude("it/unimi/dsi/fastutil/*/*Short*")
@@ -48,4 +49,6 @@ fun ShadowJar.configureExcludes() {
     exclude("it/unimi/dsi/fastutil/*/*Big*")
     exclude("it/unimi/dsi/fastutil/*/*Synchronized*")
     exclude("it/unimi/dsi/fastutil/*/*Unmodifiable*")
+    // More
+    exclude("it/unimi/dsi/fastutil/io/TextIO")
 }

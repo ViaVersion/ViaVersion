@@ -38,8 +38,8 @@ public final class Types1_20_5 {
 
     // Most of these are only safe to use after protocol loading
     public static final ParticleType PARTICLE = new ParticleType();
-    public static final StructuredDataType ITEM_DATA = new StructuredDataType();
-    public static final Type<Item> ITEM = new ItemType1_20_5(ITEM_DATA);
+    public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
+    public static final Type<Item> ITEM = new ItemType1_20_5(STRUCTURED_DATA);
     public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
     public static final MetaTypes1_20_5 META_TYPES = new MetaTypes1_20_5(PARTICLE);
     public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
