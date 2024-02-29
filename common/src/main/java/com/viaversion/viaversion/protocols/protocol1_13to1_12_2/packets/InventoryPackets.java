@@ -62,7 +62,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Slot Value
 
-                handler(itemToClientHandler(Type.ITEM1_13));
+                handler(wrapper -> handleItemToClient(wrapper.get(Type.ITEM1_13, 0)));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketHandlers() {
@@ -196,7 +196,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Item
 
-                handler(itemToClientHandler(Type.ITEM1_13));
+                handler(wrapper -> handleItemToClient(wrapper.get(Type.ITEM1_13, 0)));
             }
         });
 
@@ -211,7 +211,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.VAR_INT); // 4 - Mode
                 map(Type.ITEM1_13, Type.ITEM1_8); // 5 - Clicked Item
 
-                handler(itemToServerHandler(Type.ITEM1_8));
+                handler(wrapper -> handleItemToServer(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
 
@@ -253,7 +253,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.SHORT); // 0 - Slot
                 map(Type.ITEM1_13, Type.ITEM1_8); // 1 - Clicked Item
 
-                handler(itemToServerHandler(Type.ITEM1_8));
+                handler(wrapper -> handleItemToServer(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
     }

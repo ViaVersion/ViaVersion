@@ -91,7 +91,11 @@ public interface Item {
      */
     void setTag(@Nullable CompoundTag tag);
 
-    Int2ObjectMap<Optional<StructuredData<?>>> itemData();
+    Int2ObjectMap<Optional<StructuredData<?>>> structuredData();
+
+    void addData(StructuredData<?> data);
+
+    void removeDefaultData(int id);
 
     /**
      * Returns a copy of the item.

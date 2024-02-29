@@ -22,10 +22,10 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.item.DynamicItem;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -175,27 +175,45 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (item == null) return null;
 
         super.handleItemToClient(item);
+        return toStructuredItem(item);
+    }
 
-        final CompoundTag tag = item.tag();
-        final DynamicItem dynamicItem = new DynamicItem(item.identifier(), (byte) item.amount(), new Int2ObjectOpenHashMap<>());
+    @Override
+    public @Nullable Item handleItemToServer(@Nullable final Item item) {
+        if (item == null) return null;
+
+        super.handleItemToServer(item);
+        return toOldItem(item);
+    }
+
+    public static Item toOldItem(final Item item) {
+        final CompoundTag tag = new CompoundTag();
+        // TODO
+        return new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
+    }
+
+    public static Item toStructuredItem(final Item old) {
+        final CompoundTag tag = old.tag();
+        final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new Int2ObjectOpenHashMap<>());
         if (tag == null) {
-            return dynamicItem;
+            return item;
         }
 
         // Rewrite nbt to new data structures
         final NumberTag damage = tag.getNumberTag("Damage");
         if (damage != null) {
-            addData(dynamicItem, "damage", Type.VAR_INT, damage.asInt());
+            addData(item, "damage", Type.VAR_INT, damage.asInt());
         }
 
         final NumberTag repairCost = tag.getNumberTag("RepairCost");
         if (repairCost != null) {
-            addData(dynamicItem, "repair_cost", Type.VAR_INT, repairCost.asInt());
+            addData(item, "repair_cost", Type.VAR_INT, repairCost.asInt());
         }
-        return dynamicItem;
+        // TODO
+        return item;
     }
 
-    private <T> void addData(final DynamicItem item, final String serializer, final Type<T> type, final T value) {
+    private static <T> void addData(final StructuredItem item, final String serializer, final Type<T> type, final T value) {
         final int id = serializerId(serializer);
         if (id == -1) {
             Via.getPlatform().getLogger().severe("Could not find item data serializer for type " + type);
@@ -205,17 +223,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         item.addData(new StructuredData<>(type, value, id));
     }
 
-    private int serializerId(final String type) {
-        return protocol.getMappingData().getDataComponentSerializerMappings().mappedId(type);
-    }
-
-    @Override
-    public @Nullable Item handleItemToServer(@Nullable final Item item) {
-        if (item == null) return null;
-
-        super.handleItemToServer(item);
-
-        final CompoundTag tag = new CompoundTag();
-        return new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
+    private static int serializerId(final String type) {
+        return Protocol1_20_5To1_20_3.MAPPINGS.getDataComponentSerializerMappings().mappedId(type);
     }
 }

@@ -35,7 +35,7 @@ import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
 public final class BlockItemPacketRewriter1_99 extends ItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
+        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY); // Add two more types if they changed
     }
 
     @Override

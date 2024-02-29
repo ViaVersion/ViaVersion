@@ -29,16 +29,16 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class DynamicItem implements Item {
+public class StructuredItem implements Item {
     private final Int2ObjectMap<Optional<StructuredData<?>>> data;
     private int identifier;
     private byte amount;
 
-    public DynamicItem() {
+    public StructuredItem() {
         this(0, (byte) 0, new Int2ObjectOpenHashMap<>());
     }
 
-    public DynamicItem(int identifier, byte amount, Int2ObjectMap<Optional<StructuredData<?>>> data) {
+    public StructuredItem(final int identifier, final byte amount, final Int2ObjectMap<Optional<StructuredData<?>>> data) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
@@ -50,7 +50,7 @@ public class DynamicItem implements Item {
     }
 
     @Override
-    public void setIdentifier(int identifier) {
+    public void setIdentifier(final int identifier) {
         this.identifier = identifier;
     }
 
@@ -60,7 +60,7 @@ public class DynamicItem implements Item {
     }
 
     @Override
-    public void setAmount(int amount) {
+    public void setAmount(final int amount) {
         if (amount > Byte.MAX_VALUE || amount < Byte.MIN_VALUE) {
             throw new IllegalArgumentException("Invalid item amount: " + amount);
         }
@@ -73,34 +73,36 @@ public class DynamicItem implements Item {
     }
 
     @Override
-    public void setTag(@Nullable CompoundTag tag) {
+    public void setTag(@Nullable final CompoundTag tag) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Int2ObjectMap<Optional<StructuredData<?>>> itemData() {
+    public Int2ObjectMap<Optional<StructuredData<?>>> structuredData() {
         return data;
     }
 
-    public void addData(StructuredData<?> data) {
+    @Override
+    public void addData(final StructuredData<?> data) {
         this.data.put(data.id(), Optional.of(data));
     }
 
-    public void removeDefault(int id) {
+    @Override
+    public void removeDefaultData(final int id) {
         // Empty optional to override the Minecraft default
         this.data.put(id, Optional.empty());
     }
 
     @Override
-    public Item copy() {
-        return new DynamicItem(identifier, amount, data);
+    public StructuredItem copy() {
+        return new StructuredItem(identifier, amount, new Int2ObjectOpenHashMap<>(data));
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        final DynamicItem that = (DynamicItem) o;
+        final StructuredItem that = (StructuredItem) o;
         if (identifier != that.identifier) return false;
         if (amount != that.amount) return false;
         return data.equals(that.data);

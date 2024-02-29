@@ -26,7 +26,6 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.annotations.SerializedName;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Objects;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -96,8 +95,18 @@ public class DataItem implements Item {
     }
 
     @Override
-    public Int2ObjectMap<Optional<StructuredData<?>>> itemData() {
-        return new Int2ObjectOpenHashMap<>();
+    public Int2ObjectMap<Optional<StructuredData<?>>> structuredData() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addData(final StructuredData<?> data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeDefaultData(final int id) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
