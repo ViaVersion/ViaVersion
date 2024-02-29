@@ -543,11 +543,23 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         particle.setId(protocol.getMappingData().getNewParticleId(id));
     }
 
-    public Type<Item> getItemType() {
+    @Override
+    public Type<Item> itemType() {
         return itemType;
     }
 
-    public Type<Item[]> getItemArrayType() {
+    @Override
+    public Type<Item[]> itemArrayType() {
         return itemArrayType;
+    }
+
+    @Override
+    public Type<Item> mappedItemType() {
+        return mappedItemType;
+    }
+
+    @Override
+    public Type<Item[]> mappedItemArrayType() {
+        return mappedItemArrayType;
     }
 }

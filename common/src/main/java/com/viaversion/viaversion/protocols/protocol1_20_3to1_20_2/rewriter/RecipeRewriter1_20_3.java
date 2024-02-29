@@ -46,11 +46,21 @@ public class RecipeRewriter1_20_3<C extends ClientboundPacketType> extends Recip
 
     @Override
     protected Type<Item> itemType() {
-        return Type.ITEM1_20_2;
+        return protocol.getItemRewriter().itemType();
     }
 
     @Override
     protected Type<Item[]> itemArrayType() {
-        return Type.ITEM1_20_2_ARRAY;
+        return protocol.getItemRewriter().itemArrayType();
+    }
+
+    @Override
+    protected Type<Item> mappedItemType() {
+        return protocol.getItemRewriter().mappedItemType();
+    }
+
+    @Override
+    protected Type<Item[]> mappedItemArrayType() {
+        return protocol.getItemRewriter().mappedItemArrayType();
     }
 }

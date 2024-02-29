@@ -47,10 +47,8 @@ public final class StructuredDataContainer {
      * @param <T> data type
      * @return structured data
      */
-    public <T> Optional<StructuredData<T>> get(final int id) {
-        final Optional<StructuredData<?>> data = this.data.getOrDefault(id, Optional.empty());
-        //noinspection unchecked
-        return data.map(value -> (StructuredData<T>) value);
+    public Optional<StructuredData<?>> get(final int id) {
+        return this.data.getOrDefault(id, Optional.empty());
     }
 
     /**
@@ -78,7 +76,7 @@ public final class StructuredDataContainer {
         }
     }
 
-    public <T> void addEmpty(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<T> key) {
+    public void addEmpty(final Protocol<?, ?, ?, ?> protocol, final StructuredDataKey<?> key) {
         final int id = serializerId(protocol, key);
         if (id != -1) {
             this.data.put(id, Optional.empty());

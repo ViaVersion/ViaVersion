@@ -38,9 +38,7 @@ import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewrite
 //   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99
 //   ClientboundPacket1_20_5
 //   ServerboundPacket1_20_5
-//   ClientboundConfigurationPackets1_20_3
-//   ServerboundConfigurationPackets1_20_2
-//   Entity1_19_4Types (MAPPED type)
+//   EntityTypes1_20_5 (MAPPED type)
 //   1.99, 1.98
 public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
 

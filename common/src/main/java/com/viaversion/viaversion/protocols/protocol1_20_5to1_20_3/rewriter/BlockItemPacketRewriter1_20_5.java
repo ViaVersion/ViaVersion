@@ -156,17 +156,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         });
 
-        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<ClientboundPacket1_20_3>(protocol) {
-            @Override
-            protected Type<Item> mappedItemType() {
-                return Types1_20_5.ITEM;
-            }
-
-            @Override
-            protected Type<Item[]> mappedItemArrayType() {
-                return Types1_20_5.ITEM_ARRAY;
-            }
-        };
+        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_20_3.DECLARE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
@@ -197,11 +187,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     public Item toOldItem(final Item item) {
-        final StructuredDataContainer data = item.structuredData();
-        final Optional<StructuredData<CompoundTag>> customData = data.get(protocol, StructuredDataKey.CUSTOM_DATA);
-
         // Start out with custom data and add the rest on top
-        final CompoundTag tag = customData.map(StructuredData::value).orElse(new CompoundTag());
+        final StructuredDataContainer data = item.structuredData();
+        final CompoundTag tag = data.get(protocol, StructuredDataKey.CUSTOM_DATA).map(StructuredData::value).orElse(new CompoundTag());
 
         // TODO
 
@@ -277,6 +265,44 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) != 0);
 
         // TODO
+        //  tructuredDataKey.CUSTOM_NAME
+        //  tructuredDataKey.LORE
+        //  tructuredDataKey.CAN_PLACE_ON
+        //  tructuredDataKey.CAN_BREAK
+        //  tructuredDataKey.ATTRIBUTE_MODIFIERS
+        //  tructuredDataKey.HIDE_ADDITIONAL_TOOLTIP
+        //  tructuredDataKey.REPAIR_COST
+        //  tructuredDataKey.CREATIVE_SLOT_LOCK
+        //  tructuredDataKey.INTANGIBLE_PROJECTILE
+        //  tructuredDataKey.DYED_COLOR
+        //  tructuredDataKey.MAP_COLOR
+        //  tructuredDataKey.MAP_ID
+        //  tructuredDataKey.MAP_DECORATIONS
+        //  tructuredDataKey.MAP_POST_PROCESSING
+        //  tructuredDataKey.CHARGED_PROJECTILES
+        //  tructuredDataKey.BUNDLE_CONTENTS
+        //  tructuredDataKey.POTION_CONTENTS
+        //  tructuredDataKey.SUSPICIOUS_STEW_EFFECTS
+        //  tructuredDataKey.WRITABLE_BOOK_CONTENT
+        //  tructuredDataKey.WRITTEN_BOOK_CONTENT
+        //  tructuredDataKey.TRIM
+        //  tructuredDataKey.DEBUG_STICK_STATE
+        //  tructuredDataKey.BUCKET_ENTITY_DATA
+        //  tructuredDataKey.BLOCK_ENTITY_DATA
+        //  tructuredDataKey.INSTRUMENT
+        //  tructuredDataKey.RECIPES
+        //  tructuredDataKey.LODESTONE_TARGET
+        //  tructuredDataKey.FIREWORK_EXPLOSION
+        //  tructuredDataKey.FIREWORKS
+        //  tructuredDataKey.PROFILE
+        //  tructuredDataKey.NOTE_BLOCK_SOUND
+        //  tructuredDataKey.BANNER_PATTERNS
+        //  tructuredDataKey.BASE_COLOR
+        //  tructuredDataKey.POT_DECORATIONS
+        //  tructuredDataKey.CONTAINER
+        //  tructuredDataKey.BEES
+        //  tructuredDataKey.LOCK
+        //  tructuredDataKey.CONTAINER_LOOT
 
         // Add the rest as custom data
         data.add(protocol, StructuredDataKey.CUSTOM_DATA, tag);

@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
@@ -43,4 +44,12 @@ public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
      * @return rewritten item
      */
     @Nullable Item handleItemToServer(@Nullable Item item);
+
+    Type<Item> itemType();
+
+    Type<Item[]> itemArrayType();
+
+    Type<Item> mappedItemType();
+
+    Type<Item[]> mappedItemArrayType();
 }
