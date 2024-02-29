@@ -28,7 +28,7 @@ package com.viaversion.viaversion.api.protocol.version;
 public enum VersionType {
 
     /**
-     * Classic versions of Minecraft.
+     * Classic versions of Minecraft (Classic 0.0.2a to 0.30).
      */
     CLASSIC,
     /**
