@@ -55,7 +55,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.setIdentifier(mappingData.getNewItemId(item.identifier()));
             }
             if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.structuredData().setIdLookup(protocol, false);
+                item.structuredData().setIdLookup(protocol, true);
             }
         }
         return item;
@@ -73,7 +73,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.setIdentifier(mappingData.getOldItemId(item.identifier()));
             }
             if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.structuredData().setIdLookup(protocol, true);
+                item.structuredData().setIdLookup(protocol, false);
             }
         }
         return item;

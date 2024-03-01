@@ -27,7 +27,9 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
@@ -47,6 +49,7 @@ import com.viaversion.viaversion.api.type.types.ByteType;
 import com.viaversion.viaversion.api.type.types.ComponentType;
 import com.viaversion.viaversion.api.type.types.DoubleType;
 import com.viaversion.viaversion.api.type.types.FloatType;
+import com.viaversion.viaversion.api.type.types.IntArrayType;
 import com.viaversion.viaversion.api.type.types.IntType;
 import com.viaversion.viaversion.api.type.types.LongArrayType;
 import com.viaversion.viaversion.api.type.types.LongType;
@@ -56,7 +59,7 @@ import com.viaversion.viaversion.api.type.types.ShortByteArrayType;
 import com.viaversion.viaversion.api.type.types.ShortType;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.api.type.types.UUIDType;
-import com.viaversion.viaversion.api.type.types.UnitType;
+import com.viaversion.viaversion.api.type.types.EmptyType;
 import com.viaversion.viaversion.api.type.types.UnsignedByteType;
 import com.viaversion.viaversion.api.type.types.UnsignedShortType;
 import com.viaversion.viaversion.api.type.types.VarIntArrayType;
@@ -76,6 +79,8 @@ import com.viaversion.viaversion.api.type.types.math.GlobalPositionType;
 import com.viaversion.viaversion.api.type.types.item.ItemType1_20_2;
 import com.viaversion.viaversion.api.type.types.item.ItemShortArrayType1_8;
 import com.viaversion.viaversion.api.type.types.item.ItemType1_8;
+import com.viaversion.viaversion.api.type.types.misc.GameProfileType;
+import com.viaversion.viaversion.api.type.types.misc.HolderSetType;
 import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import com.viaversion.viaversion.api.type.types.OptionalVarIntType;
 import com.viaversion.viaversion.api.type.types.misc.PlayerMessageSignatureType;
@@ -98,7 +103,7 @@ import java.util.UUID;
  */
 public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
-    public static final Type<Unit> UNIT = new UnitType();
+    public static final Type<Unit> EMPTY = new EmptyType();
 
     public static final ByteType BYTE = new ByteType();
     public static final UnsignedByteType UNSIGNED_BYTE = new UnsignedByteType();
@@ -106,6 +111,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<byte[]> OPTIONAL_BYTE_ARRAY_PRIMITIVE = new ByteArrayType.OptionalByteArrayType();
     public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
+    public static final Type<int[]> INT_ARRAY_PRIMITIVE = new IntArrayType();
 
     public static final ShortType SHORT = new ShortType();
     public static final UnsignedShortType UNSIGNED_SHORT = new UnsignedShortType();
@@ -174,6 +180,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<VillagerData> VILLAGER_DATA = new VillagerDataType();
 
+    public static final Type<GameProfile> GAME_PROFILE = new GameProfileType();
     public static final Type<ProfileKey> PROFILE_KEY = new ProfileKeyType();
     public static final Type<ProfileKey> OPTIONAL_PROFILE_KEY = new ProfileKeyType.OptionalProfileKeyType();
 
@@ -187,6 +194,9 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final Type<RegistryEntry> REGISTRY_ENTRY = new RegistryEntryType();
     public static final Type<RegistryEntry[]> REGISTRY_ENTRY_ARRAY = new ArrayType<>(REGISTRY_ENTRY);
+
+    public static final Type<HolderSet> HOLDER_SET = new HolderSetType();
+    public static final Type<HolderSet> OPTIONAL_HOLDER_SET = new HolderSetType.OptionalHolderSetType();
 
     public static final Type<Item> ITEM1_8 = new ItemType1_8();
     public static final Type<Item> ITEM1_13 = new ItemType1_13();

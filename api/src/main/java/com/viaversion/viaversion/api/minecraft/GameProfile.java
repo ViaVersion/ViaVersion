@@ -20,43 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class GameProfile {
-
-    public static final Type<GameProfile> TYPE = new Type<GameProfile>(GameProfile.class) {
-        @Override
-        public GameProfile read(final ByteBuf buffer) throws Exception {
-            final String name = Type.STRING.read(buffer);
-            final UUID id = Type.OPTIONAL_UUID.read(buffer);
-            final int propertyCount = Type.VAR_INT.readPrimitive(buffer);
-            final Property[] properties = new Property[propertyCount];
-            for (int i = 0; i < propertyCount; i++) {
-                final String propertyName = Type.STRING.read(buffer);
-                final String propertyValue = Type.STRING.read(buffer);
-                final String propertySignature = Type.OPTIONAL_STRING.read(buffer);
-                properties[i] = new Property(propertyName, propertyValue, propertySignature);
-            }
-            return new GameProfile(name, id, properties);
-        }
-
-        @Override
-        public void write(final ByteBuf buffer, final GameProfile value) throws Exception {
-            Type.STRING.write(buffer, value.name);
-            Type.OPTIONAL_UUID.write(buffer, value.id);
-            Type.VAR_INT.writePrimitive(buffer, value.properties.length);
-            for (final Property property : value.properties) {
-                Type.STRING.write(buffer, property.name);
-                Type.STRING.write(buffer, property.value);
-                Type.OPTIONAL_STRING.write(buffer, property.signature);
-            }
-        }
-    };
 
     private final String name;
     private final UUID id;

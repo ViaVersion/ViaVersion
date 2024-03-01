@@ -20,24 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.util.Unit;
 import io.netty.buffer.ByteBuf;
 
-public final class UnitType extends Type<Unit> {
+// This goes DEEEP
+public final class AdventureModePredicate {
 
-    public UnitType() {
-        super(Unit.class);
+    public static final Type<AdventureModePredicate> TYPE = new Type<AdventureModePredicate>(AdventureModePredicate.class) {
+        @Override
+        public AdventureModePredicate read(final ByteBuf buffer) throws Exception {
+            final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
+            final boolean showInTooltip = buffer.readBoolean();
+            return new AdventureModePredicate(predicates, showInTooltip);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final AdventureModePredicate value) throws Exception {
+            BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
+            buffer.writeBoolean(value.showInTooltip);
+        }
+    };
+
+    private final BlockPredicate[] predicates;
+    private final boolean showInTooltip;
+
+    public AdventureModePredicate(final BlockPredicate[] predicates, final boolean showInTooltip) {
+        this.predicates = predicates;
+        this.showInTooltip = showInTooltip;
     }
 
-    @Override
-    public Unit read(final ByteBuf buffer) throws Exception {
-        return Unit.INSTANCE;
+    public BlockPredicate[] predicates() {
+        return predicates;
     }
 
-    @Override
-    public void write(final ByteBuf buffer, final Unit value) throws Exception {
+    public boolean showInTooltip() {
+        return showInTooltip;
     }
 }

@@ -24,14 +24,20 @@ package com.viaversion.viaversion.api.minecraft.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
-import com.viaversion.viaversion.api.minecraft.item.data.GameProfile;
+import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTarget;
+import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
+import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -45,15 +51,15 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Type.TAG);
     public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", Type.TAG_ARRAY);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS = new StructuredDataKey<>("enchantments", Enchantments.TYPE);
-    public static final StructuredDataKey<?> CAN_PLACE_ON = new StructuredDataKey<>("can_place_on", Type.UNIT); // TODO
-    public static final StructuredDataKey<?> CAN_BREAK = new StructuredDataKey<>("can_break", Type.UNIT); // TODO
-    public static final StructuredDataKey<?> ATTRIBUTE_MODIFIERS = new StructuredDataKey<>("attribute_modifiers", Type.UNIT); // TODO
+    public static final StructuredDataKey<AdventureModePredicate> CAN_PLACE_ON = new StructuredDataKey<>("can_place_on", AdventureModePredicate.TYPE);
+    public static final StructuredDataKey<AdventureModePredicate> CAN_BREAK = new StructuredDataKey<>("can_break", AdventureModePredicate.TYPE);
+    public static final StructuredDataKey<AttributeModifiers> ATTRIBUTE_MODIFIERS = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers.TYPE);
     public static final StructuredDataKey<Integer> CUSTOM_MODEL_DATA = new StructuredDataKey<>("custom_model_data", Type.VAR_INT);
-    public static final StructuredDataKey<Unit> HIDE_ADDITIONAL_TOOLTIP = new StructuredDataKey<>("hide_additional_tooltip", Type.UNIT);
+    public static final StructuredDataKey<Unit> HIDE_ADDITIONAL_TOOLTIP = new StructuredDataKey<>("hide_additional_tooltip", Type.EMPTY);
     public static final StructuredDataKey<Integer> REPAIR_COST = new StructuredDataKey<>("repair_cost", Type.VAR_INT);
-    public static final StructuredDataKey<Unit> CREATIVE_SLOT_LOCK = new StructuredDataKey<>("creative_slot_lock", Type.UNIT);
+    public static final StructuredDataKey<Unit> CREATIVE_SLOT_LOCK = new StructuredDataKey<>("creative_slot_lock", Type.EMPTY);
     public static final StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE = new StructuredDataKey<>("enchantment_glint_override", Type.BOOLEAN);
-    public static final StructuredDataKey<Unit> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Type.UNIT);
+    public static final StructuredDataKey<Unit> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Type.EMPTY);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS = new StructuredDataKey<>("storded_enchantments", Enchantments.TYPE);
     public static final StructuredDataKey<DyedColor> DYED_COLOR = new StructuredDataKey<>("dyed_color", DyedColor.TYPE);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Type.INT);
@@ -62,21 +68,21 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<Integer> MAP_POST_PROCESSING = new StructuredDataKey<>("map_post_processing", Type.VAR_INT);
     public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES = new StructuredDataKey<>("charged_projectiles", Types1_20_5.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS = new StructuredDataKey<>("bundle_contents", Types1_20_5.ITEM_ARRAY);
-    public static final StructuredDataKey<?> POTION_CONTENTS = new StructuredDataKey<>("potion_contents", Type.UNIT); // TODO
-    public static final StructuredDataKey<?> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", Type.UNIT); // TODO
+    public static final StructuredDataKey<PotionContents> POTION_CONTENTS = new StructuredDataKey<>("potion_contents", PotionContents.TYPE);
+    public static final StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", SuspiciousStewEffect.ARRAY_TYPE);
     public static final StructuredDataKey<String[]> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", Type.STRING_ARRAY);
     public static final StructuredDataKey<WrittenBook> WRITTEN_BOOK_CONTENT = new StructuredDataKey<>("written_book_content", WrittenBook.TYPE);
-    public static final StructuredDataKey<?> TRIM = new StructuredDataKey<>("trim", Type.UNIT); // TODO
+    public static final StructuredDataKey<?> TRIM = new StructuredDataKey<>("trim", Type.EMPTY); // TODO
     public static final StructuredDataKey<CompoundTag> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> ENTITY_DATA = new StructuredDataKey<>("entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> BUCKET_ENTITY_DATA = new StructuredDataKey<>("bucket_entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA = new StructuredDataKey<>("block_entity_data", Type.COMPOUND_TAG);
-    public static final StructuredDataKey<?> INSTRUMENT = new StructuredDataKey<>("instrument", Type.UNIT); // TODO
+    public static final StructuredDataKey<?> INSTRUMENT = new StructuredDataKey<>("instrument", Type.EMPTY); // TODO
     public static final StructuredDataKey<String[]> RECIPES = new StructuredDataKey<>("recipes", Type.STRING_ARRAY);
     public static final StructuredDataKey<LodestoneTarget> LODESTONE_TARGET = new StructuredDataKey<>("lodestone_target", LodestoneTarget.TYPE);
-    public static final StructuredDataKey<?> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", Type.UNIT); // TODO
-    public static final StructuredDataKey<?> FIREWORKS = new StructuredDataKey<>("fireworks", Type.UNIT); // TODO
-    public static final StructuredDataKey<GameProfile> PROFILE = new StructuredDataKey<>("profile", GameProfile.TYPE);
+    public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);
+    public static final StructuredDataKey<Fireworks> FIREWORKS = new StructuredDataKey<>("fireworks", Fireworks.TYPE);
+    public static final StructuredDataKey<GameProfile> PROFILE = new StructuredDataKey<>("profile", Type.GAME_PROFILE);
     public static final StructuredDataKey<String> NOTE_BLOCK_SOUND = new StructuredDataKey<>("note_block_sound", Type.STRING);
     public static final StructuredDataKey<BannerPattern[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPattern.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", Type.VAR_INT);
@@ -90,7 +96,7 @@ public final class StructuredDataKey<T> {
     private final String identifier;
     private final Type<T> type;
 
-    public StructuredDataKey(final String identifier, Type<T> type) {
+    public StructuredDataKey(final String identifier, final Type<T> type) {
         this.identifier = identifier;
         this.type = type;
     }
