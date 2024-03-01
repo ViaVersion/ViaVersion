@@ -85,6 +85,9 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 handler(wrapper -> sendChunksSentGameEvent(wrapper));
             }
         });
+
+        // https://github.com/ViaVersion/ViaVersion/issues/3630, should still investigate why sending it with respawn/login doesn't work on Velocity
+        protocol.registerClientbound(ClientboundPackets1_20_2.WORLD_BORDER_INIT, this::sendChunksSentGameEvent);
     }
 
     private void sendChunksSentGameEvent(final PacketWrapper wrapper) throws Exception {

@@ -23,11 +23,11 @@ body:
     attributes:
       label: Console Error
       description: |
-        If you encounter warnings/errors in your console, **paste them with https://paste.gg/ and put the paste link here**.
+        If you encounter warnings/errors in your console, **paste them with https://mclo.gs/ and put the paste link here**.
         If the error is small/less than 10 lines, you may put it directly into this field.
       value: |
         ```
-        Put the paste.gg link or text here.
+        Put the mclo.gs link or text here.
         ```
       placeholder: Please do not remove the grave accents; simply replace the line of text in the middle.
     validations:
