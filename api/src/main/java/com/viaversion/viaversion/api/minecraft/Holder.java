@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.util.Either;
+import com.google.common.base.Preconditions;
 
-public final class Holder<T> implements Either<Integer, T> {
+public final class Holder<T> {
 
     private final T value;
     private final int id;
@@ -39,27 +39,28 @@ public final class Holder<T> implements Either<Integer, T> {
         this.id = -1;
     }
 
+    /**
+     * Returns true if this holder is backed by a direct value.
+     *
+     * @return true if the holder is direct
+     * @see #hasId()
+     */
     public boolean isDirect() {
+        return id == -1;
+    }
+
+    /**
+     * Returns true if this holder has an id.
+     *
+     * @return true if this holder has an id
+     * @see #isDirect()
+     */
+    public boolean hasId() {
         return id != -1;
     }
 
-    @Override
-    public boolean isLeft() {
-        return value != null;
-    }
-
-    @Override
-    public boolean isRight() {
-        return value == null;
-    }
-
-    @Override
-    public Integer left() {
-        return id;
-    }
-
-    @Override
-    public T right() {
+    public T value() {
+        Preconditions.checkArgument(isDirect(), "Holder is not direct");
         return value;
     }
 

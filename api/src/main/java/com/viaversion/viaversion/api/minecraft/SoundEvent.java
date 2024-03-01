@@ -26,19 +26,23 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class SoundEvent {
 
-    private final String resourceLocation;
+    private final String identifier;
     private final Float fixedRange;
 
-    public SoundEvent(final String resourceLocation, @Nullable final Float fixedRange) {
-        this.resourceLocation = resourceLocation;
+    public SoundEvent(final String identifier, @Nullable final Float fixedRange) {
+        this.identifier = identifier;
         this.fixedRange = fixedRange;
     }
 
-    public String resourceLocation() {
-        return resourceLocation;
+    public String identifier() {
+        return identifier;
     }
 
     public @Nullable Float fixedRange() {
         return fixedRange;
+    }
+
+    public SoundEvent withIdentifier(final String identifier) {
+        return new SoundEvent(identifier, this.fixedRange);
     }
 }

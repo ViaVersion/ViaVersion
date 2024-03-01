@@ -37,7 +37,7 @@ public final class SoundEventType extends HolderType<SoundEvent> {
 
     @Override
     public void writeDirect(final ByteBuf buffer, final SoundEvent value) throws Exception {
-        Type.STRING.write(buffer, value.resourceLocation());
+        Type.STRING.write(buffer, value.identifier());
         Type.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
     }
 }

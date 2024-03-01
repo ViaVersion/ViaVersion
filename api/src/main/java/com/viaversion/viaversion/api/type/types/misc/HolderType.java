@@ -43,11 +43,11 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
 
     @Override
     public void write(final ByteBuf buffer, final Holder<T> object) throws Exception {
-        if (object.isLeft()) {
+        if (object.hasId()) {
             Type.VAR_INT.writePrimitive(buffer, object.id() + 1); // Normalize id
         } else {
             Type.VAR_INT.writePrimitive(buffer, 0);
-            writeDirect(buffer, object.right());
+            writeDirect(buffer, object.value());
         }
     }
 
