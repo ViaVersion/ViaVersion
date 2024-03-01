@@ -20,27 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.google.common.base.Preconditions;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface Either<X, Y> {
+public final class SoundEvent {
 
-    static <X, Y> Either<X, Y> left(final X left) {
-        Preconditions.checkNotNull(left);
-        return new EitherImpl<>(left, null);
+    private final String resourceLocation;
+    private final Float fixedRange;
+
+    public SoundEvent(final String resourceLocation, @Nullable final Float fixedRange) {
+        this.resourceLocation = resourceLocation;
+        this.fixedRange = fixedRange;
     }
 
-    static <X, Y> Either<X, Y> right(final Y right) {
-        Preconditions.checkNotNull(right);
-        return new EitherImpl<>(null, right);
+    public String resourceLocation() {
+        return resourceLocation;
     }
 
-    boolean isLeft();
-
-    boolean isRight();
-
-    X left();
-
-    Y right();
+    public @Nullable Float fixedRange() {
+        return fixedRange;
+    }
 }

@@ -20,27 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.type.types.misc;
 
-import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
-public interface Either<X, Y> {
+public final class SoundEventType extends HolderType<SoundEvent> {
 
-    static <X, Y> Either<X, Y> left(final X left) {
-        Preconditions.checkNotNull(left);
-        return new EitherImpl<>(left, null);
+    @Override
+    public SoundEvent readDirect(final ByteBuf buffer) throws Exception {
+        final String resourceLocation = Type.STRING.read(buffer);
+        final Float fixedRange = Type.OPTIONAL_FLOAT.read(buffer);
+        return new SoundEvent(resourceLocation, fixedRange);
     }
 
-    static <X, Y> Either<X, Y> right(final Y right) {
-        Preconditions.checkNotNull(right);
-        return new EitherImpl<>(null, right);
+    @Override
+    public void writeDirect(final ByteBuf buffer, final SoundEvent value) throws Exception {
+        Type.STRING.write(buffer, value.resourceLocation());
+        Type.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
     }
-
-    boolean isLeft();
-
-    boolean isRight();
-
-    X left();
-
-    Y right();
 }

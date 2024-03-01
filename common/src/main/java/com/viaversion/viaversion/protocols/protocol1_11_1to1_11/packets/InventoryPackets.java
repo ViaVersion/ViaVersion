@@ -43,6 +43,6 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
             item.setIdentifier(1);
             item.setData((short) 0);
         }
-        return null;
+        return item;
     }
 }

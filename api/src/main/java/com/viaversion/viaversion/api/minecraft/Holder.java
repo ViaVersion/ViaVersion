@@ -20,27 +20,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.util.Either;
 
-public interface Either<X, Y> {
+public final class Holder<T> implements Either<Integer, T> {
 
-    static <X, Y> Either<X, Y> left(final X left) {
-        Preconditions.checkNotNull(left);
-        return new EitherImpl<>(left, null);
+    private final T value;
+    private final int id;
+
+    public Holder(final int id) {
+        this.value = null;
+        this.id = id;
     }
 
-    static <X, Y> Either<X, Y> right(final Y right) {
-        Preconditions.checkNotNull(right);
-        return new EitherImpl<>(null, right);
+    public Holder(final T value) {
+        this.value = value;
+        this.id = -1;
     }
 
-    boolean isLeft();
+    public boolean isDirect() {
+        return id != -1;
+    }
 
-    boolean isRight();
+    @Override
+    public boolean isLeft() {
+        return value != null;
+    }
 
-    X left();
+    @Override
+    public boolean isRight() {
+        return value == null;
+    }
 
-    Y right();
+    @Override
+    public Integer left() {
+        return id;
+    }
+
+    @Override
+    public T right() {
+        return value;
+    }
+
+    public int id() {
+        return id;
+    }
 }

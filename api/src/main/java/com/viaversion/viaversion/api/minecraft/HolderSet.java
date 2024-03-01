@@ -22,21 +22,15 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.util.Either;
+import com.viaversion.viaversion.util.EitherImpl;
 
-public final class HolderSet {
-
-    private final Either<String, int[]> values;
+public final class HolderSet extends EitherImpl<String, int[]> {
 
     public HolderSet(final String tagKey) {
-        this.values = Either.left(tagKey);
+        super(tagKey, null);
     }
 
     public HolderSet(final int[] ids) {
-        this.values = Either.right(ids);
-    }
-
-    public Either<String, int[]> values() {
-        return values;
+        super(null, ids);
     }
 }

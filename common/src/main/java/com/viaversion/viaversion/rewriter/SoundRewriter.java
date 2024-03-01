@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -53,20 +55,24 @@ public class SoundRewriter<C extends ClientboundPacketType> {
 
     public PacketHandler soundHolderHandler() {
         return wrapper -> {
-            final int soundId = wrapper.read(Type.VAR_INT);
-            if (soundId == 0) {
+            Holder<SoundEvent> soundEventHolder = wrapper.read(Type.SOUND_EVENT);
+            if (soundEventHolder.isDirect()) {
                 // Is followed by the resource loation
-                wrapper.write(Type.VAR_INT, 0);
+                wrapper.write(Type.SOUND_EVENT, soundEventHolder);
                 return;
             }
 
-            final int mappedId = idRewriter.rewrite(soundId - 1); // Normalize sound id
+            final int mappedId = idRewriter.rewrite(soundEventHolder.id());
             if (mappedId == -1) {
                 wrapper.cancel();
                 return;
             }
 
-            wrapper.write(Type.VAR_INT, mappedId + 1);
+            if (mappedId != soundEventHolder.id()) {
+                soundEventHolder = new Holder<>(mappedId);
+            }
+
+            wrapper.write(Type.SOUND_EVENT, soundEventHolder);
         };
     }
 

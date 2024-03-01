@@ -25,16 +25,19 @@ package com.viaversion.viaversion.api.minecraft.data;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTarget;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
@@ -72,12 +75,12 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", SuspiciousStewEffect.ARRAY_TYPE);
     public static final StructuredDataKey<String[]> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", Type.STRING_ARRAY);
     public static final StructuredDataKey<WrittenBook> WRITTEN_BOOK_CONTENT = new StructuredDataKey<>("written_book_content", WrittenBook.TYPE);
-    public static final StructuredDataKey<?> TRIM = new StructuredDataKey<>("trim", Type.EMPTY); // TODO
+    public static final StructuredDataKey<ArmorTrim> TRIM = new StructuredDataKey<>("trim", ArmorTrim.TYPE);
     public static final StructuredDataKey<CompoundTag> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> ENTITY_DATA = new StructuredDataKey<>("entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> BUCKET_ENTITY_DATA = new StructuredDataKey<>("bucket_entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA = new StructuredDataKey<>("block_entity_data", Type.COMPOUND_TAG);
-    public static final StructuredDataKey<?> INSTRUMENT = new StructuredDataKey<>("instrument", Type.EMPTY); // TODO
+    public static final StructuredDataKey<Holder<Instrument>> INSTRUMENT = new StructuredDataKey<>("instrument", Instrument.TYPE);
     public static final StructuredDataKey<String[]> RECIPES = new StructuredDataKey<>("recipes", Type.STRING_ARRAY);
     public static final StructuredDataKey<LodestoneTarget> LODESTONE_TARGET = new StructuredDataKey<>("lodestone_target", LodestoneTarget.TYPE);
     public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);

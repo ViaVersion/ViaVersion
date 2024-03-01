@@ -20,27 +20,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.util;
+package com.viaversion.viaversion.api.type.types.misc;
 
-import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
-public interface Either<X, Y> {
+public abstract class HolderType<T> extends Type<Holder<T>> {
 
-    static <X, Y> Either<X, Y> left(final X left) {
-        Preconditions.checkNotNull(left);
-        return new EitherImpl<>(left, null);
+    protected HolderType() {
+        super(Holder.class);
     }
 
-    static <X, Y> Either<X, Y> right(final Y right) {
-        Preconditions.checkNotNull(right);
-        return new EitherImpl<>(null, right);
+    @Override
+    public Holder<T> read(final ByteBuf buffer) throws Exception {
+        final int id = Type.VAR_INT.readPrimitive(buffer) - 1; // Normalize id
+        if (id == -1) {
+            return new Holder<>(readDirect(buffer));
+        }
+        return new Holder<>(id);
     }
 
-    boolean isLeft();
+    @Override
+    public void write(final ByteBuf buffer, final Holder<T> object) throws Exception {
+        if (object.isLeft()) {
+            Type.VAR_INT.writePrimitive(buffer, object.id() + 1); // Normalize id
+        } else {
+            Type.VAR_INT.writePrimitive(buffer, 0);
+            writeDirect(buffer, object.right());
+        }
+    }
 
-    boolean isRight();
+    public abstract T readDirect(final ByteBuf buffer) throws Exception;
 
-    X left();
-
-    Y right();
+    public abstract void writeDirect(final ByteBuf buffer, final T object) throws Exception;
 }

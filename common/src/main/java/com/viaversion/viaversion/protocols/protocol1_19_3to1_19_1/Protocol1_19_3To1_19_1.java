@@ -23,8 +23,10 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.minecraft.signature.SignableCommandArgumentsProvider;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
@@ -33,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.BitSetType;
@@ -48,7 +51,6 @@ import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.packets.Invent
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_3to1_19_1.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -85,35 +87,22 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
         entityRewriter.register();
         itemRewriter.register();
 
-        final SoundRewriter<ClientboundPackets1_19_1> soundRewriter = new SoundRewriter<>(this);
-        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.VAR_INT); // Sound id
-                handler(soundRewriter.getSoundHandler());
-                handler(wrapper -> {
-                    // 0 means a resource location will be written
-                    final int soundId = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.set(Type.VAR_INT, 0, soundId + 1);
-                });
+        // Rewrite sounds as holders
+        final PacketHandler soundHandler = wrapper -> {
+            int soundId = wrapper.read(Type.VAR_INT);
+            soundId = MAPPINGS.getSoundMappings().getNewId(soundId);
+            if (soundId == -1) {
+                wrapper.cancel();
+                return;
             }
-        });
-        registerClientbound(ClientboundPackets1_19_1.SOUND, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.VAR_INT); // Sound id
-                handler(soundRewriter.getSoundHandler());
-                handler(wrapper -> {
-                    // 0 means a resource location will be written
-                    final int soundId = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.set(Type.VAR_INT, 0, soundId + 1);
-                });
-            }
-        });
+
+            wrapper.write(Type.SOUND_EVENT, new Holder<>(soundId));
+        };
+        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, soundHandler);
+        registerClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
-            wrapper.write(Type.VAR_INT, 0);
-            wrapper.passthrough(Type.STRING); // Sound identifier
-            wrapper.write(Type.OPTIONAL_FLOAT, null); // No fixed range
+            final String soundIdentifier = wrapper.read(Type.STRING);
+            wrapper.write(Type.SOUND_EVENT, new Holder<>(new SoundEvent(soundIdentifier, null)));
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);
