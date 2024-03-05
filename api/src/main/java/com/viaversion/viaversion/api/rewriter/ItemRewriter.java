@@ -45,11 +45,35 @@ public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
      */
     @Nullable Item handleItemToServer(@Nullable Item item);
 
-    Type<Item> itemType();
+    /**
+     * Returns the item type of the current protocol.
+     * @return item type
+     */
+    @Nullable default Type<Item> itemType() {
+        return null;
+    }
 
-    Type<Item[]> itemArrayType();
+    /**
+     * Returns the item array type of the current protocol.
+     * @return item array type
+     */
+    @Nullable default Type<Item[]> itemArrayType() {
+        return null;
+    }
 
-    Type<Item> mappedItemType();
+    /**
+     * Returns the mapped item type of the target protocol.
+     * @return mapped item type
+     */
+    @Nullable default Type<Item> mappedItemType() {
+        return itemType();
+    }
 
-    Type<Item[]> mappedItemArrayType();
+    /**
+     * Returns the mapped item array type of the target protocol.
+     * @return mapped item array type
+     */
+    @Nullable default Type<Item[]> mappedItemArrayType() {
+        return itemArrayType();
+    }
 }
