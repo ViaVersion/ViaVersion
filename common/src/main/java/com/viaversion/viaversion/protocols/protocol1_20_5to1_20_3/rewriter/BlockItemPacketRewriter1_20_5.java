@@ -18,11 +18,13 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -46,9 +48,12 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -267,6 +272,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
 
+        updateProfile(data, tag);
+
         // TODO
         //  StructuredDataKey.CUSTOM_NAME
         //  StructuredDataKey.LORE
@@ -297,7 +304,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.LODESTONE_TARGET
         //  StructuredDataKey.FIREWORK_EXPLOSION
         //  StructuredDataKey.FIREWORKS
-        //  StructuredDataKey.PROFILE
         //  StructuredDataKey.NOTE_BLOCK_SOUND
         //  StructuredDataKey.BANNER_PATTERNS
         //  StructuredDataKey.BASE_COLOR
@@ -348,5 +354,49 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (enchantments.size() == 0 && !enchantmentsTag.isEmpty()) {
             data.add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
+    }
+
+    private void updateProfile(final StructuredDataContainer data, final CompoundTag tag) {
+        final Tag skullOwnerTag = tag.get("SkullOwner");
+        String name;
+        UUID uuid = null;
+        GameProfile.Property[] properties = {};
+        if (skullOwnerTag instanceof StringTag) {
+            name = skullOwnerTag.asRawString();
+        } else if (skullOwnerTag instanceof CompoundTag) {
+            CompoundTag skullOwner = (CompoundTag) skullOwnerTag;
+            final StringTag nameTag = skullOwner.getStringTag("Name");
+            name = nameTag != null ? nameTag.asRawString() : "";
+            IntArrayTag idTag = skullOwner.getIntArrayTag("Id");
+            if (idTag != null) {
+                uuid = UUIDUtil.fromIntArray(idTag.getValue());
+            }
+            final CompoundTag propertiesTag = skullOwner.getCompoundTag("Properties");
+            if (propertiesTag != null) {
+                // It is very likely that there is only going to be one property attached ("textures")
+                ArrayList<GameProfile.Property> propertyList = new ArrayList<>(1);
+                for (final Map.Entry<String, Tag> mapEntry : propertiesTag.entrySet()) {
+                    final String key = mapEntry.getKey();
+                    final Tag valueTag = mapEntry.getValue();
+                    if (valueTag instanceof ListTag) {
+                        for (final Tag propertyTag : (ListTag) valueTag) {
+                            if (propertyTag instanceof CompoundTag) {
+                                final StringTag tagValue = ((CompoundTag) propertyTag).getStringTag("Value");
+                                String value = tagValue != null ? tagValue.asRawString() : "";
+                                final StringTag signatureValue = ((CompoundTag) propertyTag).getStringTag("Signature");
+                                String signature = signatureValue != null ? signatureValue.asRawString() : null;
+                                propertyList.add(new GameProfile.Property(key, value, signature));
+                            }
+
+                        }
+                    }
+                }
+                properties = propertyList.toArray(new GameProfile.Property[]{});
+            }
+        } else {
+            return;
+        }
+        data.add(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties));
+        tag.remove("SkullOwner");
     }
 }
