@@ -35,6 +35,10 @@ import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
+import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -61,6 +65,8 @@ import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
+
+    private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
@@ -183,7 +189,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (item == null) return null;
 
         super.handleItemToClient(item);
-        return toStructuredItem(item);
+        return toStructuredItem(item, true);
     }
 
     @Override
@@ -203,7 +209,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
         final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
-        if (customData != null && tag.remove(tagMarker) != null) {
+        if (customData != null && tag.remove(nbtTagName()) != null) {
             return dataItem;
         }
 
@@ -212,7 +218,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return dataItem;
     }
 
-    public Item toStructuredItem(final Item old) {
+    public Item toStructuredItem(final Item old, final boolean addMarker) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
@@ -284,17 +290,28 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             //data.set(StructuredDataKey.TRIM, armorTrim);
         }
 
-        final ListTag chargedProjectiles = tag.getListTag("ChargedProjectiles");
-        if (chargedProjectiles != null) {
-            final List<Item> items = new ArrayList<>();
-            for (final Tag chargedProjectile : chargedProjectiles) {
-                if (!(chargedProjectile instanceof CompoundTag)) {
-                    continue;
-                }
-                items.add(itemFromTag((CompoundTag) chargedProjectile));
-            }
-            data.set(StructuredDataKey.CHARGED_PROJECTILES, items.toArray(new Item[0]));
+        final CompoundTag explosionTag = tag.getCompoundTag("Explosion");
+        if (explosionTag != null) {
+            final NumberTag shape = explosionTag.getNumberTag("Type");
+            final IntArrayTag colors = explosionTag.getIntArrayTag("Colors");
+            final IntArrayTag fadeColors = explosionTag.getIntArrayTag("FadeColors");
+            final NumberTag trail = explosionTag.getNumberTag("Trail");
+            final NumberTag flicker = explosionTag.getNumberTag("Flicker");
+            final FireworkExplosion explosion = new FireworkExplosion(
+                shape != null ? shape.asInt() : 0,
+                colors != null ? colors.getValue() : new int[0],
+                fadeColors != null ? fadeColors.getValue() : new int[0],
+                trail != null && trail.asBoolean(),
+                flicker != null && flicker.asBoolean()
+            );
+            data.set(StructuredDataKey.FIREWORK_EXPLOSION, explosion);
         }
+
+        updateWritableBookPages(data, tag);
+        updateWrittenBookPages(data, tag);
+
+        updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES);
+        updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
@@ -317,12 +334,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
         //  StructuredDataKey.DYED_COLOR
-        //  StructuredDataKey.CHARGED_PROJECTILES
-        //  StructuredDataKey.BUNDLE_CONTENTS
         //  StructuredDataKey.POTION_CONTENTS
         //  StructuredDataKey.SUSPICIOUS_STEW_EFFECTS
-        //  StructuredDataKey.WRITABLE_BOOK_CONTENT
-        //  StructuredDataKey.WRITTEN_BOOK_CONTENT
         //  StructuredDataKey.TRIM
         //  StructuredDataKey.DEBUG_STICK_STATE
         //  StructuredDataKey.BUCKET_ENTITY_DATA
@@ -330,7 +343,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.INSTRUMENT
         //  StructuredDataKey.RECIPES
         //  StructuredDataKey.LODESTONE_TARGET
-        //  StructuredDataKey.FIREWORK_EXPLOSION
         //  StructuredDataKey.FIREWORKS
         //  StructuredDataKey.NOTE_BLOCK_SOUND
         //  StructuredDataKey.BANNER_PATTERNS
@@ -342,9 +354,95 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CONTAINER_LOOT
 
         // Add the original as custom data, to be re-used for creative clients as well
-        tag.putBoolean(nbtTagName(), true);
+        if (addMarker) {
+            tag.putBoolean(nbtTagName(), true);
+        }
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private void updateWritableBookPages(final StructuredDataContainer data, final CompoundTag tag) {
+        final ListTag pagesTag = tag.getListTag("pages");
+        final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
+        if (pagesTag == null) {
+            return;
+        }
+
+        final List<FilterableString> pages = new ArrayList<>();
+        for (int i = 0; i < pagesTag.size(); i++) {
+            final Tag page = pagesTag.get(i);
+            if (!(page instanceof StringTag)) {
+                continue;
+            }
+
+            String filtered = null;
+            if (filteredPagesTag != null) {
+                final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
+                if (filteredPage != null) {
+                    filtered = filteredPage.getValue();
+                }
+            }
+            pages.add(new FilterableString(((StringTag) page).getValue(), filtered));
+
+        }
+        data.set(StructuredDataKey.WRITABLE_BOOK_CONTENT, pages.toArray(new FilterableString[0]));
+    }
+
+    private void updateWrittenBookPages(final StructuredDataContainer data, final CompoundTag tag) {
+        final ListTag pagesTag = tag.getListTag("pages");
+        final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
+        if (pagesTag == null) {
+            return;
+        }
+
+        final List<FilterableComponent> pages = new ArrayList<>();
+        for (int i = 0; i < pagesTag.size(); i++) {
+            final Tag page = pagesTag.get(i);
+            if (!(page instanceof StringTag)) {
+                continue;
+            }
+
+            Tag filtered = null;
+            if (filteredPagesTag != null) {
+                final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
+                if (filteredPage != null) {
+                    filtered = ComponentUtil.jsonStringToTag(filteredPage.getValue());
+                }
+            }
+
+            final Tag parsedPage = ComponentUtil.jsonStringToTag(((StringTag) page).getValue());
+            pages.add(new FilterableComponent(parsedPage, filtered));
+        }
+
+        final StringTag title = tag.getStringTag("title");
+        final StringTag filteredTitle = tag.getStringTag("filtered_title");
+        final StringTag author = tag.getStringTag("author");
+        final NumberTag generation = tag.getNumberTag("generation");
+        final NumberTag resolved = tag.getNumberTag("resolved");
+        final WrittenBook writtenBook = new WrittenBook(
+            new FilterableString(title != null ? title.getValue() : "", filteredTitle != null ? filteredTitle.getValue() : null),
+            author != null ? author.getValue() : "",
+            generation != null ? generation.asInt() : 0,
+            pages.toArray(new FilterableComponent[0]),
+            resolved != null && resolved.asBoolean()
+        );
+        data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
+    }
+
+    private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey) {
+        final ListTag chargedProjectiles = tag.getListTag(key);
+        if (chargedProjectiles == null) {
+            return;
+        }
+
+        final List<Item> items = new ArrayList<>();
+        for (final Tag item : chargedProjectiles) {
+            if (!(item instanceof CompoundTag)) {
+                continue;
+            }
+            items.add(itemFromTag((CompoundTag) item));
+        }
+        data.set(dataKey, items.toArray(new Item[0]));
     }
 
     private Item itemFromTag(final CompoundTag item) {
@@ -388,49 +486,50 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateProfile(final StructuredDataContainer data, final Tag skullOwnerTag) {
-        final String name;
         final List<GameProfile.Property> properties = new ArrayList<>(1);
-        UUID uuid = null;
         if (skullOwnerTag instanceof StringTag) {
-            name = ((StringTag) skullOwnerTag).getValue();
+            final String name = ((StringTag) skullOwnerTag).getValue();
+            data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
         } else if (skullOwnerTag instanceof CompoundTag) {
             final CompoundTag skullOwner = (CompoundTag) skullOwnerTag;
             final StringTag nameTag = skullOwner.getStringTag("Name");
-            name = nameTag != null ? nameTag.getValue() : "";
+            final String name = nameTag != null ? nameTag.getValue() : "";
 
             final IntArrayTag idTag = skullOwner.getIntArrayTag("Id");
+            UUID uuid = null;
             if (idTag != null) {
                 uuid = UUIDUtil.fromIntArray(idTag.getValue());
             }
 
             final CompoundTag propertiesTag = skullOwner.getCompoundTag("Properties");
             if (propertiesTag != null) {
-                for (final Map.Entry<String, Tag> entry : propertiesTag.entrySet()) {
-                    if (!(entry.getValue() instanceof ListTag)) {
-                        continue;
-                    }
-
-                    for (final Tag propertyTag : (ListTag<?>) entry.getValue()) {
-                        if (!(propertyTag instanceof CompoundTag)) {
-                            continue;
-                        }
-
-                        final StringTag valueTag = ((CompoundTag) propertyTag).getStringTag("Value");
-                        final StringTag signatureTag = ((CompoundTag) propertyTag).getStringTag("Signature");
-                        final GameProfile.Property property = new GameProfile.Property(
-                            entry.getKey(),
-                            valueTag != null ? valueTag.getValue() : "",
-                            signatureTag != null ? signatureTag.getValue() : null
-                        );
-                        properties.add(property);
-                    }
-                }
+                updateProperties(propertiesTag, properties);
             }
-        } else {
-            return;
+            data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
         }
+    }
 
-        data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(new GameProfile.Property[0])));
+    private void updateProperties(final CompoundTag propertiesTag, final List<GameProfile.Property> properties) {
+        for (final Map.Entry<String, Tag> entry : propertiesTag.entrySet()) {
+            if (!(entry.getValue() instanceof ListTag)) {
+                continue;
+            }
+
+            for (final Tag propertyTag : (ListTag<?>) entry.getValue()) {
+                if (!(propertyTag instanceof CompoundTag)) {
+                    continue;
+                }
+
+                final StringTag valueTag = ((CompoundTag) propertyTag).getStringTag("Value");
+                final StringTag signatureTag = ((CompoundTag) propertyTag).getStringTag("Signature");
+                final GameProfile.Property property = new GameProfile.Property(
+                    entry.getKey(),
+                    valueTag != null ? valueTag.getValue() : "",
+                    signatureTag != null ? signatureTag.getValue() : null
+                );
+                properties.add(property);
+            }
+        }
     }
 
     private void updateMapDecorations(final StructuredDataContainer data, final ListTag<CompoundTag> decorationsTag) {

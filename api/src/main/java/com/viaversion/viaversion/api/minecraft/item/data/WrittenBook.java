@@ -30,31 +30,31 @@ public final class WrittenBook {
     public static final Type<WrittenBook> TYPE = new Type<WrittenBook>(WrittenBook.class) {
         @Override
         public WrittenBook read(final ByteBuf buffer) throws Exception {
-            final String title = Type.STRING.read(buffer);
+            final FilterableString title = FilterableString.TYPE.read(buffer);
             final String author = Type.STRING.read(buffer);
             final int generation = Type.VAR_INT.readPrimitive(buffer);
-            final String[] pages = Type.STRING_ARRAY.read(buffer);
+            final FilterableComponent[] pages = FilterableComponent.ARRAY_TYPE.read(buffer);
             final boolean resolved = buffer.readBoolean();
             return new WrittenBook(title, author, generation, pages, resolved);
         }
 
         @Override
         public void write(final ByteBuf buffer, final WrittenBook value) throws Exception {
-            Type.STRING.write(buffer, value.title);
+            FilterableString.TYPE.write(buffer, value.title);
             Type.STRING.write(buffer, value.author);
             Type.VAR_INT.writePrimitive(buffer, value.generation);
-            Type.STRING_ARRAY.write(buffer, value.pages);
+            FilterableComponent.ARRAY_TYPE.write(buffer, value.pages);
             buffer.writeBoolean(value.resolved);
         }
     };
 
-    private final String title;
+    private final FilterableString title;
     private final String author;
     private final int generation;
-    private final String[] pages;
+    private final FilterableComponent[] pages;
     private final boolean resolved;
 
-    public WrittenBook(final String title, final String author, final int generation, final String[] pages, final boolean resolved) {
+    public WrittenBook(final FilterableString title, final String author, final int generation, final FilterableComponent[] pages, final boolean resolved) {
         this.title = title;
         this.author = author;
         this.generation = generation;
@@ -62,7 +62,7 @@ public final class WrittenBook {
         this.resolved = resolved;
     }
 
-    public String title() {
+    public FilterableString title() {
         return title;
     }
 
@@ -74,7 +74,7 @@ public final class WrittenBook {
         return generation;
     }
 
-    public String[] pages() {
+    public FilterableComponent[] pages() {
         return pages;
     }
 

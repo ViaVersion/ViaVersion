@@ -192,7 +192,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
             int id = typeId;
-            if (id >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
+            if (typeId >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
+                id++;
+            }
+            if (typeId >= Types1_20_5.META_TYPES.wolfVariantType.typeId()) {
                 id++;
             }
             return Types1_20_5.META_TYPES.byId(id);
