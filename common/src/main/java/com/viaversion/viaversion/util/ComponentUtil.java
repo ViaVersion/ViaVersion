@@ -69,11 +69,28 @@ public final class ComponentUtil {
 
         try {
             final ATextComponent component = TextComponentSerializer.V1_19_4.deserialize(element);
-            return TextComponentCodec.V1_20_3.serializeNbt(component);
+            return trimStrings(TextComponentCodec.V1_20_3.serializeNbt(component));
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + element, e);
             return new StringTag("<error>");
         }
+    }
+
+    private static Tag trimStrings(final Tag input) {
+        // Dirty fix for https://github.com/ViaVersion/ViaVersion/issues/3650
+        // Usually tripped by hover event data being too long, e.g. book or shulker box contents
+        if (input == null) {
+            return null;
+        }
+        return TagUtil.handleDeep(input, (key, tag) -> {
+            if (tag instanceof StringTag) {
+                final String value = ((StringTag) tag).getValue();
+                if (value.length() > Short.MAX_VALUE) {
+                    ((StringTag) tag).setValue("{}");
+                }
+            }
+            return tag;
+        });
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
