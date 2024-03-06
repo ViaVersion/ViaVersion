@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTarget;
+import com.viaversion.viaversion.api.minecraft.item.data.MapDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
@@ -67,7 +68,7 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<DyedColor> DYED_COLOR = new StructuredDataKey<>("dyed_color", DyedColor.TYPE);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Type.INT);
     public static final StructuredDataKey<Integer> MAP_ID = new StructuredDataKey<>("map_id", Type.VAR_INT);
-    public static final StructuredDataKey<CompoundTag> MAP_DECORATIONS = new StructuredDataKey<>("map_decorations", Type.COMPOUND_TAG);
+    public static final StructuredDataKey<MapDecorations> MAP_DECORATIONS = new StructuredDataKey<>("map_decorations", MapDecorations.TYPE);
     public static final StructuredDataKey<Integer> MAP_POST_PROCESSING = new StructuredDataKey<>("map_post_processing", Type.VAR_INT);
     public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES = new StructuredDataKey<>("charged_projectiles", Types1_20_5.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS = new StructuredDataKey<>("bundle_contents", Types1_20_5.ITEM_ARRAY);

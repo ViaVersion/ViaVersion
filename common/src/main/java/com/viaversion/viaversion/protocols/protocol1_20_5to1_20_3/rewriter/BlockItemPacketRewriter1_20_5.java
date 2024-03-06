@@ -34,6 +34,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
+import com.viaversion.viaversion.api.minecraft.item.data.MapDecoration;
+import com.viaversion.viaversion.api.minecraft.item.data.MapDecorations;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -54,6 +56,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -213,6 +216,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         // Rewrite nbt to new data structures
+        updateDisplay(data, tag);
+
         final NumberTag damage = tag.getNumberTag("Damage");
         if (damage != null && damage.asInt() != 0) {
             tag.remove("Damage");
@@ -272,6 +277,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
 
+        final NumberTag map = tag.getNumberTag("map");
+        if (map != null) {
+            tag.remove("map");
+            data.add(StructuredDataKey.MAP_ID, map.asInt());
+        }
+
+        updateMapDecorations(data, tag);
+
+        // MAP_POST_PROCESSING is only used internally
+
         updateProfile(data, tag);
 
         // TODO
@@ -285,10 +300,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
         //  StructuredDataKey.DYED_COLOR
-        //  StructuredDataKey.MAP_COLOR
-        //  StructuredDataKey.MAP_ID
-        //  StructuredDataKey.MAP_DECORATIONS
-        //  StructuredDataKey.MAP_POST_PROCESSING
         //  StructuredDataKey.CHARGED_PROJECTILES
         //  StructuredDataKey.BUNDLE_CONTENTS
         //  StructuredDataKey.POTION_CONTENTS
@@ -398,5 +409,51 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
         data.add(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties));
         tag.remove("SkullOwner");
+    }
+
+    // TODO Where should data like this be stored
+    private static final String[] MAP_DECORATIONS = {"frame", "red_marker", "blue_marker", "target_x", "target_point", "player_off_map", "player_off_limits", "mansion", "monument", "banner_white", "banner_orange", "banner_magenta", "banner_light_blue", "banner_yellow", "banner_lime", "banner_pink", "banner_gray", "banner_light_gray", "banner_cyan", "banner_purple", "banner_blue", "banner_brown", "banner_green", "banner_red", "banner_black", "red_x", "village_desert", "village_plains", "village_savanna", "village_snowy", "village_taiga", "jungle_temple", "swamp_hut"};
+
+    private void updateMapDecorations(final StructuredDataContainer data, final CompoundTag tag) {
+        final ListTag decorationsTag = tag.getListTag("Decorations");
+        if (decorationsTag == null) return;
+        tag.remove("Decorations");
+        MapDecorations decorations = new MapDecorations(new Object2ObjectOpenHashMap<>());
+        for (final Tag decorationTag : decorationsTag) {
+            if (!(decorationTag instanceof CompoundTag)) {
+                continue;
+            }
+            final CompoundTag decoration = (CompoundTag) decorationTag;
+            final StringTag idTag = decoration.getStringTag("id");
+            String id = idTag != null ? idTag.asRawString() : "";
+            final NumberTag typeTag = decoration.getNumberTag("type");
+            final int type_index = (typeTag != null ? typeTag.asInt() : 0) - 1;
+            String stringType = "player";
+            if (type_index < MAP_DECORATIONS.length && type_index >= 0) {
+                stringType = MAP_DECORATIONS[type_index];
+            }
+            final NumberTag xTag = decoration.getNumberTag("x");
+            final NumberTag zTag = decoration.getNumberTag("z");
+            final NumberTag rotTag = decoration.getNumberTag("rot");
+            double x = xTag != null ? xTag.asDouble() : 0.0;
+            double z = zTag != null ? zTag.asDouble() : 0.0;
+            double rot = rotTag != null ? rotTag.asDouble() : 0.0;
+            decorations.decorations().put(id, new MapDecoration(stringType, x, z, (float) rot));
+        }
+        data.add(StructuredDataKey.MAP_DECORATIONS, decorations);
+    }
+
+    private void updateDisplay(final StructuredDataContainer data, final CompoundTag tag) {
+        final CompoundTag displayTag = tag.getCompoundTag("display");
+        if (displayTag == null) {
+            return;
+        }
+        final NumberTag mapColorTag = displayTag.getNumberTag("MapColor");
+        if (mapColorTag != null) {
+            data.add(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
+        }
+        // TODO other display values
+
+        tag.remove("display");
     }
 }
