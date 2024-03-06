@@ -93,7 +93,7 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<Item[]> CONTAINER = new StructuredDataKey<>("container", Types1_20_5.ITEM_ARRAY);
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
-    public static final StructuredDataKey<CompoundTag> LOCK = new StructuredDataKey<>("lock", Type.COMPOUND_TAG);
+    public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Type.TAG);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Type.COMPOUND_TAG);
 
     private final String identifier;
