@@ -25,6 +25,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
+import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -38,6 +39,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -274,6 +276,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             // item.structuredData().add(protocol, "block_entity_data", Type.COMPOUND_TAG, blockEntityTag);
         }
 
+        final CompoundTag debugProperty = tag.getCompoundTag("DebugProperty");
+        if (debugProperty != null) {
+            data.set(StructuredDataKey.DEBUG_STICK_STATE, debugProperty);
+        }
+
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
         if (unbreakable != null && unbreakable.asBoolean()) {
             if ((hideFlagsValue & 0x04) != 0) {
@@ -307,8 +314,32 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.FIREWORK_EXPLOSION, explosion);
         }
 
-        updateWritableBookPages(data, tag);
-        updateWrittenBookPages(data, tag);
+        final ListTag<StringTag> recipesTag = tag.getListTag("Recipes", StringTag.class);
+        if (recipesTag != null) {
+            data.set(StructuredDataKey.RECIPES, recipesTag);
+        }
+
+        final CompoundTag lodestonePosTag = tag.getCompoundTag("LodestonePos");
+        final StringTag lodestoneDimensionTag = tag.getStringTag("LodestoneDimension");
+        if (lodestonePosTag != null && lodestoneDimensionTag != null) {
+            final NumberTag trackedTag = tag.getNumberTag("LodestoneTracked");
+            final NumberTag xTag = lodestonePosTag.getNumberTag("X");
+            final NumberTag yTag = lodestonePosTag.getNumberTag("Y");
+            final NumberTag zTag = lodestonePosTag.getNumberTag("Z");
+            final GlobalPosition position = new GlobalPosition(
+                lodestoneDimensionTag.getValue(),
+                xTag != null ? xTag.asInt() : 0,
+                yTag != null ? yTag.asInt() : 0,
+                zTag != null ? zTag.asInt() : 0
+            );
+            data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, trackedTag != null && trackedTag.asBoolean()));
+        }
+
+        if (old.identifier() == 1085) {
+            updateWritableBookPages(data, tag);
+        } else if (old.identifier() == 1086) {
+            updateWrittenBookPages(data, tag);
+        }
 
         updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES);
         updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
@@ -333,16 +364,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.ATTRIBUTE_MODIFIERS
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
-        //  StructuredDataKey.DYED_COLOR
         //  StructuredDataKey.POTION_CONTENTS
         //  StructuredDataKey.SUSPICIOUS_STEW_EFFECTS
         //  StructuredDataKey.TRIM
-        //  StructuredDataKey.DEBUG_STICK_STATE
         //  StructuredDataKey.BUCKET_ENTITY_DATA
         //  StructuredDataKey.BLOCK_ENTITY_DATA
         //  StructuredDataKey.INSTRUMENT
-        //  StructuredDataKey.RECIPES
-        //  StructuredDataKey.LODESTONE_TARGET
         //  StructuredDataKey.FIREWORKS
         //  StructuredDataKey.NOTE_BLOCK_SOUND
         //  StructuredDataKey.BANNER_PATTERNS
@@ -362,7 +389,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateWritableBookPages(final StructuredDataContainer data, final CompoundTag tag) {
-        final ListTag pagesTag = tag.getListTag("pages");
+        final ListTag<StringTag> pagesTag = tag.getListTag("pages", StringTag.class);
         final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
         if (pagesTag == null) {
             return;
@@ -370,11 +397,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final List<FilterableString> pages = new ArrayList<>();
         for (int i = 0; i < pagesTag.size(); i++) {
-            final Tag page = pagesTag.get(i);
-            if (!(page instanceof StringTag)) {
-                continue;
-            }
-
+            final StringTag page = pagesTag.get(i);
             String filtered = null;
             if (filteredPagesTag != null) {
                 final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
@@ -382,14 +405,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     filtered = filteredPage.getValue();
                 }
             }
-            pages.add(new FilterableString(((StringTag) page).getValue(), filtered));
+            pages.add(new FilterableString(page.getValue(), filtered));
 
         }
         data.set(StructuredDataKey.WRITABLE_BOOK_CONTENT, pages.toArray(new FilterableString[0]));
     }
 
     private void updateWrittenBookPages(final StructuredDataContainer data, final CompoundTag tag) {
-        final ListTag pagesTag = tag.getListTag("pages");
+        final ListTag<StringTag> pagesTag = tag.getListTag("pages", StringTag.class);
         final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
         if (pagesTag == null) {
             return;
@@ -397,11 +420,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final List<FilterableComponent> pages = new ArrayList<>();
         for (int i = 0; i < pagesTag.size(); i++) {
-            final Tag page = pagesTag.get(i);
-            if (!(page instanceof StringTag)) {
-                continue;
-            }
-
+            final StringTag page = pagesTag.get(i);
             Tag filtered = null;
             if (filteredPagesTag != null) {
                 final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
@@ -410,7 +429,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 }
             }
 
-            final Tag parsedPage = ComponentUtil.jsonStringToTag(((StringTag) page).getValue());
+            final Tag parsedPage = ComponentUtil.jsonStringToTag(page.getValue());
             pages.add(new FilterableComponent(parsedPage, filtered));
         }
 
@@ -430,17 +449,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey) {
-        final ListTag chargedProjectiles = tag.getListTag(key);
+        final ListTag<CompoundTag> chargedProjectiles = tag.getListTag(key, CompoundTag.class);
         if (chargedProjectiles == null) {
             return;
         }
 
         final List<Item> items = new ArrayList<>();
-        for (final Tag item : chargedProjectiles) {
-            if (!(item instanceof CompoundTag)) {
-                continue;
-            }
-            items.add(itemFromTag((CompoundTag) item));
+        for (final CompoundTag item : chargedProjectiles) {
+            items.add(itemFromTag(item));
         }
         data.set(dataKey, items.toArray(new Item[0]));
     }
@@ -573,13 +589,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.CUSTOM_NAME, ComponentUtil.jsonStringToTag(nameTag.getValue()));
         }
 
-        final ListTag loreTag = displayTag.getListTag("Lore");
+        final ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
         if (loreTag != null) {
             final List<Tag> updatedLore = new ArrayList<>();
-            for (final Tag loreEntry : loreTag) {
-                if (loreEntry instanceof StringTag) {
-                    updatedLore.add(ComponentUtil.jsonStringToTag(((StringTag) loreEntry).getValue()));
-                }
+            for (final StringTag loreEntry : loreTag) {
+                updatedLore.add(ComponentUtil.jsonStringToTag((loreEntry.getValue())));
             }
             data.set(StructuredDataKey.LORE, updatedLore.toArray(new Tag[0]));
         }

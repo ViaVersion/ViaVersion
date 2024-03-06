@@ -82,7 +82,7 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<CompoundTag> BUCKET_ENTITY_DATA = new StructuredDataKey<>("bucket_entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA = new StructuredDataKey<>("block_entity_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<Holder<Instrument>> INSTRUMENT = new StructuredDataKey<>("instrument", Instrument.TYPE);
-    public static final StructuredDataKey<String[]> RECIPES = new StructuredDataKey<>("recipes", Type.STRING_ARRAY);
+    public static final StructuredDataKey<Tag> RECIPES = new StructuredDataKey<>("recipes", Type.TAG);
     public static final StructuredDataKey<LodestoneTracker> LODESTONE_TRACKER = new StructuredDataKey<>("lodestone_tracker", LodestoneTracker.TYPE);
     public static final StructuredDataKey<FireworkExplosion> FIREWORK_EXPLOSION = new StructuredDataKey<>("firework_explosion", FireworkExplosion.TYPE);
     public static final StructuredDataKey<Fireworks> FIREWORKS = new StructuredDataKey<>("fireworks", Fireworks.TYPE);
