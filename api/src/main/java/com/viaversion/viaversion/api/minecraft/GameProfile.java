@@ -31,13 +31,13 @@ public final class GameProfile {
     private final UUID id;
     private final Property[] properties;
 
-    public GameProfile(final String name, @Nullable final UUID id, final Property[] properties) {
+    public GameProfile(@Nullable final String name, @Nullable final UUID id, final Property[] properties) {
         this.name = name;
         this.id = id;
         this.properties = properties;
     }
 
-    public String name() {
+    public @Nullable String name() {
         return name;
     }
 

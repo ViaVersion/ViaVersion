@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.data;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
+import java.util.Objects;
 
 final class FilledStructuredData<T> implements StructuredData<T> {
 
@@ -71,5 +72,32 @@ final class FilledStructuredData<T> implements StructuredData<T> {
     @Override
     public int id() {
         return id;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final FilledStructuredData<?> that = (FilledStructuredData<?>) o;
+        if (id != that.id) return false;
+        if (!key.equals(that.key)) return false;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = key.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + id;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FilledStructuredData{" +
+            "key=" + key +
+            ", value=" + value +
+            ", id=" + id +
+            '}';
     }
 }

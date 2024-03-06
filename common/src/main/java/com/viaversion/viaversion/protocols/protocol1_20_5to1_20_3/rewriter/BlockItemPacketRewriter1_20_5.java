@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -48,6 +49,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -192,17 +194,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return toOldItem(item);
     }
 
+    // TODO Block entity changes
     public Item toOldItem(final Item item) {
-        // Start out with custom data and add the rest on top
+        // Start out with custom data and add the rest on top, or short-curcuit with the original item
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
 
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
+        final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
+        if (customData != null && tag.remove(tagMarker) != null) {
+            return dataItem;
+        }
 
         // TODO
 
-        return new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
+        return dataItem;
     }
 
     public Item toStructuredItem(final Item old) {
@@ -215,21 +222,27 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         // Rewrite nbt to new data structures
-        updateDisplay(data, tag.getCompoundTag("display"));
+        final NumberTag hideFlags = tag.getNumberTag("HideFlags");
+        final int hideFlagsValue = hideFlags != null ? hideFlags.asInt() : 0;
+        if ((hideFlagsValue & 0x20) != 0) {
+            data.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
+        }
+
+        updateDisplay(data, tag.getCompoundTag("display"), hideFlagsValue);
 
         final NumberTag damage = tag.getNumberTag("Damage");
         if (damage != null && damage.asInt() != 0) {
-            data.add(StructuredDataKey.DAMAGE, damage.asInt());
+            data.set(StructuredDataKey.DAMAGE, damage.asInt());
         }
 
         final NumberTag repairCost = tag.getNumberTag("RepairCost");
         if (repairCost != null && repairCost.asInt() != 0) {
-            data.add(StructuredDataKey.REPAIR_COST, repairCost.asInt());
+            data.set(StructuredDataKey.REPAIR_COST, repairCost.asInt());
         }
 
         final NumberTag customModelData = tag.getNumberTag("CustomModelData");
         if (customModelData != null) {
-            data.add(StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
+            data.set(StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
         }
 
         final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
@@ -240,12 +253,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     properties.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
                 }
             }
-            data.add(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
+            // TODO block state changes
+            data.set(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
         }
 
         final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
-            data.add(StructuredDataKey.ENTITY_DATA, entityTag);
+            data.set(StructuredDataKey.ENTITY_DATA, entityTag);
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
@@ -254,16 +268,32 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             // item.structuredData().add(protocol, "block_entity_data", Type.COMPOUND_TAG, blockEntityTag);
         }
 
-        final NumberTag hideFlags = tag.getNumberTag("HideFlags");
-        final int hideFlagsValue = hideFlags != null ? hideFlags.asInt() : 0;
-
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
         if (unbreakable != null && unbreakable.asBoolean()) {
             if ((hideFlagsValue & 0x04) != 0) {
-                data.add(StructuredDataKey.UNBREAKABLE, true); // TODO Value is hide, should have a wrapper
+                data.set(StructuredDataKey.UNBREAKABLE, true); // TODO Value is hide, should have a wrapper
             } else {
                 data.addEmpty(StructuredDataKey.UNBREAKABLE);
             }
+        }
+
+        final CompoundTag trimTag = tag.getCompoundTag("Trim");
+        if (trimTag != null) {
+            // TODO
+            //final ArmorTrim armorTrim = new ArmorTrim(, , (hideFlagsValue & 0x80) == 0);
+            //data.set(StructuredDataKey.TRIM, armorTrim);
+        }
+
+        final ListTag chargedProjectiles = tag.getListTag("ChargedProjectiles");
+        if (chargedProjectiles != null) {
+            final List<Item> items = new ArrayList<>();
+            for (final Tag chargedProjectile : chargedProjectiles) {
+                if (!(chargedProjectile instanceof CompoundTag)) {
+                    continue;
+                }
+                items.add(itemFromTag((CompoundTag) chargedProjectile));
+            }
+            data.set(StructuredDataKey.CHARGED_PROJECTILES, items.toArray(new Item[0]));
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
@@ -271,7 +301,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag map = tag.getNumberTag("map");
         if (map != null) {
-            data.add(StructuredDataKey.MAP_ID, map.asInt());
+            data.set(StructuredDataKey.MAP_ID, map.asInt());
         }
 
         updateMapDecorations(data, tag.getListTag("Decorations", CompoundTag.class));
@@ -281,13 +311,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateProfile(data, tag.get("SkullOwner"));
 
         // TODO
-        //  StructuredDataKey.CUSTOM_NAME
-        //  StructuredDataKey.LORE
         //  StructuredDataKey.CAN_PLACE_ON
         //  StructuredDataKey.CAN_BREAK
         //  StructuredDataKey.ATTRIBUTE_MODIFIERS
-        //  StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP
-        //  StructuredDataKey.REPAIR_COST
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
         //  StructuredDataKey.DYED_COLOR
@@ -317,8 +343,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         // Add the original as custom data, to be re-used for creative clients as well
         tag.putBoolean(nbtTagName(), true);
-        data.add(StructuredDataKey.CUSTOM_DATA, tag);
+        data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private Item itemFromTag(final CompoundTag item) {
+        final StringTag id = item.getStringTag("id");
+        final NumberTag count = item.getNumberTag("Count");
+        final CompoundTag tag = item.getCompoundTag("tag");
+        return handleItemToClient(new DataItem(0, count.asByte(), (short) 0, tag)); // TODO unmapped id from key
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
@@ -346,11 +379,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             enchantments.enchantments().put(intId, lvl.asInt());
         }
 
-        data.add(newKey, enchantments);
+        data.set(newKey, enchantments);
 
         // Add glint if none of the enchantments were valid
         if (enchantments.size() == 0 && !enchantmentsTag.isEmpty()) {
-            data.add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
+            data.set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
     }
 
@@ -397,7 +430,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        data.add(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(new GameProfile.Property[0])));
+        data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(new GameProfile.Property[0])));
     }
 
     private void updateMapDecorations(final StructuredDataContainer data, final ListTag<CompoundTag> decorationsTag) {
@@ -423,18 +456,38 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updatedDecorationsTag.put(id, updatedDecorationTag);
         }
 
-        data.add(StructuredDataKey.MAP_DECORATIONS, updatedDecorationsTag);
+        data.set(StructuredDataKey.MAP_DECORATIONS, updatedDecorationsTag);
     }
 
-    private void updateDisplay(final StructuredDataContainer data, final CompoundTag displayTag) {
+    private void updateDisplay(final StructuredDataContainer data, final CompoundTag displayTag, final int hideFlags) {
         if (displayTag == null) {
             return;
         }
 
         final NumberTag mapColorTag = displayTag.getNumberTag("MapColor");
         if (mapColorTag != null) {
-            data.add(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
+            data.set(StructuredDataKey.MAP_COLOR, mapColorTag.asInt());
         }
-        // TODO other display values
+
+        final StringTag nameTag = displayTag.getStringTag("Name");
+        if (nameTag != null) {
+            data.set(StructuredDataKey.CUSTOM_NAME, ComponentUtil.jsonStringToTag(nameTag.getValue()));
+        }
+
+        final ListTag loreTag = displayTag.getListTag("Lore");
+        if (loreTag != null) {
+            final List<Tag> updatedLore = new ArrayList<>();
+            for (final Tag loreEntry : loreTag) {
+                if (loreEntry instanceof StringTag) {
+                    updatedLore.add(ComponentUtil.jsonStringToTag(((StringTag) loreEntry).getValue()));
+                }
+            }
+            data.set(StructuredDataKey.LORE, updatedLore.toArray(new Tag[0]));
+        }
+
+        final NumberTag colorTag = displayTag.getNumberTag("color");
+        if (colorTag != null) {
+            data.set(StructuredDataKey.DYED_COLOR, new DyedColor(colorTag.asInt(), (hideFlags & 0x40) == 0));
+        }
     }
 }

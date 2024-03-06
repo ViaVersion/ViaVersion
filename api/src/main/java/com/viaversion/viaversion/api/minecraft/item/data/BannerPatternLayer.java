@@ -22,40 +22,42 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.misc.HolderType;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public final class BannerPattern {
+public final class BannerPatternLayer {
 
-    public static final HolderType<BannerPattern> TYPE = new HolderType<BannerPattern>() {
+    public static final Type<BannerPatternLayer> TYPE = new Type<BannerPatternLayer>(BannerPatternLayer.class) {
         @Override
-        public BannerPattern readDirect(final ByteBuf buffer) throws Exception {
-            final String assetId = Type.STRING.read(buffer);
-            final String tanslationKey = Type.STRING.read(buffer);
-            return new BannerPattern(assetId, tanslationKey);
+        public BannerPatternLayer read(final ByteBuf buffer) throws Exception {
+            final Holder<BannerPattern> pattern = BannerPattern.TYPE.read(buffer);
+            final DyedColor color = DyedColor.TYPE.read(buffer);
+            return new BannerPatternLayer(pattern, color);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final BannerPattern value) throws Exception {
-            Type.STRING.write(buffer, value.assetId);
-            Type.STRING.write(buffer, value.tanslationKey);
+        public void write(final ByteBuf buffer, final BannerPatternLayer value) throws Exception {
+            BannerPattern.TYPE.write(buffer, value.pattern);
+            DyedColor.TYPE.write(buffer, value.color);
         }
     };
+    public static final Type<BannerPatternLayer[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final String assetId;
-    private final String tanslationKey;
+    private final Holder<BannerPattern> pattern;
+    private final DyedColor color;
 
-    public BannerPattern(final String assetId, final String tanslationKey) {
-        this.assetId = assetId;
-        this.tanslationKey = tanslationKey;
+    public BannerPatternLayer(final Holder<BannerPattern> pattern, final DyedColor color) {
+        this.pattern = pattern;
+        this.color = color;
     }
 
-    public String assetId() {
-        return assetId;
+    public Holder<BannerPattern> pattern() {
+        return pattern;
     }
 
-    public String tanslationKey() {
-        return tanslationKey;
+    public DyedColor color() {
+        return color;
     }
 }

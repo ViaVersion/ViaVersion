@@ -51,16 +51,17 @@ public final class MetaTypes1_20_5 extends AbstractMetaTypes {
     public final MetaType optionalVarIntType = add(19, Type.OPTIONAL_VAR_INT);
     public final MetaType poseType = add(20, Type.VAR_INT);
     public final MetaType catVariantType = add(21, Type.VAR_INT);
-    public final MetaType frogVariantType = add(22, Type.VAR_INT);
-    public final MetaType optionalGlobalPosition = add(23, Type.OPTIONAL_GLOBAL_POSITION);
-    public final MetaType paintingVariantType = add(24, Type.VAR_INT);
-    public final MetaType snifferState = add(25, Type.VAR_INT);
-    public final MetaType armadilloState = add(26, Type.VAR_INT);
-    public final MetaType vectorType = add(27, Type.VECTOR3F);
-    public final MetaType quaternionType = add(28, Type.QUATERNION);
+    public final MetaType wolfVariantType = add(22, Type.VAR_INT);
+    public final MetaType frogVariantType = add(23, Type.VAR_INT);
+    public final MetaType optionalGlobalPosition = add(24, Type.OPTIONAL_GLOBAL_POSITION);
+    public final MetaType paintingVariantType = add(25, Type.VAR_INT);
+    public final MetaType snifferState = add(26, Type.VAR_INT);
+    public final MetaType armadilloState = add(27, Type.VAR_INT);
+    public final MetaType vectorType = add(28, Type.VECTOR3F);
+    public final MetaType quaternionType = add(29, Type.QUATERNION);
 
     public MetaTypes1_20_5(final ParticleType particleType) {
-        super(29);
+        super(30);
         this.particleType = add(17, particleType);
     }
 }

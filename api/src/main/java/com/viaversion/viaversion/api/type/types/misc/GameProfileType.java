@@ -34,7 +34,7 @@ public final class GameProfileType extends Type<GameProfile> {
 
     @Override
     public GameProfile read(final ByteBuf buffer) throws Exception {
-        final String name = Type.STRING.read(buffer);
+        final String name = Type.OPTIONAL_STRING.read(buffer);
         final java.util.UUID id = Type.OPTIONAL_UUID.read(buffer);
         final int propertyCount = Type.VAR_INT.readPrimitive(buffer);
         final GameProfile.Property[] properties = new GameProfile.Property[propertyCount];
@@ -49,7 +49,7 @@ public final class GameProfileType extends Type<GameProfile> {
 
     @Override
     public void write(final ByteBuf buffer, final GameProfile value) throws Exception {
-        Type.STRING.write(buffer, value.name());
+        Type.OPTIONAL_STRING.write(buffer, value.name());
         Type.OPTIONAL_UUID.write(buffer, value.id());
         Type.VAR_INT.writePrimitive(buffer, value.properties().length);
         for (final GameProfile.Property property : value.properties()) {

@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
@@ -89,6 +90,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Icon
             wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
         });
+
+        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);
 
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
@@ -147,7 +150,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .add(StructuredDataKey.BLOCK_ENTITY_DATA)
             .add(StructuredDataKey.INSTRUMENT)
             .add(StructuredDataKey.RECIPES)
-            .add(StructuredDataKey.LODESTONE_TARGET)
+            .add(StructuredDataKey.LODESTONE_TRACKER)
             .add(StructuredDataKey.FIREWORK_EXPLOSION)
             .add(StructuredDataKey.FIREWORKS)
             .add(StructuredDataKey.PROFILE)

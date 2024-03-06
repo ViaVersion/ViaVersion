@@ -29,13 +29,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class StructuredItem implements Item {
     private final StructuredDataContainer data;
     private int identifier;
-    private byte amount;
+    private int amount;
 
     public StructuredItem() {
-        this(0, (byte) 0, new StructuredDataContainer());
+        this(0, 0, new StructuredDataContainer());
     }
 
-    public StructuredItem(final int identifier, final byte amount, final StructuredDataContainer data) {
+    public StructuredItem(final int identifier, final int amount, final StructuredDataContainer data) {
         this.identifier = identifier;
         this.amount = amount;
         this.data = data;
@@ -58,10 +58,7 @@ public class StructuredItem implements Item {
 
     @Override
     public void setAmount(final int amount) {
-        if (amount > Byte.MAX_VALUE || amount < Byte.MIN_VALUE) {
-            throw new IllegalArgumentException("Invalid item amount: " + amount);
-        }
-        this.amount = (byte) amount;
+        this.amount = amount;
     }
 
     @Override

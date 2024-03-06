@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.minecraft.data;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -68,11 +69,15 @@ public final class StructuredDataContainer {
         return data != null && data.isPresent() ? data : null;
     }
 
-    public <T> void add(final StructuredDataKey<T> key, final T value) {
+    public <T> void set(final StructuredDataKey<T> key, final T value) {
         final int id = serializerId(key);
         if (id != -1) {
             this.data.put(key, StructuredData.of(key, value, id));
         }
+    }
+
+    public void set(final StructuredDataKey<Unit> key) {
+        this.set(key, Unit.INSTANCE);
     }
 
     public void addEmpty(final StructuredDataKey<?> key) {
