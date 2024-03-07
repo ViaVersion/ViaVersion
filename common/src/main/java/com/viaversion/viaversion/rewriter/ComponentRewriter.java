@@ -254,13 +254,13 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         }
 
         if (tag instanceof ListTag) {
-            processListTag((ListTag) tag);
+            processListTag((ListTag<?>) tag);
         } else if (tag instanceof CompoundTag) {
             processCompoundTag((CompoundTag) tag);
         }
     }
 
-    private void processListTag(final ListTag tag) {
+    private void processListTag(final ListTag<?> tag) {
         for (final Tag entry : tag) {
             processTag(entry);
         }
@@ -271,13 +271,13 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         if (translate != null) {
             handleTranslate(tag, translate);
 
-            final ListTag with = tag.getListTag("with");
+            final ListTag<?> with = tag.getListTag("with");
             if (with != null) {
                 processListTag(with);
             }
         }
 
-        final ListTag extra = tag.getListTag("extra");
+        final ListTag<?> extra = tag.getListTag("extra");
         if (extra != null) {
             processListTag(extra);
         }

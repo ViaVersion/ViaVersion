@@ -27,6 +27,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.io.NBTIO;
 import com.github.steveice10.opennbt.tag.io.TagReader;
 import com.google.common.annotations.Beta;
@@ -227,8 +228,8 @@ public final class MappingDataLoader {
     }
 
     public static FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        final ListTag unmappedElements = unmappedIdentifiers.get(key);
-        final ListTag mappedElements = mappedIdentifiers.get(key);
+        final ListTag<StringTag> unmappedElements = unmappedIdentifiers.getListTag(key, StringTag.class);
+        final ListTag<StringTag> mappedElements = mappedIdentifiers.getListTag(key, StringTag.class);
         if (unmappedElements == null || mappedElements == null) {
             return null;
         }
@@ -239,8 +240,8 @@ public final class MappingDataLoader {
         }
 
         return new FullMappingsBase(
-                unmappedElements.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList()),
-                mappedElements.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList()),
+                unmappedElements.getValue().stream().map(StringTag::getValue).collect(Collectors.toList()),
+                mappedElements.getValue().stream().map(StringTag::getValue).collect(Collectors.toList()),
                 mappings
         );
     }

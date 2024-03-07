@@ -80,7 +80,7 @@ public class EntityPackets {
     private static final String[] WORLD_NAMES = {"minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"};
 
     static {
-        ListTag list = new ListTag(CompoundTag.class);
+        ListTag<CompoundTag> list = new ListTag<>(CompoundTag.class);
         list.add(createOverworldEntry());
         list.add(createOverworldCavesEntry());
         list.add(createNetherEntry());

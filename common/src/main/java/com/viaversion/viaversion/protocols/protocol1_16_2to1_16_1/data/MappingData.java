@@ -38,12 +38,11 @@ public class MappingData extends MappingDataBase {
         dimensionRegistry = MappingDataLoader.loadNBTFromFile("dimension-registry-1.16.2.nbt");
 
         // Data of each dimension
-        final ListTag dimensions = dimensionRegistry.getCompoundTag("minecraft:dimension_type").get("value");
-        for (final Tag dimension : dimensions) {
-            final CompoundTag dimensionCompound = (CompoundTag) dimension;
+        final ListTag<CompoundTag> dimensions = dimensionRegistry.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
+        for (final CompoundTag dimension : dimensions) {
             // Copy with an empty name
-            final CompoundTag dimensionData = dimensionCompound.getCompoundTag("element").copy();
-            dimensionDataMap.put(dimensionCompound.getStringTag("name").getValue(), dimensionData);
+            final CompoundTag dimensionData = dimension.getCompoundTag("element").copy();
+            dimensionDataMap.put(dimension.getStringTag("name").getValue(), dimensionData);
         }
     }
 

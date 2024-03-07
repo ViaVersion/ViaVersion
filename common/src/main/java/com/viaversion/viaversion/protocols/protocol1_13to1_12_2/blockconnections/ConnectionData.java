@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -166,9 +167,9 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").getListTag("blockstates");
+        ListTag<StringTag> blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
         for (int id = 0; id < blockStates.size(); id++) {
-            String key = (String) blockStates.get(id).getValue();
+            String key = blockStates.get(id).getValue();
             KEY_TO_ID.put(key, id);
         }
 
@@ -177,11 +178,10 @@ public final class ConnectionData {
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
 
-            ListTag blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").getListTag("data");
-            for (Tag blockTag : blockConnectionMappings) {
-                CompoundTag blockCompoundTag = (CompoundTag) blockTag;
+            ListTag<CompoundTag> blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").getListTag("data", CompoundTag.class);
+            for (CompoundTag blockTag : blockConnectionMappings) {
                 BlockData blockData = new BlockData();
-                for (Entry<String, Tag> entry : blockCompoundTag.entrySet()) {
+                for (Entry<String, Tag> entry : blockTag.entrySet()) {
                     String key = entry.getKey();
                     if (key.equals("id") || key.equals("ids")) {
                         continue;
@@ -198,11 +198,11 @@ public final class ConnectionData {
                     blockData.put(connectionTypeId, attachingFaces);
                 }
 
-                NumberTag idTag = blockCompoundTag.getNumberTag("id");
+                NumberTag idTag = blockTag.getNumberTag("id");
                 if (idTag != null) {
                     blockConnectionData.put(idTag.asInt(), blockData);
                 } else {
-                    IntArrayTag idsTag = blockCompoundTag.getIntArrayTag("ids");
+                    IntArrayTag idsTag = blockTag.getIntArrayTag("ids");
                     for (int id : idsTag.getValue()) {
                         blockConnectionData.put(id, blockData);
                     }

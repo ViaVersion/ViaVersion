@@ -210,14 +210,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     tag.put("minecraft:chat_type", CHAT_REGISTRY.copy());
 
                     // Cache a whole lot of data
-                    final ListTag dimensions = tag.getCompoundTag("minecraft:dimension_type").get("value");
+                    final ListTag<CompoundTag> dimensions = tag.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
                     final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
                     final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
-                    for (final Tag dimension : dimensions) {
-                        final CompoundTag dimensionCompound = (CompoundTag) dimension;
-                        final NumberTag idTag = dimensionCompound.get("id");
-                        final CompoundTag element = dimensionCompound.get("element");
-                        final String name = (String) dimensionCompound.get("name").getValue();
+                    for (final CompoundTag dimension : dimensions) {
+                        final NumberTag idTag = dimension.get("id");
+                        final CompoundTag element = dimension.get("element");
+                        final String name = dimension.getStringTag("name").getValue();
                         addMonsterSpawnData(element);
                         dimensionDataMap.put(Key.stripMinecraftNamespace(name), new DimensionDataImpl(idTag.asInt(), element));
                         dimensionsMap.put(element.copy(), name);

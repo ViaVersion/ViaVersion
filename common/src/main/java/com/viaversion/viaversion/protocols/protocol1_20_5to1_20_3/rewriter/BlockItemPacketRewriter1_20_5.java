@@ -276,7 +276,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.add(StructuredDataKey.MAP_ID, map.asInt());
         }
 
-        updateMapDecorations(data, tag.getListTag("Decorations"));
+        updateMapDecorations(data, tag.getListTag("Decorations", CompoundTag.class));
 
         // MAP_POST_PROCESSING is only used internally
 
@@ -325,7 +325,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
                                     final StructuredDataKey<Enchantments> newKey, final boolean show) {
-        final ListTag enchantmentsTag = tag.getListTag(key);
+        final ListTag<CompoundTag> enchantmentsTag = tag.getListTag(key, CompoundTag.class);
         if (enchantmentsTag == null) {
             return;
         }
@@ -333,14 +333,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         tag.remove(key);
 
         final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), show);
-        for (final Tag enchantment : enchantmentsTag) {
-            if (!(enchantment instanceof CompoundTag)) {
-                continue;
-            }
-
-            final CompoundTag compound = (CompoundTag) enchantment;
-            final StringTag id = compound.getStringTag("id");
-            final NumberTag lvl = compound.getNumberTag("lvl");
+        for (final CompoundTag enchantment : enchantmentsTag) {
+            final StringTag id = enchantment.getStringTag("id");
+            final NumberTag lvl = enchantment.getNumberTag("lvl");
             if (id == null || lvl == null) {
                 continue;
             }
@@ -384,7 +379,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                         continue;
                     }
 
-                    for (final Tag propertyTag : (ListTag) entry.getValue()) {
+                    for (final Tag propertyTag : (ListTag<?>) entry.getValue()) {
                         if (!(propertyTag instanceof CompoundTag)) {
                             continue;
                         }
@@ -407,25 +402,20 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.add(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(new GameProfile.Property[0])));
     }
 
-    private void updateMapDecorations(final StructuredDataContainer data, final ListTag decorationsTag) {
+    private void updateMapDecorations(final StructuredDataContainer data, final ListTag<CompoundTag> decorationsTag) {
         if (decorationsTag == null) {
             return;
         }
 
         final CompoundTag updatedDecorationsTag = new CompoundTag();
-        for (final Tag decorationTag : decorationsTag) {
-            if (!(decorationTag instanceof CompoundTag)) {
-                continue;
-            }
-
-            final CompoundTag decoration = (CompoundTag) decorationTag;
-            final StringTag idTag = decoration.getStringTag("id");
+        for (final CompoundTag decorationTag : decorationsTag) {
+            final StringTag idTag = decorationTag.getStringTag("id");
             final String id = idTag != null ? idTag.asRawString() : "";
-            final NumberTag typeTag = decoration.getNumberTag("type");
+            final NumberTag typeTag = decorationTag.getNumberTag("type");
             final int type = typeTag != null ? typeTag.asInt() : 0;
-            final NumberTag xTag = decoration.getNumberTag("x");
-            final NumberTag zTag = decoration.getNumberTag("z");
-            final NumberTag rotationTag = decoration.getNumberTag("rot");
+            final NumberTag xTag = decorationTag.getNumberTag("x");
+            final NumberTag zTag = decorationTag.getNumberTag("z");
+            final NumberTag rotationTag = decorationTag.getNumberTag("rot");
 
             final CompoundTag updatedDecorationTag = new CompoundTag();
             updatedDecorationTag.putString("type", MapDecorationMappings.mapDecoration(type));

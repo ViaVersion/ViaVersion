@@ -475,7 +475,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
         final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
-        final ListTag biomes = biomeRegistry.get("value");
+        final ListTag<?> biomes = biomeRegistry.get("value");
         tracker(connection).setBiomesSent(biomes.size());
     }
 
@@ -491,13 +491,12 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * Caches dimension data, later used to get height values and other important info.
      */
     public void cacheDimensionData(final UserConnection connection, final CompoundTag registry) {
-        final ListTag dimensions = registry.getCompoundTag("minecraft:dimension_type").get("value");
+        final ListTag<CompoundTag> dimensions = registry.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
         final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
-        for (final Tag dimension : dimensions) {
-            final CompoundTag dimensionCompound = (CompoundTag) dimension;
-            final NumberTag idTag = dimensionCompound.get("id");
-            final CompoundTag element = dimensionCompound.get("element");
-            final String name = dimensionCompound.getStringTag("name").getValue();
+        for (final CompoundTag dimension : dimensions) {
+            final NumberTag idTag = dimension.get("id");
+            final CompoundTag element = dimension.get("element");
+            final String name = dimension.getStringTag("name").getValue();
             dimensionDataMap.put(Key.stripMinecraftNamespace(name), new DimensionDataImpl(idTag.asInt(), element));
         }
         tracker(connection).setDimensions(dimensionDataMap);

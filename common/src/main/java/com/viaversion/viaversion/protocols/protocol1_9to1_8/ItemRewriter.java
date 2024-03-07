@@ -221,24 +221,20 @@ public class ItemRewriter {
         }
 
         CompoundTag tag = item.tag();
-        ListTag pages = tag.getListTag("pages");
+        ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
         if (pages == null) {
             return;
         }
 
         for (int i = 0; i < pages.size(); i++) {
-            Tag pageTag = pages.get(i);
-            if (!(pageTag instanceof StringTag)) {
-                continue;
-            }
-            StringTag stag = (StringTag) pageTag;
-            String value = stag.getValue();
+            StringTag pageTag = pages.get(i);
+            String value = pageTag.getValue();
             if (value.replaceAll(" ", "").isEmpty()) {
                 value = "\"" + fixBookSpaceChars(value) + "\"";
             } else {
                 value = fixBookSpaceChars(value);
             }
-            stag.setValue(value);
+            pageTag.setValue(value);
         }
     }
 
@@ -289,17 +285,15 @@ public class ItemRewriter {
                     tag = new CompoundTag();
                 }
 
-                ListTag pages = tag.getListTag("pages");
+                ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
                 if (pages == null) {
-                    pages = new ListTag(Collections.singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
+                    pages = new ListTag<>(Collections.singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
                     tag.put("pages", pages);
                     item.setTag(tag);
                     return;
                 }
 
                 for (int i = 0; i < pages.size(); i++) {
-                    if (!(pages.get(i) instanceof StringTag))
-                        continue;
                     StringTag page = pages.get(i);
                     page.setValue(Protocol1_9To1_8.fixJson(page.getValue()).toString());
                 }

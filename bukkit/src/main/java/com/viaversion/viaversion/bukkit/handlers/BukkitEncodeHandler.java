@@ -43,7 +43,8 @@ public final class BukkitEncodeHandler extends MessageToMessageEncoder<ByteBuf> 
 
     @Override
     protected void encode(final ChannelHandlerContext ctx, final ByteBuf bytebuf, final List<Object> out) throws Exception {
-        if (!connection.checkClientboundPacket()) {
+        // Check if the channel is open as older servers might start sending packets through the pipeline despite the channel being closed
+        if (!connection.checkClientboundPacket() || !ctx.channel().isOpen()) {
             throw CancelEncoderException.generate(null);
         }
         if (!connection.shouldTransformPacket()) {

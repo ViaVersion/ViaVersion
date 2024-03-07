@@ -77,10 +77,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag damageTypeRegistry = registry.get("minecraft:damage_type");
-                    final ListTag damageTypes = damageTypeRegistry.get("value");
+                    final ListTag<CompoundTag> damageTypes = damageTypeRegistry.get("value");
                     int highestId = -1;
-                    for (final Tag damageType : damageTypes) {
-                        final IntTag id = ((CompoundTag) damageType).get("id");
+                    for (final CompoundTag damageType : damageTypes) {
+                        final IntTag id = damageType.get("id");
                         highestId = Math.max(highestId, id.asInt());
                     }
 

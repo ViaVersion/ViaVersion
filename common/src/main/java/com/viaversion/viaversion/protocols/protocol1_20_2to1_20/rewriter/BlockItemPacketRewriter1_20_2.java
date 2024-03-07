@@ -372,7 +372,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
     public static void to1_20_2Effects(final Item item) {
         final Tag customPotionEffectsTag = item.tag().remove("CustomPotionEffects");
         if (customPotionEffectsTag instanceof ListTag) {
-            final ListTag effectsTag = (ListTag) customPotionEffectsTag;
+            final ListTag<?> effectsTag = (ListTag<?>) customPotionEffectsTag;
             item.tag().put("custom_potion_effects", customPotionEffectsTag);
 
             for (final Tag tag : effectsTag) {
@@ -403,7 +403,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
     public static void to1_20_1Effects(final Item item) {
         final Tag customPotionEffectsTag = item.tag().remove("custom_potion_effects");
         if (customPotionEffectsTag instanceof ListTag) {
-            final ListTag effectsTag = (ListTag) customPotionEffectsTag;
+            final ListTag<?> effectsTag = (ListTag<?>) customPotionEffectsTag;
             item.tag().put("CustomPotionEffects", effectsTag);
 
             for (final Tag tag : effectsTag) {

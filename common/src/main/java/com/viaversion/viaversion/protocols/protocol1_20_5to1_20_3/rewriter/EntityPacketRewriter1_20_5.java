@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
@@ -66,15 +65,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
                 final CompoundTag entryTag = (CompoundTag) entry.getValue();
-                final StringTag typeTag = entryTag.get("type");
-                final ListTag valueTag = entryTag.get("value");
+                final StringTag typeTag = entryTag.getStringTag("type");
+                final ListTag<CompoundTag> valueTag = entryTag.getListTag("value", CompoundTag.class);
                 RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
                 boolean requiresDummyValues = false;
                 int entriesLength = registryEntries.length;
-                for (final Tag tag : valueTag) {
-                    final CompoundTag compoundTag = (CompoundTag) tag;
-                    final StringTag nameTag = compoundTag.get("name");
-                    final int id = ((NumberTag) compoundTag.get("id")).asInt();
+                for (final CompoundTag tag : valueTag) {
+                    final StringTag nameTag = tag.getStringTag("name");
+                    final int id = tag.getNumberTag("id").asInt();
                     entriesLength = Math.max(entriesLength, id + 1);
                     if (id >= registryEntries.length) {
                         // It was previously possible to have arbitrary ids
@@ -82,7 +80,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         requiresDummyValues = true;
                     }
 
-                    registryEntries[id] = new RegistryEntry(nameTag.getValue(), compoundTag.get("element"));
+                    registryEntries[id] = new RegistryEntry(nameTag.getValue(), tag.get("element"));
                 }
 
                 if (requiresDummyValues) {

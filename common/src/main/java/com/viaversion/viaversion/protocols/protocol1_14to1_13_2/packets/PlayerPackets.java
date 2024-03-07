@@ -57,15 +57,18 @@ public class PlayerPackets {
             CompoundTag tag = item.tag();
             if (tag == null) return;
 
-            ListTag pages = tag.getListTag("pages");
+            ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
 
             // Fix for https://github.com/ViaVersion/ViaVersion/issues/2660
             if (pages == null) {
-                tag.put("pages", new ListTag(Collections.singletonList(new StringTag())));
+                pages = new ListTag<>(StringTag.class);
+                pages.add(new StringTag());
+                tag.put("pages", pages);
+                return;
             }
 
             // Client limit when editing a book was upped from 50 to 100 in 1.14, but some anti-exploit plugins ban with a size higher than the old client limit
-            if (Via.getConfig().isTruncate1_14Books() && pages != null) {
+            if (Via.getConfig().isTruncate1_14Books()) {
                 if (pages.size() > 50) {
                     pages.setValue(pages.getValue().subList(0, 50));
                 }

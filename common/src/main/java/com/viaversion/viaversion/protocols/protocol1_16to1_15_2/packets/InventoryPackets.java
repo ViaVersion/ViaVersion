@@ -156,15 +156,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 }
             }
         } else if (item.identifier() == 759 && tag != null) {
-            ListTag pages = tag.getListTag("pages");
+            ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
             if (pages != null) {
-                for (Tag pageTag : pages) {
-                    if (!(pageTag instanceof StringTag)) {
-                        continue;
-                    }
-
-                    StringTag page = (StringTag) pageTag;
-                    page.setValue(protocol.getComponentRewriter().processText(page.getValue()).toString());
+                for (StringTag pageTag : pages) {
+                    pageTag.setValue(protocol.getComponentRewriter().processText(pageTag.getValue()).toString());
                 }
             }
         }
@@ -199,13 +194,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     public static void oldToNewAttributes(Item item) {
         if (item.tag() == null) return;
 
-        ListTag attributes = item.tag().getListTag("AttributeModifiers");
+        ListTag<CompoundTag> attributes = item.tag().getListTag("AttributeModifiers", CompoundTag.class);
         if (attributes == null) return;
 
-        for (Tag tag : attributes) {
-            if (!(tag instanceof CompoundTag)) continue;
-
-            CompoundTag attribute = (CompoundTag) tag;
+        for (CompoundTag attribute : attributes) {
             rewriteAttributeName(attribute, "AttributeName", false);
             rewriteAttributeName(attribute, "Name", false);
             NumberTag leastTag = attribute.getNumberTag("UUIDLeast");
@@ -220,13 +212,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     public static void newToOldAttributes(Item item) {
         if (item.tag() == null) return;
 
-        ListTag attributes = item.tag().getListTag("AttributeModifiers");
+        ListTag<CompoundTag> attributes = item.tag().getListTag("AttributeModifiers", CompoundTag.class);
         if (attributes == null) return;
 
-        for (Tag tag : attributes) {
-            if (!(tag instanceof CompoundTag)) continue;
-
-            CompoundTag attribute = (CompoundTag) tag;
+        for (CompoundTag attribute : attributes) {
             rewriteAttributeName(attribute, "AttributeName", true);
             rewriteAttributeName(attribute, "Name", true);
             IntArrayTag uuidTag = attribute.getIntArrayTag("UUID");

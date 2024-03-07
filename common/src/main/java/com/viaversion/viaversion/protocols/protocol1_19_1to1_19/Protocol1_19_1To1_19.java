@@ -222,11 +222,10 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     chatTypeStorage.clear();
 
                     final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
-                    final ListTag chatTypes = registry.getCompoundTag("minecraft:chat_type").get("value");
-                    for (final Tag chatType : chatTypes) {
-                        final CompoundTag chatTypeCompound = (CompoundTag) chatType;
-                        final NumberTag idTag = chatTypeCompound.get("id");
-                        chatTypeStorage.addChatType(idTag.asInt(), chatTypeCompound);
+                    final ListTag<CompoundTag> chatTypes = registry.getCompoundTag("minecraft:chat_type").getListTag("value", CompoundTag.class);
+                    for (final CompoundTag chatType : chatTypes) {
+                        final NumberTag idTag = chatType.get("id");
+                        chatTypeStorage.addChatType(idTag.asInt(), chatType);
                     }
 
                     // Replace chat types - they won't actually be used
@@ -405,12 +404,12 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
         }
 
         // Add the replacements
-        final ListTag parameters = tag.getListTag("parameters");
+        final ListTag<StringTag> parameters = tag.getListTag("parameters", StringTag.class);
         final List<ATextComponent> arguments = new ArrayList<>();
         if (parameters != null) {
-            for (final Tag element : parameters) {
+            for (final StringTag element : parameters) {
                 JsonElement argument = null;
-                switch ((String) element.getValue()) {
+                switch (element.getValue()) {
                     case "sender":
                         argument = senderName;
                         break;
