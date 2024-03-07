@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.data;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
@@ -83,8 +84,8 @@ public class MappingDataBase implements MappingData {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
 
-            final ListTag unmappedParticles = unmappedIdentifierData.get("particles");
-            final ListTag mappedParticles = mappedIdentifierData.get("particles");
+            final ListTag<StringTag> unmappedParticles = unmappedIdentifierData.getListTag("particles", StringTag.class);
+            final ListTag<StringTag> mappedParticles = mappedIdentifierData.getListTag("particles", StringTag.class);
             if (unmappedParticles != null && mappedParticles != null) {
                 Mappings particleMappings = loadMappings(data, "particles");
                 if (particleMappings == null) {

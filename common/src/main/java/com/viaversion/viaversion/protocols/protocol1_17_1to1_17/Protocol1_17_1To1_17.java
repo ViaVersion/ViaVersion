@@ -88,14 +88,14 @@ public final class Protocol1_17_1To1_17 extends AbstractProtocol<ClientboundPack
 
             // Save pages to tag
             int pages = wrapper.read(Type.VAR_INT);
-            ListTag pagesTag = new ListTag(StringTag.class);
+            ListTag<StringTag> pagesTag = new ListTag<>(StringTag.class);
             for (int i = 0; i < pages; i++) {
                 String page = wrapper.read(PAGE_STRING_TYPE);
                 pagesTag.add(new StringTag(page));
             }
 
             // Legacy servers don't like an empty pages list
-            if (pagesTag.size() == 0) {
+            if (pagesTag.isEmpty()) {
                 pagesTag.add(new StringTag(""));
             }
 

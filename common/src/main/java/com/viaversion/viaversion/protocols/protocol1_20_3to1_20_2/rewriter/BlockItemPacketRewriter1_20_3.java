@@ -150,20 +150,15 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
     }
 
     private void updatePages(final CompoundTag tag, final String key) {
-        final ListTag pages = tag.getListTag(key);
+        final ListTag<StringTag> pages = tag.getListTag(key, StringTag.class);
         if (pages == null) {
             return;
         }
 
-        for (final Tag pageTag : pages) {
-            if (!(pageTag instanceof StringTag)) {
-                continue;
-            }
-
-            final StringTag stringTag = (StringTag) pageTag;
+        for (final StringTag pageTag : pages) {
             try {
-                final JsonElement updatedComponent = ComponentUtil.convertJson(stringTag.getValue(), ComponentUtil.SerializerVersion.V1_19_4, ComponentUtil.SerializerVersion.V1_20_3);
-                stringTag.setValue(updatedComponent.toString());
+                final JsonElement updatedComponent = ComponentUtil.convertJson(pageTag.getValue(), ComponentUtil.SerializerVersion.V1_19_4, ComponentUtil.SerializerVersion.V1_20_3);
+                pageTag.setValue(updatedComponent.toString());
             } catch (final Exception e) {
                 Via.getManager().debugHandler().error("Error during book conversion", e);
             }

@@ -37,10 +37,13 @@ public final class TagUtil {
                 entry.setValue(updatedTag);
             }
         } else if (tag instanceof ListTag) {
-            final ListTag listTag = (ListTag) tag;
-            listTag.getValue().replaceAll(t -> handleDeep(null, t, consumer));
+            handleListTag((ListTag<?>) tag, consumer);
         }
         return consumer.update(key, tag);
+    }
+
+    private static <T extends Tag> void handleListTag(final ListTag<T> listTag, final TagUpdater consumer) {
+        listTag.getValue().replaceAll(t -> (T) handleDeep(null, t, consumer));
     }
 
     @FunctionalInterface

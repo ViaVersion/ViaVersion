@@ -60,17 +60,12 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
             Via.getPlatform().getLogger().warning("Why does this block have the banner block entity? :(" + tag);
         }
 
-        ListTag patterns = tag.getListTag("Patterns");
+        ListTag<CompoundTag> patterns = tag.getListTag("Patterns", CompoundTag.class);
         if (patterns != null) {
-            for (Tag pattern : patterns) {
-                if (!(pattern instanceof CompoundTag)) {
-                    continue;
-                }
-
-                CompoundTag patternTag = (CompoundTag) pattern;
-                NumberTag colorTag = patternTag.getNumberTag("Color");
+            for (CompoundTag pattern : patterns) {
+                NumberTag colorTag = pattern.getNumberTag("Color");
                 if (colorTag != null) {
-                    patternTag.putInt("Color", 15 - colorTag.asInt()); // Invert color id
+                    pattern.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                 }
             }
         }

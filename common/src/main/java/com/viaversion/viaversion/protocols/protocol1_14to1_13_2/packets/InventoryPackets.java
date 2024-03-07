@@ -244,14 +244,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         // Display Lore now uses JSON
         CompoundTag display = item.tag().getCompoundTag("display");
         if (display != null) {
-            ListTag lore = display.getListTag("Lore");
+            ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore != null) {
-                display.put(NBT_TAG_NAME + "|Lore", new ListTag(lore.copy().getValue())); // Save old lore
-                for (Tag loreEntry : lore) {
-                    if (loreEntry instanceof StringTag) {
-                        String jsonText = ComponentUtil.legacyToJsonString(((StringTag) loreEntry).getValue(), true);
-                        ((StringTag) loreEntry).setValue(jsonText);
-                    }
+                display.put(NBT_TAG_NAME + "|Lore", new ListTag<>(lore.copy().getValue())); // Save old lore
+                for (StringTag loreEntry : lore) {
+                    String jsonText = ComponentUtil.legacyToJsonString(loreEntry.getValue(), true);
+                    loreEntry.setValue(jsonText);
                 }
             }
         }
@@ -268,16 +266,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         // Display Name now uses JSON
         CompoundTag display = item.tag().getCompoundTag("display");
         if (display != null) {
-            ListTag lore = display.getListTag("Lore");
+            ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore != null) {
                 Tag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
                 if (savedLore instanceof ListTag) {
-                    display.put("Lore", new ListTag(((ListTag) savedLore).getValue()));
+                    display.put("Lore", new ListTag<>(((ListTag<?>) savedLore).getValue()));
                 } else {
-                    for (Tag loreEntry : lore) {
-                        if (loreEntry instanceof StringTag) {
-                            ((StringTag) loreEntry).setValue(ComponentUtil.jsonToLegacy(((StringTag) loreEntry).getValue()));
-                        }
+                    for (StringTag loreEntry : lore) {
+                        loreEntry.setValue(ComponentUtil.jsonToLegacy(loreEntry.getValue()));
                     }
                 }
             }

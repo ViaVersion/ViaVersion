@@ -295,21 +295,16 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         blockEntityTag.putInt("Base", 15 - baseTag.asInt());
                     }
 
-                    ListTag patternsTag = blockEntityTag.getListTag("Patterns");
+                    ListTag<CompoundTag> patternsTag = blockEntityTag.getListTag("Patterns", CompoundTag.class);
                     if (patternsTag != null) {
-                        for (Tag pattern : patternsTag) {
-                            if (!(pattern instanceof CompoundTag)) {
-                                continue;
-                            }
-
-                            CompoundTag patternTag = (CompoundTag) pattern;
-                            NumberTag colorTag = patternTag.getNumberTag("Color");
+                        for (CompoundTag pattern : patternsTag) {
+                            NumberTag colorTag = pattern.getNumberTag("Color");
                             if (colorTag == null) {
                                 continue;
                             }
 
                             // Invert color id
-                            patternTag.putInt("Color", 15 - colorTag.asInt());
+                            pattern.putInt("Color", 15 - colorTag.asInt());
                         }
                     }
                 }
@@ -324,16 +319,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 }
             }
             // ench is now Enchantments and now uses identifiers
-            ListTag ench = tag.getListTag("ench");
+            ListTag<CompoundTag> ench = tag.getListTag("ench", CompoundTag.class);
             if (ench != null) {
-                ListTag enchantments = new ListTag(CompoundTag.class);
-                for (Tag enchEntry : ench) {
-                    if (!(enchEntry instanceof CompoundTag)) {
-                        continue;
-                    }
-
-                    CompoundTag entryTag = (CompoundTag) enchEntry;
-                    NumberTag idTag = entryTag.getNumberTag("id");
+                ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
+                for (CompoundTag enchEntry : ench) {
+                    NumberTag idTag = enchEntry.getNumberTag("id");
                     if (idTag == null) {
                         continue;
                     }
@@ -346,7 +336,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     }
                     enchantmentEntry.putString("id", newId);
 
-                    NumberTag levelTag = entryTag.getNumberTag("lvl");
+                    NumberTag levelTag = enchEntry.getNumberTag("lvl");
                     if (levelTag != null) {
                         enchantmentEntry.putShort("lvl", levelTag.asShort());
                     }
@@ -357,16 +347,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put("Enchantments", enchantments);
             }
 
-            ListTag storedEnch = tag.getListTag("StoredEnchantments");
+            ListTag<CompoundTag> storedEnch = tag.getListTag("StoredEnchantments", CompoundTag.class);
             if (storedEnch != null) {
-                ListTag newStoredEnch = new ListTag(CompoundTag.class);
-                for (Tag enchEntry : storedEnch) {
-                    if (!(enchEntry instanceof CompoundTag)) {
-                        continue;
-                    }
-
-                    CompoundTag entryTag = (CompoundTag) enchEntry;
-                    NumberTag idTag = entryTag.getNumberTag("id");
+                ListTag<CompoundTag> newStoredEnch = new ListTag<>(CompoundTag.class);
+                for (CompoundTag enchEntry : storedEnch) {
+                    NumberTag idTag = enchEntry.getNumberTag("id");
                     if (idTag == null) {
                         continue;
                     }
@@ -379,7 +364,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     }
                     enchantmentEntry.putString("id", newId);
 
-                    NumberTag levelTag = entryTag.getNumberTag("lvl");
+                    NumberTag levelTag = enchEntry.getNumberTag("lvl");
                     if (levelTag != null) {
                         enchantmentEntry.putShort("lvl", levelTag.asShort());
                     }
@@ -389,9 +374,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put("StoredEnchantments", newStoredEnch);
             }
 
-            ListTag canPlaceOnTag = tag.getListTag("CanPlaceOn");
+            ListTag<?> canPlaceOnTag = tag.getListTag("CanPlaceOn");
             if (canPlaceOnTag != null) {
-                ListTag newCanPlaceOn = new ListTag(StringTag.class);
+                ListTag<StringTag> newCanPlaceOn = new ListTag<>(StringTag.class);
                 tag.put(NBT_TAG_NAME + "|CanPlaceOn", canPlaceOnTag.copy());
                 for (Tag oldTag : canPlaceOnTag) {
                     Object value = oldTag.getValue();
@@ -412,9 +397,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put("CanPlaceOn", newCanPlaceOn);
             }
 
-            ListTag canDestroyTag = tag.getListTag("CanDestroy");
+            ListTag<?> canDestroyTag = tag.getListTag("CanDestroy");
             if (canDestroyTag != null) {
-                ListTag newCanDestroy = new ListTag(StringTag.class);
+                ListTag<StringTag> newCanDestroy = new ListTag<>(StringTag.class);
                 tag.put(NBT_TAG_NAME + "|CanDestroy", canDestroyTag.copy());
                 for (Tag oldTag : canDestroyTag) {
                     Object value = oldTag.getValue();
@@ -594,16 +579,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         blockEntityTag.putInt("Base", 15 - baseTag.asInt()); // invert color id
                     }
 
-                    ListTag patternsTag = blockEntityTag.getListTag("Patterns");
+                    ListTag<CompoundTag> patternsTag = blockEntityTag.getListTag("Patterns", CompoundTag.class);
                     if (patternsTag != null) {
-                        for (Tag pattern : patternsTag) {
-                            if (!(pattern instanceof CompoundTag)) {
-                                continue;
-                            }
-
-                            CompoundTag patternTag = (CompoundTag) pattern;
-                            NumberTag colorTag = patternTag.getNumberTag("Color");
-                            patternTag.putInt("Color", 15 - colorTag.asInt()); // Invert color id
+                        for (CompoundTag pattern : patternsTag) {
+                            NumberTag colorTag = pattern.getNumberTag("Color");
+                            pattern.putInt("Color", 15 - colorTag.asInt()); // Invert color id
                         }
                     }
                 }
@@ -619,16 +599,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
 
             // ench is now Enchantments and now uses identifiers
-            ListTag enchantments = tag.getListTag("Enchantments");
+            ListTag<CompoundTag> enchantments = tag.getListTag("Enchantments", CompoundTag.class);
             if (enchantments != null) {
-                ListTag ench = new ListTag(CompoundTag.class);
-                for (Tag enchantmentEntry : enchantments) {
-                    if (!(enchantmentEntry instanceof CompoundTag)) {
-                        continue;
-                    }
-
-                    CompoundTag entryTag = (CompoundTag) enchantmentEntry;
-                    StringTag idTag = entryTag.getStringTag("id");
+                ListTag<CompoundTag> ench = new ListTag<>(CompoundTag.class);
+                for (CompoundTag enchantmentEntry : enchantments) {
+                    StringTag idTag = enchantmentEntry.getStringTag("id");
                     if (idTag == null) {
                         continue;
                     }
@@ -641,7 +616,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     }
                     if (oldId != null) {
                         enchEntry.putShort("id", oldId);
-                        NumberTag levelTag = entryTag.getNumberTag("lvl");
+                        NumberTag levelTag = enchantmentEntry.getNumberTag("lvl");
                         if (levelTag != null) {
                             enchEntry.putShort("lvl", levelTag.asShort());
                         }
@@ -653,16 +628,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
 
 
-            ListTag storedEnch = tag.getListTag("StoredEnchantments");
+            ListTag<CompoundTag> storedEnch = tag.getListTag("StoredEnchantments", CompoundTag.class);
             if (storedEnch != null) {
-                ListTag newStoredEnch = new ListTag(CompoundTag.class);
-                for (Tag enchantmentEntry : storedEnch) {
-                    if (!(enchantmentEntry instanceof CompoundTag)) {
-                        continue;
-                    }
-
-                    CompoundTag entryTag = (CompoundTag) enchantmentEntry;
-                    StringTag idTag = entryTag.getStringTag("id");
+                ListTag<CompoundTag> newStoredEnch = new ListTag<>(CompoundTag.class);
+                for (CompoundTag enchantmentEntry : storedEnch) {
+                    StringTag idTag = enchantmentEntry.getStringTag("id");
                     if (idTag == null) {
                         continue;
                     }
@@ -679,7 +649,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     }
 
                     enchEntry.putShort("id", oldId);
-                    NumberTag levelTag = entryTag.getNumberTag("lvl");
+                    NumberTag levelTag = enchantmentEntry.getNumberTag("lvl");
                     if (levelTag != null) {
                         enchEntry.putShort("lvl", levelTag.asShort());
                     }
@@ -690,8 +660,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (tag.getListTag(NBT_TAG_NAME + "|CanPlaceOn") != null) {
                 tag.put("CanPlaceOn", tag.remove(NBT_TAG_NAME + "|CanPlaceOn"));
             } else if (tag.getListTag("CanPlaceOn") != null) {
-                ListTag old = tag.getListTag("CanPlaceOn");
-                ListTag newCanPlaceOn = new ListTag(StringTag.class);
+                ListTag<?> old = tag.getListTag("CanPlaceOn");
+                ListTag<StringTag> newCanPlaceOn = new ListTag<>(StringTag.class);
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
@@ -702,7 +672,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                             newCanPlaceOn.add(new StringTag(newValue));
                         }
                     } else {
-                        newCanPlaceOn.add(oldTag);
+                        newCanPlaceOn.add(new StringTag(value.toString()));
                     }
                 }
                 tag.put("CanPlaceOn", newCanPlaceOn);
@@ -710,8 +680,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (tag.getListTag(NBT_TAG_NAME + "|CanDestroy") != null) {
                 tag.put("CanDestroy", tag.remove(NBT_TAG_NAME + "|CanDestroy"));
             } else if (tag.getListTag("CanDestroy") != null) {
-                ListTag old = tag.getListTag("CanDestroy");
-                ListTag newCanDestroy = new ListTag(StringTag.class);
+                ListTag<?> old = tag.getListTag("CanDestroy");
+                ListTag<StringTag> newCanDestroy = new ListTag<>(StringTag.class);
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
@@ -722,7 +692,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                             newCanDestroy.add(new StringTag(newValue));
                         }
                     } else {
-                        newCanDestroy.add(oldTag);
+                        newCanDestroy.add(new StringTag(oldTag.getValue().toString()));
                     }
                 }
                 tag.put("CanDestroy", newCanDestroy);
