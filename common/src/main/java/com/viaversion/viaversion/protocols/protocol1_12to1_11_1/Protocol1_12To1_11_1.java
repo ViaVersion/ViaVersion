@@ -40,6 +40,8 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.metadata.MetadataRewriter1_12To1_11_1;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets.InventoryPackets;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.rewriter.ChatItemRewriter;
+import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.rewriter.TranslateRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
@@ -98,8 +100,9 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             if (!Via.getConfig().is1_12NBTArrayFix()) return;
             try {
                 JsonElement obj = Protocol1_9To1_8.FIX_JSON.transform(null, wrapper.passthrough(Type.COMPONENT).toString());
-                TranslateRewriter.toClient(obj, wrapper.user());
-                ChatItemRewriter.toClient(obj, wrapper.user());
+                TranslateRewriter.toClient(obj);
+                ChatItemRewriter.toClient(obj);
+
                 wrapper.set(Type.COMPONENT, 0, obj);
             } catch (Exception e) {
                 e.printStackTrace();
