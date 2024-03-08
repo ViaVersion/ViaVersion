@@ -96,13 +96,13 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                 return;
             }
 
-            wrapper.write(Type.SOUND_EVENT, new Holder<>(soundId));
+            wrapper.write(Type.SOUND_EVENT, Holder.of(soundId));
         };
         registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
             final String soundIdentifier = wrapper.read(Type.STRING);
-            wrapper.write(Type.SOUND_EVENT, new Holder<>(new SoundEvent(soundIdentifier, null)));
+            wrapper.write(Type.SOUND_EVENT, Holder.of(new SoundEvent(soundIdentifier, null)));
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);

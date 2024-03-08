@@ -22,21 +22,29 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.google.common.base.Preconditions;
+public interface Holder<T> {
 
-public final class Holder<T> {
-
-    private final T value;
-    private final int id;
-
-    public Holder(final int id) {
-        this.value = null;
-        this.id = id;
+    /**
+     * Returns an indirect id holder.
+     *
+     * @param id  the id
+     * @param <T> the type of the value
+     * @return a new holder with the given id
+     * @throws IllegalArgumentException if the id is negative
+     */
+    static <T> Holder<T> of(final int id) {
+        return new HolderImpl<>(id);
     }
 
-    public Holder(final T value) {
-        this.value = value;
-        this.id = -1;
+    /**
+     * Returns a direct value holder.
+     *
+     * @param value the value
+     * @param <T>   the type of the value
+     * @return a new direct holder
+     */
+    static <T> Holder<T> of(final T value) {
+        return new HolderImpl<>(value);
     }
 
     /**
@@ -45,9 +53,7 @@ public final class Holder<T> {
      * @return true if the holder is direct
      * @see #hasId()
      */
-    public boolean isDirect() {
-        return id == -1;
-    }
+    boolean isDirect();
 
     /**
      * Returns true if this holder has an id.
@@ -55,16 +61,22 @@ public final class Holder<T> {
      * @return true if this holder has an id
      * @see #isDirect()
      */
-    public boolean hasId() {
-        return id != -1;
-    }
+    boolean hasId();
 
-    public T value() {
-        Preconditions.checkArgument(isDirect(), "Holder is not direct");
-        return value;
-    }
+    /**
+     * Returns the value of this holder.
+     *
+     * @return the value of this holder
+     * @throws IllegalArgumentException if this holder is not direct
+     * @see #isDirect()
+     */
+    T value();
 
-    public int id() {
-        return id;
-    }
+    /**
+     * Returns the id of this holder, or -1 if this holder is direct.
+     *
+     * @return the id of this holder, or -1 if this holder is direct
+     * @see #hasId()
+     */
+    int id();
 }

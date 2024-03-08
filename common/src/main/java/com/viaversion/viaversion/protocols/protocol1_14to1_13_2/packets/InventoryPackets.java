@@ -245,7 +245,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         if (display != null) {
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore != null) {
-                display.put(nbtTagName("Lore"), new ListTag<>(lore.copy().getValue())); // Save old lore
+                display.put(nbtTagName("Lore"), lore.copy()); // Save old lore
                 for (StringTag loreEntry : lore) {
                     String jsonText = ComponentUtil.legacyToJsonString(loreEntry.getValue(), true);
                     loreEntry.setValue(jsonText);
@@ -269,7 +269,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             if (lore != null) {
                 Tag savedLore = display.remove(nbtTagName("Lore"));
                 if (savedLore instanceof ListTag) {
-                    display.put("Lore", new ListTag<>(((ListTag<?>) savedLore).getValue()));
+                    display.put("Lore", savedLore.copy());
                 } else {
                     for (StringTag loreEntry : lore) {
                         loreEntry.setValue(ComponentUtil.jsonToLegacy(loreEntry.getValue()));

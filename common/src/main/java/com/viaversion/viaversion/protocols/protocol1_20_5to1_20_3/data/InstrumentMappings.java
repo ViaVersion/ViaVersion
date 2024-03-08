@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,33 +20,24 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * String to/from int ID mappings for 1.20.3 attributes.
- */
-public final class AttributeMappings {
+public final class InstrumentMappings {
 
-    private static final KeyMappings ATTRIBUTES = new KeyMappings(
-        "generic.armor",
-        "generic.armor_toughness",
-        "generic.attack_damage",
-        "generic.attack_knockback",
-        "generic.attack_speed",
-        "generic.flying_speed",
-        "generic.follow_range",
-        "horse.jump_strength",
-        "generic.knockback_resistance",
-        "generic.luck",
-        "generic.max_absorption",
-        "generic.max_health",
-        "generic.movement_speed",
-        "zombie.spawn_reinforcements"
+    private static final KeyMappings MAPPINGS = new KeyMappings(
+        "ponder_goat_horn",
+        "sing_goat_horn",
+        "seek_goat_horn",
+        "feel_goat_horn",
+        "admire_goat_horn",
+        "call_goat_horn",
+        "yearn_goat_horn",
+        "dream_goat_horn"
     );
 
-    public static @Nullable String attribute(final int id) {
-        return ATTRIBUTES.idToKey(id);
+    public static @Nullable String idToKey(final int id) {
+        return MAPPINGS.idToKey(id);
     }
 
-    public static int id(final String attribute) {
-        return ATTRIBUTES.keyToId(attribute);
+    public static int keyToId(final String name) {
+        return MAPPINGS.keyToId(name);
     }
 }

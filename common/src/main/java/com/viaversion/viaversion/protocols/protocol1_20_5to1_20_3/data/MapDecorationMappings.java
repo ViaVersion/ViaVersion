@@ -17,9 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
+import com.viaversion.viaversion.util.KeyMappings;
+
 public final class MapDecorationMappings {
 
-    private static final String[] MAP_DECORATIONS = {
+    private static final KeyMappings MAP_DECORATIONS = new KeyMappings(
         "player",
         "frame",
         "red_marker",
@@ -54,9 +56,9 @@ public final class MapDecorationMappings {
         "village_taiga",
         "jungle_temple",
         "swamp_hut"
-    };
+    );
 
     public static String mapDecoration(final int index) {
-        return index < 0 || index >= MAP_DECORATIONS.length ? "player" : MAP_DECORATIONS[index];
+        return index < 0 || index >= MAP_DECORATIONS.size() ? "player" : MAP_DECORATIONS.idToKey(index);
     }
 }

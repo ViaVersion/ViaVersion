@@ -26,6 +26,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -39,17 +40,21 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
+import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EnchantmentMappings;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.InstrumentMappings;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorationMappings;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
@@ -202,7 +207,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return toOldItem(item);
     }
 
-    // TODO Block entity changes
     public Item toOldItem(final Item item) {
         // Start out with custom data and add the rest on top, or short-curcuit with the original item
         final StructuredDataContainer data = item.structuredData();
@@ -220,11 +224,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return dataItem;
     }
 
+    // TODO Block entity changes
     public Item toStructuredItem(final Item old, final boolean addMarker) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
+        // TODO add default data :>
         if (tag == null) {
             return item;
         }
@@ -255,14 +261,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
         if (blockState != null) {
-            final Map<String, String> properties = new HashMap<>();
-            for (final Map.Entry<String, Tag> entry : blockState.entrySet()) {
-                if (entry.getValue() instanceof StringTag) {
-                    properties.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
-                }
-            }
-            // TODO block state changes
-            data.set(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
+            updateBlockState(blockState, data);
         }
 
         final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
@@ -299,19 +298,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag explosionTag = tag.getCompoundTag("Explosion");
         if (explosionTag != null) {
-            final NumberTag shape = explosionTag.getNumberTag("Type");
-            final IntArrayTag colors = explosionTag.getIntArrayTag("Colors");
-            final IntArrayTag fadeColors = explosionTag.getIntArrayTag("FadeColors");
-            final NumberTag trail = explosionTag.getNumberTag("Trail");
-            final NumberTag flicker = explosionTag.getNumberTag("Flicker");
-            final FireworkExplosion explosion = new FireworkExplosion(
-                shape != null ? shape.asInt() : 0,
-                colors != null ? colors.getValue() : new int[0],
-                fadeColors != null ? fadeColors.getValue() : new int[0],
-                trail != null && trail.asBoolean(),
-                flicker != null && flicker.asBoolean()
-            );
-            data.set(StructuredDataKey.FIREWORK_EXPLOSION, explosion);
+            data.set(StructuredDataKey.FIREWORK_EXPLOSION, readExplosion(explosionTag));
         }
 
         final ListTag<StringTag> recipesTag = tag.getListTag("Recipes", StringTag.class);
@@ -322,17 +309,28 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag lodestonePosTag = tag.getCompoundTag("LodestonePos");
         final StringTag lodestoneDimensionTag = tag.getStringTag("LodestoneDimension");
         if (lodestonePosTag != null && lodestoneDimensionTag != null) {
-            final NumberTag trackedTag = tag.getNumberTag("LodestoneTracked");
-            final NumberTag xTag = lodestonePosTag.getNumberTag("X");
-            final NumberTag yTag = lodestonePosTag.getNumberTag("Y");
-            final NumberTag zTag = lodestonePosTag.getNumberTag("Z");
-            final GlobalPosition position = new GlobalPosition(
-                lodestoneDimensionTag.getValue(),
-                xTag != null ? xTag.asInt() : 0,
-                yTag != null ? yTag.asInt() : 0,
-                zTag != null ? zTag.asInt() : 0
-            );
-            data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, trackedTag != null && trackedTag.asBoolean()));
+            updateLodestoneTracker(tag, lodestonePosTag, lodestoneDimensionTag, data);
+        }
+
+        final ListTag<CompoundTag> effectsTag = tag.getListTag("effects", CompoundTag.class);
+        if (effectsTag != null) {
+            updateEffects(effectsTag, data);
+        }
+
+        final StringTag instrumentTag = tag.getStringTag("instrument");
+        if (instrumentTag != null) {
+            final int id = InstrumentMappings.keyToId(instrumentTag.getValue());
+            if (id != -1) {
+                data.set(StructuredDataKey.INSTRUMENT, Holder.of(id));
+            }
+        }
+
+        final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
+        if (fireworksTag != null) {
+            final ListTag<CompoundTag> explosionsTag = fireworksTag.getListTag("Explosions", CompoundTag.class);
+            if (explosionsTag != null) {
+                updateFireworks(fireworksTag, explosionsTag, data);
+            }
         }
 
         if (old.identifier() == 1085) {
@@ -347,12 +345,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
 
-        final NumberTag map = tag.getNumberTag("map");
-        if (map != null) {
-            data.set(StructuredDataKey.MAP_ID, map.asInt());
+        final NumberTag mapId = tag.getNumberTag("map");
+        if (mapId != null) {
+            data.set(StructuredDataKey.MAP_ID, mapId.asInt());
         }
 
-        updateMapDecorations(data, tag.getListTag("Decorations", CompoundTag.class));
+        final ListTag<CompoundTag> decorationsTag = tag.getListTag("Decorations", CompoundTag.class);
+        if (decorationsTag != null) {
+            updateMapDecorations(data, decorationsTag);
+        }
 
         // MAP_POST_PROCESSING is only used internally
 
@@ -365,12 +366,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
         //  StructuredDataKey.POTION_CONTENTS
-        //  StructuredDataKey.SUSPICIOUS_STEW_EFFECTS
         //  StructuredDataKey.TRIM
         //  StructuredDataKey.BUCKET_ENTITY_DATA
         //  StructuredDataKey.BLOCK_ENTITY_DATA
-        //  StructuredDataKey.INSTRUMENT
-        //  StructuredDataKey.FIREWORKS
         //  StructuredDataKey.NOTE_BLOCK_SOUND
         //  StructuredDataKey.BANNER_PATTERNS
         //  StructuredDataKey.BASE_COLOR
@@ -386,6 +384,74 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private static void updateBlockState(final CompoundTag blockState, final StructuredDataContainer data) {
+        final Map<String, String> properties = new HashMap<>();
+        for (final Map.Entry<String, Tag> entry : blockState.entrySet()) {
+            // It's all strings now because ???
+            final Tag value = entry.getValue();
+            if (value instanceof StringTag) {
+                properties.put(entry.getKey(), ((StringTag) value).getValue());
+            } else if (value instanceof NumberTag) {
+                // TODO Boolean values
+                properties.put(entry.getKey(), Integer.toString(((NumberTag) value).asInt()));
+            }
+        }
+        data.set(StructuredDataKey.BLOCK_STATE, new BlockStateProperties(properties));
+    }
+
+    private static void updateFireworks(final CompoundTag fireworksTag, final ListTag<CompoundTag> explosionsTag, final StructuredDataContainer data) {
+        final NumberTag flightDuration = fireworksTag.getNumberTag("Flight");
+        final Fireworks fireworks = new Fireworks(
+            flightDuration != null ? flightDuration.asInt() : 0,
+            explosionsTag.stream().map(BlockItemPacketRewriter1_20_5::readExplosion).toArray(FireworkExplosion[]::new)
+        );
+        data.set(StructuredDataKey.FIREWORKS, fireworks);
+    }
+
+    private static void updateEffects(final ListTag<CompoundTag> effects, final StructuredDataContainer data) {
+        final SuspiciousStewEffect[] suspiciousStewEffects = new SuspiciousStewEffect[effects.size()];
+        for (int i = 0; i < effects.size(); i++) {
+            final CompoundTag effect = effects.get(i);
+            final StringTag effectId = effect.getStringTag("id");
+            final NumberTag duration = effect.getNumberTag("duration");
+            final SuspiciousStewEffect stewEffect = new SuspiciousStewEffect(
+                PotionEffects.keyToId(effectId != null ? effectId.getValue() : "luck") - 1,
+                duration != null ? duration.asInt() : 0
+            );
+            suspiciousStewEffects[i] = stewEffect;
+        }
+        data.set(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, suspiciousStewEffects);
+    }
+
+    private static void updateLodestoneTracker(final CompoundTag tag, final CompoundTag lodestonePosTag, final StringTag lodestoneDimensionTag, final StructuredDataContainer data) {
+        final NumberTag trackedTag = tag.getNumberTag("LodestoneTracked");
+        final NumberTag xTag = lodestonePosTag.getNumberTag("X");
+        final NumberTag yTag = lodestonePosTag.getNumberTag("Y");
+        final NumberTag zTag = lodestonePosTag.getNumberTag("Z");
+        final GlobalPosition position = new GlobalPosition(
+            lodestoneDimensionTag.getValue(),
+            xTag != null ? xTag.asInt() : 0,
+            yTag != null ? yTag.asInt() : 0,
+            zTag != null ? zTag.asInt() : 0
+        );
+        data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, trackedTag != null && trackedTag.asBoolean()));
+    }
+
+    private static FireworkExplosion readExplosion(final CompoundTag tag) {
+        final NumberTag shape = tag.getNumberTag("Type");
+        final IntArrayTag colors = tag.getIntArrayTag("Colors");
+        final IntArrayTag fadeColors = tag.getIntArrayTag("FadeColors");
+        final NumberTag trail = tag.getNumberTag("Trail");
+        final NumberTag flicker = tag.getNumberTag("Flicker");
+        return new FireworkExplosion(
+            shape != null ? shape.asInt() : 0,
+            colors != null ? colors.getValue() : new int[0],
+            fadeColors != null ? fadeColors.getValue() : new int[0],
+            trail != null && trail.asBoolean(),
+            flicker != null && flicker.asBoolean()
+        );
     }
 
     private void updateWritableBookPages(final StructuredDataContainer data, final CompoundTag tag) {
@@ -454,11 +520,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        final List<Item> items = new ArrayList<>();
-        for (final CompoundTag item : chargedProjectiles) {
-            items.add(itemFromTag(item));
-        }
-        data.set(dataKey, items.toArray(new Item[0]));
+        final Item[] items = chargedProjectiles.stream().map(this::itemFromTag).toArray(Item[]::new);
+        data.set(dataKey, items);
     }
 
     private Item itemFromTag(final CompoundTag item) {
@@ -502,7 +565,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateProfile(final StructuredDataContainer data, final Tag skullOwnerTag) {
-        final List<GameProfile.Property> properties = new ArrayList<>(1);
         if (skullOwnerTag instanceof StringTag) {
             final String name = ((StringTag) skullOwnerTag).getValue();
             data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
@@ -517,6 +579,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 uuid = UUIDUtil.fromIntArray(idTag.getValue());
             }
 
+            final List<GameProfile.Property> properties = new ArrayList<>(1);
             final CompoundTag propertiesTag = skullOwner.getCompoundTag("Properties");
             if (propertiesTag != null) {
                 updateProperties(propertiesTag, properties);
@@ -549,10 +612,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateMapDecorations(final StructuredDataContainer data, final ListTag<CompoundTag> decorationsTag) {
-        if (decorationsTag == null) {
-            return;
-        }
-
         final CompoundTag updatedDecorationsTag = new CompoundTag();
         for (final CompoundTag decorationTag : decorationsTag) {
             final StringTag idTag = decorationTag.getStringTag("id");
@@ -591,11 +650,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
         if (loreTag != null) {
-            final List<Tag> updatedLore = new ArrayList<>();
-            for (final StringTag loreEntry : loreTag) {
-                updatedLore.add(ComponentUtil.jsonStringToTag((loreEntry.getValue())));
-            }
-            data.set(StructuredDataKey.LORE, updatedLore.toArray(new Tag[0]));
+            data.set(StructuredDataKey.LORE, loreTag.stream().map(t -> ComponentUtil.jsonStringToTag(t.getValue())).toArray(Tag[]::new));
         }
 
         final NumberTag colorTag = displayTag.getNumberTag("color");

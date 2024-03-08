@@ -17,14 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
-import com.viaversion.viaversion.util.Key;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EnchantmentMappings {
 
-    public static final String[] ENCHANTMENTS = {
+    public static final KeyMappings ENCHANTMENTS = new KeyMappings(
         "protection",
         "fire_protection",
         "feather_falling",
@@ -64,20 +62,13 @@ public final class EnchantmentMappings {
         "piercing",
         "mending",
         "vanishing_curse"
-    };
-    private static final Object2IntMap<String> STRING_TO_ID = new Object2IntOpenHashMap<>();
-
-    static {
-        for (int i = 0; i < ENCHANTMENTS.length; i++) {
-            STRING_TO_ID.put(ENCHANTMENTS[i], i);
-        }
-    }
+    );
 
     public static @Nullable String enchantment(final int id) {
-        return id >= 0 && id < ENCHANTMENTS.length ? ENCHANTMENTS[id] : null;
+        return ENCHANTMENTS.idToKey(id);
     }
 
     public static int id(final String attribute) {
-        return STRING_TO_ID.getOrDefault(Key.stripMinecraftNamespace(attribute), -1);
+        return ENCHANTMENTS.keyToId(attribute);
     }
 }

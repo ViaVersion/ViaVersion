@@ -20,38 +20,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.misc;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.Holder;
-import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
+import com.google.common.base.Preconditions;
 
-public abstract class HolderType<T> extends Type<Holder<T>> {
+final class HolderImpl<T> implements Holder<T> {
 
-    protected HolderType() {
-        super(Holder.class);
+    private final T value;
+    private final int id;
+
+    HolderImpl(final int id) {
+        Preconditions.checkArgument(id >= 0, "id cannot be negative");
+        this.value = null;
+        this.id = id;
+    }
+
+    HolderImpl(final T value) {
+        this.value = value;
+        this.id = -1;
     }
 
     @Override
-    public Holder<T> read(final ByteBuf buffer) throws Exception {
-        final int id = Type.VAR_INT.readPrimitive(buffer) - 1; // Normalize id
-        if (id == -1) {
-            return Holder.of(readDirect(buffer));
-        }
-        return Holder.of(id);
+    public boolean isDirect() {
+        return id == -1;
     }
 
     @Override
-    public void write(final ByteBuf buffer, final Holder<T> object) throws Exception {
-        if (object.hasId()) {
-            Type.VAR_INT.writePrimitive(buffer, object.id() + 1); // Normalize id
-        } else {
-            Type.VAR_INT.writePrimitive(buffer, 0);
-            writeDirect(buffer, object.value());
-        }
+    public boolean hasId() {
+        return id != -1;
     }
 
-    public abstract T readDirect(final ByteBuf buffer) throws Exception;
+    @Override
+    public T value() {
+        Preconditions.checkArgument(isDirect(), "Holder is not direct");
+        return value;
+    }
 
-    public abstract void writeDirect(final ByteBuf buffer, final T object) throws Exception;
+    @Override
+    public int id() {
+        return id;
+    }
 }

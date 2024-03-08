@@ -69,7 +69,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
             }
 
             if (mappedId != soundEventHolder.id()) {
-                soundEventHolder = new Holder<>(mappedId);
+                soundEventHolder = Holder.of(mappedId);
             }
 
             wrapper.write(Type.SOUND_EVENT, soundEventHolder);
