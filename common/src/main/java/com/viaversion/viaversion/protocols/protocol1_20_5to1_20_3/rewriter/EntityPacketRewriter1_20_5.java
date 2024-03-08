@@ -34,7 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.AttributeMappings;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -157,7 +157,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             for (int i = 0; i < size; i++) {
                 // From a string to a registry int ID
                 final String attributeIdentifier = Key.stripMinecraftNamespace(wrapper.read(Type.STRING));
-                final int id = AttributeMappings.id(attributeIdentifier);
+                final int id = Attributes1_20_3.id(attributeIdentifier);
                 wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewAttributeId(id));
 
                 wrapper.passthrough(Type.DOUBLE); // Base

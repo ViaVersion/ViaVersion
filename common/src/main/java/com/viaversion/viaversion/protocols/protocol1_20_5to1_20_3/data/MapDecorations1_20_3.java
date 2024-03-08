@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
 import com.viaversion.viaversion.util.KeyMappings;
 
-public final class MapDecorationMappings {
+public final class MapDecorations1_20_3 {
 
     private static final KeyMappings MAP_DECORATIONS = new KeyMappings(
         "player",

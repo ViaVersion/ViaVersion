@@ -20,33 +20,26 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * String to/from int ID mappings for 1.20.3 attributes.
- */
-public final class AttributeMappings {
+public final class TrimMaterials1_20_3 {
 
-    private static final KeyMappings ATTRIBUTES = new KeyMappings(
-        "generic.armor",
-        "generic.armor_toughness",
-        "generic.attack_damage",
-        "generic.attack_knockback",
-        "generic.attack_speed",
-        "generic.flying_speed",
-        "generic.follow_range",
-        "horse.jump_strength",
-        "generic.knockback_resistance",
-        "generic.luck",
-        "generic.max_absorption",
-        "generic.max_health",
-        "generic.movement_speed",
-        "zombie.spawn_reinforcements"
+    private static final KeyMappings MATERIALS = new KeyMappings(
+        "quartz",
+        "iron",
+        "netherite",
+        "redstone",
+        "copper",
+        "gold",
+        "emerald",
+        "diamond",
+        "lapis",
+        "amethyst"
     );
 
-    public static @Nullable String attribute(final int id) {
-        return ATTRIBUTES.idToKey(id);
+    public static @Nullable String idToKey(final int id) {
+        return MATERIALS.idToKey(id);
     }
 
-    public static int id(final String attribute) {
-        return ATTRIBUTES.keyToId(attribute);
+    public static int keyToId(final String attribute) {
+        return MATERIALS.keyToId(attribute);
     }
 }

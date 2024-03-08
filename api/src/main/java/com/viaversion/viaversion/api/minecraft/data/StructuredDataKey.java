@@ -42,6 +42,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -51,7 +52,7 @@ public final class StructuredDataKey<T> {
 
     public static final StructuredDataKey<CompoundTag> CUSTOM_DATA = new StructuredDataKey<>("custom_data", Type.COMPOUND_TAG);
     public static final StructuredDataKey<Integer> DAMAGE = new StructuredDataKey<>("damage", Type.VAR_INT);
-    public static final StructuredDataKey<Boolean> UNBREAKABLE = new StructuredDataKey<>("unbreakable", Type.BOOLEAN);
+    public static final StructuredDataKey<Unbreakable> UNBREAKABLE = new StructuredDataKey<>("unbreakable", Unbreakable.TYPE);
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Type.TAG);
     public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", Type.TAG_ARRAY);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS = new StructuredDataKey<>("enchantments", Enchantments.TYPE);

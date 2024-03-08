@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class EnchantmentMappings {
+public final class Enchantments1_20_3 {
 
     public static final KeyMappings ENCHANTMENTS = new KeyMappings(
         "protection",
