@@ -45,6 +45,10 @@ public final class KeyMappings {
         return keyToId.getInt(Key.stripMinecraftNamespace(identifier));
     }
 
+    public String[] keys() {
+        return keys;
+    }
+
     public int size() {
         return keys.length;
     }

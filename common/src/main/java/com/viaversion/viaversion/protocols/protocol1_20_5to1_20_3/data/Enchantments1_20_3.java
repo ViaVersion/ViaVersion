@@ -68,7 +68,7 @@ public final class Enchantments1_20_3 {
         return ENCHANTMENTS.idToKey(id);
     }
 
-    public static int id(final String attribute) {
-        return ENCHANTMENTS.keyToId(attribute);
+    public static int id(final String enchantment) {
+        return ENCHANTMENTS.keyToId(enchantment);
     }
 }

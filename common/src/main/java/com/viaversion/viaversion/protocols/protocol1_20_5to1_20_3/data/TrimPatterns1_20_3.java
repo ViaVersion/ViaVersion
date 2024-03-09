@@ -45,7 +45,7 @@ public final class TrimPatterns1_20_3 {
         return PATTERNS.idToKey(id);
     }
 
-    public static int keyToId(final String attribute) {
-        return PATTERNS.keyToId(attribute);
+    public static int keyToId(final String pattern) {
+        return PATTERNS.keyToId(pattern);
     }
 }

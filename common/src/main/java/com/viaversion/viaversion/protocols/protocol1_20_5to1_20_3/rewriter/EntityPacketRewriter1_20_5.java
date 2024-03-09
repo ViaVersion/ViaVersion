@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -98,6 +99,32 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
 
             wrapper.cancel();
+
+            // Send banner patterns and default wolf variant
+            final PacketWrapper wolfVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+            wolfVariantsPacket.write(Type.STRING, "minecraft:wolf_variant");
+            final CompoundTag paleWolf = new CompoundTag();
+            paleWolf.putString("texture", "textures/entity/wolf/wolf.png");
+            paleWolf.putString("tame_texture", "textures/entity/wolf/wolf_tame.png");
+            paleWolf.putString("angry_texture", "textures/entity/wolf/wolf_angry.png");
+            paleWolf.put("biomes", new ListTag<>(StringTag.class));
+            wolfVariantsPacket.write(Type.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", paleWolf)});
+            wolfVariantsPacket.send(Protocol1_20_5To1_20_3.class);
+
+            final PacketWrapper bannerPatternsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+            bannerPatternsPacket.write(Type.STRING, "minecraft:banner_pattern");
+            final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_3.keys().length];
+            final String[] keys = BannerPatterns1_20_3.keys();
+            for (int i = 0; i < keys.length; i++) {
+                final CompoundTag pattern = new CompoundTag();
+                final String key = keys[i];
+                final String resourceLocation = "minecraft:" + key;
+                pattern.putString("asset_id", key);
+                pattern.putString("translation_key", "block.minecraft.banner." + key);
+                patternEntries[i] = new RegistryEntry(resourceLocation, pattern);
+            }
+            bannerPatternsPacket.write(Type.REGISTRY_ENTRY_ARRAY, patternEntries);
+            bannerPatternsPacket.send(Protocol1_20_5To1_20_3.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.JOIN_GAME, new PacketHandlers() {
@@ -202,10 +229,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         registerMetaTypeHandler(
-                Types1_20_5.META_TYPES.itemType,
-                Types1_20_5.META_TYPES.blockStateType,
-                Types1_20_5.META_TYPES.optionalBlockStateType,
-                Types1_20_5.META_TYPES.particleType
+            Types1_20_5.META_TYPES.itemType,
+            Types1_20_5.META_TYPES.blockStateType,
+            Types1_20_5.META_TYPES.optionalBlockStateType,
+            Types1_20_5.META_TYPES.particleType
         );
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color

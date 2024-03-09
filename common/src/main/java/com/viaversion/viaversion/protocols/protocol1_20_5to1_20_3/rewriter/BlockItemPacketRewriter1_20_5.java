@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
@@ -64,6 +65,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
@@ -79,6 +82,7 @@ import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -251,7 +255,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return dataItem;
     }
 
-    // TODO Block entity changes
     public Item toStructuredItem(final Item old) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
@@ -263,8 +266,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         // Rewrite nbt to new data structures
-        final NumberTag hideFlags = tag.getNumberTag("HideFlags");
-        final int hideFlagsValue = hideFlags != null ? hideFlags.asInt() : 0;
+        final int hideFlagsValue = tag.getInt("HideFlags");
         if ((hideFlagsValue & 0x20) != 0) {
             data.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
         }
@@ -329,9 +331,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final CompoundTag lodestonePosTag = tag.getCompoundTag("LodestonePos");
-        final StringTag lodestoneDimensionTag = tag.getStringTag("LodestoneDimension");
-        if (lodestonePosTag != null && lodestoneDimensionTag != null) {
-            updateLodestoneTracker(tag, lodestonePosTag, lodestoneDimensionTag, data);
+        final String lodestoneDimension = tag.getString("LodestoneDimension");
+        if (lodestonePosTag != null && lodestoneDimension != null) {
+            updateLodestoneTracker(tag, lodestonePosTag, lodestoneDimension, data);
         }
 
         final ListTag<CompoundTag> effectsTag = tag.getListTag("effects", CompoundTag.class);
@@ -339,9 +341,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updateEffects(effectsTag, data);
         }
 
-        final StringTag instrumentTag = tag.getStringTag("instrument");
-        if (instrumentTag != null) {
-            final int id = Instruments1_20_3.keyToId(instrumentTag.getValue());
+        final String instrument = tag.getString("instrument");
+        if (instrument != null) {
+            final int id = Instruments1_20_3.keyToId(instrument);
             if (id != -1) {
                 data.set(StructuredDataKey.INSTRUMENT, Holder.of(id));
             }
@@ -396,8 +398,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
         //  StructuredDataKey.NOTE_BLOCK_SOUND
-        //  StructuredDataKey.BANNER_PATTERNS
-        //  StructuredDataKey.BASE_COLOR
         //  StructuredDataKey.POT_DECORATIONS
         //  StructuredDataKey.CONTAINER
         //  StructuredDataKey.BEES
@@ -410,22 +410,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     private void updateAttributes(final StructuredDataContainer data, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
         final AttributeModifier[] modifiers = attributeModifiersTag.stream().map(modifierTag -> {
-            final StringTag attributeNameTag = modifierTag.getStringTag("AttributeName");
-            final StringTag nameTag = modifierTag.getStringTag("Name");
-            final NumberTag operationTag = modifierTag.getNumberTag("Operation");
+            final String attributeName = modifierTag.getString("AttributeName");
+            final String name = modifierTag.getString("Name");
             final NumberTag amountTag = modifierTag.getNumberTag("Amount");
             final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
             final NumberTag slotTag = modifierTag.getNumberTag("Slot");
-            if (nameTag == null || attributeNameTag == null || operationTag == null || amountTag == null || uuidTag == null || slotTag == null) {
+            if (name == null || attributeName == null || amountTag == null || uuidTag == null || slotTag == null) {
                 return null;
             }
 
-            final int operationId = operationTag.asInt();
+            final int operationId = modifierTag.getInt("Operation", -1);
             if (operationId < 0 || operationId > 2) {
                 return null;
             }
 
-            final int attributeId = Attributes1_20_3.keyToId(attributeNameTag.getValue());
+            final int attributeId = Attributes1_20_3.keyToId(attributeName);
             if (attributeId == -1) {
                 return null;
             }
@@ -434,7 +433,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 attributeId,
                 new ModifierData(
                     UUIDUtil.fromIntArray(uuidTag.getValue()),
-                    nameTag.getValue(),
+                    name,
                     amountTag.asDouble(),
                     operationId
                 ),
@@ -445,10 +444,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updatePotionTags(final StructuredDataContainer data, final CompoundTag tag) {
-        final StringTag potionTag = tag.getStringTag("Potion");
+        final String potion = tag.getString("Potion");
         Integer potionId = null;
-        if (potionTag != null) {
-            final int id = Potions1_20_3.keyToId(potionTag.getValue());
+        if (potion != null) {
+            final int id = Potions1_20_3.keyToId(potion);
             potionId = id > 0 ? id - 1 : null; // Empty potion type removed
         }
 
@@ -457,27 +456,27 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         PotionEffect[] potionEffects = null;
         if (customPotionEffectsTag != null) {
             potionEffects = customPotionEffectsTag.stream().map(effectTag -> {
-                final StringTag idTag = effectTag.getStringTag("id");
-                if (idTag == null) {
+                final String identifier = effectTag.getString("id");
+                if (identifier == null) {
                     return null;
                 }
 
-                final int id = PotionEffects.keyToId(idTag.getValue()) - 1;
+                final int id = PotionEffects.keyToId(identifier) - 1;
                 if (id < 0) {
                     return null;
                 }
 
-                final NumberTag amplifierTag = effectTag.getNumberTag("amplifier");
-                final NumberTag durationTag = effectTag.getNumberTag("duration");
-                final NumberTag ambientTag = effectTag.getNumberTag("ambient");
-                final NumberTag showParticlesTag = effectTag.getNumberTag("show_particles");
-                final NumberTag showIconTag = effectTag.getNumberTag("show_icon");
+                final byte amplifier = effectTag.getByte("amplifier");
+                final int duration = effectTag.getInt("duration");
+                final boolean ambient = effectTag.getBoolean("ambient");
+                final boolean showParticles = effectTag.getBoolean("show_particles");
+                final boolean showIcon = effectTag.getBoolean("show_icon");
                 final PotionEffectData effectData = new PotionEffectData(
-                    amplifierTag != null ? amplifierTag.asByte() : 0,
-                    durationTag != null ? durationTag.asInt() : 0,
-                    ambientTag != null && ambientTag.asBoolean(),
-                    showParticlesTag != null && showParticlesTag.asBoolean(),
-                    showIconTag != null && showIconTag.asBoolean(),
+                    amplifier,
+                    duration,
+                    ambient,
+                    showParticles,
+                    showIcon,
                     null //TODO
                 );
                 return new PotionEffect(id, effectData);
@@ -557,9 +556,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateFireworks(final StructuredDataContainer data, final CompoundTag fireworksTag, final ListTag<CompoundTag> explosionsTag) {
-        final NumberTag flightDuration = fireworksTag.getNumberTag("Flight");
+        final int flightDuration = fireworksTag.getInt("Flight");
         final Fireworks fireworks = new Fireworks(
-            flightDuration != null ? flightDuration.asInt() : 0,
+            flightDuration,
             explosionsTag.stream().map(this::readExplosion).toArray(FireworkExplosion[]::new)
         );
         data.set(StructuredDataKey.FIREWORKS, fireworks);
@@ -569,43 +568,38 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final SuspiciousStewEffect[] suspiciousStewEffects = new SuspiciousStewEffect[effects.size()];
         for (int i = 0; i < effects.size(); i++) {
             final CompoundTag effect = effects.get(i);
-            final StringTag effectId = effect.getStringTag("id");
-            final NumberTag duration = effect.getNumberTag("duration");
+            final String effectId = effect.getString("id", "luck");
+            final int duration = effect.getInt("duration");
             final SuspiciousStewEffect stewEffect = new SuspiciousStewEffect(
-                PotionEffects.keyToId(effectId != null ? effectId.getValue() : "luck") - 1,
-                duration != null ? duration.asInt() : 0
+                PotionEffects.keyToId(effectId) - 1,
+                duration
             );
             suspiciousStewEffects[i] = stewEffect;
         }
         data.set(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, suspiciousStewEffects);
     }
 
-    private void updateLodestoneTracker(final CompoundTag tag, final CompoundTag lodestonePosTag, final StringTag lodestoneDimensionTag, final StructuredDataContainer data) {
-        final NumberTag trackedTag = tag.getNumberTag("LodestoneTracked");
-        final NumberTag xTag = lodestonePosTag.getNumberTag("X");
-        final NumberTag yTag = lodestonePosTag.getNumberTag("Y");
-        final NumberTag zTag = lodestonePosTag.getNumberTag("Z");
-        final GlobalPosition position = new GlobalPosition(
-            lodestoneDimensionTag.getValue(),
-            xTag != null ? xTag.asInt() : 0,
-            yTag != null ? yTag.asInt() : 0,
-            zTag != null ? zTag.asInt() : 0
-        );
-        data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, trackedTag != null && trackedTag.asBoolean()));
+    private void updateLodestoneTracker(final CompoundTag tag, final CompoundTag lodestonePosTag, final String lodestoneDimensionTag, final StructuredDataContainer data) {
+        final boolean tracked = tag.getBoolean("LodestoneTracked");
+        final int x = lodestonePosTag.getInt("X");
+        final int y = lodestonePosTag.getInt("Y");
+        final int z = lodestonePosTag.getInt("Z");
+        final GlobalPosition position = new GlobalPosition(lodestoneDimensionTag, x, y, z);
+        data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, tracked));
     }
 
     private FireworkExplosion readExplosion(final CompoundTag tag) {
-        final NumberTag shape = tag.getNumberTag("Type");
+        final int shape = tag.getInt("Type");
         final IntArrayTag colors = tag.getIntArrayTag("Colors");
         final IntArrayTag fadeColors = tag.getIntArrayTag("FadeColors");
-        final NumberTag trail = tag.getNumberTag("Trail");
-        final NumberTag flicker = tag.getNumberTag("Flicker");
+        final boolean trail = tag.getBoolean("Trail");
+        final boolean flicker = tag.getBoolean("Flicker");
         return new FireworkExplosion(
-            shape != null ? shape.asInt() : 0,
+            shape,
             colors != null ? colors.getValue() : new int[0],
             fadeColors != null ? fadeColors.getValue() : new int[0],
-            trail != null && trail.asBoolean(),
-            flicker != null && flicker.asBoolean()
+            trail,
+            flicker
         );
     }
 
@@ -654,17 +648,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             pages.add(new FilterableComponent(parsedPage, filtered));
         }
 
-        final StringTag title = tag.getStringTag("title");
-        final StringTag filteredTitle = tag.getStringTag("filtered_title");
-        final StringTag author = tag.getStringTag("author");
-        final NumberTag generation = tag.getNumberTag("generation");
-        final NumberTag resolved = tag.getNumberTag("resolved");
+        final String title = tag.getString("title", "");
+        final String filteredTitle = tag.getString("filtered_title"); // Nullable
+        final String author = tag.getString("author", "");
+        final int generation = tag.getInt("generation");
+        final boolean resolved = tag.getBoolean("resolved");
         final WrittenBook writtenBook = new WrittenBook(
-            new FilterableString(title != null ? title.getValue() : "", filteredTitle != null ? filteredTitle.getValue() : null),
-            author != null ? author.getValue() : "",
-            generation != null ? generation.asInt() : 0,
+            new FilterableString(title, filteredTitle),
+            author,
+            generation,
             pages.toArray(new FilterableComponent[0]),
-            resolved != null && resolved.asBoolean()
+            resolved
         );
         data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
     }
@@ -697,13 +691,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), show);
         for (final CompoundTag enchantment : enchantmentsTag) {
-            final StringTag id = enchantment.getStringTag("id");
+            final String id = enchantment.getString("id");
             final NumberTag lvl = enchantment.getNumberTag("lvl");
             if (id == null || lvl == null) {
                 continue;
             }
 
-            final int intId = Enchantments1_20_3.id(id.getValue());
+            final int intId = Enchantments1_20_3.id(id);
             if (intId == -1) {
                 continue;
             }
@@ -725,8 +719,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
         } else if (skullOwnerTag instanceof CompoundTag) {
             final CompoundTag skullOwner = (CompoundTag) skullOwnerTag;
-            final StringTag nameTag = skullOwner.getStringTag("Name");
-            final String name = nameTag != null ? nameTag.getValue() : "";
+            final String name = skullOwner.getString("Name", "");
 
             final IntArrayTag idTag = skullOwner.getIntArrayTag("Id");
             UUID uuid = null;
@@ -754,14 +747,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     continue;
                 }
 
-                final StringTag valueTag = ((CompoundTag) propertyTag).getStringTag("Value");
-                final StringTag signatureTag = ((CompoundTag) propertyTag).getStringTag("Signature");
-                final GameProfile.Property property = new GameProfile.Property(
-                    entry.getKey(),
-                    valueTag != null ? valueTag.getValue() : "",
-                    signatureTag != null ? signatureTag.getValue() : null
-                );
-                properties.add(property);
+                final CompoundTag compoundTag = (CompoundTag) propertyTag;
+                final String value = compoundTag.getString("Value", "");
+                final String signature = compoundTag.getString("Signature");
+                properties.add(new GameProfile.Property(entry.getKey(), value, signature));
             }
         }
     }
@@ -769,19 +758,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateMapDecorations(final StructuredDataContainer data, final ListTag<CompoundTag> decorationsTag) {
         final CompoundTag updatedDecorationsTag = new CompoundTag();
         for (final CompoundTag decorationTag : decorationsTag) {
-            final StringTag idTag = decorationTag.getStringTag("id");
-            final String id = idTag != null ? idTag.asRawString() : "";
-            final NumberTag typeTag = decorationTag.getNumberTag("type");
-            final int type = typeTag != null ? typeTag.asInt() : 0;
-            final NumberTag xTag = decorationTag.getNumberTag("x");
-            final NumberTag zTag = decorationTag.getNumberTag("z");
-            final NumberTag rotationTag = decorationTag.getNumberTag("rot");
+            final String id = decorationTag.getString("id", "");
+            final int type = decorationTag.getInt("type");
+            final double x = decorationTag.getDouble("x");
+            final double z = decorationTag.getDouble("z");
+            final float rotation = decorationTag.getFloat("rot");
 
             final CompoundTag updatedDecorationTag = new CompoundTag();
-            updatedDecorationTag.putString("type", MapDecorations1_20_3.mapDecoration(type));
-            updatedDecorationTag.putDouble("x", xTag != null ? xTag.asDouble() : 0);
-            updatedDecorationTag.putDouble("z", zTag != null ? zTag.asDouble() : 0);
-            updatedDecorationTag.putFloat("rotation", rotationTag != null ? rotationTag.asFloat() : 0);
+            updatedDecorationTag.putString("type", MapDecorations1_20_3.idToKey(type));
+            updatedDecorationTag.putDouble("x", x);
+            updatedDecorationTag.putDouble("z", z);
+            updatedDecorationTag.putFloat("rotation", rotation);
             updatedDecorationsTag.put(id, updatedDecorationTag);
         }
 
@@ -841,16 +828,42 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         }
 
-        // TODO Lots of stuff
+        final ListTag<CompoundTag> patternsTag = tag.getListTag("Patterns", CompoundTag.class);
+        if (patternsTag != null) {
+            final BannerPatternLayer[] layers = patternsTag.stream().map(patternTag -> {
+                final String pattern = patternTag.getString("Pattern", "");
+                final int color = patternTag.getInt("Color", -1);
+                final String fullPatternIdentifier = BannerPatterns1_20_3.compactToFullId(pattern);
+                if (fullPatternIdentifier == null || color == -1) {
+                    return null;
+                }
+
+                patternTag.remove("Pattern");
+                patternTag.remove("Color");
+                patternTag.putString("pattern", fullPatternIdentifier);
+                patternTag.putString("color", DyeColors.colorById(color));
+
+                final int id = BannerPatterns1_20_3.keyToId(fullPatternIdentifier);
+                return new BannerPatternLayer(Holder.of(id), color);
+            }).filter(Objects::nonNull).toArray(BannerPatternLayer[]::new);
+            tag.remove("Patterns");
+            tag.put("patterns", patternsTag);
+
+            if (data != null) {
+                data.set(StructuredDataKey.BANNER_PATTERNS, layers);
+            }
+        }
+
+        // TODO Beehive needed?
     }
 
     private void updateSkullOwnerTag(final CompoundTag tag, final CompoundTag skullOwnerTag) {
         final CompoundTag profileTag = new CompoundTag();
         tag.put("profile", profileTag);
 
-        final StringTag nameTag = skullOwnerTag.getStringTag("Name");
-        if (nameTag != null) {
-            profileTag.putString("name", nameTag.getValue());
+        final String name = skullOwnerTag.getString("Name");
+        if (name != null) {
+            profileTag.putString("name", name);
         }
 
         final IntArrayTag idTag = skullOwnerTag.getIntArrayTag("Id");
@@ -869,20 +882,20 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 continue;
             }
 
-            final ListTag<?> value = (ListTag<?>) entry.getValue();
-            for (final Tag propertyTag : value) {
+            final ListTag<?> entryValue = (ListTag<?>) entry.getValue();
+            for (final Tag propertyTag : entryValue) {
                 if (!(propertyTag instanceof CompoundTag)) {
                     continue;
                 }
 
                 final CompoundTag updatedPropertyTag = new CompoundTag();
                 final CompoundTag propertyCompoundTag = (CompoundTag) propertyTag;
-                final StringTag valueTag = propertyCompoundTag.getStringTag("Value");
-                final StringTag signatureTag = propertyCompoundTag.getStringTag("Signature");
+                final String value = propertyCompoundTag.getString("Value", "");
+                final String signature = propertyCompoundTag.getString("Signature");
                 updatedPropertyTag.putString("name", entry.getKey());
-                updatedPropertyTag.putString("value", valueTag != null ? valueTag.getValue() : "");
-                if (signatureTag != null) {
-                    updatedPropertyTag.putString("signature", signatureTag.getValue());
+                updatedPropertyTag.putString("value", value);
+                if (signature != null) {
+                    updatedPropertyTag.putString("signature", signature);
                 }
                 propertiesListTag.add(updatedPropertyTag);
             }

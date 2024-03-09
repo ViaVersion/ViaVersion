@@ -58,7 +58,7 @@ public final class MapDecorations1_20_3 {
         "swamp_hut"
     );
 
-    public static String mapDecoration(final int index) {
+    public static String idToKey(final int index) {
         return index < 0 || index >= MAP_DECORATIONS.size() ? "player" : MAP_DECORATIONS.idToKey(index);
     }
 }

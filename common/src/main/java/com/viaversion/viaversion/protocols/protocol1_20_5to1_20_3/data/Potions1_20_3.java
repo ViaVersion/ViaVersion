@@ -72,7 +72,7 @@ public final class Potions1_20_3 {
         return POTIONS.idToKey(id);
     }
 
-    public static int keyToId(final String attribute) {
-        return POTIONS.keyToId(attribute);
+    public static int keyToId(final String potion) {
+        return POTIONS.keyToId(potion);
     }
 }

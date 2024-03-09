@@ -39,7 +39,7 @@ public final class TrimMaterials1_20_3 {
         return MATERIALS.idToKey(id);
     }
 
-    public static int keyToId(final String attribute) {
-        return MATERIALS.keyToId(attribute);
+    public static int keyToId(final String material) {
+        return MATERIALS.keyToId(material);
     }
 }

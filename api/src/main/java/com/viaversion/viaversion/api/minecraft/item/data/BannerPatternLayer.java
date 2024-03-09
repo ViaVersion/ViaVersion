@@ -33,31 +33,31 @@ public final class BannerPatternLayer {
         @Override
         public BannerPatternLayer read(final ByteBuf buffer) throws Exception {
             final Holder<BannerPattern> pattern = BannerPattern.TYPE.read(buffer);
-            final DyedColor color = DyedColor.TYPE.read(buffer);
+            final int color = Type.VAR_INT.readPrimitive(buffer);
             return new BannerPatternLayer(pattern, color);
         }
 
         @Override
         public void write(final ByteBuf buffer, final BannerPatternLayer value) throws Exception {
             BannerPattern.TYPE.write(buffer, value.pattern);
-            DyedColor.TYPE.write(buffer, value.color);
+            Type.VAR_INT.writePrimitive(buffer, value.dyeColor);
         }
     };
     public static final Type<BannerPatternLayer[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
     private final Holder<BannerPattern> pattern;
-    private final DyedColor color;
+    private final int dyeColor;
 
-    public BannerPatternLayer(final Holder<BannerPattern> pattern, final DyedColor color) {
+    public BannerPatternLayer(final Holder<BannerPattern> pattern, final int dyeColor) {
         this.pattern = pattern;
-        this.color = color;
+        this.dyeColor = dyeColor;
     }
 
     public Holder<BannerPattern> pattern() {
         return pattern;
     }
 
-    public DyedColor color() {
-        return color;
+    public int dyeColor() {
+        return dyeColor;
     }
 }
