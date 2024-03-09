@@ -17,12 +17,14 @@
  */
 package com.viaversion.viaversion.bukkit.tasks.protocol1_19to1_18_2;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
+import java.util.logging.Level;
 
 public final class AckSequenceTask implements Runnable {
 
@@ -42,7 +44,7 @@ public final class AckSequenceTask implements Runnable {
             ackPacket.write(Type.VAR_INT, sequence);
             ackPacket.scheduleSend(Protocol1_19To1_18_2.class);
         } catch (final Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send block changed ack packet", e);
         }
     }
 }

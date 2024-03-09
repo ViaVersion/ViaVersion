@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import space.vectrix.flare.fastutil.Int2ObjectSyncMap;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
@@ -99,7 +100,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         try {
             wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send second hand item", e);
         }
     }
 
@@ -327,7 +328,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 wrapper.scheduleSend(Protocol1_9To1_8.class);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send team packet", e);
         }
     }
 
@@ -353,7 +354,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 try {
                     wrapper.scheduleSend(Protocol1_9To1_8.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to send metadata", e);
                 }
             }
             metadataBuffer.remove(entityId);

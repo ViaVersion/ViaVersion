@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRew
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class SpawnPackets {
     public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<Integer, Double>(Type.DOUBLE) {
@@ -275,7 +276,7 @@ public class SpawnPackets {
                         try {
                             packet.send(Protocol1_9To1_8.class);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to send entity equipment packet", e);
                         }
                     }
                 });

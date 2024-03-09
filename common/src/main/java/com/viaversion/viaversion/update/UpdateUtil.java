@@ -28,6 +28,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class UpdateUtil {
@@ -105,7 +106,7 @@ public final class UpdateUtil {
             try {
                 statistics = GsonUtil.getGson().fromJson(builder.toString(), JsonObject.class);
             } catch (JsonParseException e) {
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to parse update response", e);
                 return null;
             }
             return statistics.get("name").getAsString();

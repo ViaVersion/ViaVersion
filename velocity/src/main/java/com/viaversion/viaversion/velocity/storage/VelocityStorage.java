@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.velocity.storage;
 
 import com.velocitypowered.api.proxy.Player;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class VelocityStorage implements StorableObject {
     private final Player player;
@@ -42,7 +44,7 @@ public class VelocityStorage implements StorableObject {
             getMinecraftConnection = Class.forName("com.velocitypowered.proxy.connection.client.ConnectedPlayer")
                     .getDeclaredMethod("getMinecraftConnection");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to initialize Velocity bossbar support, bossbars will not work.", e);
         }
     }
 
@@ -64,7 +66,7 @@ public class VelocityStorage implements StorableObject {
                     cachedBossbar = (List<UUID>) getServerBossBars.invoke(sessionHandler);
                 }
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to get bossbar list", e);
             }
         }
         return cachedBossbar;

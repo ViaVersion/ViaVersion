@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -108,7 +109,7 @@ public class BungeeServerHandler implements Listener {
             Object handshake = getHandshake.invoke(event.getPlayer().getPendingConnection());
             setProtocol.invoke(handshake, protocols == null ? clientProtocolVersion : serverProtocolVersion);
         } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error setting handshake version", e);
         }
     }
 
@@ -117,7 +118,7 @@ public class BungeeServerHandler implements Listener {
         try {
             checkServerChange(event, Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId()));
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to handle server switch", e);
         }
     }
 

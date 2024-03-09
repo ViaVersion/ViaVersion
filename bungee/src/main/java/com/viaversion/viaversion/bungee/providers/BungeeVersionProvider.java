@@ -68,10 +68,9 @@ public class BungeeVersionProvider extends BaseVersionProvider {
         try {
             list = ReflectionUtil.getStatic(ProtocolConstants.class, "SUPPORTED_VERSION_IDS", List.class);
             return list.get(0);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            // Fallback
+            return ProxyServer.getInstance().getProtocolVersion();
         }
-        // Fallback
-        return ProxyServer.getInstance().getProtocolVersion();
     }
 }

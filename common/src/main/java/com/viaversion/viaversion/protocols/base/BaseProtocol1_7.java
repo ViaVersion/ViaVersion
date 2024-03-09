@@ -110,7 +110,7 @@ public class BaseProtocol1_7 extends AbstractProtocol {
 
                         wrapper.set(Type.STRING, 0, GsonUtil.getGson().toJson(json)); // Update value
                     } catch (JsonParseException e) {
-                        e.printStackTrace();
+                        Via.getPlatform().getLogger().log(Level.SEVERE, "Error handling StatusResponse", e);
                     }
                 });
             }
