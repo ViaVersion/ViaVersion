@@ -37,6 +37,8 @@ import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
@@ -45,6 +47,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
+import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
@@ -60,6 +63,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
@@ -98,14 +102,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_3.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, blockEntity -> updateBlockEntityTag(blockEntity.tag()));
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, blockEntity -> updateBlockEntityTag(null, blockEntity.tag()));
         protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.VAR_INT); // Block entity type
 
             CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
             if (tag != null) {
-                updateBlockEntityTag(tag);
+                updateBlockEntityTag(null, tag);
             } else {
                 // No longer nullable
                 tag = new CompoundTag();
@@ -289,18 +293,19 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
-            data.set(StructuredDataKey.ENTITY_DATA, entityTag);
+            data.set(StructuredDataKey.ENTITY_DATA, entityTag.copy());
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
-            updateBlockEntityTag(blockEntityTag);
-            item.structuredData().set(StructuredDataKey.BLOCK_ENTITY_DATA, blockEntityTag);
+            final CompoundTag clonedTag = blockEntityTag.copy();
+            updateBlockEntityTag(data, clonedTag);
+            item.structuredData().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
         }
 
         final CompoundTag debugProperty = tag.getCompoundTag("DebugProperty");
         if (debugProperty != null) {
-            data.set(StructuredDataKey.DEBUG_STICK_STATE, debugProperty);
+            data.set(StructuredDataKey.DEBUG_STICK_STATE, debugProperty.copy());
         }
 
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
@@ -340,6 +345,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (id != -1) {
                 data.set(StructuredDataKey.INSTRUMENT, Holder.of(id));
             }
+        }
+
+        final ListTag<CompoundTag> attributeModifiersTag = tag.getListTag("AttributeModifiers", CompoundTag.class);
+        if (attributeModifiersTag != null) {
+            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & 0x02) == 0);
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
@@ -383,10 +393,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         // TODO
         //  StructuredDataKey.CAN_PLACE_ON
         //  StructuredDataKey.CAN_BREAK
-        //  StructuredDataKey.ATTRIBUTE_MODIFIERS
         //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.INTANGIBLE_PROJECTILE
-        //  StructuredDataKey.BUCKET_ENTITY_DATA
         //  StructuredDataKey.NOTE_BLOCK_SOUND
         //  StructuredDataKey.BANNER_PATTERNS
         //  StructuredDataKey.BASE_COLOR
@@ -398,6 +406,42 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private void updateAttributes(final StructuredDataContainer data, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
+        final AttributeModifier[] modifiers = attributeModifiersTag.stream().map(modifierTag -> {
+            final StringTag attributeNameTag = modifierTag.getStringTag("AttributeName");
+            final StringTag nameTag = modifierTag.getStringTag("Name");
+            final NumberTag operationTag = modifierTag.getNumberTag("Operation");
+            final NumberTag amountTag = modifierTag.getNumberTag("Amount");
+            final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
+            final NumberTag slotTag = modifierTag.getNumberTag("Slot");
+            if (nameTag == null || attributeNameTag == null || operationTag == null || amountTag == null || uuidTag == null || slotTag == null) {
+                return null;
+            }
+
+            final int operationId = operationTag.asInt();
+            if (operationId < 0 || operationId > 2) {
+                return null;
+            }
+
+            final int attributeId = Attributes1_20_3.keyToId(attributeNameTag.getValue());
+            if (attributeId == -1) {
+                return null;
+            }
+
+            return new AttributeModifier(
+                attributeId,
+                new ModifierData(
+                    UUIDUtil.fromIntArray(uuidTag.getValue()),
+                    nameTag.getValue(),
+                    amountTag.asDouble(),
+                    operationId
+                ),
+                slotTag.asInt()
+            );
+        }).filter(Objects::nonNull).toArray(AttributeModifier[]::new);
+        data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers, showInTooltip));
     }
 
     private void updatePotionTags(final StructuredDataContainer data, final CompoundTag tag) {
@@ -770,10 +814,80 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
-    private void updateBlockEntityTag(final CompoundTag tag) {
+    private void updateBlockEntityTag(@Nullable final StructuredDataContainer data, final CompoundTag tag) {
         if (tag == null) {
             return;
         }
+
+        final StringTag lock = tag.getStringTag("Lock");
+        if (lock != null && data != null) {
+            data.set(StructuredDataKey.LOCK, lock);
+        }
+
+        final Tag skullOwnerTag = tag.remove("SkullOwner");
+        if (skullOwnerTag instanceof StringTag) {
+            final CompoundTag profileTag = new CompoundTag();
+            profileTag.putString("name", ((StringTag) skullOwnerTag).getValue());
+            tag.put("profile", profileTag);
+        } else if (skullOwnerTag instanceof CompoundTag) {
+            updateSkullOwnerTag(tag, (CompoundTag) skullOwnerTag);
+        }
+
+        final Tag baseColorTag = tag.remove("Base");
+        if (baseColorTag instanceof NumberTag) {
+            tag.put("base_color", baseColorTag);
+            if (data != null) {
+                data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
+            }
+        }
+
         // TODO Lots of stuff
+    }
+
+    private void updateSkullOwnerTag(final CompoundTag tag, final CompoundTag skullOwnerTag) {
+        final CompoundTag profileTag = new CompoundTag();
+        tag.put("profile", profileTag);
+
+        final StringTag nameTag = skullOwnerTag.getStringTag("Name");
+        if (nameTag != null) {
+            profileTag.putString("name", nameTag.getValue());
+        }
+
+        final IntArrayTag idTag = skullOwnerTag.getIntArrayTag("Id");
+        if (idTag != null) {
+            profileTag.put("id", idTag);
+        }
+
+        final Tag propertiesTag = skullOwnerTag.remove("Properties");
+        if (!(propertiesTag instanceof CompoundTag)) {
+            return;
+        }
+
+        final ListTag<CompoundTag> propertiesListTag = new ListTag<>(CompoundTag.class);
+        for (final Map.Entry<String, Tag> entry : ((CompoundTag) propertiesTag).entrySet()) {
+            if (!(entry.getValue() instanceof ListTag<?>)) {
+                continue;
+            }
+
+            final ListTag<?> value = (ListTag<?>) entry.getValue();
+            for (final Tag propertyTag : value) {
+                if (!(propertyTag instanceof CompoundTag)) {
+                    continue;
+                }
+
+                final CompoundTag updatedPropertyTag = new CompoundTag();
+                final CompoundTag propertyCompoundTag = (CompoundTag) propertyTag;
+                final StringTag valueTag = propertyCompoundTag.getStringTag("Value");
+                final StringTag signatureTag = propertyCompoundTag.getStringTag("Signature");
+                updatedPropertyTag.putString("name", entry.getKey());
+                updatedPropertyTag.putString("value", valueTag != null ? valueTag.getValue() : "");
+                if (signatureTag != null) {
+                    updatedPropertyTag.putString("signature", signatureTag.getValue());
+                }
+                propertiesListTag.add(updatedPropertyTag);
+            }
+        }
+
+        profileTag.put("properties", propertiesListTag);
     }
 }

@@ -157,7 +157,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             for (int i = 0; i < size; i++) {
                 // From a string to a registry int ID
                 final String attributeIdentifier = Key.stripMinecraftNamespace(wrapper.read(Type.STRING));
-                final int id = Attributes1_20_3.id(attributeIdentifier);
+                final int id = Attributes1_20_3.keyToId(attributeIdentifier);
                 wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewAttributeId(id));
 
                 wrapper.passthrough(Type.DOUBLE); // Base

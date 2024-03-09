@@ -39,11 +39,11 @@ public final class Attributes1_20_3 {
         "zombie.spawn_reinforcements"
     );
 
-    public static @Nullable String attribute(final int id) {
+    public static @Nullable String idToKey(final int id) {
         return ATTRIBUTES.idToKey(id);
     }
 
-    public static int id(final String attribute) {
+    public static int keyToId(final String attribute) {
         return ATTRIBUTES.keyToId(attribute);
     }
 }
