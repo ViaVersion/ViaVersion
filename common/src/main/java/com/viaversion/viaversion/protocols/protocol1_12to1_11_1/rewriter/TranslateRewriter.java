@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_12to1_11_1;
+package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.rewriter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.data.AchievementTranslationMapping;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
@@ -103,7 +102,7 @@ public class TranslateRewriter {
         }
     };
 
-    public static void toClient(JsonElement element, UserConnection user) {
+    public static void toClient(JsonElement element) {
         if (element instanceof JsonObject) {
             JsonObject obj = (JsonObject) element;
             JsonElement translate = obj.get("translate");
