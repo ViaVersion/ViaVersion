@@ -28,6 +28,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import java.util.Collections;
+import java.util.logging.Level;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -56,7 +57,7 @@ public class ElytraPatch implements Listener {
                 wrapper.scheduleSend(Protocol1_9To1_8.class);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send elytra patch metadata packet!", e);
         }
     }
 }

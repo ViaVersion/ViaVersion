@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PlayerLookTargetProvider;
+import java.util.logging.Level;
 
 public class TabCompleteTracker implements StorableObject {
     private int transactionId;
@@ -43,7 +44,7 @@ public class TabCompleteTracker implements StorableObject {
         try {
             wrapper.scheduleSendToServer(Protocol1_13To1_12_2.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send tab complete packet", e);
         }
         lastTabComplete = null;
     }

@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.Compressio
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import java.util.logging.Level;
 
 public class PlayerPackets {
     public static void register(Protocol1_9To1_8 protocol) {
@@ -43,14 +44,14 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
-                map(Type.BYTE); // 1 - Chat Positon
+                map(Type.BYTE); // 1 - Chat Position
 
                 handler(wrapper -> {
                     try {
                         JsonObject obj = (JsonObject) wrapper.get(Type.COMPONENT, 0);
                         ChatRewriter.toClient(obj, wrapper.user());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to transform chat component", e);
                     }
                 });
             }

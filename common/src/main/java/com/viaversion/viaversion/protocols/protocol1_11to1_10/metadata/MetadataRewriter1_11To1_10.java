@@ -125,7 +125,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
                         wrapper.send(Protocol1_11To1_10.class);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Via.getPlatform().getLogger().log(Level.WARNING, "Failed to update hologram position", e);
                     }
                 }
             }

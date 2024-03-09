@@ -153,7 +153,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             // send
             packetMethod.invoke(playerConnection, packet);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to send packet to server", e);
             return false;
         }
         return true;
