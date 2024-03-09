@@ -158,22 +158,22 @@ public final class MappingDataLoader {
             final AddConsumer<V> addConsumer,
             final MappingsSupplier<M, V> mappingsSupplier
     ) {
-        final CompoundTag tag = mappingsTag.get(key);
+        final CompoundTag tag = mappingsTag.getCompoundTag(key);
         if (tag == null) {
             return null;
         }
 
-        final ByteTag serializationStragetyTag = tag.get("id");
-        final IntTag mappedSizeTag = tag.get("mappedSize");
+        final ByteTag serializationStragetyTag = tag.getUnchecked("id");
+        final IntTag mappedSizeTag = tag.getUnchecked("mappedSize");
         final byte strategy = serializationStragetyTag.asByte();
         final V mappings;
         if (strategy == DIRECT_ID) {
-            final IntArrayTag valuesTag = tag.get("val");
+            final IntArrayTag valuesTag = tag.getIntArrayTag("val");
             return IntArrayMappings.of(valuesTag.getValue(), mappedSizeTag.asInt());
         } else if (strategy == SHIFTS_ID) {
-            final IntArrayTag shiftsAtTag = tag.get("at");
-            final IntArrayTag shiftsTag = tag.get("to");
-            final IntTag sizeTag = tag.get("size");
+            final IntArrayTag shiftsAtTag = tag.getIntArrayTag("at");
+            final IntArrayTag shiftsTag = tag.getIntArrayTag("to");
+            final IntTag sizeTag = tag.getUnchecked("size");
             final int[] shiftsAt = shiftsAtTag.getValue();
             final int[] shiftsTo = shiftsTag.getValue();
             final int size = sizeTag.asInt();
@@ -197,9 +197,9 @@ public final class MappingDataLoader {
                 }
             }
         } else if (strategy == CHANGES_ID) {
-            final IntArrayTag changesAtTag = tag.get("at");
-            final IntArrayTag valuesTag = tag.get("val");
-            final IntTag sizeTag = tag.get("size");
+            final IntArrayTag changesAtTag = tag.getIntArrayTag("at");
+            final IntArrayTag valuesTag = tag.getIntArrayTag("val");
+            final IntTag sizeTag = tag.getUnchecked("size");
             final boolean fillBetween = tag.get("nofill") == null;
             final int[] changesAt = changesAtTag.getValue();
             final int[] values = valuesTag.getValue();
@@ -219,7 +219,7 @@ public final class MappingDataLoader {
                 addConsumer.addTo(mappings, id, values[i]);
             }
         } else if (strategy == IDENTITY_ID) {
-            final IntTag sizeTag = tag.get("size");
+            final IntTag sizeTag = tag.getUnchecked("size");
             return new IdentityMappings(sizeTag.asInt(), mappedSizeTag.asInt());
         } else {
             throw new IllegalArgumentException("Unknown serialization strategy: " + strategy);
@@ -240,8 +240,8 @@ public final class MappingDataLoader {
         }
 
         return new FullMappingsBase(
-                unmappedElements.getValue().stream().map(StringTag::getValue).collect(Collectors.toList()),
-                mappedElements.getValue().stream().map(StringTag::getValue).collect(Collectors.toList()),
+                unmappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
+                mappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
                 mappings
         );
     }

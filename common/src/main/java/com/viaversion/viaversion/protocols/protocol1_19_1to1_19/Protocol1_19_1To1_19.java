@@ -88,7 +88,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
     private static final CompoundTag CHAT_REGISTRY;
 
     static {
-        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
+        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).getCompoundTag("minecraft:chat_type");
     }
 
     public Protocol1_19_1To1_19() {
@@ -224,7 +224,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
                     final ListTag<CompoundTag> chatTypes = registry.getCompoundTag("minecraft:chat_type").getListTag("value", CompoundTag.class);
                     for (final CompoundTag chatType : chatTypes) {
-                        final NumberTag idTag = chatType.get("id");
+                        final NumberTag idTag = chatType.getNumberTag("id");
                         chatTypeStorage.addChatType(idTag.asInt(), chatType);
                     }
 

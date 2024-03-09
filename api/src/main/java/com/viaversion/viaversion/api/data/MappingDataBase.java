@@ -92,13 +92,13 @@ public class MappingDataBase implements MappingData {
                     particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
                 }
 
-                final List<String> identifiers = unmappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
-                final List<String> mappedIdentifiers = mappedParticles.getValue().stream().map(t -> (String) t.getValue()).collect(Collectors.toList());
+                final List<String> identifiers = unmappedParticles.stream().map(StringTag::getValue).collect(Collectors.toList());
+                final List<String> mappedIdentifiers = mappedParticles.stream().map(StringTag::getValue).collect(Collectors.toList());
                 this.particleMappings = new ParticleMappings(identifiers, mappedIdentifiers, particleMappings);
             }
         }
 
-        final CompoundTag tagsTag = data.get("tags");
+        final CompoundTag tagsTag = data.getCompoundTag("tags");
         if (tagsTag != null) {
             this.tags = new EnumMap<>(RegistryType.class);
             loadTags(RegistryType.ITEM, tagsTag);
@@ -126,7 +126,7 @@ public class MappingDataBase implements MappingData {
     }
 
     private void loadTags(final RegistryType type, final CompoundTag data) {
-        final CompoundTag tag = data.get(type.resourceLocation());
+        final CompoundTag tag = data.getCompoundTag(type.resourceLocation());
         if (tag == null) {
             return;
         }

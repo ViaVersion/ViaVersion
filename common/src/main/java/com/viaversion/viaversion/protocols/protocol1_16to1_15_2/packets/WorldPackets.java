@@ -114,7 +114,7 @@ public class WorldPackets {
             UUID targetUuid = UUID.fromString((String) targetUuidTag.getValue());
             compoundTag.put("Target", new IntArrayTag(UUIDUtil.toIntArray(targetUuid)));
         } else if (id.equals("minecraft:skull") && compoundTag.getCompoundTag("Owner") != null) {
-            CompoundTag ownerTag = compoundTag.remove("Owner");
+            CompoundTag ownerTag = compoundTag.removeUnchecked("Owner");
             Tag ownerUuidTag = ownerTag.remove("Id");
             if (ownerUuidTag instanceof StringTag) {
                 UUID ownerUuid = UUID.fromString(((StringTag) ownerUuidTag).getValue());

@@ -448,8 +448,8 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
-        final CompoundTag biomeRegistry = registry.get("minecraft:worldgen/biome");
-        final ListTag<?> biomes = biomeRegistry.get("value");
+        final CompoundTag biomeRegistry = registry.getCompoundTag("minecraft:worldgen/biome");
+        final ListTag<?> biomes = biomeRegistry.getListTag("value");
         tracker(connection).setBiomesSent(biomes.size());
     }
 
@@ -468,7 +468,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         final ListTag<CompoundTag> dimensions = registry.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
         final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
         for (final CompoundTag dimension : dimensions) {
-            final CompoundTag element = dimension.get("element");
+            final CompoundTag element = dimension.getCompoundTag("element");
             final String name = dimension.getStringTag("name").getValue();
             dimensionDataMap.put(name, new DimensionDataImpl(element));
         }

@@ -77,10 +77,10 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 map(Type.NAMED_COMPOUND_TAG); // Current dimension
                 handler(wrapper -> {
                     // Add new dimension fields
-                    CompoundTag dimensionRegistry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0).get("minecraft:dimension_type");
+                    CompoundTag dimensionRegistry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0).getCompoundTag("minecraft:dimension_type");
                     ListTag<CompoundTag> dimensions = dimensionRegistry.getListTag("value", CompoundTag.class);
                     for (CompoundTag dimension : dimensions) {
-                        CompoundTag dimensionCompound = dimension.get("element");
+                        CompoundTag dimensionCompound = dimension.getCompoundTag("element");
                         addNewDimensionData(dimensionCompound);
                     }
 
