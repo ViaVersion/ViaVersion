@@ -76,11 +76,11 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-                    final CompoundTag damageTypeRegistry = registry.get("minecraft:damage_type");
-                    final ListTag<CompoundTag> damageTypes = damageTypeRegistry.get("value");
+                    final CompoundTag damageTypeRegistry = registry.getCompoundTag("minecraft:damage_type");
+                    final ListTag<CompoundTag> damageTypes = damageTypeRegistry.getListTag("value", CompoundTag.class);
                     int highestId = -1;
                     for (final CompoundTag damageType : damageTypes) {
-                        final IntTag id = damageType.get("id");
+                        final IntTag id = damageType.getUnchecked("id");
                         highestId = Math.max(highestId, id.asInt());
                     }
 

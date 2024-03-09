@@ -172,15 +172,15 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
 
         final ListTag<StringTag> messages = new ListTag<>(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final StringTag text = tag.remove("Text" + i);
-            messages.add(text != null ? text : new StringTag(ComponentUtil.emptyJsonComponentString()));
+            final Tag text = tag.remove("Text" + i);
+            messages.add(text instanceof StringTag ? (StringTag) text : new StringTag(ComponentUtil.emptyJsonComponentString()));
         }
         frontText.put("messages", messages);
 
         final ListTag<StringTag> filteredMessages = new ListTag<>(StringTag.class);
         for (int i = 1; i < 5; i++) {
-            final StringTag text = tag.remove("FilteredText" + i);
-            filteredMessages.add(text != null ? text : messages.get(i - 1));
+            final Tag text = tag.remove("FilteredText" + i);
+            filteredMessages.add(text instanceof StringTag ? (StringTag) text : messages.get(i - 1));
         }
         if (!filteredMessages.equals(messages)) {
             frontText.put("filtered_messages", filteredMessages);

@@ -69,10 +69,10 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
                 map(Type.NAMED_COMPOUND_TAG); // Current dimension data
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-                    final CompoundTag dimensionsHolder = registry.get("minecraft:dimension_type");
+                    final CompoundTag dimensionsHolder = registry.getCompoundTag("minecraft:dimension_type");
                     final ListTag<CompoundTag> dimensions = dimensionsHolder.getListTag("value", CompoundTag.class);
                     for (final CompoundTag dimension : dimensions) {
-                        addTagPrefix(dimension.get("element"));
+                        addTagPrefix(dimension.getCompoundTag("element"));
                     }
 
                     addTagPrefix(wrapper.get(Type.NAMED_COMPOUND_TAG, 1));

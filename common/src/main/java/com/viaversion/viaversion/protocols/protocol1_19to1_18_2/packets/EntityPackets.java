@@ -81,7 +81,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
     public static final CompoundTag CHAT_REGISTRY;
 
     static {
-        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).get("minecraft:chat_type");
+        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).getCompoundTag("minecraft:chat_type");
     }
 
     public EntityPackets(final Protocol1_19To1_18_2 protocol) {
@@ -214,8 +214,8 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
                     final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
                     for (final CompoundTag dimension : dimensions) {
-                        final NumberTag idTag = dimension.get("id");
-                        final CompoundTag element = dimension.get("element");
+                        final NumberTag idTag = dimension.getNumberTag("id");
+                        final CompoundTag element = dimension.getCompoundTag("element");
                         final String name = dimension.getStringTag("name").getValue();
                         addMonsterSpawnData(element);
                         dimensionDataMap.put(Key.stripMinecraftNamespace(name), new DimensionDataImpl(idTag.asInt(), element));

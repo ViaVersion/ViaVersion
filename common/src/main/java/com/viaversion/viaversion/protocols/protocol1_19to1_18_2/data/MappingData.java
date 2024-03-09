@@ -39,7 +39,7 @@ public final class MappingData extends MappingDataBase {
     protected void loadExtras(final CompoundTag daata) {
         final ListTag<CompoundTag> chatTypes = MappingDataLoader.loadNBTFromFile("chat-types-1.19.nbt").getListTag("values", CompoundTag.class);
         for (final CompoundTag chatType : chatTypes) {
-            final NumberTag idTag = chatType.get("id");
+            final NumberTag idTag = chatType.getNumberTag("id");
             defaultChatTypes.put(idTag.asInt(), chatType);
         }
     }
