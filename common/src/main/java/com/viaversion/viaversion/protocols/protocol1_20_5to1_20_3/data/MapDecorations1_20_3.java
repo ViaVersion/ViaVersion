@@ -61,4 +61,8 @@ public final class MapDecorations1_20_3 {
     public static String idToKey(final int index) {
         return index < 0 || index >= MAP_DECORATIONS.size() ? "player" : MAP_DECORATIONS.idToKey(index);
     }
+
+    public static int keyToId(final String key) {
+        return MAP_DECORATIONS.keyToId(key);
+    }
 }

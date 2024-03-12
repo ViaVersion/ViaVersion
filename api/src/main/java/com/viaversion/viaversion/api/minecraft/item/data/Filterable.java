@@ -39,8 +39,16 @@ public abstract class Filterable<T> {
         return raw;
     }
 
-    public T filtered() {
+    public boolean isFiltered() {
+        return filtered != null;
+    }
+
+    public @Nullable T filtered() {
         return filtered;
+    }
+
+    public T get() {
+        return filtered != null ? filtered : raw;
     }
 
     public abstract static class FilterableType<T, F extends Filterable<T>> extends Type<F> {

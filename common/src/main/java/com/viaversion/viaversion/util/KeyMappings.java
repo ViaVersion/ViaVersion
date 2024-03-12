@@ -29,6 +29,7 @@ public final class KeyMappings {
     public KeyMappings(final String... keys) {
         this.keys = keys;
         keyToId = new Object2IntOpenHashMap<>(keys.length);
+        keyToId.defaultReturnValue(-1);
         for (int i = 0; i < keys.length; i++) {
             keyToId.put(keys[i], i);
         }

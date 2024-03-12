@@ -250,7 +250,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         for (final StructuredData<?> structuredData : data.data().values()) {
-            StructuredDataConverter.rewrite(structuredData, tag);
+            StructuredDataConverter.writeToTag(structuredData, tag);
         }
 
         return dataItem;
@@ -374,7 +374,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         updateMobTags(data, tag);
 
         updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES);
-        updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
+        if (old.identifier() == 927) {
+            updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
+        }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
         updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
