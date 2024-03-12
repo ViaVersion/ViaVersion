@@ -66,14 +66,14 @@ public class ItemType1_20_5 extends Type<Item> {
         for (int i = 0; i < valuesSize; i++) {
             final StructuredData<?> value = dataType.read(buffer);
             final StructuredDataKey<?> key = dataType.key(value.id());
-            Preconditions.checkNotNull(key, "No data component serializer found for $s", value);
+            Preconditions.checkNotNull(key, "No data component serializer found for %s", value);
             map.put(key, value);
         }
 
         for (int i = 0; i < markersSize; i++) {
             final int id = Type.VAR_INT.readPrimitive(buffer);
             final StructuredDataKey<?> key = dataType.key(id);
-            Preconditions.checkNotNull(key, "No data component serializer found for empty id $s", id);
+            Preconditions.checkNotNull(key, "No data component serializer found for empty id %s", id);
             map.put(key, StructuredData.empty(key, id));
         }
         return map;

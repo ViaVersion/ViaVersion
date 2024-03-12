@@ -82,7 +82,6 @@ import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,7 +249,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return dataItem;
         }
 
-        // TODO
+        for (final StructuredData<?> structuredData : data.data().values()) {
+            StructuredDataConverter.rewrite(structuredData, tag);
+        }
 
         return dataItem;
     }
@@ -395,14 +396,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         // TODO
         //  StructuredDataKey.CAN_PLACE_ON
         //  StructuredDataKey.CAN_BREAK
-        //  StructuredDataKey.CREATIVE_SLOT_LOCK
-        //  StructuredDataKey.INTANGIBLE_PROJECTILE
-        //  StructuredDataKey.NOTE_BLOCK_SOUND
+        //  (remaining ones should only affect non-essential item tooltip, or not be shown/checked at all)
         //  StructuredDataKey.POT_DECORATIONS
         //  StructuredDataKey.CONTAINER
+        //  StructuredDataKey.CONTAINER_LOOT
+        //  StructuredDataKey.INTANGIBLE_PROJECTILE
+        //  StructuredDataKey.CREATIVE_SLOT_LOCK
         //  StructuredDataKey.BEES
         //  StructuredDataKey.LOCK
-        //  StructuredDataKey.CONTAINER_LOOT
+        //  StructuredDataKey.NOTE_BLOCK_SOUND
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
