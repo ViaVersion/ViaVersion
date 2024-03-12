@@ -64,11 +64,11 @@ public final class Enchantments1_20_3 {
         "vanishing_curse"
     );
 
-    public static @Nullable String enchantment(final int id) {
+    public static @Nullable String idToKey(final int id) {
         return ENCHANTMENTS.idToKey(id);
     }
 
-    public static int id(final String enchantment) {
+    public static int keyToId(final String enchantment) {
         return ENCHANTMENTS.keyToId(enchantment);
     }
 }

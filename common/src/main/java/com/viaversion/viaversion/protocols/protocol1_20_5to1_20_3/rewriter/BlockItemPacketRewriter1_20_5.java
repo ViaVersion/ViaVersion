@@ -416,8 +416,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final String name = modifierTag.getString("Name");
             final NumberTag amountTag = modifierTag.getNumberTag("Amount");
             final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
-            final NumberTag slotTag = modifierTag.getNumberTag("Slot");
-            if (name == null || attributeName == null || amountTag == null || uuidTag == null || slotTag == null) {
+            final int slot = modifierTag.getInt("Slot");
+            if (name == null || attributeName == null || amountTag == null || uuidTag == null) {
                 return null;
             }
 
@@ -439,7 +439,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     amountTag.asDouble(),
                     operationId
                 ),
-                slotTag.asInt()
+                slot
             );
         }).filter(Objects::nonNull).toArray(AttributeModifier[]::new);
         data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers, showInTooltip));
@@ -699,7 +699,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 continue;
             }
 
-            final int intId = Enchantments1_20_3.id(id);
+            final int intId = Enchantments1_20_3.keyToId(id);
             if (intId == -1) {
                 continue;
             }
