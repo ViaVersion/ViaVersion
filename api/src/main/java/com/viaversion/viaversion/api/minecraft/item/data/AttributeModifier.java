@@ -41,19 +41,19 @@ public final class AttributeModifier {
         public void write(final ByteBuf buffer, final AttributeModifier value) throws Exception {
             Type.VAR_INT.writePrimitive(buffer, value.attribute);
             ModifierData.TYPE.write(buffer, value.modifier);
-            Type.VAR_INT.writePrimitive(buffer, value.slot);
+            Type.VAR_INT.writePrimitive(buffer, value.slotType);
         }
     };
     public static final Type<AttributeModifier[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
     private final int attribute;
     private final ModifierData modifier;
-    private final int slot;
+    private final int slotType;
 
-    public AttributeModifier(final int attribute, final ModifierData modifier, final int slot) {
+    public AttributeModifier(final int attribute, final ModifierData modifier, final int slotType) {
         this.attribute = attribute;
         this.modifier = modifier;
-        this.slot = slot;
+        this.slotType = slotType;
     }
 
     public int attribute() {
@@ -64,7 +64,7 @@ public final class AttributeModifier {
         return modifier;
     }
 
-    public int slot() {
-        return slot;
+    public int slotType() {
+        return slotType;
     }
 }

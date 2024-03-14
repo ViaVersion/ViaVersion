@@ -261,14 +261,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
-        // TODO add default data :>
+        // TODO add default data if needed (e.g. when getting a goat horn via the give command) :>
         if (tag == null) {
             return item;
         }
 
         // Rewrite nbt to new data structures
         final int hideFlagsValue = tag.getInt("HideFlags");
-        if ((hideFlagsValue & 0x20) != 0) {
+        if ((hideFlagsValue & StructuredDataConverter.HIDE_ADDITIONAL) != 0) {
             data.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
         }
 
@@ -313,12 +313,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
         if (unbreakable != null && unbreakable.asBoolean()) {
-            data.set(StructuredDataKey.UNBREAKABLE, new Unbreakable((hideFlagsValue & 0x04) == 0));
+            data.set(StructuredDataKey.UNBREAKABLE, new Unbreakable((hideFlagsValue & StructuredDataConverter.HIDE_UNBREAKABLE) == 0));
         }
 
         final CompoundTag trimTag = tag.getCompoundTag("Trim");
         if (trimTag != null) {
-            updateArmorTrim(data, trimTag, (hideFlagsValue & 0x80) == 0);
+            updateArmorTrim(data, trimTag, (hideFlagsValue & StructuredDataConverter.HIDE_ARMOR_TRIM) == 0);
         }
 
         final CompoundTag explosionTag = tag.getCompoundTag("Explosion");
@@ -352,7 +352,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<CompoundTag> attributeModifiersTag = tag.getListTag("AttributeModifiers", CompoundTag.class);
         if (attributeModifiersTag != null) {
-            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & 0x02) == 0);
+            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
@@ -378,8 +378,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
         }
 
-        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & 0x01) == 0);
-        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & 0x20) == 0);
+        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
+        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ADDITIONAL) == 0);
 
         final NumberTag mapId = tag.getNumberTag("map");
         if (mapId != null) {
@@ -418,7 +418,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final String name = modifierTag.getString("Name");
             final NumberTag amountTag = modifierTag.getNumberTag("Amount");
             final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
-            final int slot = modifierTag.getInt("Slot");
+            final int slotType = modifierTag.getInt("Slot");
             if (name == null || attributeName == null || amountTag == null || uuidTag == null) {
                 return null;
             }
@@ -441,7 +441,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     amountTag.asDouble(),
                     operationId
                 ),
-                slot
+                slotType
             );
         }).filter(Objects::nonNull).toArray(AttributeModifier[]::new);
         data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers, showInTooltip));
@@ -801,7 +801,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag colorTag = displayTag.getNumberTag("color");
         if (colorTag != null) {
-            data.set(StructuredDataKey.DYED_COLOR, new DyedColor(colorTag.asInt(), (hideFlags & 0x40) == 0));
+            data.set(StructuredDataKey.DYED_COLOR, new DyedColor(colorTag.asInt(), (hideFlags & StructuredDataConverter.HIDE_DYE_COLOR) == 0));
         }
     }
 

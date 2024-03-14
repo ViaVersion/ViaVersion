@@ -43,6 +43,15 @@ import java.util.Map;
 
 final class StructuredDataConverter {
 
+    static final int HIDE_ENCHANTMENTS = 1;
+    static final int HIDE_ATTRIBUTES = 1 << 1;
+    static final int HIDE_UNBREAKABLE = 1 << 2;
+    static final int HIDE_CAN_BREAK = 1 << 3;
+    static final int HIDE_CAN_PLACE_ON = 1 << 4;
+    static final int HIDE_ADDITIONAL = 1 << 5;
+    static final int HIDE_DYE_COLOR = 1 << 6;
+    static final int HIDE_ARMOR_TRIM = 1 << 7;
+
     private static final Map<StructuredDataKey<?>, DataConverter<?>> REWRITERS = new Reference2ObjectOpenHashMap<>();
 
     static {
@@ -50,7 +59,7 @@ final class StructuredDataConverter {
         register(StructuredDataKey.UNBREAKABLE, (data, tag) -> {
             tag.putBoolean("Unbreakable", true);
             if (!data.showInTooltip()) {
-                putHideFlag(tag, 0x04);
+                putHideFlag(tag, HIDE_UNBREAKABLE);
             }
         });
         register(StructuredDataKey.CUSTOM_NAME, (data, tag) -> tag.putString("CustomName", ComponentUtil.tagToJsonString(data)));
@@ -75,14 +84,14 @@ final class StructuredDataConverter {
                 modifierTag.putString("AttributeName", identifier);
                 modifierTag.putString("Name", modifier.modifier().name());
                 modifierTag.putDouble("Amount", modifier.modifier().amount());
-                modifierTag.putInt("Slot", modifier.slot());
+                modifierTag.putInt("Slot", modifier.slotType());
                 modifierTag.putInt("Operation", modifier.modifier().operation());
                 modifiers.add(modifierTag);
             }
             tag.put("AttributeModifiers", modifiers);
 
             if (!data.showInTooltip()) {
-                putHideFlag(tag, 0x02);
+                putHideFlag(tag, HIDE_ATTRIBUTES);
             }
         });
         register(StructuredDataKey.CUSTOM_MODEL_DATA, (data, tag) -> tag.putInt("CustomModelData", data));
@@ -91,7 +100,7 @@ final class StructuredDataConverter {
         register(StructuredDataKey.DYED_COLOR, (data, tag) -> {
             tag.putInt("color", data.rgb());
             if (!data.showInTooltip()) {
-                putHideFlag(tag, 0x40);
+                putHideFlag(tag, HIDE_DYE_COLOR);
             }
         });
         register(StructuredDataKey.MAP_COLOR, (data, tag) -> tag.putInt("MapColor", data));
@@ -281,7 +290,7 @@ final class StructuredDataConverter {
         tag.put(storedEnchantments ? "StoredEnchantments" : "Enchantments", enchantments);
 
         if (!data.showInTooltip()) {
-            putHideFlag(tag, storedEnchantments ? 0x20 : 0x01);
+            putHideFlag(tag, storedEnchantments ? HIDE_ADDITIONAL : HIDE_ENCHANTMENTS);
         }
     }
 
