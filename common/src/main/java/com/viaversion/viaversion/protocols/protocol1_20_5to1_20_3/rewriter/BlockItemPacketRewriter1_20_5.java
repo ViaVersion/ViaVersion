@@ -446,7 +446,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final String identifier = rawPredicate.substring(0, idLength);
         final HolderSet holders;
-        if (identifier.startsWith("#")) {
+        if (!identifier.startsWith("#")) {
             final int id = Protocol1_20_5To1_20_3.MAPPINGS.blockId(identifier);
             if (id == -1) {
                 return null;
@@ -454,7 +454,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             holders = new HolderSet(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)});
         } else {
-            holders = new HolderSet(identifier);
+            holders = new HolderSet(identifier.substring(1));
         }
 
         final int propertiesEndIndex = rawPredicate.indexOf(']');
