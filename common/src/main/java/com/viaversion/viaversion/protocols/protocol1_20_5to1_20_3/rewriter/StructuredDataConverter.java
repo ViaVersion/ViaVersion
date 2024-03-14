@@ -27,16 +27,23 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
+import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -258,30 +265,100 @@ final class StructuredDataConverter {
             // Handling of previously block entity tags is done using the getBlockEntityTag method
             tag.put("BlockEntityTag", data);
         });
+        register(StructuredDataKey.CONTAINER_LOOT, (data, tag) -> {
+            tag.put("LootTable", data.get("loot_table"));
+            tag.put("LootTableSeed", data.get("loot_table_seed"));
+        });
+        register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, (data, tag) -> {
+            final ListTag<CompoundTag> enchantmentsTag = getOrCreateListTag(tag, "Enchantments");
+            final CompoundTag invalidEnchantment = new CompoundTag();
+            invalidEnchantment.putString("id", "");
+            // Skipping the level tag, causing the enchantment to be invalid
+
+            enchantmentsTag.add(invalidEnchantment);
+        });
+        register(StructuredDataKey.POTION_CONTENTS, (data, tag) -> {
+            if (data.potion() != null) {
+                final String potion = Potions1_20_3.idToKey(data.potion() + 1); // Empty potion type added
+                if (potion != null) {
+                    tag.putString("Potion", potion);
+                }
+            }
+            if (data.customColor() != null) {
+                tag.putInt("CustomPotionColor", data.customColor());
+            }
+            final ListTag<CompoundTag> customPotionEffectsTag = new ListTag<>(CompoundTag.class);
+            for (final PotionEffect effect : data.customEffects()) {
+                final CompoundTag effectTag = new CompoundTag();
+                final String id = PotionEffects.idToKey(effect.effect() + 1); // Empty potion type added
+                if (id != null) {
+                    effectTag.putString("id", id);
+                }
+
+                final PotionEffectData details = effect.effectData();
+                effectTag.putByte("amplifier", (byte) details.amplifier());
+                effectTag.putInt("duration", details.duration());
+                effectTag.putBoolean("ambient", details.ambient());
+                effectTag.putBoolean("show_particles", details.showParticles());
+                effectTag.putBoolean("show_icon", details.showIcon());
+
+                customPotionEffectsTag.add(effectTag);
+            }
+            tag.put("custom_potion_effects", customPotionEffectsTag);
+        });
+        register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, (data, tag) -> {
+            final ListTag<CompoundTag> effectsTag = getOrCreateListTag(tag, "effects");
+            for (final SuspiciousStewEffect effect : data) {
+                final CompoundTag effectTag = new CompoundTag();
+                final String id = PotionEffects.idToKey(effect.mobEffect() + 1);
+                if (id != null) {
+                    effectTag.putString("id", id);
+                }
+                effectTag.putInt("duration", effect.duration());
+
+                effectsTag.add(effectTag);
+            }
+        });
+        register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
+            final ListTag<CompoundTag> patternsTag = getOrCreateListTag(tag, "Patterns");
+            for (final BannerPatternLayer layer : data) {
+                final String pattern = BannerPatterns1_20_3.fullIdToCompact(BannerPatterns1_20_3.idToKey(layer.pattern().id()));
+                if (pattern == null) {
+                    continue;
+                }
+                final CompoundTag patternTag = new CompoundTag();
+                patternTag.putString("Pattern", pattern);
+                patternTag.putInt("Color", layer.dyeColor());
+                patternsTag.add(patternTag);
+            }
+        });
         //register(StructuredDataKey., (data, tag) -> );
 
         //TODO
         // StructuredDataKey.CAN_PLACE_ON
         // StructuredDataKey.CAN_BREAK
-        // StructuredDataKey<PotionContents> POTION_CONTENT
-        // StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECT
         // StructuredDataKey<ArmorTrim> TRIM
-        // StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS
         // StructuredDataKey<BlockStateProperties> BLOCK_STATE
-        // StructuredDataKey<CompoundTag> CONTAINER_LOOT
         // StructuredDataKey<Item[]> CONTAINER
-        // StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE
         // StructuredDataKey<Unit> INTANGIBLE_PROJECTILE
-        // StructuredDataKey<Integer> MAP_POST_PROCESSING
     }
 
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
-        CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
-        if (blockEntityTag == null) {
-            blockEntityTag = new CompoundTag();
-            tag.put("BlockEntityTag", blockEntityTag);
+        CompoundTag subTag = tag.getCompoundTag("BlockEntityTag");
+        if (subTag == null) {
+            subTag = new CompoundTag();
+            tag.put("BlockEntityTag", subTag);
         }
-        return blockEntityTag;
+        return subTag;
+    }
+
+    private static ListTag<CompoundTag> getOrCreateListTag(final CompoundTag tag, final String name) {
+        ListTag<CompoundTag> subTag = tag.getListTag(name, CompoundTag.class);
+        if (subTag == null) {
+            subTag = new ListTag<>(CompoundTag.class);
+            tag.put(name, subTag);
+        }
+        return subTag;
     }
 
     private static CompoundTag convertExplosion(final FireworkExplosion explosion) {

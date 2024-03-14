@@ -125,6 +125,15 @@ public final class BannerPatterns1_20_3 {
         return PATTERN_IDS.get(compactId);
     }
 
+    public static @Nullable String fullIdToCompact(final String fullId) {
+        for (Map.Entry<String, String> entry : PATTERN_IDS.entrySet()) {
+            if (entry.getValue().equals(fullId)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     public static String[] keys() {
         return PATTERNS.keys();
     }
