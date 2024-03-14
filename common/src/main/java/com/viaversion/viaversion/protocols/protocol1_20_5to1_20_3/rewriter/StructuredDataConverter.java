@@ -23,18 +23,22 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
+import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
@@ -332,15 +336,58 @@ final class StructuredDataConverter {
                 patternsTag.add(patternTag);
             }
         });
-        //register(StructuredDataKey., (data, tag) -> );
+        register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
+        register(StructuredDataKey.CAN_BREAK, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
 
         //TODO
-        // StructuredDataKey.CAN_PLACE_ON
-        // StructuredDataKey.CAN_BREAK
         // StructuredDataKey<ArmorTrim> TRIM
         // StructuredDataKey<BlockStateProperties> BLOCK_STATE
         // StructuredDataKey<Item[]> CONTAINER
         // StructuredDataKey<Unit> INTANGIBLE_PROJECTILE
+    }
+
+    private static void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
+        final ListTag<StringTag> predicatedListTag = new ListTag<>(StringTag.class);
+        for (final BlockPredicate predicate : data.predicates()) {
+            final HolderSet holders = predicate.predicates();
+            if (holders == null) {
+                // Can't do (nicely)
+                continue;
+            }
+
+            if (holders.isLeft()) {
+                final String identifier = holders.left();
+                predicatedListTag.add(serializeBlockPredicate(predicate, identifier));
+            } else {
+                for (final int id : holders.right()) {
+                    final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
+                    final String identifier = Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId);
+                    predicatedListTag.add(serializeBlockPredicate(predicate, identifier));
+                }
+            }
+        }
+
+        tag.put(key, predicatedListTag);
+        if (!data.showInTooltip()) {
+            putHideFlag(tag, hideFlag);
+        }
+    }
+
+    private static StringTag serializeBlockPredicate(final BlockPredicate predicate, final String identifier) {
+        final StringBuilder builder = new StringBuilder(identifier);
+        if (predicate.propertyMatchers() != null) {
+            for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
+                // I'm not sure if ranged values were possible in 1.20.4 (if so, there's no trace of how)
+                if (matcher.matcher().isLeft()) {
+                    builder.append(matcher.name()).append('=');
+                    builder.append(matcher.matcher().left());
+                }
+            }
+        }
+        if (predicate.tag() != null) {
+            builder.append(predicate.tag());
+        }
+        return new StringTag(builder.toString());
     }
 
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {

@@ -445,9 +445,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final String identifier = rawPredicate.substring(0, idLength);
-        final int id = Protocol1_20_5To1_20_3.MAPPINGS.blockId(identifier);
-        if (id == -1) {
-            return null;
+        final HolderSet holders;
+        if (identifier.startsWith("#")) {
+            final int id = Protocol1_20_5To1_20_3.MAPPINGS.blockId(identifier);
+            if (id == -1) {
+                return null;
+            }
+
+            holders = new HolderSet(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)});
+        } else {
+            holders = new HolderSet(identifier);
         }
 
         final int propertiesEndIndex = rawPredicate.indexOf(']');
@@ -478,7 +485,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         return new BlockPredicate(
-            new HolderSet(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)}),
+            holders,
             propertyMatchers.isEmpty() ? null : propertyMatchers.toArray(EMPTY_PROPERTY_MATCHERS),
             tag
         );
