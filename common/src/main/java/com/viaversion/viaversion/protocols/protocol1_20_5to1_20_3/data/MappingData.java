@@ -18,19 +18,16 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import java.util.ArrayList;
-import java.util.List;
+import com.viaversion.viaversion.util.KeyMappings;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
 
-    private final Object2IntMap<String> byId = new Object2IntOpenHashMap<>();
-    private final List<String> itemIds = new ArrayList<>();
+    private KeyMappings items;
+    private KeyMappings blocks;
 
     public MappingData() {
         super("1.20.3", "1.20.5");
@@ -40,20 +37,24 @@ public class MappingData extends MappingDataBase {
     protected void loadExtras(final CompoundTag data) {
         super.loadExtras(data);
 
-        final ListTag<StringTag> items = MappingDataLoader.loadNBT("itemIds-1.20.3.nbt").getListTag("items", StringTag.class);
-        for (int i = 0; i < items.size(); i++) {
-            final StringTag tag = items.get(i);
-            itemIds.add(tag.getValue());
-            byId.put(tag.getValue(), i);
-        }
-        byId.defaultReturnValue(-1);
+        final CompoundTag extraMappings = MappingDataLoader.loadNBT("items-blocks-1.20.3.nbt");
+        items = new KeyMappings(extraMappings.getListTag("items", StringTag.class));
+        blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
     }
 
     public int itemId(final String name) {
-        return byId.getInt(name);
+        return items.keyToId(name);
     }
 
-    public String itemName(final int id) {
-        return itemIds.get(id);
+    public @Nullable String itemName(final int id) {
+        return items.idToKey(id);
+    }
+
+    public int blockId(final String name) {
+        return blocks.keyToId(name);
+    }
+
+    public @Nullable String blockName(final int id) {
+        return blocks.idToKey(id);
     }
 }

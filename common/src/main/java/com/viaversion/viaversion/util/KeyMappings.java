@@ -17,8 +17,11 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
+import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class KeyMappings {
@@ -33,6 +36,14 @@ public final class KeyMappings {
         for (int i = 0; i < keys.length; i++) {
             keyToId.put(keys[i], i);
         }
+    }
+
+    public KeyMappings(final Collection<String> keys) {
+        this(keys.toArray(new String[0]));
+    }
+
+    public KeyMappings(final ListTag<StringTag> keys) {
+        this(keys.getValue().stream().map(StringTag::getValue).toArray(String[]::new));
     }
 
     public @Nullable String idToKey(final int id) {

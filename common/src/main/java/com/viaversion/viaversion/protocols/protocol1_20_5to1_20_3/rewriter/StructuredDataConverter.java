@@ -38,7 +38,6 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantme
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -49,7 +48,7 @@ final class StructuredDataConverter {
     static final int HIDE_ENCHANTMENTS = 1;
     static final int HIDE_ATTRIBUTES = 1 << 1;
     static final int HIDE_UNBREAKABLE = 1 << 2;
-    static final int HIDE_CAN_BREAK = 1 << 3;
+    static final int HIDE_CAN_DESTROY = 1 << 3;
     static final int HIDE_CAN_PLACE_ON = 1 << 4;
     static final int HIDE_ADDITIONAL = 1 << 5;
     static final int HIDE_DYE_COLOR = 1 << 6;

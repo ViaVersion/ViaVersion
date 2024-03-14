@@ -17,16 +17,19 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
+import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -34,6 +37,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
@@ -41,6 +45,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
+import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
@@ -53,6 +58,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
+import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
@@ -79,6 +85,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -88,12 +95,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
     private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
+    private static final StatePropertyMatcher[] EMPTY_PROPERTY_MATCHERS = new StatePropertyMatcher[0];
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
@@ -392,8 +401,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updateMapDecorations(data, decorationsTag);
         }
 
-        // MAP_POST_PROCESSING is only used internally
-
         updateProfile(data, tag.get("SkullOwner"));
 
         final CompoundTag customCreativeLock = tag.getCompoundTag("CustomCreativeLock");
@@ -401,13 +408,80 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.CREATIVE_SLOT_LOCK);
         }
 
-        // TODO
-        //  StructuredDataKey.CAN_PLACE_ON
-        //  StructuredDataKey.CAN_BREAK
-        //  (remaining ones should only affect non-essential item tooltip, or not be shown/checked at all)
+        final ListTag<StringTag> canPlaceOnTag = tag.getListTag("CanPlaceOn", StringTag.class);
+        if (canPlaceOnTag != null) {
+            data.set(StructuredDataKey.CAN_PLACE_ON, updateBlockPredicates(canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
+        }
+
+        final ListTag<StringTag> canDestroyTag = tag.getListTag("CanDestroy", StringTag.class);
+        if (canDestroyTag != null) {
+            data.set(StructuredDataKey.CAN_BREAK, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
+        }
+
+        // TODO MAP_POST_PROCESSING
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private AdventureModePredicate updateBlockPredicates(final ListTag<StringTag> tag, final boolean showInTooltip) {
+        final BlockPredicate[] predicates = tag.stream()
+            .map(StringTag::getValue)
+            .map(this::deserializeBlockPredicate)
+            .filter(Objects::nonNull)
+            .toArray(BlockPredicate[]::new);
+        return new AdventureModePredicate(predicates, showInTooltip);
+    }
+
+    private @Nullable BlockPredicate deserializeBlockPredicate(final String rawPredicate) {
+        final int propertiesStartIndex = rawPredicate.indexOf('[');
+        final int tagStartIndex = rawPredicate.indexOf('{');
+        int idLength = rawPredicate.length();
+        if (propertiesStartIndex != -1) {
+            idLength = propertiesStartIndex;
+        }
+        if (tagStartIndex != -1) {
+            idLength = Math.min(propertiesStartIndex, tagStartIndex);
+        }
+
+        final String identifier = rawPredicate.substring(0, idLength);
+        final int id = Protocol1_20_5To1_20_3.MAPPINGS.blockId(identifier);
+        if (id == -1) {
+            return null;
+        }
+
+        final int propertiesEndIndex = rawPredicate.indexOf(']');
+        final List<StatePropertyMatcher> propertyMatchers = new ArrayList<>();
+        if (propertiesStartIndex != -1 && propertiesEndIndex != -1) {
+            for (final String property : rawPredicate.substring(propertiesStartIndex + 1, propertiesEndIndex).split(",")) {
+                final int propertySplitIndex = property.indexOf('=');
+                if (propertySplitIndex == -1) {
+                    continue;
+                }
+
+                final String propertyId = property.substring(0, propertySplitIndex).trim();
+                final String propertyValue = property.substring(propertySplitIndex + 1).trim();
+                propertyMatchers.add(new StatePropertyMatcher(propertyId, Either.left(propertyValue))); // TODO Also handle ranged matchers
+            }
+        }
+
+        final int tagEndIndex = rawPredicate.indexOf('}');
+        CompoundTag tag = null;
+        if (tagStartIndex != -1 && tagEndIndex != -1) {
+            try {
+                tag = SNBT.deserializeCompoundTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
+            } catch (final Exception e) {
+                if (Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to parse block predicate tag: " + rawPredicate.substring(tagStartIndex, tagEndIndex + 1), e);
+                }
+            }
+        }
+
+        return new BlockPredicate(
+            new HolderSet(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)}),
+            propertyMatchers.isEmpty() ? null : propertyMatchers.toArray(EMPTY_PROPERTY_MATCHERS),
+            tag
+        );
     }
 
     private void updateAttributes(final StructuredDataContainer data, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
@@ -676,7 +750,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private int toItemId(final String id) {
-        final int unmappedId = protocol.getMappingData().itemId(Key.stripMinecraftNamespace(id));
+        final int unmappedId = protocol.getMappingData().itemId(id);
         return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 

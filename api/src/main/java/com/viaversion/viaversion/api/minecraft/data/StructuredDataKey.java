@@ -65,7 +65,7 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<Unit> CREATIVE_SLOT_LOCK = new StructuredDataKey<>("creative_slot_lock", Type.EMPTY);
     public static final StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE = new StructuredDataKey<>("enchantment_glint_override", Type.BOOLEAN);
     public static final StructuredDataKey<Unit> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Type.EMPTY);
-    public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS = new StructuredDataKey<>("storded_enchantments", Enchantments.TYPE);
+    public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE);
     public static final StructuredDataKey<DyedColor> DYED_COLOR = new StructuredDataKey<>("dyed_color", DyedColor.TYPE);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Type.INT);
     public static final StructuredDataKey<Integer> MAP_ID = new StructuredDataKey<>("map_id", Type.VAR_INT);

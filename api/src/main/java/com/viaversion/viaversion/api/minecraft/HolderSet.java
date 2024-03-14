@@ -24,6 +24,9 @@ package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.util.EitherImpl;
 
+/**
+ * Set of ids that either holds a string tag key or an array of ids.
+ */
 public final class HolderSet extends EitherImpl<String, int[]> {
 
     public HolderSet(final String tagKey) {
