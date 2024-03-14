@@ -27,15 +27,18 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
@@ -220,6 +223,42 @@ final class StructuredDataConverter {
                 tag.putString("instrument", identifier);
             }
         });
+        register(StructuredDataKey.BEES, (data, tag) -> {
+            final ListTag<CompoundTag> bees = new ListTag<>(CompoundTag.class);
+            for (final Bee bee : data) {
+                final CompoundTag beeTag = new CompoundTag();
+                beeTag.put("EntityData", bee.entityData());
+                beeTag.putInt("TicksInHive", bee.ticksInHive());
+                beeTag.putInt("MinOccupationTicks", bee.minTicksInHive());
+                bees.add(beeTag);
+            }
+            getBlockEntityTag(tag).put("Bees", bees);
+        });
+        register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
+        register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag).putString("note_block_sound", data));
+        register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
+            final ListTag<StringTag> sherds = new ListTag<>(StringTag.class);
+            for (final int id : data) {
+                final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
+                sherds.add(new StringTag(Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId)));
+            }
+            getBlockEntityTag(tag).put("sherds", sherds);
+        });
+        register(StructuredDataKey.CREATIVE_SLOT_LOCK, (data, tag) -> tag.put("CustomCreativeLock", new CompoundTag()));
+        register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data));
+        register(StructuredDataKey.RECIPES, (data, tag) -> tag.put("Recipes", data));
+        register(StructuredDataKey.ENTITY_DATA, (data, tag) -> tag.put("EntityTag", data));
+        register(StructuredDataKey.BUCKET_ENTITY_DATA, (data, tag) -> {
+            for (final String mobTagName : BlockItemPacketRewriter1_20_5.MOB_TAGS) {
+                if (data.contains(mobTagName)) {
+                    tag.put(mobTagName, data.get(mobTagName));
+                }
+            }
+        });
+        register(StructuredDataKey.BLOCK_ENTITY_DATA, (data, tag) -> {
+            // Handling of previously block entity tags is done using the getBlockEntityTag method
+            tag.put("BlockEntityTag", data);
+        });
         //register(StructuredDataKey., (data, tag) -> );
 
         //TODO
@@ -228,23 +267,22 @@ final class StructuredDataConverter {
         // StructuredDataKey<PotionContents> POTION_CONTENT
         // StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECT
         // StructuredDataKey<ArmorTrim> TRIM
-        // StructuredDataKey<CompoundTag> DEBUG_STICK_STATE
-        // StructuredDataKey<CompoundTag> ENTITY_DATA
-        // StructuredDataKey<CompoundTag> BUCKET_ENTITY_DATA
-        // StructuredDataKey<CompoundTag> BLOCK_ENTITY_DATA
-        // StructuredDataKey<Tag> RECIPES
         // StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS
         // StructuredDataKey<BlockStateProperties> BLOCK_STATE
-        // StructuredDataKey<int[]> POT_DECORATIONS
-        // StructuredDataKey<String> NOTE_BLOCK_SOUND
-        // StructuredDataKey<Bee[]> BEES
-        // StructuredDataKey<Tag> LOCK
         // StructuredDataKey<CompoundTag> CONTAINER_LOOT
         // StructuredDataKey<Item[]> CONTAINER
-        // StructuredDataKey<Unit> CREATIVE_SLOT_LOCK
         // StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE
         // StructuredDataKey<Unit> INTANGIBLE_PROJECTILE
         // StructuredDataKey<Integer> MAP_POST_PROCESSING
+    }
+
+    private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
+        CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+        if (blockEntityTag == null) {
+            blockEntityTag = new CompoundTag();
+            tag.put("BlockEntityTag", blockEntityTag);
+        }
+        return blockEntityTag;
     }
 
     private static CompoundTag convertExplosion(final FireworkExplosion explosion) {
@@ -260,8 +298,10 @@ final class StructuredDataConverter {
     private static void convertItemList(final Item[] items, final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (final Item item : items) {
+            final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(item.identifier());
+
             final CompoundTag savedItem = new CompoundTag();
-            savedItem.putString("id", "stone"); // TODO
+            savedItem.putString("id", Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId));
             savedItem.putByte("Count", (byte) item.amount());
 
             final CompoundTag itemTag = new CompoundTag();

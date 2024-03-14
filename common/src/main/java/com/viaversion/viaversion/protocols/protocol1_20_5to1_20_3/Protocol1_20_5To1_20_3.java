@@ -18,8 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
@@ -40,6 +38,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ServerboundPackets1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MappingData;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
@@ -56,7 +55,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPacket1_20_3, ClientboundPacket1_20_5, ServerboundPacket1_20_3, ServerboundPacket1_20_5> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.20.3", "1.20.5");
+    public static final MappingData MAPPINGS = new MappingData();
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);

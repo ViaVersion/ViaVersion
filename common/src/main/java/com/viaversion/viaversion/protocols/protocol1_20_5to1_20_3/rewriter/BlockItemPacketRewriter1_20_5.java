@@ -40,6 +40,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
+import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
@@ -91,7 +92,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
-    private static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
+    public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
     private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
@@ -395,18 +396,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateProfile(data, tag.get("SkullOwner"));
 
+        final CompoundTag customCreativeLock = tag.getCompoundTag("CustomCreativeLock");
+        if (customCreativeLock != null) {
+            data.set(StructuredDataKey.CREATIVE_SLOT_LOCK);
+        }
+
         // TODO
         //  StructuredDataKey.CAN_PLACE_ON
         //  StructuredDataKey.CAN_BREAK
         //  (remaining ones should only affect non-essential item tooltip, or not be shown/checked at all)
-        //  StructuredDataKey.POT_DECORATIONS
-        //  StructuredDataKey.CONTAINER
-        //  StructuredDataKey.CONTAINER_LOOT
-        //  StructuredDataKey.INTANGIBLE_PROJECTILE
-        //  StructuredDataKey.CREATIVE_SLOT_LOCK
-        //  StructuredDataKey.BEES
-        //  StructuredDataKey.LOCK
-        //  StructuredDataKey.NOTE_BLOCK_SOUND
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
@@ -677,11 +675,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(dataKey, items);
     }
 
+    private int toItemId(final String id) {
+        final int unmappedId = protocol.getMappingData().itemId(Key.stripMinecraftNamespace(id));
+        return protocol.getMappingData().getNewItemId(unmappedId);
+    }
+
     private Item itemFromTag(final CompoundTag item) {
         final StringTag id = item.getStringTag("id");
         final NumberTag count = item.getNumberTag("Count");
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(new DataItem(0, count.asByte(), (short) 0, tag)); // TODO unmapped id from key
+        return handleItemToClient(new DataItem(toItemId(id.getValue()), count.asByte(), (short) 0, tag));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
@@ -738,6 +741,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
             data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
         }
+    }
+
+    private void updateBees(final StructuredDataContainer data, final ListTag<CompoundTag> beesTag) {
+        final Bee[] bees = beesTag.stream().map(bee -> {
+            final CompoundTag entityData = bee.getCompoundTag("EntityData");
+            final int ticksInHive = bee.getInt("TicksInHive");
+            final int minOccupationTicks = bee.getInt("MinOccupationTicks");
+
+            return new Bee(entityData, ticksInHive, minOccupationTicks);
+        }).toArray(Bee[]::new);
+
+        data.set(StructuredDataKey.BEES, bees);
     }
 
     private void updateProperties(final CompoundTag propertiesTag, final List<GameProfile.Property> properties) {
@@ -810,9 +825,41 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        final StringTag lock = tag.getStringTag("Lock");
-        if (lock != null && data != null) {
-            data.set(StructuredDataKey.LOCK, lock);
+        if (data != null) {
+            final StringTag lockTag = tag.getStringTag("Lock");
+            if (lockTag != null) {
+                data.set(StructuredDataKey.LOCK, lockTag);
+            }
+
+            final ListTag<CompoundTag> beesTag = tag.getListTag("Bees", CompoundTag.class);
+            if (beesTag != null) {
+                updateBees(data, beesTag);
+            }
+
+            final ListTag<StringTag> sherdsTag = tag.getListTag("sherds", StringTag.class);
+            if (sherdsTag != null) {
+                final String sherd1 = sherdsTag.get(0).getValue();
+                final String sherd2 = sherdsTag.get(1).getValue();
+                final String sherd3 = sherdsTag.get(2).getValue();
+                final String sherd4 = sherdsTag.get(3).getValue();
+
+                data.set(StructuredDataKey.POT_DECORATIONS, new int[]{toItemId(sherd1), toItemId(sherd2), toItemId(sherd3), toItemId(sherd4)});
+            }
+
+            final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");
+            if (noteBlockSoundTag != null) {
+                data.set(StructuredDataKey.NOTE_BLOCK_SOUND, noteBlockSoundTag.getValue());
+            }
+
+            final StringTag lootTableTag = tag.getStringTag("LootTable");
+            if (lootTableTag != null) {
+                final long lootTableSeed = tag.getLong("LootTableSeed");
+
+                final CompoundTag containerLoot = new CompoundTag();
+                containerLoot.putString("loot_table", lootTableTag.getValue());
+                containerLoot.putLong("loot_table_seed", lootTableSeed);
+                data.set(StructuredDataKey.CONTAINER_LOOT, containerLoot);
+            }
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");
