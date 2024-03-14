@@ -22,8 +22,10 @@
  */
 package com.viaversion.viaversion.api.minecraft.metadata.types;
 
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 
@@ -47,21 +49,23 @@ public final class MetaTypes1_20_5 extends AbstractMetaTypes {
     public final MetaType optionalBlockStateType = add(15, Type.VAR_INT);
     public final MetaType nbtType = add(16, Type.COMPOUND_TAG);
     public final MetaType particleType;
-    public final MetaType villagerDatatType = add(18, Type.VILLAGER_DATA);
-    public final MetaType optionalVarIntType = add(19, Type.OPTIONAL_VAR_INT);
-    public final MetaType poseType = add(20, Type.VAR_INT);
-    public final MetaType catVariantType = add(21, Type.VAR_INT);
-    public final MetaType wolfVariantType = add(22, Type.VAR_INT);
-    public final MetaType frogVariantType = add(23, Type.VAR_INT);
-    public final MetaType optionalGlobalPosition = add(24, Type.OPTIONAL_GLOBAL_POSITION);
-    public final MetaType paintingVariantType = add(25, Type.VAR_INT);
-    public final MetaType snifferState = add(26, Type.VAR_INT);
-    public final MetaType armadilloState = add(27, Type.VAR_INT);
-    public final MetaType vectorType = add(28, Type.VECTOR3F);
-    public final MetaType quaternionType = add(29, Type.QUATERNION);
+    public final MetaType particlesType;
+    public final MetaType villagerDatatType = add(19, Type.VILLAGER_DATA);
+    public final MetaType optionalVarIntType = add(20, Type.OPTIONAL_VAR_INT);
+    public final MetaType poseType = add(21, Type.VAR_INT);
+    public final MetaType catVariantType = add(22, Type.VAR_INT);
+    public final MetaType wolfVariantType = add(23, Type.VAR_INT);
+    public final MetaType frogVariantType = add(24, Type.VAR_INT);
+    public final MetaType optionalGlobalPosition = add(25, Type.OPTIONAL_GLOBAL_POSITION);
+    public final MetaType paintingVariantType = add(26, Type.VAR_INT);
+    public final MetaType snifferState = add(27, Type.VAR_INT);
+    public final MetaType armadilloState = add(28, Type.VAR_INT);
+    public final MetaType vectorType = add(29, Type.VECTOR3F);
+    public final MetaType quaternionType = add(30, Type.QUATERNION);
 
-    public MetaTypes1_20_5(final ParticleType particleType) {
-        super(30);
+    public MetaTypes1_20_5(final ParticleType particleType, final ArrayType<Particle> particlesType) {
+        super(31);
         this.particleType = add(17, particleType);
+        this.particlesType = add(18, particlesType);
     }
 }

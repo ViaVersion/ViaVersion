@@ -113,7 +113,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .reader("item", ParticleType.Readers.ITEM1_20_2)
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
+            .reader("shriek", ParticleType.Readers.SHRIEK)
+            .reader("entity_effect", ParticleType.Readers.COLOR);
         Types1_20_5.STRUCTURED_DATA.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE)
             .add(StructuredDataKey.CUSTOM_NAME).add(StructuredDataKey.LORE).add(StructuredDataKey.ENCHANTMENTS)

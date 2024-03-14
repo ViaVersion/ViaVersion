@@ -43,7 +43,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
@@ -326,7 +326,7 @@ final class StructuredDataConverter {
         register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
             final ListTag<CompoundTag> patternsTag = getOrCreateListTag(tag, "Patterns");
             for (final BannerPatternLayer layer : data) {
-                final String pattern = BannerPatterns1_20_3.fullIdToCompact(BannerPatterns1_20_3.idToKey(layer.pattern().id()));
+                final String pattern = BannerPatterns1_20_5.fullIdToCompact(BannerPatterns1_20_5.idToKey(layer.pattern().id()));
                 if (pattern == null) {
                     continue;
                 }

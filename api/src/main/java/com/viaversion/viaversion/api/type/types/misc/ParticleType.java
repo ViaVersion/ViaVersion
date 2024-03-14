@@ -135,5 +135,6 @@ public class ParticleType extends DynamicType<Particle> {
         public static final DataReader<Particle> SHRIEK = (buf, particle) -> {
             particle.add(Type.VAR_INT, Type.VAR_INT.readPrimitive(buf)); // Delay
         };
+        public static final DataReader<Particle> COLOR = (buf, particle) -> particle.add(Type.INT, buf.readInt());
     }
 }

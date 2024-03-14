@@ -22,7 +22,6 @@ import com.github.steveice10.opennbt.tag.builtin.FloatTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
@@ -129,7 +128,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(Types1_20.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType, null);
 
         // Rotate item display by 180 degrees around the Y axis
         filter().type(EntityTypes1_19_4.ITEM_DISPLAY).handler((event, meta) -> {

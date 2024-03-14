@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.version;
 
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes1_20_5;
@@ -38,10 +39,11 @@ public final class Types1_20_5 {
 
     // Most of these are only safe to use after protocol loading
     public static final ParticleType PARTICLE = new ParticleType();
+    public static final ArrayType<Particle> PARTICLES = new ArrayType<>(PARTICLE);
     public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
     public static final Type<Item> ITEM = new ItemType1_20_5(STRUCTURED_DATA);
     public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
-    public static final MetaTypes1_20_5 META_TYPES = new MetaTypes1_20_5(PARTICLE);
+    public static final MetaTypes1_20_5 META_TYPES = new MetaTypes1_20_5(PARTICLE, PARTICLES);
     public static final Type<Metadata> METADATA = new MetadataType(META_TYPES);
     public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
 }

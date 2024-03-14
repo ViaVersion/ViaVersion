@@ -72,14 +72,14 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -597,7 +597,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag patternTag = trimTag.get("pattern");
         final Holder<ArmorTrimPattern> patternHolder;
         if (patternTag instanceof StringTag) {
-            final int id = TrimPatterns1_20_3.keyToId(((StringTag) patternTag).getValue());
+            final int id = TrimPatterns1_20_5.keyToId(((StringTag) patternTag).getValue());
             if (id == -1) {
                 return;
             }
@@ -978,7 +978,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final BannerPatternLayer[] layers = patternsTag.stream().map(patternTag -> {
                 final String pattern = patternTag.getString("Pattern", "");
                 final int color = patternTag.getInt("Color", -1);
-                final String fullPatternIdentifier = BannerPatterns1_20_3.compactToFullId(pattern);
+                final String fullPatternIdentifier = BannerPatterns1_20_5.compactToFullId(pattern);
                 if (fullPatternIdentifier == null || color == -1) {
                     return null;
                 }
@@ -988,7 +988,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 patternTag.putString("pattern", fullPatternIdentifier);
                 patternTag.putString("color", DyeColors.colorById(color));
 
-                final int id = BannerPatterns1_20_3.keyToId(fullPatternIdentifier);
+                final int id = BannerPatterns1_20_5.keyToId(fullPatternIdentifier);
                 return new BannerPatternLayer(Holder.of(id), color);
             }).filter(Objects::nonNull).toArray(BannerPatternLayer[]::new);
             tag.remove("Patterns");

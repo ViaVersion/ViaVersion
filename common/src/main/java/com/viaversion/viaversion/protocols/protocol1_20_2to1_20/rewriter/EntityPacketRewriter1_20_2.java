@@ -173,7 +173,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(Types1_20_2.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_20_2.META_TYPES.itemType, Types1_20_2.META_TYPES.blockStateType, Types1_20_2.META_TYPES.optionalBlockStateType, Types1_20_2.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_20_2.META_TYPES.itemType, Types1_20_2.META_TYPES.blockStateType, Types1_20_2.META_TYPES.optionalBlockStateType, Types1_20_2.META_TYPES.particleType, null);
 
         filter().type(EntityTypes1_19_4.DISPLAY).addIndex(10);
 

@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
@@ -35,7 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -113,8 +114,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             final PacketWrapper bannerPatternsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
             bannerPatternsPacket.write(Type.STRING, "minecraft:banner_pattern");
-            final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_3.keys().length];
-            final String[] keys = BannerPatterns1_20_3.keys();
+            final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_5.keys().length];
+            final String[] keys = BannerPatterns1_20_5.keys();
             for (int i = 0; i < keys.length; i++) {
                 final CompoundTag pattern = new CompoundTag();
                 final String key = keys[i];
@@ -219,6 +220,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
             int id = typeId;
+            if (typeId >= Types1_20_5.META_TYPES.particlesType.typeId()) {
+                id++;
+            }
             if (typeId >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
                 id++;
             }
@@ -232,8 +236,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             Types1_20_5.META_TYPES.itemType,
             Types1_20_5.META_TYPES.blockStateType,
             Types1_20_5.META_TYPES.optionalBlockStateType,
-            Types1_20_5.META_TYPES.particleType
+            Types1_20_5.META_TYPES.particleType,
+            null
         );
+
+        filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
+            final int effectColor = meta.value();
+            final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
+            particle.add(Type.INT, effectColor);
+            meta.setTypeAndValue(Types1_20_5.META_TYPES.particlesType, new Particle[]{particle});
+        });
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
 
@@ -241,6 +253,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
+    }
+
+    @Override
+    public void rewriteParticle(final Particle particle) {
+        super.rewriteParticle(particle);
+        if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
+            particle.add(Type.INT, 0); // rgb
+        }
     }
 
     @Override

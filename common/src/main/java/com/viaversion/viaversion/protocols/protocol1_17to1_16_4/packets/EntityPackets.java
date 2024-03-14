@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
@@ -159,7 +158,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 meta.setValue(pose + 1);
             }
         });
-        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, null, Types1_17.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, null, Types1_17.META_TYPES.particleType, null);
 
         // Ticks frozen added with id 7
         filter().type(EntityTypes1_17.ENTITY).addIndex(7);

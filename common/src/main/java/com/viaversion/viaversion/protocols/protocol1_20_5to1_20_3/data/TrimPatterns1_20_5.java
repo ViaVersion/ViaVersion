@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class TrimPatterns1_20_3 {
+public final class TrimPatterns1_20_5 {
 
     private static final KeyMappings PATTERNS = new KeyMappings(
         "sentry",
@@ -38,7 +38,9 @@ public final class TrimPatterns1_20_3 {
         "shaper",
         "silence",
         "raiser",
-        "host"
+        "host",
+        "flow",
+        "bolt"
     );
 
     public static @Nullable String idToKey(final int id) {

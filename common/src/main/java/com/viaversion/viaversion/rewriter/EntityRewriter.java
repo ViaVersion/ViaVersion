@@ -20,7 +20,6 @@ package com.viaversion.viaversion.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -59,7 +58,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
-        extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
+    extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
     private static final Metadata[] EMPTY_ARRAY = new Metadata[0];
     protected final List<MetaFilter> metadataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
@@ -187,7 +186,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             } catch (IllegalArgumentException notFound) {
                 if (!typeMappings.contains(oldType.getId())) {
                     Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
-                            "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
+                        "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
                 }
             }
         }
@@ -209,8 +208,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param blockStateType         block state meta type if needed
      * @param optionalBlockStateType optional block state meta type if needed
      * @param particleType           particle meta type if needed
+     * @param particlesType          particles meta type if needed
      */
-    public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType optionalBlockStateType, @Nullable MetaType particleType) {
+    public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType optionalBlockStateType, @Nullable MetaType particleType, @Nullable MetaType particlesType) {
         filter().handler((event, meta) -> {
             final MetaType type = meta.metaType();
             if (type == itemType) {
@@ -225,6 +225,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 }
             } else if (type == particleType) {
                 rewriteParticle(meta.value());
+            } else if (type == particlesType) {
+                final Particle[] particles = meta.value();
+                for (final Particle particle : particles) {
+                    rewriteParticle(particle);
+                }
             }
         });
     }
@@ -604,9 +609,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
             Logger logger = Via.getPlatform().getLogger();
             logger.severe("An error occurred in metadata handler " + this.getClass().getSimpleName()
-                    + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
+                + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
             logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
-                    .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
+                .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
             logger.log(Level.SEVERE, "Error: ", e);
         }
     }

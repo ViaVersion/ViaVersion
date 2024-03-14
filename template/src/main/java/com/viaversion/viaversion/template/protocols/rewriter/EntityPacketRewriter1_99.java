@@ -94,10 +94,11 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
 
         // Registers registry type id changes
         registerMetaTypeHandler(
-                Types1_20_5.META_TYPES.itemType,
-                Types1_20_5.META_TYPES.blockStateType,
-                Types1_20_5.META_TYPES.optionalBlockStateType,
-                Types1_20_5.META_TYPES.particleType
+            Types1_20_5.META_TYPES.itemType,
+            Types1_20_5.META_TYPES.blockStateType,
+            Types1_20_5.META_TYPES.optionalBlockStateType,
+            Types1_20_5.META_TYPES.particleType,
+            Types1_20_5.META_TYPES.particlesType
         );
 
         // Minecarts are special

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class BannerPatterns1_20_3 {
+public final class BannerPatterns1_20_5 {
 
     private static final KeyMappings PATTERNS = new KeyMappings(
         "base",
@@ -65,7 +65,9 @@ public final class BannerPatterns1_20_3 {
         "skull",
         "flower",
         "mojang",
-        "piglin"
+        "piglin",
+        "flow",
+        "guster"
     );
     private static final Map<String, String> PATTERN_IDS = new HashMap<>();
 
