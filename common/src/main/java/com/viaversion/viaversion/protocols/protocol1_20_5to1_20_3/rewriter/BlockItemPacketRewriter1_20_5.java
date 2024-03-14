@@ -671,20 +671,29 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        final Item[] items = chargedProjectiles.stream().map(this::itemFromTag).toArray(Item[]::new);
+        final Item[] items = chargedProjectiles.stream().map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
         data.set(dataKey, items);
     }
 
     private int toItemId(final String id) {
         final int unmappedId = protocol.getMappingData().itemId(Key.stripMinecraftNamespace(id));
-        return protocol.getMappingData().getNewItemId(unmappedId);
+        return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
-    private Item itemFromTag(final CompoundTag item) {
-        final StringTag id = item.getStringTag("id");
-        final NumberTag count = item.getNumberTag("Count");
+    private @Nullable Item itemFromTag(final CompoundTag item) {
+        final String id = item.getString("id");
+        if (id == null) {
+            return null;
+        }
+
+        final int itemId = toItemId(id);
+        if (itemId == -1) {
+            return null;
+        }
+
+        final byte count = item.getByte("Count", (byte) 1);
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(new DataItem(toItemId(id.getValue()), count.asByte(), (short) 0, tag));
+        return handleItemToClient(new DataItem(itemId, count, (short) 0, tag));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
@@ -746,11 +755,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateBees(final StructuredDataContainer data, final ListTag<CompoundTag> beesTag) {
         final Bee[] bees = beesTag.stream().map(bee -> {
             final CompoundTag entityData = bee.getCompoundTag("EntityData");
+            if (entityData == null) {
+                return null;
+            }
+
             final int ticksInHive = bee.getInt("TicksInHive");
             final int minOccupationTicks = bee.getInt("MinOccupationTicks");
 
             return new Bee(entityData, ticksInHive, minOccupationTicks);
-        }).toArray(Bee[]::new);
+        }).filter(Objects::nonNull).toArray(Bee[]::new);
 
         data.set(StructuredDataKey.BEES, bees);
     }
@@ -837,7 +850,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
 
             final ListTag<StringTag> sherdsTag = tag.getListTag("sherds", StringTag.class);
-            if (sherdsTag != null) {
+            if (sherdsTag != null && sherdsTag.size() == 4) {
                 final String sherd1 = sherdsTag.get(0).getValue();
                 final String sherd2 = sherdsTag.get(1).getValue();
                 final String sherd3 = sherdsTag.get(2).getValue();

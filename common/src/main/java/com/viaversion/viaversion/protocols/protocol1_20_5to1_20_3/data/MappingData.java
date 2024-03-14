@@ -18,14 +18,18 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MappingData extends MappingDataBase {
 
+    private final Object2IntMap<String> byId = new Object2IntOpenHashMap<>();
     private final List<String> itemIds = new ArrayList<>();
 
     public MappingData() {
@@ -36,14 +40,17 @@ public class MappingData extends MappingDataBase {
     protected void loadExtras(final CompoundTag data) {
         super.loadExtras(data);
 
-        final CompoundTag items = MappingDataLoader.loadNBT("itemIds-1.20.3.nbt");
-        for (final StringTag tag : items.getListTag("items", StringTag.class)) {
+        final ListTag<StringTag> items = MappingDataLoader.loadNBT("itemIds-1.20.3.nbt").getListTag("items", StringTag.class);
+        for (int i = 0; i < items.size(); i++) {
+            final StringTag tag = items.get(i);
             itemIds.add(tag.getValue());
+            byId.put(tag.getValue(), i);
         }
+        byId.defaultReturnValue(-1);
     }
 
     public int itemId(final String name) {
-        return itemIds.indexOf(name);
+        return byId.getInt(name);
     }
 
     public String itemName(final int id) {
