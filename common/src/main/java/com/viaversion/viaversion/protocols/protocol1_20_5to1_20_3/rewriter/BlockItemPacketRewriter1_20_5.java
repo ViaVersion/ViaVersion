@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
@@ -96,6 +97,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -418,7 +421,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.CAN_BREAK, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
         }
 
-        // TODO MAP_POST_PROCESSING
+        final IntTag mapScaleDirectionTag = tag.getIntTag("map_scale_direction");
+        if (mapScaleDirectionTag != null) {
+            data.set(StructuredDataKey.MAP_POST_PROCESSING, 1); // Scale
+        } else {
+            final NumberTag mapToLockTag = tag.getNumberTag("map_to_lock");
+            if (mapToLockTag != null) {
+                data.set(StructuredDataKey.MAP_POST_PROCESSING, 0); // Lock
+            }
+        }
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
@@ -526,6 +537,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers, showInTooltip));
     }
 
+    private PotionEffectData readPotionEffectData(final CompoundTag tag) {
+        final byte amplifier = tag.getByte("amplifier");
+        final int duration = tag.getInt("duration");
+        final boolean ambient = tag.getBoolean("ambient");
+        final boolean showParticles = tag.getBoolean("show_particles");
+        final boolean showIcon = tag.getBoolean("show_icon");
+
+        PotionEffectData hiddenEffect = null;
+        final CompoundTag hiddenEffectTag = tag.getCompoundTag("hidden_effect");
+        if (hiddenEffectTag != null) {
+            hiddenEffect = readPotionEffectData(hiddenEffectTag);
+        }
+        return new PotionEffectData(amplifier, duration, ambient, showParticles, showIcon, hiddenEffect);
+    }
+
     private void updatePotionTags(final StructuredDataContainer data, final CompoundTag tag) {
         final String potion = tag.getString("Potion");
         Integer potionId = null;
@@ -548,21 +574,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 if (id < 0) {
                     return null;
                 }
-
-                final byte amplifier = effectTag.getByte("amplifier");
-                final int duration = effectTag.getInt("duration");
-                final boolean ambient = effectTag.getBoolean("ambient");
-                final boolean showParticles = effectTag.getBoolean("show_particles");
-                final boolean showIcon = effectTag.getBoolean("show_icon");
-                final PotionEffectData effectData = new PotionEffectData(
-                    amplifier,
-                    duration,
-                    ambient,
-                    showParticles,
-                    showIcon,
-                    null //TODO
-                );
-                return new PotionEffect(id, effectData);
+                return new PotionEffect(id, readPotionEffectData(effectTag));
             }).filter(Objects::nonNull).toArray(PotionEffect[]::new);
         }
 
@@ -585,13 +597,41 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
             materialHolder = Holder.of(id);
         } else if (materialTag instanceof CompoundTag) {
-            /*final CompoundTag materialCompoundTag = (CompoundTag) materialTag;
+            final CompoundTag materialCompoundTag = (CompoundTag) materialTag;
             final StringTag assetNameTag = materialCompoundTag.getStringTag("asset_name");
             final StringTag ingredientTag = materialCompoundTag.getStringTag("ingredient");
+            if (assetNameTag == null || ingredientTag == null) {
+                return;
+            }
+            final int ingredientId = toItemId(ingredientTag.getValue());
+            if (ingredientId == -1) {
+                return;
+            }
             final NumberTag itemModelIndexTag = materialCompoundTag.getNumberTag("item_model_index");
             final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.get("override_armor_materials");
-            final Tag descriptionTag = materialCompoundTag.get("description");*/
-            return; // TODO
+            final Tag descriptionTag = materialCompoundTag.get("description");
+
+            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
+            if (overrideArmorMaterialsTag != null) {
+                for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
+                    if (!(entry.getValue() instanceof StringTag)) {
+                        continue;
+                    }
+                    try {
+                        final int id = Integer.parseInt(entry.getKey());
+                        overrideArmorMaterials.put(id, ((StringTag) entry.getValue()).getValue());
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+
+            materialHolder = Holder.of(new ArmorTrimMaterial(
+                assetNameTag.getValue(),
+                ingredientId,
+                itemModelIndexTag != null ? itemModelIndexTag.asFloat() : 0,
+                overrideArmorMaterials,
+                descriptionTag
+            ));
         } else return;
 
         final Tag patternTag = trimTag.get("pattern");
@@ -603,7 +643,24 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
             patternHolder = Holder.of(id);
         } else if (patternTag instanceof CompoundTag) {
-            return; // TODO
+            final CompoundTag patternCompoundTag = (CompoundTag) patternTag;
+            final String assetId = patternCompoundTag.getString("assetId");
+            final String templateItem = patternCompoundTag.getString("templateItem");
+            if (assetId == null || templateItem == null) {
+                return;
+            }
+            final int templateItemId = toItemId(templateItem);
+            if (templateItemId == -1) {
+                return;
+            }
+            final Tag descriptionTag = patternCompoundTag.get("description");
+            final boolean decal = patternCompoundTag.getBoolean("decal");
+            patternHolder = Holder.of(new ArmorTrimPattern(
+                assetId,
+                templateItemId,
+                descriptionTag,
+                decal
+            ));
         } else return;
 
         data.set(StructuredDataKey.TRIM, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
@@ -756,8 +813,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(dataKey, items);
     }
 
-    private int toItemId(final String id) {
-        final int unmappedId = protocol.getMappingData().itemId(id);
+    private int toItemId(final String name) {
+        final int unmappedId = protocol.getMappingData().itemId(name);
         return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
@@ -999,7 +1056,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         }
 
-        // TODO Beehive needed?
+        updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER);
     }
 
     private void updateSkullOwnerTag(final CompoundTag tag, final CompoundTag skullOwnerTag) {

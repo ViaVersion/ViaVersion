@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.FloatTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
@@ -28,6 +29,8 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
@@ -48,9 +51,11 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantme
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
 
@@ -336,14 +341,77 @@ final class StructuredDataConverter {
                 patternsTag.add(patternTag);
             }
         });
+        register(StructuredDataKey.CONTAINER, (data, tag) -> convertItemList(data, tag, "Items"));
         register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
         register(StructuredDataKey.CAN_BREAK, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
+        register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
+            if (data == null) {
+                return;
+            }
+            if (data == 0) { // Lock
+                tag.putBoolean("map_to_lock", true);
+            } else if (data == 1) { // Scale
+                tag.putInt("map_scale_direction", 1);
+            }
+        });
+        register(StructuredDataKey.TRIM, (data, tag) -> {
+            final CompoundTag trimTag = getOrCreateTag(tag, "Trim");
+            if (data.material().isDirect()) {
+                final CompoundTag materialTag = getOrCreateTag(trimTag, "material");
+                final ArmorTrimMaterial material = data.material().value();
+                materialTag.putString("asset_name", material.assetName());
+
+                final String ingredientName = toItemName(material.itemId());
+                if (ingredientName.isEmpty()) {
+                    return;
+                }
+                materialTag.putString("ingredient", ingredientName);
+                materialTag.put("item_model_index", new FloatTag(material.itemModelIndex()));
+
+                final CompoundTag overrideArmorMaterials = new CompoundTag();
+                if (!material.overrideArmorMaterials().isEmpty()) {
+                    for (final Int2ObjectMap.Entry<String> entry : material.overrideArmorMaterials().int2ObjectEntrySet()) {
+                        overrideArmorMaterials.put(Integer.toString(entry.getIntKey()), new StringTag(entry.getValue()));
+                    }
+                    materialTag.put("override_armor_materials", overrideArmorMaterials);
+                }
+            } else {
+                final String oldKey = TrimMaterials1_20_3.idToKey(data.material().id());
+                if (oldKey != null) {
+                    trimTag.putString("material", oldKey);
+                }
+            }
+            if (data.pattern().isDirect()) {
+                final CompoundTag patternTag = getOrCreateTag(trimTag, "pattern");
+                final ArmorTrimPattern pattern = data.pattern().value();
+
+                patternTag.putString("assetId", pattern.assetName());
+                final String itemName = toItemName(pattern.itemId());
+                if (itemName.isEmpty()) {
+                    return;
+                }
+                patternTag.putString("templateItem", itemName);
+                patternTag.put("description", pattern.description());
+                patternTag.putBoolean("decal", pattern.decal());
+            } else {
+                final String oldKey = TrimMaterials1_20_3.idToKey(data.pattern().id());
+                if (oldKey != null) {
+                    trimTag.putString("pattern", oldKey);
+                }
+            }
+            if (!data.showInTooltip()) {
+                putHideFlag(tag, HIDE_ARMOR_TRIM);
+            }
+        });
 
         //TODO
-        // StructuredDataKey<ArmorTrim> TRIM
         // StructuredDataKey<BlockStateProperties> BLOCK_STATE
-        // StructuredDataKey<Item[]> CONTAINER
         // StructuredDataKey<Unit> INTANGIBLE_PROJECTILE
+    }
+
+    private static String toItemName(final int id) {
+        final int mappedId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
+        return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.itemName(mappedId) : "";
     }
 
     private static void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
@@ -359,9 +427,7 @@ final class StructuredDataConverter {
                 predicatedListTag.add(serializeBlockPredicate(predicate, tagKey));
             } else {
                 for (final int id : holders.ids()) {
-                    final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
-                    final String identifier = Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId);
-                    predicatedListTag.add(serializeBlockPredicate(predicate, identifier));
+                    predicatedListTag.add(serializeBlockPredicate(predicate, toItemName(id)));
                 }
             }
         }
@@ -390,10 +456,14 @@ final class StructuredDataConverter {
     }
 
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
-        CompoundTag subTag = tag.getCompoundTag("BlockEntityTag");
+        return getOrCreateTag(tag, "BlockEntityTag");
+    }
+
+    private static CompoundTag getOrCreateTag(final CompoundTag tag, final String name) {
+        CompoundTag subTag = tag.getCompoundTag(name);
         if (subTag == null) {
             subTag = new CompoundTag();
-            tag.put("BlockEntityTag", subTag);
+            tag.put(name, subTag);
         }
         return subTag;
     }
@@ -420,10 +490,8 @@ final class StructuredDataConverter {
     private static void convertItemList(final Item[] items, final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (final Item item : items) {
-            final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(item.identifier());
-
             final CompoundTag savedItem = new CompoundTag();
-            savedItem.putString("id", Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId));
+            savedItem.putString("id", toItemName(item.identifier()));
             savedItem.putByte("Count", (byte) item.amount());
 
             final CompoundTag itemTag = new CompoundTag();
