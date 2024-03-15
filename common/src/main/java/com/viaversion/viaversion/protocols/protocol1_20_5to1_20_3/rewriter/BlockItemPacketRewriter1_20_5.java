@@ -279,6 +279,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         // Goat horn
         // (check more)
         if (tag == null) {
+            if (old.identifier() == 1191) {
+                // I'm unsure if this is intended or an issue, see https://bugs.mojang.com/browse/MC-269503
+                data.set(StructuredDataKey.INSTRUMENT, Holder.of(Instruments1_20_3.keyToId("minecraft:ponder_goat_horn")));
+            }
             return item;
         }
 
@@ -436,6 +440,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private int toItemId(final String name) {
+        final int unmappedId = protocol.getMappingData().itemId(name);
+        return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
     private AdventureModePredicate updateBlockPredicates(final ListTag<StringTag> tag, final boolean showInTooltip) {
@@ -815,11 +824,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final Item[] items = chargedProjectiles.stream().map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
         data.set(dataKey, items);
-    }
-
-    private int toItemId(final String name) {
-        final int unmappedId = protocol.getMappingData().itemId(name);
-        return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
     private @Nullable Item itemFromTag(final CompoundTag item) {

@@ -255,8 +255,7 @@ final class StructuredDataConverter {
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             final ListTag<StringTag> sherds = new ListTag<>(StringTag.class);
             for (final int id : data.itemIds()) {
-                final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
-                sherds.add(new StringTag(Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId)));
+                sherds.add(new StringTag(toItemName(id)));
             }
             getBlockEntityTag(tag).put("sherds", sherds);
         });
@@ -280,7 +279,18 @@ final class StructuredDataConverter {
             tag.put("LootTableSeed", data.get("loot_table_seed"));
         });
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, (data, tag) -> {
-            final ListTag<CompoundTag> enchantmentsTag = getOrCreateListTag(tag, "Enchantments");
+            if (!data) {
+                // There is no way to remove the glint without removing the enchantments
+                // which would lead to broken data, so we just don't do anything
+                return;
+            }
+            // If the glint is overridden, we just add an invalid enchantment to the existing list
+            ListTag<CompoundTag> enchantmentsTag = tag.getListTag("Enchantments", CompoundTag.class);
+            if (enchantmentsTag == null) {
+                enchantmentsTag = new ListTag<>(CompoundTag.class);
+                tag.put("Enchantments", enchantmentsTag);
+            }
+
             final CompoundTag invalidEnchantment = new CompoundTag();
             invalidEnchantment.putString("id", "");
             // Skipping the level tag, causing the enchantment to be invalid
@@ -317,7 +327,7 @@ final class StructuredDataConverter {
             tag.put("custom_potion_effects", customPotionEffectsTag);
         });
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, (data, tag) -> {
-            final ListTag<CompoundTag> effectsTag = getOrCreateListTag(tag, "effects");
+            final ListTag<CompoundTag> effectsTag = new ListTag<>(CompoundTag.class);
             for (final SuspiciousStewEffect effect : data) {
                 final CompoundTag effectTag = new CompoundTag();
                 final String id = PotionEffects.idToKey(effect.mobEffect() + 1);
@@ -328,9 +338,10 @@ final class StructuredDataConverter {
 
                 effectsTag.add(effectTag);
             }
+            tag.put("effects", effectsTag);
         });
         register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
-            final ListTag<CompoundTag> patternsTag = getOrCreateListTag(tag, "Patterns");
+            final ListTag<CompoundTag> patternsTag = new ListTag<>(CompoundTag.class);
             for (final BannerPatternLayer layer : data) {
                 final String pattern = BannerPatterns1_20_5.fullIdToCompact(BannerPatterns1_20_5.idToKey(layer.pattern().id()));
                 if (pattern == null) {
@@ -341,6 +352,7 @@ final class StructuredDataConverter {
                 patternTag.putInt("Color", layer.dyeColor());
                 patternsTag.add(patternTag);
             }
+            tag.put("Patterns", patternsTag);
         });
         register(StructuredDataKey.CONTAINER, (data, tag) -> convertItemList(data, tag, "Items"));
         register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
@@ -356,9 +368,9 @@ final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.TRIM, (data, tag) -> {
-            final CompoundTag trimTag = getOrCreateTag(tag, "Trim");
+            final CompoundTag trimTag = new CompoundTag();
             if (data.material().isDirect()) {
-                final CompoundTag materialTag = getOrCreateTag(trimTag, "material");
+                final CompoundTag materialTag = new CompoundTag();
                 final ArmorTrimMaterial material = data.material().value();
                 materialTag.putString("asset_name", material.assetName());
 
@@ -376,6 +388,7 @@ final class StructuredDataConverter {
                     }
                     materialTag.put("override_armor_materials", overrideArmorMaterials);
                 }
+                trimTag.put("material", materialTag);
             } else {
                 final String oldKey = TrimMaterials1_20_3.idToKey(data.material().id());
                 if (oldKey != null) {
@@ -383,7 +396,7 @@ final class StructuredDataConverter {
                 }
             }
             if (data.pattern().isDirect()) {
-                final CompoundTag patternTag = getOrCreateTag(trimTag, "pattern");
+                final CompoundTag patternTag = new CompoundTag();
                 final ArmorTrimPattern pattern = data.pattern().value();
 
                 patternTag.putString("assetId", pattern.assetName());
@@ -394,12 +407,14 @@ final class StructuredDataConverter {
                 patternTag.putString("templateItem", itemName);
                 patternTag.put("description", pattern.description());
                 patternTag.putBoolean("decal", pattern.decal());
+                trimTag.put("pattern", patternTag);
             } else {
                 final String oldKey = TrimMaterials1_20_3.idToKey(data.pattern().id());
                 if (oldKey != null) {
                     trimTag.putString("pattern", oldKey);
                 }
             }
+            tag.put("Trim", trimTag);
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_ARMOR_TRIM);
             }
@@ -419,6 +434,16 @@ final class StructuredDataConverter {
     private static String toItemName(final int id) {
         final int mappedId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
         return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.itemName(mappedId) : "";
+    }
+
+    // If multiple item components which previously were stored in BlockEntityTag are present, we need to merge them
+    private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
+        CompoundTag subTag = tag.getCompoundTag("BlockEntityTag");
+        if (subTag == null) {
+            subTag = new CompoundTag();
+            tag.put("BlockEntityTag", subTag);
+        }
+        return subTag;
     }
 
     private static void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
@@ -460,28 +485,6 @@ final class StructuredDataConverter {
             builder.append(predicate.tag());
         }
         return new StringTag(builder.toString());
-    }
-
-    private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
-        return getOrCreateTag(tag, "BlockEntityTag");
-    }
-
-    private static CompoundTag getOrCreateTag(final CompoundTag tag, final String name) {
-        CompoundTag subTag = tag.getCompoundTag(name);
-        if (subTag == null) {
-            subTag = new CompoundTag();
-            tag.put(name, subTag);
-        }
-        return subTag;
-    }
-
-    private static ListTag<CompoundTag> getOrCreateListTag(final CompoundTag tag, final String name) {
-        ListTag<CompoundTag> subTag = tag.getListTag(name, CompoundTag.class);
-        if (subTag == null) {
-            subTag = new ListTag<>(CompoundTag.class);
-            tag.put(name, subTag);
-        }
-        return subTag;
     }
 
     private static CompoundTag convertExplosion(final FireworkExplosion explosion) {
