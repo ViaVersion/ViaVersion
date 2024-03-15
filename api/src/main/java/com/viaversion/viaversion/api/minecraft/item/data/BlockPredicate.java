@@ -42,7 +42,7 @@ public final class BlockPredicate {
 
         @Override
         public void write(final ByteBuf buffer, final BlockPredicate value) throws Exception {
-            Type.OPTIONAL_HOLDER_SET.write(buffer, value.holders);
+            Type.OPTIONAL_HOLDER_SET.write(buffer, value.holderSet);
 
             buffer.writeBoolean(value.propertyMatchers != null);
             if (value.propertyMatchers != null) {
@@ -54,18 +54,18 @@ public final class BlockPredicate {
     };
     public static final Type<BlockPredicate[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
-    private final HolderSet holders;
+    private final HolderSet holderSet;
     private final StatePropertyMatcher[] propertyMatchers;
     private final CompoundTag tag;
 
-    public BlockPredicate(@Nullable final HolderSet holders, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
-        this.holders = holders;
+    public BlockPredicate(@Nullable final HolderSet holderSet, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
+        this.holderSet = holderSet;
         this.propertyMatchers = propertyMatchers;
         this.tag = tag;
     }
 
-    public @Nullable HolderSet predicates() {
-        return holders;
+    public @Nullable HolderSet holderSet() {
+        return holderSet;
     }
 
     public StatePropertyMatcher @Nullable [] propertyMatchers() {

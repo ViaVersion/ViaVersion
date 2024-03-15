@@ -349,17 +349,16 @@ final class StructuredDataConverter {
     private static void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
         final ListTag<StringTag> predicatedListTag = new ListTag<>(StringTag.class);
         for (final BlockPredicate predicate : data.predicates()) {
-            final HolderSet holders = predicate.predicates();
+            final HolderSet holders = predicate.holderSet();
             if (holders == null) {
                 // Can't do (nicely)
                 continue;
             }
-
-            if (holders.isLeft()) {
-                final String identifier = holders.left();
-                predicatedListTag.add(serializeBlockPredicate(predicate, identifier));
+            if (holders.hasTagKey()) {
+                final String tagKey = "#" + holders.tagKey();
+                predicatedListTag.add(serializeBlockPredicate(predicate, tagKey));
             } else {
-                for (final int id : holders.right()) {
+                for (final int id : holders.ids()) {
                     final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
                     final String identifier = Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId);
                     predicatedListTag.add(serializeBlockPredicate(predicate, identifier));
@@ -377,7 +376,7 @@ final class StructuredDataConverter {
         final StringBuilder builder = new StringBuilder(identifier);
         if (predicate.propertyMatchers() != null) {
             for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
-                // I'm not sure if ranged values were possible in 1.20.4 (if so, there's no trace of how)
+                // Ranges were introduced in 1.20.5, so only handle the simple case
                 if (matcher.matcher().isLeft()) {
                     builder.append(matcher.name()).append('=');
                     builder.append(matcher.matcher().left());

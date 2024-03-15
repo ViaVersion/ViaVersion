@@ -452,9 +452,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return null;
             }
 
-            holders = new HolderSet(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)});
+            holders = HolderSet.of(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)});
         } else {
-            holders = new HolderSet(identifier.substring(1));
+            holders = HolderSet.of(identifier.substring(1));
         }
 
         final int propertiesEndIndex = rawPredicate.indexOf(']');
@@ -468,7 +468,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
                 final String propertyId = property.substring(0, propertySplitIndex).trim();
                 final String propertyValue = property.substring(propertySplitIndex + 1).trim();
-                propertyMatchers.add(new StatePropertyMatcher(propertyId, Either.left(propertyValue))); // TODO Also handle ranged matchers
+                propertyMatchers.add(new StatePropertyMatcher(propertyId, Either.left(propertyValue)));
             }
         }
 

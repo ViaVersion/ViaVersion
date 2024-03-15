@@ -22,58 +22,35 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-/**
- * Set of ids that either holds a string tag key or an array of ids.
- */
-public interface HolderSet {
+import com.viaversion.viaversion.util.EitherImpl;
 
-    /**
-     * Creates a new holder set for the given tag.
-     *
-     * @param tagKey the tag key
-     * @return a new holder set
-     */
-    static HolderSet of(final String tagKey) {
-        return new HolderSetImpl(tagKey);
+final class HolderSetImpl extends EitherImpl<String, int[]> implements HolderSet {
+
+    HolderSetImpl(final String tagKey) {
+        super(tagKey, null);
     }
 
-    /**
-     * Creates a new holder set for the given ids.
-     *
-     * @param ids the direct ids
-     * @return a new holder set
-     */
-    static HolderSet of(final int[] ids) {
-        return new HolderSetImpl(ids);
+    HolderSetImpl(final int[] ids) {
+        super(null, ids);
     }
 
-    /**
-     * Gets the tag key.
-     *
-     * @return the tag key
-     * @see #hasTagKey()
-     */
-    String tagKey();
+    @Override
+    public String tagKey() {
+        return left();
+    }
 
-    /**
-     * Returns whether this holder set has a tag key.
-     *
-     * @return true if this holder set has a tag key, false if it has direct ids
-     */
-    boolean hasTagKey();
+    @Override
+    public boolean hasTagKey() {
+        return isLeft();
+    }
 
-    /**
-     * Gets the direct ids.
-     *
-     * @return direct ids
-     * @see #hasIds()
-     */
-    int[] ids();
+    @Override
+    public int[] ids() {
+        return right();
+    }
 
-    /**
-     * Returns whether this holder set has direct ids.
-     *
-     * @return true if this holder set has direct ids, false if it has a tag key
-     */
-    boolean hasIds();
+    @Override
+    public boolean hasIds() {
+        return isRight();
+    }
 }

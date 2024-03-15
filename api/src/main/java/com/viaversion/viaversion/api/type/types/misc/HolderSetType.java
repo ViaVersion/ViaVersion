@@ -38,23 +38,23 @@ public class HolderSetType extends Type<HolderSet> {
         final int size = Type.VAR_INT.readPrimitive(buffer) - 1;
         if (size == -1) {
             final String tag = Type.STRING.read(buffer);
-            return new HolderSet(tag);
+            return HolderSet.of(tag);
         }
 
         final int[] values = new int[size];
         for (int i = 0; i < size; i++) {
             values[i] = Type.VAR_INT.readPrimitive(buffer);
         }
-        return new HolderSet(values);
+        return HolderSet.of(values);
     }
 
     @Override
     public void write(final ByteBuf buffer, final HolderSet object) throws Exception {
-        if (object.isLeft()) {
+        if (object.hasTagKey()) {
             Type.VAR_INT.writePrimitive(buffer, 0);
-            Type.STRING.write(buffer, object.left());
+            Type.STRING.write(buffer, object.tagKey());
         } else {
-            final int[] values = object.right();
+            final int[] values = object.ids();
             Type.VAR_INT.writePrimitive(buffer, values.length + 1);
             for (final int value : values) {
                 Type.VAR_INT.writePrimitive(buffer, value);
