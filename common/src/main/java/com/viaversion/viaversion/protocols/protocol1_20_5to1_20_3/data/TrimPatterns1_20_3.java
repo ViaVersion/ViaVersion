@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2023 ViaVersion and contributors
+ * Copyright (C) 2016-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,27 +20,25 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class TrimPatterns1_20_5 {
+public final class TrimPatterns1_20_3 {
 
     private static final KeyMappings PATTERNS = new KeyMappings(
-        "sentry",
-        "dune",
         "coast",
-        "wild",
-        "ward",
+        "dune",
         "eye",
-        "vex",
-        "tide",
-        "snout",
+        "host",
+        "raiser",
         "rib",
-        "spire",
-        "wayfinder",
+        "sentry",
         "shaper",
         "silence",
-        "raiser",
-        "host",
-        "flow",
-        "bolt"
+        "snout",
+        "spire",
+        "tide",
+        "vex",
+        "ward",
+        "wayfinder",
+        "wild"
     );
 
     public static @Nullable String idToKey(final int id) {

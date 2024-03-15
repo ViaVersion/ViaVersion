@@ -35,11 +35,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.util.Key;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -67,14 +66,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
                 final CompoundTag entryTag = (CompoundTag) entry.getValue();
-                final StringTag typeTag = entryTag.getStringTag("type");
+                final String type = entryTag.getString("type");
                 final ListTag<CompoundTag> valueTag = entryTag.getListTag("value", CompoundTag.class);
                 RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
                 boolean requiresDummyValues = false;
                 int entriesLength = registryEntries.length;
                 for (final CompoundTag tag : valueTag) {
-                    final StringTag nameTag = tag.getStringTag("name");
-                    final int id = tag.getNumberTag("id").asInt();
+                    final String name = tag.getString("name");
+                    final int id = tag.getInt("id");
                     entriesLength = Math.max(entriesLength, id + 1);
                     if (id >= registryEntries.length) {
                         // It was previously possible to have arbitrary ids
@@ -82,7 +81,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         requiresDummyValues = true;
                     }
 
-                    registryEntries[id] = new RegistryEntry(nameTag.getValue(), tag.get("element"));
+                    registryEntries[id] = new RegistryEntry(name, tag.get("element"));
                 }
 
                 if (requiresDummyValues) {
@@ -94,7 +93,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
 
                 final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
-                registryPacket.write(Type.STRING, typeTag.getValue());
+                registryPacket.write(Type.STRING, type);
                 registryPacket.write(Type.REGISTRY_ENTRY_ARRAY, registryEntries);
                 registryPacket.send(Protocol1_20_5To1_20_3.class);
             }
@@ -155,6 +154,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.VAR_INT); // Portal cooldown
                 create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
+                handler(playerTrackerHandler());
             }
         });
 
@@ -184,9 +184,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 // From a string to a registry int ID
-                final String attributeIdentifier = Key.stripMinecraftNamespace(wrapper.read(Type.STRING));
-                final int id = Attributes1_20_3.keyToId(attributeIdentifier);
-                wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewAttributeId(id));
+                final String attributeIdentifier = wrapper.read(Type.STRING);
+                final int id = Attributes1_20_5.keyToId(attributeIdentifier);
+                wrapper.write(Type.VAR_INT, id != -1 ? id : 0);
 
                 wrapper.passthrough(Type.DOUBLE); // Base
                 final int modifierSize = wrapper.passthrough(Type.VAR_INT);
@@ -220,13 +220,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
             int id = typeId;
-            if (typeId >= Types1_20_5.META_TYPES.particlesType.typeId()) {
+            if (id >= Types1_20_5.META_TYPES.particlesType.typeId()) {
                 id++;
             }
-            if (typeId >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
+            if (id >= Types1_20_5.META_TYPES.wolfVariantType.typeId()) {
                 id++;
             }
-            if (typeId >= Types1_20_5.META_TYPES.wolfVariantType.typeId()) {
+            if (id >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
                 id++;
             }
             return Types1_20_5.META_TYPES.byId(id);
@@ -259,7 +259,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     public void rewriteParticle(final Particle particle) {
         super.rewriteParticle(particle);
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
-            particle.add(Type.INT, 0); // rgb
+            particle.add(Type.INT, 0); // rgb // TODO
         }
     }
 

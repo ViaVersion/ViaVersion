@@ -130,4 +130,11 @@ public final class StructuredDataContainer {
     public Map<StructuredDataKey<?>, StructuredData<?>> data() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return "StructuredDataContainer{" +
+            "data=" + data +
+            '}';
+    }
 }

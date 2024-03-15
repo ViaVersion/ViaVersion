@@ -29,13 +29,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableComponent extends Filterable<Tag> {
 
-    public static final Type<FilterableComponent> TYPE = new FilterableType<Tag, FilterableComponent>(Type.TAG, Type.OPTIONAL_TAG) {
+    public static final Type<FilterableComponent> TYPE = new FilterableType<Tag, FilterableComponent>(Type.TAG, Type.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
         protected FilterableComponent create(final Tag raw, final Tag filtered) {
             return new FilterableComponent(raw, filtered);
         }
     };
-    public static final Type<FilterableComponent[]> ARRAY_TYPE = new ArrayType<>(TYPE);
+    public static final Type<FilterableComponent[]> ARRAY_TYPE = new ArrayType<>(FilterableComponent.TYPE);
 
     public FilterableComponent(final Tag raw, @Nullable final Tag filtered) {
         super(raw, filtered);

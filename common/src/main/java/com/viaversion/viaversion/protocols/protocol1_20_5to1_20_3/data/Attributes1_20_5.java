@@ -17,10 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class Attributes1_20_3 {
+public final class Attributes1_20_5 {
 
     private static final KeyMappings ATTRIBUTES = new KeyMappings(
         "generic.armor",
@@ -28,22 +29,33 @@ public final class Attributes1_20_3 {
         "generic.attack_damage",
         "generic.attack_knockback",
         "generic.attack_speed",
+        "player.block_break_speed",
+        "player.block_interaction_range",
+        "player.entity_interaction_range",
+        "generic.fall_damage_multiplier",
         "generic.flying_speed",
         "generic.follow_range",
-        "horse.jump_strength",
+        "generic.gravity",
+        "generic.jump_strength",
         "generic.knockback_resistance",
         "generic.luck",
         "generic.max_absorption",
         "generic.max_health",
         "generic.movement_speed",
-        "zombie.spawn_reinforcements"
+        "generic.safe_fall_distance",
+        "generic.scale",
+        "zombie.spawn_reinforcements",
+        "generic.step_height"
     );
 
     public static @Nullable String idToKey(final int id) {
         return ATTRIBUTES.idToKey(id);
     }
 
-    public static int keyToId(final String attribute) {
+    public static int keyToId(String attribute) {
+        if (Key.stripMinecraftNamespace(attribute).equals("horse.jump_strength")) {
+            attribute = "generic.jump_strength";
+        }
         return ATTRIBUTES.keyToId(attribute);
     }
 }

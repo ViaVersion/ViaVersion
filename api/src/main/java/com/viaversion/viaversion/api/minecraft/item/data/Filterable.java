@@ -55,8 +55,8 @@ public abstract class Filterable<T> {
         private final Type<T> elementType;
         private final Type<T> optionalElementType;
 
-        protected FilterableType(final Type<T> elementType, final Type<T> optionalElementType) {
-            super(Filterable.class);
+        protected FilterableType(final Type<T> elementType, final Type<T> optionalElementType, final Class<F> outputClass) {
+            super(outputClass);
             this.elementType = elementType;
             this.optionalElementType = optionalElementType;
         }

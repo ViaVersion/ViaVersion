@@ -46,7 +46,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
@@ -94,13 +94,13 @@ final class StructuredDataConverter {
         register(StructuredDataKey.ATTRIBUTE_MODIFIERS, (data, tag) -> {
             final ListTag<CompoundTag> modifiers = new ListTag<>(CompoundTag.class);
             for (final AttributeModifier modifier : data.modifiers()) {
-                final String identifier = Attributes1_20_3.idToKey(modifier.attribute());
+                final String identifier = Attributes1_20_5.idToKey(modifier.attribute());
                 if (identifier == null) {
                     continue;
                 }
 
                 final CompoundTag modifierTag = new CompoundTag();
-                modifierTag.putString("AttributeName", identifier);
+                modifierTag.putString("AttributeName", identifier.equals("generic.jump_strength") ? "horse.jump_strength" : identifier);
                 modifierTag.putString("Name", modifier.modifier().name());
                 modifierTag.putDouble("Amount", modifier.modifier().amount());
                 modifierTag.putInt("Slot", modifier.slotType());

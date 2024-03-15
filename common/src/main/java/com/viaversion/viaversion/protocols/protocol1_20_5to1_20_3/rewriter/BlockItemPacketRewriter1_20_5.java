@@ -73,7 +73,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
@@ -81,7 +81,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instrumen
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -233,14 +233,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     public @Nullable Item handleItemToClient(@Nullable final Item item) {
         if (item == null) return null;
 
-        super.handleItemToClient(item);
-
         // Add the original as custom data, to be re-used for creative clients as well
         final CompoundTag tag = item.tag();
         if (tag != null) {
             tag.putBoolean(nbtTagName(), true);
         }
-        return toStructuredItem(item);
+
+        final Item structuredItem = toStructuredItem(item);
+        return super.handleItemToClient(structuredItem);
     }
 
     @Override
@@ -275,7 +275,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
-        // TODO add default data if needed (e.g. when getting a goat horn via the give command) :>
+        //TODO add default data if needed, e.g. when getting an item via /give without extra data
+        // Goat horn
+        // (check more)
         if (tag == null) {
             return item;
         }
@@ -464,7 +466,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return null;
             }
 
-            holders = HolderSet.of(new int[]{Protocol1_20_5To1_20_3.MAPPINGS.getNewBlockId(id)});
+            holders = HolderSet.of(new int[]{id});
         } else {
             holders = HolderSet.of(identifier.substring(1));
         }
@@ -514,12 +516,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return null;
             }
 
-            final int operationId = modifierTag.getInt("Operation", -1);
+            final int operationId = modifierTag.getInt("Operation");
             if (operationId < 0 || operationId > 2) {
                 return null;
             }
 
-            final int attributeId = Attributes1_20_3.keyToId(attributeName);
+            final int attributeId = Attributes1_20_5.keyToId(attributeName);
             if (attributeId == -1) {
                 return null;
             }
@@ -592,6 +594,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial> materialHolder;
         if (materialTag instanceof StringTag) {
+            // Would technically have to be stored and retreived from registry data, but that'd mean a lot of work
             final int id = TrimMaterials1_20_3.keyToId(((StringTag) materialTag).getValue());
             if (id == -1) {
                 return;
@@ -638,7 +641,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag patternTag = trimTag.get("pattern");
         final Holder<ArmorTrimPattern> patternHolder;
         if (patternTag instanceof StringTag) {
-            final int id = TrimPatterns1_20_5.keyToId(((StringTag) patternTag).getValue());
+            // Would technically have to be stored and retreived from registry data, but that'd mean a lot of work
+            final int id = TrimPatterns1_20_3.keyToId(((StringTag) patternTag).getValue());
             if (id == -1) {
                 return;
             }
@@ -841,8 +845,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return;
         }
 
-        tag.remove(key);
-
         final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), show);
         for (final CompoundTag enchantment : enchantmentsTag) {
             final String id = enchantment.getString("id");
@@ -862,7 +864,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(newKey, enchantments);
 
         // Add glint if none of the enchantments were valid
-        if (enchantments.size() == 0 && !enchantmentsTag.isEmpty()) {
+        if (!enchantmentsTag.isEmpty() && enchantments.size() == 0) {
             data.set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
         }
     }
@@ -1011,6 +1013,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 containerLoot.putLong("loot_table_seed", lootTableSeed);
                 data.set(StructuredDataKey.CONTAINER_LOOT, containerLoot);
             }
+
+            final Tag baseColorTag = tag.remove("Base");
+            if (baseColorTag instanceof NumberTag) {
+                data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
+            }
+
+            updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER);
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");
@@ -1020,14 +1029,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             tag.put("profile", profileTag);
         } else if (skullOwnerTag instanceof CompoundTag) {
             updateSkullOwnerTag(tag, (CompoundTag) skullOwnerTag);
-        }
-
-        final Tag baseColorTag = tag.remove("Base");
-        if (baseColorTag instanceof NumberTag) {
-            tag.put("base_color", baseColorTag);
-            if (data != null) {
-                data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
-            }
         }
 
         final ListTag<CompoundTag> patternsTag = tag.getListTag("Patterns", CompoundTag.class);
@@ -1055,8 +1056,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BANNER_PATTERNS, layers);
             }
         }
-
-        updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER);
     }
 
     private void updateSkullOwnerTag(final CompoundTag tag, final CompoundTag skullOwnerTag) {

@@ -23,16 +23,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class TrimMaterials1_20_3 {
 
     private static final KeyMappings MATERIALS = new KeyMappings(
-        "quartz",
-        "iron",
-        "netherite",
-        "redstone",
+        "amethyst",
         "copper",
-        "gold",
-        "emerald",
         "diamond",
+        "emerald",
+        "quartz",
+        "gold",
+        "iron",
         "lapis",
-        "amethyst"
+        "netherite",
+        "redstone"
     );
 
     public static @Nullable String idToKey(final int id) {

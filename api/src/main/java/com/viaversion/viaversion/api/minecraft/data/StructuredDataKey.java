@@ -114,4 +114,12 @@ public final class StructuredDataKey<T> {
     public String identifier() {
         return identifier;
     }
+
+    @Override
+    public String toString() {
+        return "StructuredDataKey{" +
+            "identifier='" + identifier + '\'' +
+            ", type=" + type +
+            '}';
+    }
 }
