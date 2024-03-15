@@ -23,6 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
@@ -253,7 +254,7 @@ final class StructuredDataConverter {
         register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag).putString("note_block_sound", data));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             final ListTag<StringTag> sherds = new ListTag<>(StringTag.class);
-            for (final int id : data) {
+            for (final int id : data.itemIds()) {
                 final int oldId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
                 sherds.add(new StringTag(Protocol1_20_5To1_20_3.MAPPINGS.itemName(oldId)));
             }
@@ -403,10 +404,16 @@ final class StructuredDataConverter {
                 putHideFlag(tag, HIDE_ARMOR_TRIM);
             }
         });
-
-        //TODO
-        // StructuredDataKey<BlockStateProperties> BLOCK_STATE
-        // StructuredDataKey<Unit> INTANGIBLE_PROJECTILE
+        register(StructuredDataKey.BLOCK_STATE, ((data, tag) -> {
+            final CompoundTag blockStateTag = new CompoundTag();
+            tag.put("BlockStateTag", blockStateTag);
+            for (final Map.Entry<String, String> entry : data.properties().entrySet()) {
+                blockStateTag.putString(entry.getKey(), entry.getValue());
+            }
+        }));
+        register(StructuredDataKey.INTANGIBLE_PROJECTILE, (data, tag) -> {
+            // Nothing
+        });
     }
 
     private static String toItemName(final int id) {
@@ -535,9 +542,8 @@ final class StructuredDataConverter {
 
         //noinspection unchecked
         final DataConverter<T> converter = (DataConverter<T>) REWRITERS.get(data.key());
-        if (converter != null) {
-            converter.convert(data.value(), tag);
-        }
+        Preconditions.checkNotNull(converter, "No converter for %s found", data.key());
+        converter.convert(data.value(), tag);
     }
 
     private static <T> void register(final StructuredDataKey<T> key, final DataConverter<T> converter) {

@@ -56,6 +56,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
@@ -90,6 +91,8 @@ import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,8 +100,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
@@ -683,12 +684,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateBlockState(final StructuredDataContainer data, final CompoundTag blockState) {
         final Map<String, String> properties = new HashMap<>();
         for (final Map.Entry<String, Tag> entry : blockState.entrySet()) {
-            // It's all strings now because ???
+            // Only String and IntTags are valid
             final Tag value = entry.getValue();
             if (value instanceof StringTag) {
                 properties.put(entry.getKey(), ((StringTag) value).getValue());
-            } else if (value instanceof NumberTag) {
-                // TODO Boolean values
+            } else if (value instanceof IntTag) {
                 properties.put(entry.getKey(), Integer.toString(((NumberTag) value).asInt()));
             }
         }
@@ -989,12 +989,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final ListTag<StringTag> sherdsTag = tag.getListTag("sherds", StringTag.class);
             if (sherdsTag != null && sherdsTag.size() == 4) {
-                final String sherd1 = sherdsTag.get(0).getValue();
-                final String sherd2 = sherdsTag.get(1).getValue();
-                final String sherd3 = sherdsTag.get(2).getValue();
-                final String sherd4 = sherdsTag.get(3).getValue();
+                final String backSherd = sherdsTag.get(0).getValue();
+                final String leftSherd = sherdsTag.get(1).getValue();
+                final String rightSherd = sherdsTag.get(2).getValue();
+                final String frontSherd = sherdsTag.get(3).getValue();
 
-                data.set(StructuredDataKey.POT_DECORATIONS, new int[]{toItemId(sherd1), toItemId(sherd2), toItemId(sherd3), toItemId(sherd4)});
+                data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(toItemId(backSherd), toItemId(leftSherd), toItemId(rightSherd), toItemId(frontSherd)));
             }
 
             final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");
