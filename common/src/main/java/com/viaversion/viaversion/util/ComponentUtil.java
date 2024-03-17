@@ -63,7 +63,7 @@ public final class ComponentUtil {
     }
 
     public static @Nullable Tag jsonToTag(@Nullable final JsonElement element) {
-        if (element == null) {
+        if (element == null || element.isJsonNull()) {
             return null;
         }
 
