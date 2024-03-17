@@ -278,8 +278,14 @@ final class StructuredDataConverter {
             tag.put("BlockEntityTag", data);
         });
         register(StructuredDataKey.CONTAINER_LOOT, (data, tag) -> {
-            tag.put("LootTable", data.get("loot_table"));
-            tag.put("LootTableSeed", data.get("loot_table_seed"));
+            final Tag lootTable = data.get("loot_table");
+            if (lootTable != null) {
+                tag.put("LootTable", lootTable);
+            }
+            final Tag lootTableSeed = data.get("loot_table_seed");
+            if (lootTableSeed != null) {
+                tag.put("LootTableSeed", lootTableSeed);
+            }
         });
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, (data, tag) -> {
             if (!data) {
