@@ -74,6 +74,9 @@ final class StructuredDataConverter {
     private static final Map<StructuredDataKey<?>, DataConverter<?>> REWRITERS = new Reference2ObjectOpenHashMap<>();
 
     static {
+        register(StructuredDataKey.CUSTOM_DATA, (data, tag) -> {
+            // Handled manually
+        });
         register(StructuredDataKey.DAMAGE, (data, tag) -> tag.putInt("Damage", data));
         register(StructuredDataKey.UNBREAKABLE, (data, tag) -> {
             tag.putBoolean("Unbreakable", true);
@@ -524,7 +527,7 @@ final class StructuredDataConverter {
 
             final CompoundTag enchantment = new CompoundTag();
             enchantment.putString("id", identifier);
-            enchantment.putShort("lvl", (short) entry.getIntKey());
+            enchantment.putShort("lvl", (short) entry.getIntValue());
             enchantments.add(enchantment);
         }
         tag.put(storedEnchantments ? "StoredEnchantments" : "Enchantments", enchantments);
