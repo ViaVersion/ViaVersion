@@ -84,13 +84,13 @@ final class StructuredDataConverter {
                 putHideFlag(tag, HIDE_UNBREAKABLE);
             }
         });
-        register(StructuredDataKey.CUSTOM_NAME, (data, tag) -> tag.putString("CustomName", ComponentUtil.tagToJsonString(data)));
+        register(StructuredDataKey.CUSTOM_NAME, (data, tag) -> getDisplayTag(tag).putString("Name", ComponentUtil.tagToJsonString(data)));
         register(StructuredDataKey.LORE, (data, tag) -> {
             final ListTag<StringTag> lore = new ListTag<>(StringTag.class);
             for (final Tag loreEntry : data) {
                 lore.add(new StringTag(ComponentUtil.tagToJsonString(loreEntry)));
             }
-            tag.put("Lore", lore);
+            getDisplayTag(tag).put("Lore", lore);
         });
         register(StructuredDataKey.ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, false));
         register(StructuredDataKey.STORED_ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, true));
@@ -120,12 +120,12 @@ final class StructuredDataConverter {
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, (data, tag) -> putHideFlag(tag, 0x20));
         register(StructuredDataKey.REPAIR_COST, (data, tag) -> tag.putInt("RepairCost", data));
         register(StructuredDataKey.DYED_COLOR, (data, tag) -> {
-            tag.putInt("color", data.rgb());
+            getDisplayTag(tag).putInt("color", data.rgb());
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_DYE_COLOR);
             }
         });
-        register(StructuredDataKey.MAP_COLOR, (data, tag) -> tag.putInt("MapColor", data));
+        register(StructuredDataKey.MAP_COLOR, (data, tag) -> getDisplayTag(tag).putInt("MapColor", data));
         register(StructuredDataKey.MAP_ID, (data, tag) -> tag.putInt("map", data));
         register(StructuredDataKey.MAP_DECORATIONS, (data, tag) -> {
             final ListTag<CompoundTag> decorations = new ListTag<>(CompoundTag.class);
@@ -447,10 +447,18 @@ final class StructuredDataConverter {
 
     // If multiple item components which previously were stored in BlockEntityTag are present, we need to merge them
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
-        CompoundTag subTag = tag.getCompoundTag("BlockEntityTag");
+        return getOrCreate(tag, "BlockEntityTag");
+    }
+
+    private static CompoundTag getDisplayTag(final CompoundTag tag) {
+        return getOrCreate(tag, "display");
+    }
+
+    private static CompoundTag getOrCreate(final CompoundTag tag, final String key) {
+        CompoundTag subTag = tag.getCompoundTag(key);
         if (subTag == null) {
             subTag = new CompoundTag();
-            tag.put("BlockEntityTag", subTag);
+            tag.put(key, subTag);
         }
         return subTag;
     }

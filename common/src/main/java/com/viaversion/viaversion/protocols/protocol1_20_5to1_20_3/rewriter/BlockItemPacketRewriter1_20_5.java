@@ -442,8 +442,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return item;
     }
 
-    private int toItemId(final String name) {
-        final int unmappedId = protocol.getMappingData().itemId(name);
+    private int unmappedItemId(final String name) {
+        return protocol.getMappingData().itemId(name);
+    }
+
+    private int toMappedItemId(final String name) {
+        final int unmappedId = unmappedItemId(name);
         return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
@@ -616,10 +620,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (assetNameTag == null || ingredientTag == null) {
                 return;
             }
-            final int ingredientId = toItemId(ingredientTag.getValue());
+
+            final int ingredientId = toMappedItemId(ingredientTag.getValue());
             if (ingredientId == -1) {
                 return;
             }
+
             final NumberTag itemModelIndexTag = materialCompoundTag.getNumberTag("item_model_index");
             final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.get("override_armor_materials");
             final Tag descriptionTag = materialCompoundTag.get("description");
@@ -663,10 +669,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (assetId == null || templateItem == null) {
                 return;
             }
-            final int templateItemId = toItemId(templateItem);
+
+            final int templateItemId = toMappedItemId(templateItem);
             if (templateItemId == -1) {
                 return;
             }
+
             final Tag descriptionTag = patternCompoundTag.get("description");
             final boolean decal = patternCompoundTag.getBoolean("decal");
             patternHolder = Holder.of(new ArmorTrimPattern(
@@ -817,13 +825,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey) {
-        final ListTag<CompoundTag> chargedProjectiles = tag.getListTag(key, CompoundTag.class);
-        if (chargedProjectiles == null) {
-            return;
+        final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
+        if (itemsTag != null) {
+            final Item[] items = itemsTag.stream().map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
+            data.set(dataKey, items);
         }
-
-        final Item[] items = chargedProjectiles.stream().map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
-        data.set(dataKey, items);
     }
 
     private @Nullable Item itemFromTag(final CompoundTag item) {
@@ -832,7 +838,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return null;
         }
 
-        final int itemId = toItemId(id);
+        final int itemId = unmappedItemId(id);
         if (itemId == -1) {
             return null;
         }
@@ -1000,7 +1006,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final String rightSherd = sherdsTag.get(2).getValue();
                 final String frontSherd = sherdsTag.get(3).getValue();
 
-                data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(toItemId(backSherd), toItemId(leftSherd), toItemId(rightSherd), toItemId(frontSherd)));
+                data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(
+                    toMappedItemId(backSherd),
+                    toMappedItemId(leftSherd),
+                    toMappedItemId(rightSherd),
+                    toMappedItemId(frontSherd)
+                ));
             }
 
             final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");

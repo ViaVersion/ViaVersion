@@ -98,4 +98,13 @@ public class StructuredItem implements Item {
         result = 31 * result + amount;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "StructuredItem{" +
+            "data=" + data +
+            ", identifier=" + identifier +
+            ", amount=" + amount +
+            '}';
+    }
 }
