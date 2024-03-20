@@ -128,6 +128,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     public static final Type<long[]> LONG_ARRAY_PRIMITIVE = new LongArrayType();
 
     public static final BooleanType BOOLEAN = new BooleanType();
+    public static final BooleanType.OptionalBooleanType OPTIONAL_BOOLEAN = new BooleanType.OptionalBooleanType();
 
     /* Other Types */
     public static final Type<JsonElement> COMPONENT = new ComponentType();

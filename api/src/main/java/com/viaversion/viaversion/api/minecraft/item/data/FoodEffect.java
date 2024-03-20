@@ -20,42 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
-public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean> {
-    public BooleanType() {
-        super(Boolean.class);
-    }
+public final class FoodEffect {
 
-    @Override
-    public Boolean read(ByteBuf buffer) {
-        return buffer.readBoolean();
-    }
-
-    @Override
-    public void write(ByteBuf buffer, Boolean object) {
-        buffer.writeBoolean(object);
-    }
-
-
-    @Override
-    public Boolean from(Object o) {
-        if (o instanceof Number) {
-            return ((Number) o).intValue() == 1;
+    public static final Type<FoodEffect> TYPE = new Type<FoodEffect>(FoodEffect.class) {
+        @Override
+        public FoodEffect read(final ByteBuf buffer) throws Exception {
+            final PotionEffect effect = PotionEffect.TYPE.read(buffer);
+            final float probability = buffer.readFloat();
+            return new FoodEffect(effect, probability);
         }
-        return (Boolean) o;
+
+        @Override
+        public void write(final ByteBuf buffer, final FoodEffect value) throws Exception {
+            PotionEffect.TYPE.write(buffer, value.effect);
+            buffer.writeFloat(value.probability);
+        }
+    };
+    public static final Type<FoodEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
+
+    private final PotionEffect effect;
+    private final float probability;
+
+    public FoodEffect(final PotionEffect effect, final float probability) {
+        this.effect = effect;
+        this.probability = probability;
     }
 
-    // Lol
-    public static final class OptionalBooleanType extends OptionalType<Boolean> {
+    public PotionEffect effect() {
+        return effect;
+    }
 
-        public OptionalBooleanType() {
-            super(Type.BOOLEAN);
-        }
+    public float probability() {
+        return probability;
     }
 }

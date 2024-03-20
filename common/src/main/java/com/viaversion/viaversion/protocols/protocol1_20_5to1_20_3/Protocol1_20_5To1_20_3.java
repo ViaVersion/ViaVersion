@@ -116,7 +116,9 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .reader("shriek", ParticleType.Readers.SHRIEK)
             .reader("entity_effect", ParticleType.Readers.COLOR);
         Types1_20_5.STRUCTURED_DATA.filler(this)
-            .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE)
+            .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
+            .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE).add(StructuredDataKey.RARITY)
+            .add(StructuredDataKey.HIDE_TOOLTIP).add(StructuredDataKey.FOOD).add(StructuredDataKey.FIRE_RESISTANT)
             .add(StructuredDataKey.CUSTOM_NAME).add(StructuredDataKey.LORE).add(StructuredDataKey.ENCHANTMENTS)
             .add(StructuredDataKey.CAN_PLACE_ON).add(StructuredDataKey.CAN_BREAK).add(StructuredDataKey.ATTRIBUTE_MODIFIERS)
             .add(StructuredDataKey.CUSTOM_MODEL_DATA).add(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP).add(StructuredDataKey.REPAIR_COST)
@@ -131,7 +133,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .add(StructuredDataKey.FIREWORKS).add(StructuredDataKey.PROFILE).add(StructuredDataKey.NOTE_BLOCK_SOUND)
             .add(StructuredDataKey.BANNER_PATTERNS).add(StructuredDataKey.BASE_COLOR).add(StructuredDataKey.POT_DECORATIONS)
             .add(StructuredDataKey.CONTAINER).add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
-            .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT);
+            .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL);
 
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:dyeable", 853, 854, 855, 856, 1120);
     }
