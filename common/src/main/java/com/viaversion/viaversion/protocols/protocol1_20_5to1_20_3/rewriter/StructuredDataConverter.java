@@ -435,9 +435,19 @@ final class StructuredDataConverter {
                 blockStateTag.putString(entry.getKey(), entry.getValue());
             }
         }));
-        register(StructuredDataKey.INTANGIBLE_PROJECTILE, (data, tag) -> {
-            // Nothing
+        register(StructuredDataKey.HIDE_TOOLTIP, (data, tag) -> {
+            // Hide everything we can hide
+            putHideFlag(tag, 0xFF);
         });
+
+        // Nothing to do for these
+        noop(StructuredDataKey.INTANGIBLE_PROJECTILE);
+        noop(StructuredDataKey.MAX_STACK_SIZE);
+        noop(StructuredDataKey.MAX_DAMAGE);
+        noop(StructuredDataKey.RARITY);
+        noop(StructuredDataKey.FOOD);
+        noop(StructuredDataKey.FIRE_RESISTANT);
+        noop(StructuredDataKey.TOOL);
     }
 
     private static String toItemName(final int id) {
@@ -568,6 +578,11 @@ final class StructuredDataConverter {
 
     private static <T> void register(final StructuredDataKey<T> key, final DataConverter<T> converter) {
         REWRITERS.put(key, converter);
+    }
+
+    private static <T> void noop(final StructuredDataKey<T> key) {
+        register(key, (data, tag) -> {
+        });
     }
 
     @FunctionalInterface
