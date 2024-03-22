@@ -71,7 +71,7 @@ public final class StructuredDataKey<T> {
     public static final StructuredDataKey<Integer> REPAIR_COST = new StructuredDataKey<>("repair_cost", Type.VAR_INT);
     public static final StructuredDataKey<Unit> CREATIVE_SLOT_LOCK = new StructuredDataKey<>("creative_slot_lock", Type.EMPTY);
     public static final StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE = new StructuredDataKey<>("enchantment_glint_override", Type.BOOLEAN);
-    public static final StructuredDataKey<Unit> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Type.EMPTY);
+    public static final StructuredDataKey<Tag> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Type.TAG); // Doesn't actually hold data
     public static final StructuredDataKey<FoodProperties> FOOD = new StructuredDataKey<>("food", FoodProperties.TYPE);
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Type.EMPTY);
     public static final StructuredDataKey<ToolProperties> TOOL = new StructuredDataKey<>("tool", ToolProperties.TYPE);
