@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class CommonBoss implements BossBar {
     private final UUID uuid;
@@ -233,7 +234,7 @@ public class CommonBoss implements BossBar {
         try {
             wrapper.scheduleSend(Protocol1_9To1_8.class);
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send bossbar packet", e);
         }
     }
 
@@ -269,7 +270,7 @@ public class CommonBoss implements BossBar {
 
             return wrapper;
         } catch (Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to create bossbar packet", e);
         }
         return null;
     }

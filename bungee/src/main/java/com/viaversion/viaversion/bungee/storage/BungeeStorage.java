@@ -17,11 +17,13 @@
  */
 package com.viaversion.viaversion.bungee.storage;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeeStorage implements StorableObject {
@@ -52,7 +54,7 @@ public class BungeeStorage implements StorableObject {
             try {
                 bossbar = (Set<UUID>) bossField.get(player);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to get bossbar list", e);
             }
         }
     }

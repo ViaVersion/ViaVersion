@@ -30,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
+import java.util.logging.Level;
 
 public class DeathListener extends ViaBukkitListener {
 
@@ -66,7 +67,7 @@ public class DeathListener extends ViaBukkitListener {
 
                     wrapper.scheduleSend(Protocol1_9To1_8.class);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send death message", e);
                 }
             }
         });

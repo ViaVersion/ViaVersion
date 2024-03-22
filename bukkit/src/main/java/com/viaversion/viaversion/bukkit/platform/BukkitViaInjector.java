@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.bukkit.platform;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.handlers.BukkitChannelInitializer;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
@@ -31,6 +32,7 @@ import io.netty.channel.ChannelInitializer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -218,7 +220,7 @@ public class BukkitViaInjector extends LegacyViaInjector {
                 }
             }
         } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to check if ViaVersion is binded", e);
         }
         return false;
     }

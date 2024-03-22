@@ -19,6 +19,8 @@ package com.viaversion.viaversion.bukkit.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import org.bukkit.entity.Player;
@@ -52,7 +54,7 @@ public final class ProtocolSupportUtil {
 
             return ProtocolVersion.getProtocol(preNetty ? VersionType.RELEASE_INITIAL : VersionType.RELEASE, id);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to get ProtocolSupport version", e);
         }
         return ProtocolVersion.unknown;
     }

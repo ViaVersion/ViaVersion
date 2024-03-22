@@ -17,12 +17,14 @@
  */
 package com.viaversion.viaversion.bungee.handlers;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
     private final ChannelInitializer<Channel> original;
@@ -34,7 +36,7 @@ public class BungeeChannelInitializer extends ChannelInitializer<Channel> {
             this.method = ChannelInitializer.class.getDeclaredMethod("initChannel", Channel.class);
             this.method.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to get initChannel method", e);
         }
     }
 

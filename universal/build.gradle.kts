@@ -1,7 +1,5 @@
-import io.papermc.hangarpublishplugin.model.Platforms
-
 plugins {
-    id("io.papermc.hangar-publish-plugin") version "0.1.0"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
     id("com.modrinth.minotaur") version "2.+"
 }
 
@@ -80,15 +78,15 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             changelog.set(changelogContent)
             apiKey.set(System.getenv("HANGAR_TOKEN"))
             platforms {
-                register(Platforms.PAPER) {
+                paper {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                     platformVersions.set(listOf(property("mcVersionRange") as String))
                 }
-                register(Platforms.VELOCITY) {
+                velocity {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                     platformVersions.set(listOf(property("velocityVersion") as String))
                 }
-                register(Platforms.WATERFALL) {
+                waterfall {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                     platformVersions.set(listOf(property("waterfallVersion") as String))
                 }

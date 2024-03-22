@@ -29,6 +29,7 @@ import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.SortedSet;
+import java.util.logging.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class VelocityViaInjector implements ViaInjector {
@@ -38,7 +39,7 @@ public class VelocityViaInjector implements ViaInjector {
         try {
             return Class.forName("com.velocitypowered.proxy.config.VelocityConfiguration").getMethod("getPlayerInfoForwardingMode");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to get getPlayerInfoForwardingMode method from Velocity, please report this issue on our GitHub.", e);
             return null;
         }
     }

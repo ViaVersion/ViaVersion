@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -26,6 +27,7 @@ import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
 import java.util.Arrays;
+import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -84,7 +86,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
                 packet.write(Types1_14.METADATA_LIST, Arrays.asList(new Metadata(0, Types1_14.META_TYPES.byteType, bitmask)));
                 packet.scheduleSend(Protocol1_15To1_14_4.class);
             } catch (Exception e) {
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send entity glide fix metadata", e);
             }
         }
     }

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class BlockIdData {
     public static final String[] PREVIOUS = new String[0];
@@ -52,7 +54,7 @@ public class BlockIdData {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to load block id mappings (1.12.2 -> 1.13)", e);
         }
 
         InputStream blockS = MappingData.class.getClassLoader()
@@ -65,7 +67,7 @@ public class BlockIdData {
             );
             numberIdToString = new Int2ObjectOpenHashMap<>(map);
         } catch (IOException e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to load block number to string mappings (1.12.2)", e);
         }
         // Ignored
     }

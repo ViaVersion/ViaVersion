@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public final class ProtocolDetectorService extends AbstractProtocolDetectorService {
 
@@ -90,7 +91,7 @@ public final class ProtocolDetectorService extends AbstractProtocolDetectorServi
         try {
             return Via.getManager().getInjector().getServerProtocolVersion();
         } catch (final Exception e) {
-            e.printStackTrace();
+            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to get lowest supported protocol version", e);
             return ProtocolVersion.v1_8;
         }
     }

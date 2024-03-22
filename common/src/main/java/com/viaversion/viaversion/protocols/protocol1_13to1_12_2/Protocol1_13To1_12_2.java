@@ -70,6 +70,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
@@ -183,7 +184,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                         }
                         wrapper.set(Type.STRING, 0, GsonUtil.getGson().toJson(json));
                     } catch (JsonParseException e) {
-                        e.printStackTrace();
+                        Via.getPlatform().getLogger().log(Level.SEVERE, "Error transforming status response", e);
                     }
                 });
             }

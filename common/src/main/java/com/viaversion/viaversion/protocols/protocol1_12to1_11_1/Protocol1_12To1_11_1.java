@@ -48,6 +48,7 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
+import java.util.logging.Level;
 
 public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
@@ -105,7 +106,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
 
                 wrapper.set(Type.COMPONENT, 0, obj);
             } catch (Exception e) {
-                e.printStackTrace();
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error converting 1.11.2 -> 1.12 chat item", e);
             }
         });
 
