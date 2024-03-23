@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class MappingData extends MappingDataBase {
 
     @Override
     public void loadExtras(final CompoundTag data) {
-        dimensionRegistry = MappingDataLoader.loadNBTFromFile("dimension-registry-1.16.2.nbt");
+        dimensionRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("dimension-registry-1.16.2.nbt");
 
         // Data of each dimension
         final ListTag<CompoundTag> dimensions = dimensionRegistry.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);

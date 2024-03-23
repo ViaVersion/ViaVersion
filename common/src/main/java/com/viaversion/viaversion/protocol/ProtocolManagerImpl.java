@@ -526,7 +526,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         mappingLoaderFutures = null;
 
         // Clear cached mapping files
-        MappingDataLoader.clearCache();
+        MappingDataLoader.INSTANCE.clearCache();
     }
 
     private Function<Throwable, Void> mappingLoaderThrowable(Class<? extends Protocol> protocolClass) {

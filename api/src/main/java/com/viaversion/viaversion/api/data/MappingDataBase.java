@@ -70,7 +70,7 @@ public class MappingDataBase implements MappingData {
             getLogger().info("Loading " + unmappedVersion + " -> " + mappedVersion + " mappings...");
         }
 
-        final CompoundTag data = readNBTFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
+        final CompoundTag data = readMappingsFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
         blockMappings = loadMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
         blockEntityMappings = loadMappings(data, "blockentities");
@@ -82,8 +82,8 @@ public class MappingDataBase implements MappingData {
         attributeMappings = loadMappings(data, "attributes");
         itemMappings = loadBiMappings(data, "items");
 
-        final CompoundTag unmappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + unmappedVersion + ".nbt", true);
-        final CompoundTag mappedIdentifierData = MappingDataLoader.loadNBT("identifiers-" + mappedVersion + ".nbt", true);
+        final CompoundTag unmappedIdentifierData = readIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
+        final CompoundTag mappedIdentifierData = readIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
@@ -114,16 +114,20 @@ public class MappingDataBase implements MappingData {
         loadExtras(data);
     }
 
-    protected @Nullable CompoundTag readNBTFile(final String name) {
-        return MappingDataLoader.loadNBT(name);
+    protected @Nullable CompoundTag readMappingsFile(final String name) {
+        return MappingDataLoader.INSTANCE.loadNBT(name);
+    }
+
+    protected @Nullable CompoundTag readIdentifiersFile(final String name) {
+        return MappingDataLoader.INSTANCE.loadNBT(name, true);
     }
 
     protected @Nullable Mappings loadMappings(final CompoundTag data, final String key) {
-        return MappingDataLoader.loadMappings(data, key);
+        return MappingDataLoader.INSTANCE.loadMappings(data, key);
     }
 
     protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        return MappingDataLoader.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
+        return MappingDataLoader.INSTANCE.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {

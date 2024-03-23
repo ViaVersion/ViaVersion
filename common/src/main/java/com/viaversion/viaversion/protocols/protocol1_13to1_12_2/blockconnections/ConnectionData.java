@@ -167,7 +167,7 @@ public final class ConnectionData {
         }
 
         Via.getPlatform().getLogger().info("Loading block connection mappings ...");
-        ListTag<StringTag> blockStates = MappingDataLoader.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
+        ListTag<StringTag> blockStates = MappingDataLoader.INSTANCE.loadNBT("blockstates-1.13.nbt").getListTag("blockstates", StringTag.class);
         for (int id = 0; id < blockStates.size(); id++) {
             String key = blockStates.get(id).getValue();
             KEY_TO_ID.put(key, id);
@@ -178,7 +178,7 @@ public final class ConnectionData {
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);
 
-            ListTag<CompoundTag> blockConnectionMappings = MappingDataLoader.loadNBT("blockConnections.nbt").getListTag("data", CompoundTag.class);
+            ListTag<CompoundTag> blockConnectionMappings = MappingDataLoader.INSTANCE.loadNBT("blockConnections.nbt").getListTag("data", CompoundTag.class);
             for (CompoundTag blockTag : blockConnectionMappings) {
                 BlockData blockData = new BlockData();
                 for (Entry<String, Tag> entry : blockTag.entrySet()) {

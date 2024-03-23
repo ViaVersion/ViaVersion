@@ -31,7 +31,7 @@ public final class MappingData extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag data) {
-        damageTypesRegistry = MappingDataLoader.loadNBTFromFile("damage-types-1.19.4.nbt");
+        damageTypesRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("damage-types-1.19.4.nbt");
     }
 
     public CompoundTag damageTypesRegistry() {

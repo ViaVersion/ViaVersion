@@ -81,7 +81,7 @@ public class MappingData extends MappingDataBase {
             blockMappings.setNewId(1557, 3986); // chiseled stone bricks
         }
 
-        JsonObject object = MappingDataLoader.loadFromDataDir("channelmappings-1.13.json");
+        JsonObject object = MappingDataLoader.INSTANCE.loadFromDataDir("channelmappings-1.13.json");
         if (object != null) {
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 String oldChannel = entry.getKey();
@@ -145,7 +145,7 @@ public class MappingData extends MappingDataBase {
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {
         // Special cursed case
         if (key.equals("items")) {
-            return (BiMappings) MappingDataLoader.loadMappings(data, "items", size -> {
+            return (BiMappings) MappingDataLoader.INSTANCE.loadMappings(data, "items", size -> {
                 final Int2IntBiHashMap map = new Int2IntBiHashMap(size);
                 map.defaultReturnValue(-1);
                 return map;

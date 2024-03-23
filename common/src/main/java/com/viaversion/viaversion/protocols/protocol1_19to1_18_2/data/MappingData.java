@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.data;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -37,7 +36,7 @@ public final class MappingData extends MappingDataBase {
 
     @Override
     protected void loadExtras(final CompoundTag daata) {
-        final ListTag<CompoundTag> chatTypes = MappingDataLoader.loadNBTFromFile("chat-types-1.19.nbt").getListTag("values", CompoundTag.class);
+        final ListTag<CompoundTag> chatTypes = MappingDataLoader.INSTANCE.loadNBTFromFile("chat-types-1.19.nbt").getListTag("values", CompoundTag.class);
         for (final CompoundTag chatType : chatTypes) {
             final NumberTag idTag = chatType.getNumberTag("id");
             defaultChatTypes.put(idTag.asInt(), chatType);
