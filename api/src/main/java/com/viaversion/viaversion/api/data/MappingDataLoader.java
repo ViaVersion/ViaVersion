@@ -61,16 +61,15 @@ public class MappingDataLoader {
 
     public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
 
+    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
     private final Class<?> dataLoaderClass;
     private final String dataPath;
+    private boolean cacheValid = true;
 
     public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
         this.dataLoaderClass = dataLoaderClass;
         this.dataPath = dataPath;
     }
-
-    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
-    private boolean cacheValid = true;
 
     public void clearCache() {
         mappingsCache.clear();
