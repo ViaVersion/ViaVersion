@@ -53,6 +53,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataLoader {
 
+    private final static TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
@@ -60,12 +61,11 @@ public class MappingDataLoader {
 
     public static final MappingDataLoader INSTANCE = new MappingDataLoader();
 
-    private final Map<String, CompoundTag> MAPPINGS_CACHE = new HashMap<>();
-    private final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
+    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
     private boolean cacheValid = true;
 
     public void clearCache() {
-        MAPPINGS_CACHE.clear();
+        mappingsCache.clear();
         cacheValid = false;
     }
 
@@ -115,7 +115,7 @@ public class MappingDataLoader {
             return loadNBTFromFile(name);
         }
 
-        CompoundTag data = MAPPINGS_CACHE.get(name);
+        CompoundTag data = mappingsCache.get(name);
         if (data != null) {
             return data;
         }
@@ -123,7 +123,7 @@ public class MappingDataLoader {
         data = loadNBTFromFile(name);
 
         if (cache && data != null) {
-            MAPPINGS_CACHE.put(name, data);
+            mappingsCache.put(name, data);
         }
         return data;
     }
