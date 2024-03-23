@@ -59,7 +59,15 @@ public class MappingDataLoader {
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
 
-    public static final MappingDataLoader INSTANCE = new MappingDataLoader();
+    public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
+
+    private final Class<?> dataLoaderClass;
+    private final String dataPath;
+
+    public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
+        this.dataLoaderClass = dataLoaderClass;
+        this.dataPath = dataPath;
+    }
 
     private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
     private boolean cacheValid = true;
@@ -75,7 +83,7 @@ public class MappingDataLoader {
      * @return loaded json object, or null if not found or invalid
      */
     public @Nullable JsonObject loadFromDataDir(final String name) {
-        final File file = new File(Via.getPlatform().getDataFolder(), name);
+        final File file = getFile(name);
         if (!file.exists()) {
             return loadData(name);
         }
@@ -279,12 +287,12 @@ public class MappingDataLoader {
         return map;
     }
 
-    /**
-     * Returns the resource as an input stream.
-     * Platforms can override this method to load resources from their own directories by creating a new instance of this class.
-     */
     public @Nullable InputStream getResource(final String name) {
-        return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
+        return dataLoaderClass.getClassLoader().getResourceAsStream(dataPath + name);
+    }
+
+    public File getFile(final String name) {
+        return new File(Via.getPlatform().getDataFolder(), name);
     }
 
     @FunctionalInterface
