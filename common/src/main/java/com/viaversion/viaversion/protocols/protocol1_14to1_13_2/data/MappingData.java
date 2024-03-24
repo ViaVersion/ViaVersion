@@ -35,7 +35,7 @@ public class MappingData extends MappingDataBase {
 
     @Override
     public void loadExtras(final CompoundTag data) {
-        final CompoundTag heightmap = MappingDataLoader.loadNBT("heightmap-1.14.nbt");
+        final CompoundTag heightmap = MappingDataLoader.INSTANCE.loadNBT("heightmap-1.14.nbt");
         final IntArrayTag motionBlocking = heightmap.getIntArrayTag("motionBlocking");
         this.motionBlocking = new IntOpenHashSet(motionBlocking.getValue());
 

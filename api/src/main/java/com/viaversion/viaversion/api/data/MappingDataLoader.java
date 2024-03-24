@@ -51,18 +51,28 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class MappingDataLoader {
+public class MappingDataLoader {
 
-    private static final Map<String, CompoundTag> MAPPINGS_CACHE = new HashMap<>();
-    private static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
+    public static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
-    private static boolean cacheValid = true;
 
-    public static void clearCache() {
-        MAPPINGS_CACHE.clear();
+    public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
+
+    private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
+    private final Class<?> dataLoaderClass;
+    private final String dataPath;
+    private boolean cacheValid = true;
+
+    public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
+        this.dataLoaderClass = dataLoaderClass;
+        this.dataPath = dataPath;
+    }
+
+    public void clearCache() {
+        mappingsCache.clear();
         cacheValid = false;
     }
 
@@ -71,8 +81,8 @@ public final class MappingDataLoader {
      *
      * @return loaded json object, or null if not found or invalid
      */
-    public static @Nullable JsonObject loadFromDataDir(final String name) {
-        final File file = new File(Via.getPlatform().getDataFolder(), name);
+    public @Nullable JsonObject loadFromDataDir(final String name) {
+        final File file = getFile(name);
         if (!file.exists()) {
             return loadData(name);
         }
@@ -94,7 +104,7 @@ public final class MappingDataLoader {
      *
      * @return loaded json object from bundled resources if present
      */
-    public static @Nullable JsonObject loadData(final String name) {
+    public @Nullable JsonObject loadData(final String name) {
         final InputStream stream = getResource(name);
         if (stream == null) {
             return null;
@@ -107,12 +117,12 @@ public final class MappingDataLoader {
         }
     }
 
-    public static @Nullable CompoundTag loadNBT(final String name, final boolean cache) {
+    public @Nullable CompoundTag loadNBT(final String name, final boolean cache) {
         if (!cacheValid) {
             return loadNBTFromFile(name);
         }
 
-        CompoundTag data = MAPPINGS_CACHE.get(name);
+        CompoundTag data = mappingsCache.get(name);
         if (data != null) {
             return data;
         }
@@ -120,16 +130,16 @@ public final class MappingDataLoader {
         data = loadNBTFromFile(name);
 
         if (cache && data != null) {
-            MAPPINGS_CACHE.put(name, data);
+            mappingsCache.put(name, data);
         }
         return data;
     }
 
-    public static @Nullable CompoundTag loadNBT(final String name) {
+    public @Nullable CompoundTag loadNBT(final String name) {
         return loadNBT(name, false);
     }
 
-    public static @Nullable CompoundTag loadNBTFromFile(final String name) {
+    public @Nullable CompoundTag loadNBTFromFile(final String name) {
         final InputStream resource = getResource(name);
         if (resource == null) {
             return null;
@@ -142,7 +152,7 @@ public final class MappingDataLoader {
         }
     }
 
-    public static @Nullable Mappings loadMappings(final CompoundTag mappingsTag, final String key) {
+    public @Nullable Mappings loadMappings(final CompoundTag mappingsTag, final String key) {
         return loadMappings(mappingsTag, key, size -> {
             final int[] array = new int[size];
             Arrays.fill(array, -1);
@@ -151,12 +161,12 @@ public final class MappingDataLoader {
     }
 
     @Beta
-    public static <M extends Mappings, V> @Nullable Mappings loadMappings(
-            final CompoundTag mappingsTag,
-            final String key,
-            final MappingHolderSupplier<V> holderSupplier,
-            final AddConsumer<V> addConsumer,
-            final MappingsSupplier<M, V> mappingsSupplier
+    public <M extends Mappings, V> @Nullable Mappings loadMappings(
+        final CompoundTag mappingsTag,
+        final String key,
+        final MappingHolderSupplier<V> holderSupplier,
+        final AddConsumer<V> addConsumer,
+        final MappingsSupplier<M, V> mappingsSupplier
     ) {
         final CompoundTag tag = mappingsTag.getCompoundTag(key);
         if (tag == null) {
@@ -227,7 +237,7 @@ public final class MappingDataLoader {
         return mappingsSupplier.create(mappings, mappedSizeTag.asInt());
     }
 
-    public static FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
+    public FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
         final ListTag<StringTag> unmappedElements = unmappedIdentifiers.getListTag(key, StringTag.class);
         final ListTag<StringTag> mappedElements = mappedIdentifiers.getListTag(key, StringTag.class);
         if (unmappedElements == null || mappedElements == null) {
@@ -240,9 +250,9 @@ public final class MappingDataLoader {
         }
 
         return new FullMappingsBase(
-                unmappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
-                mappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
-                mappings
+            unmappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
+            mappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
+            mappings
         );
     }
 
@@ -252,7 +262,7 @@ public final class MappingDataLoader {
      * @param object json object
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap<String> indexedObjectToMap(final JsonObject object) {
+    public Object2IntMap<String> indexedObjectToMap(final JsonObject object) {
         final Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), .99F);
         map.defaultReturnValue(-1);
         for (final Map.Entry<String, JsonElement> entry : object.entrySet()) {
@@ -267,7 +277,7 @@ public final class MappingDataLoader {
      * @param array json array
      * @return map with indexes hashed by their id value
      */
-    public static Object2IntMap<String> arrayToMap(final JsonArray array) {
+    public Object2IntMap<String> arrayToMap(final JsonArray array) {
         final Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), .99F);
         map.defaultReturnValue(-1);
         for (int i = 0; i < array.size(); i++) {
@@ -276,8 +286,12 @@ public final class MappingDataLoader {
         return map;
     }
 
-    public static @Nullable InputStream getResource(final String name) {
-        return MappingDataLoader.class.getClassLoader().getResourceAsStream("assets/viaversion/data/" + name);
+    public @Nullable InputStream getResource(final String name) {
+        return dataLoaderClass.getClassLoader().getResourceAsStream(dataPath + name);
+    }
+
+    public File getFile(final String name) {
+        return new File(Via.getPlatform().getDataFolder(), name);
     }
 
     @FunctionalInterface
