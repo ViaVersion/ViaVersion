@@ -82,8 +82,8 @@ public class MappingDataBase implements MappingData {
         attributeMappings = loadMappings(data, "attributes");
         itemMappings = loadBiMappings(data, "items");
 
-        final CompoundTag unmappedIdentifierData = readIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
-        final CompoundTag mappedIdentifierData = readIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
+        final CompoundTag unmappedIdentifierData = readUnmappedIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
+        final CompoundTag mappedIdentifierData = readMappedIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
@@ -118,7 +118,11 @@ public class MappingDataBase implements MappingData {
         return MappingDataLoader.INSTANCE.loadNBT(name);
     }
 
-    protected @Nullable CompoundTag readIdentifiersFile(final String name) {
+    protected @Nullable CompoundTag readUnmappedIdentifiersFile(final String name) {
+        return MappingDataLoader.INSTANCE.loadNBT(name, true);
+    }
+
+    protected @Nullable CompoundTag readMappedIdentifiersFile(final String name) {
         return MappingDataLoader.INSTANCE.loadNBT(name, true);
     }
 
