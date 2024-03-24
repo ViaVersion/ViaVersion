@@ -22,19 +22,50 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.viaversion.viaversion.api.minecraft.chunks.*;
-
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChunkUtil {
 
     public static Chunk createEmptyChunk(final int chunkX, final int chunkZ) {
-        final ChunkSection[] airSections = new ChunkSection[16];
+        return createEmptyChunk(chunkX, chunkZ, 16, 0xFFFF);
+    }
+
+    public static Chunk createEmptyChunk(final int chunkX, final int chunkZ, final int sectionCount) {
+        int sectionBitmask = 0;
+        for (int i = 0; i < sectionCount; i++) sectionBitmask = (sectionBitmask << 1) | 1;
+        return createEmptyChunk(chunkX, chunkZ, sectionCount, sectionBitmask);
+    }
+
+    public static Chunk createEmptyChunk(final int chunkX, final int chunkZ, final int sectionCount, final int bitmask) {
+        final ChunkSection[] airSections = new ChunkSection[sectionCount];
         for (int i = 0; i < airSections.length; i++) {
             airSections[i] = new ChunkSectionImpl(true);
             airSections[i].palette(PaletteType.BLOCKS).addId(0);
         }
-        return new BaseChunk(chunkX, chunkZ, true, false, 0xFFFF, airSections, new int[256], new ArrayList<>());
+        return new BaseChunk(chunkX, chunkZ, true, false, bitmask, airSections, new int[256], new ArrayList<>());
+    }
+
+    public static void setDummySkylight(final Chunk chunk) {
+        setDummySkylight(chunk, false);
+    }
+
+    public static void setDummySkylight(final Chunk chunk, final boolean fullbright) {
+        for (final ChunkSection section : chunk.getSections()) {
+            if (section == null) continue;
+            if (section.hasLight()) {
+                final byte[] skyLight = new byte[2048];
+                if (fullbright) {
+                    Arrays.fill(skyLight, (byte) 255);
+                }
+                section.getLight().setSkyLight(skyLight);
+            }
+        }
     }
 
 }
