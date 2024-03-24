@@ -48,6 +48,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -82,7 +83,7 @@ public class MappingDataLoader {
      * @return loaded json object, or null if not found or invalid
      */
     public @Nullable JsonObject loadFromDataDir(final String name) {
-        final File file = getFile(name);
+        final File file = new File(getDataFolder(), name);
         if (!file.exists()) {
             return loadData(name);
         }
@@ -92,7 +93,7 @@ public class MappingDataLoader {
             return GsonUtil.getGson().fromJson(reader, JsonObject.class);
         } catch (final JsonSyntaxException e) {
             // Users might mess up the format, so let's catch the syntax error
-            Via.getPlatform().getLogger().warning(name + " is badly formatted!");
+            getLogger().warning(name + " is badly formatted!");
             throw new RuntimeException(e);
         } catch (final IOException | JsonIOException e) {
             throw new RuntimeException(e);
@@ -286,12 +287,16 @@ public class MappingDataLoader {
         return map;
     }
 
-    public @Nullable InputStream getResource(final String name) {
-        return dataLoaderClass.getClassLoader().getResourceAsStream(dataPath + name);
+    public Logger getLogger() {
+        return Via.getPlatform().getLogger();
     }
 
-    public File getFile(final String name) {
-        return new File(Via.getPlatform().getDataFolder(), name);
+    public File getDataFolder() {
+        return Via.getPlatform().getDataFolder();
+    }
+
+    public @Nullable InputStream getResource(final String name) {
+        return dataLoaderClass.getClassLoader().getResourceAsStream(dataPath + name);
     }
 
     @FunctionalInterface
