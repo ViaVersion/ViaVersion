@@ -194,6 +194,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
 
     public static final BitSetType PROFILE_ACTIONS_ENUM = new BitSetType(6);
     public static final ByteArrayType SIGNATURE_BYTES = new ByteArrayType(256);
+    public static final BitSetType ACKNOWLEDGED_BIT_SET = new BitSetType(20);
     public static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES = new ByteArrayType.OptionalByteArrayType(256);
 
     public static final Type<RegistryEntry> REGISTRY_ENTRY = new RegistryEntryType();

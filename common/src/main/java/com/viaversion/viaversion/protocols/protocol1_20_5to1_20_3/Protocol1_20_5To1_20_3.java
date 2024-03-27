@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.BlockItemPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.EntityPacketRewriter1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -90,6 +91,23 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
         });
 
+        registerClientbound(ClientboundPackets1_20_3.PLAYER_CHAT, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).add());
+        registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).clearOffset());
+        registerServerbound(ServerboundPackets1_20_5.CHAT_ACK, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).clearOffset());
+        registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND);
+        registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Command
+
+            final AcknowledgedMessagesStorage messagesStorage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            wrapper.write(Type.LONG, System.currentTimeMillis()); // Timestamp
+            wrapper.write(Type.LONG, 0L); // Salt
+            wrapper.write(Type.VAR_INT, 0); // No signatures
+            wrapper.write(Type.VAR_INT, messagesStorage.offset()); // TODO Fix offset
+            wrapper.write(Type.ACKNOWLEDGED_BIT_SET, messagesStorage.toAck());
+            messagesStorage.clearOffset();
+        });
+        registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
+
         new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);
 
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
@@ -108,6 +126,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust", ParticleType.Readers.DUST)
+            .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
             .reader("item", ParticleType.Readers.ITEM1_20_2)
@@ -133,7 +152,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .add(StructuredDataKey.FIREWORKS).add(StructuredDataKey.PROFILE).add(StructuredDataKey.NOTE_BLOCK_SOUND)
             .add(StructuredDataKey.BANNER_PATTERNS).add(StructuredDataKey.BASE_COLOR).add(StructuredDataKey.POT_DECORATIONS)
             .add(StructuredDataKey.CONTAINER).add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
-            .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL);
+            .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL)
+            .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER);
 
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:dyeable", 853, 854, 855, 856, 1120);
     }
@@ -141,6 +161,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
+        connection.put(new AcknowledgedMessagesStorage());
     }
 
     @Override

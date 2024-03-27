@@ -85,6 +85,12 @@ final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.CUSTOM_NAME, (data, tag) -> getDisplayTag(tag).putString("Name", ComponentUtil.tagToJsonString(data)));
+        register(StructuredDataKey.ITEM_NAME, (data, tag) -> {
+            final CompoundTag displayTag = tag.getCompoundTag("display");
+            if (displayTag != null && !displayTag.contains("Name")) {
+                displayTag.putString("Name", ComponentUtil.tagToJsonString(data));
+            }
+        });
         register(StructuredDataKey.LORE, (data, tag) -> {
             final ListTag<StringTag> lore = new ListTag<>(StringTag.class);
             for (final Tag loreEntry : data) {
@@ -448,6 +454,7 @@ final class StructuredDataConverter {
         noop(StructuredDataKey.FOOD);
         noop(StructuredDataKey.FIRE_RESISTANT);
         noop(StructuredDataKey.TOOL);
+        noop(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER);
     }
 
     private static String toItemName(final int id) {

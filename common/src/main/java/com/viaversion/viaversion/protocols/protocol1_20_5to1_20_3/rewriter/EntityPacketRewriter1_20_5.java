@@ -64,6 +64,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             cacheDimensionData(wrapper.user(), registryData);
             trackBiomeSize(wrapper.user(), registryData);
 
+            // Update format of height provider
+            final ListTag<CompoundTag> dimensionTypes = registryData.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
+            for (final CompoundTag dimensionType : dimensionTypes) {
+                final CompoundTag elementTag = dimensionType.getCompoundTag("element");
+                final CompoundTag monsterSpawnLightLevel = elementTag.getCompoundTag("monster_spawn_light_level");
+                if (monsterSpawnLightLevel != null) {
+                    final CompoundTag value = monsterSpawnLightLevel.removeUnchecked("value");
+                    monsterSpawnLightLevel.putInt("min_inclusive", value.getInt("min_inclusive"));
+                    monsterSpawnLightLevel.putInt("max_inclusive", value.getInt("max_inclusive"));
+                }
+            }
+
             for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
                 final CompoundTag entryTag = (CompoundTag) entry.getValue();
                 final String type = entryTag.getString("type");

@@ -37,7 +37,7 @@ public class MappingData extends MappingDataBase {
     protected void loadExtras(final CompoundTag data) {
         super.loadExtras(data);
 
-        final CompoundTag extraMappings = MappingDataLoader.loadNBT("items-blocks-1.20.3.nbt");
+        final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("items-blocks-1.20.3.nbt");
         items = new KeyMappings(extraMappings.getListTag("items", StringTag.class));
         blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
     }

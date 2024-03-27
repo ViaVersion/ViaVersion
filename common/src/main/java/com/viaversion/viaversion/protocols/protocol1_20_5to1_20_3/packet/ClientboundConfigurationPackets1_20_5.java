@@ -27,14 +27,15 @@ public enum ClientboundConfigurationPackets1_20_5 implements ClientboundPacket1_
     FINISH_CONFIGURATION, // 0x03
     KEEP_ALIVE, // 0x04
     PING, // 0x05
-    REGISTRY_DATA, // 0x06
-    RESOURCE_PACK_POP, // 0x07
-    RESOURCE_PACK_PUSH, // 0x08
-    STORE_COOKIE, // 0x09
-    TRANSFER, // 0x0A
-    UPDATE_ENABLED_FEATURES, // 0x0B
-    UPDATE_TAGS, // 0x0C
-    SELECT_KNOWN_PACKS; // 0x0D
+    RESET_CHAT, // 0x06
+    REGISTRY_DATA, // 0x07
+    RESOURCE_PACK_POP, // 0x08
+    RESOURCE_PACK_PUSH, // 0x09
+    STORE_COOKIE, // 0x0A
+    TRANSFER, // 0x0B
+    UPDATE_ENABLED_FEATURES, // 0x0C
+    UPDATE_TAGS, // 0x0D
+    SELECT_KNOWN_PACKS; // 0x0E
 
     @Override
     public int getId() {

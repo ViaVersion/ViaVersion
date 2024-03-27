@@ -62,7 +62,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPackets1_19_1, ClientboundPackets1_19_3, ServerboundPackets1_19_1, ServerboundPackets1_19_3> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.19", "1.19.3");
-    private static final BitSetType ACKNOWLEDGED_BIT_SET_TYPE = new BitSetType(20);
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
@@ -247,7 +246,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
                 });
                 read(Type.VAR_INT); // Offset
-                read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
+                read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
             }
         });
         registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketHandlers() {
@@ -283,7 +282,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
                     wrapper.write(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE, null); // No last unacknowledged
                 });
                 read(Type.VAR_INT); // Offset
-                read(ACKNOWLEDGED_BIT_SET_TYPE); // Acknowledged
+                read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
             }
         });
 

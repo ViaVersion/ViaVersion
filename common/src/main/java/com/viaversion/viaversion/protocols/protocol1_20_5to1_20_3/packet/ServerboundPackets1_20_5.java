@@ -24,6 +24,7 @@ public enum ServerboundPackets1_20_5 implements ServerboundPacket1_20_5 {
     SET_DIFFICULTY, // 0x02
     CHAT_ACK, // 0x03
     CHAT_COMMAND, // 0x04
+    CHAT_COMMAND_SIGNED, // 0x04
     CHAT_MESSAGE, // 0x05
     CHAT_SESSION_UPDATE, // 0x06
     CHUNK_BATCH_RECEIVED, // 0x07

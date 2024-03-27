@@ -44,6 +44,7 @@ public enum EntityTypes1_20_5 implements EntityType {
     TNT(ENTITY),
     SHULKER_BULLET(ENTITY),
     FISHING_BOBBER(ENTITY),
+    OMINOUS_ITEM_SPAWNER(ENTITY),
 
     LIVINGENTITY(ENTITY, null),
     ARMOR_STAND(LIVINGENTITY),
