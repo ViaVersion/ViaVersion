@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class MappingData extends MappingDataBase {
 
     private final Int2ObjectMap<CompoundTag> defaultChatTypes = new Int2ObjectOpenHashMap<>();
+    private CompoundTag chatRegistry;
 
     public MappingData() {
         super("1.18", "1.19");
@@ -41,9 +42,15 @@ public final class MappingData extends MappingDataBase {
             final NumberTag idTag = chatType.getNumberTag("id");
             defaultChatTypes.put(idTag.asInt(), chatType);
         }
+
+        chatRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("chat-registry-1.19.nbt");
     }
 
     public @Nullable CompoundTag chatType(final int id) {
         return defaultChatTypes.get(id);
+    }
+
+    public CompoundTag chatRegistry() {
+        return chatRegistry.copy();
     }
 }
