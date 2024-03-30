@@ -204,8 +204,6 @@ public class EntityPackets {
                     if (tracker.hasEntity(entityId)) {
                         protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
-                        // Buffer
-                        tracker.addMetadataToBuffer(entityId, metadataList);
                         wrapper.cancel();
                     }
                 });

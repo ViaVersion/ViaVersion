@@ -57,7 +57,6 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
     public static final String DRAGON_TRANSLATABLE = "{\"translate\":\"entity.EnderDragon.name\"}";
     private final Int2ObjectMap<UUID> uuidMap = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectMap<List<Metadata>> metadataBuffer = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap vehicleMap = new Int2IntOpenHashMap();
     private final Int2ObjectMap<BossBar> bossBarMap = new Int2ObjectOpenHashMap<>();
     private final IntSet validBlocking = new IntOpenHashSet();
@@ -148,7 +147,6 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         uuidMap.remove(entityId);
         validBlocking.remove(entityId);
         knownHolograms.remove(entityId);
-        metadataBuffer.remove(entityId);
 
         BossBar bar = bossBarMap.remove(entityId);
         if (bar != null) {
@@ -334,35 +332,6 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
     }
 
-    public void addMetadataToBuffer(int entityID, List<Metadata> metadataList) {
-        final List<Metadata> metadata = metadataBuffer.get(entityID);
-        if (metadata != null) {
-            metadata.addAll(metadataList);
-        } else {
-            metadataBuffer.put(entityID, metadataList);
-        }
-    }
-
-    public void sendMetadataBuffer(int entityId) {
-        List<Metadata> metadataList = metadataBuffer.get(entityId);
-        if (metadataList != null) {
-            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_METADATA, null, user());
-            wrapper.write(Type.VAR_INT, entityId);
-            wrapper.write(Types1_9.METADATA_LIST, metadataList);
-            Via.getManager().getProtocolManager().getProtocol(Protocol1_9To1_8.class).get(MetadataRewriter1_9To1_8.class)
-                    .handleMetadata(entityId, metadataList, user());
-            handleMetadata(entityId, metadataList);
-            if (!metadataList.isEmpty()) {
-                try {
-                    wrapper.scheduleSend(Protocol1_9To1_8.class);
-                } catch (Exception e) {
-                    Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to send metadata", e);
-                }
-            }
-            metadataBuffer.remove(entityId);
-        }
-    }
-
     public int getProvidedEntityId() {
         try {
             return Via.getManager().getProviders().get(EntityIdProvider.class).getEntityId(user());
@@ -373,10 +342,6 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
     public Int2ObjectMap<UUID> getUuidMap() {
         return uuidMap;
-    }
-
-    public Int2ObjectMap<List<Metadata>> getMetadataBuffer() {
-        return metadataBuffer;
     }
 
     public Int2IntMap getVehicleMap() {
