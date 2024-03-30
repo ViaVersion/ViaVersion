@@ -31,6 +31,8 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
+import net.lenni0451.mcstructs.text.ATextComponent;
+import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import java.util.logging.Level;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
@@ -48,10 +50,10 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         final JsonElement value = hoverEvent.get("value");
         if (value == null) return;
 
-        final String nbt = value.getAsString();
+        final ATextComponent nbt = TextComponentSerializer.V1_12.deserialize(value);
         CompoundTag tag;
         try {
-            tag = SNbtSerializer.V1_12.deserialize(nbt);
+            tag = SNbtSerializer.V1_12.deserialize(nbt.asUnformattedString());
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + nbt, e);
