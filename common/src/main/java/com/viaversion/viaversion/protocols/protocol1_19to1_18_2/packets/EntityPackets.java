@@ -17,12 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19to1_18_2.packets;
 
-import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
@@ -53,36 +51,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, Protocol1_19To1_18_2> {
-
-    private static final String CHAT_REGISTRY_SNBT = "{\n" +
-            "  \"minecraft:chat_type\": {\n" +
-            "    \"type\": \"minecraft:chat_type\",\n" +
-            "    \"value\": [\n" +
-            "      {\n" +
-            "        \"name\": \"minecraft:system\",\n" +
-            "        \"id\": 1,\n" +
-            "        \"element\": {\n" +
-            "          \"chat\": {},\n" +
-            "          \"narration\": {\n" +
-            "            \"priority\": \"system\"\n" +
-            "          }\n" +
-            "        }\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"name\": \"minecraft:game_info\",\n" +
-            "        \"id\": 2,\n" +
-            "        \"element\": {\n" +
-            "          \"overlay\": {}\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ]\n" +
-            "  }\n" +
-            "}";
-    public static final CompoundTag CHAT_REGISTRY;
-
-    static {
-        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).getCompoundTag("minecraft:chat_type");
-    }
 
     public EntityPackets(final Protocol1_19To1_18_2 protocol) {
         super(protocol);
@@ -207,7 +175,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
                     // Add necessary chat types
-                    tag.put("minecraft:chat_type", CHAT_REGISTRY.copy());
+                    tag.put("minecraft:chat_type", protocol.getMappingData().chatRegistry());
 
                     // Cache a whole lot of data
                     final ListTag<CompoundTag> dimensions = tag.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);

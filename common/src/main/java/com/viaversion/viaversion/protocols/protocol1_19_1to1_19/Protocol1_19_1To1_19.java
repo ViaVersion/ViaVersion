@@ -17,13 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
 
-import com.github.steveice10.opennbt.stringified.SNBT;
 import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
@@ -39,6 +37,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.data.ChatDecorationResult;
+import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.data.ChatRegistry;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.ChatTypeStorage;
 import com.viaversion.viaversion.protocols.protocol1_19_1to1_19.storage.NonceStorage;
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPackets1_19;
@@ -57,39 +57,6 @@ import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
-
-    private static final String CHAT_REGISTRY_SNBT = "{" +
-            "  \"minecraft:chat_type\": {" +
-            "    \"type\": \"minecraft:chat_type\"," +
-            "    \"value\": [" +
-            "         {" +
-            "            \"name\":\"minecraft:chat\"," +
-            "            \"id\":1," +
-            "            \"element\":{" +
-            "               \"chat\":{" +
-            "                  \"translation_key\":\"chat.type.text\"," +
-            "                  \"parameters\":[" +
-            "                     \"sender\"," +
-            "                     \"content\"" +
-            "                  ]" +
-            "               }," +
-            "               \"narration\":{" +
-            "                  \"translation_key\":\"chat.type.text.narrate\"," +
-            "                  \"parameters\":[" +
-            "                     \"sender\"," +
-            "                     \"content\"" +
-            "                  ]" +
-            "               }" +
-            "            }" +
-            "         }" +
-            "    ]" +
-            "  }" +
-            "}";
-    private static final CompoundTag CHAT_REGISTRY;
-
-    static {
-        CHAT_REGISTRY = SNBT.deserializeCompoundTag(CHAT_REGISTRY_SNBT).getCompoundTag("minecraft:chat_type");
-    }
 
     public Protocol1_19_1To1_19() {
         super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19_1.class);
@@ -229,7 +196,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     }
 
                     // Replace chat types - they won't actually be used
-                    registry.put("minecraft:chat_type", CHAT_REGISTRY.copy());
+                    registry.put("minecraft:chat_type", ChatRegistry.chatRegistry());
                 });
             }
         });

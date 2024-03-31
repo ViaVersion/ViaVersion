@@ -15,25 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_19_1to1_19;
+package com.viaversion.viaversion.protocols.protocol1_19_1to1_19.data;
 
-import com.google.gson.JsonElement;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
 
-public final class ChatDecorationResult {
+public class ChatRegistry {
 
-    private final JsonElement content;
-    private final boolean overlay;
+    private static final CompoundTag chatRegistry;
 
-    public ChatDecorationResult(final JsonElement content, final boolean overlay) {
-        this.content = content;
-        this.overlay = overlay;
+    static {
+        chatRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("chat-registry-1.19.1.nbt");
     }
 
-    public JsonElement content() {
-        return content;
-    }
-
-    public boolean overlay() {
-        return overlay;
+    public static CompoundTag chatRegistry() {
+        return chatRegistry.copy();
     }
 }
