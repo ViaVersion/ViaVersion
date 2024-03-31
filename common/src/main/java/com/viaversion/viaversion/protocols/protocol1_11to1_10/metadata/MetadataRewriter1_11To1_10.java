@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_11to1_10.EntityIdRewriter;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.rewriter.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.Protocol1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;

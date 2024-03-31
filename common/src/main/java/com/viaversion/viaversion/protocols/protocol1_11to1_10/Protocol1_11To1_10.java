@@ -34,6 +34,8 @@ import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.data.PotionColorMapping;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.metadata.MetadataRewriter1_11To1_10;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.packets.InventoryPackets;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.rewriter.BlockEntityRewriter;
+import com.viaversion.viaversion.protocols.protocol1_11to1_10.rewriter.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.protocol1_11to1_10.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ServerboundPackets1_9_3;
