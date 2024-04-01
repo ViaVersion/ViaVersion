@@ -49,36 +49,44 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         final JsonElement value = hoverEvent.get("value");
         if (value == null) return;
 
+        CompoundTag tag;
         try {
-            final CompoundTag tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
-            final CompoundTag itemTag = tag.getCompoundTag("tag");
-            final NumberTag damageTag = tag.getNumberTag("Damage");
-
-            // Call item converter
-            short damage = damageTag != null ? damageTag.asShort() : 0;
-            Item item = new DataItem();
-            item.setData(damage);
-            item.setTag(itemTag);
-            protocol.getItemRewriter().handleItemToClient(item);
-
-            // Serialize again
-            if (damage != item.data()) {
-                tag.put("Damage", new ShortTag(item.data()));
+            tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
+        } catch (Exception e) {
+            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + value, e);
             }
-            if (itemTag != null) {
-                tag.put("tag", itemTag);
-            }
+            return;
+        }
 
-            final JsonArray newValue = new JsonArray();
-            final JsonObject text = new JsonObject();
-            newValue.add(text);
+        final CompoundTag itemTag = tag.getCompoundTag("tag");
+        final NumberTag damageTag = tag.getNumberTag("Damage");
 
-            final String serializedNBT = SerializerVersion.V1_13.toSNBT(tag);
-            text.addProperty("text", serializedNBT);
+        // Call item converter
+        final short damage = damageTag != null ? damageTag.asShort() : 0;
+
+        final Item item = new DataItem();
+        item.setData(damage);
+        item.setTag(itemTag);
+        protocol.getItemRewriter().handleItemToClient(item);
+
+        // Serialize again
+        if (damage != item.data()) {
+            tag.put("Damage", new ShortTag(item.data()));
+        }
+        if (itemTag != null) {
+            tag.put("tag", itemTag);
+        }
+
+        final JsonArray newValue = new JsonArray();
+        final JsonObject showItem = new JsonObject();
+        newValue.add(showItem);
+        try {
+            showItem.addProperty("text", SerializerVersion.V1_13.toSNBT(tag));
             hoverEvent.add("value", newValue);
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error remapping 1.13 -> 1.12.2 NBT in show_item: " + value, e);
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.13 NBT in show_item: " + value, e);
             }
         }
     }
