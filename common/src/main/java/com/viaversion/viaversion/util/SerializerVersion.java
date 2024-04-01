@@ -28,6 +28,8 @@ import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 
 public enum SerializerVersion {
+    V1_6(TextComponentSerializer.V1_6, null),
+    V1_7(TextComponentSerializer.V1_7, SNbtSerializer.V1_7),
     V1_8(TextComponentSerializer.V1_8, SNbtSerializer.V1_8),
     V1_9(TextComponentSerializer.V1_9, SNbtSerializer.V1_8),
     V1_12(TextComponentSerializer.V1_12, SNbtSerializer.V1_12),
@@ -41,16 +43,16 @@ public enum SerializerVersion {
     V1_20_3(TextComponentCodec.V1_20_3, SNbtSerializer.V1_14);
 
     final TextComponentSerializer jsonSerializer;
-    final SNbtSerializer<CompoundTag> snbtSerializer;
+    final SNbtSerializer<? extends Tag> snbtSerializer;
     final TextComponentCodec codec;
 
-    SerializerVersion(final TextComponentSerializer jsonSerializer, final SNbtSerializer<CompoundTag> snbtSerializer) {
+    SerializerVersion(final TextComponentSerializer jsonSerializer, final SNbtSerializer<? extends Tag> snbtSerializer) {
         this.jsonSerializer = jsonSerializer;
         this.snbtSerializer = snbtSerializer;
         this.codec = null;
     }
 
-    SerializerVersion(final TextComponentCodec codec, final SNbtSerializer<CompoundTag> snbtSerializer) {
+    SerializerVersion(final TextComponentCodec codec, final SNbtSerializer<? extends Tag> snbtSerializer) {
         this.codec = codec;
         this.jsonSerializer = codec.asSerializer();
         this.snbtSerializer = snbtSerializer;
@@ -86,7 +88,10 @@ public enum SerializerVersion {
         return codec.deserializeNbtTree(tag);
     }
 
-    public CompoundTag toTag(final String snbt) {
+    public Tag toTag(final String snbt) {
+        if (snbtSerializer == null) {
+            throw new IllegalStateException("Cannot convert SNBT to NBT with this version");
+        }
         try {
             return snbtSerializer.deserialize(snbt);
         } catch (SNbtDeserializeException e) {
@@ -94,7 +99,10 @@ public enum SerializerVersion {
         }
     }
 
-    public String toSNBT(final CompoundTag tag) {
+    public String toSNBT(final Tag tag) {
+        if (snbtSerializer == null) {
+            throw new IllegalStateException("Cannot convert SNBT to NBT with this version");
+        }
         try {
             return snbtSerializer.serialize(tag);
         } catch (SNbtSerializeException e) {

@@ -29,7 +29,6 @@ import net.lenni0451.mcstructs.text.Style;
 import net.lenni0451.mcstructs.text.events.hover.AHoverEvent;
 import net.lenni0451.mcstructs.text.events.hover.impl.TextHoverEvent;
 import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
-import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -138,6 +137,6 @@ public final class ComponentUtil {
     }
 
     public static CompoundTag deserializeLegacyShowItem(final JsonElement element, final SerializerVersion version) {
-        return version.toTag(version.toComponent(element).asUnformattedString());
+        return (CompoundTag) version.toTag(version.toComponent(element).asUnformattedString());
     }
 }
