@@ -21,31 +21,31 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lenni0451.mcstructs.snbt.SNbtSerializer;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
-import net.lenni0451.mcstructs.text.ATextComponent;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.TagUtil;
 
-public class ChatItemRewriter {
+public final class ChatItemRewriter {
 
-    public static void toClient(JsonElement element) throws SNbtDeserializeException, SNbtSerializeException {
+    public static void toClient(JsonElement element) {
         if (element instanceof JsonObject) {
             JsonObject obj = (JsonObject) element;
             if (obj.has("hoverEvent")) {
-                if (obj.get("hoverEvent") instanceof JsonObject) {
-                    final JsonObject hoverEvent = (JsonObject) obj.get("hoverEvent");
-                    if (hoverEvent.has("action") && hoverEvent.has("value")) {
-                        final String type = hoverEvent.get("action").getAsString();
-                        final JsonElement value = hoverEvent.get("value");
+                if (!(obj.get("hoverEvent") instanceof JsonObject)) {
+                    return;
+                }
 
-                        if (type.equals("show_item")) {
-                            final ATextComponent component = TextComponentSerializer.V1_8.deserialize(value);
+                final JsonObject hoverEvent = (JsonObject) obj.get("hoverEvent");
+                if (!hoverEvent.has("action") || !hoverEvent.has("value")) {
+                    return;
+                }
 
-                            final CompoundTag compound = SNbtSerializer.V1_8.deserialize(component.asUnformattedString());
-                            hoverEvent.addProperty("value", SNbtSerializer.V1_12.serialize(compound));
-                        }
-                    }
+                final String type = hoverEvent.get("action").getAsString();
+                final JsonElement value = hoverEvent.get("value");
+
+                if (type.equals("show_item")) {
+                    final CompoundTag compound = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_8);
+                    hoverEvent.addProperty("value", TagUtil.toSNBT(compound, SerializerVersion.V1_12));
                 }
             } else if (obj.has("extra")) {
                 toClient(obj.get("extra"));

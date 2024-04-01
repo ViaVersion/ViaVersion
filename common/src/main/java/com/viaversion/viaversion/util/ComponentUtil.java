@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import java.util.logging.Level;
-import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
 import net.lenni0451.mcstructs.text.events.hover.AHoverEvent;
@@ -137,36 +137,8 @@ public final class ComponentUtil {
         return TextComponentSerializer.V1_12.deserialize(value).asLegacyFormatString();
     }
 
-    public enum SerializerVersion {
-        V1_8(TextComponentSerializer.V1_8, SNbtSerializer.V1_8),
-        V1_9(TextComponentSerializer.V1_9, SNbtSerializer.V1_8),
-        V1_12(TextComponentSerializer.V1_12, SNbtSerializer.V1_12),
-        V1_14(TextComponentSerializer.V1_14, SNbtSerializer.V1_14),
-        V1_15(TextComponentSerializer.V1_15, SNbtSerializer.V1_14),
-        V1_16(TextComponentSerializer.V1_16, SNbtSerializer.V1_14),
-        V1_17(TextComponentSerializer.V1_17, SNbtSerializer.V1_14),
-        V1_18(TextComponentSerializer.V1_18, SNbtSerializer.V1_14),
-        V1_19_4(TextComponentSerializer.V1_19_4, SNbtSerializer.V1_14),
-        V1_20_3(TextComponentCodec.V1_20_3, SNbtSerializer.V1_14);
-
-        private final TextComponentSerializer jsonSerializer;
-        private final SNbtSerializer<?> snbtSerializer;
-        private final TextComponentCodec codec;
-
-        SerializerVersion(final TextComponentSerializer jsonSerializer, final SNbtSerializer<?> snbtSerializer) {
-            this.jsonSerializer = jsonSerializer;
-            this.snbtSerializer = snbtSerializer;
-            this.codec = null;
-        }
-
-        SerializerVersion(final TextComponentCodec codec, final SNbtSerializer<?> snbtSerializer) {
-            this.codec = codec;
-            this.jsonSerializer = codec.asSerializer();
-            this.snbtSerializer = snbtSerializer;
-        }
-
-        public JsonElement toJson(final ATextComponent component) {
-            return jsonSerializer.serializeJson(component);
-        }
+    public static CompoundTag deserializeLegacyShowItem(final JsonElement element, final SerializerVersion version) {
+        final ATextComponent component = version.jsonSerializer.deserialize(element);
+        return TagUtil.fromSNBT(component.asUnformattedString(), version);
     }
 }

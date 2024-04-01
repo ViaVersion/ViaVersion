@@ -24,6 +24,10 @@ package com.viaversion.viaversion.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import java.util.Comparator;
+import net.lenni0451.mcstructs.text.utils.JsonUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class GsonUtil {
     private static final Gson GSON = new GsonBuilder().create();
@@ -37,4 +41,7 @@ public final class GsonUtil {
         return GSON;
     }
 
+    public static @Nullable JsonElement sort(@Nullable final JsonElement object) {
+        return JsonUtils.sort(object, Comparator.naturalOrder());
+    }
 }

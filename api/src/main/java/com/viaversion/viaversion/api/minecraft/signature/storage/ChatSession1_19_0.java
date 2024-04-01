@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.minecraft.signature.storage;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.signature.model.DecoratableMessage;
 import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
-import net.lenni0451.mcstructs.text.utils.JsonUtils;
+import com.viaversion.viaversion.util.GsonUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -48,7 +48,7 @@ public class ChatSession1_19_0 extends ChatSession {
             buffer.putLong(metadata.sender().getMostSignificantBits()).putLong(metadata.sender().getLeastSignificantBits());
             buffer.putLong(metadata.timestamp().getEpochSecond());
             signer.accept(data);
-            signer.accept(JsonUtils.toSortedString(content.decorated(), null).getBytes(StandardCharsets.UTF_8));
+            signer.accept(GsonUtil.sort(content.decorated()).toString().getBytes(StandardCharsets.UTF_8));
         });
     }
 

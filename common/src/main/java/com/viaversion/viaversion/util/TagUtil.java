@@ -21,6 +21,8 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import java.util.Map;
+import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
+import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class TagUtil {
@@ -44,6 +46,22 @@ public final class TagUtil {
 
     private static <T extends Tag> void handleListTag(final ListTag<T> listTag, final TagUpdater consumer) {
         listTag.getValue().replaceAll(t -> (T) handleDeep(null, t, consumer));
+    }
+
+    public static String toSNBT(final Tag tag, final SerializerVersion version) {
+        try {
+            return version.snbtSerializer.serialize(tag);
+        } catch (final SNbtSerializeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static CompoundTag fromSNBT(final String snbt, final SerializerVersion version) {
+        try {
+            return version.snbtSerializer.deserialize(snbt);
+        } catch (final SNbtDeserializeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FunctionalInterface

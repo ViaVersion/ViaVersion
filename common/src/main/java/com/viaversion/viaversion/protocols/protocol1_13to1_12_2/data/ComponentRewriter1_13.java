@@ -30,9 +30,9 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import net.lenni0451.mcstructs.snbt.SNbtSerializer;
-import net.lenni0451.mcstructs.text.ATextComponent;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.TagUtil;
 import java.util.logging.Level;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
@@ -50,13 +50,12 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         final JsonElement value = hoverEvent.get("value");
         if (value == null) return;
 
-        final ATextComponent nbt = TextComponentSerializer.V1_12.deserialize(value);
         CompoundTag tag;
         try {
-            tag = SNbtSerializer.V1_12.deserialize(nbt.asUnformattedString());
+            tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + nbt, e);
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + value, e);
             }
             return;
         }
@@ -84,11 +83,11 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         array.add(object);
         String serializedNBT;
         try {
-            serializedNBT = SNbtSerializer.V1_13.serialize(tag);
+            serializedNBT = TagUtil.toSNBT(tag, SerializerVersion.V1_13);
             object.addProperty("text", serializedNBT);
             hoverEvent.add("value", array);
         } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.13 NBT in show_item: " + nbt, e);
+            Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.13 NBT in show_item: " + value, e);
         }
     }
 
