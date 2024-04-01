@@ -49,11 +49,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.viaversion.viaversion.util.SerializerVersion;
 import net.lenni0451.mcstructs.core.TextFormatting;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
 import net.lenni0451.mcstructs.text.components.TranslationComponent;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
@@ -392,11 +392,11 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                         Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
-                    arguments.add(TextComponentSerializer.V1_18.deserialize(argument));
+                    arguments.add(SerializerVersion.V1_18.toComponent(argument));
                 }
             }
         }
 
-        return TextComponentSerializer.V1_18.serializeJson(new TranslationComponent(translationKey, arguments));
+        return SerializerVersion.V1_18.toJson(new TranslationComponent(translationKey, arguments));
     }
 }

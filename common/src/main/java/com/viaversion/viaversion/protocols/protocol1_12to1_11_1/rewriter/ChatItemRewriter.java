@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
-import com.viaversion.viaversion.util.TagUtil;
 
 public final class ChatItemRewriter {
 
@@ -45,7 +44,7 @@ public final class ChatItemRewriter {
 
                 if (type.equals("show_item")) {
                     final CompoundTag compound = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_8);
-                    hoverEvent.addProperty("value", TagUtil.toSNBT(compound, SerializerVersion.V1_12));
+                    hoverEvent.addProperty("value", SerializerVersion.V1_12.toSNBT(compound));
                 }
             } else if (obj.has("extra")) {
                 toClient(obj.get("extra"));
