@@ -18,8 +18,11 @@
 package com.viaversion.viaversion.util;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
+import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
+import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.serializer.TextComponentCodec;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
@@ -39,18 +42,63 @@ public enum SerializerVersion {
 
     final TextComponentSerializer jsonSerializer;
     final SNbtSerializer<CompoundTag> snbtSerializer;
+    final TextComponentCodec codec;
 
     SerializerVersion(final TextComponentSerializer jsonSerializer, final SNbtSerializer<CompoundTag> snbtSerializer) {
         this.jsonSerializer = jsonSerializer;
         this.snbtSerializer = snbtSerializer;
+        this.codec = null;
     }
 
     SerializerVersion(final TextComponentCodec codec, final SNbtSerializer<CompoundTag> snbtSerializer) {
+        this.codec = codec;
         this.jsonSerializer = codec.asSerializer();
         this.snbtSerializer = snbtSerializer;
     }
 
+    public String toString(final ATextComponent component) {
+        return jsonSerializer.serialize(component);
+    }
+
     public JsonElement toJson(final ATextComponent component) {
         return jsonSerializer.serializeJson(component);
+    }
+
+    public Tag toTag(final ATextComponent component) {
+        if (codec == null) {
+            throw new IllegalStateException("Cannot convert component to NBT with this version");
+        }
+        return codec.serializeNbt(component);
+    }
+
+    public ATextComponent toComponent(final JsonElement json) {
+        return jsonSerializer.deserialize(json);
+    }
+
+    public ATextComponent toComponent(final String json) {
+        return jsonSerializer.deserializeReader(json);
+    }
+
+    public ATextComponent toComponent(final Tag tag) {
+        if (codec == null) {
+            throw new IllegalStateException("Cannot convert NBT to component with this version");
+        }
+        return codec.deserializeNbtTree(tag);
+    }
+
+    public CompoundTag toTag(final String snbt) {
+        try {
+            return snbtSerializer.deserialize(snbt);
+        } catch (SNbtDeserializeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String toSNBT(final CompoundTag tag) {
+        try {
+            return snbtSerializer.serialize(tag);
+        } catch (SNbtSerializeException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

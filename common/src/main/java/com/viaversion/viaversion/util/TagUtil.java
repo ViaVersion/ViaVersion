@@ -48,22 +48,6 @@ public final class TagUtil {
         listTag.getValue().replaceAll(t -> (T) handleDeep(null, t, consumer));
     }
 
-    public static String toSNBT(final Tag tag, final SerializerVersion version) {
-        try {
-            return version.snbtSerializer.serialize(tag);
-        } catch (final SNbtSerializeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static CompoundTag fromSNBT(final String snbt, final SerializerVersion version) {
-        try {
-            return version.snbtSerializer.deserialize(snbt);
-        } catch (final SNbtDeserializeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @FunctionalInterface
     public interface TagUpdater {
 

@@ -32,7 +32,6 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
-import com.viaversion.viaversion.util.TagUtil;
 import java.util.logging.Level;
 
 public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
@@ -50,44 +49,37 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         final JsonElement value = hoverEvent.get("value");
         if (value == null) return;
 
-        CompoundTag tag;
         try {
-            tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
+            final CompoundTag tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
+            final CompoundTag itemTag = tag.getCompoundTag("tag");
+            final NumberTag damageTag = tag.getNumberTag("Damage");
+
+            // Call item converter
+            short damage = damageTag != null ? damageTag.asShort() : 0;
+            Item item = new DataItem();
+            item.setData(damage);
+            item.setTag(itemTag);
+            protocol.getItemRewriter().handleItemToClient(item);
+
+            // Serialize again
+            if (damage != item.data()) {
+                tag.put("Damage", new ShortTag(item.data()));
+            }
+            if (itemTag != null) {
+                tag.put("tag", itemTag);
+            }
+
+            final JsonArray newValue = new JsonArray();
+            final JsonObject text = new JsonObject();
+            newValue.add(text);
+
+            final String serializedNBT = SerializerVersion.V1_13.toSNBT(tag);
+            text.addProperty("text", serializedNBT);
+            hoverEvent.add("value", newValue);
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + value, e);
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error remapping 1.13 -> 1.12.2 NBT in show_item: " + value, e);
             }
-            return;
-        }
-
-        CompoundTag itemTag = tag.getCompoundTag("tag");
-        NumberTag damageTag = tag.getNumberTag("Damage");
-
-        // Call item converter
-        short damage = damageTag != null ? damageTag.asShort() : 0;
-        Item item = new DataItem();
-        item.setData(damage);
-        item.setTag(itemTag);
-        protocol.getItemRewriter().handleItemToClient(item);
-
-        // Serialize again
-        if (damage != item.data()) {
-            tag.put("Damage", new ShortTag(item.data()));
-        }
-        if (itemTag != null) {
-            tag.put("tag", itemTag);
-        }
-
-        JsonArray array = new JsonArray();
-        JsonObject object = new JsonObject();
-        array.add(object);
-        String serializedNBT;
-        try {
-            serializedNBT = TagUtil.toSNBT(tag, SerializerVersion.V1_13);
-            object.addProperty("text", serializedNBT);
-            hoverEvent.add("value", array);
-        } catch (Exception e) {
-            Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.13 NBT in show_item: " + value, e);
         }
     }
 

@@ -54,7 +54,7 @@ public final class ComponentUtil {
 
     public static @Nullable JsonElement tagToJson(@Nullable final Tag tag) {
         try {
-            final ATextComponent component = TextComponentCodec.V1_20_3.deserializeNbtTree(tag);
+            final ATextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
             return component != null ? SerializerVersion.V1_19_4.toJson(component) : null;
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + tag, e);
@@ -68,8 +68,8 @@ public final class ComponentUtil {
         }
 
         try {
-            final ATextComponent component = TextComponentSerializer.V1_19_4.deserialize(element);
-            return trimStrings(TextComponentCodec.V1_20_3.serializeNbt(component));
+            final ATextComponent component = SerializerVersion.V1_19_4.toComponent(element);
+            return trimStrings(SerializerVersion.V1_20_3.toTag(component));
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + element, e);
             return new StringTag("<error>");
@@ -126,7 +126,7 @@ public final class ComponentUtil {
         if (itemData) {
             component.setParentStyle(new Style().setItalic(false));
         }
-        return TextComponentSerializer.V1_12.serialize(component);
+        return SerializerVersion.V1_12.toString(component);
     }
 
     public static String jsonToLegacy(final String value) {
@@ -134,11 +134,10 @@ public final class ComponentUtil {
     }
 
     public static String jsonToLegacy(final JsonElement value) {
-        return TextComponentSerializer.V1_12.deserialize(value).asLegacyFormatString();
+        return SerializerVersion.V1_12.toComponent(value).asLegacyFormatString();
     }
 
     public static CompoundTag deserializeLegacyShowItem(final JsonElement element, final SerializerVersion version) {
-        final ATextComponent component = version.jsonSerializer.deserialize(element);
-        return TagUtil.fromSNBT(component.asUnformattedString(), version);
+        return version.toTag(version.toComponent(element).asUnformattedString());
     }
 }
