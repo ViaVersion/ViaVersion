@@ -39,7 +39,7 @@ import com.viaversion.viaversion.debug.DebugHandlerImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.TabCompleteThread;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.task.TabCompleteThread;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ViaIdleThread;
 import com.viaversion.viaversion.scheduler.TaskScheduler;
 import com.viaversion.viaversion.update.UpdateUtil;
