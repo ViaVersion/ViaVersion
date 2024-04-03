@@ -139,7 +139,8 @@ public enum ClientboundPackets1_20_5 implements ClientboundPacket1_20_5 {
     ENTITY_PROPERTIES, // 0x75
     ENTITY_EFFECT, // 0x76
     DECLARE_RECIPES, // 0x77
-    TAGS; // 0x78
+    TAGS, // 0x78
+    PROJECTILE_POWER; // 0x79
 
     @Override
     public int getId() {
