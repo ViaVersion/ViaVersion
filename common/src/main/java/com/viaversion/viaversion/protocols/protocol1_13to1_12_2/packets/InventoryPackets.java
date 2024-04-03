@@ -47,7 +47,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_13To1_12_2> {
-    private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_13To1_12_2.class.getSimpleName();
 
     public InventoryPackets(Protocol1_13To1_12_2 protocol) {
         super(protocol, null, null);
@@ -319,7 +318,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (display != null) {
                 StringTag name = display.getStringTag("Name");
                 if (name != null) {
-                    display.putString(NBT_TAG_NAME + "|Name", name.getValue());
+                    display.putString(nbtTagName("Name"), name.getValue());
                     name.setValue(ComponentUtil.legacyToJsonString(name.getValue(), true));
                 }
             }
@@ -382,7 +381,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             ListTag<?> canPlaceOnTag = tag.getListTag("CanPlaceOn");
             if (canPlaceOnTag != null) {
                 ListTag<StringTag> newCanPlaceOn = new ListTag<>(StringTag.class);
-                tag.put(NBT_TAG_NAME + "|CanPlaceOn", canPlaceOnTag.copy());
+                tag.put(nbtTagName("CanPlaceOn"), canPlaceOnTag.copy());
                 for (Tag oldTag : canPlaceOnTag) {
                     Object value = oldTag.getValue();
                     String oldId = Key.stripMinecraftNamespace(value.toString());
@@ -405,7 +404,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             ListTag<?> canDestroyTag = tag.getListTag("CanDestroy");
             if (canDestroyTag != null) {
                 ListTag<StringTag> newCanDestroy = new ListTag<>(StringTag.class);
-                tag.put(NBT_TAG_NAME + "|CanDestroy", canDestroyTag.copy());
+                tag.put(nbtTagName("CanDestroy"), canDestroyTag.copy());
                 for (Tag oldTag : canDestroyTag) {
                     Object value = oldTag.getValue();
                     String oldId = Key.stripMinecraftNamespace(value.toString());
@@ -456,7 +455,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId) == -1) {
             if (!isDamageable(item.identifier()) && item.identifier() != 358) { // Map
                 if (tag == null) item.setTag(tag = new CompoundTag());
-                tag.put(NBT_TAG_NAME, new IntTag(originalId)); // Data will be lost, saving original id
+                tag.put(nbtTagName(), new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
                 rawId = 32 << 4; // Dead Bush
@@ -515,11 +514,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         // Use tag to get original ID and data
         if (tag != null) {
             // Check for valid tag
-            NumberTag viaTag = tag.getNumberTag(NBT_TAG_NAME);
+            NumberTag viaTag = tag.getNumberTag(nbtTagName());
             if (viaTag != null) {
                 rawId = viaTag.asInt();
                 // Remove the tag
-                tag.remove(NBT_TAG_NAME);
+                tag.remove(nbtTagName());
                 gotRawIdFromTag = true;
             }
         }
@@ -598,7 +597,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             if (display != null) {
                 StringTag name = display.getStringTag("Name");
                 if (name != null) {
-                    Tag via = display.remove(NBT_TAG_NAME + "|Name");
+                    Tag via = display.remove(nbtTagName("Name"));
                     name.setValue(via instanceof StringTag ? (String) via.getValue() : ComponentUtil.jsonToLegacy(name.getValue()));
                 }
             }
@@ -662,8 +661,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 }
                 tag.put("StoredEnchantments", newStoredEnch);
             }
-            if (tag.getListTag(NBT_TAG_NAME + "|CanPlaceOn") != null) {
-                tag.put("CanPlaceOn", tag.remove(NBT_TAG_NAME + "|CanPlaceOn"));
+            if (tag.getListTag(nbtTagName("CanPlaceOn")) != null) {
+                tag.put("CanPlaceOn", tag.remove(nbtTagName("CanPlaceOn")));
             } else if (tag.getListTag("CanPlaceOn") != null) {
                 ListTag<?> old = tag.getListTag("CanPlaceOn");
                 ListTag<StringTag> newCanPlaceOn = new ListTag<>(StringTag.class);
@@ -682,8 +681,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 }
                 tag.put("CanPlaceOn", newCanPlaceOn);
             }
-            if (tag.getListTag(NBT_TAG_NAME + "|CanDestroy") != null) {
-                tag.put("CanDestroy", tag.remove(NBT_TAG_NAME + "|CanDestroy"));
+            if (tag.getListTag(nbtTagName("CanDestroy")) != null) {
+                tag.put("CanDestroy", tag.remove(nbtTagName("CanDestroy")));
             } else if (tag.getListTag("CanDestroy") != null) {
                 ListTag<?> old = tag.getListTag("CanDestroy");
                 ListTag<StringTag> newCanDestroy = new ListTag<>(StringTag.class);
