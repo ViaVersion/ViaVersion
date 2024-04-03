@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class StructuredDataContainer {
@@ -67,6 +68,26 @@ public final class StructuredDataContainer {
         //noinspection unchecked
         final StructuredData<T> data = (StructuredData<T>) this.data.get(key);
         return data != null && data.isPresent() ? data : null;
+    }
+
+    /**
+     * Returns structured data by id if not empty, or creates it.
+     *
+     * @param key             serializer id
+     * @param mappingFunction function to create structured data if not present
+     * @param <T>             data type
+     * @return structured data if not empty
+     */
+    public <T> StructuredData<T> computeIfAbsent(final StructuredDataKey<T> key, final Function<StructuredDataKey<T>, T> mappingFunction) {
+        final StructuredData<T> data = this.getNonEmpty(key);
+        if (data != null) {
+            return data;
+        }
+
+        final int id = serializerId(key);
+        final StructuredData<T> empty = StructuredData.of(key, mappingFunction.apply(key), id);
+        this.data.put(key, empty);
+        return empty;
     }
 
     public <T> void set(final StructuredDataKey<T> key, final T value) {

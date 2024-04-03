@@ -62,6 +62,10 @@ public final class Enchantments {
         this.showInTooltip = showInTooltip;
     }
 
+    public Enchantments(final boolean showInTooltip) {
+        this(new Int2IntOpenHashMap(), showInTooltip);
+    }
+
     public Int2IntMap enchantments() {
         return enchantments;
     }
@@ -72,5 +76,21 @@ public final class Enchantments {
 
     public boolean showInTooltip() {
         return showInTooltip;
+    }
+
+    public void add(final int id, final int level) {
+        enchantments.put(id, level);
+    }
+
+    public void remove(final int id) {
+        enchantments.remove(id);
+    }
+
+    public void clear() {
+        enchantments.clear();
+    }
+
+    public int getLevel(final int id) {
+        return enchantments.getOrDefault(id, -1);
     }
 }

@@ -116,9 +116,9 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final PacketWrapper wolfVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
             wolfVariantsPacket.write(Type.STRING, "minecraft:wolf_variant");
             final CompoundTag paleWolf = new CompoundTag();
-            paleWolf.putString("wild_texture", "textures/entity/wolf/wolf.png");
-            paleWolf.putString("tame_texture", "textures/entity/wolf/wolf_tame.png");
-            paleWolf.putString("angry_texture", "textures/entity/wolf/wolf_angry.png");
+            paleWolf.putString("wild_texture", "entity/wolf/wolf");
+            paleWolf.putString("tame_texture", "entity/wolf/wolf_tame");
+            paleWolf.putString("angry_texture", "entity/wolf/wolf_angry");
             paleWolf.put("biomes", new ListTag<>(StringTag.class));
             wolfVariantsPacket.write(Type.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", paleWolf)});
             wolfVariantsPacket.send(Protocol1_20_5To1_20_3.class);
