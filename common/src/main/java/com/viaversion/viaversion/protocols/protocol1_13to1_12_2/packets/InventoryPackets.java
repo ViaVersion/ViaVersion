@@ -101,7 +101,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             public void register() {
                 map(Type.STRING); // 0 - Channel
 
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     String channel = wrapper.get(Type.STRING, 0);
                     // Handle stopsound change
                     if (channel.equals("MC|StopSound")) {
@@ -224,7 +224,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             @Override
             public void register() {
                 map(Type.STRING); // Channel
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     String channel = wrapper.get(Type.STRING, 0);
                     String old = channel;
                     channel = getOldPluginChannelId(channel);

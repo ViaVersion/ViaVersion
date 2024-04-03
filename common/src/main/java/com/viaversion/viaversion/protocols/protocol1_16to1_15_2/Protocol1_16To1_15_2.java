@@ -163,8 +163,9 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
             registerServerbound(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketHandlers() {
                 @Override
                 public void register() {
-                    handler(wrapper -> {
-                        String channel = wrapper.passthrough(Type.STRING);
+                    map(Type.STRING); // Channel
+                    handlerSoftFail(wrapper -> {
+                        final String channel = wrapper.get(Type.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {

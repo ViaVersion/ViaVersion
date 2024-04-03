@@ -143,7 +143,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             @Override
             public void register() {
                 map(Type.STRING); // Channel
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
                     if (channel.equals("minecraft:trader_list")) {
                         wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);

@@ -22,11 +22,13 @@
  */
 package com.viaversion.viaversion.api.protocol.remapper;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 public abstract class PacketHandlers implements PacketHandler {
     private final List<PacketHandler> packetHandlers = new ArrayList<>();
@@ -126,6 +128,24 @@ public abstract class PacketHandlers implements PacketHandler {
      */
     public void handler(PacketHandler handler) {
         packetHandlers.add(handler);
+    }
+
+    /**
+     * Adds a packet handler which will suppress any exceptions thrown by the handler.
+     *
+     * @param handler packet handler
+     */
+    public void handlerSoftFail(PacketHandler handler) {
+        packetHandlers.add(h -> {
+            try {
+                handler.handle(h);
+            } catch (Exception e) {
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                }
+                h.cancel();
+            }
+        });
     }
 
     /**
