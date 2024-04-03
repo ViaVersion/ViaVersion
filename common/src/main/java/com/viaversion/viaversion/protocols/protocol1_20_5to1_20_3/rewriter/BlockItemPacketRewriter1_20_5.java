@@ -275,14 +275,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
-        //TODO add default data if needed, e.g. when getting an item via /give without extra data
-        // Goat horn
-        // (check more)
+
         if (tag == null) {
-            if (old.identifier() == 1191) {
-                // I'm unsure if this is intended or an issue, see https://bugs.mojang.com/browse/MC-269503
-                data.set(StructuredDataKey.INSTRUMENT, Holder.of(Instruments1_20_3.keyToId("minecraft:ponder_goat_horn")));
-            }
             return item;
         }
 
