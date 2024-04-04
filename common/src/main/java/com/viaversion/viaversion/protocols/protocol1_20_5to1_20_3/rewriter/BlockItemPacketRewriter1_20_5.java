@@ -60,8 +60,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
-    private final String tagMarker = "VV|" + protocol.getClass().getSimpleName();
-
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
     }
@@ -318,7 +316,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         //  StructuredDataKey.CONTAINER_LOOT
 
         // Add the original as custom data, to be re-used for creative clients as well
-        tag.putBoolean(tagMarker, true);
+        tag.putBoolean(nbtTagName(), true);
         data.add(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
     }

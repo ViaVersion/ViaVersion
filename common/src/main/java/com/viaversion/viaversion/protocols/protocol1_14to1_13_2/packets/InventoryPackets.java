@@ -46,7 +46,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_14, Protocol1_14To1_13_2> {
-    private static final String NBT_TAG_NAME = "ViaVersion|" + Protocol1_14To1_13_2.class.getSimpleName();
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
     private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<ClientboundPackets1_13>(null, ComponentRewriter.ReadType.JSON) {
         @Override
@@ -246,7 +245,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         if (display != null) {
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore != null) {
-                display.put(NBT_TAG_NAME + "|Lore", new ListTag<>(lore.copy().getValue())); // Save old lore
+                display.put(nbtTagName("Lore"), new ListTag<>(lore.copy().getValue())); // Save old lore
                 for (StringTag loreEntry : lore) {
                     String jsonText = ComponentUtil.legacyToJsonString(loreEntry.getValue(), true);
                     loreEntry.setValue(jsonText);
@@ -268,7 +267,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         if (display != null) {
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore != null) {
-                Tag savedLore = display.remove(NBT_TAG_NAME + "|Lore");
+                Tag savedLore = display.remove(nbtTagName("Lore"));
                 if (savedLore instanceof ListTag) {
                     display.put("Lore", new ListTag<>(((ListTag<?>) savedLore).getValue()));
                 } else {
