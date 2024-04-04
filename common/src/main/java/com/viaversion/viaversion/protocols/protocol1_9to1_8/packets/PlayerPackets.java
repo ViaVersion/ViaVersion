@@ -264,7 +264,7 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel Name
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equals("MC|BOpen")) {
                         wrapper.write(Type.VAR_INT, 0);
@@ -405,7 +405,7 @@ public class PlayerPackets {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel Name
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     String name = wrapper.get(Type.STRING, 0);
                     if (name.equals("MC|BSign")) {
                         Item item = wrapper.passthrough(Type.ITEM1_8);

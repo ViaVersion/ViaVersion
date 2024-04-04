@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -52,8 +53,8 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastReso
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import com.viaversion.viaversion.util.Key;
 import java.util.UUID;
+import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
@@ -75,8 +76,21 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.ENTITY_SOUND);
 
-        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
-        registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, this::sanitizeCustomPayload);
+        final PacketHandlers sanitizeCustomPayload = new PacketHandlers() {
+            @Override
+            protected void register() {
+                map(Type.STRING); // Channel
+                handlerSoftFail(wrapper -> {
+                    final String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    if (channel.equals("minecraft:brand")) {
+                        wrapper.passthrough(Type.STRING);
+                        wrapper.clearInputBuffer();
+                    }
+                });
+            }
+        };
+        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, sanitizeCustomPayload);
+        registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, sanitizeCustomPayload);
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Type.STRING);
@@ -313,14 +327,6 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             wrapper.user().get(ConfigurationState.class).addPacketToQueue(wrapper, false);
             wrapper.cancel();
         };
-    }
-
-    private void sanitizeCustomPayload(final PacketWrapper wrapper) throws Exception {
-        final String channel = Key.namespaced(wrapper.passthrough(Type.STRING));
-        if (channel.equals("minecraft:brand")) {
-            wrapper.passthrough(Type.STRING);
-            wrapper.clearInputBuffer();
-        }
     }
 
     @Override
