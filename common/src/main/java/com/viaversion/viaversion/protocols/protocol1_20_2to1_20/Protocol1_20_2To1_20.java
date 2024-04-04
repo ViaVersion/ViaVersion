@@ -54,6 +54,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.storage.LastTags
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import java.util.UUID;
+import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
@@ -80,7 +81,7 @@ public final class Protocol1_20_2To1_20 extends AbstractProtocol<ClientboundPack
             protected void register() {
                 map(Type.STRING); // Channel
                 handlerSoftFail(wrapper -> {
-                    final String channel = wrapper.get(Type.STRING, 0);
+                    final String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
                     if (channel.equals("minecraft:brand")) {
                         wrapper.passthrough(Type.STRING);
                         wrapper.clearInputBuffer();
