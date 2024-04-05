@@ -38,11 +38,11 @@ public enum MetaIndex {
     ENTITY_SILENT(ENTITY, 4, MetaType1_8.Byte, MetaType1_9.Boolean),
 
     // Living entity
-    ENTITY_LIVING_HEALTH(ENTITY_LIVING, 6, MetaType1_8.Float, MetaType1_9.Float),
-    ENTITY_LIVING_POTION_EFFECT_COLOR(ENTITY_LIVING, 7, MetaType1_8.Int, MetaType1_9.VarInt),
-    ENTITY_LIVING_IS_POTION_AMBIENT(ENTITY_LIVING, 8, MetaType1_8.Byte, MetaType1_9.Boolean),
-    ENTITY_LIVING_NUMBER_OF_ARROWS_IN(ENTITY_LIVING, 9, MetaType1_8.Byte, MetaType1_9.VarInt),
-    ENTITY_LIVING_NO_AI(ENTITY_LIVING, 15, MetaType1_8.Byte, 10, MetaType1_9.Byte), // in 1.9 this is combined with Left handed.
+    LIVING_ENTITY_HEALTH(ENTITY_LIVING, 6, MetaType1_8.Float, MetaType1_9.Float),
+    LIVING_ENTITY_POTION_EFFECT_COLOR(ENTITY_LIVING, 7, MetaType1_8.Int, MetaType1_9.VarInt),
+    LIVING_ENTITY_IS_POTION_AMBIENT(ENTITY_LIVING, 8, MetaType1_8.Byte, MetaType1_9.Boolean),
+    LIVING_ENTITY_NUMBER_OF_ARROWS_IN(ENTITY_LIVING, 9, MetaType1_8.Byte, MetaType1_9.VarInt),
+    LIVING_ENTITY_NO_AI(ENTITY_LIVING, 15, MetaType1_8.Byte, 10, MetaType1_9.Byte), // in 1.9 this is combined with Left handed.
 
     // Ageable entity
     ENTITY_AGEABLE_AGE(ENTITY_AGEABLE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
@@ -57,11 +57,11 @@ public enum MetaIndex {
     ARMOR_STAND_RL_POS(ARMOR_STAND, 16, MetaType1_8.Rotation, MetaType1_9.Vector3F),
 
     // Human (player)
-    ENTITY_HUMAN_SKIN_FLAGS(ENTITY_HUMAN, 10, MetaType1_8.Byte, 12, MetaType1_9.Byte), // unsigned on 1.8
-    ENTITY_HUMAN_BYTE(ENTITY_HUMAN, 16, MetaType1_8.Byte, null), // unused on 1.8
-    ENTITY_HUMAN_ADDITIONAL_HEARTS(ENTITY_HUMAN, 17, MetaType1_8.Float, 10, MetaType1_9.Float),
-    ENTITY_HUMAN_SCORE(ENTITY_HUMAN, 18, MetaType1_8.Int, 11, MetaType1_9.VarInt),
-    ENTITY_HUMAN_HAND(ENTITY_HUMAN, -1, MetaType1_8.NonExistent, 5, MetaType1_9.Byte), // new in 1.9
+    PLAYER_SKIN_FLAGS(ENTITY_HUMAN, 10, MetaType1_8.Byte, 12, MetaType1_9.Byte), // unsigned on 1.8
+    PLAYER_BYTE(ENTITY_HUMAN, 16, MetaType1_8.Byte, null), // unused on 1.8
+    PLAYER_ADDITIONAL_HEARTS(ENTITY_HUMAN, 17, MetaType1_8.Float, 10, MetaType1_9.Float),
+    PLAYER_SCORE(ENTITY_HUMAN, 18, MetaType1_8.Int, 11, MetaType1_9.VarInt),
+    PLAYER_HAND(ENTITY_HUMAN, -1, MetaType1_8.NonExistent, 5, MetaType1_9.Byte), // new in 1.9
 
     // Horse
     HORSE_INFO(HORSE, 16, MetaType1_8.Int, 12, MetaType1_9.Byte),
@@ -73,9 +73,9 @@ public enum MetaIndex {
     // Bat
     BAT_IS_HANGING(BAT, 16, MetaType1_8.Byte, 11, MetaType1_9.Byte),
 
-    // Tameable entity
-    ENTITY_TAMEABLE_ANIMAL_INFO(ENTITY_TAMEABLE_ANIMAL, 16, MetaType1_8.Byte, 12, MetaType1_9.Byte),
-    ENTITY_TAMEABLE_ANIMAL_OWNER(ENTITY_TAMEABLE_ANIMAL, 17, MetaType1_8.String, 13, MetaType1_9.OptUUID),
+    // Tamable entity
+    ENTITY_TAMABLE_ANIMAL_INFO(ENTITY_TAMEABLE_ANIMAL, 16, MetaType1_8.Byte, 12, MetaType1_9.Byte),
+    ENTITY_TAMABLE_ANIMAL_OWNER(ENTITY_TAMEABLE_ANIMAL, 17, MetaType1_8.String, 13, MetaType1_9.OptUUID),
 
     // Ocelot
     OCELOT_TYPE(OCELOT, 18, MetaType1_8.Byte, 14, MetaType1_9.VarInt),
@@ -152,12 +152,12 @@ public enum MetaIndex {
     BOAT_DAMAGE_TAKEN(BOAT, 19, MetaType1_8.Float, 7, MetaType1_9.Float),
 
     // Minecart
-    MINECART_ABSTRACT_SHAKING_POWER(MINECART_ABSTRACT, 17, MetaType1_8.Int, 5, MetaType1_9.VarInt),
-    MINECART_ABSTRACT_SHAKING_DIRECTION(MINECART_ABSTRACT, 18, MetaType1_8.Int, 6, MetaType1_9.VarInt),
-    MINECART_ABSTRACT_DAMAGE_TAKEN(MINECART_ABSTRACT, 19, MetaType1_8.Float, 7, MetaType1_9.Float),
-    MINECART_ABSTRACT_BLOCK(MINECART_ABSTRACT, 20, MetaType1_8.Int, 8, MetaType1_9.VarInt),
-    MINECART_ABSTRACT_BLOCK_Y(MINECART_ABSTRACT, 21, MetaType1_8.Int, 9, MetaType1_9.VarInt),
-    MINECART_ABSTRACT_SHOW_BLOCK(MINECART_ABSTRACT, 22, MetaType1_8.Byte, 10, MetaType1_9.Boolean),
+    ABSTRACT_MINECART_SHAKING_POWER(MINECART_ABSTRACT, 17, MetaType1_8.Int, 5, MetaType1_9.VarInt),
+    ABSTRACT_MINECART_SHAKING_DIRECTION(MINECART_ABSTRACT, 18, MetaType1_8.Int, 6, MetaType1_9.VarInt),
+    ABSTRACT_MINECART_DAMAGE_TAKEN(MINECART_ABSTRACT, 19, MetaType1_8.Float, 7, MetaType1_9.Float),
+    ABSTRACT_MINECART_BLOCK(MINECART_ABSTRACT, 20, MetaType1_8.Int, 8, MetaType1_9.VarInt),
+    ABSTRACT_MINECART_BLOCK_Y(MINECART_ABSTRACT, 21, MetaType1_8.Int, 9, MetaType1_9.VarInt),
+    ABSTRACT_MINECART_SHOW_BLOCK(MINECART_ABSTRACT, 22, MetaType1_8.Byte, 10, MetaType1_9.Boolean),
 
     // Command minecart (they are still broken)
     MINECART_COMMAND_BLOCK_COMMAND(MINECART_ABSTRACT, 23, MetaType1_8.String, 11, MetaType1_9.String),
