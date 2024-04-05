@@ -109,7 +109,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(value);
                 break;
             case Boolean:
-                if (metaIndex == MetaIndex.AGEABLE_ENTITY_AGE)
+                if (metaIndex == MetaIndex.AGEABLE_CREATURE_AGE)
                     metadata.setValue((Byte) value < 0);
                 else
                     metadata.setValue((Byte) value != 0);
