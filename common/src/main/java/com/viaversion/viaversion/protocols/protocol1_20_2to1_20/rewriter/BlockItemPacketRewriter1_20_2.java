@@ -41,7 +41,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.rewriter.RecipeRewriter1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.Protocol1_20_2To1_20;
 import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.packet.ServerboundPackets1_20_2;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
+import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects1_20_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.MathUtil;
@@ -383,7 +383,8 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 final CompoundTag effectTag = (CompoundTag) tag;
                 final Tag idTag = effectTag.remove("Id");
                 if (idTag instanceof NumberTag) {
-                    final String key = PotionEffects.idToKey(((NumberTag) idTag).asInt());
+                    // Empty effect removed
+                    final String key = PotionEffects1_20_2.idToKey(((NumberTag) idTag).asInt() - 1);
                     if (key != null) {
                         effectTag.put("id", new StringTag(key));
                     }
@@ -414,8 +415,8 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 final CompoundTag effectTag = (CompoundTag) tag;
                 final Tag idTag = effectTag.remove("id");
                 if (idTag instanceof StringTag) {
-                    final int id = PotionEffects.keyToId(((StringTag) idTag).getValue());
-                    effectTag.put("Id", new IntTag(id));
+                    final int id = PotionEffects1_20_2.keyToId(((StringTag) idTag).getValue());
+                    effectTag.putInt("Id", id + 1); // Account for empty effect at id 0
                 }
 
                 renameTag(effectTag, "amplifier", "Amplifier");
@@ -443,12 +444,12 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
         final Tag primaryEffect = tag.remove("Primary");
         if (primaryEffect instanceof NumberTag && ((NumberTag) primaryEffect).asInt() != 0) {
-            tag.put("primary_effect", new StringTag(PotionEffects.idToKeyOrLuck(((NumberTag) primaryEffect).asInt())));
+            tag.put("primary_effect", new StringTag(PotionEffects1_20_2.idToKeyOrLuck(((NumberTag) primaryEffect).asInt() - 1)));
         }
 
         final Tag secondaryEffect = tag.remove("Secondary");
         if (secondaryEffect instanceof NumberTag && ((NumberTag) secondaryEffect).asInt() != 0) {
-            tag.put("secondary_effect", new StringTag(PotionEffects.idToKeyOrLuck(((NumberTag) secondaryEffect).asInt())));
+            tag.put("secondary_effect", new StringTag(PotionEffects1_20_2.idToKeyOrLuck(((NumberTag) secondaryEffect).asInt() - 1)));
         }
         return tag;
     }

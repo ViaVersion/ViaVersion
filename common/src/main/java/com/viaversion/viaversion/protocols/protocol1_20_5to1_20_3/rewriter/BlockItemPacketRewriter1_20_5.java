@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 
 import com.github.steveice10.opennbt.stringified.SNBT;
+import com.github.steveice10.opennbt.tag.builtin.ByteTag;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
@@ -68,7 +69,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_2to1_20.util.PotionEffects;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.rewriter.RecipeRewriter1_20_3;
@@ -78,8 +78,9 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPat
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_3;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
@@ -105,6 +106,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
+    private static final StructuredDataConverter DATA_CONVERTER = new StructuredDataConverter(false);
     private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
     private static final StatePropertyMatcher[] EMPTY_PROPERTY_MATCHERS = new StatePropertyMatcher[0];
 
@@ -248,10 +250,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (item == null) return null;
 
         super.handleItemToServer(item);
-        return toOldItem(item);
+        return toOldItem(item, DATA_CONVERTER);
     }
 
-    public Item toOldItem(final Item item) {
+    public Item toOldItem(final Item item, final StructuredDataConverter dataConverter) {
         // Start out with custom data and add the rest on top, or short-curcuit with the original item
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
@@ -264,7 +266,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         for (final StructuredData<?> structuredData : data.data().values()) {
-            StructuredDataConverter.writeToTag(structuredData, tag);
+            dataConverter.writeToTag(structuredData, tag);
         }
 
         return dataItem;
@@ -366,7 +368,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<CompoundTag> attributeModifiersTag = tag.getListTag("AttributeModifiers", CompoundTag.class);
         if (attributeModifiersTag != null) {
-            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
+            updateAttributes(data, tag, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
@@ -432,8 +434,54 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         }
 
+        final CompoundTag backupTag = StructuredDataConverter.removeBackupTag(tag);
+        if (backupTag != null) {
+            // Restore original data components
+            restoreFromBackupTag(backupTag, data);
+        }
+
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private void restoreFromBackupTag(final CompoundTag backupTag, final StructuredDataContainer data) {
+        final ByteTag enchantmentGlintOverride = backupTag.getByteTag("enchantment_glint_override");
+        if (enchantmentGlintOverride != null) {
+            data.set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride.asBoolean());
+        }
+
+        if (backupTag.contains("hide_tooltip")) {
+            data.set(StructuredDataKey.HIDE_TOOLTIP);
+        }
+
+        final Tag intangibleProjectile = backupTag.get("intangible_projectile");
+        if (intangibleProjectile != null) {
+            data.set(StructuredDataKey.INTANGIBLE_PROJECTILE, intangibleProjectile);
+        }
+
+        final IntTag maxStackSize = backupTag.getIntTag("max_stack_size");
+        if (maxStackSize != null) {
+            data.set(StructuredDataKey.MAX_STACK_SIZE, maxStackSize.asInt());
+        }
+
+        final IntTag maxDamage = backupTag.getIntTag("max_damage");
+        if (maxDamage != null) {
+            data.set(StructuredDataKey.MAX_DAMAGE, maxDamage.asInt());
+        }
+
+        final IntTag rarity = backupTag.getIntTag("rarity");
+        if (rarity != null) {
+            data.set(StructuredDataKey.RARITY, rarity.asInt());
+        }
+
+        if (backupTag.contains("fire_resistant")) {
+            data.set(StructuredDataKey.FIRE_RESISTANT);
+        }
+
+        final IntTag ominousBottleAmplifier = backupTag.getIntTag("ominous_bottle_amplifier");
+        if (ominousBottleAmplifier != null) {
+            data.set(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, ominousBottleAmplifier.asInt());
+        }
     }
 
     private int unmappedItemId(final String name) {
@@ -512,28 +560,30 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         );
     }
 
-    private void updateAttributes(final StructuredDataContainer data, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
-        final AttributeModifier[] modifiers = attributeModifiersTag.stream().map(modifierTag -> {
+    private void updateAttributes(final StructuredDataContainer data, final CompoundTag tag, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
+        final List<AttributeModifier> modifiers = new ArrayList<>();
+        for (int i = 0; i < attributeModifiersTag.size(); i++) {
+            final CompoundTag modifierTag = attributeModifiersTag.get(i);
             final String attributeName = modifierTag.getString("AttributeName");
             final String name = modifierTag.getString("Name");
             final NumberTag amountTag = modifierTag.getNumberTag("Amount");
             final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
             final int slotType = modifierTag.getInt("Slot");
             if (name == null || attributeName == null || amountTag == null || uuidTag == null) {
-                return null;
+                continue;
             }
 
             final int operationId = modifierTag.getInt("Operation");
             if (operationId < 0 || operationId > 2) {
-                return null;
+                continue;
             }
 
             final int attributeId = Attributes1_20_5.keyToId(attributeName);
             if (attributeId == -1) {
-                return null;
+                continue;
             }
 
-            return new AttributeModifier(
+            modifiers.add(new AttributeModifier(
                 attributeId,
                 new ModifierData(
                     UUIDUtil.fromIntArray(uuidTag.getValue()),
@@ -542,9 +592,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     operationId
                 ),
                 slotType
-            );
-        }).filter(Objects::nonNull).toArray(AttributeModifier[]::new);
-        data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers, showInTooltip));
+            ));
+        }
+        data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers.toArray(new AttributeModifier[0]), showInTooltip));
     }
 
     private PotionEffectData readPotionEffectData(final CompoundTag tag) {
@@ -566,8 +616,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final String potion = tag.getString("Potion");
         Integer potionId = null;
         if (potion != null) {
-            final int id = Potions1_20_3.keyToId(potion);
-            potionId = id > 0 ? id - 1 : null; // Empty potion type removed
+            final int id = Potions1_20_5.keyToId(potion);
+            if (id != -1) {
+                potionId = id;
+            }
         }
 
         final NumberTag customPotionColorTag = tag.getNumberTag("CustomPotionColor");
@@ -580,8 +632,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     return null;
                 }
 
-                final int id = PotionEffects.keyToId(identifier) - 1;
-                if (id < 0) {
+                final int id = PotionEffects1_20_5.keyToId(identifier);
+                if (id == -1) {
                     return null;
                 }
                 return new PotionEffect(id, readPotionEffectData(effectTag));
@@ -723,13 +775,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final SuspiciousStewEffect[] suspiciousStewEffects = new SuspiciousStewEffect[effects.size()];
         for (int i = 0; i < effects.size(); i++) {
             final CompoundTag effect = effects.get(i);
-            final String effectId = effect.getString("id", "luck");
+            final String effectIdString = effect.getString("id", "luck");
             final int duration = effect.getInt("duration");
-            final SuspiciousStewEffect stewEffect = new SuspiciousStewEffect(
-                PotionEffects.keyToId(effectId) - 1,
-                duration
-            );
-            suspiciousStewEffects[i] = stewEffect;
+            final int effectId = PotionEffects1_20_5.keyToId(effectIdString);
+            if (effectId != -1) {
+                final SuspiciousStewEffect stewEffect = new SuspiciousStewEffect(
+                    effectId,
+                    duration
+                );
+                suspiciousStewEffects[i] = stewEffect;
+            }
         }
         data.set(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, suspiciousStewEffects);
     }
@@ -941,7 +996,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final float rotation = decorationTag.getFloat("rot");
 
             final CompoundTag updatedDecorationTag = new CompoundTag();
-            updatedDecorationTag.putString("type", MapDecorations1_20_3.idToKey(type));
+            updatedDecorationTag.putString("type", MapDecorations1_20_5.idToKey(type));
             updatedDecorationTag.putDouble("x", x);
             updatedDecorationTag.putDouble("z", z);
             updatedDecorationTag.putFloat("rotation", rotation);

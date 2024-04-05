@@ -20,10 +20,9 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class Potions1_20_3 {
+public final class Potions1_20_5 {
 
     private static final KeyMappings POTIONS = new KeyMappings(
-        "empty",
         "water",
         "mundane",
         "thick",
@@ -65,7 +64,11 @@ public final class Potions1_20_3 {
         "long_weakness",
         "luck",
         "slow_falling",
-        "long_slow_falling"
+        "long_slow_falling",
+        "wind_charged",
+        "weaving",
+        "oozing",
+        "infested"
     );
 
     public static @Nullable String idToKey(final int id) {

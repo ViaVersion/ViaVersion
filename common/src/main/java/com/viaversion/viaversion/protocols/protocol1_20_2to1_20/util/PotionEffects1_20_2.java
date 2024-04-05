@@ -22,11 +22,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class PotionEffects {
+public final class PotionEffects1_20_2 {
 
     private static final Object2IntMap<String> KEY_TO_ID = new Object2IntOpenHashMap<>();
     private static final String[] POTION_EFFECTS = {
-            "", // No effect
             "speed",
             "slowness",
             "haste",
@@ -63,18 +62,19 @@ public final class PotionEffects {
     };
 
     static {
-        for (int i = 1; i < POTION_EFFECTS.length; i++) {
+        for (int i = 0; i < POTION_EFFECTS.length; i++) {
             final String effect = POTION_EFFECTS[i];
             KEY_TO_ID.put(effect, i);
         }
+        KEY_TO_ID.defaultReturnValue(-1);
     }
 
     public static @Nullable String idToKey(final int id) {
-        return id >= 1 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : null;
+        return id >= 0 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : null;
     }
 
     public static String idToKeyOrLuck(final int id) {
-        return id >= 1 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : "minecraft:luck";
+        return id >= 0 && id < POTION_EFFECTS.length ? Key.namespaced(POTION_EFFECTS[id]) : "minecraft:luck";
     }
 
     public static int keyToId(final String key) {

@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 
 import com.viaversion.viaversion.util.KeyMappings;
 
-public final class MapDecorations1_20_3 {
+public final class MapDecorations1_20_5 {
 
     private static final KeyMappings MAP_DECORATIONS = new KeyMappings(
         "player",
@@ -55,7 +55,8 @@ public final class MapDecorations1_20_3 {
         "village_snowy",
         "village_taiga",
         "jungle_temple",
-        "swamp_hut"
+        "swamp_hut",
+        "trial_chambers"
     );
 
     public static String idToKey(final int index) {
