@@ -31,12 +31,10 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.GameMode;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetadataRewriter1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.EntityIdProvider;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -171,21 +169,6 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
 
         for (Metadata metadata : new ArrayList<>(metadataList)) {
-            // Fix: wither (crash fix)
-            if (type == EntityType.WITHER) {
-                if (metadata.id() == 10) {
-                    metadataList.remove(metadata);
-                    //metadataList.add(new Metadata(10, NewType.Byte.getTypeID(), Type.BYTE, 0));
-                }
-            }
-            // Fix: enderdragon (crash fix)
-            if (type == EntityType.ENDER_DRAGON) {
-                if (metadata.id() == 11) {
-                    metadataList.remove(metadata);
-                    //   metadataList.add(new Metadata(11, NewType.Byte.getTypeID(), Type.VAR_INT, 0));
-                }
-            }
-
             if (type == EntityType.SKELETON) {
                 if ((getMetaByIndex(metadataList, 12)) == null) {
                     metadataList.add(new Metadata(12, MetaType1_9.Boolean, true));

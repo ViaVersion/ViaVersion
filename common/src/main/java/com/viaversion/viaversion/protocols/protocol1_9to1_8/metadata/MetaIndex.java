@@ -58,7 +58,6 @@ public enum MetaIndex {
     PLAYER_ADDITIONAL_HEARTS(ENTITY_HUMAN, 17, MetaType1_8.Float, 10, MetaType1_9.Float),
     PLAYER_SCORE(ENTITY_HUMAN, 18, MetaType1_8.Int, 11, MetaType1_9.VarInt),
     PLAYER_HAND(ENTITY_HUMAN, -1, MetaType1_8.NonExistent, 5, MetaType1_9.Byte), // new in 1.9
-    SOMETHING_ANTICHEAT_PLUGINS_FOR_SOME_REASON_USE(ENTITY_HUMAN, 11, MetaType1_8.Byte, null), //For what we know, This doesn't exists. If you think it exists and knows what it does. Please tell us.
     // horse
     HORSE_INFO(HORSE, 16, MetaType1_8.Int, 12, MetaType1_9.Byte),
     HORSE_TYPE(HORSE, 19, MetaType1_8.Byte, 13, MetaType1_9.VarInt),
@@ -116,8 +115,7 @@ public enum MetaIndex {
     WITHER_TARGET2(WITHER, 18, MetaType1_8.Int, 12, MetaType1_9.VarInt),
     WITHER_TARGET3(WITHER, 19, MetaType1_8.Int, 13, MetaType1_9.VarInt),
     WITHER_INVULN_TIME(WITHER, 20, MetaType1_8.Int, 14, MetaType1_9.VarInt),
-    WITHER_PROPERTIES(WITHER, 10, MetaType1_8.Byte, null), // Thanks to plugins sending bad metadata
-    WITHER_UNKNOWN(WITHER, 11, MetaType1_8.NonExistent, null), // Thanks to plugins sending bad metadata
+
     // wither skull
     WITHERSKULL_INVULN(WITHER_SKULL, 10, MetaType1_8.Byte, 5, MetaType1_9.Boolean),
     // guardian
@@ -151,12 +149,8 @@ public enum MetaIndex {
     ITEMFRAME_ROTATION(ITEM_FRAME, 9, MetaType1_8.Byte, 6, MetaType1_9.VarInt),
     // ender crystal
     ENDERCRYSTAL_HEALTH(ENDER_CRYSTAL, 8, MetaType1_8.Int, null),
-    // Ender dragon boss bar issues
-    ENDERDRAGON_UNKNOWN(ENDER_DRAGON, 5, MetaType1_8.Byte, null),
-    ENDERDRAGON_NAME(ENDER_DRAGON, 10, MetaType1_8.String, null),
-    // Normal Ender dragon
-    ENDERDRAGON_FLAG(ENDER_DRAGON, 15, MetaType1_8.Byte, null),
-    ENDERDRAGON_PHASE(ENDER_DRAGON, 11, MetaType1_8.Byte, MetaType1_9.VarInt);
+    // ender dragon
+    ENDERDRAGON_PHASE(ENDER_DRAGON, -1, MetaType1_8.NonExistent, 11, MetaType1_9.VarInt);
 
     private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
