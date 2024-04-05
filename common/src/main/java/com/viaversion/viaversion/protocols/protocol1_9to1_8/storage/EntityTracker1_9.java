@@ -192,11 +192,13 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 }
             }
 
-            //ECHOPET Patch
-            if (type == EntityType.HORSE) {
-                // Wrong metadata value from EchoPet, patch since it's discontinued. (https://github.com/DSH105/EchoPet/blob/06947a8b08ce40be9a518c2982af494b3b99d140/modules/API/src/main/java/com/dsh105/echopet/compat/api/entity/HorseArmour.java#L22)
-                if (metadata.id() == 16 && (int) metadata.getValue() == Integer.MIN_VALUE)
+            // 1.8 can handle out of range values and will just not show any armor, 1.9+ clients will get
+            // exceptions and won't render the entity at all
+            if (type == EntityType.HORSE && metadata.id() == 16) {
+                final int value = metadata.value();
+                if (value < 0 || value > 3) { // no armor, iron armor, gold armor and diamond armor
                     metadata.setValue(0);
+                }
             }
 
             if (type == EntityType.PLAYER) {
