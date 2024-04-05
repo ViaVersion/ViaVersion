@@ -61,7 +61,7 @@ public enum MetaIndex {
     PLAYER_BYTE(ENTITY_HUMAN, 16, MetaType1_8.Byte, null), // unused on 1.8
     PLAYER_ADDITIONAL_HEARTS(ENTITY_HUMAN, 17, MetaType1_8.Float, 10, MetaType1_9.Float),
     PLAYER_SCORE(ENTITY_HUMAN, 18, MetaType1_8.Int, 11, MetaType1_9.VarInt),
-    PLAYER_HAND(ENTITY_HUMAN, -1, MetaType1_8.NonExistent, 5, MetaType1_9.Byte), // new in 1.9
+    PLAYER_HAND(ENTITY_HUMAN, 5, MetaType1_9.Byte), // new in 1.9
 
     // Horse
     HORSE_INFO(HORSE, 16, MetaType1_8.Int, 12, MetaType1_9.Byte),
@@ -183,7 +183,7 @@ public enum MetaIndex {
     ENDER_CRYSTAL_HEALTH(ENDER_CRYSTAL, 8, MetaType1_8.Int, null),
 
     // Ender dragon
-    ENDER_DRAGON_PHASE(ENDER_DRAGON, -1, MetaType1_8.NonExistent, 11, MetaType1_9.VarInt);
+    ENDER_DRAGON_PHASE(ENDER_DRAGON, 11, MetaType1_9.VarInt);
 
     private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
@@ -204,6 +204,14 @@ public enum MetaIndex {
         this.index = index;
         this.newIndex = index;
         this.oldType = oldType;
+        this.newType = newType;
+    }
+
+    MetaIndex(EntityTypes1_10.EntityType type, int newIndex, @Nullable MetaType1_9 newType) {
+        this.clazz = type;
+        this.index = -1;
+        this.oldType = null;
+        this.newIndex = newIndex;
         this.newType = newType;
     }
 
