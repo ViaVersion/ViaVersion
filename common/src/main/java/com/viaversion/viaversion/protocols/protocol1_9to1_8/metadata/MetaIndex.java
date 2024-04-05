@@ -45,7 +45,7 @@ public enum MetaIndex {
     LIVING_ENTITY_NO_AI(ENTITY_LIVING, 15, MetaType1_8.Byte, 10, MetaType1_9.Byte), // in 1.9 this is combined with Left handed.
 
     // Ageable entity
-    ENTITY_AGEABLE_AGE(ENTITY_AGEABLE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
+    AGEABLE_ENTITY_AGE(ENTITY_AGEABLE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
 
     // Armor stand
     ARMOR_STAND_INFO(ARMOR_STAND, 10, MetaType1_8.Byte, MetaType1_9.Byte),
@@ -74,8 +74,8 @@ public enum MetaIndex {
     BAT_IS_HANGING(BAT, 16, MetaType1_8.Byte, 11, MetaType1_9.Byte),
 
     // Tamable entity
-    ENTITY_TAMABLE_ANIMAL_INFO(ENTITY_TAMEABLE_ANIMAL, 16, MetaType1_8.Byte, 12, MetaType1_9.Byte),
-    ENTITY_TAMABLE_ANIMAL_OWNER(ENTITY_TAMEABLE_ANIMAL, 17, MetaType1_8.String, 13, MetaType1_9.OptUUID),
+    TAMABLE_ENTITY_ANIMAL_INFO(ENTITY_TAMEABLE_ANIMAL, 16, MetaType1_8.Byte, 12, MetaType1_9.Byte),
+    TAMABLE_ENTITY_ANIMAL_OWNER(ENTITY_TAMEABLE_ANIMAL, 17, MetaType1_8.String, 13, MetaType1_9.OptUUID),
 
     // Ocelot
     OCELOT_TYPE(OCELOT, 18, MetaType1_8.Byte, 14, MetaType1_9.VarInt),
