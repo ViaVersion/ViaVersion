@@ -76,8 +76,8 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
                     }
-                    int newIndex = MetaIndex.ENTITY_HUMAN_HAND.getNewIndex();
-                    MetaType metaType = MetaIndex.ENTITY_HUMAN_HAND.getNewType();
+                    int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
+                    MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
                     event.createExtraMeta(new Metadata(newIndex, metaType, val));
                 }
                 break;
@@ -109,7 +109,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(value);
                 break;
             case Boolean:
-                if (metaIndex == MetaIndex.ENTITY_AGEABLE_AGE)
+                if (metaIndex == MetaIndex.AGEABLE_ENTITY_AGE)
                     metadata.setValue((Byte) value < 0);
                 else
                     metadata.setValue((Byte) value != 0);
