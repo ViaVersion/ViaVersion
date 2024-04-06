@@ -42,6 +42,7 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
 
@@ -74,6 +75,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     monsterSpawnLightLevel.putInt("min_inclusive", value.getInt("min_inclusive"));
                     monsterSpawnLightLevel.putInt("max_inclusive", value.getInt("max_inclusive"));
                 }
+            }
+
+            // Fixup sound ids that are now hard checked against the registry
+            final ListTag<CompoundTag> biomes = registryData.getCompoundTag("minecraft:worldgen/biome").getListTag("value", CompoundTag.class);
+            for (final CompoundTag biome : biomes) {
+                final CompoundTag effects = biome.getCompoundTag("element").getCompoundTag("effects");
+                checkSoundTag(effects.getCompoundTag("mood_sound"), "sound");
+                checkSoundTag(effects.getCompoundTag("additions_sound"), "sound");
+                checkSoundTag(effects.getCompoundTag("music"), "sound");
+                checkSoundTag(effects, "ambient_sound");
             }
 
             for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
@@ -209,6 +220,20 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
             }
         });
+    }
+
+    private void checkSoundTag(@Nullable final CompoundTag tag, final String key) {
+        if (tag == null) {
+            return;
+        }
+
+        final String sound = tag.getString(key);
+        if (sound != null && protocol.getMappingData().soundId(sound) == -1) {
+            // Write as direct value
+            final CompoundTag directSoundValue = new CompoundTag();
+            directSoundValue.putString("sound_id", sound);
+            tag.put(key, directSoundValue);
+        }
     }
 
     private void replaceNullValues(final RegistryEntry[] entries) {

@@ -28,6 +28,7 @@ public class MappingData extends MappingDataBase {
 
     private KeyMappings items;
     private KeyMappings blocks;
+    private KeyMappings sounds;
 
     public MappingData() {
         super("1.20.3", "1.20.5");
@@ -37,9 +38,10 @@ public class MappingData extends MappingDataBase {
     protected void loadExtras(final CompoundTag data) {
         super.loadExtras(data);
 
-        final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("items-blocks-1.20.3.nbt");
+        final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("extra-identifiers-1.20.3.nbt");
         items = new KeyMappings(extraMappings.getListTag("items", StringTag.class));
         blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
+        sounds = new KeyMappings(extraMappings.getListTag("sounds", StringTag.class));
     }
 
     public int itemId(final String name) {
@@ -56,5 +58,13 @@ public class MappingData extends MappingDataBase {
 
     public @Nullable String blockName(final int id) {
         return blocks.idToKey(id);
+    }
+
+    public int soundId(final String name) {
+        return sounds.keyToId(name);
+    }
+
+    public @Nullable String soundName(final int id) {
+        return sounds.idToKey(id);
     }
 }
