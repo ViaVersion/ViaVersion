@@ -22,11 +22,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.PlayerMovementMapper;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.chat.ChatRewriter;
@@ -36,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.Compressio
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
 import java.util.logging.Level;
 
 public class PlayerPackets {
@@ -451,6 +452,11 @@ public class PlayerPackets {
             }
         });
 
+        final PacketHandler onGroundHandler = wrapper -> {
+            final MovementTracker tracker = wrapper.user().get(MovementTracker.class);
+            tracker.incrementIdlePacket();
+            tracker.setGround(wrapper.get(Type.BOOLEAN, 0));
+        };
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION, new PacketHandlers() {
             @Override
             public void register() {
@@ -458,7 +464,7 @@ public class PlayerPackets {
                 map(Type.DOUBLE); // 1 - Y
                 map(Type.DOUBLE); // 2 - Z
                 map(Type.BOOLEAN); // 3 - Ground
-                handler(new PlayerMovementMapper());
+                handler(onGroundHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
@@ -470,7 +476,7 @@ public class PlayerPackets {
                 map(Type.FLOAT); // 3 - Yaw
                 map(Type.FLOAT); // 4 - Pitch
                 map(Type.BOOLEAN); // 5 - Ground
-                handler(new PlayerMovementMapper());
+                handler(onGroundHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_ROTATION, new PacketHandlers() {
@@ -479,14 +485,14 @@ public class PlayerPackets {
                 map(Type.FLOAT); // 0 - Yaw
                 map(Type.FLOAT); // 1 - Pitch
                 map(Type.BOOLEAN); // 2 - Ground
-                handler(new PlayerMovementMapper());
+                handler(onGroundHandler);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_9.PLAYER_MOVEMENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BOOLEAN); // 0 - Ground
-                handler(new PlayerMovementMapper());
+                handler(onGroundHandler);
             }
         });
     }
