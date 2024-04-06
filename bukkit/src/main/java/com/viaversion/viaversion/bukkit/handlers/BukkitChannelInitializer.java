@@ -34,12 +34,12 @@ public final class BukkitChannelInitializer extends ChannelInitializer<Channel> 
     public static final String VIA_DECODER = "via-decoder";
     public static final String MINECRAFT_ENCODER = "encoder";
     public static final String MINECRAFT_DECODER = "decoder";
+    public static final String MINECRAFT_OUTBOUND_CONFIG = "outbound_config";
     public static final String MINECRAFT_COMPRESSOR = "compress";
     public static final String MINECRAFT_DECOMPRESSOR = "decompress";
     public static final Object COMPRESSION_ENABLED_EVENT = paperCompressionEnabledEvent();
     private static final Method INIT_CHANNEL_METHOD;
     private final ChannelInitializer<Channel> original;
-
 
     static {
         try {
@@ -80,7 +80,8 @@ public final class BukkitChannelInitializer extends ChannelInitializer<Channel> 
 
         // Add our transformers
         final ChannelPipeline pipeline = channel.pipeline();
-        pipeline.addBefore(MINECRAFT_ENCODER, VIA_ENCODER, new BukkitEncodeHandler(connection));
+        final String encoderName = pipeline.get(MINECRAFT_OUTBOUND_CONFIG) != null ? MINECRAFT_OUTBOUND_CONFIG : MINECRAFT_ENCODER;
+        pipeline.addBefore(encoderName, VIA_ENCODER, new BukkitEncodeHandler(connection));
         pipeline.addBefore(MINECRAFT_DECODER, VIA_DECODER, new BukkitDecodeHandler(connection));
     }
 
