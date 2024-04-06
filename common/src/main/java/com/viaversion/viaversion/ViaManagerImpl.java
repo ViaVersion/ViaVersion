@@ -329,7 +329,11 @@ public class ViaManagerImpl implements ViaManager {
      * @param runnable runnable to be executed
      */
     public void addEnableListener(Runnable runnable) {
-        enableListeners.add(runnable);
+        if (enableListeners != null) {
+            enableListeners.add(runnable);
+        } else {
+            runnable.run();
+        }
     }
 
     @Override
