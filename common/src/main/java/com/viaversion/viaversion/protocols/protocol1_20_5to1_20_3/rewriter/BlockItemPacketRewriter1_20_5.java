@@ -103,6 +103,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.viaversion.viaversion.util.MathUtil.clamp;
+
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
@@ -461,12 +463,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final IntTag maxStackSize = backupTag.getIntTag("max_stack_size");
         if (maxStackSize != null) {
-            data.set(StructuredDataKey.MAX_STACK_SIZE, maxStackSize.asInt());
+            data.set(StructuredDataKey.MAX_STACK_SIZE, clamp(maxStackSize.asInt(), 1, 99));
         }
 
         final IntTag maxDamage = backupTag.getIntTag("max_damage");
         if (maxDamage != null) {
-            data.set(StructuredDataKey.MAX_DAMAGE, maxDamage.asInt());
+            data.set(StructuredDataKey.MAX_DAMAGE, Math.max(maxDamage.asInt(), 1));
         }
 
         final IntTag rarity = backupTag.getIntTag("rarity");
@@ -480,7 +482,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final IntTag ominousBottleAmplifier = backupTag.getIntTag("ominous_bottle_amplifier");
         if (ominousBottleAmplifier != null) {
-            data.set(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, ominousBottleAmplifier.asInt());
+            data.set(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, clamp(ominousBottleAmplifier.asInt(), 0, 4));
         }
     }
 
@@ -766,7 +768,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final int flightDuration = fireworksTag.getInt("Flight");
         final Fireworks fireworks = new Fireworks(
             flightDuration,
-            explosionsTag.stream().map(this::readExplosion).toArray(FireworkExplosion[]::new)
+            explosionsTag.stream().limit(256).map(this::readExplosion).toArray(FireworkExplosion[]::new)
         );
         data.set(StructuredDataKey.FIREWORKS, fireworks);
     }
@@ -827,11 +829,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (filteredPagesTag != null) {
                 final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
                 if (filteredPage != null) {
-                    filtered = filteredPage.getValue();
+                    filtered = limit(filteredPage.getValue(), 1024);
                 }
             }
-            pages.add(new FilterableString(page.getValue(), filtered));
+            pages.add(new FilterableString(limit(page.getValue(), 1024), filtered));
 
+            if (pages.size() == 100) {
+                // Network limit
+                break;
+            }
         }
         data.set(StructuredDataKey.WRITABLE_BOOK_CONTENT, pages.toArray(new FilterableString[0]));
     }
@@ -856,6 +862,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final Tag parsedPage = ComponentUtil.jsonStringToTag(page.getValue());
             pages.add(new FilterableComponent(parsedPage, filtered));
+
+            if (pages.size() == 100) {
+                // Network limit
+                break;
+            }
         }
 
         final String title = tag.getString("title", "");
@@ -864,7 +875,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final int generation = tag.getInt("generation");
         final boolean resolved = tag.getBoolean("resolved");
         final WrittenBook writtenBook = new WrittenBook(
-            new FilterableString(title, filteredTitle),
+            new FilterableString(limit(title, 32), limit(filteredTitle, 32)),
             author,
             generation,
             pages.toArray(new FilterableComponent[0]),
@@ -876,7 +887,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
-            final Item[] items = itemsTag.stream().map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
+            final Item[] items = itemsTag.stream().limit(256).map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
             data.set(dataKey, items);
         }
     }
@@ -947,8 +958,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (propertiesTag != null) {
                 updateProperties(propertiesTag, properties);
             }
-            data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
+            data.set(StructuredDataKey.PROFILE, new GameProfile(limit(name, 16), uuid, properties.toArray(EMPTY_PROPERTIES)));
         }
+    }
+
+    private @Nullable String limit(@Nullable final String s, final int length) {
+        if (s == null) {
+            return null;
+        }
+        return s.length() > length ? s.substring(0, length) : s;
     }
 
     private void updateBees(final StructuredDataContainer data, final ListTag<CompoundTag> beesTag) {
@@ -981,7 +999,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final CompoundTag compoundTag = (CompoundTag) propertyTag;
                 final String value = compoundTag.getString("Value", "");
                 final String signature = compoundTag.getString("Signature");
-                properties.add(new GameProfile.Property(entry.getKey(), value, signature));
+                properties.add(new GameProfile.Property(
+                    limit(entry.getKey(), 64),
+                    value,
+                    limit(signature, 1024)
+                ));
+
+                if (properties.size() == 16) {
+                    // Max 16 properties
+                    return;
+                }
             }
         }
     }
@@ -1023,7 +1050,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
         if (loreTag != null) {
-            data.set(StructuredDataKey.LORE, loreTag.stream().map(t -> ComponentUtil.jsonStringToTag(t.getValue())).toArray(Tag[]::new));
+            // Apply limit as per new network codec. Some servers send these lores to do trickery with shaders
+            data.set(StructuredDataKey.LORE, loreTag.stream().limit(256).map(t -> ComponentUtil.jsonStringToTag(t.getValue())).toArray(Tag[]::new));
         }
 
         final NumberTag colorTag = displayTag.getNumberTag("color");
