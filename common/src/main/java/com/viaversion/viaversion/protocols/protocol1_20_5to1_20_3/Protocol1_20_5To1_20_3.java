@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
@@ -52,6 +53,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.Acknow
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -89,7 +91,15 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_3.SERVER_DATA, wrapper -> {
             wrapper.passthrough(Type.TAG); // MOTD
             wrapper.passthrough(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE); // Icon
-            wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
+
+            // Moved to join game
+            final boolean enforcesSecureChat = wrapper.read(Type.BOOLEAN);
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            storage.setSecureChatEnforced(enforcesSecureChat);
+            if (enforcesSecureChat) {
+                // Only send the chat session to the server if we know that it is required
+                storage.sendQueuedChatSession(wrapper);
+            }
         });
 
         // Big problem with this update: Without access to the client, this cannot 100% predict the
@@ -98,43 +108,65 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.passthrough(Type.UUID); // Sender
             wrapper.passthrough(Type.VAR_INT); // Index
             final byte[] signature = wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES);
+            if (signature == null) {
+                return;
+            }
 
+            // Mimic client behavior for acknowledgements
             final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
-            if (signature != null && signature.length != 0) {
-                if (storage.add(signature) && storage.offset() > 64) {
-                    final PacketWrapper chatAck = wrapper.create(ServerboundPackets1_20_3.CHAT_ACK);
-                    chatAck.write(Type.VAR_INT, storage.offset());
-                    chatAck.sendToServer(Protocol1_20_5To1_20_3.class);
+            if (storage.add(signature) && storage.offset() > 64) {
+                final PacketWrapper chatAck = wrapper.create(ServerboundPackets1_20_3.CHAT_ACK);
+                chatAck.write(Type.VAR_INT, storage.offset());
+                chatAck.sendToServer(Protocol1_20_5To1_20_3.class);
 
-                    storage.clearOffset();
-                }
+                storage.clearOffset();
             }
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> {
             wrapper.passthrough(Type.STRING); // Message
             wrapper.passthrough(Type.LONG); // Timestamp
-            wrapper.passthrough(Type.LONG); // Salt
-            wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
 
-            // Remove original acknowledgement
-            wrapper.read(Type.VAR_INT); // Offset
-            wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
-            writeChatAck(wrapper);
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final long salt = wrapper.read(Type.LONG);
+            final byte[] signature = wrapper.read(Type.OPTIONAL_SIGNATURE_BYTES);
+            if (storage.isSecureChatEnforced()) {
+                // Fake it till you make it
+                wrapper.write(Type.LONG, salt);
+                wrapper.write(Type.OPTIONAL_SIGNATURE_BYTES, signature);
+            } else {
+                // Go the safer route and strip the signature. No signature means no verification
+                wrapper.write(Type.LONG, 0L);
+                wrapper.write(Type.OPTIONAL_SIGNATURE_BYTES, null);
+            }
+
+            replaceChatAck(wrapper, storage);
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Type.STRING); // Command
             wrapper.passthrough(Type.LONG); // Timestamp
-            wrapper.passthrough(Type.LONG); // Salt
-            final int signatures = wrapper.passthrough(Type.VAR_INT);
-            for (int i = 0; i < signatures; i++) {
-                wrapper.passthrough(Type.STRING); // Argument name
-                wrapper.passthrough(Type.SIGNATURE_BYTES); // Signature
+
+            // See above, strip signatures if we can to prevent verification of possibly bad signatures
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            final long salt = wrapper.read(Type.LONG);
+            final int signatures = wrapper.read(Type.VAR_INT);
+            if (storage.isSecureChatEnforced()) {
+                wrapper.write(Type.LONG, salt);
+                wrapper.write(Type.VAR_INT, signatures);
+                for (int i = 0; i < signatures; i++) {
+                    wrapper.passthrough(Type.STRING); // Argument name
+                    wrapper.passthrough(Type.SIGNATURE_BYTES); // Signature
+                }
+            } else {
+                // Remove signatures
+                wrapper.write(Type.LONG, 0L);
+                wrapper.write(Type.VAR_INT, 0); // No signatures
+                for (int i = 0; i < signatures; i++) {
+                    wrapper.read(Type.STRING); // Argument name
+                    wrapper.read(Type.SIGNATURE_BYTES); // Signature
+                }
             }
 
-            // Remove original acknowledgement
-            wrapper.read(Type.VAR_INT); // Offset
-            wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
-            writeChatAck(wrapper);
+            replaceChatAck(wrapper, storage);
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Type.STRING); // Command
@@ -142,7 +174,23 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.write(Type.LONG, System.currentTimeMillis()); // Timestamp
             wrapper.write(Type.LONG, 0L); // Salt
             wrapper.write(Type.VAR_INT, 0); // No signatures
-            writeChatAck(wrapper);
+
+            writeChatAck(wrapper, wrapper.user().get(AcknowledgedMessagesStorage.class));
+        });
+        registerServerbound(ServerboundPackets1_20_5.CHAT_SESSION_UPDATE, wrapper -> {
+            // Delay this until we know whether the server enforces secure chat
+            // The server sends this info in SERVER_DATA, but the client already sends this after receiving the game login
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            if (storage.secureChatEnforced() != null && storage.secureChatEnforced()) {
+                // We already know that secure chat is enforced, let it through
+                return;
+            }
+
+            final UUID sessionId = wrapper.read(Type.UUID);
+            final ProfileKey profileKey = wrapper.read(Type.PROFILE_KEY);
+            storage.queueChatSession(sessionId, profileKey);
+
+            wrapper.cancel();
         });
         cancelServerbound(ServerboundPackets1_20_5.CHAT_ACK);
 
@@ -157,8 +205,13 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
-    private void writeChatAck(final PacketWrapper wrapper) {
-        final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+    private void replaceChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) throws Exception {
+        wrapper.read(Type.VAR_INT); // Offset
+        wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
+        writeChatAck(wrapper, storage);
+    }
+
+    private void writeChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
         wrapper.write(Type.VAR_INT, storage.offset());
         wrapper.write(Type.ACKNOWLEDGED_BIT_SET, storage.toAck());
         storage.clearOffset();
