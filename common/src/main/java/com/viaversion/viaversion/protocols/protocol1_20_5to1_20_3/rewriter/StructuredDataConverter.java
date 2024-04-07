@@ -20,12 +20,14 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.FloatTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
+import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -33,6 +35,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
@@ -40,10 +43,13 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
 import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
@@ -58,6 +64,7 @@ import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import java.util.Arrays;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -72,13 +79,13 @@ public final class StructuredDataConverter {
     static final int HIDE_DYE_COLOR = 1 << 6;
     static final int HIDE_ARMOR_TRIM = 1 << 7;
 
+    // Can't do nicely
     private static final String BACKUP_TAG_KEY = "VV|DataComponents";
+    private static final String ITEM_TAG_KEY = "VV|id";
 
     private final Map<StructuredDataKey<?>, DataConverter<?>> rewriters = new Reference2ObjectOpenHashMap<>();
-    private final boolean backupInconvertibleData;
 
     public StructuredDataConverter(final boolean backupInconvertibleData) {
-        this.backupInconvertibleData = backupInconvertibleData;
         register(StructuredDataKey.CUSTOM_DATA, (data, tag) -> {
             // Handled manually
         });
@@ -244,9 +251,26 @@ public final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.INSTRUMENT, (data, tag) -> {
+            // Can't do anything with direct values
             if (!data.hasId()) {
-                // Can't do anything with direct values
-                // TODO Backup
+                if (backupInconvertibleData) {
+                    final CompoundTag backupTag = new CompoundTag();
+                    final Instrument instrument = data.value();
+                    if (instrument.soundEvent().hasId()) {
+                        backupTag.putInt("sound_event", instrument.soundEvent().id());
+                    } else {
+                        final CompoundTag soundEventTag = new CompoundTag();
+                        final SoundEvent soundEvent = instrument.soundEvent().value();
+                        soundEventTag.putString("identifier", soundEvent.identifier());
+                        if (soundEvent.fixedRange() != null) {
+                            soundEventTag.putFloat("fixed_range", soundEvent.fixedRange());
+                        }
+                        backupTag.put("sound_event", soundEventTag);
+                    }
+                    backupTag.putInt("use_duration", instrument.useDuration());
+                    backupTag.putFloat("range", instrument.range());
+                    getBackupTag(tag).put("instrument", backupTag);
+                }
                 return;
             }
 
@@ -269,9 +293,23 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
         register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag).putString("note_block_sound", data));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
+            IntArrayTag originalSherds = null;
+
             final ListTag<StringTag> sherds = new ListTag<>(StringTag.class);
             for (final int id : data.itemIds()) {
-                sherds.add(new StringTag(toItemName(id)));
+                final String name = toMappedItemName(id);
+                if (name.isEmpty()) {
+                    // Backup whole data if one of the sherds is inconvertible
+                    // Since we don't want to break the order of the sherds
+                    if (backupInconvertibleData && originalSherds == null) {
+                        originalSherds = new IntArrayTag(data.itemIds());
+                    }
+                    continue;
+                }
+                sherds.add(new StringTag(name));
+            }
+            if (originalSherds != null) {
+                getBackupTag(tag).put("pot_decorations", originalSherds);
             }
             getBlockEntityTag(tag).put("sherds", sherds);
         });
@@ -302,7 +340,7 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putBoolean("enchantment_glint_override", data);
+                getBackupTag(tag).putBoolean("enchantment_glint_override", data);
             }
             if (!data) {
                 // There is no way to remove the glint without removing the enchantments
@@ -368,14 +406,32 @@ public final class StructuredDataConverter {
             tag.put("effects", effectsTag);
         });
         register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
+            final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
+            if (backupInconvertibleData) {
+                // Backup whole data if one of the patterns is inconvertible
+                // Since we don't want to break the order of the patterns
+                if (Arrays.stream(data).anyMatch(layer -> layer.pattern().isDirect())) {
+                    for (final BannerPatternLayer layer : data) {
+                        final CompoundTag layerTag = new CompoundTag();
+                        final CompoundTag patternTag = new CompoundTag();
+                        final BannerPattern pattern = layer.pattern().value();
+                        patternTag.putString("asset_id", pattern.assetId());
+                        patternTag.putString("translation_key", pattern.translationKey());
+                        layerTag.put("pattern", patternTag);
+                        layerTag.putInt("dye_color", layer.dyeColor());
+                        originalPatterns.add(layerTag);
+                    }
+                    getBackupTag(tag).put("banner_patterns", originalPatterns);
+                    return;
+                }
+            }
+
             final ListTag<CompoundTag> patternsTag = new ListTag<>(CompoundTag.class);
             for (final BannerPatternLayer layer : data) {
                 final String pattern = BannerPatterns1_20_5.fullIdToCompact(BannerPatterns1_20_5.idToKey(layer.pattern().id()));
                 if (pattern == null) {
-                    // TODO Backup
                     continue;
                 }
-
                 final CompoundTag patternTag = new CompoundTag();
                 patternTag.putString("Pattern", pattern);
                 patternTag.putInt("Color", layer.dyeColor());
@@ -403,9 +459,9 @@ public final class StructuredDataConverter {
                 final ArmorTrimMaterial material = data.material().value();
                 materialTag.putString("asset_name", material.assetName());
 
-                final String ingredientName = toItemName(material.itemId());
+                final String ingredientName = toMappedItemName(material.itemId());
                 if (ingredientName.isEmpty()) {
-                    return;
+                    getBackupTag(materialTag).putInt(ITEM_TAG_KEY, material.itemId());
                 }
                 materialTag.putString("ingredient", ingredientName);
                 materialTag.put("item_model_index", new FloatTag(material.itemModelIndex()));
@@ -429,9 +485,9 @@ public final class StructuredDataConverter {
                 final ArmorTrimPattern pattern = data.pattern().value();
 
                 patternTag.putString("assetId", pattern.assetName());
-                final String itemName = toItemName(pattern.itemId());
+                final String itemName = toMappedItemName(pattern.itemId());
                 if (itemName.isEmpty()) {
-                    return;
+                    getBackupTag(patternTag).putInt(ITEM_TAG_KEY, pattern.itemId());
                 }
                 patternTag.putString("templateItem", itemName);
                 patternTag.put("description", pattern.description());
@@ -459,60 +515,102 @@ public final class StructuredDataConverter {
             // Hide everything we can hide
             putHideFlag(tag, 0xFF);
             if (backupInconvertibleData) {
-                createBackupTag(tag).putBoolean("hide_tooltip", true);
+                getBackupTag(tag).putBoolean("hide_tooltip", true);
             }
         });
 
         // New in 1.20.5
         register(StructuredDataKey.INTANGIBLE_PROJECTILE, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).put("intangible_projectile", data);
+                getBackupTag(tag).put("intangible_projectile", data);
             }
         });
         register(StructuredDataKey.MAX_STACK_SIZE, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putInt("max_stack_size", data);
+                getBackupTag(tag).putInt("max_stack_size", data);
             }
         });
         register(StructuredDataKey.MAX_DAMAGE, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putInt("max_damage", data);
+                getBackupTag(tag).putInt("max_damage", data);
             }
         });
         register(StructuredDataKey.RARITY, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putInt("rarity", data);
+                getBackupTag(tag).putInt("rarity", data);
             }
         });
         register(StructuredDataKey.FOOD, (data, tag) -> {
             if (backupInconvertibleData) {
-                //createBackupTag(tag).; // TODO Backup
+                final CompoundTag backupTag = new CompoundTag();
+                backupTag.putInt("nutrition", data.nutrition());
+                backupTag.putFloat("saturation_modifier", data.saturationModifier());
+                backupTag.putBoolean("can_always_eat", data.canAlwaysEat());
+                backupTag.putFloat("eat_seconds", data.eatSeconds());
+
+                final ListTag<CompoundTag> possibleEffectsTag = new ListTag<>(CompoundTag.class);
+                for (final FoodEffect effect : data.possibleEffects()) {
+                    final CompoundTag effectTag = new CompoundTag();
+
+                    final PotionEffect potionEffect = effect.effect();
+                    final CompoundTag potionEffectTag = new CompoundTag();
+                    potionEffectTag.putInt("effect", potionEffect.effect());
+                    potionEffectTag.put("effect_data", convertPotionEffectData(potionEffect.effectData()));
+
+                    effectTag.putFloat("probability", effect.probability());
+                    effectTag.put("effect", potionEffectTag);
+                    possibleEffectsTag.add(effectTag);
+                }
+                backupTag.put("possible_effects", possibleEffectsTag);
+                getBackupTag(tag).put("food", backupTag);
             }
         });
         register(StructuredDataKey.FIRE_RESISTANT, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putBoolean("fire_resistant", true);
+                getBackupTag(tag).putBoolean("fire_resistant", true);
             }
         });
         register(StructuredDataKey.TOOL, (data, tag) -> {
             if (backupInconvertibleData) {
-                //createBackupTag(tag).; // TODO Backup
+                final CompoundTag backupTag = new CompoundTag();
+                final ListTag<CompoundTag> rulesTag = new ListTag<>(CompoundTag.class);
+                for (final ToolRule rule : data.rules()) {
+                    final CompoundTag ruleTag = new CompoundTag();
+                    final HolderSet set = rule.blocks();
+                    if (set.hasTagKey()) {
+                        ruleTag.putString("blocks", set.tagKey());
+                    } else {
+                        ruleTag.put("blocks", new IntArrayTag(set.ids()));
+                    }
+                    if (rule.speed() != null) {
+                        ruleTag.putFloat("speed", rule.speed());
+                    }
+                    if (rule.correctForDrops() != null) {
+                        ruleTag.putBoolean("correct_for_drops", rule.correctForDrops());
+                    }
+                    rulesTag.add(ruleTag);
+                }
+                backupTag.put("rules", rulesTag);
+                backupTag.putFloat("default_mining_speed", data.defaultMiningSpeed());
+                backupTag.putInt("damage_per_block", data.damagePerBlock());
+                getBackupTag(tag).put("tool", backupTag);
             }
         });
         register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, (data, tag) -> {
             if (backupInconvertibleData) {
-                createBackupTag(tag).putInt("ominous_bottle_amplifier", data);
+                getBackupTag(tag).putInt("ominous_bottle_amplifier", data);
             }
         });
     }
 
-    private String toItemName(final int id) {
-        final int mappedId = Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
-        // TODO Backup
-        return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.itemName(mappedId) : "";
+    private int unmappedItemId(final int id) {
+        return Protocol1_20_5To1_20_3.MAPPINGS.getOldItemId(id);
     }
 
-    // If multiple item components which previously were stored in BlockEntityTag are present, we need to merge them
+    private String toMappedItemName(final int id) {
+        final int mappedId = unmappedItemId(id);
+        return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.itemName(mappedId) : "";
+    }
 
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
         return getOrCreate(tag, "BlockEntityTag");
@@ -522,6 +620,11 @@ public final class StructuredDataConverter {
         return getOrCreate(tag, "display");
     }
 
+    private static CompoundTag getBackupTag(final CompoundTag tag) {
+        return getOrCreate(tag, BACKUP_TAG_KEY);
+    }
+
+    // If multiple item components which previously were stored in BlockEntityTag are present, we need to merge them
     private static CompoundTag getOrCreate(final CompoundTag tag, final String key) {
         CompoundTag subTag = tag.getCompoundTag(key);
         if (subTag == null) {
@@ -529,6 +632,22 @@ public final class StructuredDataConverter {
             tag.put(key, subTag);
         }
         return subTag;
+    }
+
+    static @Nullable CompoundTag removeBackupTag(final CompoundTag tag) {
+        final CompoundTag backupTag = tag.getCompoundTag(BACKUP_TAG_KEY);
+        if (backupTag != null) {
+            tag.remove(BACKUP_TAG_KEY);
+        }
+        return backupTag;
+    }
+
+    static int getBackupItemId(final CompoundTag tag, final int unmappedId) {
+        if (unmappedId != -1) {
+            return unmappedId;
+        }
+        final IntTag itemIdTag = tag.getIntTag(ITEM_TAG_KEY);
+        return itemIdTag != null ? itemIdTag.getTagId() : -1;
     }
 
     private void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
@@ -545,7 +664,12 @@ public final class StructuredDataConverter {
                 predicatedListTag.add(serializeBlockPredicate(predicate, tagKey));
             } else {
                 for (final int id : holders.ids()) {
-                    predicatedListTag.add(serializeBlockPredicate(predicate, toItemName(id)));
+                    final String name = toMappedItemName(id);
+                    if (name.isEmpty()) {
+                        // TODO HANDLE
+                        continue;
+                    }
+                    predicatedListTag.add(serializeBlockPredicate(predicate, name));
                 }
             }
         }
@@ -583,11 +707,28 @@ public final class StructuredDataConverter {
         return explosionTag;
     }
 
+    private CompoundTag convertPotionEffectData(final PotionEffectData data) {
+        final CompoundTag effectDataTag = new CompoundTag();
+        effectDataTag.putInt("amplifier", data.amplifier());
+        effectDataTag.putInt("duration", data.duration());
+        effectDataTag.putBoolean("ambient", data.ambient());
+        effectDataTag.putBoolean("show_particles", data.showParticles());
+        effectDataTag.putBoolean("show_icon", data.showIcon());
+        if (data.hiddenEffect() != null) {
+            effectDataTag.put("hidden_effect", convertPotionEffectData(data.hiddenEffect()));
+        }
+        return effectDataTag;
+    }
+
     private void convertItemList(final Item[] items, final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (final Item item : items) {
             final CompoundTag savedItem = new CompoundTag();
-            savedItem.putString("id", toItemName(item.identifier()));
+            final String name = toMappedItemName(item.identifier());
+            savedItem.putString("id", name);
+            if (name.isEmpty()) {
+                savedItem.putInt(ITEM_TAG_KEY, item.identifier());
+            }
             savedItem.putByte("Count", (byte) item.amount());
 
             final CompoundTag itemTag = new CompoundTag();
@@ -647,18 +788,6 @@ public final class StructuredDataConverter {
 
     private <T> void register(final StructuredDataKey<T> key, final DataConverter<T> converter) {
         rewriters.put(key, converter);
-    }
-
-    private static CompoundTag createBackupTag(final CompoundTag tag) {
-        return getOrCreate(tag, BACKUP_TAG_KEY);
-    }
-
-    static @Nullable CompoundTag removeBackupTag(final CompoundTag tag) {
-        final CompoundTag backupTag = tag.getCompoundTag(BACKUP_TAG_KEY);
-        if (backupTag != null) {
-            tag.remove(BACKUP_TAG_KEY);
-        }
-        return backupTag;
     }
 
     @FunctionalInterface

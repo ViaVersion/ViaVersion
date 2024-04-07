@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -45,6 +46,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
+import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
 import com.viaversion.viaversion.api.minecraft.item.data.BlockPredicate;
@@ -55,6 +57,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
@@ -63,6 +68,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
 import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
 import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
@@ -498,6 +505,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void restoreFromBackupTag(final CompoundTag backupTag, final StructuredDataContainer data) {
+        final CompoundTag instrument = backupTag.getCompoundTag("instrument");
+        if (instrument != null) {
+            restoreInstrumentFromBackup(instrument, data);
+        }
+
+        final IntArrayTag potDecorationsTag = backupTag.getIntArrayTag("pot_decorations");
+        if (potDecorationsTag != null && potDecorationsTag.getValue().length == 4) {
+            data.set(StructuredDataKey.POT_DECORATIONS, new PotDecorations(potDecorationsTag.getValue()));
+        }
+
         final ByteTag enchantmentGlintOverride = backupTag.getByteTag("enchantment_glint_override");
         if (enchantmentGlintOverride != null) {
             data.set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, enchantmentGlintOverride.asBoolean());
@@ -527,14 +544,128 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.RARITY, rarity.asInt());
         }
 
+        final CompoundTag food = backupTag.getCompoundTag("food");
+        if (food != null) {
+            restoreFoodFromBackup(food, data);
+        }
+
         if (backupTag.contains("fire_resistant")) {
             data.set(StructuredDataKey.FIRE_RESISTANT);
+        }
+
+        final CompoundTag tool = backupTag.getCompoundTag("tool");
+        if (tool != null) {
+            restoreToolFromBackup(tool, data);
         }
 
         final IntTag ominousBottleAmplifier = backupTag.getIntTag("ominous_bottle_amplifier");
         if (ominousBottleAmplifier != null) {
             data.set(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, clamp(ominousBottleAmplifier.asInt(), 0, 4));
         }
+
+        final ListTag<CompoundTag> bannerPatterns = backupTag.getListTag("banner_patterns", CompoundTag.class);
+        if (bannerPatterns != null) {
+            restoreBannerPatternsFromBackup(bannerPatterns, data);
+        }
+    }
+
+    private void restoreInstrumentFromBackup(final CompoundTag instrument, final StructuredDataContainer data) {
+        final int useDuration = instrument.getInt("use_duration");
+        final float range = instrument.getFloat("range");
+
+        Holder<SoundEvent> soundEvent;
+        final Tag soundEventTag = instrument.get("sound_event");
+        if (soundEventTag instanceof IntTag) {
+            soundEvent = Holder.of(((IntTag) soundEventTag).asInt());
+        } else if (soundEventTag instanceof CompoundTag) {
+            final CompoundTag soundEventCompound = (CompoundTag) soundEventTag;
+            final StringTag identifier = soundEventCompound.getStringTag("identifier");
+            if (identifier == null) {
+                return; // Nothing we can do about
+            }
+            soundEvent = Holder.of(new SoundEvent(
+                identifier.getValue(),
+                soundEventCompound.contains("fixed_range") ?
+                    soundEventCompound.getFloat("fixed_range") : null
+            ));
+        } else {
+            return; // Nothing we can do about
+        }
+        data.set(StructuredDataKey.INSTRUMENT, Holder.of(new Instrument(soundEvent, useDuration, range)));
+    }
+
+    private void restoreFoodFromBackup(final CompoundTag food, final StructuredDataContainer data) {
+        final int nutrition = food.getInt("nutrition");
+        final float saturation = food.getFloat("saturation");
+        final boolean canAlwaysEat = food.getBoolean("can_always_eat");
+        final float eatSeconds = food.getFloat("eat_seconds");
+
+        final ListTag<CompoundTag> possibleEffectsTag = food.getListTag("possible_effects", CompoundTag.class);
+        if (possibleEffectsTag == null) {
+            return;
+        }
+        final List<FoodEffect> possibleEffects = new ArrayList<>();
+        for (final CompoundTag effect : possibleEffectsTag) {
+            final CompoundTag potionEffectTag = effect.getCompoundTag("effect");
+            if (potionEffectTag == null) {
+                continue; // Nothing we can do about
+            }
+            possibleEffects.add(new FoodEffect(
+                new PotionEffect(
+                    potionEffectTag.getInt("effect"),
+                    readPotionEffectData(potionEffectTag)
+                ),
+                effect.getFloat("probability")
+            ));
+        }
+        data.set(StructuredDataKey.FOOD, new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, possibleEffects.toArray(new FoodEffect[0])));
+    }
+
+    private void restoreToolFromBackup(final CompoundTag tool, final StructuredDataContainer data) {
+        final ListTag<CompoundTag> rulesTag = tool.getListTag("rules", CompoundTag.class);
+        if (rulesTag == null) {
+            return;
+        }
+        final List<ToolRule> rules = new ArrayList<>();
+        for (final CompoundTag tag : rulesTag) {
+            HolderSet blocks = null;
+            if (tag.get("blocks") instanceof StringTag) {
+                blocks = HolderSet.of(tag.getString("blocks"));
+            } else {
+                final IntArrayTag blockIds = tag.getIntArrayTag("blocks");
+                if (blockIds != null) {
+                    blocks = HolderSet.of(blockIds.getValue());
+                }
+            }
+            if (blocks == null) {
+                continue; // Nothing we can do about
+            }
+            rules.add(new ToolRule(
+                blocks,
+                tag.contains("speed") ? tag.getFloat("speed") : null,
+                tag.contains("correct_for_drops") ? tag.getBoolean("correct_for_drops") : null
+            ));
+        }
+        data.set(StructuredDataKey.TOOL, new ToolProperties(
+            rules.toArray(new ToolRule[0]),
+            tool.getFloat("default_mining_speed"),
+            tool.getInt("damage_per_block")
+        ));
+    }
+
+    private void restoreBannerPatternsFromBackup(final ListTag<CompoundTag> bannerPatterns, final StructuredDataContainer data) {
+        final List<BannerPatternLayer> patternLayer = new ArrayList<>();
+        for (final CompoundTag tag : bannerPatterns) {
+            final CompoundTag patternTag = tag.getCompoundTag("pattern");
+            if (patternTag == null) {
+                continue; // Nothing we can do about
+            }
+            final String assetId = patternTag.getString("asset_id");
+            final String translationKey = patternTag.getString("translation_key");
+            final int dyeColor = tag.getInt("dye_color");
+            patternLayer.add(new BannerPatternLayer(Holder.of(new BannerPattern(assetId, translationKey)), dyeColor));
+        }
+        data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
     }
 
     private int unmappedItemId(final String name) {
@@ -706,7 +837,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial> materialHolder;
         if (materialTag instanceof StringTag) {
-            // Would technically have to be stored and retreived from registry data, but that'd mean a lot of work
+            // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
             final int id = TrimMaterials1_20_3.keyToId(((StringTag) materialTag).getValue());
             if (id == -1) {
                 return;
@@ -720,7 +851,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            final int ingredientId = toMappedItemId(ingredientTag.getValue());
+            final int ingredientId = StructuredDataConverter.getBackupItemId(materialCompoundTag, toMappedItemId(ingredientTag.getValue()));
             if (ingredientId == -1) {
                 return;
             }
@@ -755,7 +886,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag patternTag = trimTag.get("pattern");
         final Holder<ArmorTrimPattern> patternHolder;
         if (patternTag instanceof StringTag) {
-            // Would technically have to be stored and retreived from registry data, but that'd mean a lot of work
+            // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
             final int id = TrimPatterns1_20_3.keyToId(((StringTag) patternTag).getValue());
             if (id == -1) {
                 return;
@@ -769,7 +900,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            final int templateItemId = toMappedItemId(templateItem);
+            final int templateItemId = StructuredDataConverter.getBackupItemId(patternCompoundTag, toMappedItemId(templateItem));
             if (templateItemId == -1) {
                 return;
             }
@@ -954,7 +1085,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return null;
         }
 
-        final int itemId = unmappedItemId(id);
+        final int itemId = StructuredDataConverter.getBackupItemId(item, unmappedItemId(id));
         if (itemId == -1) {
             return null;
         }

@@ -32,30 +32,30 @@ public final class BannerPattern {
         @Override
         public BannerPattern readDirect(final ByteBuf buffer) throws Exception {
             final String assetId = Type.STRING.read(buffer);
-            final String tanslationKey = Type.STRING.read(buffer);
-            return new BannerPattern(assetId, tanslationKey);
+            final String translationKey = Type.STRING.read(buffer);
+            return new BannerPattern(assetId, translationKey);
         }
 
         @Override
         public void writeDirect(final ByteBuf buffer, final BannerPattern value) throws Exception {
             Type.STRING.write(buffer, value.assetId);
-            Type.STRING.write(buffer, value.tanslationKey);
+            Type.STRING.write(buffer, value.translationKey);
         }
     };
 
     private final String assetId;
-    private final String tanslationKey;
+    private final String translationKey;
 
-    public BannerPattern(final String assetId, final String tanslationKey) {
+    public BannerPattern(final String assetId, final String translationKey) {
         this.assetId = assetId;
-        this.tanslationKey = tanslationKey;
+        this.translationKey = translationKey;
     }
 
     public String assetId() {
         return assetId;
     }
 
-    public String tanslationKey() {
-        return tanslationKey;
+    public String translationKey() {
+        return translationKey;
     }
 }
