@@ -231,8 +231,8 @@ public class ViaManagerImpl implements ViaManager {
         }
 
         if (version < 17) {
-            platform.getLogger().warning("You are running an outdated Java version, please consider updating it to at least Java 17 (your version is " + javaVersion + "). "
-                    + "At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
+            platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 17 (your version is " + javaVersion + ").");
+            platform.getLogger().warning("Starting with Minecraft 1.21, ViaVersion will no longer officially be compatible with this version of Java, only offering unsupported compatibility builds.");
         }
     }
 
