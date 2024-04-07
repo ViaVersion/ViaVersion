@@ -22,9 +22,11 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -91,21 +93,47 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
         });
 
-        registerClientbound(ClientboundPackets1_20_3.PLAYER_CHAT, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).add());
+        registerClientbound(ClientboundPackets1_20_3.PLAYER_CHAT, wrapper -> {
+            wrapper.passthrough(Type.UUID); // Sender
+            wrapper.passthrough(Type.VAR_INT); // Index
+            final byte[] signature = wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES);
+
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            if (signature != null && signature.length != 0) {
+                if (storage.add(signature) && storage.offset() > 64) {
+                    final PacketWrapper chatAck = wrapper.create(ServerboundPackets1_20_3.CHAT_ACK);
+                    chatAck.write(Type.VAR_INT, storage.offset());
+                    chatAck.sendToServer(Protocol1_20_5To1_20_3.class);
+
+                    storage.clearOffset();
+                }
+            }
+        });
         registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).clearOffset());
-        registerServerbound(ServerboundPackets1_20_5.CHAT_ACK, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).clearOffset());
-        registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND);
+        registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Command
+            wrapper.passthrough(Type.LONG); // Timestamp
+            wrapper.passthrough(Type.LONG); // Salt
+            final int signatures = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < signatures; i++) {
+                wrapper.passthrough(Type.STRING); // Argument name
+                wrapper.passthrough(Type.SIGNATURE_BYTES); // Signature
+            }
+
+            wrapper.read(Type.VAR_INT); // Offset
+            wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
+            getChatAckHandler().handle(wrapper);
+        });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Type.STRING); // Command
 
-            final AcknowledgedMessagesStorage messagesStorage = wrapper.user().get(AcknowledgedMessagesStorage.class);
             wrapper.write(Type.LONG, System.currentTimeMillis()); // Timestamp
             wrapper.write(Type.LONG, 0L); // Salt
             wrapper.write(Type.VAR_INT, 0); // No signatures
-            wrapper.write(Type.VAR_INT, messagesStorage.offset()); // TODO Fix offset
-            wrapper.write(Type.ACKNOWLEDGED_BIT_SET, messagesStorage.toAck());
-            messagesStorage.clearOffset();
+            getChatAckHandler().handle(wrapper);
         });
+        cancelServerbound(ServerboundPackets1_20_5.CHAT_ACK);
+
         registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
 
         new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);
@@ -115,6 +143,15 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
         cancelServerbound(ServerboundPackets1_20_5.COOKIE_RESPONSE);
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
+    }
+
+    private PacketHandler getChatAckHandler() {
+        return wrapper -> {
+            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+            wrapper.write(Type.VAR_INT, storage.offset());
+            wrapper.write(Type.ACKNOWLEDGED_BIT_SET, storage.toAck());
+            storage.clearOffset();
+        };
     }
 
     @Override

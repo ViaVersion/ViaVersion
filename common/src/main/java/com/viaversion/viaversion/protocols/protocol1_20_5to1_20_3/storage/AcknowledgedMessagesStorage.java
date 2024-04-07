@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
+import java.util.Arrays;
 import java.util.BitSet;
 
 public final class AcknowledgedMessagesStorage implements StorableObject {
@@ -25,11 +26,17 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
     private final boolean[] trackedMessages = new boolean[MAX_HISTORY];
     private int offset;
     private int tail;
+    private byte[] lastMessage;
 
-    public void add() {
+    public boolean add(final byte[] message) {
+        if (Arrays.equals(message, lastMessage)) {
+            return false;
+        }
+        this.lastMessage = message;
         this.offset++;
         this.trackedMessages[this.tail] = true;
         this.tail = (this.tail + 1) % MAX_HISTORY;
+        return true;
     }
 
     public BitSet toAck() {

@@ -513,6 +513,7 @@ public final class StructuredDataConverter {
     }
 
     // If multiple item components which previously were stored in BlockEntityTag are present, we need to merge them
+
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {
         return getOrCreate(tag, "BlockEntityTag");
     }
