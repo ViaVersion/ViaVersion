@@ -57,7 +57,7 @@ import org.slf4j.Logger;
         id = "viaversion",
         name = "ViaVersion",
         version = VersionInfo.VERSION,
-        authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv"},
+        authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv", "EnZaXD", "RK_01"},
         description = "Allow newer Minecraft versions to connect to an older server version.",
         url = "https://viaversion.com"
 )
