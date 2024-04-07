@@ -92,6 +92,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.read(Type.BOOLEAN); // Enforces secure chat - moved to join game
         });
 
+        // Big problem with this update: Without access to the client, this cannot 100% predict the
+        // correct offset. This means we have to entirely discard client acknowledgements and fake them.
         registerClientbound(ClientboundPackets1_20_3.PLAYER_CHAT, wrapper -> {
             wrapper.passthrough(Type.UUID); // Sender
             wrapper.passthrough(Type.VAR_INT); // Index
@@ -108,7 +110,17 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
                 }
             }
         });
-        registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> wrapper.user().get(AcknowledgedMessagesStorage.class).clearOffset());
+        registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> {
+            wrapper.passthrough(Type.STRING); // Message
+            wrapper.passthrough(Type.LONG); // Timestamp
+            wrapper.passthrough(Type.LONG); // Salt
+            wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
+
+            // Remove original acknowledgement
+            wrapper.read(Type.VAR_INT); // Offset
+            wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
+            writeChatAck(wrapper);
+        });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Type.STRING); // Command
             wrapper.passthrough(Type.LONG); // Timestamp
