@@ -279,24 +279,32 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerTradeList1_20_5(C packetType) {
+    // Hopefully the item cost weirdness is temporary
+    public void registerTradeList1_20_5(
+        final C packetType,
+        final Type<Item> costType, final Type<Item> mappedCostType,
+        final Type<Item> optionalCostType, final Type<Item> mappedOptionalCostType
+    ) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Container id
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                handleClientboundItem(wrapper); // Input
-                handleClientboundItem(wrapper); // Output
-                handleClientboundItem(wrapper); // Second item
+                final Item input = wrapper.read(costType);
+                wrapper.write(mappedCostType, handleItemToClient(input));
 
-                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                wrapper.passthrough(Type.INT); // Number of tools uses
+                handleClientboundItem(wrapper); // Result
+
+                final Item secondInput = wrapper.read(optionalCostType);
+                wrapper.write(mappedOptionalCostType, handleItemToClient(secondInput));
+
+                wrapper.passthrough(Type.BOOLEAN); // Out of stock
+                wrapper.passthrough(Type.INT); // Number of trade uses
                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
 
                 wrapper.passthrough(Type.INT); // XP
                 wrapper.passthrough(Type.INT); // Special price
                 wrapper.passthrough(Type.FLOAT); // Price multiplier
                 wrapper.passthrough(Type.INT); // Demand
-                wrapper.passthrough(Type.BOOLEAN); // Ignore tags
             }
         });
     }
@@ -307,10 +315,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
-
-                // Parent
-                if (wrapper.passthrough(Type.BOOLEAN))
-                    wrapper.passthrough(Type.STRING);
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
@@ -350,11 +355,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
-
-                // Parent
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.STRING);
-                }
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {

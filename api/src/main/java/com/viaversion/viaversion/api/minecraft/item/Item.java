@@ -80,7 +80,8 @@ public interface Item {
      *
      * @return item tag
      */
-    @Nullable CompoundTag tag();
+    @Nullable
+    CompoundTag tag();
 
     /**
      * Sets the item compound tag.
@@ -97,4 +98,13 @@ public interface Item {
      * @return copy of the item
      */
     Item copy();
+
+    /**
+     * Returns true if the item is empty.
+     *
+     * @return true if the item is empty
+     */
+    default boolean isEmpty() {
+        return identifier() == 0 || amount() <= 0;
+    }
 }

@@ -31,8 +31,8 @@ public class StructuredItem implements Item {
     private int identifier;
     private int amount;
 
-    public StructuredItem() {
-        this(0, 0, new StructuredDataContainer());
+    public StructuredItem(final int identifier, final int amount) {
+        this(identifier, amount, new StructuredDataContainer());
     }
 
     public StructuredItem(final int identifier, final int amount, final StructuredDataContainer data) {

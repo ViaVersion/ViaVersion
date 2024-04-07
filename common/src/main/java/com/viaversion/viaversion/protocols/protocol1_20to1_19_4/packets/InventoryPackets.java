@@ -66,10 +66,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
-
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.STRING); // Parent
-                }
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {

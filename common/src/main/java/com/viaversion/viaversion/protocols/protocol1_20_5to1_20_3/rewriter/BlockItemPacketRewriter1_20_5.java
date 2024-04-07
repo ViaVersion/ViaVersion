@@ -141,11 +141,43 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
         registerWindowItems1_17_1(ClientboundPackets1_20_3.WINDOW_ITEMS);
         registerSetSlot1_17_1(ClientboundPackets1_20_3.SET_SLOT);
-        registerAdvancements1_20_3(ClientboundPackets1_20_3.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_20_3.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
         registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.ADVANCEMENTS, wrapper -> {
+            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            for (int i = 0; i < size; i++) {
+                wrapper.passthrough(Type.STRING); // Identifier
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+
+                // Display data
+                if (wrapper.passthrough(Type.BOOLEAN)) {
+                    wrapper.passthrough(Type.TAG); // Title
+                    wrapper.passthrough(Type.TAG); // Description
+
+                    Item item = handleNonNullItemToClient(wrapper.read(itemType()));
+                    wrapper.write(mappedItemType(), item);
+
+                    wrapper.passthrough(Type.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    if ((flags & 1) != 0) {
+                        wrapper.passthrough(Type.STRING); // Background texture
+                    }
+                    wrapper.passthrough(Type.FLOAT); // X
+                    wrapper.passthrough(Type.FLOAT); // Y
+                }
+
+                int requirements = wrapper.passthrough(Type.VAR_INT);
+                for (int array = 0; array < requirements; array++) {
+                    wrapper.passthrough(Type.STRING_ARRAY);
+                }
+
+                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.SPAWN_PARTICLE, wrapper -> {
             final int particleId = wrapper.read(Type.VAR_INT);
@@ -167,7 +199,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
-                final Item item = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item item = handleNonNullItemToClient(wrapper.read(Type.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
             }
 
@@ -201,21 +233,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 final Item input = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                final Item output = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                final Item secondItem = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                wrapper.write(Types1_20_5.ITEM, input);
-                wrapper.write(Types1_20_5.ITEM, output);
-                wrapper.write(Types1_20_5.ITEM, secondItem);
+                wrapper.write(Types1_20_5.ITEM_COST, input);
 
-                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                wrapper.passthrough(Type.INT); // Number of tools uses
+                final Item output = handleNonNullItemToClient(wrapper.read(Type.ITEM1_20_2));
+                wrapper.write(Types1_20_5.ITEM, output);
+
+                final Item secondInput = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                wrapper.write(Types1_20_5.OPTIONAL_ITEM_COST, secondInput);
+
+                wrapper.passthrough(Type.BOOLEAN); // Out of stock
+                wrapper.passthrough(Type.INT); // Number of trade uses
                 wrapper.passthrough(Type.INT); // Maximum number of trade uses
                 wrapper.passthrough(Type.INT); // XP
                 wrapper.passthrough(Type.INT); // Special price
                 wrapper.passthrough(Type.FLOAT); // Price multiplier
                 wrapper.passthrough(Type.INT); // Demand
-
-                wrapper.write(Type.BOOLEAN, false); // Ignore tags
             }
         });
 
@@ -231,6 +263,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
             }
         });
+    }
+
+    public Item handleNonNullItemToClient(@Nullable Item item) {
+        item = handleItemToClient(item);
+        // Items are no longer nullable in a few places
+        if (item == null || item.isEmpty()) {
+            return new StructuredItem(1, 1);
+        }
+        return item;
     }
 
     @Override
@@ -391,9 +432,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES);
+        updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES, false);
         if (old.identifier() == 927) {
-            updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS);
+            updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS, false);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -884,10 +925,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
     }
 
-    private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey) {
+    private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey, final boolean allowEmpty) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
-            final Item[] items = itemsTag.stream().limit(256).map(this::itemFromTag).filter(Objects::nonNull).toArray(Item[]::new);
+            final Item[] items = itemsTag.stream()
+                .limit(256)
+                .map(this::itemFromTag)
+                .filter(Objects::nonNull)
+                .filter(item -> allowEmpty || !item.isEmpty())
+                .toArray(Item[]::new);
             data.set(dataKey, items);
         }
     }
@@ -1111,7 +1157,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
             }
 
-            updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER);
+            updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER, true);
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");

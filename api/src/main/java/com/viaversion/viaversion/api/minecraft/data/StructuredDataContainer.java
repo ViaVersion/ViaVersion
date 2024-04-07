@@ -41,6 +41,13 @@ public final class StructuredDataContainer {
         this.data = data;
     }
 
+    public StructuredDataContainer(final StructuredData<?>[] dataArray) {
+        this(new Reference2ObjectOpenHashMap<>(dataArray.length));
+        for (final StructuredData<?> data : dataArray) {
+            add(data);
+        }
+    }
+
     public StructuredDataContainer() {
         this(new Reference2ObjectOpenHashMap<>());
     }
@@ -150,6 +157,10 @@ public final class StructuredDataContainer {
 
     public Map<StructuredDataKey<?>, StructuredData<?>> data() {
         return data;
+    }
+
+    private <T> void add(final StructuredData<T> data) {
+        set(data.key(), data.value());
     }
 
     @Override

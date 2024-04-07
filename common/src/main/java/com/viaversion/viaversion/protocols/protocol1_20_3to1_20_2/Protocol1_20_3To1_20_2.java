@@ -128,11 +128,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
             final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
                 wrapper.passthrough(Type.STRING); // Identifier
-
-                // Parent
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.STRING);
-                }
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
