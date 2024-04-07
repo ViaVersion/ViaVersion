@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -120,9 +119,10 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
                 wrapper.passthrough(Type.SIGNATURE_BYTES); // Signature
             }
 
+            // Remove original acknowledgement
             wrapper.read(Type.VAR_INT); // Offset
             wrapper.read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
-            getChatAckHandler().handle(wrapper);
+            writeChatAck(wrapper);
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Type.STRING); // Command
@@ -130,7 +130,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             wrapper.write(Type.LONG, System.currentTimeMillis()); // Timestamp
             wrapper.write(Type.LONG, 0L); // Salt
             wrapper.write(Type.VAR_INT, 0); // No signatures
-            getChatAckHandler().handle(wrapper);
+            writeChatAck(wrapper);
         });
         cancelServerbound(ServerboundPackets1_20_5.CHAT_ACK);
 
@@ -145,13 +145,11 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
-    private PacketHandler getChatAckHandler() {
-        return wrapper -> {
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
-            wrapper.write(Type.VAR_INT, storage.offset());
-            wrapper.write(Type.ACKNOWLEDGED_BIT_SET, storage.toAck());
-            storage.clearOffset();
-        };
+    private void writeChatAck(final PacketWrapper wrapper) {
+        final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+        wrapper.write(Type.VAR_INT, storage.offset());
+        wrapper.write(Type.ACKNOWLEDGED_BIT_SET, storage.toAck());
+        storage.clearOffset();
     }
 
     @Override
