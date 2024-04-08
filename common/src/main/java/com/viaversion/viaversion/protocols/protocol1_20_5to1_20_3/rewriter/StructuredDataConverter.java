@@ -79,9 +79,13 @@ public final class StructuredDataConverter {
     static final int HIDE_DYE_COLOR = 1 << 6;
     static final int HIDE_ARMOR_TRIM = 1 << 7;
 
-    // Can't do nicely
+    // Store invalid/inconvertible data in the backup tag and later
+    // restore it when converting back to the original version
     private static final String BACKUP_TAG_KEY = "VV|DataComponents";
-    private static final String ITEM_BACKUP_TAG_KEY = "VV|id";
+
+    // Store item ids separately to avoid copying whole data tree
+    // just for the item id
+    private static final String ITEM_BACKUP_TAG_KEY = "VV|Id";
 
     private final Map<StructuredDataKey<?>, DataConverter<?>> rewriters = new Reference2ObjectOpenHashMap<>();
     private final boolean backupInconvertibleData;
@@ -301,8 +305,8 @@ public final class StructuredDataConverter {
             for (final int id : data.itemIds()) {
                 final String name = toMappedItemName(id);
                 if (name.isEmpty()) {
-                    // Backup whole data if one of the sherds is inconvertible
-                    // Since we don't want to break the order of the sherds
+                    // Backup whole data if one of the entries is inconvertible
+                    // Since we don't want to break the order of the entries
                     if (backupInconvertibleData && originalSherds == null) {
                         originalSherds = new IntArrayTag(data.itemIds());
                     }
@@ -410,8 +414,8 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
             final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
             if (backupInconvertibleData) {
-                // Backup whole data if one of the patterns is inconvertible
-                // Since we don't want to break the order of the patterns
+                // Backup whole data if one of the entries is inconvertible
+                // Since we don't want to break the order of the entries
                 if (Arrays.stream(data).anyMatch(layer -> layer.pattern().isDirect())) {
                     for (final BannerPatternLayer layer : data) {
                         final CompoundTag layerTag = new CompoundTag();
@@ -645,6 +649,7 @@ public final class StructuredDataConverter {
         return backupTag;
     }
 
+    // Check if item name could be mapped, if not, locate original/backup item id and use it
     static int removeItemBackupTag(final CompoundTag tag, final int unmappedId) {
         if (unmappedId != -1) {
             return unmappedId;
@@ -674,8 +679,10 @@ public final class StructuredDataConverter {
             } else {
                 for (final int id : holders.ids()) {
                     final String name = toMappedItemName(id);
-                    if (backupInconvertibleData && name.isEmpty()) {
-                        // TODO HANDLE
+                    if (name.isEmpty()) {
+                        if (backupInconvertibleData) {
+                            // TODO Backup
+                        }
                         continue;
                     }
                     predicatedListTag.add(serializeBlockPredicate(predicate, name));

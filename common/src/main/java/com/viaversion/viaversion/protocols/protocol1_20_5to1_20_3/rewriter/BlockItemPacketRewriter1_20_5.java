@@ -509,6 +509,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return item;
     }
 
+    private int unmappedItemId(final String name) {
+        return protocol.getMappingData().itemId(name);
+    }
+
+    private int toMappedItemId(final String name) {
+        final int unmappedId = unmappedItemId(name);
+        return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
+    }
+
     private void restoreFromBackupTag(final CompoundTag backupTag, final StructuredDataContainer data) {
         final CompoundTag instrument = backupTag.getCompoundTag("instrument");
         if (instrument != null) {
@@ -586,7 +595,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final CompoundTag soundEventCompound = (CompoundTag) soundEventTag;
             final StringTag identifier = soundEventCompound.getStringTag("identifier");
             if (identifier == null) {
-                return; // Nothing we can do about
+                return;
             }
             soundEvent = Holder.of(new SoundEvent(
                 identifier.getValue(),
@@ -594,7 +603,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     soundEventCompound.getFloat("fixed_range") : null
             ));
         } else {
-            return; // Nothing we can do about
+            return;
         }
         data.set(StructuredDataKey.INSTRUMENT, Holder.of(new Instrument(soundEvent, useDuration, range)));
     }
@@ -613,7 +622,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         for (final CompoundTag effect : possibleEffectsTag) {
             final CompoundTag potionEffectTag = effect.getCompoundTag("effect");
             if (potionEffectTag == null) {
-                continue; // Nothing we can do about
+                continue;
             }
             possibleEffects.add(new FoodEffect(
                 new PotionEffect(
@@ -643,7 +652,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 }
             }
             if (blocks == null) {
-                continue; // Nothing we can do about
+                continue;
             }
             rules.add(new ToolRule(
                 blocks,
@@ -663,7 +672,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         for (final CompoundTag tag : bannerPatterns) {
             final CompoundTag patternTag = tag.getCompoundTag("pattern");
             if (patternTag == null) {
-                continue; // Nothing we can do about
+                continue;
             }
             final String assetId = patternTag.getString("asset_id");
             final String translationKey = patternTag.getString("translation_key");
@@ -671,15 +680,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             patternLayer.add(new BannerPatternLayer(Holder.of(new BannerPattern(assetId, translationKey)), dyeColor));
         }
         data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
-    }
-
-    private int unmappedItemId(final String name) {
-        return protocol.getMappingData().itemId(name);
-    }
-
-    private int toMappedItemId(final String name) {
-        final int unmappedId = unmappedItemId(name);
-        return unmappedId != -1 ? protocol.getMappingData().getNewItemId(unmappedId) : -1;
     }
 
     private AdventureModePredicate updateBlockPredicates(final ListTag<StringTag> tag, final boolean showInTooltip) {
