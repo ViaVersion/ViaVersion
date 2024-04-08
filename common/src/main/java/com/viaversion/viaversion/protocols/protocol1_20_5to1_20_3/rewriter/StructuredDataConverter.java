@@ -475,6 +475,7 @@ public final class StructuredDataConverter {
                     }
                     materialTag.put("override_armor_materials", overrideArmorMaterials);
                 }
+                materialTag.put("description", material.description());
                 trimTag.put("material", materialTag);
             } else {
                 final String oldKey = TrimMaterials1_20_3.idToKey(data.material().id());
