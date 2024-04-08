@@ -851,7 +851,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            final int ingredientId = StructuredDataConverter.getBackupItemId(materialCompoundTag, toMappedItemId(ingredientTag.getValue()));
+            final int ingredientId = StructuredDataConverter.removeItemBackupTag(materialCompoundTag, toMappedItemId(ingredientTag.getValue()));
             if (ingredientId == -1) {
                 return;
             }
@@ -900,7 +900,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 return;
             }
 
-            final int templateItemId = StructuredDataConverter.getBackupItemId(patternCompoundTag, toMappedItemId(templateItem));
+            final int templateItemId = StructuredDataConverter.removeItemBackupTag(patternCompoundTag, toMappedItemId(templateItem));
             if (templateItemId == -1) {
                 return;
             }
@@ -1085,7 +1085,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return null;
         }
 
-        final int itemId = StructuredDataConverter.getBackupItemId(item, unmappedItemId(id));
+        final int itemId = StructuredDataConverter.removeItemBackupTag(item, unmappedItemId(id));
         if (itemId == -1) {
             return null;
         }

@@ -81,7 +81,7 @@ public final class StructuredDataConverter {
 
     // Can't do nicely
     private static final String BACKUP_TAG_KEY = "VV|DataComponents";
-    private static final String ITEM_TAG_KEY = "VV|id";
+    private static final String ITEM_BACKUP_TAG_KEY = "VV|id";
 
     private final Map<StructuredDataKey<?>, DataConverter<?>> rewriters = new Reference2ObjectOpenHashMap<>();
 
@@ -461,7 +461,7 @@ public final class StructuredDataConverter {
 
                 final String ingredientName = toMappedItemName(material.itemId());
                 if (ingredientName.isEmpty()) {
-                    getBackupTag(materialTag).putInt(ITEM_TAG_KEY, material.itemId());
+                    getBackupTag(materialTag).putInt(ITEM_BACKUP_TAG_KEY, material.itemId());
                 }
                 materialTag.putString("ingredient", ingredientName);
                 materialTag.put("item_model_index", new FloatTag(material.itemModelIndex()));
@@ -487,7 +487,7 @@ public final class StructuredDataConverter {
                 patternTag.putString("assetId", pattern.assetName());
                 final String itemName = toMappedItemName(pattern.itemId());
                 if (itemName.isEmpty()) {
-                    getBackupTag(patternTag).putInt(ITEM_TAG_KEY, pattern.itemId());
+                    getBackupTag(patternTag).putInt(ITEM_BACKUP_TAG_KEY, pattern.itemId());
                 }
                 patternTag.putString("templateItem", itemName);
                 patternTag.put("description", pattern.description());
@@ -642,12 +642,16 @@ public final class StructuredDataConverter {
         return backupTag;
     }
 
-    static int getBackupItemId(final CompoundTag tag, final int unmappedId) {
+    static int removeItemBackupTag(final CompoundTag tag, final int unmappedId) {
         if (unmappedId != -1) {
             return unmappedId;
         }
-        final IntTag itemIdTag = tag.getIntTag(ITEM_TAG_KEY);
-        return itemIdTag != null ? itemIdTag.getTagId() : -1;
+        final IntTag itemBackupTag = tag.getIntTag(ITEM_BACKUP_TAG_KEY);
+        if (itemBackupTag != null) {
+            tag.remove(ITEM_BACKUP_TAG_KEY);
+            return itemBackupTag.asInt();
+        }
+        return -1;
     }
 
     private void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
@@ -727,7 +731,7 @@ public final class StructuredDataConverter {
             final String name = toMappedItemName(item.identifier());
             savedItem.putString("id", name);
             if (name.isEmpty()) {
-                savedItem.putInt(ITEM_TAG_KEY, item.identifier());
+                savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
             }
             savedItem.putByte("Count", (byte) item.amount());
 
