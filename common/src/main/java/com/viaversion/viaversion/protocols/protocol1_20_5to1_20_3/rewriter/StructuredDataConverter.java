@@ -84,8 +84,10 @@ public final class StructuredDataConverter {
     private static final String ITEM_BACKUP_TAG_KEY = "VV|id";
 
     private final Map<StructuredDataKey<?>, DataConverter<?>> rewriters = new Reference2ObjectOpenHashMap<>();
+    private final boolean backupInconvertibleData;
 
     public StructuredDataConverter(final boolean backupInconvertibleData) {
+        this.backupInconvertibleData = backupInconvertibleData;
         register(StructuredDataKey.CUSTOM_DATA, (data, tag) -> {
             // Handled manually
         });
@@ -460,7 +462,7 @@ public final class StructuredDataConverter {
                 materialTag.putString("asset_name", material.assetName());
 
                 final String ingredientName = toMappedItemName(material.itemId());
-                if (ingredientName.isEmpty()) {
+                if (backupInconvertibleData && ingredientName.isEmpty()) {
                     getBackupTag(materialTag).putInt(ITEM_BACKUP_TAG_KEY, material.itemId());
                 }
                 materialTag.putString("ingredient", ingredientName);
@@ -486,7 +488,7 @@ public final class StructuredDataConverter {
 
                 patternTag.putString("assetId", pattern.assetName());
                 final String itemName = toMappedItemName(pattern.itemId());
-                if (itemName.isEmpty()) {
+                if (backupInconvertibleData && itemName.isEmpty()) {
                     getBackupTag(patternTag).putInt(ITEM_BACKUP_TAG_KEY, pattern.itemId());
                 }
                 patternTag.putString("templateItem", itemName);
@@ -660,7 +662,9 @@ public final class StructuredDataConverter {
             final HolderSet holders = predicate.holderSet();
             if (holders == null) {
                 // Can't do (nicely)
-                // TODO Backup
+                if (backupInconvertibleData) {
+                    // TODO Backup
+                }
                 continue;
             }
             if (holders.hasTagKey()) {
@@ -669,7 +673,7 @@ public final class StructuredDataConverter {
             } else {
                 for (final int id : holders.ids()) {
                     final String name = toMappedItemName(id);
-                    if (name.isEmpty()) {
+                    if (backupInconvertibleData && name.isEmpty()) {
                         // TODO HANDLE
                         continue;
                     }
@@ -730,7 +734,7 @@ public final class StructuredDataConverter {
             final CompoundTag savedItem = new CompoundTag();
             final String name = toMappedItemName(item.identifier());
             savedItem.putString("id", name);
-            if (name.isEmpty()) {
+            if (backupInconvertibleData && name.isEmpty()) {
                 savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
             }
             savedItem.putByte("Count", (byte) item.amount());
