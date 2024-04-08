@@ -107,6 +107,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -196,12 +197,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.FLOAT); // Offset X
             wrapper.passthrough(Type.FLOAT); // Offset Y
             wrapper.passthrough(Type.FLOAT); // Offset Z
-            wrapper.passthrough(Type.FLOAT); // Particle Data
+            final float data = wrapper.passthrough(Type.FLOAT);
             wrapper.passthrough(Type.INT); // Particle Count
 
             // Read data and add it to Particle
             final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             final Particle particle = new Particle(mappings.getNewId(particleId));
+            if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
+                particle.add(Type.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
+            }
+
             if (mappings.isBlockParticle(particleId)) {
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
