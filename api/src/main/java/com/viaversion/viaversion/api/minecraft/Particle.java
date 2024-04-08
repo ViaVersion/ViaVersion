@@ -73,6 +73,18 @@ public final class Particle implements IdHolder {
         arguments.add(index, new ParticleData<>(type, value));
     }
 
+    public <T> void set(final int index, final Type<T> type, final T value) {
+        arguments.set(index, new ParticleData<>(type, value));
+    }
+
+    @Override
+    public String toString() {
+        return "Particle{" +
+            "arguments=" + arguments +
+            ", id=" + id +
+            '}';
+    }
+
     public static final class ParticleData<T> {
         private final Type<T> type;
         private T value;

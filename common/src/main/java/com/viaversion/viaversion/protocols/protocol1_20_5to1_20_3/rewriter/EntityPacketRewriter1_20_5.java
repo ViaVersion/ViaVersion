@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -285,6 +286,30 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
+        filter().type(EntityTypes1_20_5.AREA_EFFECT_CLOUD).handler((event, meta) -> {
+            // Color removed - Now put into the actual particle
+            final int metaIndex = event.index();
+            if (metaIndex == 9) {
+                // If the color is found first
+                final Metadata particleData = event.metaAtIndex(11);
+                addColor(particleData, meta.value());
+
+                event.cancel();
+                return;
+            }
+
+            if (metaIndex > 9) {
+                event.setIndex(metaIndex - 1);
+            }
+
+            if (metaIndex == 11) {
+                // If the particle is found first
+                final Metadata colorData = event.metaAtIndex(9);
+                if (colorData != null) {
+                    addColor(meta, colorData.value());
+                }
+            }
+        });
 
         filter().type(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
@@ -292,11 +317,22 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
     }
 
+    private void addColor(@Nullable final Metadata particleMeta, final int color) {
+        if (particleMeta == null) {
+            return;
+        }
+
+        final Particle particle = particleMeta.value();
+        if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
+            particle.getArgument(0).setValue(color);
+        }
+    }
+
     @Override
     public void rewriteParticle(final Particle particle) {
         super.rewriteParticle(particle);
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
-            particle.add(Type.INT, 0); // rgb // TODO
+            particle.add(Type.INT, 0); // Default color, changed in the area effect handler
         }
     }
 

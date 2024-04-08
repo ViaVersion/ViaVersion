@@ -40,6 +40,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -586,14 +587,20 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     public void rewriteParticle(Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        int id = particle.getId();
+        int id = particle.id();
         if (mappings.isBlockParticle(id)) {
             Particle.ParticleData<Integer> data = particle.getArgument(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id) && protocol.getItemRewriter() != null) {
             Particle.ParticleData<Item> data = particle.getArgument(0);
-            Item item = data.getValue();
-            protocol.getItemRewriter().handleItemToClient(item);
+            ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
+            Item item = itemRewriter.handleItemToClient(data.getValue());
+            if (itemRewriter.mappedItemType() != null && itemRewriter.itemType() != itemRewriter.mappedItemType()) {
+                // Replace the type
+                particle.set(0, itemRewriter.mappedItemType(), item);
+            } else {
+                data.setValue(item);
+            }
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
