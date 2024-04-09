@@ -214,7 +214,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             final MetaType type = meta.metaType();
             if (type == itemType) {
                 meta.setValue(protocol.getItemRewriter().handleItemToClient(meta.value()));
-            }if (type == blockStateType) { // Actually optional
+            } else if (type == blockStateType) { // Actually optional
                 int data = meta.value();
                 if (data != 0) {
                     meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
