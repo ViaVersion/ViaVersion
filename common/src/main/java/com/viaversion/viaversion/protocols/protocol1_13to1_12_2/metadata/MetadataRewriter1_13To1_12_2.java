@@ -41,8 +41,9 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         filter().mapMetaType(typeId -> Types1_13.META_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
         filter().metaType(Types1_13.META_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(meta.value())));
         filter().metaType(Types1_13.META_TYPES.blockStateType).handler(((event, meta) -> {
-            if ((int) meta.value() != 0) {
-                meta.setValue(WorldPackets.toNewId(meta.value()));
+            final int stateId = meta.value();
+            if (stateId != 0) {
+                meta.setValue(WorldPackets.toNewId(stateId));
             }
         }));
 
