@@ -20,7 +20,6 @@ package com.viaversion.viaversion.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -210,19 +209,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param particleType           particle meta type if needed
      */
     public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType particleType) {
-        filter().handler((event, meta) -> {
-            final MetaType type = meta.metaType();
-            if (type == itemType) {
-                meta.setValue(protocol.getItemRewriter().handleItemToClient(meta.value()));
-            } else if (type == blockStateType) { // Actually optional
-                int data = meta.value();
-                if (data != 0) {
-                    meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-                }
-            } else if (type == particleType) {
-                rewriteParticle(meta.value());
-            }
-        });
+        registerMetaTypeHandler(itemType, null, blockStateType, particleType);
     }
 
     /**
