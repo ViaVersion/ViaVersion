@@ -34,7 +34,7 @@ public class MetadataRewriter1_16_2To1_16_1 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        registerMetaTypeHandler(Types1_16.META_TYPES.itemType, Types1_16.META_TYPES.blockStateType, null, Types1_16.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_16.META_TYPES.itemType, Types1_16.META_TYPES.blockStateType, Types1_16.META_TYPES.particleType);
         filter().type(EntityTypes1_16_2.MINECART_ABSTRACT).index(10).handler((metadatas, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
