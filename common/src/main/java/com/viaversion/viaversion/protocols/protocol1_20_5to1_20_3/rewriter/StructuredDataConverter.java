@@ -412,11 +412,11 @@ public final class StructuredDataConverter {
             tag.put("effects", effectsTag);
         });
         register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
-            final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
             if (backupInconvertibleData) {
                 // Backup whole data if one of the entries is inconvertible
                 // Since we don't want to break the order of the entries
-                if (Arrays.stream(data).anyMatch(layer -> layer.pattern().isDirect())) {
+                if (Arrays.stream(data).anyMatch(layer -> layer.pattern().isDirect() || BannerPatterns1_20_5.idToKey(layer.pattern().id()) == null)) {
+                    final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
                     for (final BannerPatternLayer layer : data) {
                         final CompoundTag layerTag = new CompoundTag();
                         final CompoundTag patternTag = new CompoundTag();
@@ -428,18 +428,23 @@ public final class StructuredDataConverter {
                         originalPatterns.add(layerTag);
                     }
                     getBackupTag(tag).put("banner_patterns", originalPatterns);
-                    return;
                 }
             }
 
             final ListTag<CompoundTag> patternsTag = new ListTag<>(CompoundTag.class);
             for (final BannerPatternLayer layer : data) {
-                final String pattern = BannerPatterns1_20_5.fullIdToCompact(BannerPatterns1_20_5.idToKey(layer.pattern().id()));
-                if (pattern == null) {
+                if (layer.pattern().isDirect()) {
                     continue;
                 }
+
+                final String key = BannerPatterns1_20_5.idToKey(layer.pattern().id());
+                if (key == null) {
+                    continue;
+                }
+
+                final String compactKey = BannerPatterns1_20_5.fullIdToCompact(key);
                 final CompoundTag patternTag = new CompoundTag();
-                patternTag.putString("Pattern", pattern);
+                patternTag.putString("Pattern", compactKey);
                 patternTag.putInt("Color", layer.dyeColor());
                 patternsTag.add(patternTag);
             }

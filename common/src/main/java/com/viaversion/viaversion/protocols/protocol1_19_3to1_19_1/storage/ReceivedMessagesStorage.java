@@ -60,4 +60,11 @@ public final class ReceivedMessagesStorage implements StorableObject {
     public void resetUnacknowledgedCount() {
         unacknowledged = 0;
     }
+
+    public void clear() {
+        this.size = 0;
+        this.unacknowledged = 0;
+        this.lastSignature = null;
+        Arrays.fill(this.signatures, null);
+    }
 }

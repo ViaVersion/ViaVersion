@@ -536,7 +536,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id)) {
             Particle.ParticleData<Item> data = particle.getArgument(0);
-            data.setValue(handleItemToClient(data.getValue()));
+            Item item = handleItemToClient(data.getValue());
+            if (mappedItemType() != null && itemType() != mappedItemType()) {
+                // Replace the type
+                particle.set(0, mappedItemType(), item);
+            } else {
+                data.setValue(item);
+            }
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
