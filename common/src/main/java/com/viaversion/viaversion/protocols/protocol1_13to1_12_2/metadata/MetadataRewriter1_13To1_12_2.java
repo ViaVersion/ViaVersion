@@ -41,9 +41,11 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         filter().mapMetaType(typeId -> Types1_13.META_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
         filter().metaType(Types1_13.META_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(meta.value())));
         filter().metaType(Types1_13.META_TYPES.blockStateType).handler(((event, meta) -> {
-            final int stateId = meta.value();
-            if (stateId != 0) {
-                meta.setValue(WorldPackets.toNewId(stateId));
+            final int oldId = meta.value();
+            if (oldId != 0) {
+                final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+                final int newId = WorldPackets.toNewId(combined);
+                meta.setValue(newId);
             }
         }));
 
@@ -58,14 +60,6 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
             }
         }));
 
-        filter().type(EntityTypes1_13.EntityType.ENDERMAN).index(12).handler((event, meta) -> {
-            // Remap held block to match new format for remapping to flat block
-            int stateId = meta.value();
-            int id = stateId & 4095;
-            int data = stateId >> 12 & 15;
-            meta.setValue((id << 4) | (data & 0xF));
-        });
-
         filter().type(EntityTypes1_13.EntityType.WOLF).index(17).handler((event, meta) -> {
             // Handle new colors
             meta.setValue(15 - (int) meta.getValue());
@@ -74,9 +68,9 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
         filter().type(EntityTypes1_13.EntityType.ZOMBIE).addIndex(15); // Shaking
 
         filter().type(EntityTypes1_13.EntityType.MINECART_ABSTRACT).index(9).handler((event, meta) -> {
-            int oldId = meta.value();
-            int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
-            int newId = WorldPackets.toNewId(combined);
+            final int oldId = meta.value();
+            final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
+            final int newId = WorldPackets.toNewId(combined);
             meta.setValue(newId);
         });
 
