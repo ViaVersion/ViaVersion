@@ -111,4 +111,11 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
             return profileKey;
         }
     }
+
+    public void clear() {
+        this.offset = 0;
+        this.tail = 0;
+        this.lastMessage = null;
+        Arrays.fill(this.trackedMessages, false);
+    }
 }

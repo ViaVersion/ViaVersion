@@ -151,7 +151,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerSetSlot1_17_1(ClientboundPackets1_20_3.SET_SLOT);
         registerEntityEquipmentArray(ClientboundPackets1_20_3.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
+        protocol.registerServerbound(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION, wrapper -> {
+            final int slot = wrapper.read(Type.UNSIGNED_SHORT);
+            wrapper.write(Type.SHORT, (short) Math.min(slot, Short.MAX_VALUE));
+
+            final Item item = handleItemToServer(wrapper.read(Types1_20_5.ITEM));
+            wrapper.write(Type.ITEM1_20_2, item);
+        });
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ADVANCEMENTS, wrapper -> {
@@ -1049,11 +1055,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final Tag parsedPage = ComponentUtil.jsonStringToTag(page.getValue());
             pages.add(new FilterableComponent(parsedPage, filtered));
-
-            if (pages.size() == 100) {
-                // Network limit
-                break;
-            }
         }
 
         final String title = tag.getString("title", "");
@@ -1064,7 +1065,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final WrittenBook writtenBook = new WrittenBook(
             new FilterableString(limit(title, 32), limit(filteredTitle, 32)),
             author,
-            generation,
+            clamp(generation, 0, 3),
             pages.toArray(new FilterableComponent[0]),
             resolved
         );

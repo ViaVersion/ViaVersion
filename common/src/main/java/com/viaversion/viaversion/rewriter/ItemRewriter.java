@@ -186,6 +186,16 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerCreativeInvAction1_20_5(S packetType) {
+        protocol.registerServerbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.UNSIGNED_SHORT); // Slot
+                handler(wrapper -> handleServerboundItem(wrapper));
+            }
+        });
+    }
+
     public void registerClickWindow(S packetType) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override

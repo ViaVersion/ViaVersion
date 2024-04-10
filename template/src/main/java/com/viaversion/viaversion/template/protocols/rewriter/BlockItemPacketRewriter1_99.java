@@ -60,7 +60,7 @@ public final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Cl
         registerEntityEquipmentArray(ClientboundPackets1_20_5.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
         registerTradeList1_20_5(ClientboundPackets1_20_5.TRADE_LIST, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
-        registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
+        registerCreativeInvAction1_20_5(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_5.WINDOW_PROPERTY);
         registerSpawnParticle1_20_5(ClientboundPackets1_20_5.SPAWN_PARTICLE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLOSION, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
