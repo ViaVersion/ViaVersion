@@ -20,7 +20,6 @@ package com.viaversion.viaversion.rewriter;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -200,6 +199,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         Preconditions.checkArgument(typeMappings == null, "Type mappings have already been set - manual type mappings should be set *after* this");
         Preconditions.checkNotNull(protocol.getMappingData().getEntityMappings(), "Protocol does not have entity mappings");
         typeMappings = protocol.getMappingData().getEntityMappings();
+    }
+
+    /**
+     * Registers a metadata handler to rewrite, item, block, and particle ids stored in metadata.
+     *
+     * @param itemType               item meta type if needed
+     * @param blockStateType         block state meta type if needed
+     * @param particleType           particle meta type if needed
+     */
+    public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType particleType) {
+        registerMetaTypeHandler(itemType, null, blockStateType, particleType);
     }
 
     /**

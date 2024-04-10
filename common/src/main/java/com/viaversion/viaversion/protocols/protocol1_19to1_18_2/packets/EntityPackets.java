@@ -338,7 +338,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             rewriteParticle(particle);
         });
 
-        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null, null);
+        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null);
 
         filter().type(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
             // Convert to new block id

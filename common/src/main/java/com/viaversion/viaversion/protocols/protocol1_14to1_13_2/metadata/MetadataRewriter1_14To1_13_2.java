@@ -45,7 +45,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(Types1_14.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.blockStateType, null, Types1_14.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.blockStateType, Types1_14.META_TYPES.particleType);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
         filter().type(EntityTypes1_14.LIVINGENTITY).addIndex(12);
