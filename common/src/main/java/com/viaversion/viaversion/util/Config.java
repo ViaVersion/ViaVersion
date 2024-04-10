@@ -21,9 +21,6 @@ import com.google.gson.JsonElement;
 import com.viaversion.viaversion.compatibility.YamlCompat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
 import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
@@ -148,7 +148,9 @@ public abstract class Config {
     }
 
     public void save() {
-        this.configFile.getParentFile().mkdirs();
+        if (this.configFile.getParentFile() != null) {
+            this.configFile.getParentFile().mkdirs();
+        }
         save(this.configFile, this.config);
     }
 
@@ -157,7 +159,9 @@ public abstract class Config {
     }
 
     public void reload() {
-        this.configFile.getParentFile().mkdirs();
+        if (this.configFile.getParentFile() != null) {
+            this.configFile.getParentFile().mkdirs();
+        }
         this.config = new ConcurrentSkipListMap<>(loadConfig(this.configFile));
     }
 
