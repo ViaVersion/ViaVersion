@@ -68,6 +68,7 @@ import java.util.Arrays;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// 1.20.5 data component -> 1.20.3 nbt conversion
 public final class StructuredDataConverter {
 
     static final int HIDE_ENCHANTMENTS = 1;

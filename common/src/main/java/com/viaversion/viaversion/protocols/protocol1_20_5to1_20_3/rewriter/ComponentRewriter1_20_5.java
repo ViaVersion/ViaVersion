@@ -89,6 +89,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+// 1.20.5 data component -> 1.20.5 nbt conversion
 public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket1_20_3> {
 
     @SuppressWarnings("rawtypes")

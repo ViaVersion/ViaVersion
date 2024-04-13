@@ -113,6 +113,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.viaversion.viaversion.util.MathUtil.clamp;
 
+// 1.20.3 nbt -> 1.20.5 data component conversion
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
