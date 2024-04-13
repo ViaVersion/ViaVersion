@@ -78,6 +78,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantme
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -161,6 +162,18 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         final StringTag actionTag = hoverEventTag.getStringTag("action");
         if (actionTag == null || !actionTag.getValue().equals("show_item")) {
             return;
+        }
+
+        final Tag valueTag = hoverEventTag.remove("value");
+        if (valueTag != null) { // Convert legacy hover event to new format for rewriting
+            final CompoundTag tag = ComponentUtil.deserializeShowItem(valueTag, SerializerVersion.V1_20_3);
+            final CompoundTag contentsTag = new CompoundTag();
+            contentsTag.put("id", tag.getStringTag("id"));
+            contentsTag.put("count", new IntTag(tag.getByte("Count")));
+            if (tag.get("tag") instanceof CompoundTag) {
+                contentsTag.put("tag", new StringTag(SerializerVersion.V1_20_3.toSNBT(tag.getCompoundTag("tag"))));
+            }
+            hoverEventTag.put("contents", contentsTag);
         }
 
         final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");

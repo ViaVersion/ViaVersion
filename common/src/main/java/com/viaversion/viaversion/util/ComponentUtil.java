@@ -163,4 +163,8 @@ public final class ComponentUtil {
     public static CompoundTag deserializeLegacyShowItem(final JsonElement element, final SerializerVersion version) {
         return (CompoundTag) version.toTag(version.toComponent(element).asUnformattedString());
     }
+
+    public static CompoundTag deserializeShowItem(final Tag value, final SerializerVersion version) {
+        return (CompoundTag) version.toTag(version.toComponent(value).asUnformattedString());
+    }
 }
