@@ -85,11 +85,11 @@ public final class StatePropertyMatcher {
             this.maxValue = maxValue;
         }
 
-        public String minValue() {
+        public @Nullable String minValue() {
             return minValue;
         }
 
-        public String maxValue() {
+        public @Nullable String maxValue() {
             return maxValue;
         }
     }
