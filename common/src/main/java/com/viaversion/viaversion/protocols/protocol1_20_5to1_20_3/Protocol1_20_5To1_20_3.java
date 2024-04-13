@@ -48,8 +48,10 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Serverb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.BlockItemPacketRewriter1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.ComponentRewriter1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.rewriter.EntityPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -80,6 +82,10 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.ENTITY_SOUND);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.STATISTICS);
+
+        final ComponentRewriter<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5(this);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Type.STRING); // Server ID

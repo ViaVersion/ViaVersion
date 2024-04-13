@@ -116,6 +116,7 @@ import static com.viaversion.viaversion.util.MathUtil.clamp;
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_5To1_20_3> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
+    public static final String[] ATTRIBUTE_OPERATIONS = {"add_value", "add_multiplied_base", "add_multiplied_total"};
     private static final StructuredDataConverter DATA_CONVERTER = new StructuredDataConverter(false);
     private static final GameProfile.Property[] EMPTY_PROPERTIES = new GameProfile.Property[0];
     private static final StatePropertyMatcher[] EMPTY_PROPERTY_MATCHERS = new StatePropertyMatcher[0];
