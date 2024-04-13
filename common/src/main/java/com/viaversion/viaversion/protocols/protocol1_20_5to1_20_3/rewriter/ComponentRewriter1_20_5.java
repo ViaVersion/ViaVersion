@@ -94,7 +94,7 @@ import java.util.logging.Level;
 public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket1_20_3> {
 
     @SuppressWarnings("rawtypes")
-    protected final Map<StructuredDataKey, DataConverter> handlers = new HashMap<>();
+    protected final Map<StructuredDataKey, DataConverter> rewriters = new HashMap<>();
 
     public ComponentRewriter1_20_5(final Protocol<ClientboundPacket1_20_3, ?, ?, ?> protocol) {
         super(protocol, ReadType.NBT);
@@ -201,7 +201,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             tagTag = (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue());
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.30.3 NBT in show_item: " + contentsTag, e);
+                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.20.3 NBT in show_item: " + contentsTag, e);
             }
             return;
         }
@@ -241,8 +241,8 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         final CompoundTag tag = new CompoundTag();
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : data.entrySet()) {
             final StructuredDataKey<?> key = entry.getKey();
-            if (!handlers.containsKey(key)) { // Should NOT happen
-                Via.getPlatform().getLogger().severe("No handler for " + key.identifier() + " found!");
+            if (!rewriters.containsKey(key)) { // Should NOT happen
+                Via.getPlatform().getLogger().severe("No converter for " + key.identifier() + " found!");
                 continue;
             }
             final StructuredData<?> value = entry.getValue();
@@ -251,7 +251,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             }
 
             //noinspection unchecked
-            final Tag valueTag = handlers.get(key).convert(value.value());
+            final Tag valueTag = rewriters.get(key).convert(value.value());
             if (valueTag == null) continue;
 
             tag.put(key.identifier(), valueTag);
@@ -1016,7 +1016,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     // ---------------------------------------------------------------------------------------
 
     private <T> void register(final StructuredDataKey<T> key, final DataConverter<T> converter) {
-        handlers.put(key, converter);
+        rewriters.put(key, converter);
     }
 
     public SerializerVersion serializerVersion() {

@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-// This goes DEEEP
 public final class AdventureModePredicate {
 
     public static final Type<AdventureModePredicate> TYPE = new Type<AdventureModePredicate>(AdventureModePredicate.class) {

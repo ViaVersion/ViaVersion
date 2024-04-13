@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -60,7 +59,7 @@ public final class PotionEffectData {
     private final boolean ambient;
     private final boolean showParticles;
     private final boolean showIcon;
-    private final PotionEffectData hiddenEffect; // RECURSIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVESIVE
+    private final PotionEffectData hiddenEffect;
 
     public PotionEffectData(final int amplifier, final int duration, final boolean ambient, final boolean showParticles,
                             final boolean showIcon, @Nullable final PotionEffectData hiddenEffect) {
