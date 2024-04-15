@@ -24,6 +24,7 @@
 package com.viaversion.viaversion.util;
 
 import com.google.common.base.Preconditions;
+import java.util.Objects;
 
 public class IdAndData {
 
@@ -78,5 +79,27 @@ public class IdAndData {
 
     public void setData(final byte data) {
         this.data = data;
+    }
+
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IdAndData idAndData = (IdAndData) o;
+        return id == idAndData.id && data == idAndData.data;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, data);
+    }
+
+    @Override
+    public String toString() {
+        return "IdAndData{" +
+            "id=" + id +
+            ", data=" + data +
+            '}';
     }
 }
