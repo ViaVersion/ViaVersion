@@ -153,14 +153,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerSetSlot1_17_1(ClientboundPackets1_20_3.SET_SLOT);
         registerEntityEquipmentArray(ClientboundPackets1_20_3.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
-        protocol.registerServerbound(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION, wrapper -> {
-            final int slot = wrapper.read(Type.UNSIGNED_SHORT);
-            wrapper.write(Type.SHORT, (short) Math.min(slot, Short.MAX_VALUE));
-
-            final Item item = handleItemToServer(wrapper.read(Types1_20_5.ITEM));
-            wrapper.write(Type.ITEM1_20_2, item);
-        });
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
+        registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
+        protocol.registerServerbound(ServerboundPackets1_20_5.CLICK_WINDOW_BUTTON, wrapper -> {
+            final byte containerId = wrapper.read(Type.BYTE);
+            final byte buttonId = wrapper.read(Type.BYTE);
+            wrapper.write(Type.VAR_INT, (int) containerId);
+            wrapper.write(Type.VAR_INT, (int) buttonId);
+        });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
