@@ -31,11 +31,11 @@ public class IdAndData {
     private int id;
     private byte data;
 
-    public IdAndData(int id) {
+    public IdAndData(final int id) {
         this(id, -1);
     }
 
-    public IdAndData(int id, int data) {
+    public IdAndData(final int id, final int data) {
         Preconditions.checkArgument(data >= 0 && data <= 15, "Data has to be between 0 and 15: (id: " + id + " data: " + data + ")");
         this.id = id;
         this.data = (byte) data;
@@ -69,7 +69,7 @@ public class IdAndData {
         return toRawData(id, data);
     }
 
-    public IdAndData withData(int data) {
+    public IdAndData withData(final int data) {
         return new IdAndData(this.id, data);
     }
 
@@ -85,10 +85,9 @@ public class IdAndData {
         return data;
     }
 
-    public void setData(final byte data) {
-        this.data = data;
+    public void setData(final int data) {
+        this.data = (byte) data;
     }
-
 
     @Override
     public boolean equals(final Object o) {
