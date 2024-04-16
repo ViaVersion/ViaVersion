@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.ParticleRew
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.providers.PaintingProvider;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
+import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -569,7 +570,7 @@ public class WorldPackets {
         if (newId != -1) {
             return newId;
         }
-        newId = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(oldId & ~0xF); // Remove data
+        newId = Protocol1_13To1_12_2.MAPPINGS.getBlockMappings().getNewId(IdAndData.removeData(oldId)); // Remove data
         if (newId != -1) {
             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().warning("Missing block " + oldId);
