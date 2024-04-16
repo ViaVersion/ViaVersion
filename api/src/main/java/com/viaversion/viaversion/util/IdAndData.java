@@ -31,6 +31,10 @@ public class IdAndData {
     private int id;
     private byte data;
 
+    public IdAndData(int id) {
+        this(id, -1);
+    }
+
     public IdAndData(int id, int data) {
         Preconditions.checkArgument(data >= 0 && data <= 15, "Data has to be between 0 and 15: (id: " + id + " data: " + data + ")");
         this.id = id;
@@ -63,6 +67,10 @@ public class IdAndData {
 
     public int toCompressedData() {
         return toCompressedData(id, data);
+    }
+
+    public IdAndData withData(int data) {
+        return new IdAndData(this.id, data);
     }
 
     public int getId() {
