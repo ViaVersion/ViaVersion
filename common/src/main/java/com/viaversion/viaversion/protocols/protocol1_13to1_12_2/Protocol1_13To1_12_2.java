@@ -318,7 +318,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 }
             } else {
                 for (int i = 0; i < 16; i++) {
-                    int newItem = MAPPINGS.getItemMappings().getNewId(IdAndData.toCompressedData(item, i));
+                    int newItem = MAPPINGS.getItemMappings().getNewId(IdAndData.toRawData(item, i));
                     if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                         packet.write(Type.VAR_INT, newItem);
@@ -343,11 +343,11 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(IdAndData.toCompressedData(data)));
+                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(IdAndData.toRawData(data)));
                     } else if (id == 2001) { // Block break + block break sound
                         int blockId = data & 0xFFF;
                         int blockData = data >> 12;
-                        wrapper.set(Type.INT, 1, WorldPackets.toNewId(IdAndData.toCompressedData(blockId, blockData)));
+                        wrapper.set(Type.INT, 1, WorldPackets.toNewId(IdAndData.toRawData(blockId, blockData)));
                     }
                 });
             }

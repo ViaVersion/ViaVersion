@@ -41,15 +41,15 @@ public class IdAndData {
         this.data = (byte) data;
     }
 
-    public static int getId(final int compressedData) {
-        return compressedData >> 4;
+    public static int getId(final int rawData) {
+        return rawData >> 4;
     }
 
-    public static int getData(final int compressedData) {
-        return compressedData & 15;
+    public static int getData(final int rawData) {
+        return rawData & 15;
     }
 
-    public static int toCompressedData(final int id) {
+    public static int toRawData(final int id) {
         return id << 4;
     }
 
@@ -57,16 +57,16 @@ public class IdAndData {
         return data & ~15;
     }
 
-    public static IdAndData fromCompressedData(final int compressedData) {
-        return new IdAndData(compressedData >> 4, compressedData & 15);
+    public static IdAndData fromRawData(final int rawData) {
+        return new IdAndData(rawData >> 4, rawData & 15);
     }
 
-    public static int toCompressedData(final int id, final int data) {
+    public static int toRawData(final int id, final int data) {
         return (id << 4) | (data & 15);
     }
 
-    public int toCompressedData() {
-        return toCompressedData(id, data);
+    public int toRawData() {
+        return toRawData(id, data);
     }
 
     public IdAndData withData(int data) {

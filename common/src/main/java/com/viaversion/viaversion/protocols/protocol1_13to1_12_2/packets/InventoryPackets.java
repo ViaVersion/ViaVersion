@@ -271,7 +271,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         // Save original id
         int originalId = (item.identifier() << 16 | item.data() & 0xFFFF);
 
-        int rawId = IdAndData.toCompressedData(item.identifier(), item.data());
+        int rawId = IdAndData.toRawData(item.identifier(), item.data());
 
         // NBT Additions
         if (isDamageable(item.identifier())) {
@@ -459,7 +459,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put(nbtTagName(), new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
-                rawId = IdAndData.toCompressedData(32); // Dead Bush
+                rawId = IdAndData.toRawData(32); // Dead Bush
             } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(IdAndData.removeData(rawId)) != -1) {
                 rawId = IdAndData.removeData(rawId);
             } else {
