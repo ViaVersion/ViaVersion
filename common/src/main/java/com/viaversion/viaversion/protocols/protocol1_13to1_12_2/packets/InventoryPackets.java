@@ -165,7 +165,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         channel = getNewPluginChannelId(channel);
                         if (channel == null) {
                             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Ignoring outgoing plugin message with channel: " + old);
+                                Via.getPlatform().getLogger().warning("Ignoring client bound plugin message with channel: " + old);
                             }
                             wrapper.cancel();
                             return;
@@ -177,7 +177,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
                                 } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + s);
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in client bound " + Key.stripMinecraftNamespace(channel).toUpperCase(Locale.ROOT) + ": " + s);
                                 }
                             }
                             if (!rewrittenChannels.isEmpty()) {
@@ -229,7 +229,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     channel = getOldPluginChannelId(channel);
                     if (channel == null) {
                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                            Via.getPlatform().getLogger().warning("Ignoring incoming plugin message with channel: " + old);
+                            Via.getPlatform().getLogger().warning("Ignoring server bound plugin message with channel: " + old);
                         }
                         wrapper.cancel();
                         return;
@@ -241,7 +241,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                             if (rewritten != null) {
                                 rewrittenChannels.add(rewritten);
                             } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + s);
+                                Via.getPlatform().getLogger().warning("Ignoring plugin channel in server bound " + channel + ": " + s);
                             }
                         }
                         wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));

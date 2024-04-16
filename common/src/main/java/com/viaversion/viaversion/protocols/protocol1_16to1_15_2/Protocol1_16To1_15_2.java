@@ -169,7 +169,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
+                                Via.getPlatform().getLogger().warning("Ignoring server bound plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
@@ -178,7 +178,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
                                     if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel register of '"
+                                        Via.getPlatform().getLogger().warning("Ignoring server bound plugin channel register of '"
                                                 + registeredChannel + "', as it is longer than 32 characters");
                                     }
                                     continue;
