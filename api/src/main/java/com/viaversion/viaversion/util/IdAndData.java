@@ -32,7 +32,8 @@ public class IdAndData {
     private byte data;
 
     public IdAndData(final int id) {
-        this(id, -1);
+        this.id = id;
+        this.data = -1;
     }
 
     public IdAndData(final int id, final int data) {
