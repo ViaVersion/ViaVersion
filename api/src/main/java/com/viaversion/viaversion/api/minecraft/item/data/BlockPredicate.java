@@ -58,7 +58,7 @@ public final class BlockPredicate {
     private final StatePropertyMatcher[] propertyMatchers;
     private final CompoundTag tag;
 
-    public BlockPredicate(@Nullable final HolderSet holderSet, @Nullable final StatePropertyMatcher[] propertyMatchers, @Nullable final CompoundTag tag) {
+    public BlockPredicate(@Nullable final HolderSet holderSet, final StatePropertyMatcher @Nullable [] propertyMatchers, @Nullable final CompoundTag tag) {
         this.holderSet = holderSet;
         this.propertyMatchers = propertyMatchers;
         this.tag = tag;
@@ -68,7 +68,7 @@ public final class BlockPredicate {
         return holderSet;
     }
 
-    public @Nullable StatePropertyMatcher[] propertyMatchers() {
+    public StatePropertyMatcher @Nullable [] propertyMatchers() {
         return propertyMatchers;
     }
 

@@ -226,7 +226,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         if (!data.isEmpty()) {
             CompoundTag components;
             try {
-                components = toTag(data);
+                components = toTag(data, false);
             } catch (Exception e) {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.20.5 components in show_item!", e);
@@ -237,7 +237,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         }
     }
 
-    protected CompoundTag toTag(final Map<StructuredDataKey<?>, StructuredData<?>> data) {
+    protected CompoundTag toTag(final Map<StructuredDataKey<?>, StructuredData<?>> data, final boolean empty) {
         final CompoundTag tag = new CompoundTag();
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : data.entrySet()) {
             final StructuredDataKey<?> key = entry.getKey();
@@ -247,13 +247,19 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             }
             final StructuredData<?> value = entry.getValue();
             if (value.isEmpty()) {
+                if (empty) {
+                    // Theoretically not needed here, but we'll keep it for consistency
+                    tag.put("!" + key.identifier(), new CompoundTag());
+                    continue;
+                }
                 throw new IllegalArgumentException("Empty structured data: " + key.identifier());
             }
 
             //noinspection unchecked
             final Tag valueTag = rewriters.get(key).convert(value.value());
-            if (valueTag == null) continue;
-
+            if (valueTag == null) {
+                continue;
+            }
             tag.put(key.identifier(), valueTag);
         }
         return tag;
@@ -863,7 +869,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             tag.putInt("count", 1);
         }
         final Map<StructuredDataKey<?>, StructuredData<?>> components = item.structuredData().data();
-        tag.put("components", toTag(components));
+        tag.put("components", toTag(components, true));
     }
 
     protected void convertFilterableString(final CompoundTag tag, final FilterableString string, final int min, final int max) {

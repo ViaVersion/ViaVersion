@@ -87,7 +87,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded(); // Calls load methods on rewriters
 
-        // Uncomment this if the entity types enum has been newly added specificly for this Protocol
+        // Uncomment this if the entity types enum has been newly added specifically for this Protocol
         // EntityTypes1_20_5.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
