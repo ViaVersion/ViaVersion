@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import java.util.Arrays;
+
 public final class TagData {
     private final String identifier;
     private final int[] entries;
@@ -37,5 +39,13 @@ public final class TagData {
 
     public int[] entries() {
         return entries;
+    }
+
+    @Override
+    public String toString() {
+        return "TagData{" +
+            "identifier='" + identifier + '\'' +
+            ", entries=" + Arrays.toString(entries) +
+            '}';
     }
 }
