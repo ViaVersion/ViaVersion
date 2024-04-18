@@ -120,6 +120,17 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     registryEntries[id] = new RegistryEntry(name, tag.get("element"));
                 }
 
+                // Add spit damage type
+                if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
+                    final int length = registryEntries.length;
+                    registryEntries = Arrays.copyOf(registryEntries, length + 1);
+                    final CompoundTag spitData = new CompoundTag();
+                    spitData.putString("scaling", "when_caused_by_living_non_player");
+                    spitData.putString("message_id", "mob");
+                    spitData.putFloat("exhaustion", 0.1F);
+                    registryEntries[length] = new RegistryEntry("minecraft:spit", spitData);
+                }
+
                 if (requiresDummyValues) {
                     // Truncate and replace null values
                     if (registryEntries.length != entriesLength) {
