@@ -41,6 +41,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPat
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.Key;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -79,14 +80,24 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
             }
 
-            // Fixup sound ids that are now hard checked against the registry
+            // Changes in biomes
             final ListTag<CompoundTag> biomes = registryData.getCompoundTag("minecraft:worldgen/biome").getListTag("value", CompoundTag.class);
             for (final CompoundTag biome : biomes) {
                 final CompoundTag effects = biome.getCompoundTag("element").getCompoundTag("effects");
+
+                // Fixup sound ids that are now hard checked against the registry
                 checkSoundTag(effects.getCompoundTag("mood_sound"), "sound");
                 checkSoundTag(effects.getCompoundTag("additions_sound"), "sound");
                 checkSoundTag(effects.getCompoundTag("music"), "sound");
                 checkSoundTag(effects, "ambient_sound");
+
+                // Particle format changes
+                final CompoundTag particle = effects.getCompoundTag("particle");
+                if (particle != null) {
+                    final CompoundTag particleOptions = particle.getCompoundTag("options");
+                    final String particleType = particleOptions.getString("type");
+                    updateParticleFormat(particleOptions, Key.stripMinecraftNamespace(particleType));
+                }
             }
 
             for (final Map.Entry<String, Tag> entry : registryData.entrySet()) {
@@ -224,6 +235,26 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
             }
         });
+    }
+
+    private void updateParticleFormat(final CompoundTag options, final String particleType) {
+        if ("block".equals(particleType) || "block_marker".equals(particleType) || "falling_dust".equals(particleType) || "dust_pillar".equals(particleType)) {
+            moveTag(options, "value", "block_state");
+        } else if ("item".equals(particleType)) {
+            moveTag(options, "value", "item");
+        } else if ("dust_color_transition".equals(particleType)) {
+            moveTag(options, "fromColor", "from_color");
+            moveTag(options, "toColor", "to_color");
+        } else if ("entity_effect".equals(particleType)) {
+            moveTag(options, "value", "color");
+        }
+    }
+
+    private void moveTag(final CompoundTag compoundTag, final String from, final String to) {
+        final Tag tag = compoundTag.remove(from);
+        if (tag != null) {
+            compoundTag.put(to, tag);
+        }
     }
 
     private void checkSoundTag(@Nullable final CompoundTag tag, final String key) {
