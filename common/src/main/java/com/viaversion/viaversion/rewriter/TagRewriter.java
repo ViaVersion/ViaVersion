@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class TagRewriter<C extends ClientboundPacketType> {
+public class TagRewriter<C extends ClientboundPacketType> implements com.viaversion.viaversion.api.rewriter.TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
     private final Protocol<C, ?, ?, ?> protocol;
     private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
@@ -49,10 +49,12 @@ public class TagRewriter<C extends ClientboundPacketType> {
         this.protocol = protocol;
     }
 
-    /**
-     * Gets new tags from the protocol's {@link MappingData} instance.
-     */
-    public void loadFromMappingData() {
+    @Override
+    public void onMappingDataLoaded() {
+        if (protocol.getMappingData() == null) {
+            return;
+        }
+
         for (RegistryType type : RegistryType.getValues()) {
             List<TagData> tags = protocol.getMappingData().getTags(type);
             if (tags != null) {
@@ -61,24 +63,22 @@ public class TagRewriter<C extends ClientboundPacketType> {
         }
     }
 
+    @Override
     public void removeTags(final String registryKey) {
         toRemove.add(registryKey);
     }
 
+    @Override
     public void renameTag(final RegistryType type, final String registryKey, final String renameTo) {
         toRename.computeIfAbsent(type, t -> new HashMap<>()).put(registryKey, renameTo);
     }
 
-    /**
-     * Adds an empty tag (since the client crashes if a checked tag is not registered).
-     *
-     * @param tagType registry tag type
-     * @param tagId   tag id
-     */
+    @Override
     public void addEmptyTag(RegistryType tagType, String tagId) {
         getOrComputeNewTags(tagType).add(new TagData(tagId, EMPTY_ARRAY));
     }
 
+    @Override
     public void addEmptyTags(RegistryType tagType, String... tagIds) {
         List<TagData> tagList = getOrComputeNewTags(tagType);
         for (String id : tagIds) {
@@ -86,12 +86,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    /**
-     * Adds an entity tag type to be filled with the given entity type ids.
-     *
-     * @param tagId    registry tag type
-     * @param entities mapped entity types
-     */
+    @Override
     public void addEntityTag(String tagId, EntityType... entities) {
         int[] ids = new int[entities.length];
         for (int i = 0; i < entities.length; i++) {
@@ -100,13 +95,7 @@ public class TagRewriter<C extends ClientboundPacketType> {
         addTagRaw(RegistryType.ENTITY, tagId, ids);
     }
 
-    /**
-     * Adds a tag type to be filled with the given type ids after being mapped to new ids.
-     *
-     * @param tagType     registry tag type
-     * @param tagId       tag id
-     * @param unmappedIds unmapped type ids
-     */
+    @Override
     public void addTag(RegistryType tagType, String tagId, int... unmappedIds) {
         List<TagData> newTags = getOrComputeNewTags(tagType);
         IdRewriteFunction rewriteFunction = getRewriter(tagType);
@@ -119,32 +108,15 @@ public class TagRewriter<C extends ClientboundPacketType> {
         newTags.add(new TagData(tagId, unmappedIds));
     }
 
-    /**
-     * Adds a tag type to be filled with the given raw type ids.
-     *
-     * @param tagType registry tag type
-     * @param tagId   tag id
-     * @param ids     raw type ids
-     */
+    @Override
     public void addTagRaw(RegistryType tagType, String tagId, int... ids) {
         getOrComputeNewTags(tagType).add(new TagData(tagId, ids));
     }
 
-    /**
-     * Pre 1.17 reading of hardcoded registry types.
-     *
-     * @param packetType    packet type
-     * @param readUntilType read and process the types until (including) the given registry type
-     */
     public void register(C packetType, @Nullable RegistryType readUntilType) {
         protocol.registerClientbound(packetType, getHandler(readUntilType));
     }
 
-    /**
-     * 1.17+ reading of generic tag types.
-     *
-     * @param packetType packet type
-     */
     public void registerGeneric(C packetType) {
         protocol.registerClientbound(packetType, getGenericHandler());
     }
@@ -236,10 +208,12 @@ public class TagRewriter<C extends ClientboundPacketType> {
         }
     }
 
+    @Override
     public @Nullable List<TagData> getNewTags(RegistryType tagType) {
         return newTags.get(tagType);
     }
 
+    @Override
     public List<TagData> getOrComputeNewTags(RegistryType tagType) {
         return newTags.computeIfAbsent(tagType, type -> new ArrayList<>());
     }

@@ -185,6 +185,11 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
+    public TagRewriter<ClientboundPacket1_20_3> getTagRewriter() {
+        return tagRewriter;
+    }
+
+    @Override
     protected PacketTypesProvider<ClientboundPacket1_20_3, ClientboundPacket1_20_5, ServerboundPacket1_20_3, ServerboundPacket1_20_5> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_20_3.class, ClientboundConfigurationPackets1_20_3.class),

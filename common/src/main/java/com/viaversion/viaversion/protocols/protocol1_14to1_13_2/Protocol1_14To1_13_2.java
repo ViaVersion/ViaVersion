@@ -140,6 +140,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
         WorldPackets.air = MAPPINGS.getBlockStateMappings().getNewId(0);
         WorldPackets.voidAir = MAPPINGS.getBlockStateMappings().getNewId(8591);
         WorldPackets.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);

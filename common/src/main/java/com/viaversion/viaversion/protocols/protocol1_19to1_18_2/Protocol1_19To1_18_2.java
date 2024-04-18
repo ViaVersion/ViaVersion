@@ -55,6 +55,7 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19To1_18_2() {
         super(ClientboundPackets1_18.class, ClientboundPackets1_19.class, ServerboundPackets1_17.class, ServerboundPackets1_19.class);
@@ -74,7 +75,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
 
         entityRewriter.register();
@@ -330,5 +330,10 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_18> getTagRewriter() {
+        return tagRewriter;
     }
 }

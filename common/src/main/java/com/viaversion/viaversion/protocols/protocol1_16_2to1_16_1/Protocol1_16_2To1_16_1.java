@@ -39,7 +39,7 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     public static final MappingData MAPPINGS = new MappingData();
     private final MetadataRewriter1_16_2To1_16_1 metadataRewriter = new MetadataRewriter1_16_2To1_16_1(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
-    private TagRewriter<ClientboundPackets1_16> tagRewriter;
+    private final TagRewriter<ClientboundPackets1_16> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_16_2To1_16_1() {
         super(ClientboundPackets1_16.class, ClientboundPackets1_16_2.class, ServerboundPackets1_16.class, ServerboundPackets1_16_2.class);
@@ -52,7 +52,6 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_16.STATISTICS);
@@ -85,19 +84,21 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:mushroom_grow_block");
 
         // The client now wants ALL (previous) tags to be sent, sooooo :>
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:soul_fire_base_blocks", "minecraft:furnace_materials", "minecraft:crimson_stems",
-                "minecraft:gold_ores", "minecraft:piglin_loved", "minecraft:piglin_repellents", "minecraft:creeper_drop_music_discs",
-                "minecraft:logs_that_burn", "minecraft:stone_tool_materials", "minecraft:warped_stems");
+            "minecraft:gold_ores", "minecraft:piglin_loved", "minecraft:piglin_repellents", "minecraft:creeper_drop_music_discs",
+            "minecraft:logs_that_burn", "minecraft:stone_tool_materials", "minecraft:warped_stems");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:infiniburn_nether", "minecraft:crimson_stems",
-                "minecraft:wither_summon_base_blocks", "minecraft:infiniburn_overworld", "minecraft:piglin_repellents",
-                "minecraft:hoglin_repellents", "minecraft:prevent_mob_spawning_inside", "minecraft:wart_blocks",
-                "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",
-                "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end",
-                "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
+            "minecraft:wither_summon_base_blocks", "minecraft:infiniburn_overworld", "minecraft:piglin_repellents",
+            "minecraft:hoglin_repellents", "minecraft:prevent_mob_spawning_inside", "minecraft:wart_blocks",
+            "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",
+            "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end",
+            "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
     }
 
     @Override
@@ -118,5 +119,10 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_16> getTagRewriter() {
+        return tagRewriter;
     }
 }
