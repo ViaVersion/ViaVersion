@@ -61,7 +61,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
     private final MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
     private final TranslationMappings componentRewriter = new TranslationMappings(this);
-    private TagRewriter<ClientboundPackets1_15> tagRewriter;
+    private final TagRewriter<ClientboundPackets1_15> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_16To1_15_2() {
         super(ClientboundPackets1_15.class, ClientboundPackets1_16.class, ServerboundPackets1_14.class, ServerboundPackets1_16.class);
@@ -74,7 +74,6 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_15.TAGS, RegistryType.ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
@@ -169,7 +168,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 32 characters: " + channel);
+                                Via.getPlatform().getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
@@ -178,7 +177,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
                                     if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring incoming plugin channel register of '"
+                                        Via.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '"
                                                 + registeredChannel + "', as it is longer than 32 characters");
                                     }
                                     continue;
@@ -213,6 +212,8 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+
         int[] wallPostOverrideTag = new int[47];
         int arrayIndex = 0;
         wallPostOverrideTag[arrayIndex++] = 140;
@@ -291,5 +292,10 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
 
     public TranslationMappings getComponentRewriter() {
         return componentRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_15> getTagRewriter() {
+        return tagRewriter;
     }
 }

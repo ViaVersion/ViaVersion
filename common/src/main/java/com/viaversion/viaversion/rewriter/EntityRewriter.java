@@ -207,6 +207,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      *
      * @param itemType               item meta type if needed
      * @param blockStateType         block state meta type if needed
+     * @param particleType           particle meta type if needed
+     */
+    public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType particleType) {
+        registerMetaTypeHandler(itemType, null, blockStateType, particleType, null);
+    }
+
+    /**
+     * Registers a metadata handler to rewrite, item, block, and particle ids stored in metadata.
+     *
+     * @param itemType               item meta type if needed
+     * @param blockStateType         block state meta type if needed
      * @param optionalBlockStateType optional block state meta type if needed
      * @param particleType           particle meta type if needed
      * @param particlesType          particles meta type if needed

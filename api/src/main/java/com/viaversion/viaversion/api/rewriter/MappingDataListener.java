@@ -22,19 +22,8 @@
  */
 package com.viaversion.viaversion.api.rewriter;
 
-import com.viaversion.viaversion.api.protocol.Protocol;
+public interface MappingDataListener {
 
-public interface Rewriter<T extends Protocol> extends MappingDataListener {
-
-    /**
-     * Registers any packet handlers or rewrites needed.
-     */
-    void register();
-
-    /**
-     * Returns the {@link Protocol} instance of this rewriter.
-     *
-     * @return protocol of the rewriter
-     */
-    T protocol();
+    default void onMappingDataLoaded() {
+    }
 }

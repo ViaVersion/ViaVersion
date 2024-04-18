@@ -36,6 +36,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.rewriter.Rewriter;
+import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -347,6 +349,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @return item rewriter
      */
     default @Nullable ItemRewriter<?> getItemRewriter() {
+        return null;
+    }
+
+    /**
+     * Returns the protocol's tag rewriter if present.
+     *
+     * @return tag rewriter
+     */
+    default @Nullable TagRewriter getTagRewriter() {
         return null;
     }
 

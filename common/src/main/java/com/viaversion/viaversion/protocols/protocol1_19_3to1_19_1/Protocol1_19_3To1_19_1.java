@@ -66,6 +66,7 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19_3To1_19_1() {
         super(ClientboundPackets1_19_1.class, ClientboundPackets1_19_3.class, ServerboundPackets1_19_1.class, ServerboundPackets1_19_3.class);
@@ -73,8 +74,6 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void registerPackets() {
-        final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
-
         // Flint and steel was hardcoded before 1.19.3 to ignite a creeper; has been moved to a tag - adding this ensures offhand doesn't trigger as well
         tagRewriter.addTagRaw(RegistryType.ITEM, "minecraft:creeper_igniters", 733); // 733 = flint_and_steel 1.19.3
 
@@ -376,5 +375,10 @@ public final class Protocol1_19_3To1_19_1 extends AbstractProtocol<ClientboundPa
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_19_1> getTagRewriter() {
+        return tagRewriter;
     }
 }

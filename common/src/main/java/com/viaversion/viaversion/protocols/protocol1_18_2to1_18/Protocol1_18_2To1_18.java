@@ -31,6 +31,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_18, ServerboundPackets1_17, ServerboundPackets1_17> {
 
+
     public Protocol1_18_2To1_18() {
         super(ClientboundPackets1_18.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
     }

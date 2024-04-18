@@ -44,6 +44,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2");
     private final MetadataRewriter1_13_1To1_13 entityRewriter = new MetadataRewriter1_13_1To1_13(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_13_1To1_13() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_13.class, ServerboundPackets1_13.class, ServerboundPackets1_13.class);
@@ -128,7 +129,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        new TagRewriter<>(this).register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
+        tagRewriter.register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.STATISTICS);
     }
 
@@ -153,5 +154,10 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_13> getTagRewriter() {
+        return tagRewriter;
     }
 }

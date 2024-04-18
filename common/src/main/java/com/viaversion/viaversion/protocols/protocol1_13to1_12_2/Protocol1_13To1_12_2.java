@@ -65,6 +65,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.IdAndData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -317,7 +318,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                 }
             } else {
                 for (int i = 0; i < 16; i++) {
-                    int newItem = MAPPINGS.getItemMappings().getNewId(item << 4 | i);
+                    int newItem = MAPPINGS.getItemMappings().getNewId(IdAndData.toRawData(item, i));
                     if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
                         packet.write(Type.VAR_INT, newItem);
@@ -342,11 +343,11 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     int id = wrapper.get(Type.INT, 0);
                     int data = wrapper.get(Type.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(data << 4));
+                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(IdAndData.toRawData(data)));
                     } else if (id == 2001) { // Block break + block break sound
                         int blockId = data & 0xFFF;
                         int blockData = data >> 12;
-                        wrapper.set(Type.INT, 1, WorldPackets.toNewId(blockId << 4 | blockData));
+                        wrapper.set(Type.INT, 1, WorldPackets.toNewId(IdAndData.toRawData(blockId, blockData)));
                     }
                 });
             }
@@ -839,6 +840,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
         ConnectionData.init();
         RecipeData.init();
         BlockIdData.init();

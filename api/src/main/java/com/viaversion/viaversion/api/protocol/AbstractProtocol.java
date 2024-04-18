@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypeMap;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.rewriter.MappingDataListener;
 import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -211,6 +212,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     protected void onMappingDataLoaded() {
         callOnMappingDataLoaded(getEntityRewriter());
         callOnMappingDataLoaded(getItemRewriter());
+        callOnMappingDataLoaded(getTagRewriter());
     }
 
     private void callRegister(@Nullable Rewriter<?> rewriter) {
@@ -219,7 +221,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
-    private void callOnMappingDataLoaded(@Nullable Rewriter<?> rewriter) {
+    private void callOnMappingDataLoaded(@Nullable MappingDataListener rewriter) {
         if (rewriter != null) {
             rewriter.onMappingDataLoaded();
         }

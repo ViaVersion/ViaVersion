@@ -40,7 +40,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.14", "1.15");
     private final MetadataRewriter1_15To1_14_4 metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
-    private TagRewriter<ClientboundPackets1_14_4> tagRewriter;
+    private final TagRewriter<ClientboundPackets1_14_4> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_15To1_14_4() {
         super(ClientboundPackets1_14_4.class, ClientboundPackets1_15.class, ServerboundPackets1_14.class, ServerboundPackets1_14.class);
@@ -61,12 +61,13 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
 
-        tagRewriter = new TagRewriter<>(this);
         tagRewriter.register(ClientboundPackets1_14_4.TAGS, RegistryType.ENTITY);
     }
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
+
         int[] shulkerBoxes = new int[17];
         int shulkerBoxOffset = 501;
         for (int i = 0; i < 17; i++) {
@@ -93,5 +94,10 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_14_4> getTagRewriter() {
+        return tagRewriter;
     }
 }

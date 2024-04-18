@@ -43,6 +43,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingDataBase("1.17", "1.18");
     private final EntityPackets entityRewriter = new EntityPackets(this);
     private final InventoryPackets itemRewriter = new InventoryPackets(this);
+    private final TagRewriter<ClientboundPackets1_17_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_18To1_17_1() {
         super(ClientboundPackets1_17_1.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
@@ -58,7 +59,6 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_17_1.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_17_1.ENTITY_SOUND);
 
-        final TagRewriter<ClientboundPackets1_17_1> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_17_1.TAGS);
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace", "minecraft:big_dripleaf_placeable",
                 "minecraft:wolves_spawnable_on", "minecraft:rabbits_spawnable_on", "minecraft:polar_bears_spawnable_on_in_frozen_ocean", "minecraft:parrots_spawnable_on",
@@ -85,6 +85,7 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
+        super.onMappingDataLoaded();
         Types1_18.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)

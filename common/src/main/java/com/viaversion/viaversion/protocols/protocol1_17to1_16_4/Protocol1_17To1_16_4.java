@@ -188,7 +188,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        tagRewriter.loadFromMappingData(); // Load filled extra tags
+        super.onMappingDataLoaded();
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
                 "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals", "minecraft:fox_food",
@@ -231,5 +231,10 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
     @Override
     public InventoryPackets getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_16_2> getTagRewriter() {
+        return tagRewriter;
     }
 }

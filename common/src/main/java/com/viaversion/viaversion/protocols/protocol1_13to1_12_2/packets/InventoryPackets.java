@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SoundSource
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.data.SpawnEggRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -165,7 +166,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         channel = getNewPluginChannelId(channel);
                         if (channel == null) {
                             if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Ignoring outgoing plugin message with channel: " + old);
+                                Via.getPlatform().getLogger().warning("Ignoring clientbound plugin message with channel: " + old);
                             }
                             wrapper.cancel();
                             return;
@@ -177,7 +178,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
                                 } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in outgoing REGISTER: " + s);
+                                    Via.getPlatform().getLogger().warning("Ignoring plugin channel in clientbound " + Key.stripMinecraftNamespace(channel).toUpperCase(Locale.ROOT) + ": " + s);
                                 }
                             }
                             if (!rewrittenChannels.isEmpty()) {
@@ -229,7 +230,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                     channel = getOldPluginChannelId(channel);
                     if (channel == null) {
                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                            Via.getPlatform().getLogger().warning("Ignoring incoming plugin message with channel: " + old);
+                            Via.getPlatform().getLogger().warning("Ignoring serverbound plugin message with channel: " + old);
                         }
                         wrapper.cancel();
                         return;
@@ -241,7 +242,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                             if (rewritten != null) {
                                 rewrittenChannels.add(rewritten);
                             } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Ignoring plugin channel in incoming REGISTER: " + s);
+                                Via.getPlatform().getLogger().warning("Ignoring plugin channel in serverbound " + channel + ": " + s);
                             }
                         }
                         wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
@@ -270,7 +271,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         // Save original id
         int originalId = (item.identifier() << 16 | item.data() & 0xFFFF);
 
-        int rawId = (item.identifier() << 4 | item.data() & 0xF);
+        int rawId = IdAndData.toRawData(item.identifier(), item.data());
 
         // NBT Additions
         if (isDamageable(item.identifier())) {
@@ -458,9 +459,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 tag.put(nbtTagName(), new IntTag(originalId)); // Data will be lost, saving original id
             }
             if (item.identifier() == 31 && item.data() == 0) { // Shrub was removed
-                rawId = 32 << 4; // Dead Bush
-            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(rawId & ~0xF) != -1) {
-                rawId &= ~0xF; // Remove data
+                rawId = IdAndData.toRawData(32); // Dead Bush
+            } else if (Protocol1_13To1_12_2.MAPPINGS.getItemMappings().getNewId(IdAndData.removeData(rawId)) != -1) {
+                rawId = IdAndData.removeData(rawId);
             } else {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.identifier());
@@ -538,7 +539,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         tag.put("EntityTag", entityTag);
                     }
                 } else {
-                    rawId = (oldId >> 4) << 16 | oldId & 0xF;
+                    rawId = IdAndData.getId(oldId) << 16 | oldId & 0xF;
                 }
             }
         }

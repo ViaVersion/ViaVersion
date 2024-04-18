@@ -45,6 +45,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
+    private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_99To_98() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
@@ -55,7 +56,6 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     protected void registerPackets() {
         super.registerPackets();
 
-        final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
         tagRewriter.registerGeneric(ClientboundPackets1_20_5.TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
 
@@ -109,7 +109,8 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
     }
 
-    // Overriding these three methods is important as they are relied on various rewriter classes
+    // Overriding these four methods is important as they are relied on various rewriter classes
+    // and have mapping load methods called in AbstractProtocol via the getters
     @Override
     public MappingData getMappingData() {
         return MAPPINGS;
@@ -123,5 +124,10 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     @Override
     public BlockItemPacketRewriter1_99 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPacket1_20_5> getTagRewriter() {
+        return tagRewriter;
     }
 }
