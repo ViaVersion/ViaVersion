@@ -20,9 +20,10 @@ package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.SerializerVersion;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.Collections;
@@ -227,24 +228,11 @@ public class ItemRewriter {
         }
 
         for (int i = 0; i < pages.size(); i++) {
-            StringTag pageTag = pages.get(i);
-            String value = pageTag.getValue();
-            if (value.replaceAll(" ", "").isEmpty()) {
-                value = "\"" + fixBookSpaceChars(value) + "\"";
-            } else {
-                value = fixBookSpaceChars(value);
-            }
-            pageTag.setValue(value);
-        }
-    }
+            final StringTag pageTag = pages.get(i);
+            final String value = pageTag.getValue();
 
-    private static String fixBookSpaceChars(String str) {
-        if (!str.startsWith(" ")) {
-            return str;
+            pageTag.setValue(ComponentUtil.convertJson(value, SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
         }
-        // hacky but it works :)
-        str = "§r" + str;
-        return str;
     }
 
     public static void toClient(Item item) {
@@ -287,15 +275,15 @@ public class ItemRewriter {
 
                 ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
                 if (pages == null) {
-                    pages = new ListTag<>(Collections.singletonList(new StringTag(Protocol1_9To1_8.fixJson("").toString())));
+                    pages = new ListTag<>(Collections.singletonList(new StringTag(ComponentUtil.emptyJsonComponent().toString())));
                     tag.put("pages", pages);
                     item.setTag(tag);
                     return;
                 }
 
                 for (int i = 0; i < pages.size(); i++) {
-                    StringTag page = pages.get(i);
-                    page.setValue(Protocol1_9To1_8.fixJson(page.getValue()).toString());
+                    final StringTag page = pages.get(i);
+                    page.setValue(ComponentUtil.convertJson(page.getValue(), SerializerVersion.V1_8, SerializerVersion.V1_9).toString());
                 }
                 item.setTag(tag);
             }
