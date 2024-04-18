@@ -62,6 +62,9 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPacket1_20_3, ClientboundPacket1_20_5, ServerboundPacket1_20_3, ServerboundPacket1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingData();
+    // Mojang will remove this in the next release, so if we were to set this to false,
+    // people would miss the changes and not fix their plugins before forcefully running into the errors then
+    public static boolean strictErrorHandling = System.getProperty("viaversion.strict-error-handling1_20_5", "true").equalsIgnoreCase("true");
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
@@ -203,6 +206,20 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
 
         new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);
+
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+            wrapper.passthrough(Type.UUID); // UUID
+            wrapper.passthrough(Type.STRING); // Name
+
+            final int properties = wrapper.passthrough(Type.VAR_INT);
+            for (int i = 0; i < properties; i++) {
+                wrapper.passthrough(Type.STRING); // Name
+                wrapper.passthrough(Type.STRING); // Value
+                wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
+            }
+
+            wrapper.write(Type.BOOLEAN, strictErrorHandling);
+        });
 
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.COOKIE_RESPONSE.getId());
         cancelServerbound(ServerboundConfigurationPackets1_20_5.COOKIE_RESPONSE);
