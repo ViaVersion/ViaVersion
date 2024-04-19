@@ -56,7 +56,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
         @Override
         public JsonElement transform(PacketWrapper wrapper, String line) {
-            return Protocol1_9To1_8.toJson(line);
+            return ComponentUtil.convertJson(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
         }
     };
     private final MetadataRewriter1_9To1_8 metadataRewriter = new MetadataRewriter1_9To1_8(this);
@@ -93,7 +93,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
                 return;
             }
 
-            wrapper.write(Type.COMPONENT, toJson(wrapper.read(Type.STRING)));
+            STRING_TO_JSON.write(wrapper, wrapper.read(Type.STRING));
         });
 
         // Other Handlers
@@ -102,16 +102,6 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
-    }
-
-    public static JsonElement toJson(final String line) {
-        try {
-            // Rewrite to new format if already in json
-            return ComponentUtil.convertJson(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
-        } catch (Exception e) {
-            // If plain text, convert to json
-            return ComponentUtil.plainToJson(line);
-        }
     }
 
     @Override
