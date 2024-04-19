@@ -45,6 +45,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.Effect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -54,10 +56,12 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 4 - Sign Line (json)
+                handler(wrapper -> {
+                    for (int i = 0; i < 4; i++) {
+                        final String line = wrapper.read(Type.STRING); // Should be Type.COMPONENT but would crash
+                        wrapper.write(Type.COMPONENT, ComponentUtil.convertJson(line, SerializerVersion.V1_8, SerializerVersion.V1_9));
+                    }
+                });
             }
         });
 
@@ -245,10 +249,12 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 4 - Sign Line (json)
+                handler(wrapper -> {
+                    for (int i = 0; i < 4; i++) {
+                        final String line = wrapper.read(Type.STRING);
+                        wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(line));
+                    }
+                });
             }
         });
 
