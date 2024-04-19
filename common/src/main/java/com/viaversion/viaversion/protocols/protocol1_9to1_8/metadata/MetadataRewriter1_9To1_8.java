@@ -130,8 +130,9 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(angle);
                 break;
             case Chat:
+                // Was previously also a component, so just convert it
                 String text = (String) value;
-                metadata.setValue(Protocol1_9To1_8.toJson(text));
+                metadata.setValue(ComponentUtil.convertJson(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
                 break;
             case BlockID:
                 // Convert from int, short, byte

@@ -248,13 +248,13 @@ public class PlayerPackets {
                             wrapper.passthrough(Type.VAR_INT); // ping
                             String displayName = wrapper.read(Type.OPTIONAL_STRING);
                             wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_9To1_8.STRING_TO_JSON.transform(wrapper, displayName) : null);
+                                    Protocol1_9To1_8.toJson(displayName) : null);
                         } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // update display name
                             String displayName = wrapper.read(Type.OPTIONAL_STRING);
                             wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_9To1_8.STRING_TO_JSON.transform(wrapper, displayName) : null);
+                                    Protocol1_9To1_8.toJson(displayName) : null);
                         }
                     }
                 });
