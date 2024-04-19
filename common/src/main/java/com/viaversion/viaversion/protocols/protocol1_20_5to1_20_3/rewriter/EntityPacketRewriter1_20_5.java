@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -39,6 +40,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -48,6 +50,10 @@ import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
+
+    private static final UUID CREATIVE_BLOCK_INTERACTION_RANGE = UUID.fromString("736565d2-e1a7-403d-a3f8-1aeb3e302542");
+    private static final UUID CREATIVE_ENTITY_INTERACTION_RANGE = UUID.fromString("98491ef6-97b1-4584-ae82-71a8cc85cf73");
+    private static final int CREATIVE_MODE_ID = 1;
 
     public EntityPacketRewriter1_20_5(final Protocol1_20_5To1_20_3 protocol) {
         super(protocol);
@@ -204,6 +210,12 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(playerTrackerHandler());
+                handler(wrapper -> {
+                    final byte gamemode = wrapper.get(Type.BYTE, 0);
+                    if (gamemode == CREATIVE_MODE_ID) {
+                        sendRangeAttributes(wrapper.user(), true);
+                    }
+                });
             }
         });
 
@@ -211,8 +223,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final String dimensionKey = wrapper.read(Type.STRING);
             final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
             wrapper.write(Type.VAR_INT, data.id());
+
             wrapper.passthrough(Type.STRING); // World
             worldDataTrackerHandlerByKey1_20_5(0).handle(wrapper); // Tracks world height and name for chunk data and entity (un)tracking
+            wrapper.passthrough(Type.LONG); // Seed
+
+            final byte gamemode = wrapper.passthrough(Type.BYTE);
+            sendRangeAttributes(wrapper.user(), gamemode == CREATIVE_MODE_ID);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_EFFECT, wrapper -> {
@@ -229,13 +246,12 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ENTITY_PROPERTIES, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity ID
-
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 // From a string to a registry int ID
                 final String attributeIdentifier = wrapper.read(Type.STRING);
-                final int id = Attributes1_20_5.keyToId(attributeIdentifier);
-                wrapper.write(Type.VAR_INT, id != -1 ? id : 0);
+                final int mappedId = Attributes1_20_5.keyToId(attributeIdentifier);
+                wrapper.write(Type.VAR_INT, mappedId != -1 ? mappedId : 0);
 
                 wrapper.passthrough(Type.DOUBLE); // Base
                 final int modifierSize = wrapper.passthrough(Type.VAR_INT);
@@ -245,6 +261,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     wrapper.passthrough(Type.BYTE); // Operation
                 }
             }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.GAME_EVENT, wrapper -> {
+            // If the gamemode changed to/from creative, update the range attribute
+            final short event = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            if (event != 3) {
+                return;
+            }
+
+            // Resend attributes either with their original list or with the creative range modifier added
+            final float value = wrapper.passthrough(Type.FLOAT);
+            sendRangeAttributes(wrapper.user(), value == CREATIVE_MODE_ID);
         });
     }
 
@@ -296,6 +324,30 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             if (entries[i] == null) {
                 entries[i] = first.withKey(UUID.randomUUID().toString());
             }
+        }
+    }
+
+    private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) throws Exception {
+        final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.ENTITY_PROPERTIES, connection);
+        wrapper.write(Type.VAR_INT, tracker(connection).clientEntityId());
+        wrapper.write(Type.VAR_INT, 2); // Number of attributes
+        writeAttribute(wrapper, "player.block_interaction_range", 4.5, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5);
+        writeAttribute(wrapper, "player.entity_interaction_range", 3.0, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2.0);
+        wrapper.scheduleSend(Protocol1_20_5To1_20_3.class);
+    }
+
+    private void writeAttribute(final PacketWrapper wrapper, final String attributeId, final double base, @Nullable final UUID modifierId, final double amount) {
+        wrapper.write(Type.VAR_INT, Attributes1_20_5.keyToId(attributeId));
+        wrapper.write(Type.DOUBLE, base);
+        if (modifierId != null) {
+            // Single modifier
+            wrapper.write(Type.VAR_INT, 1);
+            wrapper.write(Type.UUID, modifierId);
+            wrapper.write(Type.DOUBLE, amount);
+            wrapper.write(Type.BYTE, (byte) 0); // Add
+        } else {
+            // No modifiers
+            wrapper.write(Type.VAR_INT, 0);
         }
     }
 
