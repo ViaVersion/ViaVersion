@@ -80,7 +80,7 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Blue 0-1
-            particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Scale 0.01-4
+            particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Scale 0.01-4 (moved to the end as of 24w03a / 1.20.5)
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Blue

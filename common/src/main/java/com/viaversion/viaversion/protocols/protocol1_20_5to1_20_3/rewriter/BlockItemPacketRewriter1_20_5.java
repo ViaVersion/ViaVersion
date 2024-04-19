@@ -214,6 +214,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
                 particle.add(Type.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
             }
+            if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("dust_color_transition")) {
+                for (int i = 0; i < 7; i++) {
+                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT));
+                }
+                // fromColor, scale, toColor -> fromColor, toColor, scale
+                particle.add(Type.FLOAT, particle.<Float> removeArgument(3).getValue());
+            }
 
             if (mappings.isBlockParticle(particleId)) {
                 final int blockStateId = wrapper.read(Type.VAR_INT);
@@ -223,6 +230,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 particle.add(Types1_20_5.ITEM, item);
             }
 
+            // TODO: We should read the particle data of every particle.
+            //  Otherwise reading the particle type in future versions will be broken.
             wrapper.write(Types1_20_5.PARTICLE, particle);
         });
 
