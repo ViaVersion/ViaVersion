@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
+import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -30,6 +31,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.UUID;
 
 public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1_8, Protocol1_9To1_8> {
@@ -127,8 +130,8 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(angle);
                 break;
             case Chat:
-                value = Protocol1_9To1_8.fixJson(value.toString());
-                metadata.setValue(value);
+                JsonElement json = (JsonElement) value;
+                metadata.setValue(ComponentUtil.convertJson(json, SerializerVersion.V1_8, SerializerVersion.V1_9));
                 break;
             case BlockID:
                 // Convert from int, short, byte

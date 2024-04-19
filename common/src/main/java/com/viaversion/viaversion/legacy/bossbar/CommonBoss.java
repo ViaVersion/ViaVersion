@@ -245,7 +245,7 @@ public class CommonBoss implements BossBar {
             wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {
                 case ADD:
-                    Protocol1_9To1_8.FIX_JSON.write(wrapper, title);
+                    Protocol1_9To1_8.STRING_TO_JSON.write(wrapper, title);
                     wrapper.write(Type.FLOAT, health);
                     wrapper.write(Type.VAR_INT, color.getId());
                     wrapper.write(Type.VAR_INT, style.getId());
@@ -257,7 +257,7 @@ public class CommonBoss implements BossBar {
                     wrapper.write(Type.FLOAT, health);
                     break;
                 case UPDATE_TITLE:
-                    Protocol1_9To1_8.FIX_JSON.write(wrapper, title);
+                    Protocol1_9To1_8.STRING_TO_JSON.write(wrapper, title);
                     break;
                 case UPDATE_STYLE:
                     wrapper.write(Type.VAR_INT, color.getId());

@@ -54,10 +54,10 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 4 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 1 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 2 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 3 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 4 - Sign Line (json)
             }
         });
 
@@ -245,10 +245,10 @@ public class WorldPackets {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Sign Position
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 3 - Sign Line (json)
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 4 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 1 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 2 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 3 - Sign Line (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 4 - Sign Line (json)
             }
         });
 

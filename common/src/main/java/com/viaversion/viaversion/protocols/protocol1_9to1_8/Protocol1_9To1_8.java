@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.protocol1_9to1_8;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
@@ -49,48 +48,27 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.CommandBlock
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.InventoryTracker;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.MovementTracker;
-import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 
 public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
-    public static final ValueTransformer<String, JsonElement> FIX_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
+
+    public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
         @Override
         public JsonElement transform(PacketWrapper wrapper, String line) {
-            return fixJson(line);
+            try {
+                // Rewrite to new format if already in json
+                return ComponentUtil.convertJson(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
+            } catch (Exception e) {
+                // If plain text, convert to json
+                return ComponentUtil.plainToJson(line);
+            }
         }
     };
     private final MetadataRewriter1_9To1_8 metadataRewriter = new MetadataRewriter1_9To1_8(this);
 
     public Protocol1_9To1_8() {
         super(ClientboundPackets1_8.class, ClientboundPackets1_9.class, ServerboundPackets1_8.class, ServerboundPackets1_9.class);
-    }
-
-    public static JsonElement fixJson(String line) {
-        if (line == null || line.equalsIgnoreCase("null")) {
-            line = "{\"text\":\"\"}";
-        } else {
-            if ((!line.startsWith("\"") || !line.endsWith("\"")) && (!line.startsWith("{") || !line.endsWith("}"))) {
-                return constructJson(line);
-            }
-            if (line.startsWith("\"") && line.endsWith("\"")) {
-                line = "{\"text\":" + line + "}";
-            }
-        }
-        try {
-            return GsonUtil.getGson().fromJson(line, JsonObject.class);
-        } catch (Exception e) {
-            if (Via.getConfig().isForceJsonTransform()) {
-                return constructJson(line);
-            } else {
-                Via.getPlatform().getLogger().warning("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
-                return GsonUtil.getGson().fromJson("{\"text\":\"\"}", JsonObject.class);
-            }
-        }
-    }
-
-    private static JsonElement constructJson(String text) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("text", text);
-        return jsonObject;
     }
 
     public static Item getHandItem(final UserConnection info) {
@@ -121,7 +99,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
                 return;
             }
 
-            wrapper.write(Type.COMPONENT, fixJson(wrapper.read(Type.STRING)));
+            wrapper.write(Type.COMPONENT, toJson(wrapper.read(Type.STRING)));
         });
 
         // Other Handlers
@@ -130,6 +108,15 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
         EntityPackets.register(this);
         PlayerPackets.register(this);
         WorldPackets.register(this);
+    }
+
+    public static JsonElement toJson(final String line) {
+        try {
+            return STRING_TO_JSON.transform(null, line);
+        } catch (Exception e) {
+            Via.getPlatform().getLogger().warning("Invalid JSON String: \"" + line + "\" Please report this issue to the ViaVersion Github: " + e.getMessage());
+            return ComponentUtil.emptyJsonComponent();
+        }
     }
 
     @Override

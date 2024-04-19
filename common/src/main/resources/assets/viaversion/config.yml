@@ -216,8 +216,6 @@ replace-pistons: false
 replacement-piston-id: 0
 # Fix 1.9+ clients not rendering the far away chunks and improve chunk rendering when moving fast (Increases network usage and decreases client fps slightly)
 chunk-border-fix: false
-# Force the string -> json transform
-force-json-transform: false
 # Minimize the cooldown animation in 1.8 servers
 minimize-cooldown: true
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers

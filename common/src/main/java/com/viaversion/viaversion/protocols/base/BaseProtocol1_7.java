@@ -164,7 +164,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                 if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
                 PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper.user()); // Disconnect Packet
-                Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg()));
+                Protocol1_9To1_8.STRING_TO_JSON.write(disconnectPacket, ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg()));
                 wrapper.cancel(); // cancel current
 
                 // Send and close

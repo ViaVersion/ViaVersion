@@ -44,7 +44,7 @@ public class PlayerPackets {
         protocol.registerClientbound(ClientboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Chat Message (json)
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 0 - Chat Message (json)
                 map(Type.BYTE); // 1 - Chat Position
 
                 handler(wrapper -> {
@@ -61,15 +61,15 @@ public class PlayerPackets {
         protocol.registerClientbound(ClientboundPackets1_8.TAB_LIST, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Header
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 1 - Footer
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 0 - Header
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 1 - Footer
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_8.DISCONNECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 0 - Reason
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 0 - Reason
             }
         });
 
@@ -81,7 +81,7 @@ public class PlayerPackets {
                 handler(wrapper -> {
                     int action = wrapper.get(Type.VAR_INT, 0);
                     if (action == 0 || action == 1) {
-                        Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
+                        Protocol1_9To1_8.STRING_TO_JSON.write(wrapper, wrapper.read(Type.STRING));
                     }
                 });
                 // Everything else is handled.
@@ -248,13 +248,13 @@ public class PlayerPackets {
                             wrapper.passthrough(Type.VAR_INT); // ping
                             String displayName = wrapper.read(Type.OPTIONAL_STRING);
                             wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_9To1_8.FIX_JSON.transform(wrapper, displayName) : null);
+                                    Protocol1_9To1_8.STRING_TO_JSON.transform(wrapper, displayName) : null);
                         } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
                             wrapper.passthrough(Type.VAR_INT);
                         } else if (action == 3) { // update display name
                             String displayName = wrapper.read(Type.OPTIONAL_STRING);
                             wrapper.write(Type.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_9To1_8.FIX_JSON.transform(wrapper, displayName) : null);
+                                    Protocol1_9To1_8.STRING_TO_JSON.transform(wrapper, displayName) : null);
                         }
                     }
                 });

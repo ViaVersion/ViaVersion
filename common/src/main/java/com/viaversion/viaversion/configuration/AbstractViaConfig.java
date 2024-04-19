@@ -63,7 +63,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private int pistonReplacementId;
     private boolean chunkBorderFix;
     private boolean autoTeam;
-    private boolean forceJsonTransform;
     private boolean nbtArrayFix;
     private BlockedProtocolVersions blockedProtocolVersions;
     private String blockedDisconnectMessage;
@@ -128,7 +127,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         pistonReplacementId = getInt("replacement-piston-id", 0);
         chunkBorderFix = getBoolean("chunk-border-fix", false);
         autoTeam = getBoolean("auto-team", true);
-        forceJsonTransform = getBoolean("force-json-transform", false);
         nbtArrayFix = getBoolean("chat-nbt-fix", true);
         blockedProtocolVersions = loadBlockedProtocolVersions();
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
@@ -367,11 +365,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     public boolean isAutoTeam() {
         // Collision has to be enabled first
         return preventCollision && autoTeam;
-    }
-
-    @Override
-    public boolean isForceJsonTransform() {
-        return forceJsonTransform;
     }
 
     @Override
