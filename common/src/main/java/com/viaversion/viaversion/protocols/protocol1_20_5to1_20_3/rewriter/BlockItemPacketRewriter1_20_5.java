@@ -210,28 +210,45 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             // Read data and add it to Particle
             final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-            final Particle particle = new Particle(mappings.getNewId(particleId));
-            if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
+            final int mappedId = mappings.getNewId(particleId);
+            final Particle particle = new Particle(mappedId);
+            if (mappedId == mappings.mappedId("entity_effect")) {
                 particle.add(Type.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
-            }
-            if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("dust_color_transition")) {
+            } else if (particleId == mappings.id("dust_color_transition")) {
                 for (int i = 0; i < 7; i++) {
                     particle.add(Type.FLOAT, wrapper.read(Type.FLOAT));
                 }
                 // fromColor, scale, toColor -> fromColor, toColor, scale
-                particle.add(Type.FLOAT, particle.<Float> removeArgument(3).getValue());
-            }
-
-            if (mappings.isBlockParticle(particleId)) {
+                particle.add(Type.FLOAT, particle.<Float>removeArgument(3).getValue());
+            } else if (mappings.isBlockParticle(particleId)) {
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
                 final Item item = handleNonNullItemToClient(wrapper.read(Type.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
+            } else if (particleId == mappings.id("dust")) {
+                // R, g, b, scale
+                for (int i = 0; i < 4; i++) {
+                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT));
+                }
+            } else if (particleId == mappings.id("vibration")) {
+                final int sourceTypeId = wrapper.read(Type.VAR_INT);
+                particle.add(Type.VAR_INT, sourceTypeId);
+                if (sourceTypeId == 0) { // Block
+                    particle.add(Type.POSITION1_14, wrapper.read(Type.POSITION1_14)); // Target block pos
+                } else if (sourceTypeId == 1) { // Entity
+                    particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Target entity
+                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT)); // Y offset
+                } else {
+                    Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + sourceTypeId);
+                }
+                particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Arrival in ticks
+            } else if (particleId == mappings.id("sculk_charge")) {
+                particle.add(Type.FLOAT, wrapper.read(Type.FLOAT)); // Roll
+            } else if (particleId == mappings.id("shriek")) {
+                particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Delay
             }
 
-            // TODO: We should read the particle data of every particle.
-            //  Otherwise reading the particle type in future versions will be broken.
             wrapper.write(Types1_20_5.PARTICLE, particle);
         });
 

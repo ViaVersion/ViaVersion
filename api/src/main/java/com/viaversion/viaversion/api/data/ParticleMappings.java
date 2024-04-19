@@ -35,6 +35,7 @@ public class ParticleMappings extends FullMappingsBase {
         addBlockParticle("block");
         addBlockParticle("falling_dust");
         addBlockParticle("block_marker");
+        addBlockParticle("dust_pillar");
         addItemParticle("item");
     }
 
