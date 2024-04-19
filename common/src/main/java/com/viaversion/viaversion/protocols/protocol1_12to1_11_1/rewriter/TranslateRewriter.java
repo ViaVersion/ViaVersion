@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.data.AchievementTranslationMapping;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.logging.Level;
 
 public class TranslateRewriter {
@@ -45,13 +46,7 @@ public class TranslateRewriter {
                 return;
             }
 
-            String textValue;
-            JsonElement value = hoverEvent.get("value");
-            if (value.isJsonObject()) {
-                textValue = value.getAsJsonObject().get("text").getAsString();
-            } else {
-                textValue = value.getAsJsonPrimitive().getAsString();
-            }
+            String textValue = SerializerVersion.V1_9.toComponent(hoverEvent.get("value")).asUnformattedString();
 
             if (AchievementTranslationMapping.get(textValue) == null) {
                 JsonObject invalidText = new JsonObject();
@@ -79,7 +74,7 @@ public class TranslateRewriter {
                     typePart.addProperty("translate", "stats.tooltip.type.achievement");
                     JsonObject description = new JsonObject();
                     typePart.addProperty("italic", true);
-                    description.addProperty("translate", value + ".desc");
+                    description.addProperty("translate", textValue + ".desc");
                     baseArray.add(newLine);
                     baseArray.add(description);
                 } else if (textValue.startsWith("stat")) {
@@ -91,7 +86,9 @@ public class TranslateRewriter {
                 hoverEvent.addProperty("action", "show_text");
                 hoverEvent.add("value", baseArray);
             } catch (Exception e) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    Via.getPlatform().getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
+                }
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");
                 invalidText.addProperty("color", "red");
