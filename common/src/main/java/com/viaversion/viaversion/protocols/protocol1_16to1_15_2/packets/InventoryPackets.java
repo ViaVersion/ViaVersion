@@ -205,6 +205,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             if (leastTag != null && mostTag != null) {
                 int[] uuidIntArray = UUIDUtil.toIntArray(mostTag.asLong(), leastTag.asLong());
                 attribute.put("UUID", new IntArrayTag(uuidIntArray));
+                attribute.remove("UUIDLeast");
+                attribute.remove("UUIDMost");
             }
         }
     }
