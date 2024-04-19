@@ -1343,6 +1343,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BANNER_PATTERNS, layers);
             }
         }
+
+        // Remove air item from brushable blocks, decorated pots, jukeboxes, and lecterns
+        removeEmptyItem(tag, "item");
+        removeEmptyItem(tag, "RecordItem");
+        removeEmptyItem(tag, "Book");
+    }
+
+    private void removeEmptyItem(final CompoundTag tag, final String key) {
+        final CompoundTag itemTag = tag.getCompoundTag(key);
+        if (itemTag != null) {
+            final int id = itemTag.getInt("id");
+            if (id == 0) {
+                tag.remove(key);
+            }
+        }
     }
 
     private void updateSkullOwnerTag(final CompoundTag tag, final CompoundTag skullOwnerTag) {
