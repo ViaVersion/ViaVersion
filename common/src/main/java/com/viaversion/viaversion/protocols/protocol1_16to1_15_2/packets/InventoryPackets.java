@@ -203,7 +203,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             NumberTag leastTag = attribute.getNumberTag("UUIDLeast");
             NumberTag mostTag = attribute.getNumberTag("UUIDMost");
             if (leastTag != null && mostTag != null) {
-                int[] uuidIntArray = UUIDUtil.toIntArray(leastTag.asLong(), mostTag.asLong());
+                int[] uuidIntArray = UUIDUtil.toIntArray(mostTag.asLong(), leastTag.asLong());
                 attribute.put("UUID", new IntArrayTag(uuidIntArray));
             }
         }
@@ -223,6 +223,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 UUID uuid = UUIDUtil.fromIntArray(uuidTag.getValue());
                 attribute.putLong("UUIDLeast", uuid.getLeastSignificantBits());
                 attribute.putLong("UUIDMost", uuid.getMostSignificantBits());
+                attribute.remove("UUID");
             }
         }
     }
