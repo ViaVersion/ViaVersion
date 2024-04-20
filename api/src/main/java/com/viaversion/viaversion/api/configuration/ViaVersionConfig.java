@@ -452,4 +452,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean isArmorToggleFix();
+
+    /**
+     * Ocelots will always be translated to cats for 1.14+ clients on 1.13 servers.
+     *
+     * @return true if enabled
+     */
+    boolean translateOcelotToCat();
 }

@@ -89,6 +89,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
+    private boolean translateOcelotToCat;
 
     protected AbstractViaConfig(final File configFile) {
         super(configFile);
@@ -157,6 +158,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
+        translateOcelotToCat = getBoolean("translate-ocelot-to-cat", false);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -527,5 +529,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isArmorToggleFix() {
         return false;
+    }
+
+    @Override
+    public boolean translateOcelotToCat() {
+        return translateOcelotToCat;
     }
 }
