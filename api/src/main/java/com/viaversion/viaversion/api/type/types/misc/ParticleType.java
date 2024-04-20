@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
@@ -70,6 +71,7 @@ public class ParticleType extends DynamicType<Particle> {
         public static final DataReader<Particle> ITEM1_13 = itemHandler(Type.ITEM1_13);
         public static final DataReader<Particle> ITEM1_13_2 = itemHandler(Type.ITEM1_13_2);
         public static final DataReader<Particle> ITEM1_20_2 = itemHandler(Type.ITEM1_20_2);
+        public static final DataReader<Particle> ITEM1_20_5 = itemHandler(Types1_20_5.ITEM);
         public static final DataReader<Particle> DUST = (buf, particle) -> {
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Type.FLOAT, Type.FLOAT.readPrimitive(buf)); // Green 0-1
