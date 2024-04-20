@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata;
 
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -132,7 +131,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
             case Chat:
                 // Was previously also a component, so just convert it
                 String text = (String) value;
-                metadata.setValue(ComponentUtil.convertJson(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
+                metadata.setValue(ComponentUtil.convertJsonOrEmpty(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
                 break;
             case BlockID:
                 // Convert from int, short, byte

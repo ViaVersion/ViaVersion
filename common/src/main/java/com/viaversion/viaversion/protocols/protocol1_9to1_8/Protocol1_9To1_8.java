@@ -56,7 +56,7 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<String, JsonElement>(Type.COMPONENT) {
         @Override
         public JsonElement transform(PacketWrapper wrapper, String line) {
-            return ComponentUtil.convertJson(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
+            return ComponentUtil.convertJsonOrEmpty(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
         }
     };
     private final MetadataRewriter1_9To1_8 metadataRewriter = new MetadataRewriter1_9To1_8(this);
