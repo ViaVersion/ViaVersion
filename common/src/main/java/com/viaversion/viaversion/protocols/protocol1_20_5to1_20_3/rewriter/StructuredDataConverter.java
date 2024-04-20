@@ -65,6 +65,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -105,9 +106,13 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.CUSTOM_NAME, (data, tag) -> getDisplayTag(tag).putString("Name", ComponentUtil.tagToJsonString(data)));
         register(StructuredDataKey.ITEM_NAME, (data, tag) -> {
-            final CompoundTag displayTag = tag.getCompoundTag("display");
-            if (displayTag != null && !displayTag.contains("Name")) {
-                displayTag.putString("Name", ComponentUtil.tagToJsonString(data));
+            final CompoundTag displayTag = getDisplayTag(tag);
+            if (!displayTag.contains("Name")) {
+                CompoundTag name = new CompoundTag();
+                name.putBoolean("italic", false);
+                name.putString("text", "");
+                name.put("extra", new ListTag<>(Collections.singletonList(data)));
+                displayTag.putString("Name", ComponentUtil.tagToJsonString(name));
             }
         });
         register(StructuredDataKey.LORE, (data, tag) -> {
