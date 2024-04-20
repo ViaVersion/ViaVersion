@@ -164,6 +164,12 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             event.cancel(); // "Has target (aggressive state)"
         });
 
+        filter().type(EntityTypes1_14.OCELOT).removeIndex(17); // variant
+
+        // Ocelot is not tamable anymore
+        filter().type(EntityTypes1_14.OCELOT).removeIndex(16); // owner uuid
+        filter().type(EntityTypes1_14.OCELOT).removeIndex(15); // data
+
         filter().handler((event, meta) -> {
             EntityType type = event.entityType();
             if (type.is(EntityTypes1_14.WITCH) || type.is(EntityTypes1_14.RAVAGER) || type.isOrHasParent(EntityTypes1_14.ABSTRACT_ILLAGER_BASE)) {
