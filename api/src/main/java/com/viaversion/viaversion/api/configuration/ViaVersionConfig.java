@@ -27,8 +27,6 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ViaVersionConfig extends Config {
 
@@ -454,7 +452,7 @@ public interface ViaVersionConfig extends Config {
     boolean isArmorToggleFix();
 
     /**
-     * Ocelots will always be translated to cats for 1.14+ clients on 1.13 servers.
+     * If disabled, tamed cats will be displayed as ocelots to 1.14+ clients on 1.13 servers. Otherwise, ocelots (tamed and untamed) will be displayed as cats.
      *
      * @return true if enabled
      */

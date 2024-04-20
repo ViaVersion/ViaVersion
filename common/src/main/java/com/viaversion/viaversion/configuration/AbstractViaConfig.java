@@ -158,7 +158,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
-        translateOcelotToCat = getBoolean("translate-ocelot-to-cat", false);
+        translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
