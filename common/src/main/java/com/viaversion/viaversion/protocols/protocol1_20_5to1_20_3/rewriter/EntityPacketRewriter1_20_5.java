@@ -376,7 +376,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             null
         );
 
-        filter().type(EntityTypes1_20_5.ZOMBIFIED_PIGLIN).removeIndex(19); // TODO Where is this coming from
+        filter().type(EntityTypes1_20_5.ZOMBIFIED_PIGLIN).removeIndex(19); // TODO Somewhere between 1.8 and 1.11 we most likely have bad handling
 
         filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
@@ -405,7 +405,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             if (metaIndex == 11) {
                 // If the particle is found first
                 final Metadata colorData = event.metaAtIndex(9);
-                if (colorData != null) {
+                if (colorData != null && colorData.metaType() == Types1_20_5.META_TYPES.varIntType) {
                     addColor(meta, colorData.value());
                 }
             }

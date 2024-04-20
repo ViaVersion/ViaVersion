@@ -150,13 +150,17 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             event.cancel();  // "Is swinging arms"
         });
 
-        filter().type(EntityTypes1_14.ABSTRACT_ILLAGER_BASE).index(14).handler((event, meta) -> {
-            EntityTracker1_14 tracker = tracker(event.user());
-            int entityId = event.entityId();
-            tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
+        filter().type(EntityTypes1_14.ABSTRACT_ILLAGER_BASE).handler((event, meta) -> {
+            if (event.index() == 14) {
+                EntityTracker1_14 tracker = tracker(event.user());
+                int entityId = event.entityId();
+                tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                     | (((Number) meta.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
-            event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
-            event.cancel(); // "Has target (aggressive state)"
+                event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
+                event.cancel(); // "Has target (aggressive state)"
+            } else if (event.index() > 14) {
+                meta.setId(meta.id() - 1);
+            }
         });
 
         filter().handler((event, meta) -> {
