@@ -175,6 +175,9 @@ map-1_16-world-names:
   nether: "minecraft:the_nether"
   end: "minecraft:the_end"
 #
+# Ocelots will always be translated to cats for 1.14+ clients on 1.13 servers.
+translate-ocelot-to-cat: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
