@@ -28,9 +28,9 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_18to1_17_1.ClientboundPackets1_18;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.TagUtil;
 
 public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_18, ServerboundPackets1_17, ServerboundPackets1_17> {
-
 
     public Protocol1_18_2To1_18() {
         super(ClientboundPackets1_18.class, ClientboundPackets1_18.class, ServerboundPackets1_17.class, ServerboundPackets1_17.class);
@@ -70,8 +70,7 @@ public final class Protocol1_18_2To1_18 extends AbstractProtocol<ClientboundPack
                 map(Type.NAMED_COMPOUND_TAG); // Current dimension data
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-                    final CompoundTag dimensionsHolder = registry.getCompoundTag("minecraft:dimension_type");
-                    final ListTag<CompoundTag> dimensions = dimensionsHolder.getListTag("value", CompoundTag.class);
+                    final ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(registry, "dimension_type");
                     for (final CompoundTag dimension : dimensions) {
                         addTagPrefix(dimension.getCompoundTag("element"));
                     }

@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.protocol1_20to1_19_4.Protocol1_20To1_19_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.TagUtil;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_20To1_19_4> {
 
@@ -75,8 +76,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_4
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(wrapper -> {
                     final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-                    final CompoundTag damageTypeRegistry = registry.getCompoundTag("minecraft:damage_type");
-                    final ListTag<CompoundTag> damageTypes = damageTypeRegistry.getListTag("value", CompoundTag.class);
+                    final ListTag<CompoundTag> damageTypes = TagUtil.getRegistryEntries(registry, "damage_type");
                     int highestId = -1;
                     for (final CompoundTag damageType : damageTypes) {
                         final IntTag id = damageType.getUnchecked("id");

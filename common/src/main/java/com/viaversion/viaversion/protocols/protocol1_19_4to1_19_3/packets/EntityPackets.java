@@ -33,6 +33,7 @@ import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
 import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.storage.PlayerVehicleTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.TagUtil;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3, Protocol1_19_4To1_19_3> {
 
@@ -62,8 +63,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 
-                    final CompoundTag biomeRegistry = registry.getCompoundTag("minecraft:worldgen/biome");
-                    final ListTag<CompoundTag> biomes = biomeRegistry.getListTag("value", CompoundTag.class);
+                    final ListTag<CompoundTag> biomes = TagUtil.getRegistryEntries(registry, "worldgen/biome");
                     for (final CompoundTag biomeTag : biomes) {
                         final CompoundTag biomeData = biomeTag.getCompoundTag("element");
                         final StringTag precipitation = biomeData.getStringTag("precipitation");

@@ -21,11 +21,17 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import java.util.Map;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class TagUtil {
+
+    public static ListTag<CompoundTag> getRegistryEntries(final CompoundTag tag, final String key) {
+        CompoundTag registry = tag.getCompoundTag(Key.namespaced(key));
+        if (registry == null) {
+            registry = tag.getCompoundTag(Key.stripMinecraftNamespace(key));
+        }
+        return registry.getListTag("value", CompoundTag.class);
+    }
 
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {
         return handleDeep(null, tag, consumer);

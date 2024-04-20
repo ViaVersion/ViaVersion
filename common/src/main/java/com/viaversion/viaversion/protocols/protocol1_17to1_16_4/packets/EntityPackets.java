@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_16_2to1_16_1.ClientboundPac
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.protocol1_17to1_16_4.Protocol1_17To1_16_4;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.TagUtil;
 
 public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2, Protocol1_17To1_16_4> {
 
@@ -76,8 +77,8 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
                 map(Type.NAMED_COMPOUND_TAG); // Current dimension
                 handler(wrapper -> {
                     // Add new dimension fields
-                    CompoundTag dimensionRegistry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0).getCompoundTag("minecraft:dimension_type");
-                    ListTag<CompoundTag> dimensions = dimensionRegistry.getListTag("value", CompoundTag.class);
+                    CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(registry, "dimension_type");
                     for (CompoundTag dimension : dimensions) {
                         CompoundTag dimensionCompound = dimension.getCompoundTag("element");
                         addNewDimensionData(dimensionCompound);

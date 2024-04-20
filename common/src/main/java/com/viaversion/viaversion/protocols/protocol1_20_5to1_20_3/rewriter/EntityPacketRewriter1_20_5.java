@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.TagUtil;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -75,7 +76,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             trackBiomeSize(wrapper.user(), registryData);
 
             // Update format of height provider
-            final ListTag<CompoundTag> dimensionTypes = registryData.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
+            final ListTag<CompoundTag> dimensionTypes = TagUtil.getRegistryEntries(registryData, "dimension_type");
             for (final CompoundTag dimensionType : dimensionTypes) {
                 final CompoundTag elementTag = dimensionType.getCompoundTag("element");
                 final CompoundTag monsterSpawnLightLevel = elementTag.getCompoundTag("monster_spawn_light_level");
@@ -87,7 +88,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
 
             // Changes in biomes
-            final ListTag<CompoundTag> biomes = registryData.getCompoundTag("minecraft:worldgen/biome").getListTag("value", CompoundTag.class);
+            final ListTag<CompoundTag> biomes = TagUtil.getRegistryEntries(registryData, "worldgen/biome");
             for (final CompoundTag biome : biomes) {
                 final CompoundTag effects = biome.getCompoundTag("element").getCompoundTag("effects");
 

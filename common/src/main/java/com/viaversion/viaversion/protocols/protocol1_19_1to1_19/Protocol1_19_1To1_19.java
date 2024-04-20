@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.ServerboundPackets1_19;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     chatTypeStorage.clear();
 
                     final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
-                    final ListTag<CompoundTag> chatTypes = registry.getCompoundTag("minecraft:chat_type").getListTag("value", CompoundTag.class);
+                    final ListTag<CompoundTag> chatTypes = TagUtil.getRegistryEntries(registry, "chat_type");
                     for (final CompoundTag chatType : chatTypes) {
                         final NumberTag idTag = chatType.getNumberTag("id");
                         chatTypeStorage.addChatType(idTag.asInt(), chatType);

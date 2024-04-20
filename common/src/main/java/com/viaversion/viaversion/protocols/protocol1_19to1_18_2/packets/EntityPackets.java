@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.Dimensio
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -178,7 +179,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     tag.put("minecraft:chat_type", protocol.getMappingData().chatRegistry());
 
                     // Cache a whole lot of data
-                    final ListTag<CompoundTag> dimensions = tag.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
+                    final ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(tag, "dimension_type");
                     final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
                     final Map<CompoundTag, String> dimensionsMap = new HashMap<>(dimensions.size());
                     for (final CompoundTag dimension : dimensions) {

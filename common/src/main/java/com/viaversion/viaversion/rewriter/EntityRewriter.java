@@ -48,6 +48,7 @@ import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -205,9 +206,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     /**
      * Registers a metadata handler to rewrite, item, block, and particle ids stored in metadata.
      *
-     * @param itemType               item meta type if needed
-     * @param blockStateType         block state meta type if needed
-     * @param particleType           particle meta type if needed
+     * @param itemType       item meta type if needed
+     * @param blockStateType block state meta type if needed
+     * @param particleType   particle meta type if needed
      */
     public void registerMetaTypeHandler(@Nullable MetaType itemType, @Nullable MetaType blockStateType, @Nullable MetaType particleType) {
         registerMetaTypeHandler(itemType, null, blockStateType, particleType, null);
@@ -491,8 +492,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void trackBiomeSize(final UserConnection connection, final CompoundTag registry) {
-        final CompoundTag biomeRegistry = registry.getCompoundTag("minecraft:worldgen/biome");
-        final ListTag<?> biomes = biomeRegistry.getListTag("value");
+        final ListTag<?> biomes = TagUtil.getRegistryEntries(registry, "worldgen/biome");
         tracker(connection).setBiomesSent(biomes.size());
     }
 
@@ -508,7 +508,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * Caches dimension data, later used to get height values and other important info.
      */
     public void cacheDimensionData(final UserConnection connection, final CompoundTag registry) {
-        final ListTag<CompoundTag> dimensions = registry.getCompoundTag("minecraft:dimension_type").getListTag("value", CompoundTag.class);
+        final ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(registry, "dimension_type");
         final Map<String, DimensionData> dimensionDataMap = new HashMap<>(dimensions.size());
         for (final CompoundTag dimension : dimensions) {
             final NumberTag idTag = dimension.getNumberTag("id");
