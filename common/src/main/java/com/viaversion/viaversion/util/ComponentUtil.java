@@ -95,7 +95,7 @@ public final class ComponentUtil {
     public static @Nullable String tagToJsonString(@Nullable final Tag tag) {
         try {
             final ATextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
-            return component != null ? SerializerVersion.V1_20_3.jsonSerializer.serialize(component) : null;
+            return component != null ? SerializerVersion.V1_20_3.toString(component) : null;
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + tag, e);
             return plainToJson("<error>").toString();
