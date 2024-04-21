@@ -108,7 +108,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                handler(blockRewriter.chunkDataHandler1_19(ChunkType1_18::new, InventoryPackets.this::handleBlockEntity));
+                handler(blockRewriter.chunkDataHandler1_19(ChunkType1_18::new, (user, blockEntity) -> handleBlockEntity(blockEntity)));
                 read(Type.BOOLEAN); // Trust edges
             }
         });

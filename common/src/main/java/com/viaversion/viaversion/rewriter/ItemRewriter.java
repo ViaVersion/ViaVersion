@@ -291,12 +291,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 final Item input = wrapper.read(costType);
-                wrapper.write(mappedCostType, handleItemToClient(input));
+                wrapper.write(mappedCostType, handleItemToClient(wrapper.user(), input));
 
                 handleClientboundItem(wrapper); // Result
 
                 final Item secondInput = wrapper.read(optionalCostType);
-                wrapper.write(mappedOptionalCostType, handleItemToClient(secondInput));
+                wrapper.write(mappedOptionalCostType, handleItemToClient(wrapper.user(), secondInput));
 
                 wrapper.passthrough(Type.BOOLEAN); // Out of stock
                 wrapper.passthrough(Type.INT); // Number of trade uses

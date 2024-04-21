@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -41,8 +42,8 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
     }
 
     @Override
-    protected void handleHoverEvent(JsonObject hoverEvent) {
-        super.handleHoverEvent(hoverEvent);
+    protected void handleHoverEvent(UserConnection connection, JsonObject hoverEvent) {
+        super.handleHoverEvent(connection, hoverEvent);
         final String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
         if (!action.equals("show_item")) return;
 

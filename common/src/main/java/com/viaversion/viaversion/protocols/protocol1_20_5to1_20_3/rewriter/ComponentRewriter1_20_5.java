@@ -28,6 +28,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.UnsignedBytes;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -158,7 +159,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     }
 
     @Override
-    protected void handleHoverEvent(final CompoundTag hoverEventTag) {
+    protected void handleHoverEvent(final UserConnection connection, final CompoundTag hoverEventTag) {
         final StringTag actionTag = hoverEventTag.getStringTag("action");
         if (actionTag == null) return;
 
@@ -211,7 +212,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 oldItem.setTag(tagTag);
             }
 
-            final Item newItem = protocol.getItemRewriter().handleItemToClient(oldItem);
+            final Item newItem = protocol.getItemRewriter().handleItemToClient(connection, oldItem);
             if (newItem == null) {
                 return;
             }

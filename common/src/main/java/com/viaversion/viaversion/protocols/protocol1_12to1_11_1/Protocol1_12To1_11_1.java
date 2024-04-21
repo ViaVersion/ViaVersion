@@ -101,7 +101,7 @@ public class Protocol1_12To1_11_1 extends AbstractProtocol<ClientboundPackets1_9
             if (!Via.getConfig().is1_12NBTArrayFix()) return;
             try {
                 final JsonElement element = wrapper.passthrough(Type.COMPONENT);
-                TranslateRewriter.toClient(element);
+                TranslateRewriter.toClient(wrapper.user(), element);
                 ChatItemRewriter.toClient(element);
 
                 wrapper.set(Type.COMPONENT, 0, element);

@@ -28,6 +28,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -84,7 +85,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             if (wrapper.passthrough(Type.VAR_INT) == 2) {
                 wrapper.passthrough(Type.VAR_INT);
                 wrapper.passthrough(Type.INT);
-                processText(wrapper.passthrough(Type.COMPONENT));
+                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
@@ -96,14 +97,14 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, wrapper -> {
             final int action = wrapper.passthrough(Type.VAR_INT);
             if (action >= 0 && action <= 2) {
-                processText(wrapper.passthrough(Type.COMPONENT));
+                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
             }
         });
     }
 
     public void registerPing() {
         // Always json
-        protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+        protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
     }
 
     public void registerLegacyOpenWindow(final C packetType) {
@@ -112,7 +113,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Id
                 map(Type.STRING); // Window Type
-                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
             }
         });
     }
@@ -141,7 +142,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             public void register() {
                 map(Type.VAR_INT);
                 map(Type.INT);
-                handler(wrapper -> processText(wrapper.passthrough(Type.COMPONENT)));
+                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
             }
         });
     }
@@ -159,18 +160,18 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     public void passthroughAndProcess(final PacketWrapper wrapper) throws Exception {
         switch (type) {
             case JSON:
-                processText(wrapper.passthrough(Type.COMPONENT));
+                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
                 break;
             case NBT:
-                processTag(wrapper.passthrough(Type.TAG));
+                processTag(wrapper.user(), wrapper.passthrough(Type.TAG));
                 break;
         }
     }
 
-    public JsonElement processText(final String value) {
+    public JsonElement processText(final UserConnection connection, final String value) {
         try {
             final JsonElement root = JsonParser.parseString(value);
-            processText(root);
+            processText(connection, root);
             return root;
         } catch (final JsonSyntaxException e) {
             if (Via.getManager().isDebug()) {
@@ -182,43 +183,43 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         }
     }
 
-    public void processText(final JsonElement element) {
+    public void processText(final UserConnection connection, final JsonElement element) {
         if (element == null || element.isJsonNull()) {
             return;
         }
 
         if (element.isJsonArray()) {
-            processJsonArray(element.getAsJsonArray());
+            processJsonArray(connection, element.getAsJsonArray());
         } else if (element.isJsonObject()) {
-            processJsonObject(element.getAsJsonObject());
+            processJsonObject(connection, element.getAsJsonObject());
         }
     }
 
-    protected void processJsonArray(final JsonArray array) {
+    protected void processJsonArray(final UserConnection connection, final JsonArray array) {
         for (final JsonElement jsonElement : array) {
-            processText(jsonElement);
+            processText(connection, jsonElement);
         }
     }
 
-    protected void processJsonObject(final JsonObject object) {
+    protected void processJsonObject(final UserConnection connection, final JsonObject object) {
         final JsonElement translate = object.get("translate");
         if (translate != null && translate.isJsonPrimitive()) {
             handleTranslate(object, translate.getAsString());
 
             final JsonElement with = object.get("with");
             if (with != null && with.isJsonArray()) {
-                processJsonArray(with.getAsJsonArray());
+                processJsonArray(connection, with.getAsJsonArray());
             }
         }
 
         final JsonElement extra = object.get("extra");
         if (extra != null && extra.isJsonArray()) {
-            processJsonArray(extra.getAsJsonArray());
+            processJsonArray(connection, extra.getAsJsonArray());
         }
 
         final JsonElement hoverEvent = object.get("hoverEvent");
         if (hoverEvent != null && hoverEvent.isJsonObject()) {
-            handleHoverEvent(hoverEvent.getAsJsonObject());
+            handleHoverEvent(connection, hoverEvent.getAsJsonObject());
         }
     }
 
@@ -226,7 +227,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         // To override if needed
     }
 
-    protected void handleHoverEvent(final JsonObject hoverEvent) {
+    protected void handleHoverEvent(final UserConnection connection, final JsonObject hoverEvent) {
         // To override if needed (don't forget to call super)
         final JsonPrimitive actionElement = hoverEvent.getAsJsonPrimitive("action");
         if (!actionElement.isString()) {
@@ -236,11 +237,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         final String action = actionElement.getAsString();
         if (action.equals("show_text")) {
             final JsonElement value = hoverEvent.get("value");
-            processText(value != null ? value : hoverEvent.get("contents"));
+            processText(connection, value != null ? value : hoverEvent.get("contents"));
         } else if (action.equals("show_entity")) {
             final JsonElement contents = hoverEvent.get("contents");
             if (contents != null && contents.isJsonObject()) {
-                processText(contents.getAsJsonObject().get("name"));
+                processText(connection, contents.getAsJsonObject().get("name"));
             }
         }
     }
@@ -248,51 +249,51 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     // -----------------------------------------------------------------------
     // Tag methods
 
-    public void processTag(@Nullable final Tag tag) {
+    public void processTag(final UserConnection connection, @Nullable final Tag tag) {
         if (tag == null) {
             return;
         }
 
         if (tag instanceof ListTag) {
-            processListTag((ListTag<?>) tag);
+            processListTag(connection, (ListTag<?>) tag);
         } else if (tag instanceof CompoundTag) {
-            processCompoundTag((CompoundTag) tag);
+            processCompoundTag(connection, (CompoundTag) tag);
         }
     }
 
-    private void processListTag(final ListTag<?> tag) {
+    private void processListTag(final UserConnection connection, final ListTag<?> tag) {
         for (final Tag entry : tag) {
-            processTag(entry);
+            processTag(connection, entry);
         }
     }
 
-    protected void processCompoundTag(final CompoundTag tag) {
+    protected void processCompoundTag(final UserConnection connection, final CompoundTag tag) {
         final StringTag translate = tag.getStringTag("translate");
         if (translate != null) {
-            handleTranslate(tag, translate);
+            handleTranslate(connection, tag, translate);
 
             final ListTag<?> with = tag.getListTag("with");
             if (with != null) {
-                processListTag(with);
+                processListTag(connection, with);
             }
         }
 
         final ListTag<?> extra = tag.getListTag("extra");
         if (extra != null) {
-            processListTag(extra);
+            processListTag(connection, extra);
         }
 
         final CompoundTag hoverEvent = tag.getCompoundTag("hoverEvent");
         if (hoverEvent != null) {
-            handleHoverEvent(hoverEvent);
+            handleHoverEvent(connection, hoverEvent);
         }
     }
 
-    protected void handleTranslate(final CompoundTag parentTag, final StringTag translateTag) {
+    protected void handleTranslate(final UserConnection connection, final CompoundTag parentTag, final StringTag translateTag) {
         // To override if needed
     }
 
-    protected void handleHoverEvent(final CompoundTag hoverEventTag) {
+    protected void handleHoverEvent(final UserConnection connection, final CompoundTag hoverEventTag) {
         // To override if needed (don't forget to call super)
         final StringTag actionTag = hoverEventTag.getStringTag("action");
         if (actionTag == null) {
@@ -302,11 +303,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         final String action = actionTag.getValue();
         if (action.equals("show_text")) {
             final Tag value = hoverEventTag.get("value");
-            processTag(value != null ? value : hoverEventTag.get("contents"));
+            processTag(connection, value != null ? value : hoverEventTag.get("contents"));
         } else if (action.equals("show_entity")) {
             final CompoundTag contents = hoverEventTag.getCompoundTag("contents");
             if (contents != null) {
-                processTag(contents.get("name"));
+                processTag(connection, contents.get("name"));
             }
         }
     }

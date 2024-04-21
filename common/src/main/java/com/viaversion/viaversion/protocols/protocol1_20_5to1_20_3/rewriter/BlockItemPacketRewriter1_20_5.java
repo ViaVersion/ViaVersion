@@ -134,14 +134,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_3.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, blockEntity -> updateBlockEntityTag(null, blockEntity.tag()));
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, (user, blockEntity) -> updateBlockEntityTag(user, null, blockEntity.tag()));
         protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.VAR_INT); // Block entity type
 
             CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
             if (tag != null) {
-                updateBlockEntityTag(null, tag);
+                updateBlockEntityTag(wrapper.user(), null, tag);
             } else {
                 // No longer nullable
                 tag = new CompoundTag();
@@ -175,7 +175,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     wrapper.passthrough(Type.TAG); // Title
                     wrapper.passthrough(Type.TAG); // Description
 
-                    Item item = handleNonNullItemToClient(wrapper.read(itemType()));
+                    Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(itemType()));
                     wrapper.write(mappedItemType(), item);
 
                     wrapper.passthrough(Type.VAR_INT); // Frame type
@@ -300,8 +300,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<ClientboundPacket1_20_3>(protocol) {
             @Override
-            protected Item rewrite(@Nullable Item item) {
-                item = super.rewrite(item);
+            protected Item rewrite(final UserConnection connection, @Nullable Item item) {
+                item = super.rewrite(connection, item);
                 if (item == null || item.isEmpty()) {
                     // Does not allow empty items
                     return new StructuredItem(1, 1);
@@ -322,8 +322,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         });
     }
 
-    public Item handleNonNullItemToClient(@Nullable Item item) {
-        item = handleItemToClient(item);
+    public Item handleNonNullItemToClient(final UserConnection connection, @Nullable Item item) {
+        item = handleItemToClient(connection, item);
         // Items are no longer nullable in a few places
         if (item == null || item.isEmpty()) {
             return new StructuredItem(1, 1);
@@ -332,7 +332,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     @Override
-    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable final Item item) {
+    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
 
         // Add the original as custom data, to be re-used for creative clients as well
@@ -341,7 +341,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             tag.putBoolean(nbtTagName(), true);
         }
 
-        final Item structuredItem = toStructuredItem(item);
+        final Item structuredItem = toStructuredItem(connection, item);
         return super.handleItemToClient(connection, structuredItem);
     }
 
@@ -372,7 +372,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         return dataItem;
     }
 
-    public Item toStructuredItem(final Item old) {
+    public Item toStructuredItem(final UserConnection connection, final Item old) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
         final StructuredDataContainer data = item.structuredData();
@@ -418,7 +418,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
         if (blockEntityTag != null) {
             final CompoundTag clonedTag = blockEntityTag.copy();
-            updateBlockEntityTag(data, clonedTag);
+            updateBlockEntityTag(connection, data, clonedTag);
             item.structuredData().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
         }
 
@@ -489,9 +489,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES, false);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES, false);
         if (old.identifier() == 927) {
-            updateItemList(data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS, false);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS, false);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1101,12 +1101,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
     }
 
-    private void updateItemList(final StructuredDataContainer data, final CompoundTag tag, final String key, final StructuredDataKey<Item[]> dataKey, final boolean allowEmpty) {
+    private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
+                                final String key, final StructuredDataKey<Item[]> dataKey, final boolean allowEmpty) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
-                .map(this::itemFromTag)
+                .map(item -> itemFromTag(connection, item))
                 .filter(Objects::nonNull)
                 .filter(item -> allowEmpty || !item.isEmpty())
                 .toArray(Item[]::new);
@@ -1114,7 +1115,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
-    private @Nullable Item itemFromTag(final CompoundTag item) {
+    private @Nullable Item itemFromTag(final UserConnection connection, final CompoundTag item) {
         final String id = item.getString("id");
         if (id == null) {
             return null;
@@ -1127,7 +1128,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final byte count = item.getByte("Count", (byte) 1);
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(new DataItem(itemId, count, (short) 0, tag));
+        return handleItemToClient(connection, new DataItem(itemId, count, (short) 0, tag));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
@@ -1282,7 +1283,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
-    private void updateBlockEntityTag(@Nullable final StructuredDataContainer data, final CompoundTag tag) {
+    private void updateBlockEntityTag(final UserConnection connection, @Nullable final StructuredDataContainer data, final CompoundTag tag) {
         if (tag == null) {
             return;
         }
@@ -1333,7 +1334,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, ((NumberTag) baseColorTag).asInt());
             }
 
-            updateItemList(data, tag, "Items", StructuredDataKey.CONTAINER, true);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER, true);
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");

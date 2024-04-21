@@ -19,6 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -36,6 +37,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -178,11 +180,11 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         registerChunkData1_19(packetType, chunkTypeSupplier, null);
     }
 
-    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         protocol.registerClientbound(packetType, chunkDataHandler1_19(chunkTypeSupplier, blockEntityHandler));
     }
 
-    public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable Consumer<BlockEntity> blockEntityHandler) {
+    public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         return wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
@@ -209,7 +211,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                     }
 
                     if (blockEntityHandler != null && blockEntity.tag() != null) {
-                        blockEntityHandler.accept(blockEntity);
+                        blockEntityHandler.accept(wrapper.user(), blockEntity);
                     }
                 }
             }
