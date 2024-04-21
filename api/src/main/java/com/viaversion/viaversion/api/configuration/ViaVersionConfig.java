@@ -234,13 +234,6 @@ public interface ViaVersionConfig extends Config {
     boolean isChunkBorderFix();
 
     /**
-     * Force json transform
-     *
-     * @return true if enabled
-     */
-    boolean isForceJsonTransform();
-
-    /**
      * Should we fix nbt array's in json chat messages for 1.12 clients
      *
      * @return true if enabled

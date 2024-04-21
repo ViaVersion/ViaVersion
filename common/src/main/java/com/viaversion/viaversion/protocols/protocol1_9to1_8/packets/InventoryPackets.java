@@ -69,7 +69,7 @@ public class InventoryPackets {
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
                 map(Type.STRING); // 1 - Window Type
-                map(Type.STRING, Protocol1_9To1_8.FIX_JSON); // 2 - Window Title
+                map(Type.STRING, Protocol1_9To1_8.STRING_TO_JSON); // 2 - Window Title
                 map(Type.UNSIGNED_BYTE); // 3 - Slot Count
                 // There is a horse parameter after this, we don't handle it and let it passthrough
                 // Inventory tracking

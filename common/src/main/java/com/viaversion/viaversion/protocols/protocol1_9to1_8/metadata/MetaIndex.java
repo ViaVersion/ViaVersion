@@ -159,7 +159,7 @@ public enum MetaIndex {
     ABSTRACT_MINECART_BLOCK_Y(MINECART_ABSTRACT, 21, MetaType1_8.Int, 9, MetaType1_9.VarInt),
     ABSTRACT_MINECART_SHOW_BLOCK(MINECART_ABSTRACT, 22, MetaType1_8.Byte, 10, MetaType1_9.Boolean),
 
-    // Command minecart (they are still broken)
+    // Command minecart
     MINECART_COMMAND_BLOCK_COMMAND(MINECART_ABSTRACT, 23, MetaType1_8.String, 11, MetaType1_9.String),
     MINECART_COMMAND_BLOCK_OUTPUT(MINECART_ABSTRACT, 24, MetaType1_8.String, 12, MetaType1_9.Chat),
 

@@ -283,7 +283,7 @@ public class ItemRewriter {
 
                 for (int i = 0; i < pages.size(); i++) {
                     final StringTag page = pages.get(i);
-                    page.setValue(ComponentUtil.convertJson(page.getValue(), SerializerVersion.V1_8, SerializerVersion.V1_9).toString());
+                    page.setValue(ComponentUtil.convertJsonOrEmpty(page.getValue(), SerializerVersion.V1_8, SerializerVersion.V1_9).toString());
                 }
                 item.setTag(tag);
             }

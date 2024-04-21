@@ -100,6 +100,14 @@ public final class ComponentUtil {
         return json != null ? convert(from, to, from.toComponent(json)) : null;
     }
 
+    public static @Nullable JsonElement convertJsonOrEmpty(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
+        final ATextComponent component = from.toComponent(json);
+        if (component == null) {
+            return emptyJsonComponent();
+        }
+        return to.toJson(component);
+    }
+
     private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final ATextComponent component) {
         if (from.ordinal() >= SerializerVersion.V1_16.ordinal() && to.ordinal() < SerializerVersion.V1_16.ordinal()) {
             // Convert hover event to legacy format
