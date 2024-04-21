@@ -38,11 +38,13 @@ public enum MetaIndex {
     ENTITY_SILENT(ENTITY, 4, MetaType1_8.Byte, MetaType1_9.Boolean),
 
     // Living entity
+    // hand state added in 1.9 (5/byte)
     LIVING_ENTITY_HEALTH(ENTITY_LIVING, 6, MetaType1_8.Float, MetaType1_9.Float),
     LIVING_ENTITY_POTION_EFFECT_COLOR(ENTITY_LIVING, 7, MetaType1_8.Int, MetaType1_9.VarInt),
     LIVING_ENTITY_IS_POTION_AMBIENT(ENTITY_LIVING, 8, MetaType1_8.Byte, MetaType1_9.Boolean),
     LIVING_ENTITY_NUMBER_OF_ARROWS_IN(ENTITY_LIVING, 9, MetaType1_8.Byte, MetaType1_9.VarInt),
-    LIVING_ENTITY_NO_AI(ENTITY_LIVING, 15, MetaType1_8.Byte, 10, MetaType1_9.Byte), // in 1.9 this is combined with Left handed.
+
+    LIVING_ENTITY_NO_AI(ENTITY_LIVING, 15, MetaType1_8.Byte, 10, MetaType1_9.Byte),
 
     // Ageable entity
     AGEABLE_CREATURE_AGE(ENTITY_AGEABLE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
@@ -104,8 +106,9 @@ public enum MetaIndex {
 
     // Zombie
     ZOMBIE_IS_CHILD(ZOMBIE, 12, MetaType1_8.Byte, 11, MetaType1_9.Boolean),
-    ZOMBIE_IS_VILLAGER(ZOMBIE, 13, MetaType1_8.Byte, 12, MetaType1_9.VarInt),
+    ZOMBIE_IS_VILLAGER(ZOMBIE, 13, MetaType1_8.Byte, 12, MetaType1_9.VarInt), // now indicates villager type
     ZOMBIE_IS_CONVERTING(ZOMBIE, 14, MetaType1_8.Byte, 13, MetaType1_9.Boolean),
+    // arms raised added in 1.9 (14/boolean)
 
     // Blaze
     BLAZE_ON_FIRE(BLAZE, 16, MetaType1_8.Byte, 11, MetaType1_9.Byte),
@@ -150,6 +153,7 @@ public enum MetaIndex {
     BOAT_SINCE_HIT(BOAT, 17, MetaType1_8.Int, 5, MetaType1_9.VarInt),
     BOAT_FORWARD_DIRECTION(BOAT, 18, MetaType1_8.Int, 6, MetaType1_9.VarInt),
     BOAT_DAMAGE_TAKEN(BOAT, 19, MetaType1_8.Float, 7, MetaType1_9.Float),
+    // boat type added in 1.9 (20/varint)
 
     // Minecart
     ABSTRACT_MINECART_SHAKING_POWER(MINECART_ABSTRACT, 17, MetaType1_8.Int, 5, MetaType1_9.VarInt),
