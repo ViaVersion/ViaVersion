@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -51,7 +52,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable Item item) {
+    public @Nullable Item handleItemToClient(final UserConnection connection,  @Nullable Item item) {
         if (item == null) return null;
         if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
             item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));
@@ -60,7 +61,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     @Override
-    public @Nullable Item handleItemToServer(@Nullable Item item) {
+    public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
         if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
             item.setIdentifier(protocol.getMappingData().getOldItemId(item.identifier()));
@@ -77,7 +78,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     Item[] items = wrapper.read(itemArrayType);
                     wrapper.write(mappedItemArrayType, items);
                     for (int i = 0; i < items.length; i++) {
-                        items[i] = handleItemToClient(items[i]);
+                        items[i] = handleItemToClient(wrapper.user(), items[i]);
                     }
                 });
             }
@@ -94,7 +95,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     Item[] items = wrapper.read(itemArrayType);
                     wrapper.write(mappedItemArrayType, items);
                     for (int i = 0; i < items.length; i++) {
-                        items[i] = handleItemToClient(items[i]);
+                        items[i] = handleItemToClient(wrapper.user(), items[i]);
                     }
 
                     handleClientboundItem(wrapper);
@@ -456,7 +457,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Type.INT); // Particle Count
                 handler(wrapper -> {
                     final Particle particle = wrapper.read(unmappedParticleType);
-                    rewriteParticle(particle);
+                    rewriteParticle(wrapper.user(), particle);
                     wrapper.write(mappedParticleType, particle);
                 });
             }
@@ -485,8 +486,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             final Particle largeExplosionParticle = wrapper.read(unmappedParticleType);
             wrapper.write(mappedParticleType, smallExplosionParticle);
             wrapper.write(mappedParticleType, largeExplosionParticle);
-            rewriteParticle(smallExplosionParticle);
-            rewriteParticle(largeExplosionParticle);
+            rewriteParticle(wrapper.user(), smallExplosionParticle);
+            rewriteParticle(wrapper.user(), largeExplosionParticle);
 
             cSoundRewriter.soundHolderHandler().handle(wrapper);
         });
@@ -519,16 +520,16 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
-        final Item item = handleItemToClient(wrapper.read(itemType));
+        final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType));
         wrapper.write(mappedItemType, item);
     }
 
     private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
-        final Item item = handleItemToServer(wrapper.read(mappedItemType));
+        final Item item = handleItemToServer(wrapper.user(), wrapper.read(mappedItemType));
         wrapper.write(itemType, item);
     }
 
-    protected void rewriteParticle(Particle particle) {
+    protected void rewriteParticle(UserConnection connection, Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.id();
         if (mappings.isBlockParticle(id)) {
@@ -536,7 +537,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id)) {
             Particle.ParticleData<Item> data = particle.getArgument(0);
-            Item item = handleItemToClient(data.getValue());
+            Item item = handleItemToClient(connection, data.getValue());
             if (mappedItemType() != null && itemType() != mappedItemType()) {
                 // Replace the type
                 particle.set(0, mappedItemType(), item);

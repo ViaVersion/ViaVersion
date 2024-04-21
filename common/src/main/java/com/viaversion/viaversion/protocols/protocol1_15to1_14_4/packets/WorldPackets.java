@@ -99,7 +99,7 @@ public final class WorldPackets {
                         int data = wrapper.passthrough(Type.VAR_INT);
                         wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (id == 32) {
-                        protocol.getItemRewriter().handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                        protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
                     }
                 });
             }

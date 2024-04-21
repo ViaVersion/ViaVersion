@@ -27,8 +27,6 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ViaVersionConfig extends Config {
 
@@ -234,13 +232,6 @@ public interface ViaVersionConfig extends Config {
      * @return true to fix chunk borders
      */
     boolean isChunkBorderFix();
-
-    /**
-     * Force json transform
-     *
-     * @return true if enabled
-     */
-    boolean isForceJsonTransform();
 
     /**
      * Should we fix nbt array's in json chat messages for 1.12 clients
@@ -452,4 +443,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean isArmorToggleFix();
+
+    /**
+     * If disabled, tamed cats will be displayed as ocelots to 1.14+ clients on 1.13 servers. Otherwise, ocelots (tamed and untamed) will be displayed as cats.
+     *
+     * @return true if enabled
+     */
+    boolean translateOcelotToCat();
 }

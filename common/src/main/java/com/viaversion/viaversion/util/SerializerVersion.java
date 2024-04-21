@@ -78,7 +78,13 @@ public enum SerializerVersion {
     }
 
     public ATextComponent toComponent(final String json) {
-        return jsonSerializer.deserializeReader(json);
+        if (ordinal() >= SerializerVersion.V1_20_3.ordinal()) {
+            return jsonSerializer.deserializeParser(json);
+        } else if (ordinal() >= SerializerVersion.V1_9.ordinal()) {
+            return jsonSerializer.deserializeReader(json);
+        } else {
+            return jsonSerializer.deserialize(json);
+        }
     }
 
     public ATextComponent toComponent(final Tag tag) {

@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_12to1_11_1.packets;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -52,12 +53,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
 
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Output Item
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Input Item
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Output Item
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
-                                handleItemToClient(wrapper.passthrough(Type.ITEM1_8)); // Second Item
+                                handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Second Item
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -83,7 +84,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
                         handler(wrapper -> {
                             Item item = wrapper.get(Type.ITEM1_8, 0);
                             if (!Via.getConfig().is1_12QuickMoveActionFix()) {
-                                handleItemToServer(item);
+                                handleItemToServer(wrapper.user(), item);
                                 return;
                             }
                             byte button = wrapper.get(Type.BYTE, 0);
@@ -100,7 +101,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
                                 }
                                 // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
                             } else {
-                                handleItemToServer(item);
+                                handleItemToServer(wrapper.user(), item);
                             }
                         });
                     }
@@ -111,7 +112,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(UserConnection connection, Item item) {
         if (item == null) return null;
 
         if (item.identifier() == 355) { // Bed rewrite
@@ -128,7 +129,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable Item item) {
+    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
         if (item.identifier() == 355) { // Bed rewrite
             item.setData((short) 14);

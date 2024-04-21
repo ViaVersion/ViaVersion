@@ -78,7 +78,7 @@ public class Protocol1_13_1To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 map(Type.BOOLEAN);
                 handler(wrapper -> {
                     Item item = wrapper.get(Type.ITEM1_13, 0);
-                    itemRewriter.handleItemToServer(item);
+                    itemRewriter.handleItemToServer(wrapper.user(), item);
                 });
                 handler(wrapper -> {
                     int hand = wrapper.read(Type.VAR_INT);

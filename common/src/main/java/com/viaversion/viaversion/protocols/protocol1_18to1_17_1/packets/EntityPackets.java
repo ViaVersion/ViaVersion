@@ -84,13 +84,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_17_1
         filter().mapMetaType(Types1_18.META_TYPES::byId);
         filter().metaType(Types1_18.META_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = (Particle) meta.getValue();
-            if (particle.getId() == 2) { // Barrier
+            if (particle.id() == 2) { // Barrier
                 particle.setId(3); // Block marker
                 particle.add(Type.VAR_INT, 7754); // Barrier state
-            } else if (particle.getId() == 3) { // Light block
+            } else if (particle.id() == 3) { // Light block
                 particle.add(Type.VAR_INT, 7786); // Light block state
             } else {
-                rewriteParticle(particle);
+                rewriteParticle(event.user(), particle);
             }
         });
 

@@ -72,10 +72,10 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                         for (int j = 0; j < ingredients; j++) {
                             final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
                             for (final Item item : items) {
-                                handleItemToClient(item);
+                                handleItemToClient(wrapper.user(), item);
                             }
                         }
-                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
                         break;
                     }
                     case "crafting_shaped": {
@@ -85,10 +85,10 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                         for (int j = 0; j < ingredients; j++) {
                             final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
                             for (final Item item : items) {
-                                handleItemToClient(item);
+                                handleItemToClient(wrapper.user(), item);
                             }
                         }
-                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
                         break;
                     }
                     case "smelting":
@@ -99,9 +99,9 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                         wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                         final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
                         for (final Item item : items) {
-                            handleItemToClient(item);
+                            handleItemToClient(wrapper.user(), item);
                         }
-                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
                         wrapper.passthrough(Type.FLOAT); // EXP
                         wrapper.passthrough(Type.VAR_INT); // Cooking time
                         break;

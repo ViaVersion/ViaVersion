@@ -253,7 +253,7 @@ public class EntityPackets {
                     if (wrapper.get(Type.VAR_INT, 0) == 2) { // entity dead
                         wrapper.passthrough(Type.VAR_INT); //Player id
                         wrapper.passthrough(Type.INT); //Entity id
-                        Protocol1_9To1_8.FIX_JSON.write(wrapper, wrapper.read(Type.STRING));
+                        Protocol1_9To1_8.STRING_TO_JSON.write(wrapper, wrapper.read(Type.STRING));
                     }
                 });
             }

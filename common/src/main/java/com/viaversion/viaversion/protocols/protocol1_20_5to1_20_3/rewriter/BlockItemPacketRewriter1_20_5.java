@@ -27,6 +27,7 @@ import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
@@ -224,7 +225,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
-                final Item item = handleNonNullItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
             } else if (particleId == mappings.id("dust")) {
                 // R, g, b, scale
@@ -278,13 +279,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.VAR_INT); // Container id
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final Item input = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item input = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM_COST, input);
 
-                final Item output = handleNonNullItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item output = handleNonNullItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, output);
 
-                final Item secondInput = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item secondInput = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 wrapper.write(Types1_20_5.OPTIONAL_ITEM_COST, secondInput);
 
                 wrapper.passthrough(Type.BOOLEAN); // Out of stock
@@ -331,7 +332,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable final Item item) {
+    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
 
         // Add the original as custom data, to be re-used for creative clients as well
@@ -341,14 +342,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final Item structuredItem = toStructuredItem(item);
-        return super.handleItemToClient(structuredItem);
+        return super.handleItemToClient(connection, structuredItem);
     }
 
     @Override
-    public @Nullable Item handleItemToServer(@Nullable final Item item) {
+    public @Nullable Item handleItemToServer(UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
 
-        super.handleItemToServer(item);
+        super.handleItemToServer(connection, item);
         return toOldItem(item, DATA_CONVERTER);
     }
 

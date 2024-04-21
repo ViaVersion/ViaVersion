@@ -37,8 +37,8 @@ import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import io.netty.channel.ChannelFuture;
 import java.util.List;
@@ -163,8 +163,10 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                 if (!wrapper.user().getChannel().isOpen()) return;
                 if (!wrapper.user().shouldApplyBlockProtocol()) return;
 
+                final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
+
                 PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper.user()); // Disconnect Packet
-                Protocol1_9To1_8.FIX_JSON.write(disconnectPacket, ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg()));
+                wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
                 wrapper.cancel(); // cancel current
 
                 // Send and close

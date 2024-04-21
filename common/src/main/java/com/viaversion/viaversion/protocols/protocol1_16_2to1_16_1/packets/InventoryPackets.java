@@ -56,7 +56,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_16, Serve
 
         registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW);
         registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION);
-        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
+        protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
         registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, Type.DOUBLE);
     }

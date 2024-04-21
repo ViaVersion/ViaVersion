@@ -63,7 +63,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private int pistonReplacementId;
     private boolean chunkBorderFix;
     private boolean autoTeam;
-    private boolean forceJsonTransform;
     private boolean nbtArrayFix;
     private BlockedProtocolVersions blockedProtocolVersions;
     private String blockedDisconnectMessage;
@@ -89,6 +88,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private JsonElement resourcePack1_17PromptMessage;
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
+    private boolean translateOcelotToCat;
 
     protected AbstractViaConfig(final File configFile) {
         super(configFile);
@@ -128,7 +128,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         pistonReplacementId = getInt("replacement-piston-id", 0);
         chunkBorderFix = getBoolean("chunk-border-fix", false);
         autoTeam = getBoolean("auto-team", true);
-        forceJsonTransform = getBoolean("force-json-transform", false);
         nbtArrayFix = getBoolean("chat-nbt-fix", true);
         blockedProtocolVersions = loadBlockedProtocolVersions();
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
@@ -157,6 +156,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
+        translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -370,11 +370,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean isForceJsonTransform() {
-        return forceJsonTransform;
-    }
-
-    @Override
     public boolean is1_12NBTArrayFix() {
         return nbtArrayFix;
     }
@@ -527,5 +522,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean isArmorToggleFix() {
         return false;
+    }
+
+    @Override
+    public boolean translateOcelotToCat() {
+        return translateOcelotToCat;
     }
 }

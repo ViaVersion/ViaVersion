@@ -30,6 +30,8 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.UUID;
 
 public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1_8, Protocol1_9To1_8> {
@@ -127,8 +129,9 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 metadata.setValue(angle);
                 break;
             case Chat:
-                value = Protocol1_9To1_8.fixJson(value.toString());
-                metadata.setValue(value);
+                // Was previously also a component, so just convert it
+                String text = (String) value;
+                metadata.setValue(ComponentUtil.convertJsonOrEmpty(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
                 break;
             case BlockID:
                 // Convert from int, short, byte

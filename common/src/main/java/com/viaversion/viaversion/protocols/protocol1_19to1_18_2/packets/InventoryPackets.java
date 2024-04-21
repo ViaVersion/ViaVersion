@@ -86,11 +86,11 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_18,
                     final int size = wrapper.read(Type.UNSIGNED_BYTE);
                     wrapper.write(Type.VAR_INT, size);
                     for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // First item
-                        handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // First item
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
 
                         if (wrapper.read(Type.BOOLEAN)) {
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
                         } else {
                             wrapper.write(Type.ITEM1_13_2, null);
                         }

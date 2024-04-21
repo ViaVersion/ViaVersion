@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_17to1_16_4.packets;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -52,7 +53,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
 
         registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION);
 
-        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
+        protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
         protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
             @Override
@@ -81,7 +82,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
                         item = null;
                     } else {
                         // Use the item sent
-                        handleItemToServer(item);
+                        handleItemToServer(wrapper.user(), item);
                     }
 
                     wrapper.write(Type.ITEM1_13_2, item);
@@ -126,7 +127,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
     }
 
     @Override
-    public Item handleItemToClient(Item item) {
+    public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
 
         CompoundTag tag = item.tag();

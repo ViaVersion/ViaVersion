@@ -117,11 +117,19 @@ public final class ComponentUtil {
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
-        return element != null ? convert(from, to, from.jsonSerializer.deserialize(element)) : null;
+        return element != null ? convert(from, to, from.toComponent(element)) : null;
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
-        return json != null ? convert(from, to, from.jsonSerializer.deserializeReader(json)) : null;
+        return json != null ? convert(from, to, from.toComponent(json)) : null;
+    }
+
+    public static @Nullable JsonElement convertJsonOrEmpty(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
+        final ATextComponent component = from.toComponent(json);
+        if (component == null) {
+            return emptyJsonComponent();
+        }
+        return to.toJson(component);
     }
 
     private static JsonElement convert(final SerializerVersion from, final SerializerVersion to, final ATextComponent component) {
