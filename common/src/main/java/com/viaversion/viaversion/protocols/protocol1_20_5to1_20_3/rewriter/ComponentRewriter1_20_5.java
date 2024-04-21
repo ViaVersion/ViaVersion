@@ -370,7 +370,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 predicateTag.put("state", state);
             }
             if (predicate.tag() != null) {
-                predicateTag.putString("nbt", SerializerVersion.V1_20_3.toSNBT(predicate.tag()));
+                predicateTag.putString("nbt", serializerVersion().toSNBT(predicate.tag()));
             }
 
             predicates.add(predicateTag);
@@ -1045,7 +1045,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     }
 
     public SerializerVersion serializerVersion() {
-        return SerializerVersion.V1_20_3;
+        return SerializerVersion.V1_20_5;
     }
 
     @FunctionalInterface

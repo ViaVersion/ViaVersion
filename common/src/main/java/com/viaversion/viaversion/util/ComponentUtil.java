@@ -94,7 +94,7 @@ public final class ComponentUtil {
 
     public static @Nullable String tagToJsonString(@Nullable final Tag tag) {
         try {
-            final ATextComponent component = SerializerVersion.V1_20_3.toComponent(tag);
+            final ATextComponent component = SerializerVersion.V1_20_5.toComponent(tag);
             return component != null ? SerializerVersion.V1_20_3.toString(component) : null;
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting tag: " + tag, e);
@@ -109,7 +109,7 @@ public final class ComponentUtil {
 
         try {
             final ATextComponent component = TextComponentSerializer.V1_20_3.deserialize(json);
-            return SerializerVersion.V1_20_3.toTag(component);
+            return SerializerVersion.V1_20_5.toTag(component);
         } catch (final Exception e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + json, e);
             return new StringTag("<error>");
