@@ -34,7 +34,7 @@ public class MetadataRewriter1_12To1_11_1 extends EntityRewriter<ClientboundPack
     protected void registerRewrites() {
         filter().handler((event, meta) -> {
             if (meta.getValue() instanceof Item) {
-                meta.setValue(protocol.getItemRewriter().handleItemToClient(meta.value()));
+                meta.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), meta.value()));
             }
         });
 

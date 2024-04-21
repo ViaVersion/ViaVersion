@@ -23,6 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -110,7 +111,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final int blockStateId = wrapper.read(Type.VAR_INT);
                 particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
-                final Item item = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item item = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
             }
 
@@ -143,9 +144,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Type.VAR_INT); // Container id
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final Item input = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                final Item output = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
-                final Item secondItem = handleItemToClient(wrapper.read(Type.ITEM1_20_2));
+                final Item input = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item output = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item secondItem = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, input);
                 wrapper.write(Types1_20_5.ITEM, output);
                 wrapper.write(Types1_20_5.ITEM, secondItem);
@@ -177,18 +178,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable final Item item) {
+    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
 
-        super.handleItemToClient(item);
+        super.handleItemToClient(connection, item);
         return toStructuredItem(item);
     }
 
     @Override
-    public @Nullable Item handleItemToServer(@Nullable final Item item) {
+    public @Nullable Item handleItemToServer(UserConnection connection, @Nullable final Item item) {
         if (item == null) return null;
 
-        super.handleItemToServer(item);
+        super.handleItemToServer(connection, item);
         return toOldItem(item);
     }
 

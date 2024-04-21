@@ -335,7 +335,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                 }
             }
 
-            rewriteParticle(particle);
+            rewriteParticle(event.user(), particle);
         });
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null);

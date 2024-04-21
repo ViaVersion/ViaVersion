@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.rewriter;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
@@ -32,18 +33,22 @@ public interface ItemRewriter<T extends Protocol> extends Rewriter<T> {
     /**
      * Returns the rewritten item, which may or may not be the same given Item instance.
      *
-     * @param item item
+     * @param connection user connection
+     * @param item       item
      * @return rewritten item
      */
-    @Nullable Item handleItemToClient(@Nullable Item item);
+    @Nullable
+    Item handleItemToClient(UserConnection connection, @Nullable Item item);
 
     /**
      * Returns the rewritten item, which may or may not be the same given Item instance.
      *
-     * @param item item
+     * @param connection user connection
+     * @param item       item
      * @return rewritten item
      */
-    @Nullable Item handleItemToServer(@Nullable Item item);
+    @Nullable
+    Item handleItemToServer(UserConnection connection, @Nullable Item item);
 
     /**
      * Returns the item type of the current protocol.

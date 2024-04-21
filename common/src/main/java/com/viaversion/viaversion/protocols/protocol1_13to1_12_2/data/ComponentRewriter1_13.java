@@ -68,7 +68,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         final Item item = new DataItem();
         item.setData(damage);
         item.setTag(itemTag);
-        protocol.getItemRewriter().handleItemToClient(item);
+        protocol.getItemRewriter().handleItemToClient(null, item);
 
         // Serialize again
         if (damage != item.data()) {

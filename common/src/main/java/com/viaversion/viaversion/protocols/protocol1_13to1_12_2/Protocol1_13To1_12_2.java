@@ -531,7 +531,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
                     componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Title
                     componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Description
                     Item icon = wrapper.read(Type.ITEM1_8);
-                    itemRewriter.handleItemToClient(icon);
+                    itemRewriter.handleItemToClient(wrapper.user(), icon);
                     wrapper.write(Type.ITEM1_13, icon); // Translate item to flat item
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
@@ -600,7 +600,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             Item item = wrapper.read(Type.ITEM1_13);
             boolean isSigning = wrapper.read(Type.BOOLEAN);
 
-            itemRewriter.handleItemToServer(item);
+            itemRewriter.handleItemToServer(wrapper.user(), item);
 
             wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
             wrapper.write(Type.ITEM1_8, item);

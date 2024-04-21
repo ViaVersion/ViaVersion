@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
@@ -44,7 +45,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable Item item) {
+    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable Item item) {
         if (item == null) {
             return null;
         }
@@ -62,7 +63,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     @Override
-    public @Nullable Item handleItemToServer(@Nullable Item item) {
+    public @Nullable Item handleItemToServer(UserConnection connection, @Nullable Item item) {
         if (item == null) {
             return null;
         }

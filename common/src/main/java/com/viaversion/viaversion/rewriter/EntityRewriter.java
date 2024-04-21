@@ -224,7 +224,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         filter().handler((event, meta) -> {
             final MetaType type = meta.metaType();
             if (type == itemType) {
-                meta.setValue(protocol.getItemRewriter().handleItemToClient(meta.value()));
+                meta.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), meta.value()));
             } else if (type == blockStateType) {
                 int data = meta.value();
                 meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
@@ -234,7 +234,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
                 }
             } else if (type == particleType) {
-                rewriteParticle(meta.value());
+                rewriteParticle(event.user(), meta.value());
             }
         });
     }
@@ -589,16 +589,16 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     // ---------------------------------------------------------------------------
 
-    public void rewriteParticle(Particle particle) {
+    public void rewriteParticle(UserConnection connection, Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        int id = particle.getId();
+        int id = particle.id();
         if (mappings.isBlockParticle(id)) {
             Particle.ParticleData<Integer> data = particle.getArgument(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id) && protocol.getItemRewriter() != null) {
             Particle.ParticleData<Item> data = particle.getArgument(0);
             Item item = data.getValue();
-            protocol.getItemRewriter().handleItemToClient(item);
+            protocol.getItemRewriter().handleItemToClient(connection, item);
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
@@ -606,7 +606,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     public void rewriteParticle(PacketWrapper wrapper, Type<Particle> from, Type<Particle> to) throws Exception {
         final Particle particle = wrapper.read(from);
-        rewriteParticle(particle);
+        rewriteParticle(wrapper.user(), particle);
         wrapper.write(to, particle);
     }
 

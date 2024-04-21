@@ -52,14 +52,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
                             // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13));
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13));
                             // Output Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13));
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13));
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
-                                handleItemToClient(wrapper.passthrough(Type.ITEM1_13));
+                                handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13));
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled

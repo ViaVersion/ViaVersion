@@ -75,7 +75,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     wrapper.passthrough(Type.COMPONENT); // Title
                     wrapper.passthrough(Type.COMPONENT); // Description
-                    handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2)); // Icon
+                    handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Type.INT); // Flags
                     if ((flags & 1) != 0) {

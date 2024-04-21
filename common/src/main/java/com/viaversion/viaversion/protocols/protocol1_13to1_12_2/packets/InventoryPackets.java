@@ -26,6 +26,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Ints;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -62,7 +63,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.SHORT); // 1 - Slot ID
                 map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Slot Value
 
-                handler(wrapper -> handleItemToClient(wrapper.get(Type.ITEM1_13, 0)));
+                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_13, 0)));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketHandlers() {
@@ -74,7 +75,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 handler(wrapper -> {
                     Item[] items = wrapper.get(Type.ITEM1_13_SHORT_ARRAY, 0);
                     for (Item item : items) {
-                        handleItemToClient(item);
+                        handleItemToClient(wrapper.user(), item);
                     }
                 });
             }
@@ -142,18 +143,18 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                         for (int i = 0; i < size; i++) {
                             // Input Item
                             Item input = wrapper.read(Type.ITEM1_8);
-                            handleItemToClient(input);
+                            handleItemToClient(wrapper.user(), input);
                             wrapper.write(Type.ITEM1_13, input);
                             // Output Item
                             Item output = wrapper.read(Type.ITEM1_8);
-                            handleItemToClient(output);
+                            handleItemToClient(wrapper.user(), output);
                             wrapper.write(Type.ITEM1_13, output);
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
                                 Item second = wrapper.read(Type.ITEM1_8);
-                                handleItemToClient(second);
+                                handleItemToClient(wrapper.user(), second);
                                 wrapper.write(Type.ITEM1_13, second);
                             }
 
@@ -201,7 +202,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.VAR_INT); // 1 - Slot ID
                 map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Item
 
-                handler(wrapper -> handleItemToClient(wrapper.get(Type.ITEM1_13, 0)));
+                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_13, 0)));
             }
         });
 
@@ -216,7 +217,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.VAR_INT); // 4 - Mode
                 map(Type.ITEM1_13, Type.ITEM1_8); // 5 - Clicked Item
 
-                handler(wrapper -> handleItemToServer(wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
             }
         });
 
@@ -258,13 +259,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 map(Type.SHORT); // 0 - Slot
                 map(Type.ITEM1_13, Type.ITEM1_8); // 1 - Clicked Item
 
-                handler(wrapper -> handleItemToServer(wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
             }
         });
     }
 
     @Override
-    public Item handleItemToClient(Item item) {
+    public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
         CompoundTag tag = item.tag();
 
@@ -504,7 +505,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(UserConnection connection, Item item) {
         if (item == null) return null;
 
         Integer rawId = null;

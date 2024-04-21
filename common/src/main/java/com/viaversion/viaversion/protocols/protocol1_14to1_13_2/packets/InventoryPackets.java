@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -157,14 +158,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                         int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
                             // Input Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
                             // Output Item
-                            handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
 
                             boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
-                                handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                                handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
                             }
 
                             wrapper.passthrough(Type.BOOLEAN); // Trade disabled
@@ -234,7 +235,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     }
 
     @Override
-    public Item handleItemToClient(Item item) {
+    public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
         item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getNewItemId(item.identifier()));
 
@@ -256,7 +257,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(UserConnection connection, Item item) {
         if (item == null) return null;
         item.setIdentifier(Protocol1_14To1_13_2.MAPPINGS.getOldItemId(item.identifier()));
 

@@ -23,6 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -110,7 +111,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
                 for (int i = 0; i < ingredients; i++) {
                     handleIngredient(wrapper);
                 }
-                rewrite(wrapper.passthrough(itemType())); // Result
+                rewrite(wrapper.user(), wrapper.passthrough(itemType())); // Result
                 wrapper.passthrough(Type.BOOLEAN); // Show notification
             }
         }.register(ClientboundPackets1_20_2.DECLARE_RECIPES);
@@ -139,7 +140,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
     }
 
     @Override
-    public @Nullable Item handleItemToClient(@Nullable final Item item) {
+    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
         if (item == null) {
             return null;
         }
@@ -149,7 +150,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             updatePages(tag, "pages");
             updatePages(tag, "filtered_pages");
         }
-        return super.handleItemToClient(item);
+        return super.handleItemToClient(connection, item);
     }
 
     private void updatePages(final CompoundTag tag, final String key) {

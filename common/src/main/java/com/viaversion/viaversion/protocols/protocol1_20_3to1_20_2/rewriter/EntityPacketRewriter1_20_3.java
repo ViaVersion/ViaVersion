@@ -126,7 +126,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 }
             }
 
-            rewriteParticle(particle);
+            rewriteParticle(event.user(), particle);
         });
 
         registerMetaTypeHandler(

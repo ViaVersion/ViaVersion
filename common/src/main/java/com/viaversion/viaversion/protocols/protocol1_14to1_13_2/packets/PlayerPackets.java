@@ -50,7 +50,7 @@ public class PlayerPackets {
 
         protocol.registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> {
             Item item = wrapper.passthrough(Type.ITEM1_13_2);
-            protocol.getItemRewriter().handleItemToServer(item);
+            protocol.getItemRewriter().handleItemToServer(wrapper.user(), item);
 
             if (item == null) return;
 

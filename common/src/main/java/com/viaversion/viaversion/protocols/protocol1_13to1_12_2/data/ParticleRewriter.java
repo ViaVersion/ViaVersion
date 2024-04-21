@@ -138,7 +138,7 @@ public class ParticleRewriter {
             }
 
             // Transform to new Item
-            Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(item);
+            Via.getManager().getProtocolManager().getProtocol(Protocol1_13To1_12_2.class).getItemRewriter().handleItemToClient(null, item);
 
             particle.add(Type.ITEM1_13, item); // Item Slot	The item that will be used.
             return particle;

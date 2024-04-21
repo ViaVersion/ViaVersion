@@ -138,7 +138,7 @@ public final class Protocol1_20_3To1_20_2 extends AbstractProtocol<ClientboundPa
                 if (wrapper.passthrough(Type.BOOLEAN)) {
                     convertComponent(wrapper); // Title
                     convertComponent(wrapper); // Description
-                    itemRewriter.handleItemToClient(wrapper.passthrough(Type.ITEM1_20_2)); // Icon
+                    itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_20_2)); // Icon
                     wrapper.passthrough(Type.VAR_INT); // Frame type
                     final int flags = wrapper.passthrough(Type.INT);
                     if ((flags & 1) != 0) {

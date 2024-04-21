@@ -22,6 +22,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
@@ -119,7 +120,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
                 handler(wrapper -> {
                     int slot = wrapper.read(Type.VAR_INT);
                     wrapper.write(Type.BYTE, (byte) slot);
-                    handleItemToClient(wrapper.passthrough(Type.ITEM1_13_2));
+                    handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
                 });
             }
         });
@@ -134,13 +135,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             inventoryTracker.setInventoryOpen(false);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
         registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.DOUBLE);
     }
 
     @Override
-    public Item handleItemToClient(Item item) {
+    public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
 
         CompoundTag tag = item.tag();
@@ -169,7 +170,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(UserConnection connection, Item item) {
         if (item == null) return null;
 
         item.setIdentifier(Protocol1_16To1_15_2.MAPPINGS.getOldItemId(item.identifier()));

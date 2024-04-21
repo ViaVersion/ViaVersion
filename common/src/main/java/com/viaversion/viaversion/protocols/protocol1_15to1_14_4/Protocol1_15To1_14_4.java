@@ -59,7 +59,7 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.STATISTICS);
 
-        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.passthrough(Type.ITEM1_13_2)));
+        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
         tagRewriter.register(ClientboundPackets1_14_4.TAGS, RegistryType.ENTITY);
     }
