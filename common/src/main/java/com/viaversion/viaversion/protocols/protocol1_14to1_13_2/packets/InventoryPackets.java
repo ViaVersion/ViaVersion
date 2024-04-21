@@ -72,7 +72,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
             String type = wrapper.read(Type.STRING);
             JsonElement title = wrapper.read(Type.COMPONENT);
-            COMPONENT_REWRITER.processText(title);
+            COMPONENT_REWRITER.processText(wrapper.user(), title);
             Short slots = wrapper.read(Type.UNSIGNED_BYTE);
 
             if (type.equals("EntityHorse")) {

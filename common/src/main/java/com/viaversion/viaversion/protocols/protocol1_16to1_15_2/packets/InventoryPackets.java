@@ -159,7 +159,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
             if (pages != null) {
                 for (StringTag pageTag : pages) {
-                    pageTag.setValue(protocol.getComponentRewriter().processText(pageTag.getValue()).toString());
+                    pageTag.setValue(protocol.getComponentRewriter().processText(connection, pageTag.getValue()).toString());
                 }
             }
         }

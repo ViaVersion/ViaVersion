@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
@@ -67,8 +68,8 @@ public class TranslationMappings extends ComponentRewriter<ClientboundPackets1_1
     }
 
     @Override
-    public void processText(JsonElement element) {
-        super.processText(element);
+    public void processText(UserConnection connection, JsonElement element) {
+        super.processText(connection, element);
         if (element == null || !element.isJsonObject()) return;
 
         // Score components no longer contain value fields

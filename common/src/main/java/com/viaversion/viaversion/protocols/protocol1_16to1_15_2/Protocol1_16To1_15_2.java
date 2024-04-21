@@ -127,7 +127,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                 map(Type.COMPONENT);
                 map(Type.BYTE);
                 handler(wrapper -> {
-                    componentRewriter.processText(wrapper.get(Type.COMPONENT, 0));
+                    componentRewriter.processText(wrapper.user(), wrapper.get(Type.COMPONENT, 0));
                     wrapper.write(Type.UUID, ZERO_UUID); // Sender uuid - always send as 'system'
                 });
             }

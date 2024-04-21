@@ -23,6 +23,7 @@ import com.github.steveice10.opennbt.tag.builtin.LongArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -35,6 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPacke
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.Protocol1_16To1_15_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.util.CompactArrayUtil;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.Map;
 import java.util.UUID;
@@ -87,7 +89,7 @@ public class WorldPackets {
 
             if (chunk.getBlockEntities() == null) return;
             for (CompoundTag blockEntity : chunk.getBlockEntities()) {
-                handleBlockEntity(protocol, blockEntity);
+                handleBlockEntity(protocol, wrapper.user(), blockEntity);
             }
         });
 
@@ -95,17 +97,17 @@ public class WorldPackets {
             wrapper.passthrough(Type.POSITION1_14); // Position
             wrapper.passthrough(Type.UNSIGNED_BYTE); // Action
             CompoundTag tag = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
-            handleBlockEntity(protocol, tag);
+            handleBlockEntity(protocol, wrapper.user(), tag);
         });
 
         blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);
     }
 
-    private static void handleBlockEntity(Protocol1_16To1_15_2 protocol, CompoundTag compoundTag) {
+    private static void handleBlockEntity(Protocol1_16To1_15_2 protocol, UserConnection connection, CompoundTag compoundTag) {
         StringTag idTag = compoundTag.getStringTag("id");
         if (idTag == null) return;
 
-        String id = idTag.getValue();
+        String id = Key.namespaced(idTag.getValue());
         if (id.equals("minecraft:conduit")) {
             Tag targetUuidTag = compoundTag.remove("target_uuid");
             if (!(targetUuidTag instanceof StringTag)) return;
@@ -131,7 +133,7 @@ public class WorldPackets {
             for (int i = 1; i <= 4; i++) {
                 StringTag line = compoundTag.getStringTag("Text" + i);
                 if (line != null) {
-                    JsonElement text = protocol.getComponentRewriter().processText(line.getValue());
+                    JsonElement text = protocol.getComponentRewriter().processText(connection, line.getValue());
                     compoundTag.putString("Text" + i, text.toString());
                 }
             }

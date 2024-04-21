@@ -170,7 +170,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)));
+        registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
 
         registerClientbound(State.STATUS, 0x00, 0x00, new PacketHandlers() {
             @Override
@@ -296,7 +296,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Id
                 map(Type.STRING); // Window type
-                handler(wrapper -> componentRewriter.processText(wrapper.passthrough(Type.COMPONENT))); // Title
+                handler(wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT))); // Title
             }
         });
 
@@ -511,8 +511,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
 
         registerClientbound(ClientboundPackets1_12_1.TAB_LIST, wrapper -> {
-            componentRewriter.processText(wrapper.passthrough(Type.COMPONENT));
-            componentRewriter.processText(wrapper.passthrough(Type.COMPONENT));
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
         });
 
         registerClientbound(ClientboundPackets1_12_1.ADVANCEMENTS, wrapper -> {
@@ -528,8 +528,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
                 // Display data
                 if (wrapper.passthrough(Type.BOOLEAN)) {
-                    componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Title
-                    componentRewriter.processText(wrapper.passthrough(Type.COMPONENT)); // Description
+                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)); // Title
+                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)); // Description
                     Item icon = wrapper.read(Type.ITEM1_8);
                     itemRewriter.handleItemToClient(wrapper.user(), icon);
                     wrapper.write(Type.ITEM1_13, icon); // Translate item to flat item
