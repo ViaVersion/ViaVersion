@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.ViaManager;
 import com.viaversion.viaversion.api.configuration.ConfigurationProvider;
 import com.viaversion.viaversion.api.connection.ConnectionManager;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.debug.DebugHandler;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.UnsupportedSoftware;
@@ -92,6 +93,8 @@ public class ViaManagerImpl implements ViaManager {
         if (!injector.lateProtocolVersionSetting()) {
             loadServerProtocol();
         }
+
+        MappingDataLoader.loadGlobalIdentifiers();
 
         // Register protocols
         protocolManager.registerProtocols();

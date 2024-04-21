@@ -89,7 +89,20 @@ public interface MappingData {
      */
     @Nullable List<TagData> getTags(RegistryType type);
 
+    /**
+     * Returns item mappings.
+     *
+     * @return item mappings
+     */
     @Nullable BiMappings getItemMappings();
+
+    /**
+     * Returns item mappings if they also have identifier data present.
+     *
+     * @return item mappings if they also have identifier data present
+     * @see #getItemMappings()
+     */
+    @Nullable FullMappings getFullItemMappings();
 
     @Nullable ParticleMappings getParticleMappings();
 

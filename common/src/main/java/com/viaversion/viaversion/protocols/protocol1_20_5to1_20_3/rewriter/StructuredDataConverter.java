@@ -627,7 +627,7 @@ public final class StructuredDataConverter {
 
     private String toMappedItemName(final int id) {
         final int mappedId = unmappedItemId(id);
-        return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.itemName(mappedId) : "";
+        return mappedId != -1 ? Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(mappedId) : "";
     }
 
     private static CompoundTag getBlockEntityTag(final CompoundTag tag) {

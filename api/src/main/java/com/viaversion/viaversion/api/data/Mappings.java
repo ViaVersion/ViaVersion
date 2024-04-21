@@ -84,10 +84,4 @@ public interface Mappings {
      * @return mappings with keys and values swapped
      */
     Mappings inverse();
-
-    @FunctionalInterface
-    interface MappingsSupplier<T extends Mappings> {
-
-        T supply(int[] mappings, int mappedIds);
-    }
 }

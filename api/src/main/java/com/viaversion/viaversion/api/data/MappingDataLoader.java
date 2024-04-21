@@ -28,6 +28,7 @@ import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
 import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
+import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.github.steveice10.opennbt.tag.io.NBTIO;
 import com.github.steveice10.opennbt.tag.io.TagReader;
 import com.google.common.annotations.Beta;
@@ -40,13 +41,16 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -54,13 +58,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataLoader {
 
+    public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
     public static final TagReader<CompoundTag> MAPPINGS_READER = NBTIO.reader(CompoundTag.class).named();
+    private static final Map<String, String[]> GLOBAL_IDENTIFIER_INDEXES = new HashMap<>();
     private static final byte DIRECT_ID = 0;
     private static final byte SHIFTS_ID = 1;
     private static final byte CHANGES_ID = 2;
     private static final byte IDENTITY_ID = 3;
-
-    public static final MappingDataLoader INSTANCE = new MappingDataLoader(MappingDataLoader.class, "assets/viaversion/data/");
 
     private final Map<String, CompoundTag> mappingsCache = new HashMap<>();
     private final Class<?> dataLoaderClass;
@@ -70,6 +74,40 @@ public class MappingDataLoader {
     public MappingDataLoader(final Class<?> dataLoaderClass, final String dataPath) {
         this.dataLoaderClass = dataLoaderClass;
         this.dataPath = dataPath;
+    }
+
+    public static void loadGlobalIdentifiers() {
+        // Load in a file with all the identifiers we need, so that we don't need to duplicate them
+        // for every single new version with only a couple of changes in them.
+        final CompoundTag globalIdentifiers = INSTANCE.loadNBT("identifier-table.nbt");
+        for (final Map.Entry<String, Tag> entry : globalIdentifiers.entrySet()) {
+            //noinspection unchecked
+            final ListTag<StringTag> value = (ListTag<StringTag>) entry.getValue();
+            final String[] array = new String[value.size()];
+            for (int i = 0, size = value.size(); i < size; i++) {
+                array[i] = value.get(i).getValue();
+            }
+            GLOBAL_IDENTIFIER_INDEXES.put(entry.getKey(), array);
+        }
+    }
+
+    /**
+     * Returns the global id of the identifier in the registry.
+     *
+     * @param registry registry key
+     * @param globalId global id
+     * @return identifier
+     * @throws IllegalArgumentException if the registry key is invalid
+     */
+    public @Nullable String identifierFromGlobalId(final String registry, final int globalId) {
+        final String[] array = GLOBAL_IDENTIFIER_INDEXES.get(registry);
+        if (array == null) {
+            throw new IllegalArgumentException("Unknown global identifier key: " + registry);
+        }
+        if (globalId < 0 || globalId >= array.length) {
+            throw new IllegalArgumentException("Unknown global identifier index: " + globalId);
+        }
+        return array[globalId];
     }
 
     public void clearCache() {
@@ -146,7 +184,7 @@ public class MappingDataLoader {
             return null;
         }
 
-        try (final InputStream stream = resource) {
+        try (final InputStream stream = new BufferedInputStream(resource)) {
             return MAPPINGS_READER.read(stream);
         } catch (final IOException e) {
             throw new RuntimeException(e);
@@ -238,23 +276,32 @@ public class MappingDataLoader {
         return mappingsSupplier.create(mappings, mappedSizeTag.asInt());
     }
 
-    public FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        final ListTag<StringTag> unmappedElements = unmappedIdentifiers.getListTag(key, StringTag.class);
-        final ListTag<StringTag> mappedElements = mappedIdentifiers.getListTag(key, StringTag.class);
-        if (unmappedElements == null || mappedElements == null) {
+    public FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiersTag, final CompoundTag mappedIdentifiersTag, final String key) {
+        if (!unmappedIdentifiersTag.contains(key) || !mappedIdentifiersTag.contains(key)) {
             return null;
         }
 
+        final List<String> unmappedIdentifiers = identifiersFromGlobalIds(unmappedIdentifiersTag, key);
+        final List<String> mappedIdentifiers = identifiersFromGlobalIds(mappedIdentifiersTag, key);
         Mappings mappings = loadMappings(mappingsTag, key);
         if (mappings == null) {
-            mappings = new IdentityMappings(unmappedElements.size(), mappedElements.size());
+            mappings = new IdentityMappings(unmappedIdentifiers.size(), mappedIdentifiers.size());
         }
 
-        return new FullMappingsBase(
-            unmappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
-            mappedElements.stream().map(StringTag::getValue).collect(Collectors.toList()),
-            mappings
-        );
+        return new FullMappingsBase(unmappedIdentifiers, mappedIdentifiers, mappings);
+    }
+
+    public @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
+        final Mappings mappings = loadMappings(mappingsTag, key);
+        if (mappings == null) {
+            return null;
+        }
+
+        final List<String> identifiers = new ArrayList<>(mappings.size());
+        for (int i = 0; i < mappings.size(); i++) {
+            identifiers.add(identifierFromGlobalId(key, mappings.getNewId(i)));
+        }
+        return identifiers;
     }
 
     /**

@@ -26,7 +26,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingData extends MappingDataBase {
 
-    private KeyMappings items;
     private KeyMappings blocks;
     private KeyMappings sounds;
 
@@ -39,17 +38,8 @@ public class MappingData extends MappingDataBase {
         super.loadExtras(data);
 
         final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("extra-identifiers-1.20.3.nbt");
-        items = new KeyMappings(extraMappings.getListTag("items", StringTag.class));
         blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
         sounds = new KeyMappings(extraMappings.getListTag("sounds", StringTag.class));
-    }
-
-    public int itemId(final String name) {
-        return items.keyToId(name);
-    }
-
-    public @Nullable String itemName(final int id) {
-        return items.idToKey(id);
     }
 
     public int blockId(final String name) {

@@ -544,7 +544,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private int unmappedItemId(final String name) {
-        return protocol.getMappingData().itemId(name);
+        return protocol.getMappingData().getFullItemMappings().id(name);
     }
 
     private int toMappedItemId(final String name) {

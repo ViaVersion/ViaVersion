@@ -185,7 +185,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            final int itemId = Protocol1_20_5To1_20_3.MAPPINGS.itemId(idTag.getValue());
+            final int itemId = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().id(idTag.getValue());
             if (itemId == -1) {
                 return;
             }
@@ -216,7 +216,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.itemName(newItem.identifier());
+            final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(newItem.identifier());
             if (itemName != null) {
                 contentsTag.putString("id", itemName);
             }
@@ -606,7 +606,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             final ArmorTrimMaterial armorTrimMaterial = material.value();
             final CompoundTag materialTag = new CompoundTag();
             materialTag.putString("asset_name", armorTrimMaterial.assetName());
-            final String ingredient = Protocol1_20_5To1_20_3.MAPPINGS.itemName(armorTrimMaterial.itemId());
+            final String ingredient = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(armorTrimMaterial.itemId());
             if (ingredient == null) {
                 throw new IllegalArgumentException("Unknown item: " + armorTrimMaterial.itemId());
             }
@@ -628,7 +628,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             final ArmorTrimPattern armorTrimPattern = pattern.value();
             final CompoundTag patternTag = new CompoundTag();
             patternTag.put("asset_id", convertIdentifier(armorTrimPattern.assetName()));
-            final String templateItem = Protocol1_20_5To1_20_3.MAPPINGS.itemName(armorTrimPattern.itemId());
+            final String templateItem = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(armorTrimPattern.itemId());
             if (templateItem == null) {
                 throw new IllegalArgumentException("Unknown item: " + armorTrimPattern.itemId());
             }
@@ -769,7 +769,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     protected ListTag<StringTag> convertPotDecorations(final PotDecorations value) {
         final ListTag<StringTag> tag = new ListTag<>(StringTag.class);
         for (final int decoration : value.itemIds()) {
-            final String item = Protocol1_20_5To1_20_3.MAPPINGS.itemName(decoration);
+            final String item = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(decoration);
             if (item == null) {
                 throw new IllegalArgumentException("Unknown item: " + decoration);
             }
@@ -877,7 +877,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     }
 
     protected void convertItem(final CompoundTag tag, final Item item) {
-        final String name = Protocol1_20_5To1_20_3.MAPPINGS.itemName(item.identifier());
+        final String name = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(item.identifier());
         if (name == null) {
             throw new IllegalArgumentException("Unknown item: " + item.identifier());
         }

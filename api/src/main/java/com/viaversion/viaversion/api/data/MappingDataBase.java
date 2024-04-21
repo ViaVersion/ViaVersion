@@ -24,8 +24,6 @@ package com.viaversion.viaversion.api.data;
 
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.IntArrayTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
@@ -35,7 +33,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataBase implements MappingData {
@@ -80,28 +77,29 @@ public class MappingDataBase implements MappingData {
         enchantmentMappings = loadMappings(data, "enchantments");
         paintingMappings = loadMappings(data, "paintings");
         attributeMappings = loadMappings(data, "attributes");
-        itemMappings = loadBiMappings(data, "items");
+
 
         final CompoundTag unmappedIdentifierData = readUnmappedIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
         final CompoundTag mappedIdentifierData = readMappedIdentifiersFile("identifiers-" + mappedVersion + ".nbt");
         if (unmappedIdentifierData != null && mappedIdentifierData != null) {
+            itemMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "items");
             entityMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "entities");
             argumentTypeMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "argumenttypes");
             recipeSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "recipe_serializers");
             itemDataSerializerMappings = loadFullMappings(data, unmappedIdentifierData, mappedIdentifierData, "data_component_type");
 
-            final ListTag<StringTag> unmappedParticles = unmappedIdentifierData.getListTag("particles", StringTag.class);
-            final ListTag<StringTag> mappedParticles = mappedIdentifierData.getListTag("particles", StringTag.class);
+            final List<String> unmappedParticles = identifiersFromGlobalIds(unmappedIdentifierData, "particles");
+            final List<String> mappedParticles = identifiersFromGlobalIds(mappedIdentifierData, "particles");
             if (unmappedParticles != null && mappedParticles != null) {
                 Mappings particleMappings = loadMappings(data, "particles");
                 if (particleMappings == null) {
                     particleMappings = new IdentityMappings(unmappedParticles.size(), mappedParticles.size());
                 }
-
-                final List<String> identifiers = unmappedParticles.stream().map(StringTag::getValue).collect(Collectors.toList());
-                final List<String> mappedIdentifiers = mappedParticles.stream().map(StringTag::getValue).collect(Collectors.toList());
-                this.particleMappings = new ParticleMappings(identifiers, mappedIdentifiers, particleMappings);
+                this.particleMappings = new ParticleMappings(unmappedParticles, mappedParticles, particleMappings);
             }
+        } else {
+            // Might not have identifiers in older versions
+            itemMappings = loadBiMappings(data, "items");
         }
 
         final CompoundTag tagsTag = data.getCompoundTag("tags");
@@ -112,6 +110,10 @@ public class MappingDataBase implements MappingData {
         }
 
         loadExtras(data);
+    }
+
+    protected @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
+        return MappingDataLoader.INSTANCE.identifiersFromGlobalIds(mappingsTag, key);
     }
 
     protected @Nullable CompoundTag readMappingsFile(final String name) {
@@ -192,6 +194,14 @@ public class MappingDataBase implements MappingData {
     @Override
     public @Nullable BiMappings getItemMappings() {
         return itemMappings;
+    }
+
+    @Override
+    public @Nullable FullMappings getFullItemMappings() {
+        if (itemMappings instanceof FullMappings) {
+            return (FullMappings) itemMappings;
+        }
+        return null;
     }
 
     @Override
