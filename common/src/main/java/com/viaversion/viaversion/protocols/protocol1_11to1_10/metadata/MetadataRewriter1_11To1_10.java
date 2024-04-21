@@ -61,8 +61,6 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
                 event.cancel();
             } else if (meta.id() == 15) {
                 meta.setId(14);
-            } else if (meta.id() == 14) {
-                meta.setId(15);
             }
         });
 
@@ -110,7 +108,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
             byte data = meta.value();
             // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
             if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
-                    && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
+                && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
                 EntityTracker1_11 tracker = tracker(event.user());
                 int entityId = event.entityId();
                 if (tracker.addHologram(entityId)) {

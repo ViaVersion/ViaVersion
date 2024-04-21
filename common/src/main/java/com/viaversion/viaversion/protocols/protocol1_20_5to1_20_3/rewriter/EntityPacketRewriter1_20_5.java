@@ -376,8 +376,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             null
         );
 
-        filter().type(EntityTypes1_20_5.ZOMBIFIED_PIGLIN).removeIndex(19); // TODO Somewhere between 1.8 and 1.11 we most likely have bad handling
-
         filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
