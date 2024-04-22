@@ -85,6 +85,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attribute
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
@@ -795,8 +796,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final String name = modifierTag.getString("Name");
             final NumberTag amountTag = modifierTag.getNumberTag("Amount");
             final IntArrayTag uuidTag = modifierTag.getIntArrayTag("UUID");
-            final int slotType = modifierTag.getInt("Slot");
+            final String slotType = modifierTag.getString("Slot", "any");
             if (name == null || attributeName == null || amountTag == null || uuidTag == null) {
+                continue;
+            }
+
+            final int slotTypeId = EquipmentSlots1_20_5.keyToId(slotType);
+            if (slotTypeId == -1) {
                 continue;
             }
 
@@ -818,7 +824,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     amountTag.asDouble(),
                     operationId
                 ),
-                slotType
+                slotTypeId
             ));
         }
         data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers.toArray(new AttributeModifier[0]), showInTooltip));

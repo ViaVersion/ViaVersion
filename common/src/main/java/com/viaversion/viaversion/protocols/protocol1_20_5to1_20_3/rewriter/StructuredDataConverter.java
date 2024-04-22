@@ -54,6 +54,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
@@ -137,7 +138,9 @@ public final class StructuredDataConverter {
                 modifierTag.putString("AttributeName", identifier.equals("generic.jump_strength") ? "horse.jump_strength" : identifier);
                 modifierTag.putString("Name", modifier.modifier().name());
                 modifierTag.putDouble("Amount", modifier.modifier().amount());
-                modifierTag.putInt("Slot", modifier.slotType());
+                if (modifier.slotType() != 0) {
+                    modifierTag.putString("Slot", EquipmentSlots1_20_5.idToKey(modifier.slotType()));
+                }
                 modifierTag.putInt("Operation", modifier.modifier().operation());
                 modifiers.add(modifierTag);
             }

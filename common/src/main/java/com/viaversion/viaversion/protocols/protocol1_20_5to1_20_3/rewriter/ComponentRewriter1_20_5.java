@@ -76,6 +76,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
@@ -401,12 +402,13 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             if (type == null) {
                 throw new IllegalArgumentException("Unknown attribute type: " + modifier.attribute());
             }
+
             modifierTag.putString("type", type);
             convertModifierData(modifierTag, modifier.modifier());
             if (modifier.slotType() != 0) {
-                final StringTag slotTag = convertEnumEntry(modifier.slotType(), "any", "mainhand", "offhand",
-                    "hand", "feet", "legs", "chest", "head", "armor", "body");
-                modifierTag.put("slot", slotTag);
+                final String slotType = EquipmentSlots1_20_5.idToKey(modifier.slotType());
+                Preconditions.checkNotNull(slotType, "Unknown slot type %s", modifier.slotType());
+                modifierTag.putString("slot", slotType);
             }
 
             modifiers.add(modifierTag);
