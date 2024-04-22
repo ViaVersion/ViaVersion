@@ -75,7 +75,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
@@ -338,7 +338,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         final CompoundTag levels = new CompoundTag();
         for (final Int2IntMap.Entry entry : value.enchantments().int2IntEntrySet()) {
             final int level = checkIntRange(0, 255, entry.getIntValue());
-            levels.putInt(Enchantments1_20_3.idToKey(entry.getIntKey()), level);
+            levels.putInt(Enchantments1_20_5.idToKey(entry.getIntKey()), level);
         }
         tag.put("levels", levels);
         if (!value.showInTooltip()) {
