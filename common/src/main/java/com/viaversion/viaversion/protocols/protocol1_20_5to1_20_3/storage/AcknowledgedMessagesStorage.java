@@ -118,4 +118,9 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
         this.lastMessage = null;
         Arrays.fill(this.trackedMessages, false);
     }
+
+    @Override
+    public boolean clearOnServerSwitch() {
+        return false;
+    }
 }

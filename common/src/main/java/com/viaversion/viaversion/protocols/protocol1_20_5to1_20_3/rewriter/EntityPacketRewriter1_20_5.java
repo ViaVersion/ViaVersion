@@ -197,8 +197,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     final String dimensionKey = wrapper.read(Type.STRING);
                     final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
                     wrapper.write(Type.VAR_INT, data.id());
-
-                    wrapper.user().get(AcknowledgedMessagesStorage.class).clear();
                 });
                 map(Type.STRING); // World
                 map(Type.LONG); // Seed
@@ -208,10 +206,17 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 map(Type.BOOLEAN); // Flat
                 map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
                 map(Type.VAR_INT); // Portal cooldown
-                create(Type.BOOLEAN, false); // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
+                    // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
+                    // Just put in what we know if this is sent multiple times
+                    final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
+                    wrapper.write(Type.BOOLEAN, storage.isSecureChatEnforced());
+
+                    storage.clear();
+
+                    // Handle creative interaction range
                     final byte gamemode = wrapper.get(Type.BYTE, 0);
                     if (gamemode == CREATIVE_MODE_ID) {
                         sendRangeAttributes(wrapper.user(), true);
