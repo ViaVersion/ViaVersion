@@ -468,7 +468,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<CompoundTag> attributeModifiersTag = tag.getListTag("AttributeModifiers", CompoundTag.class);
         if (attributeModifiersTag != null) {
-            updateAttributes(data, tag, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
+            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
@@ -653,6 +653,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (possibleEffectsTag == null) {
             return;
         }
+
         final List<FoodEffect> possibleEffects = new ArrayList<>();
         for (final CompoundTag effect : possibleEffectsTag) {
             final CompoundTag potionEffectTag = effect.getCompoundTag("effect");
@@ -675,6 +676,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (rulesTag == null) {
             return;
         }
+
         final List<ToolRule> rules = new ArrayList<>();
         for (final CompoundTag tag : rulesTag) {
             HolderSet blocks = null;
@@ -709,6 +711,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (patternTag == null) {
                 continue;
             }
+
             final String assetId = patternTag.getString("asset_id");
             final String translationKey = patternTag.getString("translation_key");
             final int dyeColor = tag.getInt("dye_color");
@@ -784,7 +787,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         );
     }
 
-    private void updateAttributes(final StructuredDataContainer data, final CompoundTag tag, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
+    private void updateAttributes(final StructuredDataContainer data, final ListTag<CompoundTag> attributeModifiersTag, final boolean showInTooltip) {
         final List<AttributeModifier> modifiers = new ArrayList<>();
         for (int i = 0; i < attributeModifiersTag.size(); i++) {
             final CompoundTag modifierTag = attributeModifiersTag.get(i);

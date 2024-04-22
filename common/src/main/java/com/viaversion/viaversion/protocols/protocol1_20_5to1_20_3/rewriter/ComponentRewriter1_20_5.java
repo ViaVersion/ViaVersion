@@ -196,10 +196,10 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            CompoundTag tagTag;
+            final CompoundTag tagTag;
             try {
                 tagTag = (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue());
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.20.3 NBT in show_item: " + contentsTag, e);
                 }
@@ -217,17 +217,22 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(newItem.identifier());
-            if (itemName != null) {
-                contentsTag.putString("id", itemName);
+            if (newItem.identifier() != 0) {
+                final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().mappedIdentifier(newItem.identifier());
+                if (itemName != null) {
+                    contentsTag.putString("id", itemName);
+                }
+            } else {
+                // Cannot be air
+                contentsTag.putString("id", "minecraft:stone");
             }
 
             final Map<StructuredDataKey<?>, StructuredData<?>> data = newItem.structuredData().data();
             if (!data.isEmpty()) {
-                CompoundTag components;
+                final CompoundTag components;
                 try {
                     components = toTag(data, false);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                         Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.20.5 components in show_item!", e);
                     }
@@ -783,7 +788,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         final ListTag<CompoundTag> items = convertItemArray(value);
         for (int i = 0; i < items.size(); i++) {
-            final CompoundTag itemTag = items.get(i);
+            final CompoundTag itemTag = new CompoundTag();
             itemTag.putInt("slot", i);
             itemTag.put("item", items.get(i));
             tag.add(itemTag);
@@ -942,11 +947,11 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     // ---------------------------------------------------------------------------------------
 
     protected IntTag convertPositiveInt(final Integer value) {
-        return convertIntRange(1, Integer.MAX_VALUE, value);
+        return convertIntRange(value, 1, Integer.MAX_VALUE);
     }
 
     protected IntTag convertNonNegativeInt(final Integer value) {
-        return convertIntRange(0, Integer.MAX_VALUE, value);
+        return convertIntRange(value, 0, Integer.MAX_VALUE);
     }
 
     protected IntTag convertIntRange(final Integer value, final int min, final int max) {
