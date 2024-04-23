@@ -1168,7 +1168,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 continue;
             }
 
-            enchantments.enchantments().put(intId, lvl.asInt());
+            enchantments.enchantments().put(intId, clamp(lvl.asInt(), 0, 255));
         }
 
         data.set(newKey, enchantments);
