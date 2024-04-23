@@ -102,6 +102,10 @@ public final class ComponentUtil {
         }
     }
 
+    public static @Nullable Tag jsonStringToTag(@Nullable final String json) {
+        return jsonStringToTag(json, SerializerVersion.V1_20_3, SerializerVersion.V1_20_5);
+    }
+
     public static @Nullable Tag jsonStringToTag(@Nullable final String json, final SerializerVersion from, final SerializerVersion to) {
         if (json == null) {
             return null;
