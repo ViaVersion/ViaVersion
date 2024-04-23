@@ -84,7 +84,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_5;
@@ -1157,13 +1157,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final Enchantments enchantments = new Enchantments(new Int2IntOpenHashMap(), show);
         for (final CompoundTag enchantment : enchantmentsTag) {
-            final String id = enchantment.getString("id");
+            String id = enchantment.getString("id");
             final NumberTag lvl = enchantment.getNumberTag("lvl");
             if (id == null || lvl == null) {
                 continue;
             }
 
-            final int intId = Enchantments1_20_3.keyToId(id);
+            if (Key.stripMinecraftNamespace(id).equals("sweeping")) {
+                // Renamed
+                id = "minecraft:sweeping_edge";
+            }
+
+            final int intId = Enchantments1_20_5.keyToId(id);
             if (intId == -1) {
                 continue;
             }
