@@ -389,7 +389,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP);
         }
 
-        updateDisplay(data, tag.getCompoundTag("display"), hideFlagsValue);
+        updateDisplay(connection, data, tag.getCompoundTag("display"), hideFlagsValue);
 
         final NumberTag damage = tag.getNumberTag("Damage");
         if (damage != null && damage.asInt() != 0) {
@@ -483,7 +483,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (old.identifier() == 1085) {
             updateWritableBookPages(data, tag);
         } else if (old.identifier() == 1086) {
-            updateWrittenBookPages(data, tag);
+            updateWrittenBookPages(connection, data, tag);
         }
 
         updatePotionTags(data, tag);
@@ -1073,7 +1073,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.WRITABLE_BOOK_CONTENT, pages.toArray(new FilterableString[0]));
     }
 
-    private void updateWrittenBookPages(final StructuredDataContainer data, final CompoundTag tag) {
+    private void updateWrittenBookPages(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag) {
         final ListTag<StringTag> pagesTag = tag.getListTag("pages", StringTag.class);
         final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
         if (pagesTag == null) {
@@ -1087,11 +1087,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (filteredPagesTag != null) {
                 final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
                 if (filteredPage != null) {
-                    filtered = ComponentUtil.jsonStringToTag(filteredPage.getValue());
+                    filtered = jsonToTag(connection, filteredPage);
                 }
             }
 
-            final Tag parsedPage = ComponentUtil.jsonStringToTag(page.getValue());
+            final Tag parsedPage = jsonToTag(connection, page);
             pages.add(new FilterableComponent(parsedPage, filtered));
         }
 
@@ -1108,6 +1108,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             resolved
         );
         data.set(StructuredDataKey.WRITTEN_BOOK_CONTENT, writtenBook);
+    }
+
+    private Tag jsonToTag(final UserConnection connection, final StringTag stringTag) {
+        final Tag tag = ComponentUtil.jsonStringToTag(stringTag.getValue());
+        protocol.getComponentRewriter().processTag(connection, tag);
+        return tag;
     }
 
     private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
@@ -1265,7 +1271,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.MAP_DECORATIONS, updatedDecorationsTag);
     }
 
-    private void updateDisplay(final StructuredDataContainer data, final CompoundTag displayTag, final int hideFlags) {
+    private void updateDisplay(final UserConnection connection, final StructuredDataContainer data, final CompoundTag displayTag, final int hideFlags) {
         if (displayTag == null) {
             return;
         }
@@ -1277,13 +1283,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final StringTag nameTag = displayTag.getStringTag("Name");
         if (nameTag != null) {
-            data.set(StructuredDataKey.CUSTOM_NAME, ComponentUtil.jsonStringToTag(nameTag.getValue()));
+            data.set(StructuredDataKey.CUSTOM_NAME, jsonToTag(connection, nameTag));
         }
 
         final ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
         if (loreTag != null) {
             // Apply limit as per new network codec. Some servers send these lores to do trickery with shaders
-            data.set(StructuredDataKey.LORE, loreTag.stream().limit(256).map(t -> ComponentUtil.jsonStringToTag(t.getValue())).toArray(Tag[]::new));
+            data.set(StructuredDataKey.LORE, loreTag.stream().limit(256).map(t -> jsonToTag(connection, t)).toArray(Tag[]::new));
         }
 
         final NumberTag colorTag = displayTag.getNumberTag("color");
