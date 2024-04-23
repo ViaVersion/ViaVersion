@@ -989,10 +989,11 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     }
 
     protected ListTag<StringTag> convertComponents(final Tag[] value, final int maxLength) {
+        checkIntRange(0, maxLength, value.length);
         final ListTag<StringTag> listTag = new ListTag<>(StringTag.class);
         for (final Tag tag : value) {
             final String json = serializerVersion().toString(serializerVersion().toComponent(tag));
-            listTag.add(new StringTag(checkStringRange(0, maxLength, json)));
+            listTag.add(new StringTag(json));
         }
         return listTag;
     }
