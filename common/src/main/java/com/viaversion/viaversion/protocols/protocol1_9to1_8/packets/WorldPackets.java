@@ -46,6 +46,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.sounds.SoundEffect;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Key;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -98,7 +99,7 @@ public class WorldPackets {
                 // Everything else gets written through
 
                 handler(wrapper -> {
-                    String name = wrapper.get(Type.STRING, 0);
+                    String name = Key.stripMinecraftNamespace(wrapper.get(Type.STRING, 0));
 
                     SoundEffect effect = SoundEffect.getByName(name);
                     int catid = 0;
@@ -109,7 +110,7 @@ public class WorldPackets {
                     }
                     wrapper.set(Type.STRING, 0, newname);
                     wrapper.write(Type.VAR_INT, catid); // Write Category ID
-                    if (effect != null && effect.isBreaksound()) {
+                    if (effect != null && effect.isBreakSound()) {
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
                         int x = wrapper.passthrough(Type.INT); //Position X
                         int y = wrapper.passthrough(Type.INT); //Position Y
