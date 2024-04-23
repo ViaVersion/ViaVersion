@@ -99,6 +99,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -1111,7 +1112,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private Tag jsonToTag(final UserConnection connection, final StringTag stringTag) {
-        final Tag tag = ComponentUtil.jsonStringToTag(stringTag.getValue());
+        // Use the same version for deserializing and serializing, as the only write changes are in hovers, which we handle ourselves
+        final Tag tag = ComponentUtil.jsonStringToTag(stringTag.getValue(), SerializerVersion.V1_20_3, SerializerVersion.V1_20_3);
         protocol.getComponentRewriter().processTag(connection, tag);
         return tag;
     }
