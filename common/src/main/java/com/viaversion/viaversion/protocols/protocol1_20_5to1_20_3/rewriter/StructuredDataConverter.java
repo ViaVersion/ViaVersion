@@ -53,7 +53,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecorations1_20_5;
@@ -773,20 +773,19 @@ public final class StructuredDataConverter {
 
     private void convertEnchantments(final Enchantments data, final CompoundTag tag, final boolean storedEnchantments) {
         final ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
-        final int piercingId = Enchantments1_20_3.keyToId("piercing");
         for (final Int2IntMap.Entry entry : data.enchantments().int2IntEntrySet()) {
-            int id = entry.getIntKey();
-            if (id > piercingId) {
-                if (id <= piercingId + 3) {
-                    // Density, breach, wind burst - Already backed up by VB
-                    continue;
-                }
-                id -= 3;
-            }
-
-            final String identifier = Enchantments1_20_3.idToKey(id);
+            final int enchantmentId = entry.getIntKey();
+            String identifier = Enchantments1_20_5.idToKey(enchantmentId);
             if (identifier == null) {
                 continue;
+            }
+            if (identifier.equals("density") || identifier.equals("breach") || identifier.equals("wind_burst")) {
+                // New ones, backed up by VB
+                continue;
+            }
+
+            if (identifier.equals("sweeping_edge")) {
+                identifier = "sweeping";
             }
 
             final CompoundTag enchantment = new CompoundTag();
