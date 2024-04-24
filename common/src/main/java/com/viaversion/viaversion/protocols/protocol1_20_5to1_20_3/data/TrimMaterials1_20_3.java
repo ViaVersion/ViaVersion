@@ -27,11 +27,11 @@ public final class TrimMaterials1_20_3 {
         "copper",
         "diamond",
         "emerald",
-        "quartz",
         "gold",
         "iron",
         "lapis",
         "netherite",
+        "quartz",
         "redstone"
     );
 

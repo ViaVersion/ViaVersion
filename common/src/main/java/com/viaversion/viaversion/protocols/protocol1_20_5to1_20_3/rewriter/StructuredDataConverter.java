@@ -668,6 +668,7 @@ public final class StructuredDataConverter {
         if (unmappedId != -1) {
             return unmappedId;
         }
+
         final IntTag itemBackupTag = tag.getIntTag(ITEM_BACKUP_TAG_KEY);
         if (itemBackupTag != null) {
             tag.remove(ITEM_BACKUP_TAG_KEY);

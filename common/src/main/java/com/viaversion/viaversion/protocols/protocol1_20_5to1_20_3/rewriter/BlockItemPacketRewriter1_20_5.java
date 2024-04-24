@@ -892,6 +892,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (id == -1) {
                 return;
             }
+
             materialHolder = Holder.of(id);
         } else if (materialTag instanceof CompoundTag) {
             final CompoundTag materialCompoundTag = (CompoundTag) materialTag;
