@@ -89,6 +89,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
+        componentRewriter.registerCombatKill1_20(ClientboundPackets1_20_3.COMBAT_KILL);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Type.STRING); // Server ID
