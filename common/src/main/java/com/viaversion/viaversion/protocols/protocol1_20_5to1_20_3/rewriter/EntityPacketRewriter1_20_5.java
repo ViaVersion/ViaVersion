@@ -210,9 +210,15 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
                     // Enforces secure chat - moved from server data (which is unfortunately sent a while after this)
-                    // Just put in what we know if this is sent multiple times
                     final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
-                    wrapper.write(Type.BOOLEAN, storage.isSecureChatEnforced());
+                    if (storage.secureChatEnforced() != null) {
+                        // Just put in what we know if this is sent multiple times
+                        wrapper.write(Type.BOOLEAN, storage.isSecureChatEnforced());
+                    } else {
+                        // Assume that it isn't, otherwise the client will disregard chat messages from players
+                        // without chat sessions if it assumes secure chat is enforced
+                        wrapper.write(Type.BOOLEAN, false);
+                    }
 
                     storage.clear();
 
