@@ -1089,11 +1089,23 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (filteredPagesTag != null) {
                 final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
                 if (filteredPage != null) {
-                    filtered = jsonToTag(connection, filteredPage);
+                    try {
+                        filtered = jsonToTag(connection, filteredPage);
+                    } catch (final Exception e) {
+                        // A 1.20.4 client would display the broken json raw, but a 1.20.5 client would die
+                        continue;
+                    }
                 }
             }
 
-            final Tag parsedPage = jsonToTag(connection, page);
+            final Tag parsedPage;
+            try {
+                parsedPage = jsonToTag(connection, page);
+            } catch (final Exception e) {
+                // Same as above
+                continue;
+            }
+
             pages.add(new FilterableComponent(parsedPage, filtered));
         }
 
@@ -1291,13 +1303,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final StringTag nameTag = displayTag.getStringTag("Name");
         if (nameTag != null) {
-            data.set(StructuredDataKey.CUSTOM_NAME, jsonToTag(connection, nameTag));
+            try {
+                final Tag convertedName = jsonToTag(connection, nameTag);
+                data.set(StructuredDataKey.CUSTOM_NAME, convertedName);
+            } catch (final Exception ignored) {
+                // No display name if it fails to parse
+            }
         }
 
         final ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
         if (loreTag != null) {
             // Apply limit as per new network codec. Some servers send these lores to do trickery with shaders
-            data.set(StructuredDataKey.LORE, loreTag.stream().limit(256).map(t -> jsonToTag(connection, t)).toArray(Tag[]::new));
+            try {
+                data.set(StructuredDataKey.LORE, loreTag.stream().limit(256).map(t -> jsonToTag(connection, t)).toArray(Tag[]::new));
+            } catch (final Exception ignored) {
+                // No lore if any one of them fail to parse
+            }
         }
 
         final NumberTag colorTag = displayTag.getNumberTag("color");

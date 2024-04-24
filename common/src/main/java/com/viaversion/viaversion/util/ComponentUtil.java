@@ -110,14 +110,7 @@ public final class ComponentUtil {
         if (json == null) {
             return null;
         }
-
-        try {
-            final ATextComponent component = from.jsonSerializer.deserialize(json);
-            return to.toTag(component);
-        } catch (final Exception e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Error converting component: " + json, e);
-            return new StringTag("<error>");
-        }
+        return to.toTag(from.jsonSerializer.deserialize(json));
     }
 
     public static @Nullable JsonElement convertJson(@Nullable final JsonElement element, final SerializerVersion from, final SerializerVersion to) {
