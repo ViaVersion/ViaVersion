@@ -570,9 +570,11 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         if (value == null) {
             return tag;
         }
+
         if (value.length > 100) {
             throw new IllegalArgumentException("Too many pages: " + value.length);
         }
+
         final ListTag<CompoundTag> pagesTag = new ListTag<>(CompoundTag.class);
         for (final FilterableString page : value) {
             final CompoundTag pageTag = new CompoundTag();
@@ -590,15 +592,22 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         if (value.generation() != 0) {
             tag.put("generation", convertIntRange(value.generation(), 0, 3));
         }
+
+        final CompoundTag title = new CompoundTag();
+        convertFilterableString(title, value.title(), 0, 32);
+        tag.put("title", title);
+
         final ListTag<CompoundTag> pagesTag = new ListTag<>(CompoundTag.class);
         for (final FilterableComponent page : value.pages()) {
             final CompoundTag pageTag = new CompoundTag();
             convertFilterableComponent(pageTag, page);
             pagesTag.add(pageTag);
         }
+
         if (!pagesTag.isEmpty()) {
             tag.put("pages", pagesTag);
         }
+
         if (value.resolved()) {
             tag.putBoolean("resolved", true);
         }
