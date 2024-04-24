@@ -68,6 +68,9 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
             getLogger().warning("/_____________\\");
         }
 
+        getLogger().warning("ViaVersion does not work as intended across many different server versions, especially the more recent ones. " +
+            "Consider moving Via plugins to your backend server or switching to Velocity.");
+
         api = new BungeeViaAPI();
         config = new BungeeViaConfig(getDataFolder());
         BungeeCommandHandler commandHandler = new BungeeCommandHandler();
