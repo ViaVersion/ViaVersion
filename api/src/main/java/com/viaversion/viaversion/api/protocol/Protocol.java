@@ -36,8 +36,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
-import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
+import com.viaversion.viaversion.api.type.Type;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -243,6 +243,28 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     boolean hasRegisteredServerbound(State state, int unmappedPacketId);
 
     /**
+     * Appends a clientbound packet type handler with another, as opposed to replacing it entirely.
+     * <p>
+     * Use {@link PacketWrapper#set(Type, int, Object)} to change individual parts, or call
+     * {@link PacketWrapper#resetReader()} to reset the reader index.
+     *
+     * @param type    clientbound packet type
+     * @param handler packet handler
+     */
+    void appendClientbound(CU type, PacketHandler handler);
+
+    /**
+     * Appends a serverbound packet type handler with another, as opposed to replacing it entirely.
+     * <p>
+     * Use {@link PacketWrapper#set(Type, int, Object)} to change individual parts, or call
+     * {@link PacketWrapper#resetReader()} to reset the reader index.
+     *
+     * @param type    serverbound packet type
+     * @param handler packet handler
+     */
+    void appendServerbound(SU type, PacketHandler handler);
+
+    /**
      * Transform a packet using this protocol
      *
      * @param direction     The direction the packet is going in
@@ -268,7 +290,8 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @return object if present, else null
      */
     @Deprecated
-    @Nullable <T> T get(Class<T> objectClass);
+    @Nullable
+    <T> T get(Class<T> objectClass);
 
     /**
      * Caches an object, retrievable by using {@link #get(Class)}.

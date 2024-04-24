@@ -66,7 +66,7 @@ public interface ViaAPI<T> {
      * @return API version incremented with meaningful API changes
      */
     default int apiVersion() {
-        return 25;
+        return 26;
     }
 
     /**

@@ -146,6 +146,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
+    @Override
     public void appendClientbound(final CU type, final PacketHandler handler) {
         final PacketMapping mapping = clientboundMappings.mappedPacket(type.state(), type.getId());
         if (mapping != null) {
@@ -155,6 +156,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
+    @Override
     public void appendServerbound(final SU type, final PacketHandler handler) {
         final PacketMapping mapping = serverboundMappings.mappedPacket(type.state(), type.getId());
         if (mapping != null) {
