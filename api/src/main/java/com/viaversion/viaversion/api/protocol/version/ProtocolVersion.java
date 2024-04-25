@@ -49,10 +49,10 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_9 = register(107, "1.9");
     public static final ProtocolVersion v1_9_1 = register(108, "1.9.1");
     public static final ProtocolVersion v1_9_2 = register(109, "1.9.2");
-    public static final ProtocolVersion v1_9_3 = register(110, "1.9.3/1.9.4", new SubVersionRange("1.9", 3, 4));
+    public static final ProtocolVersion v1_9_3 = register(110, "1.9.3-1.9.4", new SubVersionRange("1.9", 3, 4));
     public static final ProtocolVersion v1_10 = register(210, "1.10.x", new SubVersionRange("1.10", 0, 2));
     public static final ProtocolVersion v1_11 = register(315, "1.11");
-    public static final ProtocolVersion v1_11_1 = register(316, "1.11.1/1.11.2", new SubVersionRange("1.11", 1, 2));
+    public static final ProtocolVersion v1_11_1 = register(316, "1.11.1-1.11.2", new SubVersionRange("1.11", 1, 2));
     public static final ProtocolVersion v1_12 = register(335, "1.12");
     public static final ProtocolVersion v1_12_1 = register(338, "1.12.1");
     public static final ProtocolVersion v1_12_2 = register(340, "1.12.2");
@@ -71,18 +71,18 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_16_1 = register(736, "1.16.1");
     public static final ProtocolVersion v1_16_2 = register(751, "1.16.2");
     public static final ProtocolVersion v1_16_3 = register(753, "1.16.3");
-    public static final ProtocolVersion v1_16_4 = register(754, "1.16.4/1.16.5", new SubVersionRange("1.16", 4, 5));
+    public static final ProtocolVersion v1_16_4 = register(754, "1.16.4-1.16.5", new SubVersionRange("1.16", 4, 5));
     public static final ProtocolVersion v1_17 = register(755, "1.17");
     public static final ProtocolVersion v1_17_1 = register(756, "1.17.1");
-    public static final ProtocolVersion v1_18 = register(757, "1.18/1.18.1", new SubVersionRange("1.18", 0, 1));
+    public static final ProtocolVersion v1_18 = register(757, "1.18-1.18.1", new SubVersionRange("1.18", 0, 1));
     public static final ProtocolVersion v1_18_2 = register(758, "1.18.2");
     public static final ProtocolVersion v1_19 = register(759, "1.19");
-    public static final ProtocolVersion v1_19_1 = register(760, "1.19.1/1.19.2", new SubVersionRange("1.19", 1, 2));
+    public static final ProtocolVersion v1_19_1 = register(760, "1.19.1-1.19.2", new SubVersionRange("1.19", 1, 2));
     public static final ProtocolVersion v1_19_3 = register(761, "1.19.3");
     public static final ProtocolVersion v1_19_4 = register(762, "1.19.4");
-    public static final ProtocolVersion v1_20 = register(763, "1.20/1.20.1", new SubVersionRange("1.20", 0, 1));
+    public static final ProtocolVersion v1_20 = register(763, "1.20-1.20.1", new SubVersionRange("1.20", 0, 1));
     public static final ProtocolVersion v1_20_2 = register(764, "1.20.2");
-    public static final ProtocolVersion v1_20_3 = register(765, "1.20.3/1.20.4", new SubVersionRange("1.20", 3, 4));
+    public static final ProtocolVersion v1_20_3 = register(765, "1.20.3-1.20.4", new SubVersionRange("1.20", 3, 4));
     public static final ProtocolVersion v1_20_5 = register(766, "1.20.5");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 

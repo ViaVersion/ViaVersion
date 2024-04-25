@@ -86,10 +86,9 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
     protected void registerPackets() {
         super.registerPackets();
 
-        // Disconnect workaround (JSON!)
         registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> {
             if (wrapper.isReadable(Type.COMPONENT, 0)) {
-                // Already written as json somewhere else
+                // Already written as component in the base protocol
                 return;
             }
 

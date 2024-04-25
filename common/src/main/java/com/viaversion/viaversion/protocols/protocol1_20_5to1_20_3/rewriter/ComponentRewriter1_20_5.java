@@ -297,6 +297,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     }
 
     // ---------------------------------------------------------------------------------------
+    // Conversion methods, can be overridden in future protocols to handle new changes
 
     protected CompoundTag convertCustomData(final CompoundTag value) {
         return value;
