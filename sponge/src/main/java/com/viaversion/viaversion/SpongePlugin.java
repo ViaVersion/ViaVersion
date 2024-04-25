@@ -90,11 +90,11 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
-                .platform(this)
-                .commandHandler(new SpongeCommandHandler())
-                .injector(new SpongeViaInjector())
-                .loader(new SpongeViaLoader(this))
-                .build());
+            .platform(this)
+            .commandHandler(new SpongeCommandHandler())
+            .injector(new SpongeViaInjector())
+            .loader(new SpongeViaLoader(this))
+            .build());
         conf.reload();
     }
 
@@ -210,11 +210,11 @@ public class SpongePlugin implements ViaPlatform<Player> {
         for (PluginContainer plugin : game.pluginManager().plugins()) {
             PluginMetadata metadata = plugin.metadata();
             plugins.add(new PluginInfo(
-                    true,
-                    metadata.name().orElse("Unknown"),
-                    metadata.version().toString(),
-                    plugin.instance().getClass().getCanonicalName(),
-                    metadata.contributors().stream().map(PluginContributor::name).collect(Collectors.toList())
+                true,
+                metadata.name().orElse("Unknown"),
+                metadata.version().toString(),
+                plugin.instance() != null ? plugin.instance().getClass().getCanonicalName() : "Unknown",
+                metadata.contributors().stream().map(PluginContributor::name).collect(Collectors.toList())
             ));
         }
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
