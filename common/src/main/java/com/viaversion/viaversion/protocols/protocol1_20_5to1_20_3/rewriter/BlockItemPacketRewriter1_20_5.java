@@ -469,8 +469,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final ListTag<CompoundTag> attributeModifiersTag = tag.getListTag("AttributeModifiers", CompoundTag.class);
+        final boolean showAttributes = (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0;
         if (attributeModifiersTag != null) {
-            updateAttributes(data, attributeModifiersTag, (hideFlagsValue & StructuredDataConverter.HIDE_ATTRIBUTES) == 0);
+            updateAttributes(data, attributeModifiersTag, showAttributes);
+        } else if (!showAttributes) {
+            data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(new AttributeModifier[0], false));
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2023 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,25 +20,24 @@ package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data;
 import com.viaversion.viaversion.util.KeyMappings;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-// Same as 1.20.5
-public final class Instruments1_20_3 {
+public final class ArmorMaterials1_20_5 {
 
-    private static final KeyMappings MAPPINGS = new KeyMappings(
-        "ponder_goat_horn",
-        "sing_goat_horn",
-        "seek_goat_horn",
-        "feel_goat_horn",
-        "admire_goat_horn",
-        "call_goat_horn",
-        "yearn_goat_horn",
-        "dream_goat_horn"
+    private static final KeyMappings MATERIALS = new KeyMappings(
+        "leather",
+        "chainmail",
+        "iron",
+        "gold",
+        "diamond",
+        "turtle",
+        "netherite",
+        "armadillo"
     );
 
     public static @Nullable String idToKey(final int id) {
-        return MAPPINGS.idToKey(id);
+        return MATERIALS.idToKey(id);
     }
 
-    public static int keyToId(final String name) {
-        return MAPPINGS.keyToId(name);
+    public static int keyToId(final String material) {
+        return MATERIALS.keyToId(material);
     }
 }

@@ -73,12 +73,17 @@ import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.ArmorMaterials1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DyeColors;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.EquipmentSlots1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
@@ -413,6 +418,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
 
             modifiers.add(modifierTag);
         }
+
         tag.put("modifiers", modifiers);
         if (!value.showInTooltip()) {
             tag.putBoolean("show_in_tooltip", false);
@@ -618,21 +624,27 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial> material = value.material();
         if (material.hasId()) {
-            tag.putInt("material", material.id());
+            final String trimMaterial = TrimMaterials1_20_3.idToKey(material.id());
+            tag.putString("material", trimMaterial);
         } else {
             final ArmorTrimMaterial armorTrimMaterial = material.value();
             final CompoundTag materialTag = new CompoundTag();
-            materialTag.putString("asset_name", armorTrimMaterial.assetName());
             final String ingredient = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(armorTrimMaterial.itemId());
             if (ingredient == null) {
                 throw new IllegalArgumentException("Unknown item: " + armorTrimMaterial.itemId());
             }
-            materialTag.putString("ingredient", ingredient);
-            materialTag.putFloat("item_model_index", armorTrimMaterial.itemModelIndex());
+
             final CompoundTag overrideArmorMaterialsTag = new CompoundTag();
             for (final Int2ObjectMap.Entry<String> entry : armorTrimMaterial.overrideArmorMaterials().int2ObjectEntrySet()) {
-                overrideArmorMaterialsTag.putString(String.valueOf(entry.getIntKey()), entry.getValue());
+                final String materialKey = ArmorMaterials1_20_5.idToKey(entry.getIntKey());
+                if (materialKey != null) {
+                    overrideArmorMaterialsTag.putString(materialKey, entry.getValue());
+                }
             }
+
+            materialTag.putString("asset_name", armorTrimMaterial.assetName());
+            materialTag.putString("ingredient", ingredient);
+            materialTag.putFloat("item_model_index", armorTrimMaterial.itemModelIndex());
             materialTag.put("override_armor_materials", overrideArmorMaterialsTag);
             materialTag.put("description", armorTrimMaterial.description());
             tag.put("material", materialTag);
@@ -640,21 +652,26 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
 
         final Holder<ArmorTrimPattern> pattern = value.pattern();
         if (pattern.hasId()) {
-            tag.putInt("pattern", pattern.id());
+            tag.putString("pattern", TrimPatterns1_20_3.idToKey(pattern.id()));
         } else {
             final ArmorTrimPattern armorTrimPattern = pattern.value();
             final CompoundTag patternTag = new CompoundTag();
-            patternTag.put("asset_id", convertIdentifier(armorTrimPattern.assetName()));
             final String templateItem = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().identifier(armorTrimPattern.itemId());
             if (templateItem == null) {
                 throw new IllegalArgumentException("Unknown item: " + armorTrimPattern.itemId());
             }
+
+            patternTag.put("asset_id", convertIdentifier(armorTrimPattern.assetName()));
             patternTag.putString("template_item", templateItem);
             patternTag.put("description", armorTrimPattern.description());
+            tag.put("pattern", patternTag);
             if (armorTrimPattern.decal()) {
                 patternTag.putBoolean("decal", true);
             }
-            tag.put("pattern", patternTag);
+        }
+
+        if (!value.showInTooltip()) {
+            tag.putBoolean("show_in_tooltip", false);
         }
         return tag;
     }
@@ -677,13 +694,14 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
 
     protected Tag convertInstrument(final Holder<Instrument> value) {
         if (value.hasId()) {
-            return new IntTag(value.id());
+            return new StringTag(Instruments1_20_3.idToKey(value.id()));
         }
+
         final Instrument instrument = value.value();
         final CompoundTag tag = new CompoundTag();
         final Holder<SoundEvent> sound = instrument.soundEvent();
         if (sound.hasId()) {
-            tag.putInt("sound_event", sound.id());
+            tag.putString("sound_event", Protocol1_20_5To1_20_3.MAPPINGS.soundName(sound.id()));
         } else {
             final SoundEvent soundEvent = sound.value();
             final CompoundTag soundEventTag = new CompoundTag();
@@ -692,6 +710,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 soundEventTag.putFloat("range", soundEvent.fixedRange());
             }
         }
+
         tag.put("use_duration", convertPositiveInt(instrument.useDuration()));
         tag.put("range", convertPositiveFloat(instrument.range()));
         return tag;
@@ -945,9 +964,10 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
 
     protected void convertBannerPattern(final CompoundTag tag, final String name, final Holder<BannerPattern> pattern) {
         if (pattern.hasId()) {
-            tag.putInt(name, pattern.id());
+            tag.putString(name, BannerPatterns1_20_5.idToKey(pattern.id()));
             return;
         }
+
         final BannerPattern bannerPattern = pattern.value();
         final CompoundTag patternTag = new CompoundTag();
         patternTag.put("asset_id", convertIdentifier(bannerPattern.assetId()));
