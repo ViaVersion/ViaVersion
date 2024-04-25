@@ -22,14 +22,12 @@ import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -89,6 +87,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private WorldIdentifiers map1_16WorldNames;
     private boolean cache1_17Light;
     private boolean translateOcelotToCat;
+    private boolean enforceSecureChat;
 
     protected AbstractViaConfig(final File configFile) {
         super(configFile);
@@ -157,6 +156,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
                 worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
+        enforceSecureChat = getBoolean("enforce-secure-chat", false);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -527,5 +527,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean translateOcelotToCat() {
         return translateOcelotToCat;
+    }
+
+    @Override
+    public boolean enforceSecureChat() {
+        return enforceSecureChat;
     }
 }

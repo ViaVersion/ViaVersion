@@ -21,6 +21,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -215,9 +216,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         // Just put in what we know if this is sent multiple times
                         wrapper.write(Type.BOOLEAN, storage.isSecureChatEnforced());
                     } else {
-                        // Assume that it isn't, otherwise the client will disregard chat messages from players
-                        // without chat sessions if it assumes secure chat is enforced
-                        wrapper.write(Type.BOOLEAN, false);
+                        wrapper.write(Type.BOOLEAN, Via.getConfig().enforceSecureChat());
                     }
 
                     storage.clear();

@@ -178,6 +178,10 @@ map-1_16-world-names:
 # If disabled, tamed cats will be displayed as ocelots to 1.14+ clients on 1.13 servers. Otherwise, ocelots (tamed and untamed) will be displayed as cats.
 translate-ocelot-to-cat: false
 #
+# Determines the value sent to 1.19+ clients on join if currently not accessible by ViaVersion.
+# It is not recommended to fake this value if your server is running 1.19 or later, as 1.20.5 have stricter chat handling and may get kicked otherwise.
+enforce-secure-chat: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

@@ -664,10 +664,10 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
             patternTag.put("asset_id", convertIdentifier(armorTrimPattern.assetName()));
             patternTag.putString("template_item", templateItem);
             patternTag.put("description", armorTrimPattern.description());
-            tag.put("pattern", patternTag);
             if (armorTrimPattern.decal()) {
                 patternTag.putBoolean("decal", true);
             }
+            tag.put("pattern", patternTag);
         }
 
         if (!value.showInTooltip()) {

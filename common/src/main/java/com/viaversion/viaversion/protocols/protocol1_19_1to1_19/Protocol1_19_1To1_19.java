@@ -208,7 +208,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                 map(Type.OPTIONAL_COMPONENT); // Motd
                 map(Type.OPTIONAL_STRING); // Encoded icon
                 map(Type.BOOLEAN); // Previews chat
-                create(Type.BOOLEAN, false); // Enforces secure chat
+                create(Type.BOOLEAN, Via.getConfig().enforceSecureChat()); // Enforces secure chat
             }
         });
 

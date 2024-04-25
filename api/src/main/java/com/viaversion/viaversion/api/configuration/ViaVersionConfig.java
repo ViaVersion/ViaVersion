@@ -450,4 +450,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean translateOcelotToCat();
+
+    /**
+     * Returns the value of the "enforce secure chat" setting sent to 1.19+ clients on join.
+     *
+     * @return the value sent to 1.19+ clients on join
+     */
+    boolean enforceSecureChat();
 }
