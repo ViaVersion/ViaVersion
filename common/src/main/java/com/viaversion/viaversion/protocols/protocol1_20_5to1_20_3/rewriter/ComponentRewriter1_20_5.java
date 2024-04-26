@@ -194,19 +194,16 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            final int itemId = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().id(idTag.getValue());
+            int itemId = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().id(idTag.getValue());
             if (itemId == -1) {
-                return;
+                // Default to stone (anything that is not air)
+                itemId = 1;
             }
 
             final StringTag tag = contentsTag.remove("tag");
-            if (tag == null) {
-                return;
-            }
-
             final CompoundTag tagTag;
             try {
-                tagTag = (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue());
+                tagTag = tag != null ? (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue()) : null;
             } catch (final Exception e) {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                     Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.20.3 NBT in show_item: " + contentsTag, e);
@@ -214,19 +211,20 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 return;
             }
 
-            final Item oldItem = new DataItem();
-            oldItem.setIdentifier(itemId);
+            final Item dataItem = new DataItem();
+            dataItem.setIdentifier(itemId);
             if (tagTag != null) { // We don't need to remap data if there is none
-                oldItem.setTag(tagTag);
+                dataItem.setTag(tagTag);
             }
 
-            final Item newItem = protocol.getItemRewriter().handleItemToClient(connection, oldItem);
-            if (newItem == null) {
-                return;
+            final Item structuredItem = protocol.getItemRewriter().handleItemToClient(connection, dataItem);
+            if (structuredItem.amount() < 1) {
+                // Cannot be empty
+                structuredItem.setAmount(1);
             }
 
-            if (newItem.identifier() != 0) {
-                final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().mappedIdentifier(newItem.identifier());
+            if (structuredItem.identifier() != 0) {
+                final String itemName = Protocol1_20_5To1_20_3.MAPPINGS.getFullItemMappings().mappedIdentifier(structuredItem.identifier());
                 if (itemName != null) {
                     contentsTag.putString("id", itemName);
                 }
@@ -235,7 +233,7 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
                 contentsTag.putString("id", "minecraft:stone");
             }
 
-            final Map<StructuredDataKey<?>, StructuredData<?>> data = newItem.structuredData().data();
+            final Map<StructuredDataKey<?>, StructuredData<?>> data = structuredItem.structuredData().data();
             if (!data.isEmpty()) {
                 final CompoundTag components;
                 try {
