@@ -1440,7 +1440,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         tag.put("profile", profileTag);
 
         final String name = skullOwnerTag.getString("Name");
-        if (name != null) {
+        if (name != null && name.length() <= 16 && name.indexOf(' ') == -1) { // Ignore invalid names
             profileTag.putString("name", name);
         }
 
