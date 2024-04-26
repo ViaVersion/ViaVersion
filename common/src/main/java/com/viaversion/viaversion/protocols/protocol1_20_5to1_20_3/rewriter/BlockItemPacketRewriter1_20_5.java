@@ -1203,10 +1203,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private void updateProfile(final StructuredDataContainer data, final Tag skullOwnerTag) {
         if (skullOwnerTag instanceof StringTag) {
             final String name = ((StringTag) skullOwnerTag).getValue();
-            data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
+            if (isValidName(name)) {
+                data.set(StructuredDataKey.PROFILE, new GameProfile(name, null, EMPTY_PROPERTIES));
+            }
         } else if (skullOwnerTag instanceof CompoundTag) {
             final CompoundTag skullOwner = (CompoundTag) skullOwnerTag;
-            final String name = skullOwner.getString("Name", "");
+            String name = skullOwner.getString("Name", "");
+            if (!isValidName(name)) {
+                name = null;
+            }
 
             final IntArrayTag idTag = skullOwner.getIntArrayTag("Id");
             UUID uuid = null;
@@ -1219,7 +1224,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (propertiesTag != null) {
                 updateProperties(propertiesTag, properties);
             }
-            data.set(StructuredDataKey.PROFILE, new GameProfile(limit(name, 16), uuid, properties.toArray(EMPTY_PROPERTIES)));
+
+            data.set(StructuredDataKey.PROFILE, new GameProfile(name, uuid, properties.toArray(EMPTY_PROPERTIES)));
         }
     }
 
@@ -1440,7 +1446,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         tag.put("profile", profileTag);
 
         final String name = skullOwnerTag.getString("Name");
-        if (name != null && name.length() <= 16 && name.indexOf(' ') == -1) { // Ignore invalid names
+        if (name != null && isValidName(name)) {
             profileTag.putString("name", name);
         }
 
@@ -1480,5 +1486,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         profileTag.put("properties", propertiesListTag);
+    }
+
+    private boolean isValidName(final String name) {
+        // Ignore invalid player profile names
+        if (name.length() > 16) {
+            return false;
+        }
+
+        for (int i = 0, len = name.length(); i < len; ++i) {
+            final char c = name.charAt(i);
+            if (c < '!' || c > '~') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

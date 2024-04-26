@@ -167,7 +167,9 @@ public class ComponentRewriter1_20_5 extends ComponentRewriter<ClientboundPacket
     @Override
     protected void handleHoverEvent(final UserConnection connection, final CompoundTag hoverEventTag) {
         final StringTag actionTag = hoverEventTag.getStringTag("action");
-        if (actionTag == null) return;
+        if (actionTag == null) {
+            return;
+        }
 
         if (actionTag.getValue().equals("show_item")) {
             final Tag valueTag = hoverEventTag.remove("value");
