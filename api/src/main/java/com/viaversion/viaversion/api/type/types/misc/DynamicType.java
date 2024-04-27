@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
@@ -58,6 +59,10 @@ public abstract class DynamicType<T extends IdHolder> extends Type<T> {
         }
     }
 
+    public RawDataFiller rawFiller() {
+        return new RawDataFiller();
+    }
+
     public final class DataFiller {
 
         private final FullMappings mappings;
@@ -65,6 +70,7 @@ public abstract class DynamicType<T extends IdHolder> extends Type<T> {
 
         private DataFiller(final Protocol<?, ?, ?, ?> protocol, final boolean useMappedNames) {
             this.mappings = mappings(protocol);
+            Preconditions.checkNotNull(mappings, "Mappings for %s are null", protocol.getClass());
             this.useMappedNames = useMappedNames;
         }
 
@@ -72,8 +78,11 @@ public abstract class DynamicType<T extends IdHolder> extends Type<T> {
             readers.put(useMappedNames ? mappings.mappedId(identifier) : mappings.id(identifier), reader);
             return this;
         }
+    }
 
-        public DataFiller reader(final int id, final DataReader<T> reader) {
+    public final class RawDataFiller {
+
+        public RawDataFiller reader(final int id, final DataReader<T> reader) {
             readers.put(id, reader);
             return this;
         }

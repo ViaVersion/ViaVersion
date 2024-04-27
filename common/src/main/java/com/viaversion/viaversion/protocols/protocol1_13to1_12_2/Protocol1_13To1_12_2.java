@@ -845,7 +845,7 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         RecipeData.init();
         BlockIdData.init();
 
-        Types1_13.PARTICLE.filler(this)
+        Types1_13.PARTICLE.rawFiller()
                 .reader(3, ParticleType.Readers.BLOCK)
                 .reader(20, ParticleType.Readers.DUST)
                 .reader(11, ParticleType.Readers.DUST)
