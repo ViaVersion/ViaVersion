@@ -18,12 +18,14 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import java.util.HashMap;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Abstract rewriter for the declare commands packet to handle argument type name and content changes.
@@ -118,16 +120,23 @@ public class CommandRewriter<C extends ClientboundPacketType> {
                 if (nodeType == 2) { // Argument node
                     int argumentTypeId = wrapper.read(Type.VAR_INT);
                     String argumentType = argumentType(argumentTypeId);
+                    if (argumentType == null) {
+                        // Modded servers may send unknown argument types that are ignored by the client
+                        // Adjust the id to the hopefully still assumed out-of-bounds pos...
+                        wrapper.write(Type.VAR_INT, mapInvalidArgumentType(argumentTypeId));
+                        continue;
+                    }
+
                     String newArgumentType = handleArgumentType(argumentType);
                     Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
                     wrapper.write(Type.VAR_INT, mappedArgumentTypeId(newArgumentType));
 
                     // Always call the handler using the previous name
                     handleArgument(wrapper, argumentType);
-                }
 
-                if ((flags & 0x10) != 0) {
-                    wrapper.passthrough(Type.STRING); // Suggestion type
+                    if ((flags & 0x10) != 0) {
+                        wrapper.passthrough(Type.STRING); // Suggestion type
+                    }
                 }
             }
 
@@ -148,19 +157,33 @@ public class CommandRewriter<C extends ClientboundPacketType> {
      * @param argumentType argument type
      * @return mapped argument type
      */
-    public String handleArgumentType(String argumentType) {
+    public String handleArgumentType(final String argumentType) {
         if (protocol.getMappingData() != null && protocol.getMappingData().getArgumentTypeMappings() != null) {
             return protocol.getMappingData().getArgumentTypeMappings().mappedIdentifier(argumentType);
         }
         return argumentType;
     }
 
-    protected String argumentType(int argumentTypeId) {
-        return protocol.getMappingData().getArgumentTypeMappings().identifier(argumentTypeId);
+    protected @Nullable String argumentType(final int argumentTypeId) {
+        final FullMappings mappings = protocol.getMappingData().getArgumentTypeMappings();
+        final String identifier = mappings.identifier(argumentTypeId);
+        // Allow unknown argument types to be passed through as long as they are actually out of bounds
+        Preconditions.checkArgument(identifier != null || argumentTypeId >= mappings.size(), "Unknown argument type id %s", argumentTypeId);
+        return identifier;
     }
 
-    protected int mappedArgumentTypeId(String mappedArgumentType) {
+    protected int mappedArgumentTypeId(final String mappedArgumentType) {
         return protocol.getMappingData().getArgumentTypeMappings().mappedId(mappedArgumentType);
+    }
+
+    private int mapInvalidArgumentType(final int id) {
+        if (id < 0) {
+            return id;
+        }
+
+        final FullMappings mappings = protocol.getMappingData().getArgumentTypeMappings();
+        final int idx = id - mappings.size();
+        return mappings.mappedSize() + idx;
     }
 
     @FunctionalInterface

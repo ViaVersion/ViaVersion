@@ -66,12 +66,20 @@ public class FullMappingsBase implements FullMappings {
 
     @Override
     public String identifier(final int id) {
+        if (id < 0 || id >= idToString.length) {
+            return null;
+        }
+
         final String identifier = idToString[id];
         return Key.namespaced(identifier);
     }
 
     @Override
     public String mappedIdentifier(final int mappedId) {
+        if (mappedId < 0 || mappedId >= mappedIdToString.length) {
+            return null;
+        }
+
         final String identifier = mappedIdToString[mappedId];
         return Key.namespaced(identifier);
     }
