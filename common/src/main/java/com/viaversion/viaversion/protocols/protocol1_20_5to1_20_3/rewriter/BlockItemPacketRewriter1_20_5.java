@@ -159,10 +159,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.WINDOW_PROPERTY);
         registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         protocol.registerServerbound(ServerboundPackets1_20_5.CLICK_WINDOW_BUTTON, wrapper -> {
-            final byte containerId = wrapper.read(Type.BYTE);
-            final byte buttonId = wrapper.read(Type.BYTE);
-            wrapper.write(Type.VAR_INT, (int) containerId);
-            wrapper.write(Type.VAR_INT, (int) buttonId);
+            final byte containerId = wrapper.read(Type.VAR_INT).byteValue();
+            final byte buttonId = wrapper.read(Type.VAR_INT).byteValue();
+            wrapper.write(Type.BYTE, containerId);
+            wrapper.write(Type.BYTE, buttonId);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.ADVANCEMENTS, wrapper -> {
