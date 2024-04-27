@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -158,20 +159,22 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
 
         // Login Start Packet
         registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
-            ProtocolVersion protocol = wrapper.user().getProtocolInfo().protocolVersion();
+            final UserConnection user = wrapper.user();
+            final ProtocolVersion protocol = user.getProtocolInfo().protocolVersion();
             if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
-                if (!wrapper.user().getChannel().isOpen()) return;
-                if (!wrapper.user().shouldApplyBlockProtocol()) return;
+                if (!user.getChannel().isOpen() || !user.shouldApplyBlockProtocol()) {
+                    return;
+                }
 
-                final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
-
-                PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper.user()); // Disconnect Packet
-                wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
                 wrapper.cancel(); // cancel current
 
+                final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
+                final PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, user);
+                disconnectPacket.write(Type.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
+
                 // Send and close
-                ChannelFuture future = disconnectPacket.sendFuture(null);
-                future.addListener(f -> wrapper.user().getChannel().close());
+                final ChannelFuture future = disconnectPacket.sendFuture(null);
+                future.addListener(f -> user.getChannel().close());
             }
         });
 
