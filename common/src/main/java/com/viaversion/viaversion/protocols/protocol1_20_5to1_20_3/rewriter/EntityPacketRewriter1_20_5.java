@@ -385,6 +385,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             Types1_20_5.META_TYPES.particleType,
             null
         );
+        filter().metaType(Types1_20_5.META_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
+        filter().metaType(Types1_20_5.META_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
 
         filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
