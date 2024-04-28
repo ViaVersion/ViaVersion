@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.data;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -44,7 +45,7 @@ public final class StructuredDataContainer {
     public StructuredDataContainer(final StructuredData<?>[] dataArray) {
         this(new Reference2ObjectOpenHashMap<>(dataArray.length));
         for (final StructuredData<?> data : dataArray) {
-            add(data);
+            this.data.put(data.key(), data);
         }
     }
 
@@ -138,6 +139,7 @@ public final class StructuredDataContainer {
      */
     public void setIdLookup(final Protocol<?, ?, ?, ?> protocol, final boolean mappedNames) {
         this.lookup = protocol.getMappingData().getDataComponentSerializerMappings();
+        Preconditions.checkNotNull(this.lookup, "Data component serializer mappings are null");
         this.mappedNames = mappedNames;
     }
 
@@ -157,10 +159,6 @@ public final class StructuredDataContainer {
 
     public Map<StructuredDataKey<?>, StructuredData<?>> data() {
         return data;
-    }
-
-    private <T> void add(final StructuredData<T> data) {
-        set(data.key(), data.value());
     }
 
     @Override
