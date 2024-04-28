@@ -14,6 +14,9 @@ dependencies {
 
 tasks {
     shadowJar {
+        manifest {
+            attributes["paperweight-mappings-namespace"] = "mojang"
+        }
         archiveClassifier.set("")
         archiveFileName.set("ViaVersion-${project.version}.jar")
         destinationDirectory.set(rootProject.projectDir.resolve("build/libs"))
