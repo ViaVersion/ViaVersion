@@ -755,18 +755,23 @@ public final class StructuredDataConverter {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (final Item item : items) {
             final CompoundTag savedItem = new CompoundTag();
-            final String name = toMappedItemName(item.identifier());
-            savedItem.putString("id", name);
-            if (backupInconvertibleData && name.isEmpty()) {
-                savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
-            }
-            savedItem.putByte("Count", (byte) item.amount());
+            if (item != null) {
+                final String name = toMappedItemName(item.identifier());
+                savedItem.putString("id", name);
+                if (backupInconvertibleData && name.isEmpty()) {
+                    savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
+                }
+                savedItem.putByte("Count", (byte) item.amount());
 
-            final CompoundTag itemTag = new CompoundTag();
-            for (final StructuredData<?> data : item.structuredData().data().values()) {
-                writeToTag(data, itemTag);
+                final CompoundTag itemTag = new CompoundTag();
+                for (final StructuredData<?> data : item.structuredData().data().values()) {
+                    writeToTag(data, itemTag);
+                }
+                savedItem.put("tag", itemTag);
+            } else {
+                savedItem.putString("id", "air");
             }
-            savedItem.put("tag", itemTag);
+
             itemsTag.add(savedItem);
         }
         tag.put(key, itemsTag);
