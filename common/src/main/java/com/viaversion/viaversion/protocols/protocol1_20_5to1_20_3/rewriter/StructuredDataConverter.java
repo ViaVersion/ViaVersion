@@ -61,6 +61,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEff
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -424,7 +425,19 @@ public final class StructuredDataConverter {
             if (backupInconvertibleData) {
                 // Backup whole data if one of the entries is inconvertible
                 // Since we don't want to break the order of the entries
-                if (Arrays.stream(data).anyMatch(layer -> layer.pattern().isDirect() || BannerPatterns1_20_5.idToKey(layer.pattern().id()) == null)) {
+                if (Arrays.stream(data).anyMatch(layer -> {
+                    if (layer.pattern().isDirect()) {
+                        return true;
+                    }
+
+                    String identifier = BannerPatterns1_20_5.idToKey(layer.pattern().id());
+                    if (identifier == null) {
+                        return true;
+                    }
+
+                    identifier = Key.stripMinecraftNamespace(identifier);
+                    return identifier.equals("flow") || identifier.equals("guster");
+                })) {
                     final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
                     for (final BannerPatternLayer layer : data) {
                         final CompoundTag layerTag = new CompoundTag();
@@ -452,6 +465,10 @@ public final class StructuredDataConverter {
                 }
 
                 final String compactKey = BannerPatterns1_20_5.fullIdToCompact(key);
+                if (compactKey == null) {
+                    continue;
+                }
+
                 final CompoundTag patternTag = new CompoundTag();
                 patternTag.putString("Pattern", compactKey);
                 patternTag.putInt("Color", layer.dyeColor());
