@@ -430,13 +430,8 @@ public final class StructuredDataConverter {
                         return true;
                     }
 
-                    String identifier = BannerPatterns1_20_5.idToKey(layer.pattern().id());
-                    if (identifier == null) {
-                        return true;
-                    }
-
-                    identifier = Key.stripMinecraftNamespace(identifier);
-                    return identifier.equals("flow") || identifier.equals("guster");
+                    final String identifier = BannerPatterns1_20_5.idToKey(layer.pattern().id());
+                    return identifier == null || identifier.equals("flow") || identifier.equals("guster");
                 })) {
                     final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
                     for (final BannerPatternLayer layer : data) {

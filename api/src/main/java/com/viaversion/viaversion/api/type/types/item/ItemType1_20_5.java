@@ -62,7 +62,7 @@ public class ItemType1_20_5 extends Type<Item> {
             return new Reference2ObjectOpenHashMap<>();
         }
 
-        final Map<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>(valuesSize + markersSize);
+        final Map<StructuredDataKey<?>, StructuredData<?>> map = new Reference2ObjectOpenHashMap<>();
         for (int i = 0; i < valuesSize; i++) {
             final StructuredData<?> value = dataType.read(buffer);
             final StructuredDataKey<?> key = dataType.key(value.id());
