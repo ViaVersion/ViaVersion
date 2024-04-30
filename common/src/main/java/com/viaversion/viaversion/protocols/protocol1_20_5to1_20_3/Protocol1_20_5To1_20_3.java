@@ -68,7 +68,7 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
-    private final ComponentRewriter<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5(this);
+    private final ComponentRewriter1_20_5<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5<>(this, Types1_20_5.STRUCTURED_DATA);
 
     public Protocol1_20_5To1_20_3() {
         super(ClientboundPacket1_20_3.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_3.class, ServerboundPacket1_20_5.class);

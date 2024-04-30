@@ -79,10 +79,10 @@ public class StructuredDataType extends Type<StructuredData<?>> {
             types = new StructuredDataKey[mappings.mappedSize()];
         }
 
-        public DataFiller add(final StructuredDataKey<?> reader) {
-            final int id = mappings.mappedId(reader.identifier());
-            Preconditions.checkArgument(id != -1, "No mapped id found for %s", reader.identifier());
-            types[id] = reader;
+        public DataFiller add(final StructuredDataKey<?> key) {
+            final int id = mappings.mappedId(key.identifier());
+            Preconditions.checkArgument(id != -1, "No mapped id found for %s", key.identifier());
+            types[id] = key;
             return this;
         }
     }
