@@ -627,24 +627,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final int useDuration = instrument.getInt("use_duration");
         final float range = instrument.getFloat("range");
 
-        Holder<SoundEvent> soundEvent;
-        final Tag soundEventTag = instrument.get("sound_event");
-        if (soundEventTag instanceof IntTag) {
-            soundEvent = Holder.of(((IntTag) soundEventTag).asInt());
-        } else if (soundEventTag instanceof CompoundTag) {
-            final CompoundTag soundEventCompound = (CompoundTag) soundEventTag;
-            final StringTag identifier = soundEventCompound.getStringTag("identifier");
+        final Holder<SoundEvent> soundEvent;
+        final CompoundTag soundEventTag = instrument.getCompoundTag("sound_event");
+        if (soundEventTag != null) {
+            final StringTag identifier = soundEventTag.getStringTag("identifier");
             if (identifier == null) {
                 return;
             }
+
             soundEvent = Holder.of(new SoundEvent(
                 identifier.getValue(),
-                soundEventCompound.contains("fixed_range") ?
-                    soundEventCompound.getFloat("fixed_range") : null
+                soundEventTag.contains("fixed_range") ? soundEventTag.getFloat("fixed_range") : null
             ));
         } else {
-            return;
+            soundEvent = Holder.of(instrument.getInt("sound_event"));
         }
+
         data.set(StructuredDataKey.INSTRUMENT, Holder.of(new Instrument(soundEvent, useDuration, range)));
     }
 
@@ -665,6 +663,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (potionEffectTag == null) {
                 continue;
             }
+
             possibleEffects.add(new FoodEffect(
                 new PotionEffect(
                     potionEffectTag.getInt("effect"),
@@ -696,6 +695,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (blocks == null) {
                 continue;
             }
+
             rules.add(new ToolRule(
                 blocks,
                 tag.contains("speed") ? tag.getFloat("speed") : null,
@@ -713,14 +713,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final List<BannerPatternLayer> patternLayer = new ArrayList<>();
         for (final CompoundTag tag : bannerPatterns) {
             final CompoundTag patternTag = tag.getCompoundTag("pattern");
-            if (patternTag == null) {
-                continue;
+            final Holder<BannerPattern> pattern;
+            if (patternTag != null) {
+                final String assetId = patternTag.getString("asset_id");
+                final String translationKey = patternTag.getString("translation_key");
+                pattern = Holder.of(new BannerPattern(assetId, translationKey));
+            } else {
+                pattern = Holder.of(tag.getInt("pattern"));
             }
 
-            final String assetId = patternTag.getString("asset_id");
-            final String translationKey = patternTag.getString("translation_key");
             final int dyeColor = tag.getInt("dye_color");
-            patternLayer.add(new BannerPatternLayer(Holder.of(new BannerPattern(assetId, translationKey)), dyeColor));
+            patternLayer.add(new BannerPatternLayer(pattern, dyeColor));
         }
         data.set(StructuredDataKey.BANNER_PATTERNS, patternLayer.toArray(new BannerPatternLayer[0]));
     }

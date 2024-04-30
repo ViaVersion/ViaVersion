@@ -61,7 +61,6 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEff
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -436,11 +435,16 @@ public final class StructuredDataConverter {
                     final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
                     for (final BannerPatternLayer layer : data) {
                         final CompoundTag layerTag = new CompoundTag();
-                        final CompoundTag patternTag = new CompoundTag();
-                        final BannerPattern pattern = layer.pattern().value();
-                        patternTag.putString("asset_id", pattern.assetId());
-                        patternTag.putString("translation_key", pattern.translationKey());
-                        layerTag.put("pattern", patternTag);
+                        if (layer.pattern().isDirect()) {
+                            final CompoundTag patternTag = new CompoundTag();
+                            final BannerPattern pattern = layer.pattern().value();
+                            patternTag.putString("asset_id", pattern.assetId());
+                            patternTag.putString("translation_key", pattern.translationKey());
+                            layerTag.put("pattern", patternTag);
+                        } else {
+                            layerTag.putInt("pattern", layer.pattern().id());
+                        }
+
                         layerTag.putInt("dye_color", layer.dyeColor());
                         originalPatterns.add(layerTag);
                     }
