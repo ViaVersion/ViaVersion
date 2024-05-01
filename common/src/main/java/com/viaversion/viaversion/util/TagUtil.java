@@ -33,6 +33,21 @@ public final class TagUtil {
         return registry.getListTag("value", CompoundTag.class);
     }
 
+    public static ListTag<CompoundTag> removeRegistryEntries(final CompoundTag tag, final String key) {
+        String currentKey = Key.namespaced(key);
+        CompoundTag registry = tag.getCompoundTag(currentKey);
+        if (registry == null) {
+            currentKey = Key.stripMinecraftNamespace(key);
+            registry = tag.getCompoundTag(currentKey);
+        }
+        tag.remove(currentKey);
+        return registry.getListTag("value", CompoundTag.class);
+    }
+
+    public static boolean removeNamespaced(final CompoundTag tag, final String key) {
+        return tag.remove(Key.namespaced(key)) != null || tag.remove(Key.stripMinecraftNamespace(key)) != null;
+    }
+
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {
         return handleDeep(null, tag, consumer);
     }

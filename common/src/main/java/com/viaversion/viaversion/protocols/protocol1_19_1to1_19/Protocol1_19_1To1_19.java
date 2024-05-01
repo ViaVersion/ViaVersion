@@ -190,7 +190,7 @@ public final class Protocol1_19_1To1_19 extends AbstractProtocol<ClientboundPack
                     chatTypeStorage.clear();
 
                     final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
-                    final ListTag<CompoundTag> chatTypes = TagUtil.getRegistryEntries(registry, "chat_type");
+                    final ListTag<CompoundTag> chatTypes = TagUtil.removeRegistryEntries(registry, "chat_type");
                     for (final CompoundTag chatType : chatTypes) {
                         final NumberTag idTag = chatType.getNumberTag("id");
                         chatTypeStorage.addChatType(idTag.asInt(), chatType);
