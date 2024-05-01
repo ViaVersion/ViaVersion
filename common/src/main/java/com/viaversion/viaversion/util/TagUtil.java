@@ -33,6 +33,14 @@ public final class TagUtil {
         return registry.getListTag("value", CompoundTag.class);
     }
 
+    public static ListTag<CompoundTag> getOptionalRegistryEntries(final CompoundTag tag, final String key) {
+        if (!tag.contains(Key.namespaced(key)) && !tag.contains(Key.stripMinecraftNamespace(key))) {
+            return new ListTag<>(CompoundTag.class);
+        } else {
+            return getRegistryEntries(tag, key);
+        }
+    }
+
     public static ListTag<CompoundTag> removeRegistryEntries(final CompoundTag tag, final String key) {
         String currentKey = Key.namespaced(key);
         CompoundTag registry = tag.getCompoundTag(currentKey);
@@ -42,6 +50,13 @@ public final class TagUtil {
         }
         tag.remove(currentKey);
         return registry.getListTag("value", CompoundTag.class);
+    }
+
+    public static ListTag<CompoundTag> removeOptionalRegistryEntries(final CompoundTag tag, final String key) {
+        if (!tag.contains(Key.namespaced(key)) && !tag.contains(Key.stripMinecraftNamespace(key))) {
+            return new ListTag<>(CompoundTag.class);
+        }
+        return removeRegistryEntries(tag, key);
     }
 
     public static boolean removeNamespaced(final CompoundTag tag, final String key) {
