@@ -26,37 +26,36 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class TagUtil {
 
     public static ListTag<CompoundTag> getRegistryEntries(final CompoundTag tag, final String key) {
+        return getRegistryEntries(tag, key, null);
+    }
+
+    public static ListTag<CompoundTag> getRegistryEntries(final CompoundTag tag, final String key, final @Nullable ListTag<CompoundTag> defaultValue) {
         CompoundTag registry = tag.getCompoundTag(Key.namespaced(key));
         if (registry == null) {
             registry = tag.getCompoundTag(Key.stripMinecraftNamespace(key));
+            if (registry == null) {
+                return defaultValue;
+            }
         }
         return registry.getListTag("value", CompoundTag.class);
     }
 
-    public static ListTag<CompoundTag> getOptionalRegistryEntries(final CompoundTag tag, final String key) {
-        if (!tag.contains(Key.namespaced(key)) && !tag.contains(Key.stripMinecraftNamespace(key))) {
-            return new ListTag<>(CompoundTag.class);
-        } else {
-            return getRegistryEntries(tag, key);
-        }
+    public static ListTag<CompoundTag> removeRegistryEntries(final CompoundTag tag, final String key) {
+        return removeRegistryEntries(tag, key, null);
     }
 
-    public static ListTag<CompoundTag> removeRegistryEntries(final CompoundTag tag, final String key) {
+    public static ListTag<CompoundTag> removeRegistryEntries(final CompoundTag tag, final String key, final @Nullable ListTag<CompoundTag> defaultValue) {
         String currentKey = Key.namespaced(key);
         CompoundTag registry = tag.getCompoundTag(currentKey);
         if (registry == null) {
             currentKey = Key.stripMinecraftNamespace(key);
             registry = tag.getCompoundTag(currentKey);
+            if (registry == null) {
+                return defaultValue;
+            }
         }
         tag.remove(currentKey);
         return registry.getListTag("value", CompoundTag.class);
-    }
-
-    public static ListTag<CompoundTag> removeOptionalRegistryEntries(final CompoundTag tag, final String key) {
-        if (!tag.contains(Key.namespaced(key)) && !tag.contains(Key.stripMinecraftNamespace(key))) {
-            return new ListTag<>(CompoundTag.class);
-        }
-        return removeRegistryEntries(tag, key);
     }
 
     public static boolean removeNamespaced(final CompoundTag tag, final String key) {
