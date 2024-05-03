@@ -71,8 +71,6 @@ public class ParticleType extends DynamicType<Particle> {
         };
         public static final DataReader<Particle> ITEM1_13 = itemHandler(Types.ITEM1_13);
         public static final DataReader<Particle> ITEM1_13_2 = itemHandler(Types.ITEM1_13_2);
-        public static final DataReader<Particle> ITEM1_20_2 = itemHandler(Types.ITEM1_20_2);
-        public static final DataReader<Particle> ITEM1_20_5 = itemHandler(Types1_20_5.ITEM);
         public static final DataReader<Particle> DUST = (buf, particle) -> {
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Green 0-1
@@ -139,5 +137,9 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Delay
         };
         public static final DataReader<Particle> COLOR = (buf, particle) -> particle.add(Types.INT, buf.readInt());
+
+        public static DataReader<Particle> item(Type<Item> item) {
+            return (buf, particle) -> particle.add(item, item.read(buf));
+        }
     }
 }

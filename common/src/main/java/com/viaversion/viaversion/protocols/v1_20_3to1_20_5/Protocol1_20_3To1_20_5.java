@@ -253,7 +253,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.ITEM1_20_5)
+            .reader("item", ParticleType.Readers.item(Types1_20_5.ITEM))
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK)

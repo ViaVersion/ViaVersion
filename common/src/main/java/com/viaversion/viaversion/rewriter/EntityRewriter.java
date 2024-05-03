@@ -51,6 +51,7 @@ import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEventImpl;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -578,6 +579,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     // ---------------------------------------------------------------------------
+
+    public RegistryEntry[] addRegistryEnties(final RegistryEntry[] entries, final RegistryEntry... toAdd) {
+        final int length = entries.length;
+        final RegistryEntry[] newEntries = Arrays.copyOf(entries, length + toAdd.length);
+        System.arraycopy(toAdd, 0, newEntries, length, toAdd.length);
+        return newEntries;
+    }
 
     public void rewriteParticle(UserConnection connection, Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();

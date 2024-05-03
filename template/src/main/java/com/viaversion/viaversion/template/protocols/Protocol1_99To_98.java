@@ -22,6 +22,8 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
@@ -33,6 +35,8 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.template.protocols.rewriter.BlockItemPacketRewriter1_99;
 import com.viaversion.viaversion.template.protocols.rewriter.EntityPacketRewriter1_99;
+
+import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 // Placeholders to replace (in the entire package):
 //   Protocol1_99To_98, EntityPacketRewriter1_99, BlockItemPacketRewriter1_99
@@ -129,5 +133,15 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     @Override
     public TagRewriter<ClientboundPacket1_20_5> getTagRewriter() {
         return tagRewriter;
+    }
+
+    @Override
+    protected PacketTypesProvider<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> createPacketTypesProvider() {
+        return new SimplePacketTypesProvider<>(
+            packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_20_5.class, ClientboundConfigurationPackets1_20_5.class),
+            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_20_5.class, ClientboundConfigurationPackets1_20_5.class),
+            packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_20_5.class, ServerboundConfigurationPackets1_20_5.class),
+            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_20_5.class, ServerboundConfigurationPackets1_20_5.class)
+        );
     }
 }

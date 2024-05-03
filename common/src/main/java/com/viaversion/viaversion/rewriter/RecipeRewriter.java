@@ -56,7 +56,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     public void handleRecipeType(PacketWrapper wrapper, String type) {
-        RecipeConsumer handler = recipeHandlers.get(type);
+        RecipeConsumer handler = recipeHandlers.get(Key.stripMinecraftNamespace(type));
         if (handler != null) {
             handler.accept(wrapper);
         }
@@ -73,7 +73,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
             for (int i = 0; i < size; i++) {
                 String type = wrapper.passthrough(Types.STRING);
                 wrapper.passthrough(Types.STRING); // Recipe Identifier
-                handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
+                handleRecipeType(wrapper, type);
             }
         });
     }
@@ -82,7 +82,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, wrapper -> {
             int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Types.STRING);// Recipe Identifier
+                wrapper.passthrough(Types.STRING); // Recipe Identifier
 
                 final int typeId = wrapper.passthrough(Types.VAR_INT);
                 final String type = protocol.getMappingData().getRecipeSerializerMappings().identifier(typeId);

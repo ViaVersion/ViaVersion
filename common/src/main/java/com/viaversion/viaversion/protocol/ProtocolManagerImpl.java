@@ -187,6 +187,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         registerProtocol(new Protocol1_20To1_20_2(), ProtocolVersion.v1_20_2, ProtocolVersion.v1_20);
         registerProtocol(new Protocol1_20_2To1_20_3(), ProtocolVersion.v1_20_3, ProtocolVersion.v1_20_2);
         registerProtocol(new Protocol1_20_3To1_20_5(), ProtocolVersion.v1_20_5, ProtocolVersion.v1_20_3);
+
+        registerProtocol(new Protocol1_21To1_20_5(), ProtocolVersion.v1_21, ProtocolVersion.v1_20_5);
     }
 
     @Override

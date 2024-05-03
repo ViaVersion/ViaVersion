@@ -340,7 +340,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 wrapper.passthrough(Types.STRING); // Recipe Identifier
 
                 wrapper.write(Types.VAR_INT, protocol.getMappingData().getRecipeSerializerMappings().mappedId(type));
-                recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
+                recipeRewriter.handleRecipeType(wrapper, type);
             }
         });
     }

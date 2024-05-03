@@ -19,7 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.Types.Types;
 
 public class AttributeRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
@@ -33,10 +33,24 @@ public class AttributeRewriter<C extends ClientboundPacketType> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
 
             final int size = wrapper.passthrough(Types.VAR_INT);
+            int newSize = size;
             for (int i = 0; i < size; i++) {
                 final int attributeId = wrapper.read(Types.VAR_INT);
-                wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewAttributeId(attributeId));
+                final int mappedId = protocol.getMappingData().getNewAttributeId(attributeId);
+                if (mappedId == -1) {
+                    newSize--;
 
+                    wrapper.read(Types.DOUBLE); // Base
+                    final int modifierSize = wrapper.read(Types.VAR_INT);
+                    for (int j = 0; j < modifierSize; j++) {
+                        wrapper.read(Types.UUID); // ID
+                        wrapper.read(Types.DOUBLE); // Amount
+                        wrapper.read(Types.BYTE); // Operation
+                    }
+                    continue;
+                }
+
+                wrapper.write(Types.VAR_INT, mappedId);
                 wrapper.passthrough(Types.DOUBLE); // Base
                 final int modifierSize = wrapper.passthrough(Types.VAR_INT);
                 for (int j = 0; j < modifierSize; j++) {
@@ -44,6 +58,10 @@ public class AttributeRewriter<C extends ClientboundPacketType> {
                     wrapper.passthrough(Types.DOUBLE); // Amount
                     wrapper.passthrough(Types.BYTE); // Operation
                 }
+            }
+
+            if (size != newSize) {
+                wrapper.set(Types.VAR_INT, 1, newSize);
             }
         });
     }
