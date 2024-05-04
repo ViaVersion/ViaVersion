@@ -47,7 +47,9 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -112,17 +114,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 final CompoundTag entryTag = (CompoundTag) entry.getValue();
                 final String type = entryTag.getString("type");
                 final ListTag<CompoundTag> valueTag = entryTag.getListTag("value", CompoundTag.class);
-                RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+
+                // Calculate number of entries (exclude duplicated ids)
+                RegistryEntry[] registryEntries = new RegistryEntry[valueTag.stream().map(e -> e.getInt("id")).distinct().toArray().length];
                 boolean requiresDummyValues = false;
                 int entriesLength = registryEntries.length;
+                Set<Integer> ids = new HashSet<>();
                 for (final CompoundTag tag : valueTag) {
                     final String name = tag.getString("name");
                     final int id = tag.getInt("id");
-                    entriesLength = Math.max(entriesLength, id + 1);
-                    if (id >= registryEntries.length) {
-                        // It was previously possible to have arbitrary ids
-                        registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
-                        requiresDummyValues = true;
+                    if (!ids.contains(id)) { // Override duplicated id without incrementing entries length
+                        ids.add(id);
+                        entriesLength = Math.max(entriesLength, id + 1);
+                        if (id >= registryEntries.length) {
+                            // It was previously possible to have arbitrary ids
+                            registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
+                            requiresDummyValues = true;
+                        }
                     }
 
                     registryEntries[id] = new RegistryEntry(name, tag.get("element"));
