@@ -22,7 +22,6 @@ import com.github.steveice10.opennbt.tag.builtin.IntTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -40,7 +39,6 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
 
     public EntityPackets(Protocol1_17To1_16_4 protocol) {
         super(protocol);
-        mapTypes(EntityTypes1_16_2.values(), EntityTypes1_17.class);
     }
 
     @Override
@@ -172,6 +170,11 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
 
         // Attachment position removed
         filter().type(EntityTypes1_17.SHULKER).removeIndex(17);
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
     }
 
     @Override

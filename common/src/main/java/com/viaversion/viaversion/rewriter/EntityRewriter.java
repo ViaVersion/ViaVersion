@@ -171,30 +171,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     /**
-     * Maps entity ids based on the enum constant's names.
-     *
-     * @param oldTypes     entity types of the higher version
-     * @param newTypeClass entity types enum class of the lower version
-     * @param <E>          new enum entity type
-     */
-    public <E extends Enum<E> & EntityType> void mapTypes(EntityType[] oldTypes, Class<E> newTypeClass) {
-        if (typeMappings == null) {
-            typeMappings = Int2IntMapMappings.of();
-        }
-        for (EntityType oldType : oldTypes) {
-            try {
-                E newType = Enum.valueOf(newTypeClass, oldType.name());
-                typeMappings.setNewId(oldType.getId(), newType.getId());
-            } catch (IllegalArgumentException notFound) {
-                if (!typeMappings.contains(oldType.getId())) {
-                    Via.getPlatform().getLogger().warning("Could not find new entity type for " + oldType + "! " +
-                        "Old type: " + oldType.getClass().getEnclosingClass().getSimpleName() + ", new type: " + newTypeClass.getEnclosingClass().getSimpleName());
-                }
-            }
-        }
-    }
-
-    /**
      * Maps entity ids based on the protocol's mapping data.
      */
     public void mapTypes() {

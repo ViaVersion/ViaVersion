@@ -203,6 +203,7 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:powder_snow_walkable_mobs", "minecraft:axolotl_always_hostiles", "minecraft:axolotl_tempted_hostiles",
                 "minecraft:axolotl_hunt_targets", "minecraft:freeze_hurts_extra_types", "minecraft:freeze_immune_entity_types");
 
+        EntityTypes1_17.initialize(this);
         Types1_17.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)

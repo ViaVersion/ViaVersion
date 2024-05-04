@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.protocol1_14to1_13_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -145,6 +146,7 @@ public class Protocol1_14To1_13_2 extends AbstractProtocol<ClientboundPackets1_1
         WorldPackets.voidAir = MAPPINGS.getBlockStateMappings().getNewId(8591);
         WorldPackets.caveAir = MAPPINGS.getBlockStateMappings().getNewId(8592);
 
+        EntityTypes1_14.initialize(this);
         Types1_13_2.PARTICLE.filler(this, false)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)

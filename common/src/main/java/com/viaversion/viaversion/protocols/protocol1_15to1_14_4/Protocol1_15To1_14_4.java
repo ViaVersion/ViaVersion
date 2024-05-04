@@ -68,6 +68,8 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded();
 
+        EntityTypes1_15.initialize(this);
+
         int[] shulkerBoxes = new int[17];
         int shulkerBoxOffset = 501;
         for (int i = 0; i < 17; i++) {

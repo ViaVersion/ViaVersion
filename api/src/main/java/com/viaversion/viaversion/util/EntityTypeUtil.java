@@ -24,6 +24,7 @@ package com.viaversion.viaversion.util;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import java.util.ArrayList;
@@ -62,15 +63,20 @@ public final class EntityTypeUtil {
      * @param <T>         entity type
      */
     public static <T extends EntityType> void initialize(final T[] values, final EntityType[] typesToFill, final Protocol<?, ?, ?, ?> protocol, final EntityIdSetter<T> idSetter) {
+        final FullMappings mappings = protocol.getMappingData().getEntityMappings();
         for (final T type : values) {
             if (type.isAbstractType()) {
                 continue;
             }
 
-            final int id = protocol.getMappingData().getEntityMappings().mappedId(type.identifier());
+            final int id = mappings.mappedId(type.identifier());
             Preconditions.checkArgument(id != -1, "Entity type %s has no id", type.identifier());
             idSetter.setId(type, id);
             typesToFill[id] = type;
+        }
+
+        if (typesToFill.length != mappings.mappedSize()) {
+            throw new IllegalArgumentException("typesToFill length doesn't match the amount of entity types: " + typesToFill.length + " != " + mappings.size());
         }
     }
 

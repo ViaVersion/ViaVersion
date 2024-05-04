@@ -257,6 +257,7 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
                 "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
 
+        EntityTypes1_16.initialize(this);
         Types1_16.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)

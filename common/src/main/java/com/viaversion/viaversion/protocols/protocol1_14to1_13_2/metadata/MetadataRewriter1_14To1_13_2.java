@@ -38,13 +38,6 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
 
     public MetadataRewriter1_14To1_13_2(Protocol1_14To1_13_2 protocol) {
         super(protocol);
-        mapTypes(EntityTypes1_13.EntityType.values(), EntityTypes1_14.class);
-
-        if (Via.getConfig().translateOcelotToCat()) {
-            // A better solution for this would be to despawn the ocelot and spawn a cat in its place, but that would
-            // require a lot of data tracking and is not worth the effort.
-            mapEntityType(EntityTypes1_13.EntityType.OCELOT, EntityTypes1_14.CAT);
-        }
     }
 
     @Override
@@ -182,6 +175,16 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
                 }
             }
         });
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
+        if (Via.getConfig().translateOcelotToCat()) {
+            // A better solution for this would be to despawn the ocelot and spawn a cat in its place, but that would
+            // require a lot of data tracking and is not worth the effort.
+            mapEntityType(EntityTypes1_13.EntityType.OCELOT, EntityTypes1_14.CAT);
+        }
     }
 
     @Override

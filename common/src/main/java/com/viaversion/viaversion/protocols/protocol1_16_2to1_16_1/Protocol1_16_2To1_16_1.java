@@ -86,6 +86,8 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded();
 
+        EntityTypes1_16_2.initialize(this);
+
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:mushroom_grow_block");
 
