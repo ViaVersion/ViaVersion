@@ -47,10 +47,10 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
@@ -119,12 +119,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 RegistryEntry[] registryEntries = new RegistryEntry[valueTag.stream().map(e -> e.getInt("id")).distinct().toArray().length];
                 boolean requiresDummyValues = false;
                 int entriesLength = registryEntries.length;
-                Set<Integer> ids = new HashSet<>();
+                IntSet ids = new IntArraySet();
                 for (final CompoundTag tag : valueTag) {
                     final String name = tag.getString("name");
                     final int id = tag.getInt("id");
-                    if (!ids.contains(id)) { // Override duplicated id without incrementing entries length
-                        ids.add(id);
+                    if (!ids.add(id)) { // Override duplicated id without incrementing entries length
                         entriesLength = Math.max(entriesLength, id + 1);
                         if (id >= registryEntries.length) {
                             // It was previously possible to have arbitrary ids
