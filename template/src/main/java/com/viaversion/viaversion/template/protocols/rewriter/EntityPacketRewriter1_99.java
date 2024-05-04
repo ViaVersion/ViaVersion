@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.template.protocols.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -27,6 +28,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.template.protocols.Protocol1_99To_98;
+import com.viaversion.viaversion.util.Key;
 
 // Replace if needed
 //  Types1_OLD
@@ -44,13 +46,10 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         registerSetEntityData(ClientboundPackets1_20_5.SET_ENTITY_DATA, /*Types1_OLD_ENTITY_DATA_LIST, */Types1_20_5.ENTITY_DATA_LIST); // Specify old and new entity data list if changed
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, new PacketHandlers() {
-            @Override
-            protected void register() {
-                map(Types.STRING); // Registry
-                map(Types.REGISTRY_ENTRY_ARRAY); // Data
-                handler(registryDataHandler1_20_5()); // Caches dimensions to access data like height later and tracks the amount of biomes sent for chunk data
-            }
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
+            final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
+            final RegistryEntry[] entries = wrapper.passthrough(Types.REGISTRY_ENTRY_ARRAY);
+            handleRegistryData1_20_5(wrapper.user(), registryKey, entries); // Caches dimensions to access data like height later and tracks the amount of biomes sent for chunk data
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_5.LOGIN, new PacketHandlers() {
@@ -72,13 +71,10 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Dimension
-                map(Types.STRING); // World
-                handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
-            }
+        protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, wrapper -> {
+            final int dimensionId = wrapper.passthrough(Types.VAR_INT);
+            final String world = wrapper.passthrough(Types.STRING);
+            trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world); // Tracks world height and name for chunk data and entity (un)tracking
         });
     }
 

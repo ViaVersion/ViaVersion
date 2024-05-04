@@ -47,24 +47,18 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         registerMetadataRewriter(ClientboundPackets1_20_5.ENTITY_METADATA, Types1_20_5.METADATA_LIST, Types1_21.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, new PacketHandlers() {
-            @Override
-            protected void register() {
-                map(Type.STRING); // Registry
-                map(Type.REGISTRY_ENTRY_ARRAY); // Data
-                handler(registryDataHandler1_20_5());
-                handler(wrapper -> {
-                    // Add required damage type
-                    final String type = wrapper.get(Type.STRING, 0);
-                    final RegistryEntry[] entries = wrapper.get(Type.REGISTRY_ENTRY_ARRAY, 0);
-                    if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
-                        final CompoundTag campfireDamageType = new CompoundTag();
-                        campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
-                        campfireDamageType.putString("message_id", "inFire");
-                        campfireDamageType.putFloat("exhaustion", 0.1F);
-                        wrapper.set(Type.REGISTRY_ENTRY_ARRAY, 0, addRegistryEnties(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
-                    }
-                });
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
+            final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
+            final RegistryEntry[] entries = wrapper.passthrough(Type.REGISTRY_ENTRY_ARRAY);
+            if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
+                // Add required damage type
+                final CompoundTag campfireDamageType = new CompoundTag();
+                campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
+                campfireDamageType.putString("message_id", "inFire");
+                campfireDamageType.putFloat("exhaustion", 0.1F);
+                wrapper.set(Type.REGISTRY_ENTRY_ARRAY, 0, addRegistryEnties(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
+            } else {
+                handleRegistryData1_20_5(wrapper.user(), type, entries);
             }
         });
 
@@ -115,13 +109,10 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.VAR_INT); // Dimension
-                map(Type.STRING); // World
-                handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
-            }
+        protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, wrapper -> {
+            final int dimensionId = wrapper.passthrough(Type.VAR_INT);
+            final String world = wrapper.passthrough(Type.STRING);
+            trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world); // Tracks world height and name for chunk data and entity (un)tracking
         });
     }
 

@@ -446,25 +446,30 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     public PacketHandler worldDataTrackerHandlerByKey1_20_5(final int dimensionIdIndex) {
         return wrapper -> {
-            EntityTracker tracker = tracker(wrapper.user());
             int dimensionId = wrapper.get(Types.VAR_INT, dimensionIdIndex);
-            DimensionData dimensionData = tracker.dimensionData(dimensionId);
-            if (dimensionData == null) {
-                protocol.getLogger().severe("Dimension data missing for dimension: " + dimensionId + ", falling back to overworld");
-                dimensionData = tracker.dimensionData("minecraft:overworld");
-                Preconditions.checkNotNull(dimensionData, "Overworld data missing");
-            }
-
-            tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
-            tracker.setCurrentMinY(dimensionData.minY());
-
             String world = wrapper.get(Types.STRING, 0);
-            if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                tracker.clearEntities();
-                tracker.trackClientEntity();
-            }
-            tracker.setCurrentWorld(world);
+            trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
         };
+    }
+
+    public void trackWorldDataByKey1_20_5(final UserConnection connection, final int dimensionId, final String world) {
+        // Track world height for use in chunk data
+        EntityTracker tracker = tracker(connection);
+        DimensionData dimensionData = tracker.dimensionData(dimensionId);
+        if (dimensionData == null) {
+            protocol.getLogger().severe("Dimension data missing for dimension: " + dimensionId + ", falling back to overworld");
+            dimensionData = tracker.dimensionData("overworld");
+            Preconditions.checkNotNull(dimensionData, "Overworld data missing");
+        }
+        tracker.setCurrentWorldSectionHeight(dimensionData.height() >> 4);
+        tracker.setCurrentMinY(dimensionData.minY());
+
+        // Clear entities if the world changes
+        if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
+            tracker.clearEntities();
+            tracker.trackClientEntity();
+        }
+        tracker.setCurrentWorld(world);
     }
 
     public PacketHandler biomeSizeTracker() {
@@ -503,22 +508,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         tracker(connection).setDimensions(dimensionDataMap);
     }
 
-    public PacketHandler registryDataHandler1_20_5() {
-        return wrapper -> {
-            final String registryKey = Key.stripMinecraftNamespace(wrapper.get(Types.STRING, 0));
-            if (registryKey.equals("worldgen/biome")) {
-                final RegistryEntry[] entries = wrapper.get(Types.REGISTRY_ENTRY_ARRAY, 0);
-                tracker(wrapper.user()).setBiomesSent(entries.length);
-            } else if (registryKey.equals("dimension_type")) {
-                final RegistryEntry[] entries = wrapper.get(Types.REGISTRY_ENTRY_ARRAY, 0);
-                final Map<String, DimensionData> dimensionDataMap = new HashMap<>(entries.length);
-                for (int i = 0; i < entries.length; i++) {
-                    final RegistryEntry entry = entries[i];
-                    dimensionDataMap.put(Key.stripMinecraftNamespace(entry.key()), new DimensionDataImpl(i, (CompoundTag) entry.tag()));
-                }
-                tracker(wrapper.user()).setDimensions(dimensionDataMap);
+    public void handleRegistryData1_20_5(final UserConnection connection, final String registryKey, final RegistryEntry[] entries) {
+        if (registryKey.equals("worldgen/biome")) {
+            tracker(connection).setBiomesSent(entries.length);
+        } else if (registryKey.equals("dimension_type")) {
+            final Map<String, DimensionData> dimensionDataMap = new HashMap<>(entries.length);
+            for (int i = 0; i < entries.length; i++) {
+                final RegistryEntry entry = entries[i];
+                dimensionDataMap.put(Key.stripMinecraftNamespace(entry.key()), new DimensionDataImpl(i, (CompoundTag) entry.tag()));
             }
-        };
+            tracker(connection).setDimensions(dimensionDataMap);
+        }
     }
 
     // ---------------------------------------------------------------------------
