@@ -19,11 +19,18 @@ package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
+import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.Map;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
@@ -51,6 +58,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.dataContainer().setIdLookup(protocol, true);
             }
         }
+
+        updateItemComponents(connection, item.dataContainer(), this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null);
         return item;
     }
 
@@ -69,6 +78,51 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.dataContainer().setIdLookup(protocol, false);
             }
         }
+
+        updateItemComponents(connection, item.dataContainer(), this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null);
         return item;
+    }
+
+    public static void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter) {
+        // Specific types that need deep handling
+        final StructuredData<ArmorTrim> trimData = container.getNonEmpty(StructuredDataKey.TRIM);
+        if (trimData != null && idRewriter != null) {
+            trimData.setValue(trimData.value().rewrite(idRewriter));
+        }
+
+        final StructuredData<PotDecorations> potDecorationsData = container.getNonEmpty(StructuredDataKey.POT_DECORATIONS);
+        if (potDecorationsData != null && idRewriter != null) {
+            potDecorationsData.setValue(potDecorationsData.value().rewrite(idRewriter));
+        }
+
+        // Look for item types
+        for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
+            final StructuredData<?> data = entry.getValue();
+            if (data.isEmpty()) {
+                continue;
+            }
+
+            final StructuredDataKey<?> key = entry.getKey();
+            final Class<?> outputClass = key.type().getOutputClass();
+            if (outputClass == Item.class) {
+                //noinspection unchecked
+                final StructuredData<Item> itemData = (StructuredData<Item>) data;
+                itemData.setValue(itemHandler.rewrite(connection, itemData.value()));
+            } else if (outputClass == Item[].class) {
+                //noinspection unchecked
+                final StructuredData<Item[]> itemArrayData = (StructuredData<Item[]>) data;
+                final Item[] items = itemArrayData.value();
+                for (int i = 0; i < items.length; i++) {
+                    items[i] = itemHandler.rewrite(connection, items[i]);
+                }
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface ItemHandler {
+
+        @Nullable
+        Item rewrite(UserConnection connection, @Nullable Item item);
     }
 }

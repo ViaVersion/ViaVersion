@@ -50,7 +50,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
             final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
             final RegistryEntry[] entries = wrapper.passthrough(Type.REGISTRY_ENTRY_ARRAY);
-            if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
+            if (type.equals("damage_type")) {
                 // Add required damage type
                 final CompoundTag campfireDamageType = new CompoundTag();
                 campfireDamageType.putString("scaling", "when_caused_by_living_non_player");

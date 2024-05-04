@@ -67,4 +67,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
         }
     };
 
+    public ArmorTrimMaterial rewrite(final Int2IntFunction idRewriteFunction) {
+        return new ArmorTrimMaterial(assetName, idRewriteFunction.applyAsInt(itemId), itemModelIndex, overrideArmorMaterials, description);
+    }
 }

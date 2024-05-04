@@ -45,4 +45,16 @@ public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPatt
         }
     };
 
+    public ArmorTrim rewrite(final Int2IntFunction idRewriteFunction) {
+        Holder<ArmorTrimMaterial> material = this.material;
+        if (material.isDirect()) {
+            material = Holder.of(material.value().rewrite(idRewriteFunction));
+        }
+
+        Holder<ArmorTrimPattern> pattern = this.pattern;
+        if (pattern.isDirect()) {
+            pattern = Holder.of(pattern.value().rewrite(idRewriteFunction));
+        }
+        return new ArmorTrim(material, pattern, showInTooltip);
+    }
 }

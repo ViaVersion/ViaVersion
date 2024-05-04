@@ -22,9 +22,11 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public final class PotDecorations {
 
@@ -72,5 +74,13 @@ public final class PotDecorations {
 
     private int item(final int index) {
         return index < 0 || index >= itemIds.length ? -1 : itemIds[index];
+    }
+
+    public PotDecorations rewrite(final Int2IntFunction idRewriteFunction) {
+        final int[] newItems = new int[itemIds.length];
+        for (int i = 0; i < itemIds.length; i++) {
+            newItems[i] = idRewriteFunction.applyAsInt(itemIds[i]);
+        }
+        return new PotDecorations(newItems);
     }
 }

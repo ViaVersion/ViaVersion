@@ -48,4 +48,7 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
         }
     };
 
+    public ArmorTrimPattern rewrite(final Int2IntFunction idRewriteFunction) {
+        return new ArmorTrimPattern(assetName, idRewriteFunction.applyAsInt(itemId), description, decal);
+    }
 }
