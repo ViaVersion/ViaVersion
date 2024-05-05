@@ -56,7 +56,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
                 campfireDamageType.putString("message_id", "inFire");
                 campfireDamageType.putFloat("exhaustion", 0.1F);
-                wrapper.set(Type.REGISTRY_ENTRY_ARRAY, 0, addRegistryEnties(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
+                wrapper.set(Type.REGISTRY_ENTRY_ARRAY, 0, addRegistryEntries(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
             } else {
                 handleRegistryData1_20_5(wrapper.user(), type, entries);
             }

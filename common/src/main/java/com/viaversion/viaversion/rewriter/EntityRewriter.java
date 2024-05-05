@@ -580,7 +580,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     // ---------------------------------------------------------------------------
 
-    public RegistryEntry[] addRegistryEnties(final RegistryEntry[] entries, final RegistryEntry... toAdd) {
+    public RegistryEntry[] addRegistryEntries(final RegistryEntry[] entries, final RegistryEntry... toAdd) {
         final int length = entries.length;
         final RegistryEntry[] newEntries = Arrays.copyOf(entries, length + toAdd.length);
         System.arraycopy(toAdd, 0, newEntries, length, toAdd.length);

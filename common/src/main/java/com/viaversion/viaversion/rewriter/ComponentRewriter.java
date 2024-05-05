@@ -39,7 +39,7 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Handles json chat components, containing methods to override certain parts of the handling.
+ * Handles json and tag components, containing methods to override certain parts of the handling.
  * Also contains methods to register a few of the packets using components.
  */
 public class ComponentRewriter<C extends ClientboundPacketType> {
