@@ -121,15 +121,15 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 // Calculate number of entries (exclude duplicated ids)
                 RegistryEntry[] registryEntries = new RegistryEntry[valueTag.stream().map(e -> e.getInt("id")).distinct().toArray().length];
                 boolean requiresDummyValues = false;
-                int entriesLength = registryEntries.length;
-                IntSet ids = new IntArraySet();
+                int highestId = -1;
+                final IntSet ids = new IntArraySet();
                 for (final CompoundTag tag : valueTag) {
                     final String name = tag.getString("name");
                     final int id = tag.getInt("id");
                     if (ids.add(id)) { // Override duplicated id without incrementing entries length
-                        entriesLength = Math.max(entriesLength, id + 1);
+                        highestId = Math.max(highestId, id);
                         if (id >= registryEntries.length) {
-                            // It was previously possible to have arbitrary ids
+                            // It was previously possible to have arbitrary ids, increase array length if needed
                             registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
                             requiresDummyValues = true;
                         }
@@ -140,13 +140,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                 if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
                     // Add spit damage type
-                    final int length = registryEntries.length;
-                    registryEntries = Arrays.copyOf(registryEntries, length + 1);
+                    highestId++;
+                    registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
                     final CompoundTag spitData = new CompoundTag();
                     spitData.putString("scaling", "when_caused_by_living_non_player");
                     spitData.putString("message_id", "mob");
                     spitData.putFloat("exhaustion", 0.1F);
-                    registryEntries[length] = new RegistryEntry("minecraft:spit", spitData);
+                    registryEntries[highestId] = new RegistryEntry("minecraft:spit", spitData);
 
                     // Fill in missing damage types with 1.20.3/4 defaults
                     final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(e -> Key.stripMinecraftNamespace(e.key())).collect(Collectors.toSet());
@@ -154,15 +154,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         if (registryEntryKeys.contains(key)) {
                             continue;
                         }
-                        registryEntries = Arrays.copyOf(registryEntries, registryEntries.length + 1);
-                        registryEntries[registryEntries.length - 1] = new RegistryEntry(Key.namespaced(key), DamageTypes1_20_3.get(key));
+
+                        highestId++;
+                        registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
+                        registryEntries[highestId] = new RegistryEntry(Key.namespaced(key), DamageTypes1_20_3.get(key));
                     }
                 }
 
                 if (requiresDummyValues) {
                     // Truncate and replace null values
-                    if (registryEntries.length != entriesLength) {
-                        registryEntries = Arrays.copyOf(registryEntries, entriesLength);
+                    final int finalLength = highestId + 1;
+                    if (registryEntries.length != finalLength) {
+                        registryEntries = Arrays.copyOf(registryEntries, finalLength);
                     }
                     replaceNullValues(registryEntries);
                 }

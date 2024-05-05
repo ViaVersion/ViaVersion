@@ -24,7 +24,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSet;
 
 public final class DamageTypes1_20_3 {
 
-    private final static Object2ObjectMap<String, CompoundTag> DAMAGE_TYPES = new Object2ObjectOpenHashMap<>();
+    private static final Object2ObjectMap<String, CompoundTag> DAMAGE_TYPES = new Object2ObjectOpenHashMap<>();
 
     static {
         DAMAGE_TYPES.put("in_fire", create("inFire", 0.1F));
