@@ -132,8 +132,19 @@ public class MappingDataBase implements MappingData {
         return MappingDataLoader.INSTANCE.loadMappings(data, key);
     }
 
-    protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiers, final CompoundTag mappedIdentifiers, final String key) {
-        return MappingDataLoader.INSTANCE.loadFullMappings(data, unmappedIdentifiers, mappedIdentifiers, key);
+    protected @Nullable FullMappings loadFullMappings(final CompoundTag data, final CompoundTag unmappedIdentifiersTag, final CompoundTag mappedIdentifiersTag, final String key) {
+        if (!unmappedIdentifiersTag.contains(key) || !mappedIdentifiersTag.contains(key)) {
+            return null;
+        }
+
+        final List<String> unmappedIdentifiers = identifiersFromGlobalIds(unmappedIdentifiersTag, key);
+        final List<String> mappedIdentifiers = identifiersFromGlobalIds(mappedIdentifiersTag, key);
+        Mappings mappings = loadBiMappings(data, key); // Load as bi-mappings to keep the inverse cached
+        if (mappings == null) {
+            mappings = new IdentityMappings(unmappedIdentifiers.size(), mappedIdentifiers.size());
+        }
+
+        return new FullMappingsBase(unmappedIdentifiers, mappedIdentifiers, mappings);
     }
 
     protected @Nullable BiMappings loadBiMappings(final CompoundTag data, final String key) {

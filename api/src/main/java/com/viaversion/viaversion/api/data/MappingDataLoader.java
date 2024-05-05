@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class MappingDataLoader {
@@ -274,21 +273,6 @@ public class MappingDataLoader {
             throw new IllegalArgumentException("Unknown serialization strategy: " + strategy);
         }
         return mappingsSupplier.create(mappings, mappedSizeTag.asInt());
-    }
-
-    public FullMappings loadFullMappings(final CompoundTag mappingsTag, final CompoundTag unmappedIdentifiersTag, final CompoundTag mappedIdentifiersTag, final String key) {
-        if (!unmappedIdentifiersTag.contains(key) || !mappedIdentifiersTag.contains(key)) {
-            return null;
-        }
-
-        final List<String> unmappedIdentifiers = identifiersFromGlobalIds(unmappedIdentifiersTag, key);
-        final List<String> mappedIdentifiers = identifiersFromGlobalIds(mappedIdentifiersTag, key);
-        Mappings mappings = loadMappings(mappingsTag, key);
-        if (mappings == null) {
-            mappings = new IdentityMappings(unmappedIdentifiers.size(), mappedIdentifiers.size());
-        }
-
-        return new FullMappingsBase(unmappedIdentifiers, mappedIdentifiers, mappings);
     }
 
     public @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
