@@ -188,8 +188,6 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:candles", "minecraft:ignored_by_piglin_babies", "minecraft:piglin_food", "minecraft:freeze_immune_wearables",
                 "minecraft:axolotl_tempt_items", "minecraft:occludes_vibration_signals", "minecraft:fox_food",
                 "minecraft:diamond_ores", "minecraft:iron_ores", "minecraft:lapis_ores", "minecraft:redstone_ores",
@@ -211,6 +209,8 @@ public final class Protocol1_17To1_16_4 extends AbstractProtocol<ClientboundPack
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
                 .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

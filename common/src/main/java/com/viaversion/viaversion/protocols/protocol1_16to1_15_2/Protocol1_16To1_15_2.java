@@ -212,8 +212,6 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
         int[] wallPostOverrideTag = new int[47];
         int arrayIndex = 0;
         wallPostOverrideTag[arrayIndex++] = 140;
@@ -263,6 +261,8 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("item", ParticleType.Readers.ITEM1_13_2);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

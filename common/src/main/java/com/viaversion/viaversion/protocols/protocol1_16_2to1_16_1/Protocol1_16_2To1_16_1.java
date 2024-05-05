@@ -84,8 +84,6 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
         EntityTypes1_16_2.initialize(this);
 
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
@@ -101,6 +99,8 @@ public class Protocol1_16_2To1_16_1 extends AbstractProtocol<ClientboundPackets1
             "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",
             "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end",
             "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
+
+        super.onMappingDataLoaded();
     }
 
     @Override

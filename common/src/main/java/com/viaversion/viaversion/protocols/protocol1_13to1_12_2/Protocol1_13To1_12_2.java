@@ -840,7 +840,6 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
         ConnectionData.init();
         RecipeData.init();
         BlockIdData.init();
@@ -854,6 +853,8 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         if (Via.getConfig().isServersideBlockConnections() && Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
             BlockConnectionStorage.init();
         }
+
+        super.onMappingDataLoaded();
     }
 
     @Override

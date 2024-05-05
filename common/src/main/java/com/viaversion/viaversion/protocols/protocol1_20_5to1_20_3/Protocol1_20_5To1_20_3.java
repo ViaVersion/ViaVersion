@@ -243,8 +243,6 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
         EntityTypes1_20_5.initialize(this);
         Types1_20_5.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
@@ -280,6 +278,8 @@ public final class Protocol1_20_5To1_20_3 extends AbstractProtocol<ClientboundPa
             .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER);
 
         tagRewriter.addTag(RegistryType.ITEM, "minecraft:dyeable", 853, 854, 855, 856, 1120);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

@@ -85,7 +85,6 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
         Types1_18.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -94,6 +93,8 @@ public final class Protocol1_18To1_17_1 extends AbstractProtocol<ClientboundPack
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
                 .reader("item", ParticleType.Readers.ITEM1_13_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

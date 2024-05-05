@@ -289,7 +289,6 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
         Types1_19.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -301,6 +300,8 @@ public final class Protocol1_19To1_18_2 extends AbstractProtocol<ClientboundPack
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19.initialize(this);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

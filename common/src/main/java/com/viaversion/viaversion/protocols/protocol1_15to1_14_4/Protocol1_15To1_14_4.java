@@ -66,8 +66,6 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded();
-
         EntityTypes1_15.initialize(this);
 
         int[] shulkerBoxes = new int[17];
@@ -76,6 +74,8 @@ public class Protocol1_15To1_14_4 extends AbstractProtocol<ClientboundPackets1_1
             shulkerBoxes[i] = shulkerBoxOffset + i;
         }
         tagRewriter.addTag(RegistryType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
+
+        super.onMappingDataLoaded();
     }
 
     @Override

@@ -85,8 +85,6 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
 
     @Override
     protected void onMappingDataLoaded() {
-        super.onMappingDataLoaded(); // Calls load methods on rewriters
-
         // Uncomment this if the entity types enum has been newly added specifically for this Protocol
         // EntityTypes1_20_5.initialize(this);
 
@@ -101,6 +99,8 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
                 .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
                 .reader("shriek", ParticleType.Readers.SHRIEK);*/
+
+        super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data
     }
 
     @Override
