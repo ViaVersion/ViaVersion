@@ -98,8 +98,12 @@ public final class DamageTypes1_20_3 {
         tag.putString("message_id", messageId);
         tag.putString("scaling", scaling);
         tag.putFloat("exhaustion", exhaustion);
-        if (damageEffects != null) tag.putString("effects", damageEffects);
-        if (deathMessageType != null) tag.putString("death_message_type", deathMessageType);
+        if (damageEffects != null) {
+            tag.putString("effects", damageEffects);
+        }
+        if (deathMessageType != null) {
+            tag.putString("death_message_type", deathMessageType);
+        }
 
         return tag;
     }

@@ -149,7 +149,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     registryEntries[length] = new RegistryEntry("minecraft:spit", spitData);
 
                     // Fill in missing damage types with 1.20.3/4 defaults
-                    final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(RegistryEntry::key).collect(Collectors.toSet());
+                    final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(e -> Key.stripMinecraftNamespace(e.key())).collect(Collectors.toSet());
                     for (final String key : DamageTypes1_20_3.keys()) {
                         if (registryEntryKeys.contains(key)) {
                             continue;
