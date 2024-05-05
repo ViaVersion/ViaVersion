@@ -385,6 +385,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         }
     }
 
+    private int withAlpha(final int rgb) {
+        return 255 << 24 | rgb & 16777215;
+    }
+
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
@@ -467,10 +471,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
             particle.add(Type.INT, 0); // Default color, changed in the area effect handler
         }
-    }
-
-    private int withAlpha(int rgb) {
-        return 255 << 24 | rgb & 16777215;
     }
 
     @Override
