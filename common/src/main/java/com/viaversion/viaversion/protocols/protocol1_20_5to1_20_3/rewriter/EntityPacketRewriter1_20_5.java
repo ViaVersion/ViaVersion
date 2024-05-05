@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -47,13 +48,13 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.Acknow
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import it.unimi.dsi.fastutil.ints.IntArraySet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
@@ -410,6 +411,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         );
         filter().metaType(Types1_20_5.META_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
         filter().metaType(Types1_20_5.META_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
+
+        filter().metaType(Types1_20_5.META_TYPES.itemType).handler((event, meta) -> {
+            final Item item = meta.value();
+            if (item != null && item.amount() <= 0) {
+                // No longer accepted by the client, needs to be properly empty
+                meta.setValue(null);
+            }
+        });
 
         filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
