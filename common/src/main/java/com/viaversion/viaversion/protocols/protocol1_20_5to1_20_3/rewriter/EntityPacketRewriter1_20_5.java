@@ -40,6 +40,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_3to1_20_2.packet.Clientb
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.Protocol1_20_5To1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.DamageTypes1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.AcknowledgedMessagesStorage;
@@ -48,7 +49,11 @@ import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityPacketRewriter1_20_5 extends EntityRewriter<ClientboundPacket1_20_3, Protocol1_20_5To1_20_3> {
@@ -112,24 +117,29 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 final CompoundTag entryTag = (CompoundTag) entry.getValue();
                 final String type = entryTag.getString("type");
                 final ListTag<CompoundTag> valueTag = entryTag.getListTag("value", CompoundTag.class);
-                RegistryEntry[] registryEntries = new RegistryEntry[valueTag.size()];
+
+                // Calculate number of entries (exclude duplicated ids)
+                RegistryEntry[] registryEntries = new RegistryEntry[valueTag.stream().map(e -> e.getInt("id")).distinct().toArray().length];
                 boolean requiresDummyValues = false;
                 int entriesLength = registryEntries.length;
+                IntSet ids = new IntArraySet();
                 for (final CompoundTag tag : valueTag) {
                     final String name = tag.getString("name");
                     final int id = tag.getInt("id");
-                    entriesLength = Math.max(entriesLength, id + 1);
-                    if (id >= registryEntries.length) {
-                        // It was previously possible to have arbitrary ids
-                        registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
-                        requiresDummyValues = true;
+                    if (ids.add(id)) { // Override duplicated id without incrementing entries length
+                        entriesLength = Math.max(entriesLength, id + 1);
+                        if (id >= registryEntries.length) {
+                            // It was previously possible to have arbitrary ids
+                            registryEntries = Arrays.copyOf(registryEntries, Math.max(registryEntries.length * 2, id + 1));
+                            requiresDummyValues = true;
+                        }
                     }
 
                     registryEntries[id] = new RegistryEntry(name, tag.get("element"));
                 }
 
-                // Add spit damage type
                 if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
+                    // Add spit damage type
                     final int length = registryEntries.length;
                     registryEntries = Arrays.copyOf(registryEntries, length + 1);
                     final CompoundTag spitData = new CompoundTag();
@@ -137,6 +147,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     spitData.putString("message_id", "mob");
                     spitData.putFloat("exhaustion", 0.1F);
                     registryEntries[length] = new RegistryEntry("minecraft:spit", spitData);
+
+                    // Fill in missing damage types with 1.20.3/4 defaults
+                    final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(e -> Key.stripMinecraftNamespace(e.key())).collect(Collectors.toSet());
+                    for (final String key : DamageTypes1_20_3.keys()) {
+                        if (registryEntryKeys.contains(key)) {
+                            continue;
+                        }
+                        registryEntries = Arrays.copyOf(registryEntries, registryEntries.length + 1);
+                        registryEntries[registryEntries.length - 1] = new RegistryEntry(Key.namespaced(key), DamageTypes1_20_3.get(key));
+                    }
                 }
 
                 if (requiresDummyValues) {
