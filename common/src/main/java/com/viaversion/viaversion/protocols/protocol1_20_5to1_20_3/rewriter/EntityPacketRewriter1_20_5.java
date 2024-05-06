@@ -386,6 +386,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         }
     }
 
+    private int withAlpha(final int rgb) {
+        return 255 << 24 | rgb & 16777215;
+    }
+
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> {
@@ -423,7 +427,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         filter().type(EntityTypes1_20_5.LIVINGENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
-            particle.add(Type.INT, effectColor);
+            particle.add(Type.INT, withAlpha(effectColor));
             meta.setTypeAndValue(Types1_20_5.META_TYPES.particlesType, new Particle[]{particle});
         });
 
@@ -466,7 +470,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         final Particle particle = particleMeta.value();
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
-            particle.getArgument(0).setValue(color);
+            particle.getArgument(0).setValue(withAlpha(color));
         }
     }
 
