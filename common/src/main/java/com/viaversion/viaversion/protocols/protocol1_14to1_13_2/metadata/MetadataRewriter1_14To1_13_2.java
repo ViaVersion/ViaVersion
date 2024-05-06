@@ -59,7 +59,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             EntityTracker1_14 tracker = tracker(event.user());
             int entityId = event.entityId();
             tracker.setInsentientData(entityId, (byte) ((((Number) meta.getValue()).byteValue() & ~0x4)
-                    | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
+                | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
             meta.setValue(tracker.getInsentientData(entityId));
         });
 
@@ -85,7 +85,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
                 EntityTracker1_14 tracker = tracker(event.user());
                 int entityId = event.entityId();
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                        | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
+                    | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
                 event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
                 event.cancel(); // "Are hands held up"
             } else if (meta.id() > 16) {
@@ -143,7 +143,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             EntityTracker1_14 tracker = tracker(event.user());
             int entityId = event.entityId();
             tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
-                    | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
+                | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
             event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
             event.cancel();  // "Is swinging arms"
         });
@@ -167,14 +167,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
         filter().type(EntityTypes1_14.OCELOT).removeIndex(16); // owner uuid
         filter().type(EntityTypes1_14.OCELOT).removeIndex(15); // data
 
-        filter().handler((event, meta) -> {
-            EntityType type = event.entityType();
-            if (type.is(EntityTypes1_14.WITCH) || type.is(EntityTypes1_14.RAVAGER) || type.isOrHasParent(EntityTypes1_14.ABSTRACT_ILLAGER_BASE)) {
-                if (meta.id() >= 14) {  // 19w13 added a new boolean (raid participant - is celebrating) with id 14
-                    meta.setId(meta.id() + 1);
-                }
-            }
-        });
+        filter().type(EntityTypes1_14.ABSTRACT_RAIDER).addIndex(14); // celebrating
     }
 
     @Override
