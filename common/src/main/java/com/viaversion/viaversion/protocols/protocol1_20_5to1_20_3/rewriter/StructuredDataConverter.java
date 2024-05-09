@@ -692,7 +692,7 @@ public final class StructuredDataConverter {
         return subTag;
     }
 
-    static @Nullable CompoundTag removeBackupTag(final CompoundTag tag) {
+    public static @Nullable CompoundTag removeBackupTag(final CompoundTag tag) {
         final CompoundTag backupTag = tag.getCompoundTag(BACKUP_TAG_KEY);
         if (backupTag != null) {
             tag.remove(BACKUP_TAG_KEY);
