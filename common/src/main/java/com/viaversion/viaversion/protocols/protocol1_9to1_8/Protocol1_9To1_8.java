@@ -93,7 +93,14 @@ public class Protocol1_9To1_8 extends AbstractProtocol<ClientboundPackets1_8, Cl
                 return;
             }
 
-            STRING_TO_JSON.write(wrapper, wrapper.read(Type.STRING));
+            final String reason = wrapper.read(Type.STRING);
+            try {
+                STRING_TO_JSON.write(wrapper, reason);
+            } catch (Exception e) {
+                // Dirty fix for https://github.com/Lenni0451/MCStructs/issues/4, I personally don't think it matters
+                // too much since it's only the login disconnect message and nothing relevant to the gameplay
+                wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(reason));
+            }
         });
 
         // Other Handlers
