@@ -1340,6 +1340,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
+    private void addBlockEntityId(final CompoundTag tag, final String id) {
+        if (!tag.contains("id")) {
+            tag.putString("id", id);
+        }
+    }
+
     private void updateBlockEntityTag(final UserConnection connection, @Nullable final StructuredDataContainer data, final CompoundTag tag) {
         if (tag == null) {
             return;
@@ -1354,6 +1360,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final ListTag<CompoundTag> beesTag = tag.getListTag("Bees", CompoundTag.class);
             if (beesTag != null) {
                 updateBees(data, beesTag);
+                addBlockEntityId(tag, "beehive");
             }
 
             final ListTag<StringTag> sherdsTag = tag.getListTag("sherds", StringTag.class);
@@ -1369,11 +1376,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     toMappedItemId(rightSherd),
                     toMappedItemId(frontSherd)
                 ));
+                addBlockEntityId(tag, "decorated_pot");
             }
 
             final StringTag noteBlockSoundTag = tag.getStringTag("note_block_sound");
             if (noteBlockSoundTag != null) {
                 data.set(StructuredDataKey.NOTE_BLOCK_SOUND, noteBlockSoundTag.getValue());
+                addBlockEntityId(tag, "player_head");
             }
 
             final StringTag lootTableTag = tag.getStringTag("LootTable");
@@ -1424,6 +1433,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }).filter(Objects::nonNull).toArray(BannerPatternLayer[]::new);
             tag.remove("Patterns");
             tag.put("patterns", patternsTag);
+            addBlockEntityId(tag, "banner");
 
             if (data != null) {
                 data.set(StructuredDataKey.BANNER_PATTERNS, layers);
