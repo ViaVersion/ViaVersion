@@ -39,6 +39,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.protocol1_12_1to1_12.ServerboundPackets1_12_1;
@@ -170,9 +172,11 @@ public class Protocol1_13To1_12_2 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        registerClientbound(State.LOGIN, 0x00, 0x00, wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+        });
 
-        registerClientbound(State.STATUS, 0x00, 0x00, new PacketHandlers() {
+        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING);

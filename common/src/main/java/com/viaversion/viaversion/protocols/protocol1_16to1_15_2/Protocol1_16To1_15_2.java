@@ -35,6 +35,8 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.protocol1_14to1_13_2.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.protocol1_16to1_15_2.data.TranslationMappings;
@@ -79,14 +81,14 @@ public class Protocol1_16To1_15_2 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
 
         // Login Success
-        registerClientbound(State.LOGIN, 0x02, 0x02, wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
             // Transform string to a uuid
             UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
             wrapper.write(Type.UUID, uuid);
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
-        registerClientbound(State.STATUS, 0x00, 0x00, wrapper -> {
+        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), wrapper -> {
             String original = wrapper.passthrough(Type.STRING);
             JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
             JsonObject players = object.getAsJsonObject("players");
