@@ -264,6 +264,7 @@ public final class StructuredDataConverter {
                 values.add(propertyTag);
                 propertiesTag.put(property.name(), values);
             }
+            profileTag.put("Properties", propertiesTag);
         });
         register(StructuredDataKey.INSTRUMENT, (data, tag) -> {
             // Can't do anything with direct values

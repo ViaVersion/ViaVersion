@@ -444,13 +444,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             if (metaIndex == 9) {
                 // If the color is found first
                 final Metadata particleData = event.metaAtIndex(11);
+                final int color = meta.value();
                 if (particleData == null) {
-                    // Add default particle with data
-                    final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
-                    particle.add(Type.INT, withAlpha(meta.value()));
-                    event.createExtraMeta(new Metadata(10, Types1_20_5.META_TYPES.particleType, particle));
+                    if (color != 0) {
+                        // Add default particle with data
+                        final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
+                        particle.add(Type.INT, withAlpha(color));
+                        event.createExtraMeta(new Metadata(10, Types1_20_5.META_TYPES.particleType, particle));
+                    }
                 } else {
-                    addColor(particleData, meta.value());
+                    addColor(particleData, color);
                 }
 
                 event.cancel();
