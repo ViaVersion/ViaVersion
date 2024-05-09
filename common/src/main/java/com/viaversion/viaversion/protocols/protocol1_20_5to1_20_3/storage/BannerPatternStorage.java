@@ -18,16 +18,29 @@
 package com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.BannerPatterns1_20_5;
+import com.viaversion.viaversion.util.KeyMappings;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-//TODO Item rewriting doesn't have user connection context yet. That's a fairly disruptive change, so it'll be done later
-// Replace BannerPatterns1_20_5.idToKey
+// Used by VB
 public final class BannerPatternStorage implements StorableObject {
 
-    private final Int2ObjectMap<String> bannerPatterns = new Int2ObjectOpenHashMap<>();
+    private KeyMappings bannerPatterns = BannerPatterns1_20_5.PATTERNS;
 
-    public Int2ObjectMap<String> bannerPatterns() {
+    public KeyMappings bannerPatterns() {
         return bannerPatterns;
+    }
+
+    public void setBannerPatterns(final KeyMappings bannerPatterns) {
+        this.bannerPatterns = bannerPatterns;
+    }
+
+    public @Nullable String pattern(final int id) {
+        return bannerPatterns.idToKey(id);
+    }
+
+    @Override
+    public boolean clearOnServerSwitch() {
+        return false;
     }
 }

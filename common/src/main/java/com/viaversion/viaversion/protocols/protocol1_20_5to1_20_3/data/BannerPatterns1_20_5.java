@@ -24,7 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BannerPatterns1_20_5 {
 
-    private static final KeyMappings PATTERNS = new KeyMappings(
+    public static final KeyMappings PATTERNS = new KeyMappings(
         "base",
         "square_bottom_left",
         "square_bottom_right",

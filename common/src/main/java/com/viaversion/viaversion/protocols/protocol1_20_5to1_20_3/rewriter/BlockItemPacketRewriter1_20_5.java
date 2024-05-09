@@ -94,6 +94,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMater
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.BannerPatternStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -352,10 +353,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (item == null) return null;
 
         super.handleItemToServer(connection, item);
-        return toOldItem(item, DATA_CONVERTER);
+        return toOldItem(connection, item, DATA_CONVERTER);
     }
 
-    public Item toOldItem(final Item item, final StructuredDataConverter dataConverter) {
+    public Item toOldItem(final UserConnection connection, final Item item, final StructuredDataConverter dataConverter) {
         // Start out with custom data and add the rest on top, or short-curcuit with the original item
         final StructuredDataContainer data = item.structuredData();
         data.setIdLookup(protocol, true);
@@ -368,7 +369,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         for (final StructuredData<?> structuredData : data.data().values()) {
-            dataConverter.writeToTag(structuredData, tag);
+            dataConverter.writeToTag(connection, structuredData, tag);
         }
 
         return dataItem;
@@ -1404,6 +1405,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<CompoundTag> patternsTag = tag.getListTag("Patterns", CompoundTag.class);
         if (patternsTag != null) {
+            final BannerPatternStorage patternStorage = connection.get(BannerPatternStorage.class);
             final BannerPatternLayer[] layers = patternsTag.stream().map(patternTag -> {
                 final String pattern = patternTag.getString("Pattern", "");
                 final int color = patternTag.getInt("Color", -1);
@@ -1417,8 +1419,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 patternTag.putString("pattern", fullPatternIdentifier);
                 patternTag.putString("color", DyeColors.colorById(color));
 
-                final int id = BannerPatterns1_20_5.keyToId(fullPatternIdentifier);
-                return new BannerPatternLayer(Holder.of(id), color);
+                final int id = patternStorage != null ? patternStorage.bannerPatterns().keyToId(fullPatternIdentifier) : BannerPatterns1_20_5.keyToId(fullPatternIdentifier);
+                return id != -1 ? new BannerPatternLayer(Holder.of(id), color) : null;
             }).filter(Objects::nonNull).toArray(BannerPatternLayer[]::new);
             tag.remove("Patterns");
             tag.put("patterns", patternsTag);

@@ -25,6 +25,7 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
@@ -60,6 +61,7 @@ import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.MapDecora
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.data.TrimMaterials1_20_3;
+import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.storage.BannerPatternStorage;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -215,8 +217,8 @@ public final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.BASE_COLOR, (data, tag) -> tag.putInt("Base", data));
-        register(StructuredDataKey.CHARGED_PROJECTILES, (data, tag) -> convertItemList(data, tag, "ChargedProjectiles"));
-        register(StructuredDataKey.BUNDLE_CONTENTS, (data, tag) -> convertItemList(data, tag, "Items"));
+        register(StructuredDataKey.CHARGED_PROJECTILES, (connection, data, tag) -> convertItemList(connection, data, tag, "ChargedProjectiles"));
+        register(StructuredDataKey.BUNDLE_CONTENTS, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.LODESTONE_TRACKER, (data, tag) -> {
             final CompoundTag positionTag = new CompoundTag();
             tag.put("LodestonePos", positionTag);
@@ -304,10 +306,10 @@ public final class StructuredDataConverter {
                 beeTag.putInt("MinOccupationTicks", bee.minTicksInHive());
                 bees.add(beeTag);
             }
-            getBlockEntityTag(tag).put("Bees", bees);
+            getBlockEntityTag(tag, "beehive").put("Bees", bees);
         });
         register(StructuredDataKey.LOCK, (data, tag) -> getBlockEntityTag(tag).put("Lock", data));
-        register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag).putString("note_block_sound", data));
+        register(StructuredDataKey.NOTE_BLOCK_SOUND, (data, tag) -> getBlockEntityTag(tag, "player_head").putString("note_block_sound", data));
         register(StructuredDataKey.POT_DECORATIONS, (data, tag) -> {
             IntArrayTag originalSherds = null;
 
@@ -327,7 +329,7 @@ public final class StructuredDataConverter {
             if (originalSherds != null) {
                 getBackupTag(tag).put("pot_decorations", originalSherds);
             }
-            getBlockEntityTag(tag).put("sherds", sherds);
+            getBlockEntityTag(tag, "decorated_pot").put("sherds", sherds);
         });
         register(StructuredDataKey.CREATIVE_SLOT_LOCK, (data, tag) -> tag.put("CustomCreativeLock", new CompoundTag()));
         register(StructuredDataKey.DEBUG_STICK_STATE, (data, tag) -> tag.put("DebugProperty", data));
@@ -342,7 +344,13 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.BLOCK_ENTITY_DATA, (data, tag) -> {
             // Handling of previously block entity tags is done using the getBlockEntityTag method
-            tag.put("BlockEntityTag", data);
+            // Merge with already added tag if needed
+            final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
+            if (blockEntityTag != null) {
+                blockEntityTag.putAll(data);
+            } else {
+                tag.put("BlockEntityTag", data);
+            }
         });
         register(StructuredDataKey.CONTAINER_LOOT, (data, tag) -> {
             final Tag lootTable = data.get("loot_table");
@@ -421,7 +429,8 @@ public final class StructuredDataConverter {
             }
             tag.put("effects", effectsTag);
         });
-        register(StructuredDataKey.BANNER_PATTERNS, (data, tag) -> {
+        register(StructuredDataKey.BANNER_PATTERNS, (connection, data, tag) -> {
+            final BannerPatternStorage patternStorage = connection.get(BannerPatternStorage.class);
             if (backupInconvertibleData) {
                 // Backup whole data if one of the entries is inconvertible
                 // Since we don't want to break the order of the entries
@@ -430,7 +439,8 @@ public final class StructuredDataConverter {
                         return true;
                     }
 
-                    final String identifier = BannerPatterns1_20_5.idToKey(layer.pattern().id());
+                    final int id = layer.pattern().id();
+                    final String identifier = patternStorage != null ? patternStorage.pattern(id) : BannerPatterns1_20_5.idToKey(id);
                     return identifier == null || identifier.equals("flow") || identifier.equals("guster");
                 })) {
                     final ListTag<CompoundTag> originalPatterns = new ListTag<>(CompoundTag.class);
@@ -459,7 +469,8 @@ public final class StructuredDataConverter {
                     continue;
                 }
 
-                final String key = BannerPatterns1_20_5.idToKey(layer.pattern().id());
+                final int id = layer.pattern().id();
+                final String key = patternStorage != null ? patternStorage.pattern(id) : BannerPatterns1_20_5.idToKey(id);
                 if (key == null) {
                     continue;
                 }
@@ -474,9 +485,9 @@ public final class StructuredDataConverter {
                 patternTag.putInt("Color", layer.dyeColor());
                 patternsTag.add(patternTag);
             }
-            tag.put("Patterns", patternsTag);
+            getBlockEntityTag(tag, "banner").put("Patterns", patternsTag);
         });
-        register(StructuredDataKey.CONTAINER, (data, tag) -> convertItemList(data, tag, "Items"));
+        register(StructuredDataKey.CONTAINER, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
         register(StructuredDataKey.CAN_BREAK, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
         register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
@@ -654,6 +665,15 @@ public final class StructuredDataConverter {
         return getOrCreate(tag, "BlockEntityTag");
     }
 
+    private CompoundTag getBlockEntityTag(final CompoundTag tag, final String blockEntity) {
+        final CompoundTag blockEntityTag = getOrCreate(tag, "BlockEntityTag");
+        if (!blockEntityTag.contains("id")) {
+            // Add in the assumed (and required) block entity id
+            blockEntityTag.putString("id", blockEntity);
+        }
+        return blockEntityTag;
+    }
+
     private static CompoundTag getDisplayTag(final CompoundTag tag) {
         return getOrCreate(tag, "display");
     }
@@ -768,7 +788,7 @@ public final class StructuredDataConverter {
         return effectDataTag;
     }
 
-    private void convertItemList(final Item[] items, final CompoundTag tag, final String key) {
+    private void convertItemList(final UserConnection connection, final Item[] items, final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
         for (final Item item : items) {
             final CompoundTag savedItem = new CompoundTag();
@@ -782,7 +802,7 @@ public final class StructuredDataConverter {
 
                 final CompoundTag itemTag = new CompoundTag();
                 for (final StructuredData<?> data : item.structuredData().data().values()) {
-                    writeToTag(data, itemTag);
+                    writeToTag(connection, data, itemTag);
                 }
                 savedItem.put("tag", itemTag);
             } else {
@@ -827,7 +847,7 @@ public final class StructuredDataConverter {
         tag.putInt("HideFlags", tag.getInt("HideFlags") | value);
     }
 
-    public <T> void writeToTag(final StructuredData<T> data, final CompoundTag tag) {
+    public <T> void writeToTag(final UserConnection connection, final StructuredData<T> data, final CompoundTag tag) {
         if (data.isEmpty()) {
             return;
         }
@@ -835,16 +855,27 @@ public final class StructuredDataConverter {
         //noinspection unchecked
         final DataConverter<T> converter = (DataConverter<T>) rewriters.get(data.key());
         Preconditions.checkNotNull(converter, "No converter for %s found", data.key());
-        converter.convert(data.value(), tag);
+        converter.convert(connection, data.value(), tag);
     }
 
     private <T> void register(final StructuredDataKey<T> key, final DataConverter<T> converter) {
         rewriters.put(key, converter);
     }
 
+    private <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> converter) {
+        final DataConverter<T> c = (connection, data, tag) -> converter.convert(data, tag);
+        rewriters.put(key, c);
+    }
+
+    @FunctionalInterface
+    interface SimpleDataConverter<T> {
+
+        void convert(T data, CompoundTag tag);
+    }
+
     @FunctionalInterface
     interface DataConverter<T> {
 
-        void convert(T data, CompoundTag tag);
+        void convert(UserConnection connection, T data, CompoundTag tag);
     }
 }
