@@ -47,9 +47,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.Types.Type;
+import com.viaversion.viaversion.api.Types.Types;
+import com.viaversion.viaversion.api.Types.types.version.Types1_20_5;
 import com.viaversion.viaversion.util.Unit;
 
 public record StructuredDataKey<T>(String identifier, Type<T> type) {
@@ -74,7 +74,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Unit> CREATIVE_SLOT_LOCK = new StructuredDataKey<>("creative_slot_lock", Types.EMPTY);
     public static final StructuredDataKey<Boolean> ENCHANTMENT_GLINT_OVERRIDE = new StructuredDataKey<>("enchantment_glint_override", Types.BOOLEAN);
     public static final StructuredDataKey<Tag> INTANGIBLE_PROJECTILE = new StructuredDataKey<>("intangible_projectile", Types.TAG); // Doesn't actually hold data
-    public static final StructuredDataKey<FoodProperties> FOOD = new StructuredDataKey<>("food", FoodProperties.TYPE);
+    public static final StructuredDataKey<FoodProperties> FOOD1_20_5 = new StructuredDataKey<>("food", FoodProperties.TYPE1_20_5);
+    public static final StructuredDataKey<FoodProperties> FOOD1_21 = new StructuredDataKey<>("food", FoodProperties.TYPE1_21);
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Types.EMPTY);
     public static final StructuredDataKey<ToolProperties> TOOL = new StructuredDataKey<>("tool", ToolProperties.TYPE);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE);

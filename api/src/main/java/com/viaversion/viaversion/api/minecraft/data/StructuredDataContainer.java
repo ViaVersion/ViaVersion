@@ -105,6 +105,13 @@ public final class StructuredDataContainer {
         }
     }
 
+    public <T> void replaceKey(final StructuredDataKey<T> key, final StructuredDataKey<T> toKey) {
+        final StructuredData<T> data = remove(key);
+        if (data != null) {
+            set(toKey, data.value());
+        }
+    }
+
     public void set(final StructuredDataKey<Unit> key) {
         this.set(key, Unit.INSTANCE);
     }

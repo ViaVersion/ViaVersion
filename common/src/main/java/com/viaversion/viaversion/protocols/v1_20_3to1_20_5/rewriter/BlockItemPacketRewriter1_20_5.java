@@ -712,7 +712,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 effect.getFloat("probability")
             ));
         }
-        data.set(StructuredDataKey.FOOD, new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, possibleEffects.toArray(new FoodEffect[0])));
+        data.set(StructuredDataKey.FOOD1_20_5, new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, null, possibleEffects.toArray(new FoodEffect[0])));
     }
 
     private void restoreToolFromBackup(final CompoundTag tool, final StructuredDataContainer data) {

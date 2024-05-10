@@ -596,7 +596,7 @@ public final class StructuredDataConverter {
                 getBackupTag(tag).putInt("rarity", data);
             }
         });
-        register(StructuredDataKey.FOOD, (data, tag) -> {
+        register(StructuredDataKey.FOOD1_20_5, (data, tag) -> {
             if (backupInconvertibleData) {
                 final CompoundTag backupTag = new CompoundTag();
                 backupTag.putInt("nutrition", data.nutrition());

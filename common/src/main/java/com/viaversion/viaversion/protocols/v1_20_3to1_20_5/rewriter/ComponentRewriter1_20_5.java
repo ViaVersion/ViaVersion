@@ -134,7 +134,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, this::convertEnchantmentGlintOverride);
         register(StructuredDataKey.CREATIVE_SLOT_LOCK, null);
         register(StructuredDataKey.INTANGIBLE_PROJECTILE, this::convertIntangibleProjectile);
-        register(StructuredDataKey.FOOD, this::convertFood);
+        register(StructuredDataKey.FOOD1_20_5, this::convertFood);
         register(StructuredDataKey.FIRE_RESISTANT, this::convertFireResistant);
         register(StructuredDataKey.TOOL, this::convertTool);
         register(StructuredDataKey.STORED_ENCHANTMENTS, this::convertStoredEnchantments);

@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.protocol1_21to1_20_5.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -54,12 +55,34 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerAdvancements1_20_3(ClientboundPackets1_20_5.ADVANCEMENTS);
         registerEntityEquipmentArray(ClientboundPackets1_20_5.ENTITY_EQUIPMENT);
         registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
-        registerTradeList1_20_5(ClientboundPackets1_20_5.TRADE_LIST, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21.OPTIONAL_ITEM_COST);
+        registerTradeList1_20_5(ClientboundPackets1_20_5.TRADE_LIST, Types1_20_5.ITEM_COST, Types1_21.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.OPTIONAL_ITEM_COST);
         registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_5.WINDOW_PROPERTY);
         registerSpawnParticle1_20_5(ClientboundPackets1_20_5.SPAWN_PARTICLE, Types1_20_5.PARTICLE, Types1_21.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLOSION, Types1_20_5.PARTICLE, Types1_21.PARTICLE); // Rewrites the included sound and particles
 
         new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_20_5.DECLARE_RECIPES);
+    }
+
+    @Override
+    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
+        if (item == null) {
+            return null;
+        }
+
+        super.handleItemToClient(connection, item);
+        item.structuredData().replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
+        return item;
+    }
+
+    @Override
+    public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
+        if (item == null) {
+            return null;
+        }
+
+        super.handleItemToServer(connection, item);
+        item.structuredData().replaceKey(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_20_5);
+        return item;
     }
 }

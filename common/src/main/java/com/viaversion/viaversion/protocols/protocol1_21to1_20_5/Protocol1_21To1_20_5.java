@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
@@ -67,13 +68,21 @@ public final class Protocol1_21To1_20_5 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.STATISTICS);
         new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.ENTITY_PROPERTIES);
+
+        registerClientbound(ClientboundPackets1_20_5.PROJECTILE_POWER, wrapper -> {
+            wrapper.passthrough(Type.VAR_INT); // Id
+            final double xPower = wrapper.read(Type.DOUBLE);
+            final double yPower = wrapper.read(Type.DOUBLE);
+            final double zPower = wrapper.read(Type.DOUBLE);
+            final double accelerationPower = Math.sqrt(xPower * xPower + yPower * yPower + zPower * zPower);
+            wrapper.write(Type.DOUBLE, accelerationPower);
+        });
     }
 
     @Override
     protected void onMappingDataLoaded() {
         super.onMappingDataLoaded();
 
-        // Added preemptively TODO Check if there are actual changes before release
         Types1_21.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -81,7 +90,7 @@ public final class Protocol1_21To1_20_5 extends AbstractProtocol<ClientboundPack
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(Types1_20_5.ITEM))
+            .reader("item", ParticleType.Readers.item(Types1_21.ITEM))
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK)
@@ -89,7 +98,7 @@ public final class Protocol1_21To1_20_5 extends AbstractProtocol<ClientboundPack
         Types1_21.STRUCTURED_DATA.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
             .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE).add(StructuredDataKey.RARITY)
-            .add(StructuredDataKey.HIDE_TOOLTIP).add(StructuredDataKey.FOOD).add(StructuredDataKey.FIRE_RESISTANT)
+            .add(StructuredDataKey.HIDE_TOOLTIP).add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.FIRE_RESISTANT)
             .add(StructuredDataKey.CUSTOM_NAME).add(StructuredDataKey.LORE).add(StructuredDataKey.ENCHANTMENTS)
             .add(StructuredDataKey.CAN_PLACE_ON).add(StructuredDataKey.CAN_BREAK).add(StructuredDataKey.ATTRIBUTE_MODIFIERS)
             .add(StructuredDataKey.CUSTOM_MODEL_DATA).add(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP).add(StructuredDataKey.REPAIR_COST)

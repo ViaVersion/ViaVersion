@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
+import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
@@ -112,6 +113,13 @@ public class ItemType1_20_5 extends Type<Item> {
             if (value.isEmpty()) {
                 Types.VAR_INT.writePrimitive(buffer, value.id());
             }
+        }
+    }
+
+    public final class OptionalItemType extends OptionalType<Item> {
+
+        public OptionalItemType() {
+            super(ItemType1_20_5.this);
         }
     }
 }
