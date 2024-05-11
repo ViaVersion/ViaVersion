@@ -43,29 +43,29 @@ public final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Cl
         // Other places using block state id mappings: Spawn particle, entity metadata, entity spawn (falling blocks)
         // Tags and statistics use block (!) ids
         final BlockRewriter<ClientboundPacket1_20_5> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_20_5.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_20_5.BLOCK_CHANGE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_5.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_20_5.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_5.CHUNK_DATA, ChunkType1_20_2::new);
+        blockRewriter.registerBlockAction(ClientboundPackets1_20_5.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_20_5.BLOCK_UPDATE);
+        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerEffect(ClientboundPackets1_20_5.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_5.BLOCK_ENTITY_DATA);
 
         // Registers item id changes
         // Other places using item ids are: Entity metadata, tags, statistics, effect
         // registerOpenWindow(ClientboundPackets1_20_5.OPEN_WINDOW); - If a new container type was added
         registerSetCooldown(ClientboundPackets1_20_5.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_20_5.WINDOW_ITEMS);
-        registerSetSlot1_17_1(ClientboundPackets1_20_5.SET_SLOT);
-        registerAdvancements1_20_3(ClientboundPackets1_20_5.ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_20_5.ENTITY_EQUIPMENT);
-        registerClickWindow1_17_1(ServerboundPackets1_20_5.CLICK_WINDOW);
-        registerTradeList1_20_5(ClientboundPackets1_20_5.TRADE_LIST, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
-        registerCreativeInvAction(ServerboundPackets1_20_5.CREATIVE_INVENTORY_ACTION);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_5.WINDOW_PROPERTY);
-        registerSpawnParticle1_20_5(ClientboundPackets1_20_5.SPAWN_PARTICLE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
-        registerExplosion(ClientboundPackets1_20_5.EXPLOSION, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
+        registerWindowItems1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
+        registerSetSlot1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_SLOT);
+        registerAdvancements1_20_3(ClientboundPackets1_20_5.UPDATE_ADVANCEMENTS);
+        registerEntityEquipmentArray(ClientboundPackets1_20_5.SET_EQUIPMENT);
+        registerClickWindow1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
+        registerTradeList1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
+        registerCreativeInvAction(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
+        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_5.CONTAINER_SET_DATA);
+        registerSpawnParticle1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
+        registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
 
-        new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_20_5.DECLARE_RECIPES);
+        new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_20_5.UPDATE_RECIPES);
         // OR do this if serialization of recipes changed and override the relevant method
         // Add new serializers to RecipeRewriter, or extend the last one for changes
         // new RecipeRewriter1_20_3<ClientboundPackets1_20_5>(this) {}.register1_20_5(ClientboundPackets1_20_5.DECLARE_RECIPES);

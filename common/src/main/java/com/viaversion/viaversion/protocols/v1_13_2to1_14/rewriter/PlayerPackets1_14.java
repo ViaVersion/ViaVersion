@@ -40,7 +40,7 @@ public class PlayerPackets1_14 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.QUERY_BLOCK_NBT, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.BLOCK_ENTITY_TAG_QUERY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -75,7 +75,7 @@ public class PlayerPackets1_14 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_DIGGING, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
@@ -83,7 +83,7 @@ public class PlayerPackets1_14 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.RECIPE_BOOK_DATA, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.RECIPE_BOOK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -107,26 +107,26 @@ public class PlayerPackets1_14 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_COMMAND_BLOCK, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.SET_COMMAND_BLOCK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_STRUCTURE_BLOCK, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.SET_STRUCTURE_BLOCK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_14.UPDATE_SIGN, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_14.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_14, Type.POSITION1_8);
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_14.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_14.USE_ITEM_ON, wrapper -> {
             int hand = wrapper.read(Type.VAR_INT);
             Position position = wrapper.read(Type.POSITION1_14);
             int face = wrapper.read(Type.VAR_INT);

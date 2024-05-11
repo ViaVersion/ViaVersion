@@ -54,16 +54,16 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
         EntityPacketRewriter1_16_2.register(this);
         WorldPacketRewriter1_16_2.register(this);
 
-        tagRewriter.register(ClientboundPackets1_16.TAGS, RegistryType.ENTITY);
+        tagRewriter.register(ClientboundPackets1_16.UPDATE_TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_16.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16.AWARD_STATS);
 
         SoundRewriter<ClientboundPackets1_16> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_16.ENTITY_SOUND);
+        soundRewriter.registerSound(ClientboundPackets1_16.SOUND_ENTITY);
 
         // Recipe book data has been split into 2 separate packets
-        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_DATA, wrapper -> {
+        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_CHANGE_SETTINGS, ServerboundPackets1_16.RECIPE_BOOK_UPDATE, wrapper -> {
             int recipeType = wrapper.read(Type.VAR_INT);
             boolean open = wrapper.read(Type.BOOLEAN);
             boolean filter = wrapper.read(Type.BOOLEAN);
@@ -77,7 +77,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
             wrapper.write(Type.BOOLEAN, recipeType == 3 && open); // Smoker
             wrapper.write(Type.BOOLEAN, filter);
         });
-        registerServerbound(ServerboundPackets1_16_2.SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_DATA, wrapper -> {
+        registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_UPDATE, wrapper -> {
             String recipe = wrapper.read(Type.STRING);
             wrapper.write(Type.VAR_INT, 0); // Shown
             wrapper.write(Type.STRING, recipe);

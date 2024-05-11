@@ -35,13 +35,13 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_17_1.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_17_1.WINDOW_ITEMS);
-        registerTradeList(ClientboundPackets1_17_1.TRADE_LIST);
-        registerSetSlot1_17_1(ClientboundPackets1_17_1.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_17_1.ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_17_1.ENTITY_EQUIPMENT);
+        registerWindowItems1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_CONTENT);
+        registerTradeList(ClientboundPackets1_17_1.MERCHANT_OFFERS);
+        registerSetSlot1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_SLOT);
+        registerAdvancements(ClientboundPackets1_17_1.UPDATE_ADVANCEMENTS);
+        registerEntityEquipmentArray(ClientboundPackets1_17_1.SET_EQUIPMENT);
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Effect id
@@ -57,7 +57,7 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.SPAWN_PARTICLE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Particle id
@@ -97,9 +97,9 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.UPDATE_RECIPES);
 
-        registerClickWindow1_17_1(ServerboundPackets1_17.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow1_17_1(ServerboundPackets1_17.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
     }
 }

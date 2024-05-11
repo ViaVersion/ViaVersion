@@ -64,7 +64,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -76,7 +76,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -98,7 +98,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHAT_MESSAGE, wrapper -> {
+        registerClientbound(ClientboundPackets1_9_3.CHAT, wrapper -> {
             if (!Via.getConfig().is1_12NBTArrayFix()) return;
             final JsonElement element = wrapper.passthrough(Type.COMPONENT);
             TranslateRewriter.toClient(wrapper.user(), element);
@@ -107,7 +107,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
             wrapper.set(Type.COMPONENT, 0, element);
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+        registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
             ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
@@ -137,10 +137,10 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_12.METADATA_LIST);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_12.METADATA_LIST);
 
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT);
@@ -154,7 +154,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
 
                     // Reset recipes
                     if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)) {
-                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
+                        wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
                                 .scheduleSend(Protocol1_12_2To1_13.class);
                     }
                 });
@@ -176,10 +176,10 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
 
 
         // New packet at 0x01
-        cancelServerbound(ServerboundPackets1_12.PREPARE_CRAFTING_GRID);
+        cancelServerbound(ServerboundPackets1_12.CRAFTING_RECIPE_PLACEMENT);
 
         // Client Settings (max length changed)
-        registerServerbound(ServerboundPackets1_12.CLIENT_SETTINGS, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_12.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Locale
@@ -207,10 +207,10 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         // New packet at 0x17
-        cancelServerbound(ServerboundPackets1_12.RECIPE_BOOK_DATA);
+        cancelServerbound(ServerboundPackets1_12.RECIPE_BOOK_UPDATE);
 
         // New packet 0x19
-        cancelServerbound(ServerboundPackets1_12.ADVANCEMENT_TAB);
+        cancelServerbound(ServerboundPackets1_12.SEEN_ADVANCEMENTS);
     }
 
     private int getNewSoundId(int id) {

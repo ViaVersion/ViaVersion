@@ -38,9 +38,9 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
-        registerMetadataRewriter(ClientboundPackets1_17_1.ENTITY_METADATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_17_1.SET_ENTITY_DATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_17_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID

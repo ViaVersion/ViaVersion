@@ -47,7 +47,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
         });
 
-        registerClientbound(ClientboundPackets1_17.SET_SLOT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
@@ -55,7 +55,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_17.WINDOW_ITEMS, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id
@@ -70,7 +70,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Container id

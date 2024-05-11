@@ -49,19 +49,19 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_19_4.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_19_4.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND_ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.AWARD_STATS);
 
-        registerClientbound(ClientboundPackets1_19_4.COMBAT_END, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_4.PLAYER_COMBAT_END, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.read(Type.INT); // Killer ID
         });
-        registerClientbound(ClientboundPackets1_19_4.COMBAT_KILL, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_4.PLAYER_COMBAT_KILL, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Duration
             wrapper.read(Type.INT); // Killer ID
         });

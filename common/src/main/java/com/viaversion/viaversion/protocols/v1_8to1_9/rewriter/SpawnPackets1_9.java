@@ -49,7 +49,7 @@ public class SpawnPackets1_9 {
     };
 
     public static void register(Protocol1_8To1_9 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -104,7 +104,7 @@ public class SpawnPackets1_9 {
                     int typeID = wrapper.get(Type.BYTE, 0);
                     if (EntityTypes1_10.getTypeFromId(typeID, true) == EntityTypes1_10.EntityType.SPLASH_POTION) {
                         // Convert this to meta data, woo!
-                        PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.ENTITY_METADATA, wrapper1 -> {
+                        PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
                             wrapper1.write(Type.VAR_INT, entityID);
                             List<Metadata> meta = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
@@ -123,7 +123,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_EXPERIENCE_ORB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -143,7 +143,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_GLOBAL_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -162,7 +162,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_MOB, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -216,7 +216,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PAINTING, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_PAINTING, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -239,7 +239,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -263,7 +263,7 @@ public class SpawnPackets1_9 {
                 handler(wrapper -> {
                     short item = wrapper.read(Type.SHORT);
                     if (item != 0) {
-                        PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, wrapper.user());
+                        PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_9.SET_EQUIPPED_ITEM, null, wrapper.user());
                         packet.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
                         packet.write(Type.VAR_INT, 0);
                         packet.write(Type.ITEM1_8, new DataItem(item, (byte) 1, (short) 0, null));
@@ -295,7 +295,7 @@ public class SpawnPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.REMOVE_ENTITIES, new PacketHandlers() {
 
             @Override
             public void register() {

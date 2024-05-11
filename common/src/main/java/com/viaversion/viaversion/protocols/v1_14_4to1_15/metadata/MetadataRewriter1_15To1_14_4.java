@@ -34,12 +34,12 @@ public class MetadataRewriter1_15To1_14_4 extends EntityRewriter<ClientboundPack
     @Override
     protected void registerRewrites() {
         registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.blockStateType, Types1_14.META_TYPES.particleType);
-        filter().type(EntityTypes1_15.MINECART_ABSTRACT).index(10).handler((metadatas, meta) -> {
+        filter().type(EntityTypes1_15.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(EntityTypes1_15.LIVINGENTITY).addIndex(12);
+        filter().type(EntityTypes1_15.LIVING_ENTITY).addIndex(12);
         filter().type(EntityTypes1_15.WOLF).removeIndex(18);
     }
 

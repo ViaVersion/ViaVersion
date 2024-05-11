@@ -25,7 +25,7 @@ import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.Protocol1_13_1To1_13_
 public class WorldPacketRewriter1_13_2 {
 
     public static void register(Protocol1_13_1To1_13_2 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PARTICLE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Particle ID

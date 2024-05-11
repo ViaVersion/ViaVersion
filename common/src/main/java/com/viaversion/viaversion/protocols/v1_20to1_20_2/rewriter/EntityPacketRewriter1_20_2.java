@@ -39,11 +39,11 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_4.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_19_4.ENTITY_METADATA, Types1_20.METADATA_LIST, Types1_20_2.METADATA_LIST);
+        registerTrackerWithData1_19(ClientboundPackets1_19_4.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
+        registerMetadataRewriter(ClientboundPackets1_19_4.SET_ENTITY_DATA, Types1_20.METADATA_LIST, Types1_20_2.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.SPAWN_PLAYER, ClientboundPackets1_20_2.SPAWN_ENTITY, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.ADD_PLAYER, ClientboundPackets1_20_2.ADD_ENTITY, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity id
             wrapper.passthrough(Type.UUID); // UUID
 
@@ -63,7 +63,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             wrapper.write(Type.SHORT, (short) 0); // Velocity Z
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_4.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -155,7 +155,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_EFFECT, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.UPDATE_MOB_EFFECT, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity id
             wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) - 1); // Effect id
             wrapper.passthrough(Type.BYTE); // Amplifier
@@ -164,7 +164,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             wrapper.write(Type.OPTIONAL_COMPOUND_TAG, wrapper.read(Type.OPTIONAL_NAMED_COMPOUND_TAG)); // Factor data
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.REMOVE_ENTITY_EFFECT, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.REMOVE_MOB_EFFECT, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity id
             wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) - 1); // Effect id
         });
@@ -177,7 +177,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
 
         filter().type(EntityTypes1_19_4.DISPLAY).addIndex(10);
 
-        filter().type(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_4.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

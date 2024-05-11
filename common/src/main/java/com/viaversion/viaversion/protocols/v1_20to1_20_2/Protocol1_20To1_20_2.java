@@ -76,7 +76,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND_ENTITY);
 
         final PacketHandlers sanitizeCustomPayload = new PacketHandlers() {
             @Override
@@ -91,8 +91,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
                 });
             }
         };
-        registerClientbound(ClientboundPackets1_19_4.PLUGIN_MESSAGE, sanitizeCustomPayload);
-        registerServerbound(ServerboundPackets1_20_2.PLUGIN_MESSAGE, sanitizeCustomPayload);
+        registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, sanitizeCustomPayload);
+        registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, sanitizeCustomPayload);
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Type.STRING);
@@ -102,7 +102,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
         });
 
-        registerClientbound(ClientboundPackets1_19_4.TAGS, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_4.UPDATE_TAGS, wrapper -> {
             tagRewriter.getGenericHandler().handle(wrapper);
             wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
@@ -113,7 +113,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.user().put(new LastTags(wrapper));
         });
 
-        registerClientbound(ClientboundPackets1_19_4.DISPLAY_SCOREBOARD, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_4.SET_DISPLAY_OBJECTIVE, wrapper -> {
             final byte slot = wrapper.read(Type.BYTE);
             wrapper.write(Type.VAR_INT, (int) slot);
         });
@@ -177,7 +177,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
 
         // If these are not queued, they may be received before the server switched its listener state to play
-        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PLUGIN_MESSAGE));
+        registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.CUSTOM_PAYLOAD));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.KEEP_ALIVE.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.KEEP_ALIVE));
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.PONG.getId(), -1, queueServerboundPacket(ServerboundPackets1_20_2.PONG));
 
@@ -234,7 +234,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         final int unmappedId = packetWrapper.getId();
         if (phase == BridgePhase.PROFILE_SENT || phase == BridgePhase.REENTERING_CONFIGURATION) {
-            if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
+            if (unmappedId == ClientboundPackets1_19_4.UPDATE_TAGS.getId()) {
                 // Don't re-send old tags during config phase
                 packetWrapper.user().remove(LastTags.class);
             }
@@ -246,7 +246,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         if (packetWrapper.getPacketType() == null || packetWrapper.getPacketType().state() != State.CONFIGURATION) {
             // Map some of them to their configuration state counterparts, but make sure to let join game through
-            if (unmappedId == ClientboundPackets1_19_4.JOIN_GAME.getId()) {
+            if (unmappedId == ClientboundPackets1_19_4.LOGIN.getId()) {
                 super.transform(direction, State.PLAY, packetWrapper);
                 return;
             }
@@ -263,7 +263,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
                 throw CancelException.generate();
             }
 
-            if (unmappedId == ClientboundPackets1_19_4.PLUGIN_MESSAGE.getId()) {
+            if (unmappedId == ClientboundPackets1_19_4.CUSTOM_PAYLOAD.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.CUSTOM_PAYLOAD);
             } else if (unmappedId == ClientboundPackets1_19_4.DISCONNECT.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.DISCONNECT);
@@ -273,7 +273,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.PING);
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
-            } else if (unmappedId == ClientboundPackets1_19_4.TAGS.getId()) {
+            } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_TAGS.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
             } else {
                 // Not a packet that can be mapped to the configuration protocol

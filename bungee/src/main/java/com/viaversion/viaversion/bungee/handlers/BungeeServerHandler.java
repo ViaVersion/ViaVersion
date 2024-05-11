@@ -185,7 +185,7 @@ public class BungeeServerHandler implements Listener {
             // This ensures we can encode it properly as only the 1.9 protocol is currently implemented.
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_8To1_9.class)) {
                 for (UUID uuid : storage.getBossbar()) {
-                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, user);
+                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, null, user);
                     wrapper.write(Type.UUID, uuid);
                     wrapper.write(Type.VAR_INT, 1); // remove
                     wrapper.send(Protocol1_8To1_9.class);
