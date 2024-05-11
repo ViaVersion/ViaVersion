@@ -33,7 +33,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.chat.GameMode;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.GameMode;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.EntityIdProvider;
@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class EntityTracker1_9 extends EntityTrackerBase {
     public static final String WITHER_TRANSLATABLE = "{\"translate\":\"entity.WitherBoss.name\"}";
