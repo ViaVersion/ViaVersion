@@ -17,7 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -27,10 +31,9 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ChatRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.GameMode;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CompressionProvider;
@@ -38,6 +41,8 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 
 public class PlayerPackets1_9 {
     public static void register(Protocol1_8To1_9 protocol) {
@@ -49,7 +54,20 @@ public class PlayerPackets1_9 {
 
                 handler(wrapper -> {
                     JsonObject obj = (JsonObject) wrapper.get(Types.COMPONENT, 0);
-                    ChatRewriter.toClient(obj, wrapper.user());
+                    if (obj.get("translate") != null && obj.get("translate").getAsString().equals("gameMode.changed")) {
+                        EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                        String gameMode = tracker.getGameMode().getText();
+
+                        JsonObject gameModeObject = new JsonObject();
+                        gameModeObject.addProperty("text", gameMode);
+                        gameModeObject.addProperty("color", "gray");
+                        gameModeObject.addProperty("italic", true);
+
+                        JsonArray array = new JsonArray();
+                        array.add(gameModeObject);
+
+                        obj.add("with", array);
+                    }
                 });
             }
         });
@@ -270,16 +288,16 @@ public class PlayerPackets1_9 {
 
                         for (int i = 0; i < size; ++i) {
                             Item item1 = wrapper.passthrough(Types.ITEM1_8);
-                            ItemRewriter.toClient(item1);
+                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item1);
 
                             Item item2 = wrapper.passthrough(Types.ITEM1_8);
-                            ItemRewriter.toClient(item2);
+                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item2);
 
                             boolean present = wrapper.passthrough(Types.BOOLEAN);
 
                             if (present) {
                                 Item item3 = wrapper.passthrough(Types.ITEM1_8);
-                                ItemRewriter.toClient(item3);
+                                protocol.getItemRewriter().handleItemToClient(wrapper.user(), item3);
                             }
 
                             wrapper.passthrough(Types.BOOLEAN);
@@ -406,7 +424,18 @@ public class PlayerPackets1_9 {
                         Item item = wrapper.passthrough(Types.ITEM1_8);
                         if (item != null) {
                             item.setIdentifier(387); // Written Book
-                            ItemRewriter.rewriteBookToServer(item);
+                            CompoundTag tag = item.tag();
+                            ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+                            if (pages == null) {
+                                return;
+                            }
+
+                            for (int i = 0; i < pages.size(); i++) {
+                                final StringTag pageTag = pages.get(i);
+                                final String value = pageTag.getValue();
+
+                                pageTag.setValue(ComponentUtil.convertJson(value, SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
+                            }
                         }
                     }
                     if (name.equals("MC|AutoCmd")) {

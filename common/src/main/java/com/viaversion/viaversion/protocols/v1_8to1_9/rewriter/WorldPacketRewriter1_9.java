@@ -37,12 +37,12 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8.packet.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CommandBlockProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.Effect;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EffectIds;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.SoundEffect;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
@@ -77,7 +77,7 @@ public class WorldPacketRewriter1_9 {
                 handler(wrapper -> {
                     int id = wrapper.get(Types.INT, 0);
 
-                    id = Effect.getNewId(id);
+                    id = EffectIds.getNewId(id);
                     wrapper.set(Types.INT, 0, id);
                 });
                 // Rewrite potion effect as it changed to use a dynamic registry
@@ -85,7 +85,7 @@ public class WorldPacketRewriter1_9 {
                     int id = wrapper.get(Types.INT, 0);
                     if (id == 2002) {
                         int data = wrapper.get(Types.INT, 1);
-                        int newData = ItemRewriter.getNewEffectID(data);
+                        int newData = PotionIds.getNewPotionID(data);
                         wrapper.set(Types.INT, 1, newData);
                     }
                 });

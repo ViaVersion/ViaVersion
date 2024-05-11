@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_10To1_11> {
+public class MetadataRewriter1_11 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_10To1_11> {
 
-    public MetadataRewriter1_11To1_10(Protocol1_10To1_11 protocol) {
+    public MetadataRewriter1_11(Protocol1_10To1_11 protocol) {
         super(protocol);
     }
 
