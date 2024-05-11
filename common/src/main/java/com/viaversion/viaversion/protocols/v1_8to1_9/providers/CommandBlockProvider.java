@@ -51,7 +51,7 @@ public class CommandBlockProvider implements Provider {
     }
 
     public void sendPermission(UserConnection user) {
-        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_STATUS, null, user); // Entity status
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EVENT, null, user); // Entity status
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
         wrapper.write(Type.INT, tracker.getProvidedEntityId()); // Entity ID

@@ -46,12 +46,12 @@ public class WorldPacketRewriter1_16 {
     public static void register(Protocol1_15_2To1_16 protocol) {
         BlockRewriter<ClientboundPackets1_15> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_CHANGE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.ACKNOWLEDGE_PLAYER_DIGGING);
+        blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_UPDATE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.CHUNK_BLOCKS_UPDATE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.BLOCK_BREAK_ACK);
 
-        protocol.registerClientbound(ClientboundPackets1_15.UPDATE_LIGHT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.LIGHT_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // x
@@ -60,7 +60,7 @@ public class WorldPacketRewriter1_16 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_15.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_15.TYPE);
             wrapper.write(ChunkType1_16.TYPE, chunk);
 
@@ -100,7 +100,7 @@ public class WorldPacketRewriter1_16 {
             handleBlockEntity(protocol, wrapper.user(), tag);
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_15.EFFECT, 1010, 2001);
+        blockRewriter.registerEffect(ClientboundPackets1_15.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void handleBlockEntity(Protocol1_15_2To1_16 protocol, UserConnection connection, CompoundTag compoundTag) {

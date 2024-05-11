@@ -41,19 +41,19 @@ public class EntityPacketRewriter1_14 {
     public static void register(Protocol1_13_2To1_14 protocol) {
         MetadataRewriter1_14To1_13_2 metadataRewriter = protocol.get(MetadataRewriter1_14To1_13_2.class);
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_EXPERIENCE_ORB, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_EXPERIENCE_ORB, wrapper -> {
             int entityId = wrapper.passthrough(Type.VAR_INT);
             metadataRewriter.tracker(wrapper.user()).addEntity(entityId, EntityTypes1_14.EXPERIENCE_ORB);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_GLOBAL_ENTITY, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_GLOBAL_ENTITY, wrapper -> {
             int entityId = wrapper.passthrough(Type.VAR_INT);
             if (wrapper.passthrough(Type.BYTE) == 1) {
                 metadataRewriter.tracker(wrapper.user()).addEntity(entityId, EntityTypes1_14.LIGHTNING_BOLT);
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -115,7 +115,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_MOB, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -136,7 +136,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PAINTING, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_PAINTING, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -148,7 +148,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_PLAYER, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -164,7 +164,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_ANIMATION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.ANIMATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -175,7 +175,7 @@ public class EntityPacketRewriter1_14 {
                         int entityId = wrapper.get(Type.VAR_INT, 0);
                         tracker.setSleeping(entityId, false);
 
-                        PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.ENTITY_METADATA);
+                        PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
                         metadataPacket.write(Type.VAR_INT, entityId);
                         List<Metadata> metadataList = new LinkedList<>();
                         if (tracker.clientEntityId() != entityId) {
@@ -189,7 +189,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID
@@ -204,7 +204,7 @@ public class EntityPacketRewriter1_14 {
                 handler(metadataRewriter.playerTrackerHandler());
                 handler(wrapper -> {
                     short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from join game
-                    PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
+                    PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.CHANGE_DIFFICULTY);
                     difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                     difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
                     difficultyPacket.scheduleSend(protocol.getClass());
@@ -225,7 +225,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.USE_BED, ClientboundPackets1_14.ENTITY_METADATA, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.PLAYER_SLEEP, ClientboundPackets1_14.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -245,7 +245,7 @@ public class EntityPacketRewriter1_14 {
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_13.DESTROY_ENTITIES);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_13.ENTITY_METADATA, Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST);
     }
 }

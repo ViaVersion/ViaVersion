@@ -33,13 +33,13 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_16.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16.WINDOW_ITEMS);
-        registerTradeList(ClientboundPackets1_16.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_16.SET_SLOT);
-        registerEntityEquipmentArray(ClientboundPackets1_16.ENTITY_EQUIPMENT);
-        registerAdvancements(ClientboundPackets1_16.ADVANCEMENTS);
+        registerWindowItems(ClientboundPackets1_16.CONTAINER_SET_CONTENT);
+        registerTradeList(ClientboundPackets1_16.MERCHANT_OFFERS);
+        registerSetSlot(ClientboundPackets1_16.CONTAINER_SET_SLOT);
+        registerEntityEquipmentArray(ClientboundPackets1_16.SET_EQUIPMENT);
+        registerAdvancements(ClientboundPackets1_16.UPDATE_ADVANCEMENTS);
 
-        protocol.registerClientbound(ClientboundPackets1_16.UNLOCK_RECIPES, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16.RECIPE, wrapper -> {
             wrapper.passthrough(Type.VAR_INT);
             wrapper.passthrough(Type.BOOLEAN); // Open
             wrapper.passthrough(Type.BOOLEAN); // Filter
@@ -52,12 +52,12 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
             wrapper.write(Type.BOOLEAN, false);
         });
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_16.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_16.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_16_2.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_16_2.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow(ServerboundPackets1_16_2.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_16_2.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_16.SPAWN_PARTICLE, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_16.LEVEL_PARTICLES, Type.DOUBLE);
     }
 }

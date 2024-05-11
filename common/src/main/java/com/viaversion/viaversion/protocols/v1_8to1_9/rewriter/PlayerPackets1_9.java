@@ -42,7 +42,7 @@ import java.util.logging.Level;
 
 public class PlayerPackets1_9 {
     public static void register(Protocol1_8To1_9 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING, Protocol1_8To1_9.STRING_TO_JSON); // 0 - Chat Message (json)
@@ -70,7 +70,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.TITLE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_TITLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Action
@@ -101,7 +101,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.TEAMS, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_PLAYER_TEAM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Team Name
@@ -162,7 +162,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Player ID
@@ -256,7 +256,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel Name
@@ -355,7 +355,7 @@ public class PlayerPackets1_9 {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.TAB_COMPLETE, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.COMMAND_SUGGESTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Requested Command
@@ -363,7 +363,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_SETTINGS, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - locale
@@ -386,18 +386,18 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.ANIMATION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.SWING, new PacketHandlers() {
             @Override
             public void register() {
                 read(Type.VAR_INT); // 0 - Hand
             }
         });
 
-        protocol.cancelServerbound(ServerboundPackets1_9.TELEPORT_CONFIRM);
-        protocol.cancelServerbound(ServerboundPackets1_9.VEHICLE_MOVE);
-        protocol.cancelServerbound(ServerboundPackets1_9.STEER_BOAT);
+        protocol.cancelServerbound(ServerboundPackets1_9.ACCEPT_TELEPORTATION);
+        protocol.cancelServerbound(ServerboundPackets1_9.MOVE_VEHICLE);
+        protocol.cancelServerbound(ServerboundPackets1_9.PADDLE_BOAT);
 
-        protocol.registerServerbound(ServerboundPackets1_9.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel Name
@@ -427,7 +427,7 @@ public class PlayerPackets1_9 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_STATUS, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.CLIENT_COMMAND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Action ID
@@ -452,7 +452,7 @@ public class PlayerPackets1_9 {
             tracker.incrementIdlePacket();
             tracker.setGround(wrapper.get(Type.BOOLEAN, 0));
         };
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.DOUBLE); // 0 - X
@@ -462,7 +462,7 @@ public class PlayerPackets1_9 {
                 handler(onGroundHandler);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_POS_ROT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.DOUBLE); // 0 - X
@@ -474,7 +474,7 @@ public class PlayerPackets1_9 {
                 handler(onGroundHandler);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_ROTATION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_ROT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.FLOAT); // 0 - Yaw
@@ -483,7 +483,7 @@ public class PlayerPackets1_9 {
                 handler(onGroundHandler);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_MOVEMENT, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.MOVE_PLAYER_STATUS_ONLY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BOOLEAN); // 0 - Ground

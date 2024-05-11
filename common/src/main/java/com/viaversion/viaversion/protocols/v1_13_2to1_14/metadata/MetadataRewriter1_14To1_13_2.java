@@ -46,16 +46,16 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
         registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.blockStateType, Types1_14.META_TYPES.particleType);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
-        filter().type(EntityTypes1_14.LIVINGENTITY).addIndex(12);
+        filter().type(EntityTypes1_14.LIVING_ENTITY).addIndex(12);
 
-        filter().type(EntityTypes1_14.LIVINGENTITY).index(8).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.LIVING_ENTITY).index(8).handler((event, meta) -> {
             float value = ((Number) meta.getValue()).floatValue();
             if (Float.isNaN(value) && Via.getConfig().is1_14HealthNaNFix()) {
                 meta.setValue(1F);
             }
         });
 
-        filter().type(EntityTypes1_14.ABSTRACT_INSENTIENT).index(13).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.MOB).index(13).handler((event, meta) -> {
             EntityTracker1_14 tracker = tracker(event.user());
             int entityId = event.entityId();
             tracker.setInsentientData(entityId, (byte) ((((Number) meta.getValue()).byteValue() & ~0x4)
@@ -93,7 +93,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
         });
 
-        filter().type(EntityTypes1_14.MINECART_ABSTRACT).index(10).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.ABSTRACT_MINECART).index(10).handler((event, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
@@ -111,7 +111,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
                 armorItem = new DataItem(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
             }
 
-            PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.ENTITY_EQUIPMENT, null, event.user());
+            PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.SET_EQUIPPED_ITEM, null, event.user());
             equipmentPacket.write(Type.VAR_INT, event.entityId());
             equipmentPacket.write(Type.VAR_INT, 4);
             equipmentPacket.write(Type.ITEM1_13_2, armorItem);
@@ -148,7 +148,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             event.cancel();  // "Is swinging arms"
         });
 
-        filter().type(EntityTypes1_14.ABSTRACT_ILLAGER_BASE).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.ABSTRACT_ILLAGER).handler((event, meta) -> {
             if (event.index() == 14) {
                 EntityTracker1_14 tracker = tracker(event.user());
                 int entityId = event.entityId();

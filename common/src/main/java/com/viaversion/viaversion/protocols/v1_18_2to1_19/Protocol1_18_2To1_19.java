@@ -77,7 +77,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_18.UPDATE_TAGS);
 
         entityRewriter.register();
         itemRewriter.register();
@@ -100,7 +100,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 handler(soundRewriter.getSoundHandler());
             }
         });
-        registerClientbound(ClientboundPackets1_18.ENTITY_SOUND, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.SOUND_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Sound id
@@ -112,7 +112,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 handler(soundRewriter.getSoundHandler());
             }
         });
-        registerClientbound(ClientboundPackets1_18.NAMED_SOUND, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Sound name
@@ -126,20 +126,20 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_18.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_18.AWARD_STATS);
 
         final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
-        registerClientbound(ClientboundPackets1_18.TITLE_TEXT, singleNullTextComponentMapper);
-        registerClientbound(ClientboundPackets1_18.TITLE_SUBTITLE, singleNullTextComponentMapper);
-        registerClientbound(ClientboundPackets1_18.ACTIONBAR, singleNullTextComponentMapper);
-        registerClientbound(ClientboundPackets1_18.SCOREBOARD_OBJECTIVE, wrapper -> {
+        registerClientbound(ClientboundPackets1_18.SET_TITLE_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.SET_SUBTITLE_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.SET_ACTION_BAR_TEXT, singleNullTextComponentMapper);
+        registerClientbound(ClientboundPackets1_18.SET_OBJECTIVE, wrapper -> {
             wrapper.passthrough(Type.STRING); // Objective Name
             byte action = wrapper.passthrough(Type.BYTE); // Mode
             if (action == 0 || action == 2) {
                 wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
             }
         });
-        registerClientbound(ClientboundPackets1_18.TEAMS, wrapper -> {
+        registerClientbound(ClientboundPackets1_18.SET_PLAYER_TEAM, wrapper -> {
             wrapper.passthrough(Type.STRING); // Team Name
             byte action = wrapper.passthrough(Type.BYTE); // Mode
             if (action == 0 || action == 2) {
@@ -154,7 +154,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         });
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
-        registerClientbound(ClientboundPackets1_18.DECLARE_COMMANDS, wrapper -> {
+        registerClientbound(ClientboundPackets1_18.COMMANDS, wrapper -> {
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 final byte flags = wrapper.passthrough(Type.BYTE);
@@ -188,7 +188,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         });
 
         // Make every message a system message, including player ones; we don't want to analyze and remove player names from the original component
-        registerClientbound(ClientboundPackets1_18.CHAT_MESSAGE, ClientboundPackets1_19.SYSTEM_CHAT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.CHAT, ClientboundPackets1_19.SYSTEM_CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.COMPONENT); // Message
@@ -200,7 +200,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_19.CHAT_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_19.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Message
@@ -210,7 +210,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 read(Type.BOOLEAN); // Signed preview
             }
         });
-        registerServerbound(ServerboundPackets1_19.CHAT_COMMAND, ServerboundPackets1_17.CHAT_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_19.CHAT_COMMAND, ServerboundPackets1_17.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Command

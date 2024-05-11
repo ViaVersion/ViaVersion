@@ -86,7 +86,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
             wrapper.write(Type.NAMED_COMPOUND_TAG, tag);
         });
 
-        registerClientbound(ClientboundPackets1_9.CHUNK_DATA, wrapper -> {
+        registerClientbound(ClientboundPackets1_9.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
             Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment()));
@@ -112,7 +112,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
             }
         });
 
-        registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID

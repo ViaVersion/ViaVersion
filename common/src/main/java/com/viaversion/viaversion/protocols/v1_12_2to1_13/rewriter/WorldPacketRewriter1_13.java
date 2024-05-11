@@ -77,7 +77,7 @@ public class WorldPacketRewriter1_13 {
 
     public static void register(Protocol1_12_2To1_13 protocol) {
         // Outgoing packets
-        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PAINTING, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.ADD_PAINTING, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -127,7 +127,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ACTION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // Location
@@ -162,7 +162,7 @@ public class WorldPacketRewriter1_13 {
                         blockId = blockId - 219 + 483;
 
                     if (blockId == 73) { // Note block
-                        PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_CHANGE);
+                        PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_UPDATE);
                         blockChange.write(Type.POSITION1_8, pos);
                         blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_12_2To1_13.class);
@@ -172,7 +172,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_CHANGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8);
@@ -199,7 +199,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Chunk X
@@ -257,7 +257,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.EXPLOSION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
                 if (!Via.getConfig().isServersideBlockConnections()) {
@@ -300,7 +300,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.UNLOAD_CHUNK, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.FORGET_LEVEL_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
                 if (Via.getConfig().isServersideBlockConnections()) {
@@ -313,7 +313,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.NAMED_SOUND, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING);
@@ -325,7 +325,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_12_1.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             BlockStorage storage = wrapper.user().get(BlockStorage.class);
 
@@ -467,7 +467,7 @@ public class WorldPacketRewriter1_13 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.SPAWN_PARTICLE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Particle ID
@@ -536,7 +536,7 @@ public class WorldPacketRewriter1_13 {
         });
 
         // Incoming Packets
-        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_13.USE_ITEM_ON, wrapper -> {
             Position pos = wrapper.passthrough(Type.POSITION1_8);
             wrapper.passthrough(Type.VAR_INT); // block face
             wrapper.passthrough(Type.VAR_INT); // hand
@@ -548,7 +548,7 @@ public class WorldPacketRewriter1_13 {
                 ConnectionData.markModified(wrapper.user(), pos);
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_DIGGING, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_13.PLAYER_ACTION, wrapper -> {
             int status = wrapper.passthrough(Type.VAR_INT); // Status
             Position pos = wrapper.passthrough(Type.POSITION1_8); // Location
             wrapper.passthrough(Type.UNSIGNED_BYTE); // block face

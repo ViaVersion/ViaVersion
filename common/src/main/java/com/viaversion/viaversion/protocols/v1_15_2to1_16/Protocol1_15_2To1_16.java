@@ -78,9 +78,9 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         EntityPacketRewriter1_16.register(this);
         WorldPacketRewriter1_16.register(this);
 
-        tagRewriter.register(ClientboundPackets1_15.TAGS, RegistryType.ENTITY);
+        tagRewriter.register(ClientboundPackets1_15.UPDATE_TAGS, RegistryType.ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_15.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_15.AWARD_STATS);
 
         // Login Success
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
@@ -125,7 +125,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Handle (relevant) component cases for translatable and score changes
-        registerClientbound(ClientboundPackets1_15.CHAT_MESSAGE, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_15.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.COMPONENT);
@@ -136,15 +136,15 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        componentRewriter.registerBossBar(ClientboundPackets1_15.BOSSBAR);
-        componentRewriter.registerTitle(ClientboundPackets1_15.TITLE);
-        componentRewriter.registerCombatEvent(ClientboundPackets1_15.COMBAT_EVENT);
+        componentRewriter.registerBossBar(ClientboundPackets1_15.BOSS_EVENT);
+        componentRewriter.registerTitle(ClientboundPackets1_15.SET_TITLES);
+        componentRewriter.registerCombatEvent(ClientboundPackets1_15.PLAYER_COMBAT);
 
         SoundRewriter<ClientboundPackets1_15> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_15.ENTITY_SOUND);
+        soundRewriter.registerSound(ClientboundPackets1_15.SOUND_ENTITY);
 
-        registerServerbound(ServerboundPackets1_16.INTERACT_ENTITY, wrapper -> {
+        registerServerbound(ServerboundPackets1_16.INTERACT, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Entity Id
             int action = wrapper.passthrough(Type.VAR_INT);
             if (action == 0 || action == 2) {
@@ -163,7 +163,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
-            registerServerbound(ServerboundPackets1_16.PLUGIN_MESSAGE, new PacketHandlers() {
+            registerServerbound(ServerboundPackets1_16.CUSTOM_PAYLOAD, new PacketHandlers() {
                 @Override
                 public void register() {
                     map(Type.STRING); // Channel
@@ -210,8 +210,8 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
             wrapper.write(Type.FLOAT, playerAbilities.getWalkingSpeed(wrapper.user()));
         });
 
-        cancelServerbound(ServerboundPackets1_16.GENERATE_JIGSAW);
-        cancelServerbound(ServerboundPackets1_16.UPDATE_JIGSAW_BLOCK);
+        cancelServerbound(ServerboundPackets1_16.JIGSAW_GENERATE);
+        cancelServerbound(ServerboundPackets1_16.SET_JIGSAW_BLOCK);
     }
 
     @Override

@@ -78,18 +78,18 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_20_3.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_20_3.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_3> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND_ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.AWARD_STATS);
 
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
-        componentRewriter.registerCombatKill1_20(ClientboundPackets1_20_3.COMBAT_KILL);
+        componentRewriter.registerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Type.STRING); // Server ID
@@ -132,7 +132,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 storage.clearOffset();
             }
         });
-        registerServerbound(ServerboundPackets1_20_5.CHAT_MESSAGE, wrapper -> {
+        registerServerbound(ServerboundPackets1_20_5.CHAT, wrapper -> {
             wrapper.passthrough(Type.STRING); // Message
             wrapper.passthrough(Type.LONG); // Timestamp
 
@@ -206,7 +206,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
 
         registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
 
-        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.DECLARE_COMMANDS);
+        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_3.COMMANDS);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             wrapper.passthrough(Type.UUID); // UUID

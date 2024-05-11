@@ -55,7 +55,7 @@ public class WorldPacketRewriter1_14 {
     public static void register(Protocol1_13_2To1_14 protocol) {
         BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_BREAK_ANIMATION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_DESTRUCTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -69,7 +69,7 @@ public class WorldPacketRewriter1_14 {
                 map(Type.POSITION1_8, Type.POSITION1_14);
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ACTION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8, Type.POSITION1_14); // Location
@@ -79,7 +79,7 @@ public class WorldPacketRewriter1_14 {
                 handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Type.VAR_INT, 0))));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_CHANGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8, Type.POSITION1_14);
@@ -92,7 +92,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SERVER_DIFFICULTY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CHANGE_DIFFICULTY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE);
@@ -102,9 +102,9 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
 
-        protocol.registerClientbound(ClientboundPackets1_13.EXPLOSION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.FLOAT); // X
@@ -124,7 +124,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             Chunk chunk = wrapper.read(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
             wrapper.write(ChunkType1_14.TYPE, chunk);
@@ -182,7 +182,7 @@ public class WorldPacketRewriter1_14 {
             heightMap.put("WORLD_SURFACE", new LongArrayTag(encodeHeightMap(worldSurface)));
             chunk.setHeightMap(heightMap);
 
-            PacketWrapper lightPacket = wrapper.create(ClientboundPackets1_14.UPDATE_LIGHT);
+            PacketWrapper lightPacket = wrapper.create(ClientboundPackets1_14.LIGHT_UPDATE);
             lightPacket.write(Type.VAR_INT, chunk.getX());
             lightPacket.write(Type.VAR_INT, chunk.getZ());
 
@@ -229,7 +229,7 @@ public class WorldPacketRewriter1_14 {
             if (entityTracker.isForceSendCenterChunk()
                     || diffX >= SERVERSIDE_VIEW_DISTANCE
                     || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
-                PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.UPDATE_VIEW_POSITION); // Set center chunk
+                PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.SET_CHUNK_CACHE_CENTER); // Set center chunk
                 fakePosLook.write(Type.VAR_INT, chunk.getX());
                 fakePosLook.write(Type.VAR_INT, chunk.getZ());
                 fakePosLook.send(Protocol1_13_2To1_14.class);
@@ -247,7 +247,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
@@ -265,7 +265,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.MAP_DATA, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -291,7 +291,7 @@ public class WorldPacketRewriter1_14 {
                 });
                 handler(wrapper -> {
                     short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
-                    PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.SERVER_DIFFICULTY);
+                    PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.CHANGE_DIFFICULTY);
                     difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
                     difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
                     difficultyPacket.scheduleSend(protocol.getClass());
@@ -305,7 +305,7 @@ public class WorldPacketRewriter1_14 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.SPAWN_POSITION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8, Type.POSITION1_14);
@@ -314,7 +314,7 @@ public class WorldPacketRewriter1_14 {
     }
 
     static void sendViewDistancePacket(UserConnection connection) {
-        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.UPDATE_VIEW_DISTANCE, connection);
+        PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.SET_CHUNK_CACHE_RADIUS, connection);
         setViewDistance.write(Type.VAR_INT, WorldPacketRewriter1_14.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_13_2To1_14.class);
     }

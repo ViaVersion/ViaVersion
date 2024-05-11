@@ -34,12 +34,12 @@ public final class WorldPacketRewriter1_15 {
     public static void register(Protocol1_14_4To1_15 protocol) {
         BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_CHANGE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14_4.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.ACKNOWLEDGE_PLAYER_DIGGING);
+        blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_UPDATE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14_4.CHUNK_BLOCKS_UPDATE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.BLOCK_BREAK_ACK);
 
-        protocol.registerClientbound(ClientboundPackets1_14_4.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
             wrapper.write(ChunkType1_15.TYPE, chunk);
 
@@ -79,8 +79,8 @@ public final class WorldPacketRewriter1_15 {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_14_4.EFFECT, 1010, 2001);
-        protocol.registerClientbound(ClientboundPackets1_14_4.SPAWN_PARTICLE, new PacketHandlers() {
+        blockRewriter.registerEffect(ClientboundPackets1_14_4.LEVEL_EVENT, 1010, 2001);
+        protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Particle ID

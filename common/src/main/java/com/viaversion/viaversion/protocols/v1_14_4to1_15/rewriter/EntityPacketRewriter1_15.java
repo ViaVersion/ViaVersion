@@ -36,9 +36,9 @@ public final class EntityPacketRewriter1_15 {
     public static void register(Protocol1_14_4To1_15 protocol) {
         MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
 
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14_4.SPAWN_ENTITY, EntityTypes1_15.FALLING_BLOCK);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14_4.ADD_ENTITY, EntityTypes1_15.FALLING_BLOCK);
 
-        protocol.registerClientbound(ClientboundPackets1_14_4.SPAWN_MOB, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -59,7 +59,7 @@ public final class EntityPacketRewriter1_15 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_14_4.SPAWN_PLAYER, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_14_4.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -87,7 +87,7 @@ public final class EntityPacketRewriter1_15 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_14_4.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_14_4.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID
@@ -105,8 +105,8 @@ public final class EntityPacketRewriter1_15 {
             }
         });
 
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14_4.ENTITY_METADATA, Types1_14.METADATA_LIST);
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14_4.DESTROY_ENTITIES);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
     }
 
     private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter<?, ?> rewriter) {
@@ -123,7 +123,7 @@ public final class EntityPacketRewriter1_15 {
         // Handle meta
         rewriter.handleMetadata(entityId, metadata, wrapper.user());
 
-        PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, wrapper.user());
+        PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
         metadataPacket.write(Type.VAR_INT, entityId);
         metadataPacket.write(Types1_14.METADATA_LIST, metadata);
         metadataPacket.send(Protocol1_14_4To1_15.class);
