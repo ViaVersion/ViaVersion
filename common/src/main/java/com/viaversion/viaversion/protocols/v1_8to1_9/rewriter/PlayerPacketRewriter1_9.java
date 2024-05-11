@@ -31,7 +31,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.GameMode;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CompressionProvider;
@@ -54,7 +54,7 @@ public class PlayerPacketRewriter1_9 {
                     JsonObject obj = (JsonObject) wrapper.get(Types.COMPONENT, 0);
                     if (obj.get("translate") != null && obj.get("translate").getAsString().equals("gameMode.changed")) {
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                        String gameMode = tracker.getGameMode().getText();
+                        String gameMode = tracker.getGameMode().text();
 
                         JsonObject gameModeObject = new JsonObject();
                         gameModeObject.addProperty("text", gameMode);
