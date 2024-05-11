@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorType;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorTypes1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import java.util.UUID;
@@ -56,7 +56,7 @@ public class ArmorListener extends ViaBukkitListener {
 
         int armor = 0;
         for (ItemStack stack : player.getInventory().getArmorContents()) {
-            armor += ArmorType.findById(stack.getTypeId()).getArmorPoints();
+            armor += ArmorTypes1_8.findById(stack.getTypeId()).getArmorPoints();
         }
 
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.UPDATE_ATTRIBUTES, null, getUserConnection(player));
@@ -75,7 +75,7 @@ public class ArmorListener extends ViaBukkitListener {
     public void onInventoryClick(InventoryClickEvent e) {
         HumanEntity human = e.getWhoClicked();
         if (human instanceof final Player player && e.getInventory() instanceof CraftingInventory) {
-            if ((e.getCurrentItem() != null && ArmorType.isArmor(e.getCurrentItem().getTypeId()))
+            if ((e.getCurrentItem() != null && ArmorTypes1_8.isArmor(e.getCurrentItem().getTypeId()))
                     || (e.getRawSlot() >= 5 && e.getRawSlot() <= 8)) {
                 sendDelayedArmorUpdate(player);
             }

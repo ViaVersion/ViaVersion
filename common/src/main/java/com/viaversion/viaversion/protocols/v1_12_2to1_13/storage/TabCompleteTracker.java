@@ -25,9 +25,8 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.providers.PlayerLookTargetProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
-import java.util.logging.Level;
 
 public class TabCompleteTracker implements StorableObject {
     private int transactionId;

@@ -20,7 +20,7 @@ package com.viaversion.viaversion.bungee.providers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MainHandProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;

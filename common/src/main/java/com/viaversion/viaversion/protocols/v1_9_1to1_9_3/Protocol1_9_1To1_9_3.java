@@ -38,7 +38,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
-import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.data.FakeTileEntity;
+import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.data.FakeTileEntities1_9_1;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import java.util.List;
@@ -101,8 +101,8 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
 
                 for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                     int id = blocks.idAt(idx) >> 4;
-                    if (FakeTileEntity.isTileEntity(id)) {
-                        tags.add(FakeTileEntity.createTileEntity(
+                    if (FakeTileEntities1_9_1.isTileEntity(id)) {
+                        tags.add(FakeTileEntities1_9_1.createTileEntity(
                                 ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
                                 ChunkSection.yFromIndex(idx) + (s << 4),
                                 ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),

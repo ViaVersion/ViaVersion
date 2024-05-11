@@ -42,8 +42,8 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.NamedSoundRewriter
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleRewriter;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.providers.BlockEntityProvider;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.providers.PaintingProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.util.IdAndData;

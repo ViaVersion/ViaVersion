@@ -15,30 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bungee.providers;
+package com.viaversion.viaversion.protocols.v1_8to1_9.provider;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.bungee.storage.BungeeStorage;
-import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
-import java.lang.reflect.Method;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.viaversion.viaversion.api.platform.providers.Provider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 
-public class BungeeEntityIdProvider extends EntityIdProvider {
-    private static final Method GET_CLIENT_ENTITY_ID;
+public class EntityIdProvider implements Provider {
 
-    static {
-        try {
-            GET_CLIENT_ENTITY_ID = Class.forName("net.md_5.bungee.UserConnection").getDeclaredMethod("getClientEntityId");
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public int getEntityId(UserConnection user) throws Exception {
-        BungeeStorage storage = user.get(BungeeStorage.class);
-        ProxiedPlayer player = storage.getPlayer();
-
-        return (int) GET_CLIENT_ENTITY_ID.invoke(player);
+        return user.getEntityTracker(Protocol1_8To1_9.class).clientEntityId();
     }
 }

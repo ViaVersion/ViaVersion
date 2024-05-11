@@ -41,7 +41,7 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.metadata.MetadataRewriter1_12To1_11_1;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ClientboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ChatItemRewriter;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ItemPacketRewriter1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.TranslateRewriter;
@@ -50,7 +50,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import java.util.logging.Level;
 
 public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
