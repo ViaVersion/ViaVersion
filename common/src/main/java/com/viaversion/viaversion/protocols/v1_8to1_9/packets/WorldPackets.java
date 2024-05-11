@@ -65,7 +65,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Effect ID
@@ -91,7 +91,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.NAMED_SOUND, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Sound Name
@@ -123,7 +123,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_8.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
             Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(clientWorld.getEnvironment()));
@@ -132,7 +132,7 @@ public class WorldPackets {
 
             // Check if the chunk should be handled as an unload packet
             if (chunk.isFullChunk() && chunk.getBitmask() == 0) {
-                wrapper.setPacketType(ClientboundPackets1_9.UNLOAD_CHUNK);
+                wrapper.setPacketType(ClientboundPackets1_9.FORGET_LEVEL_CHUNK);
                 wrapper.write(Type.INT, chunk.getX());
                 wrapper.write(Type.INT, chunk.getZ());
 
@@ -148,7 +148,7 @@ public class WorldPackets {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
                         if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                            PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.UNLOAD_CHUNK);
+                            PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.FORGET_LEVEL_CHUNK);
                             unloadChunk.write(Type.INT, chunkX);
                             unloadChunk.write(Type.INT, chunkZ);
                             unloadChunk.send(Protocol1_8To1_9.class);
@@ -167,7 +167,7 @@ public class WorldPackets {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
                         if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                             Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
                             emptyChunk.write(chunkType, c);
                             emptyChunk.send(Protocol1_8To1_9.class);
@@ -186,7 +186,7 @@ public class WorldPackets {
             Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
             // Split into multiple chunk packets
             for (Chunk chunk : chunks) {
-                PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                PacketWrapper chunkData = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                 chunkData.write(chunkType, chunk);
                 chunkData.send(Protocol1_8To1_9.class);
 
@@ -198,7 +198,7 @@ public class WorldPackets {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
                         if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
-                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.CHUNK_DATA);
+                            PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                             Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
                             emptyChunk.write(chunkType, c);
                             emptyChunk.send(Protocol1_8To1_9.class);
@@ -245,7 +245,7 @@ public class WorldPackets {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.UPDATE_SIGN, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Sign Position
@@ -258,7 +258,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_DIGGING, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
@@ -288,7 +288,7 @@ public class WorldPackets {
             int hand = wrapper.read(Type.VAR_INT);
             // Wipe the input buffer
             wrapper.clearInputBuffer();
-            wrapper.setPacketType(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT);
+            wrapper.setPacketType(ServerboundPackets1_8.USE_ITEM_ON);
             wrapper.write(Type.POSITION1_8, new Position(-1, (short) -1, -1));
             wrapper.write(Type.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
@@ -339,7 +339,7 @@ public class WorldPackets {
             wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Position

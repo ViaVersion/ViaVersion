@@ -160,7 +160,7 @@ public class EntityPackets {
         MetadataRewriter1_16To1_15_2 metadataRewriter = protocol.get(MetadataRewriter1_16To1_15_2.class);
 
         // Spawn lightning -> Spawn entity
-        protocol.registerClientbound(ClientboundPackets1_15.SPAWN_GLOBAL_ENTITY, ClientboundPackets1_16.SPAWN_ENTITY, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_15.ADD_GLOBAL_ENTITY, ClientboundPackets1_16.ADD_ENTITY, wrapper -> {
             int entityId = wrapper.passthrough(Type.VAR_INT);
             byte type = wrapper.read(Type.BYTE);
             if (type != 1) {
@@ -185,11 +185,11 @@ public class EntityPackets {
             wrapper.write(Type.SHORT, (short) 0); // velocity
         });
 
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.SPAWN_ENTITY, EntityTypes1_16.FALLING_BLOCK);
-        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_15.SPAWN_PLAYER, EntityTypes1_16.PLAYER);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.ENTITY_METADATA, Types1_14.METADATA_LIST, Types1_16.METADATA_LIST);
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_15.DESTROY_ENTITIES);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_15.ADD_ENTITY, EntityTypes1_16.FALLING_BLOCK);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.ADD_MOB);
+        metadataRewriter.registerTracker(ClientboundPackets1_15.ADD_PLAYER, EntityTypes1_16.PLAYER);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_15.SET_ENTITY_DATA, Types1_14.METADATA_LIST, Types1_16.METADATA_LIST);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_15.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketHandlers() {
             @Override
@@ -208,7 +208,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID
@@ -235,7 +235,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_PROPERTIES, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_15.UPDATE_ATTRIBUTES, wrapper -> {
             wrapper.passthrough(Type.VAR_INT);
             int size = wrapper.passthrough(Type.INT);
             int actualSize = size;
@@ -276,7 +276,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.ANIMATION, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_16.SWING, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
             // Don't send an arm swing if the player has an inventory opened.
             if (inventoryTracker.isInventoryOpen()) {

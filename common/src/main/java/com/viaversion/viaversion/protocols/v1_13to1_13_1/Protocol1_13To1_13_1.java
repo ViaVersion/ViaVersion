@@ -57,7 +57,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         EntityPackets.register(this);
         WorldPackets.register(this);
 
-        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.COMMAND_SUGGESTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -89,7 +89,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.TAB_COMPLETE, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_13.COMMAND_SUGGESTIONS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Transaction id
@@ -109,7 +109,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.BOSSBAR, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_13.BOSS_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UUID);
@@ -129,8 +129,8 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        tagRewriter.register(ClientboundPackets1_13.TAGS, RegistryType.ITEM);
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.STATISTICS);
+        tagRewriter.register(ClientboundPackets1_13.UPDATE_TAGS, RegistryType.ITEM);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
     }
 
     @Override

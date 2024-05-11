@@ -34,7 +34,7 @@ public class WorldPackets {
     public static void register(Protocol1_13To1_13_1 protocol) {
         BlockRewriter<ClientboundPackets1_13> blockRewriter = BlockRewriter.legacy(protocol);
 
-        protocol.registerClientbound(ClientboundPackets1_13.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
@@ -51,11 +51,11 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_CHANGE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.MULTI_BLOCK_CHANGE);
+        blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_UPDATE);
+        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
 
-        protocol.registerClientbound(ClientboundPackets1_13.EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
@@ -95,7 +95,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID

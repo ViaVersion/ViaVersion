@@ -59,11 +59,11 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
     @Override
     public void registerPackets() {
-        registerTracker(ClientboundPackets1_18.SPAWN_PLAYER, EntityTypes1_19.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_18.ENTITY_METADATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
+        registerTracker(ClientboundPackets1_18.ADD_PLAYER, EntityTypes1_19.PLAYER);
+        registerMetadataRewriter(ClientboundPackets1_18.SET_ENTITY_DATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -90,7 +90,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PAINTING, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.ADD_PAINTING, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -116,7 +116,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
                     wrapper.cancel();
 
                     // Send motive in metadata
-                    final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.ENTITY_METADATA);
+                    final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
                     metaPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0)); // Entity id
                     final List<Metadata> metadata = new ArrayList<>();
                     metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
@@ -126,7 +126,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_MOB, ClientboundPackets1_19.SPAWN_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.ADD_MOB, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity ID
@@ -151,7 +151,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -163,7 +163,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID
@@ -336,7 +336,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_18, 
 
         registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null);
 
-        filter().type(EntityTypes1_19.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));

@@ -48,7 +48,7 @@ public class ElytraPatch implements Listener {
             EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
             int entityId = tracker.getProvidedEntityId();
 
-            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_METADATA, null, user);
+            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, null, user);
 
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, Collections.singletonList(new Metadata(0, MetaType1_9.Byte, (byte) 0)));

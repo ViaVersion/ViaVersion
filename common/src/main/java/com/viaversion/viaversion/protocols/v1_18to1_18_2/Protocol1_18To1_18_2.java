@@ -40,9 +40,9 @@ public final class Protocol1_18To1_18_2 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
         tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting");
-        tagRewriter.registerGeneric(ClientboundPackets1_18.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_18.UPDATE_TAGS);
 
-        registerClientbound(ClientboundPackets1_18.ENTITY_EFFECT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -50,7 +50,7 @@ public final class Protocol1_18To1_18_2 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.REMOVE_ENTITY_EFFECT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.REMOVE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -58,7 +58,7 @@ public final class Protocol1_18To1_18_2 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_18.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID

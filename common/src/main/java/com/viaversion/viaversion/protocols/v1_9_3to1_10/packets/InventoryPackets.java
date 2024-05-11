@@ -33,7 +33,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
 
     @Override
     public void registerPackets() {
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION);
+        registerCreativeInvAction(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

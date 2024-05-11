@@ -30,7 +30,7 @@ public class Protocol1_14_2To1_14_3 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
-        registerClientbound(ClientboundPackets1_14.TRADE_LIST, wrapper -> {
+        registerClientbound(ClientboundPackets1_14.MERCHANT_OFFERS, wrapper -> {
             wrapper.passthrough(Type.VAR_INT);
             int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
             for (int i = 0; i < size; i++) {

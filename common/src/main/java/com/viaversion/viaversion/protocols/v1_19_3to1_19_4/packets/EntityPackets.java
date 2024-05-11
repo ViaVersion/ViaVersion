@@ -43,7 +43,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
 
     @Override
     public void registerPackets() {
-        protocol.registerClientbound(ClientboundPackets1_19_3.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity id
@@ -88,7 +88,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                     if (wrapper.read(Type.BOOLEAN)) { // Dismount vehicle
                         final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
                         if (playerVehicleTracker.getVehicleId() != -1) {
-                            final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE);
+                            final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE_DELIMITER);
                             bundleStart.send(Protocol1_19_3To1_19_4.class);
                             final PacketWrapper setPassengers = wrapper.create(ClientboundPackets1_19_4.SET_PASSENGERS);
                             setPassengers.write(Type.VAR_INT, playerVehicleTracker.getVehicleId()); // vehicle id
@@ -96,7 +96,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                             setPassengers.send(Protocol1_19_3To1_19_4.class);
                             wrapper.send(Protocol1_19_3To1_19_4.class);
                             wrapper.cancel();
-                            final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_19_4.BUNDLE);
+                            final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_19_4.BUNDLE_DELIMITER);
                             bundleEnd.send(Protocol1_19_3To1_19_4.class);
 
                             playerVehicleTracker.setVehicleId(-1);
@@ -131,7 +131,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_TELEPORT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             protected void register() {
                 handler(wrapper -> {
@@ -155,7 +155,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_ANIMATION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.ANIMATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -166,7 +166,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
                         return;
                     }
 
-                    wrapper.setPacketType(ClientboundPackets1_19_4.HIT_ANIMATION);
+                    wrapper.setPacketType(ClientboundPackets1_19_4.HURT_ANIMATION);
                     wrapper.write(Type.FLOAT, 0F);
                 });
             }
@@ -182,7 +182,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_STATUS, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_EVENT, wrapper -> {
             final int entityId = wrapper.read(Type.INT);
             final byte event = wrapper.read(Type.BYTE);
 
@@ -201,9 +201,9 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
             wrapper.write(Type.BYTE, event);
         });
 
-        registerTrackerWithData1_19(ClientboundPackets1_19_3.SPAWN_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_19_3.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
-        registerMetadataRewriter(ClientboundPackets1_19_3.ENTITY_METADATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_19_3.SET_ENTITY_DATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
     }
 
     private int damageTypeFromEntityEvent(byte entityEvent) {
@@ -222,7 +222,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_3
         filter().mapMetaType(typeId -> Types1_19_4.META_TYPES.byId(typeId >= 14 ? typeId + 1 : typeId)); // Optional block state (and map block state=14 to optional block state)
         registerMetaTypeHandler(Types1_19_4.META_TYPES.itemType, Types1_19_4.META_TYPES.blockStateType, Types1_19_4.META_TYPES.optionalBlockStateType, Types1_19_4.META_TYPES.particleType, null);
 
-        filter().type(EntityTypes1_19_4.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_4.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

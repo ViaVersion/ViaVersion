@@ -56,7 +56,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
 
     @Override
     public void registerPackets() {
-        protocol.registerClientbound(ClientboundPackets1_12_1.SET_SLOT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -66,7 +66,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_13, 0)));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_ITEMS, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -80,7 +80,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_12_1.WINDOW_PROPERTY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -97,7 +97,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         });
 
         // Plugin message Packet -> Trading
-        protocol.registerClientbound(ClientboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel
@@ -195,7 +195,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_12_1.ENTITY_EQUIPMENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_12_1.SET_EQUIPPED_ITEM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -207,7 +207,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
         });
 
 
-        protocol.registerServerbound(ServerboundPackets1_13.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_13.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -221,7 +221,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Channel
@@ -253,7 +253,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_12_1, Ser
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot

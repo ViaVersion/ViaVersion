@@ -59,7 +59,7 @@ public class DeathListener extends ViaBukkitListener {
             // If online
             UserConnection userConnection = getUserConnection(p);
             if (userConnection != null) {
-                PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.COMBAT_EVENT, userConnection);
+                PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.PLAYER_COMBAT, userConnection);
                 try {
                     wrapper.write(Type.VAR_INT, 2); // Event - Entity dead
                     wrapper.write(Type.VAR_INT, p.getEntityId()); // Player ID

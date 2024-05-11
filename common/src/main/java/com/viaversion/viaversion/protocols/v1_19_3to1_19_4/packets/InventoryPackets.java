@@ -37,13 +37,13 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_19_3.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_19_3.BLOCK_CHANGE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_3.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_3.CHUNK_DATA, ChunkType1_18::new);
+        blockRewriter.registerBlockAction(ClientboundPackets1_19_3.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_19_3.BLOCK_UPDATE);
+        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_3.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_3.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_19_3.BLOCK_ENTITY_DATA);
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
@@ -68,7 +68,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_3.OPEN_WINDOW, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_3.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Container id
@@ -84,15 +84,15 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
         });
 
         registerSetCooldown(ClientboundPackets1_19_3.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_19_3.WINDOW_ITEMS);
-        registerSetSlot1_17_1(ClientboundPackets1_19_3.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_19_3.ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_19_3.ENTITY_EQUIPMENT);
-        registerTradeList1_19(ClientboundPackets1_19_3.TRADE_LIST);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_3.WINDOW_PROPERTY);
-        registerSpawnParticle1_19(ClientboundPackets1_19_3.SPAWN_PARTICLE);
-        registerCreativeInvAction(ServerboundPackets1_19_4.CREATIVE_INVENTORY_ACTION);
-        registerClickWindow1_17_1(ServerboundPackets1_19_4.CLICK_WINDOW);
+        registerWindowItems1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_CONTENT);
+        registerSetSlot1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_SLOT);
+        registerAdvancements(ClientboundPackets1_19_3.UPDATE_ADVANCEMENTS);
+        registerEntityEquipmentArray(ClientboundPackets1_19_3.SET_EQUIPMENT);
+        registerTradeList1_19(ClientboundPackets1_19_3.MERCHANT_OFFERS);
+        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_3.CONTAINER_SET_DATA);
+        registerSpawnParticle1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
+        registerCreativeInvAction(ServerboundPackets1_19_4.SET_CREATIVE_MODE_SLOT);
+        registerClickWindow1_17_1(ServerboundPackets1_19_4.CONTAINER_CLICK);
 
         new RecipeRewriter1_19_3<>(protocol) {
             @Override
@@ -100,6 +100,6 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_19_
                 super.handleCraftingShaped(wrapper);
                 wrapper.write(Type.BOOLEAN, true); // Show notification
             }
-        }.register(ClientboundPackets1_19_3.DECLARE_RECIPES);
+        }.register(ClientboundPackets1_19_3.UPDATE_RECIPES);
     }
 }

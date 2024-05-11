@@ -86,7 +86,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public void setSecondHand(int entityID, Item item) {
-        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_EQUIPMENT, null, user());
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.SET_EQUIPPED_ITEM, null, user());
         wrapper.write(Type.VAR_INT, entityID);
         wrapper.write(Type.VAR_INT, 1); // slot
         wrapper.write(Type.ITEM1_8, this.itemInSecondHand = item);
@@ -212,7 +212,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
                             // Send movement
-                            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_POSITION, null, user());
+                            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.MOVE_ENTITY_POS, null, user());
                             wrapper.write(Type.VAR_INT, entityId);
                             wrapper.write(Type.SHORT, (short) 0);
                             wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
@@ -272,7 +272,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public void sendTeamPacket(boolean add, boolean now) {
-        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.TEAMS, null, user());
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.SET_PLAYER_TEAM, null, user());
         wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
         if (add) {
             // add

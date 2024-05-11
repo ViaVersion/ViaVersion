@@ -32,7 +32,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.storage.InventoryTracker;
 public class InventoryPackets {
 
     public static void register(Protocol1_8To1_9 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_DATA, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -63,7 +63,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.OPEN_SCREEN, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -87,7 +87,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -129,7 +129,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_CONTENT, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -182,7 +182,7 @@ public class InventoryPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_CLOSE, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -196,7 +196,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.MAP_DATA, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.MAP_ITEM_DATA, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -211,7 +211,7 @@ public class InventoryPackets {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -243,7 +243,7 @@ public class InventoryPackets {
                     boolean throwItem = (slot == 45);
                     if (throwItem) {
                         // Send a packet wiping the slot
-                        wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
+                        wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
                             w.write(Type.UNSIGNED_BYTE, (short) 0);
                             w.write(Type.SHORT, slot);
                             w.write(Type.ITEM1_8, null);
@@ -255,7 +255,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.CONTAINER_CLICK, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -298,7 +298,7 @@ public class InventoryPackets {
 
                     if (throwItem) {
                         // Send a packet wiping the slot
-                        wrapper.create(ClientboundPackets1_9.SET_SLOT, w -> {
+                        wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
                             w.write(Type.UNSIGNED_BYTE, windowID);
                             w.write(Type.SHORT, slot);
                             w.write(Type.ITEM1_8, null);
@@ -312,7 +312,7 @@ public class InventoryPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.CLOSE_WINDOW, new
+        protocol.registerServerbound(ServerboundPackets1_9.CONTAINER_CLOSE, new
 
                 PacketHandlers() {
 
@@ -329,7 +329,7 @@ public class InventoryPackets {
                     }
                 });
 
-        protocol.registerServerbound(ServerboundPackets1_9.HELD_ITEM_CHANGE, new
+        protocol.registerServerbound(ServerboundPackets1_9.SET_CARRIED_ITEM, new
 
                 PacketHandlers() {
                     @Override

@@ -55,14 +55,14 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
         WorldPackets.register(this);
 
         SoundRewriter<ClientboundPackets1_14_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.registerSound(ClientboundPackets1_14_4.ENTITY_SOUND); // Entity Sound Effect (added somewhere in 1.14)
+        soundRewriter.registerSound(ClientboundPackets1_14_4.SOUND_ENTITY); // Entity Sound Effect (added somewhere in 1.14)
         soundRewriter.registerSound(ClientboundPackets1_14_4.SOUND);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.AWARD_STATS);
 
         registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
-        tagRewriter.register(ClientboundPackets1_14_4.TAGS, RegistryType.ENTITY);
+        tagRewriter.register(ClientboundPackets1_14_4.UPDATE_TAGS, RegistryType.ENTITY);
     }
 
     @Override

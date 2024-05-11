@@ -46,7 +46,7 @@ public class Protocol1_13_1To1_13_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        registerClientbound(ClientboundPackets1_13.ADVANCEMENTS, wrapper -> {
+        registerClientbound(ClientboundPackets1_13.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
 

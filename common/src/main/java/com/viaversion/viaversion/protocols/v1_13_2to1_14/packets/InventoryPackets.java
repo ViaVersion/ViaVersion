@@ -66,9 +66,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS);
+        registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
 
-        protocol.registerClientbound(ClientboundPackets1_13.OPEN_WINDOW, null, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.OPEN_SCREEN, null, wrapper -> {
             Short windowId = wrapper.read(Type.UNSIGNED_BYTE);
             String type = wrapper.read(Type.STRING);
             JsonElement title = wrapper.read(Type.COMPONENT);
@@ -76,13 +76,13 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             Short slots = wrapper.read(Type.UNSIGNED_BYTE);
 
             if (type.equals("EntityHorse")) {
-                wrapper.setPacketType(ClientboundPackets1_14.OPEN_HORSE_WINDOW);
+                wrapper.setPacketType(ClientboundPackets1_14.HORSE_SCREEN_OPEN);
                 int entityId = wrapper.read(Type.INT);
                 wrapper.write(Type.UNSIGNED_BYTE, windowId);
                 wrapper.write(Type.VAR_INT, slots.intValue());
                 wrapper.write(Type.INT, entityId);
             } else {
-                wrapper.setPacketType(ClientboundPackets1_14.OPEN_WINDOW);
+                wrapper.setPacketType(ClientboundPackets1_14.OPEN_SCREEN);
                 wrapper.write(Type.VAR_INT, windowId.intValue());
 
                 int typeId = -1;
@@ -134,17 +134,17 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS);
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT);
+        registerWindowItems(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
+        registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
 
-        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Channel
                 handlerSoftFail(wrapper -> {
                     String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
                     if (channel.equals("minecraft:trader_list")) {
-                        wrapper.setPacketType(ClientboundPackets1_14.TRADE_LIST);
+                        wrapper.setPacketType(ClientboundPackets1_14.MERCHANT_OFFERS);
                         wrapper.resetReader();
                         wrapper.read(Type.STRING); // Remove channel
 
@@ -188,10 +188,10 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT);
+        registerEntityEquipment(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Type.VAR_INT);
             int deleted = 0;
             for (int i = 0; i < size; i++) {
@@ -210,11 +210,11 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
         });
 
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW);
+        registerClickWindow(ServerboundPackets1_14.CONTAINER_CLICK);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
-            PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CLICK_WINDOW);
+            PacketWrapper resyncPacket = wrapper.create(ServerboundPackets1_13.CONTAINER_CLICK);
             EntityTracker1_14 tracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
             resyncPacket.write(Type.UNSIGNED_BYTE, ((short) tracker.getLatestTradeWindowId())); // 0 - Window ID
             resyncPacket.write(Type.SHORT, ((short) -999)); // 1 - Slot
@@ -227,9 +227,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             resyncPacket.scheduleSendToServer(Protocol1_13_2To1_14.class);
         });
 
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
+        registerCreativeInvAction(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.LEVEL_PARTICLES, Type.FLOAT);
     }
 
     @Override

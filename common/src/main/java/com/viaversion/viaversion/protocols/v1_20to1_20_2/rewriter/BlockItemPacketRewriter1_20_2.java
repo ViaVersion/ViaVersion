@@ -57,12 +57,12 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_19_4.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_CHANGE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_19_4.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_19_4.EFFECT, 1010, 2001);
+        blockRewriter.registerBlockAction(ClientboundPackets1_19_4.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_UPDATE);
+        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_19_4.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerEffect(ClientboundPackets1_19_4.LEVEL_EVENT, 1010, 2001);
 
-        protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON_EFFECT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON, wrapper -> {
             // Effects start at 1 before 1.20.2
             if (wrapper.passthrough(Type.BOOLEAN)) { // Primary effect
                 wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
@@ -72,13 +72,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.UNLOAD_CHUNK, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.FORGET_LEVEL_CHUNK, wrapper -> {
             final int x = wrapper.read(Type.INT);
             final int z = wrapper.read(Type.INT);
             wrapper.write(Type.CHUNK_POSITION, new ChunkPosition(x, z));
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.NBT_QUERY, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.TAG_QUERY, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Transaction id
             wrapper.write(Type.COMPOUND_TAG, wrapper.read(Type.NAMED_COMPOUND_TAG));
         });
@@ -89,7 +89,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
             wrapper.write(Type.COMPOUND_TAG, handleBlockEntity(wrapper.read(Type.NAMED_COMPOUND_TAG)));
         });
 
-        protocol.registerClientbound(ClientboundPackets1_19_4.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             final Type<Chunk> chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
                     MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
@@ -115,7 +115,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         });
 
         // Replace the NBT type everywhere
-        protocol.registerClientbound(ClientboundPackets1_19_4.WINDOW_ITEMS, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_4.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -130,7 +130,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.SET_SLOT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_4.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window id
@@ -139,7 +139,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 handler(wrapper -> wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))));
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.ADVANCEMENTS, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
@@ -171,7 +171,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 wrapper.passthrough(Type.BOOLEAN); // Send telemetry
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.ENTITY_EQUIPMENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_4.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -184,7 +184,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 });
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_20_2.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_20_2.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -206,7 +206,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.TRADE_LIST, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_19_4.MERCHANT_OFFERS, wrapper -> {
             wrapper.passthrough(Type.VAR_INT); // Container id
             final int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
@@ -224,14 +224,14 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                 wrapper.passthrough(Type.INT); // Demand
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_20_2.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_20_2.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot
                 handler(wrapper -> wrapper.write(Type.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Type.ITEM1_20_2)))); // 1 - Clicked Item
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_19_4.SPAWN_PARTICLE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Particle ID
@@ -338,7 +338,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
                     rewrite(wrapper.user(), item);
                 }
             }
-        }.register(ClientboundPackets1_19_4.DECLARE_RECIPES);
+        }.register(ClientboundPackets1_19_4.UPDATE_RECIPES);
     }
 
     @Override

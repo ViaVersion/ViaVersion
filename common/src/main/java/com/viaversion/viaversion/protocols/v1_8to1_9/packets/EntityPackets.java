@@ -52,7 +52,7 @@ public class EntityPackets {
 
     public static void register(Protocol1_8To1_9 protocol) {
         // Attach Entity Packet
-        protocol.registerClientbound(ClientboundPackets1_8.ATTACH_ENTITY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_LINK, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -86,7 +86,7 @@ public class EntityPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.TELEPORT_ENTITY, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -115,7 +115,7 @@ public class EntityPackets {
 
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_POS_ROT, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -130,7 +130,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 6 - On Ground
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_POS, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -142,7 +142,7 @@ public class EntityPackets {
                 map(Type.BOOLEAN); // 4 - On Ground
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -191,7 +191,7 @@ public class EntityPackets {
                 });
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_METADATA, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_DATA, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -226,7 +226,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EFFECT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -245,7 +245,7 @@ public class EntityPackets {
 
         protocol.cancelClientbound(ClientboundPackets1_8.UPDATE_ENTITY_NBT);
 
-        protocol.registerClientbound(ClientboundPackets1_8.COMBAT_EVENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.PLAYER_COMBAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); //Event id
@@ -259,7 +259,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.UPDATE_ATTRIBUTES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT);
@@ -313,7 +313,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.ENTITY_ANIMATION, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_8.ANIMATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -328,7 +328,7 @@ public class EntityPackets {
 
 
         /* Incoming Packets */
-        protocol.registerServerbound(ServerboundPackets1_9.ENTITY_ACTION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.PLAYER_COMMAND, new PacketHandlers() {
 
             @Override
             public void register() {
@@ -346,7 +346,7 @@ public class EntityPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_9.INTERACT_ENTITY, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_9.INTERACT, new PacketHandlers() {
 
             @Override
             public void register() {

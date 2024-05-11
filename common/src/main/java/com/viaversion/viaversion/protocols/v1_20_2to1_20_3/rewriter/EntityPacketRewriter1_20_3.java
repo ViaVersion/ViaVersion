@@ -44,8 +44,8 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_20_2.SPAWN_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_2.ENTITY_METADATA, Types1_20_2.METADATA_LIST, Types1_20_3.METADATA_LIST);
+        registerTrackerWithData1_19(ClientboundPackets1_20_2.ADD_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
+        registerMetadataRewriter(ClientboundPackets1_20_2.SET_ENTITY_DATA, Types1_20_2.METADATA_LIST, Types1_20_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, new PacketHandlers() {
@@ -57,7 +57,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_2.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_20_2.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity id
@@ -87,7 +87,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         });
 
         // https://github.com/ViaVersion/ViaVersion/issues/3630, should still investigate why sending it with respawn/login doesn't work on Velocity
-        protocol.registerClientbound(ClientboundPackets1_20_2.WORLD_BORDER_INIT, this::sendChunksSentGameEvent);
+        protocol.registerClientbound(ClientboundPackets1_20_2.INITIALIZE_BORDER, this::sendChunksSentGameEvent);
     }
 
     private void sendChunksSentGameEvent(final PacketWrapper wrapper) {
@@ -136,7 +136,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 Types1_20_3.META_TYPES.particleType,
                 null);
 
-        filter().type(EntityTypes1_20_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_20_3.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

@@ -40,13 +40,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_19_1.SPAWN_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_19_1.SPAWN_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
-        registerTracker(ClientboundPackets1_19_1.SPAWN_PLAYER, EntityTypes1_19_3.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_19_1.ENTITY_METADATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
+        registerTrackerWithData1_19(ClientboundPackets1_19_1.ADD_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
+        registerTracker(ClientboundPackets1_19_1.ADD_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
+        registerTracker(ClientboundPackets1_19_1.ADD_PLAYER, EntityTypes1_19_3.PLAYER);
+        registerMetadataRewriter(ClientboundPackets1_19_1.SET_ENTITY_DATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_19_1.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_19_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity id
@@ -161,7 +161,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_19_1
                 meta.setValue(pose + 1);
             }
         });
-        filter().type(EntityTypes1_19_3.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_3.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             // Convert to new block id
             final int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));

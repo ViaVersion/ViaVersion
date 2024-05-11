@@ -50,14 +50,14 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
     public void registerPackets() {
         // clear cursor item to prevent client to try dropping it during navigation between multiple inventories causing arm swing
         PacketHandler cursorRemapper = wrapper -> {
-            PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.SET_SLOT);
+            PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.CONTAINER_SET_SLOT);
             clearPacket.write(Type.UNSIGNED_BYTE, (short) -1);
             clearPacket.write(Type.SHORT, (short) -1);
             clearPacket.write(Type.ITEM1_13_2, null);
             clearPacket.send(Protocol1_15_2To1_16.class);
         };
 
-        protocol.registerClientbound(ClientboundPackets1_15.OPEN_WINDOW, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Window Id
@@ -76,7 +76,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.CLOSE_WINDOW, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.CONTAINER_CLOSE, new PacketHandlers() {
             @Override
             public void register() {
                 handler(cursorRemapper);
@@ -87,7 +87,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_15.WINDOW_PROPERTY, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.CONTAINER_SET_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -107,12 +107,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
         });
 
         registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_15.WINDOW_ITEMS);
-        registerTradeList(ClientboundPackets1_15.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_15.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_15.ADVANCEMENTS);
+        registerWindowItems(ClientboundPackets1_15.CONTAINER_SET_CONTENT);
+        registerTradeList(ClientboundPackets1_15.MERCHANT_OFFERS);
+        registerSetSlot(ClientboundPackets1_15.CONTAINER_SET_SLOT);
+        registerAdvancements(ClientboundPackets1_15.UPDATE_ADVANCEMENTS);
 
-        protocol.registerClientbound(ClientboundPackets1_15.ENTITY_EQUIPMENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_15.SET_EQUIPPED_ITEM, ClientboundPackets1_16.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -125,19 +125,19 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_15, Serve
             }
         });
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_16.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_16.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow(ServerboundPackets1_16.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_16.SET_CREATIVE_MODE_SLOT);
 
-        protocol.registerServerbound(ServerboundPackets1_16.CLOSE_WINDOW, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_16.CONTAINER_CLOSE, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
             inventoryTracker.setInventoryOpen(false);
         });
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_15.SPAWN_PARTICLE, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_15.LEVEL_PARTICLES, Type.DOUBLE);
     }
 
     @Override

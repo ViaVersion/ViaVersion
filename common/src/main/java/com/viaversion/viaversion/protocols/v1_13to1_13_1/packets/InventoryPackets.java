@@ -35,12 +35,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_13.SET_SLOT);
-        registerWindowItems(ClientboundPackets1_13.WINDOW_ITEMS);
-        registerAdvancements(ClientboundPackets1_13.ADVANCEMENTS);
+        registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
+        registerWindowItems(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
+        registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
         registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
 
-        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Channel
@@ -71,7 +71,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.ENTITY_EQUIPMENT);
+        registerEntityEquipment(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol) {
             @Override
@@ -84,7 +84,7 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
                 return Type.ITEM1_13_ARRAY;
             }
         };
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
             int size = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < size; i++) {
                 // First id, then type
@@ -94,9 +94,9 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_13, Serve
             }
         });
 
-        registerClickWindow(ServerboundPackets1_13.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow(ServerboundPackets1_13.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT);
 
-        registerSpawnParticle(ClientboundPackets1_13.SPAWN_PARTICLE, Type.FLOAT);
+        registerSpawnParticle(ClientboundPackets1_13.LEVEL_PARTICLES, Type.FLOAT);
     }
 }

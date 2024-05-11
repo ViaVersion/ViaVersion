@@ -33,15 +33,15 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_14_4, Ser
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_14_4.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_14_4.WINDOW_ITEMS);
-        registerTradeList(ClientboundPackets1_14_4.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_14_4.SET_SLOT);
-        registerEntityEquipment(ClientboundPackets1_14_4.ENTITY_EQUIPMENT);
-        registerAdvancements(ClientboundPackets1_14_4.ADVANCEMENTS);
+        registerWindowItems(ClientboundPackets1_14_4.CONTAINER_SET_CONTENT);
+        registerTradeList(ClientboundPackets1_14_4.MERCHANT_OFFERS);
+        registerSetSlot(ClientboundPackets1_14_4.CONTAINER_SET_SLOT);
+        registerEntityEquipment(ClientboundPackets1_14_4.SET_EQUIPPED_ITEM);
+        registerAdvancements(ClientboundPackets1_14_4.UPDATE_ADVANCEMENTS);
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_14_4.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_14_4.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_14.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_14.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow(ServerboundPackets1_14.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
     }
 }

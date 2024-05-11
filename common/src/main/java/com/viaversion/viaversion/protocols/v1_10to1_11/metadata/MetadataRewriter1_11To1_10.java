@@ -113,7 +113,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
                 int entityId = event.entityId();
                 if (tracker.addHologram(entityId)) {
                     // Send movement
-                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.ENTITY_POSITION, null, event.user());
+                    PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.MOVE_ENTITY_POS, null, event.user());
                     wrapper.write(Type.VAR_INT, entityId);
                     wrapper.write(Type.SHORT, (short) 0);
                     wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));

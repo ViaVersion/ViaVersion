@@ -35,12 +35,12 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT);
+        registerSetSlot(ClientboundPackets1_9_3.CONTAINER_SET_SLOT);
+        registerWindowItems(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
+        registerEntityEquipment(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
 
         // Plugin message Packet -> Trading
-        protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel
@@ -67,8 +67,8 @@ public class InventoryPackets extends ItemRewriter<ClientboundPackets1_9_3, Serv
             }
         });
 
-        registerClickWindow(ServerboundPackets1_9_3.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_9_3.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow(ServerboundPackets1_9_3.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

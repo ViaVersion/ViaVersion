@@ -61,7 +61,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_ENTITY, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -73,7 +73,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -109,7 +109,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
         new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
 
-        registerClientbound(ClientboundPackets1_9_3.COLLECT_ITEM, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.TAKE_ITEM_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Collected entity id
@@ -121,9 +121,9 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        entityRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.ENTITY_METADATA, Types1_9.METADATA_LIST);
+        entityRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.METADATA_LIST);
 
-        registerClientbound(ClientboundPackets1_9_3.ENTITY_TELEPORT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -148,9 +148,9 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        entityRewriter.registerRemoveEntities(ClientboundPackets1_9_3.DESTROY_ENTITIES);
+        entityRewriter.registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
 
-        registerClientbound(ClientboundPackets1_9_3.TITLE, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.SET_TITLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Action
@@ -166,7 +166,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.BLOCK_ACTION, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Position
@@ -208,7 +208,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+        registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
             Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
@@ -230,7 +230,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID
@@ -255,7 +255,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        this.registerClientbound(ClientboundPackets1_9_3.EFFECT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_9_3.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 this.map(Type.INT); //effectID
@@ -288,7 +288,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             INCOMING PACKETS
         */
 
-        registerServerbound(ServerboundPackets1_9_3.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_9_3.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_8); // 0 - Location
@@ -301,7 +301,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerServerbound(ServerboundPackets1_9_3.CHAT_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_9_3.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Message

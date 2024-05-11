@@ -35,14 +35,14 @@ public final class WorldPackets {
 
     public static void register(final Protocol1_18_2To1_19 protocol) {
         final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_18.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_18.BLOCK_CHANGE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerEffect(ClientboundPackets1_18.EFFECT, 1010, 2001);
+        blockRewriter.registerBlockAction(ClientboundPackets1_18.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_18.BLOCK_UPDATE);
+        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerEffect(ClientboundPackets1_18.LEVEL_EVENT, 1010, 2001);
 
-        protocol.cancelClientbound(ClientboundPackets1_18.ACKNOWLEDGE_PLAYER_DIGGING);
+        protocol.cancelClientbound(ClientboundPackets1_18.BLOCK_BREAK_ACK);
 
-        protocol.registerClientbound(ClientboundPackets1_18.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
@@ -59,7 +59,7 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON_EFFECT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON, wrapper -> {
             // Primary effect
             if (wrapper.read(Type.BOOLEAN)) {
                 wrapper.passthrough(Type.VAR_INT);

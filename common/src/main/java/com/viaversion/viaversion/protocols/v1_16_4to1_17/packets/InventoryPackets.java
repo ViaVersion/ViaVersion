@@ -42,20 +42,20 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16_2.WINDOW_ITEMS);
-        registerTradeList(ClientboundPackets1_16_2.TRADE_LIST);
-        registerSetSlot(ClientboundPackets1_16_2.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_16_2.ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_16_2.ENTITY_EQUIPMENT);
-        registerSpawnParticle(ClientboundPackets1_16_2.SPAWN_PARTICLE, Type.DOUBLE);
+        registerWindowItems(ClientboundPackets1_16_2.CONTAINER_SET_CONTENT);
+        registerTradeList(ClientboundPackets1_16_2.MERCHANT_OFFERS);
+        registerSetSlot(ClientboundPackets1_16_2.CONTAINER_SET_SLOT);
+        registerAdvancements(ClientboundPackets1_16_2.UPDATE_ADVANCEMENTS);
+        registerEntityEquipmentArray(ClientboundPackets1_16_2.SET_EQUIPMENT);
+        registerSpawnParticle(ClientboundPackets1_16_2.LEVEL_PARTICLES, Type.DOUBLE);
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.UPDATE_RECIPES);
 
-        registerCreativeInvAction(ServerboundPackets1_17.CREATIVE_INVENTORY_ACTION);
+        registerCreativeInvAction(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
 
-        protocol.registerServerbound(ServerboundPackets1_17.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Window Id
@@ -90,7 +90,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.WINDOW_CONFIRMATION, null, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.CONTAINER_ACK, null, wrapper -> {
             short inventoryId = wrapper.read(Type.UNSIGNED_BYTE);
             short confirmationId = wrapper.read(Type.SHORT);
             boolean accepted = wrapper.read(Type.BOOLEAN);
@@ -115,7 +115,7 @@ public final class InventoryPackets extends ItemRewriter<ClientboundPackets1_16_
                 // Decode our requested inventory acknowledgement
                 short inventoryId = (short) ((id >> 16) & 0xFF);
                 short confirmationId = (short) (id & 0xFFFF);
-                PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.WINDOW_CONFIRMATION);
+                PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.CONTAINER_ACK);
                 packet.write(Type.UNSIGNED_BYTE, inventoryId);
                 packet.write(Type.SHORT, confirmationId);
                 packet.write(Type.BOOLEAN, true); // Accept

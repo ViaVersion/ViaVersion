@@ -62,10 +62,10 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         PlayerPackets.register(this);
 
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_13.SOUND);
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
 
         ComponentRewriter<ClientboundPackets1_13> componentRewriter = new ComponentRewriter1_14<>(this);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT_MESSAGE);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT);
 
         CommandRewriter<ClientboundPackets1_13> commandRewriter = new CommandRewriter<>(this) {
             @Override
@@ -76,9 +76,9 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
                 return super.handleArgumentType(argumentType);
             }
         };
-        commandRewriter.registerDeclareCommands(ClientboundPackets1_13.DECLARE_COMMANDS);
+        commandRewriter.registerDeclareCommands(ClientboundPackets1_13.COMMANDS);
 
-        registerClientbound(ClientboundPackets1_13.TAGS, wrapper -> {
+        registerClientbound(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
             int blockTagsSize = wrapper.read(Type.VAR_INT);
             wrapper.write(Type.VAR_INT, blockTagsSize + 6); // block tags
             for (int i = 0; i < blockTagsSize; i++) {
@@ -134,11 +134,11 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // Set Difficulty packet added in 19w11a
-        cancelServerbound(ServerboundPackets1_14.SET_DIFFICULTY);
+        cancelServerbound(ServerboundPackets1_14.CHANGE_DIFFICULTY);
         // Lock Difficulty packet added in 19w11a
         cancelServerbound(ServerboundPackets1_14.LOCK_DIFFICULTY);
         // Unknown packet added in 19w13a
-        cancelServerbound(ServerboundPackets1_14.UPDATE_JIGSAW_BLOCK);
+        cancelServerbound(ServerboundPackets1_14.SET_JIGSAW_BLOCK);
     }
 
     @Override

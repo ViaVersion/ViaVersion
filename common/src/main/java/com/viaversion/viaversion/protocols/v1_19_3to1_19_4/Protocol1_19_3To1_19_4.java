@@ -57,11 +57,11 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_19_3.TAGS);
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.STATISTICS);
+        tagRewriter.registerGeneric(ClientboundPackets1_19_3.UPDATE_TAGS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.AWARD_STATS);
 
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND_ENTITY);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_19_3.SOUND);
 
         new CommandRewriter<>(this) {
@@ -74,7 +74,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
                     super.handleArgument(wrapper, argumentType);
                 }
             }
-        }.registerDeclareCommands1_19(ClientboundPackets1_19_3.DECLARE_COMMANDS);
+        }.registerDeclareCommands1_19(ClientboundPackets1_19_3.COMMANDS);
 
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
             JsonElement element = wrapper.read(Type.OPTIONAL_COMPONENT);

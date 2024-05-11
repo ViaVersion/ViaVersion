@@ -68,7 +68,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         itemRewriter.register();
 
         // Named sound effect
-        registerClientbound(ClientboundPackets1_9_3.NAMED_SOUND, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Sound name
@@ -101,7 +101,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Metadata packet
-        registerClientbound(ClientboundPackets1_9_3.ENTITY_METADATA, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -110,7 +110,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Spawn Mob
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_MOB, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity id
@@ -130,7 +130,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Spawn Player
-        registerClientbound(ClientboundPackets1_9_3.SPAWN_PLAYER, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -145,7 +145,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Join Game
-        registerClientbound(ClientboundPackets1_9_3.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // 0 - Entity ID
@@ -177,7 +177,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Chunk Data
-        registerClientbound(ClientboundPackets1_9_3.CHUNK_DATA, wrapper -> {
+        registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
@@ -205,7 +205,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         });
 
         // Packet ResourcePack status
-        registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK_STATUS, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_9_3.RESOURCE_PACK, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {

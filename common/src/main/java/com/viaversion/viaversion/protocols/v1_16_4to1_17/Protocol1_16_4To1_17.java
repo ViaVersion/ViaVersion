@@ -62,7 +62,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
 
         WorldPackets.register(this);
 
-        registerClientbound(ClientboundPackets1_16_2.TAGS, wrapper -> {
+        registerClientbound(ClientboundPackets1_16_2.UPDATE_TAGS, wrapper -> {
             // Tags are now generically written with resource location - 5 different Vanilla types
             wrapper.write(Type.VAR_INT, 5);
             for (RegistryType type : RegistryType.getValues()) {
@@ -87,11 +87,11 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_16_2.AWARD_STATS);
 
         SoundRewriter<ClientboundPackets1_16_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
-        soundRewriter.registerSound(ClientboundPackets1_16_2.ENTITY_SOUND);
+        soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND_ENTITY);
 
         registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
             wrapper.passthrough(Type.STRING);
@@ -100,7 +100,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
         });
 
-        registerClientbound(ClientboundPackets1_16_2.MAP_DATA, wrapper -> {
+        registerClientbound(ClientboundPackets1_16_2.MAP_ITEM_DATA, wrapper -> {
             wrapper.passthrough(Type.VAR_INT);
             wrapper.passthrough(Type.BYTE);
             wrapper.read(Type.BOOLEAN); // Tracking position removed
@@ -116,15 +116,15 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.TITLE, null, wrapper -> {
+        registerClientbound(ClientboundPackets1_16_2.SET_TITLES, null, wrapper -> {
             // Title packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Type.VAR_INT);
             ClientboundPacketType packetType;
             switch (type) {
-                case 0 -> packetType = ClientboundPackets1_17.TITLE_TEXT;
-                case 1 -> packetType = ClientboundPackets1_17.TITLE_SUBTITLE;
-                case 2 -> packetType = ClientboundPackets1_17.ACTIONBAR;
-                case 3 -> packetType = ClientboundPackets1_17.TITLE_TIMES;
+                case 0 -> packetType = ClientboundPackets1_17.SET_TITLE_TEXT;
+                case 1 -> packetType = ClientboundPackets1_17.SET_SUBTITLE_TEXT;
+                case 2 -> packetType = ClientboundPackets1_17.SET_ACTION_BAR_TEXT;
+                case 3 -> packetType = ClientboundPackets1_17.SET_TITLES_ANIMATION;
                 case 4 -> {
                     packetType = ClientboundPackets1_17.CLEAR_TITLES;
                     wrapper.write(Type.BOOLEAN, false); // Reset times
@@ -139,7 +139,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             wrapper.setPacketType(packetType);
         });
 
-        registerClientbound(ClientboundPackets1_16_2.EXPLOSION, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_16_2.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.FLOAT); // X
@@ -150,7 +150,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(ClientboundPackets1_16_2.SPAWN_POSITION, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_16_2.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.POSITION1_14);
@@ -158,7 +158,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(ServerboundPackets1_17.CLIENT_SETTINGS, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Locale

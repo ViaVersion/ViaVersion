@@ -88,7 +88,7 @@ public final class ConnectionData {
 
             updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
 
-            PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
+            PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_UPDATE, null, user);
             blockUpdatePacket.write(Type.POSITION1_8, pos);
             blockUpdatePacket.write(Type.VAR_INT, newBlockState);
             blockUpdatePacket.send(Protocol1_12_2To1_13.class);
@@ -719,7 +719,7 @@ public final class ConnectionData {
                     }
 
                     if (!updates.isEmpty()) {
-                        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.MULTI_BLOCK_CHANGE, null, user);
+                        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE, null, user);
                         wrapper.write(Type.INT, chunkX + chunkDeltaX);
                         wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
                         wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));

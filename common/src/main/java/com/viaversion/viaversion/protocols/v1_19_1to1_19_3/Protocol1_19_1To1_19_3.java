@@ -83,7 +83,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:bookshelf_books", "minecraft:hanging_signs", "minecraft:stripped_logs");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:all_hanging_signs", "minecraft:ceiling_hanging_signs", "minecraft:invalid_spawn_inside",
                 "minecraft:stripped_logs", "minecraft:wall_hanging_signs");
-        tagRewriter.registerGeneric(ClientboundPackets1_19_1.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_19_1.UPDATE_TAGS);
 
         entityRewriter.register();
         itemRewriter.register();
@@ -99,14 +99,14 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
             wrapper.write(Type.SOUND_EVENT, Holder.of(soundId));
         };
-        registerClientbound(ClientboundPackets1_19_1.ENTITY_SOUND, soundHandler);
+        registerClientbound(ClientboundPackets1_19_1.SOUND_ENTITY, soundHandler);
         registerClientbound(ClientboundPackets1_19_1.SOUND, soundHandler);
-        registerClientbound(ClientboundPackets1_19_1.NAMED_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
+        registerClientbound(ClientboundPackets1_19_1.CUSTOM_SOUND, ClientboundPackets1_19_3.SOUND, wrapper -> {
             final String soundIdentifier = wrapper.read(Type.STRING);
             wrapper.write(Type.SOUND_EVENT, Holder.of(new SoundEvent(soundIdentifier, null)));
         });
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.STATISTICS);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_19_1.AWARD_STATS);
 
         final CommandRewriter<ClientboundPackets1_19_1> commandRewriter = new CommandRewriter<>(this) {
             @Override
@@ -130,7 +130,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                 };
             }
         };
-        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.DECLARE_COMMANDS);
+        commandRewriter.registerDeclareCommands1_19(ClientboundPackets1_19_1.COMMANDS);
 
         registerClientbound(ClientboundPackets1_19_1.SERVER_DATA, new PacketHandlers() {
             @Override
@@ -244,7 +244,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                 read(Type.ACKNOWLEDGED_BIT_SET); // Acknowledged
             }
         });
-        registerServerbound(ServerboundPackets1_19_3.CHAT_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_19_3.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Message
@@ -339,7 +339,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
         });
 
         cancelServerbound(ServerboundPackets1_19_3.CHAT_SESSION_UPDATE);
-        cancelClientbound(ClientboundPackets1_19_1.DELETE_CHAT_MESSAGE);
+        cancelClientbound(ClientboundPackets1_19_1.DELETE_CHAT);
         cancelClientbound(ClientboundPackets1_19_1.PLAYER_CHAT_HEADER);
         cancelClientbound(ClientboundPackets1_19_1.CHAT_PREVIEW);
         cancelClientbound(ClientboundPackets1_19_1.SET_DISPLAY_CHAT_PREVIEW);

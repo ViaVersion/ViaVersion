@@ -41,11 +41,11 @@ public class WorldPackets {
     public static void register(Protocol1_16_1To1_16_2 protocol) {
         BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_CHANGE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16.ACKNOWLEDGE_PLAYER_DIGGING);
+        blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_UPDATE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16.BLOCK_BREAK_ACK);
 
-        protocol.registerClientbound(ClientboundPackets1_16.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_16.TYPE);
             wrapper.write(ChunkType1_16_2.TYPE, chunk);
 
@@ -63,7 +63,7 @@ public class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16.MULTI_BLOCK_CHANGE, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16.CHUNK_BLOCKS_UPDATE, ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE, wrapper -> {
             wrapper.cancel();
 
             int chunkX = wrapper.read(Type.INT);
@@ -92,7 +92,7 @@ public class WorldPackets {
                 List<BlockChangeRecord> sectionRecord = sectionRecords[chunkY];
                 if (sectionRecord == null) continue;
 
-                PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
+                PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
                 newPacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
                 newPacket.write(Type.BOOLEAN, false); // Ignore light updates
                 newPacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));
@@ -100,6 +100,6 @@ public class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_16.EFFECT, 1010, 2001);
+        blockRewriter.registerEffect(ClientboundPackets1_16.LEVEL_EVENT, 1010, 2001);
     }
 }

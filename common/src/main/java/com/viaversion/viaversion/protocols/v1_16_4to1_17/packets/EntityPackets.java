@@ -43,12 +43,12 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData(ClientboundPackets1_16_2.SPAWN_ENTITY, EntityTypes1_17.FALLING_BLOCK);
-        registerTracker(ClientboundPackets1_16_2.SPAWN_MOB);
-        registerTracker(ClientboundPackets1_16_2.SPAWN_PLAYER, EntityTypes1_17.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_16_2.ENTITY_METADATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
+        registerTrackerWithData(ClientboundPackets1_16_2.ADD_ENTITY, EntityTypes1_17.FALLING_BLOCK);
+        registerTracker(ClientboundPackets1_16_2.ADD_MOB);
+        registerTracker(ClientboundPackets1_16_2.ADD_PLAYER, EntityTypes1_17.PLAYER);
+        registerMetadataRewriter(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.DESTROY_ENTITIES, null, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.REMOVE_ENTITIES, null, wrapper -> {
             int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
             wrapper.cancel();
 
@@ -63,7 +63,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID
@@ -94,7 +94,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             addNewDimensionData(dimensionData);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.ENTITY_PROPERTIES, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_ATTRIBUTES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Entity id
@@ -116,13 +116,13 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.COMBAT_EVENT, null, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_COMBAT, null, wrapper -> {
             // Combat packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Type.VAR_INT);
             ClientboundPacketType packetType = switch (type) {
-                case 0 -> ClientboundPackets1_17.COMBAT_ENTER;
-                case 1 -> ClientboundPackets1_17.COMBAT_END;
-                case 2 -> ClientboundPackets1_17.COMBAT_KILL;
+                case 0 -> ClientboundPackets1_17.PLAYER_COMBAT_ENTER;
+                case 1 -> ClientboundPackets1_17.PLAYER_COMBAT_END;
+                case 2 -> ClientboundPackets1_17.PLAYER_COMBAT_KILL;
                 default -> throw new IllegalArgumentException("Invalid combat type received: " + type);
             };
 
@@ -130,7 +130,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
         });
 
         // The parent class of the other entity move packets that is never actually used has finally been removed from the id list
-        protocol.cancelClientbound(ClientboundPackets1_16_2.ENTITY_MOVEMENT);
+        protocol.cancelClientbound(ClientboundPackets1_16_2.MOVE_ENTITY);
     }
 
     @Override
@@ -148,7 +148,7 @@ public final class EntityPackets extends EntityRewriter<ClientboundPackets1_16_2
         // Ticks frozen added with id 7
         filter().type(EntityTypes1_17.ENTITY).addIndex(7);
 
-        filter().type(EntityTypes1_17.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_17.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             // Convert to new block id
             int data = (int) meta.getValue();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));

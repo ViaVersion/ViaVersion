@@ -40,8 +40,8 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         // Tracks entities, applies metadata rewrites registered below, untracks entities
-        registerTrackerWithData1_19(ClientboundPackets1_20_5.SPAWN_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_5.ENTITY_METADATA, /*Types1_OLD.METADATA_LIST, */Types1_20_5.METADATA_LIST); // Specify old and new metadata list if changed
+        registerTrackerWithData1_19(ClientboundPackets1_20_5.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
+        registerMetadataRewriter(ClientboundPackets1_20_5.SET_ENTITY_DATA, /*Types1_OLD.METADATA_LIST, */Types1_20_5.METADATA_LIST); // Specify old and new metadata list if changed
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, new PacketHandlers() {
@@ -53,7 +53,7 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_20_5.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_20_5.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity id
@@ -103,7 +103,7 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         );
 
         // Minecarts are special
-        filter().type(EntityTypes1_20_5.MINECART_ABSTRACT).index(11).handler((event, meta) -> {
+        filter().type(EntityTypes1_20_5.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });

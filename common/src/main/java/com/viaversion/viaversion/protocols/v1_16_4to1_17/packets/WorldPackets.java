@@ -42,28 +42,28 @@ public final class WorldPackets {
     public static void register(Protocol1_16_4To1_17 protocol) {
         BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_ACTION);
-        blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_CHANGE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.MULTI_BLOCK_CHANGE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.ACKNOWLEDGE_PLAYER_DIGGING);
+        blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_EVENT);
+        blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_UPDATE);
+        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.BLOCK_BREAK_ACK);
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.WORLD_BORDER, null, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.SET_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
             int type = wrapper.read(Type.VAR_INT);
             ClientboundPacketType packetType = switch (type) {
-                case 0 -> ClientboundPackets1_17.WORLD_BORDER_SIZE;
-                case 1 -> ClientboundPackets1_17.WORLD_BORDER_LERP_SIZE;
-                case 2 -> ClientboundPackets1_17.WORLD_BORDER_CENTER;
-                case 3 -> ClientboundPackets1_17.WORLD_BORDER_INIT;
-                case 4 -> ClientboundPackets1_17.WORLD_BORDER_WARNING_DELAY;
-                case 5 -> ClientboundPackets1_17.WORLD_BORDER_WARNING_DISTANCE;
+                case 0 -> ClientboundPackets1_17.SET_BORDER_SIZE;
+                case 1 -> ClientboundPackets1_17.SET_BORDER_LERP_SIZE;
+                case 2 -> ClientboundPackets1_17.SET_BORDER_CENTER;
+                case 3 -> ClientboundPackets1_17.INITIALIZE_BORDER;
+                case 4 -> ClientboundPackets1_17.SET_BORDER_WARNING_DELAY;
+                case 5 -> ClientboundPackets1_17.SET_BORDER_WARNING_DISTANCE;
                 default -> throw new IllegalArgumentException("Invalid world border type received: " + type);
             };
 
             wrapper.setPacketType(packetType);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_LIGHT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16_2.LIGHT_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // x
@@ -107,7 +107,7 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_16_2.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_16_2.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_16_2.TYPE);
             if (!chunk.isFullChunk()) {
                 // All chunks are full chunk packets now (1.16 already stopped sending non-full chunks)
@@ -139,7 +139,7 @@ public final class WorldPackets {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_16_2.EFFECT, 1010, 2001);
+        blockRewriter.registerEffect(ClientboundPackets1_16_2.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) {
@@ -151,7 +151,7 @@ public final class WorldPackets {
             ChunkSection section = sections[chunkY];
             if (section == null) continue;
 
-            PacketWrapper blockChangePacket = wrapper.create(ClientboundPackets1_17.MULTI_BLOCK_CHANGE);
+            PacketWrapper blockChangePacket = wrapper.create(ClientboundPackets1_17.SECTION_BLOCKS_UPDATE);
             blockChangePacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
             blockChangePacket.write(Type.BOOLEAN, true); // Suppress light updates
 

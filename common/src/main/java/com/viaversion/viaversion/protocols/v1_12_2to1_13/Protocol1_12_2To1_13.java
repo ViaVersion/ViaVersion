@@ -126,7 +126,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
             w -> {
                 // Send fake declare commands
-                w.create(ClientboundPackets1_13.DECLARE_COMMANDS, wrapper -> {
+                w.create(ClientboundPackets1_13.COMMANDS, wrapper -> {
                     wrapper.write(Type.VAR_INT, 2); // Size
                     // Write root node
                     wrapper.write(Type.BYTE, (byte) 0); // Mark as command
@@ -145,7 +145,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 }).scheduleSend(Protocol1_12_2To1_13.class);
 
                 // Send tags packet
-                w.create(ClientboundPackets1_13.TAGS, wrapper -> {
+                w.create(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
                     wrapper.write(Type.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
                     for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
                         wrapper.write(Type.STRING, tag.getKey());
@@ -200,7 +200,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         // New packet 0x04 - Login Plugin Message
 
         // Statistics
-        registerClientbound(ClientboundPackets1_12_1.STATISTICS, wrapper -> {
+        registerClientbound(ClientboundPackets1_12_1.AWARD_STATS, wrapper -> {
             int size = wrapper.read(Type.VAR_INT);
             List<StatisticData> remappedStats = new ArrayList<>();
             for (int i = 0; i < size; i++) {
@@ -246,10 +246,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
 
-        componentRewriter.registerBossBar(ClientboundPackets1_12_1.BOSSBAR);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT_MESSAGE);
+        componentRewriter.registerBossBar(ClientboundPackets1_12_1.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
 
-        registerClientbound(ClientboundPackets1_12_1.TAB_COMPLETE, wrapper -> {
+        registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
             wrapper.write(Type.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
 
             String input = wrapper.user().get(TabCompleteTracker.class).getInput();
@@ -282,7 +282,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.OPEN_WINDOW, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // Id
@@ -324,7 +324,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.DISCONNECT);
 
-        registerClientbound(ClientboundPackets1_12_1.EFFECT, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Effect Id
@@ -344,7 +344,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.CRAFT_RECIPE_RESPONSE, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.PLACE_GHOST_RECIPE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE);
@@ -352,9 +352,9 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerCombatEvent(ClientboundPackets1_12_1.COMBAT_EVENT);
+        componentRewriter.registerCombatEvent(ClientboundPackets1_12_1.PLAYER_COMBAT);
 
-        registerClientbound(ClientboundPackets1_12_1.MAP_DATA, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Map id
@@ -375,7 +375,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 });
             }
         });
-        registerClientbound(ClientboundPackets1_12_1.UNLOCK_RECIPES, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.RECIPE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // action
@@ -396,7 +396,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         wrapper.write(Type.STRING_ARRAY, stringIds);
                     }
                     if (action == 0) {
-                        wrapper.create(ClientboundPackets1_13.DECLARE_RECIPES, w -> writeDeclareRecipes(w)).send(Protocol1_12_2To1_13.class);
+                        wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, w -> writeDeclareRecipes(w)).send(Protocol1_12_2To1_13.class);
                     }
                 });
             }
@@ -419,7 +419,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.SCOREBOARD_OBJECTIVE, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.SET_OBJECTIVE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Objective name
@@ -439,7 +439,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.TEAMS, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_12_1.SET_PLAYER_TEAM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Team Name
@@ -489,13 +489,13 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
             }
         });
-        registerClientbound(ClientboundPackets1_12_1.UPDATE_SCORE, wrapper -> {
+        registerClientbound(ClientboundPackets1_12_1.SET_SCORE, wrapper -> {
             String displayName = wrapper.read(Type.STRING); // Display Name
             displayName = rewriteTeamMemberName(displayName);
             wrapper.write(Type.STRING, displayName);
         });
 
-        componentRewriter.registerTitle(ClientboundPackets1_12_1.TITLE);
+        componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
 
         // New 0x4C - Stop Sound
 
@@ -506,7 +506,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
         });
 
-        registerClientbound(ClientboundPackets1_12_1.ADVANCEMENTS, wrapper -> {
+        registerClientbound(ClientboundPackets1_12_1.UPDATE_ADVANCEMENTS, wrapper -> {
             wrapper.passthrough(Type.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
 
@@ -545,10 +545,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         cancelServerbound(State.LOGIN, ServerboundLoginPackets.CUSTOM_QUERY_ANSWER.getId());
 
         // New 0x01 - Query Block NBT
-        cancelServerbound(ServerboundPackets1_13.QUERY_BLOCK_NBT);
+        cancelServerbound(ServerboundPackets1_13.BLOCK_ENTITY_TAG_QUERY);
 
         // Tab-Complete
-        registerServerbound(ServerboundPackets1_13.TAB_COMPLETE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.COMMAND_SUGGESTION, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -584,7 +584,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x0A - Edit book -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, wrapper -> {
+        registerServerbound(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
             Item item = wrapper.read(Type.ITEM1_13);
             boolean isSigning = wrapper.read(Type.BOOLEAN);
 
@@ -595,14 +595,14 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x0C - Query Entity NBT
-        cancelServerbound(ServerboundPackets1_13.ENTITY_NBT_REQUEST);
+        cancelServerbound(ServerboundPackets1_13.ENTITY_TAG_QUERY);
 
         // New 0x15 - Pick Item -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, wrapper -> {
+        registerServerbound(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
             wrapper.write(Type.STRING, "MC|PickItem"); // Channel
         });
 
-        registerServerbound(ServerboundPackets1_13.CRAFT_RECIPE_REQUEST, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.PLACE_RECIPE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE); // Window id
@@ -620,7 +620,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerServerbound(ServerboundPackets1_13.RECIPE_BOOK_DATA, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.RECIPE_BOOK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Type
@@ -650,12 +650,12 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x1C - Name Item -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.PLUGIN_MESSAGE, wrapper -> {
+        registerServerbound(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
             wrapper.write(Type.STRING, "MC|ItemName"); // Channel
         });
 
         // New 0x1F - Select Trade -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 create(Type.STRING, "MC|TrSel"); // Channel
@@ -664,7 +664,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x20 - Set Beacon Effect -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.SET_BEACON_EFFECT, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.SET_BEACON, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 create(Type.STRING, "MC|Beacon"); // Channel
@@ -674,7 +674,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x22 - Update Command Block -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.SET_COMMAND_BLOCK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 create(Type.STRING, "MC|AutoCmd"); // Channel
@@ -697,7 +697,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         // New 0x23 - Update Command Block Minecart -> Plugin Message
-        registerServerbound(ServerboundPackets1_13.UPDATE_COMMAND_BLOCK_MINECART, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.SET_COMMAND_MINECART, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -711,7 +711,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         // 0x1B -> 0x24 in InventoryPackets
 
         // New 0x25 - Update Structure Block -> Message Channel
-        registerServerbound(ServerboundPackets1_13.UPDATE_STRUCTURE_BLOCK, ServerboundPackets1_12_1.PLUGIN_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_13.SET_STRUCTURE_BLOCK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 create(Type.STRING, "MC|Struct"); // Channel

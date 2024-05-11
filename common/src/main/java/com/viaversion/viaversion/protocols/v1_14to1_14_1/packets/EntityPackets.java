@@ -30,7 +30,7 @@ public class EntityPackets {
     public static void register(Protocol1_14To1_14_1 protocol) {
         MetadataRewriter1_14_1To1_14 metadataRewriter = protocol.get(MetadataRewriter1_14_1To1_14.class);
 
-        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_MOB, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_14.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -51,9 +51,9 @@ public class EntityPackets {
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.DESTROY_ENTITIES);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_14.SPAWN_PLAYER, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_14.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -69,6 +69,6 @@ public class EntityPackets {
             }
         });
 
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.ENTITY_METADATA, Types1_14.METADATA_LIST);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
     }
 }

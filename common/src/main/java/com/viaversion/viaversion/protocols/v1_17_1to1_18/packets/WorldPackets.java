@@ -37,6 +37,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.util.Key;
@@ -62,7 +63,7 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.UPDATE_LIGHT, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_17_1.LIGHT_UPDATE, wrapper -> {
             final int chunkX = wrapper.passthrough(Type.VAR_INT);
             final int chunkZ = wrapper.passthrough(Type.VAR_INT);
 
@@ -101,7 +102,7 @@ public final class WorldPackets {
                             emptySkyLightMask, emptyBlockLightMask, skyLight, blockLight));
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.CHUNK_DATA, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_CHUNK, ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             final Chunk oldChunk = wrapper.read(new ChunkType1_17(tracker.currentWorldSectionHeight()));
 
@@ -194,7 +195,7 @@ public final class WorldPackets {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_17_1.UNLOAD_CHUNK, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_17_1.FORGET_LEVEL_CHUNK, wrapper -> {
             final int chunkX = wrapper.passthrough(Type.INT);
             final int chunkZ = wrapper.passthrough(Type.INT);
             wrapper.user().get(ChunkLightStorage.class).clear(chunkX, chunkZ);

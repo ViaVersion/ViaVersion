@@ -31,13 +31,13 @@ public class EntityPackets {
 
     public static void register(Protocol1_16_1To1_16_2 protocol) {
         MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.SPAWN_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.SPAWN_PLAYER, EntityTypes1_16_2.PLAYER);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.ENTITY_METADATA, Types1_16.METADATA_LIST);
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.DESTROY_ENTITIES);
+        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.ADD_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
+        metadataRewriter.registerTracker(ClientboundPackets1_16.ADD_MOB);
+        metadataRewriter.registerTracker(ClientboundPackets1_16.ADD_PLAYER, EntityTypes1_16_2.PLAYER);
+        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.METADATA_LIST);
+        metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundPackets1_16.JOIN_GAME, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_16.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID

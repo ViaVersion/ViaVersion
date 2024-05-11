@@ -31,6 +31,6 @@ public class Protocol1_12To1_12_1 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        cancelServerbound(ServerboundPackets1_12_1.CRAFT_RECIPE_REQUEST);
+        cancelServerbound(ServerboundPackets1_12_1.PLACE_RECIPE);
     }
 }

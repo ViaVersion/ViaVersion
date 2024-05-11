@@ -56,15 +56,15 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_20_5.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_20_5.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_5> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.ENTITY_SOUND);
+        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND_ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.STATISTICS);
-        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.ENTITY_PROPERTIES);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
+        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES);
 
         // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
         /*final CommandRewriter1_19_4<ClientboundPackets1_20_5> commandRewriter = new CommandRewriter1_19_4<ClientboundPackets1_20_5>(this) {

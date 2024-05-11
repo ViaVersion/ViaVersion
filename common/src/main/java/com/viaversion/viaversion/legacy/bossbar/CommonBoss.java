@@ -241,7 +241,7 @@ public class CommonBoss implements BossBar {
 
     private PacketWrapper getPacket(UpdateAction action, UserConnection connection) {
         try {
-            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, connection);
+            PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, null, connection);
             wrapper.write(Type.UUID, uuid);
             wrapper.write(Type.VAR_INT, action.getId());
             switch (action) {
