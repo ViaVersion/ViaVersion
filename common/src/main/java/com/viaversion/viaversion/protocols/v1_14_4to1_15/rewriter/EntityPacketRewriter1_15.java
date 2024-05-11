@@ -18,26 +18,28 @@
 package com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
-import com.viaversion.viaversion.protocols.v1_14_4to1_15.metadata.MetadataRewriter1_15To1_14_4;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import java.util.List;
 
-public final class EntityPacketRewriter1_15 {
+public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1_14_4, Protocol1_14_4To1_15> {
 
-    public static void register(Protocol1_14_4To1_15 protocol) {
-        MetadataRewriter1_15To1_14_4 metadataRewriter = protocol.get(MetadataRewriter1_15To1_14_4.class);
+    public EntityPacketRewriter1_15(Protocol1_14_4To1_15 protocol) {
+        super(protocol);
+    }
 
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_14_4.ADD_ENTITY, EntityTypes1_15.FALLING_BLOCK);
+    @Override
+    protected void registerPackets() {
+        registerTrackerWithData(ClientboundPackets1_14_4.ADD_ENTITY, EntityTypes1_15.FALLING_BLOCK);
 
         protocol.registerClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
             @Override
@@ -55,8 +57,8 @@ public final class EntityPacketRewriter1_15 {
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
 
-                handler(metadataRewriter.trackerHandler());
-                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Types.VAR_INT, 0), metadataRewriter));
+                handler(trackerHandler());
+                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Types.VAR_INT, 0)));
             }
         });
 
@@ -75,7 +77,7 @@ public final class EntityPacketRewriter1_15 {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     wrapper.user().getEntityTracker(Protocol1_14_4To1_15.class).addEntity(entityId, EntityTypes1_15.PLAYER);
 
-                    sendMetadataPacket(wrapper, entityId, metadataRewriter);
+                    sendMetadataPacket(wrapper, entityId);
                 });
             }
         });
@@ -94,7 +96,7 @@ public final class EntityPacketRewriter1_15 {
                 map(Types.INT); // 0 - Entity ID
                 map(Types.UNSIGNED_BYTE); // 1 - Gamemode
                 map(Types.INT); // 2 - Dimension
-                handler(metadataRewriter.playerTrackerHandler());
+                handler(playerTrackerHandler());
                 handler(wrapper -> wrapper.write(Types.LONG, 0L)); // Level Seed
 
                 map(Types.UNSIGNED_BYTE); // 3 - Max Players
@@ -106,11 +108,24 @@ public final class EntityPacketRewriter1_15 {
             }
         });
 
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
+        registerMetadataRewriter(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+        registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
     }
 
-    private static void sendMetadataPacket(PacketWrapper wrapper, int entityId, EntityRewriter<?, ?> rewriter) {
+    @Override
+    protected void registerRewrites() {
+        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.optionalBlockStateType, Types1_14.META_TYPES.particleType);
+        filter().type(EntityTypes1_15.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
+            int data = meta.value();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+
+        filter().type(EntityTypes1_15.LIVING_ENTITY).addIndex(12);
+        filter().type(EntityTypes1_15.WOLF).removeIndex(18);
+    }
+
+
+    private void sendMetadataPacket(PacketWrapper wrapper, int entityId) {
         // Meta is no longer included in the spawn packets, but sent separately
         List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
         if (metadata.isEmpty()) {
@@ -122,7 +137,7 @@ public final class EntityPacketRewriter1_15 {
         wrapper.cancel();
 
         // Handle meta
-        rewriter.handleMetadata(entityId, metadata, wrapper.user());
+        handleMetadata(entityId, metadata, wrapper.user());
 
         PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
         metadataPacket.write(Types.VAR_INT, entityId);
@@ -130,7 +145,13 @@ public final class EntityPacketRewriter1_15 {
         metadataPacket.send(Protocol1_14_4To1_15.class);
     }
 
-    public static int getNewEntityId(int oldId) {
-        return oldId >= 4 ? oldId + 1 : oldId; // 4 = bee
+    @Override
+    public int newEntityId(final int id) {
+        return id >= 4 ? id + 1 : id; // 4 = bee
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return EntityTypes1_15.getTypeFromId(type);
     }
 }

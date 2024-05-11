@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_10to1_11.metadata;
+package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
@@ -24,9 +26,12 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityIdRewriter;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityNames1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityNames1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -34,10 +39,122 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class MetadataRewriter1_11 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_10To1_11> {
+public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1_9_3, Protocol1_10To1_11> {
 
-    public MetadataRewriter1_11(Protocol1_10To1_11 protocol) {
+    public EntityPacketRewriter1_11(Protocol1_10To1_11 protocol) {
         super(protocol);
+    }
+
+    @Override
+    protected void registerPackets() {
+        protocol.registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.UUID); // 1 - UUID
+                map(Types.BYTE); // 2 - Type
+
+                // Track Entity
+                handler(objectTrackerHandler());
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
+                map(Types.UNSIGNED_BYTE, Types.VAR_INT); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
+                map(Types1_9.METADATA_LIST); // 12 - Metadata
+
+                handler(wrapper -> {
+                    int entityId = wrapper.get(Types.VAR_INT, 0);
+                    // Change Type :)
+                    int type = wrapper.get(Types.VAR_INT, 1);
+
+                    EntityTypes1_11.EntityType entType = EntityPacketRewriter1_11.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    if (entType != null) {
+                        wrapper.set(Types.VAR_INT, 1, entType.getId());
+
+                        // Register Type ID
+                        wrapper.user().getEntityTracker(Protocol1_10To1_11.class).addEntity(entityId, entType);
+                        handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                    }
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_9_3.TAKE_ITEM_ENTITY, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.VAR_INT); // 0 - Collected entity id
+                map(Types.VAR_INT); // 1 - Collector entity id
+
+                handler(wrapper -> {
+                    wrapper.write(Types.VAR_INT, 1); // 2 - Pickup Count
+                });
+            }
+        });
+
+        registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.METADATA_LIST);
+
+        protocol.registerClientbound(ClientboundPackets1_9_3.TELEPORT_ENTITY, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.DOUBLE); // 1 - x
+                map(Types.DOUBLE); // 2 - y
+                map(Types.DOUBLE); // 3 - z
+                map(Types.BYTE); // 4 - yaw
+                map(Types.BYTE); // 5 - pitch
+                map(Types.BOOLEAN); // 6 - onGround
+
+                handler(wrapper -> {
+                    int entityID = wrapper.get(Types.VAR_INT, 0);
+                    if (Via.getConfig().isHologramPatch()) {
+                        EntityTracker1_11 tracker = wrapper.user().getEntityTracker(Protocol1_10To1_11.class);
+                        if (tracker.isHologram(entityID)) {
+                            Double newValue = wrapper.get(Types.DOUBLE, 1);
+                            newValue -= (Via.getConfig().getHologramYOffset());
+                            wrapper.set(Types.DOUBLE, 1, newValue);
+                        }
+                    }
+                });
+            }
+        });
+
+        registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.BLOCK_POSITION1_8); // 0 - Position
+                map(Types.UNSIGNED_BYTE); // 1 - Action
+                map(Types.NAMED_COMPOUND_TAG); // 2 - NBT data
+
+                handler(wrapper -> {
+                    CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
+                    if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 1) {
+                        EntityNames1_11.toClientSpawner(tag);
+                    }
+
+                    StringTag idTag = tag.getStringTag("id");
+                    if (idTag != null) {
+                        // Handle new identifier
+                        idTag.setValue(BlockEntityNames1_11.toNewIdentifier(idTag.getValue()));
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -45,7 +162,7 @@ public class MetadataRewriter1_11 extends EntityRewriter<ClientboundPackets1_9_3
         filter().handler((event, meta) -> {
             if (meta.getValue() instanceof DataItem) {
                 // Apply rewrite
-                EntityIdRewriter.toClientItem(meta.value());
+                EntityNames1_11.toClientItem(meta.value());
             }
         });
 

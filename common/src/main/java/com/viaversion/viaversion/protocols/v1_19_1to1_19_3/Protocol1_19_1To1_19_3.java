@@ -37,9 +37,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.BitSetType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -51,7 +49,7 @@ import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.EntityPacketRewriter1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.ItemPacketRewriter1_19_3;
-import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage;
+import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.NonceStorage1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessagesStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -294,7 +292,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                 map(Types.BYTE_ARRAY_PRIMITIVE); // Public key
                 handler(wrapper -> {
                     if (wrapper.user().has(ChatSession1_19_1.class)) {
-                        wrapper.user().put(new NonceStorage(wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE))); // Nonce
+                        wrapper.user().put(new NonceStorage1_19_3(wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE))); // Nonce
                     }
                 });
             }
@@ -324,7 +322,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                         final byte[] signature;
                         try {
                             signature = chatSession.sign(signer -> {
-                                signer.accept(wrapper.user().remove(NonceStorage.class).nonce());
+                                signer.accept(wrapper.user().remove(NonceStorage1_19_3.class).nonce());
                                 signer.accept(Longs.toByteArray(salt));
                             });
                         } catch (final SignatureException e) {

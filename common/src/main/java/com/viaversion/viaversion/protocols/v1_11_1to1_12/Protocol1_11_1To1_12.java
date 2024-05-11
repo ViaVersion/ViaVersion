@@ -33,18 +33,16 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.metadata.MetadataRewriter1_12To1_11_1;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.EntityPacketRewriter1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ClientboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ChatItemRewriter;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.ChatItemRewriter;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ItemPacketRewriter1_12;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.TranslateRewriter;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.TranslateRewriter;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
@@ -53,7 +51,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 
 public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
 
-    private final MetadataRewriter1_12To1_11_1 metadataRewriter = new MetadataRewriter1_12To1_11_1(this);
+    private final EntityPacketRewriter1_12 entityRewriter = new EntityPacketRewriter1_12(this);
     private final ItemPacketRewriter1_12 itemRewriter = new ItemPacketRewriter1_12(this);
 
     public Protocol1_11_1To1_12() {
@@ -63,40 +61,6 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     @Override
     protected void registerPackets() {
         super.registerPackets();
-
-        registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity id
-                map(Types.UUID); // 1 - UUID
-                map(Types.BYTE); // 2 - Type
-
-                // Track Entity
-                handler(metadataRewriter.objectTrackerHandler());
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.UUID); // 1 - Entity UUID
-                map(Types.VAR_INT); // 2 - Entity Type
-                map(Types.DOUBLE); // 3 - X
-                map(Types.DOUBLE); // 4 - Y
-                map(Types.DOUBLE); // 5 - Z
-                map(Types.BYTE); // 6 - Yaw
-                map(Types.BYTE); // 7 - Pitch
-                map(Types.BYTE); // 8 - Head Pitch
-                map(Types.SHORT); // 9 - Velocity X
-                map(Types.SHORT); // 10 - Velocity Y
-                map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.METADATA_LIST); // 12 - Metadata
-
-                // Track mob and rewrite metadata
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_12.METADATA_LIST));
-            }
-        });
 
         registerClientbound(ClientboundPackets1_9_3.CHAT, wrapper -> {
             if (!Via.getConfig().is1_12NBTArrayFix()) return;
@@ -136,9 +100,6 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                 }
             }
         });
-
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_12.METADATA_LIST);
 
         registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
@@ -250,8 +211,8 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     }
 
     @Override
-    public MetadataRewriter1_12To1_11_1 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_12 getEntityRewriter() {
+        return entityRewriter;
     }
 
     @Override

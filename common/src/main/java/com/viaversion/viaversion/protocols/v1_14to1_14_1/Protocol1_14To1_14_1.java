@@ -23,12 +23,11 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
-import com.viaversion.viaversion.protocols.v1_14to1_14_1.metadata.MetadataRewriter1_14_1To1_14;
 import com.viaversion.viaversion.protocols.v1_14to1_14_1.rewriter.EntityPacketRewriter1_14_1;
 
 public class Protocol1_14To1_14_1 extends AbstractProtocol<ClientboundPackets1_14, ClientboundPackets1_14, ServerboundPackets1_14, ServerboundPackets1_14> {
 
-    private final MetadataRewriter1_14_1To1_14 metadataRewriter = new MetadataRewriter1_14_1To1_14(this);
+    private final EntityPacketRewriter1_14_1 entityRewriter = new EntityPacketRewriter1_14_1(this);
 
     public Protocol1_14To1_14_1() {
         super(ClientboundPackets1_14.class, ClientboundPackets1_14.class, ServerboundPackets1_14.class, ServerboundPackets1_14.class);
@@ -36,9 +35,7 @@ public class Protocol1_14To1_14_1 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void registerPackets() {
-        super.registerPackets();
-
-        EntityPacketRewriter1_14_1.register(this);
+        entityRewriter.register();
     }
 
     @Override
@@ -47,7 +44,7 @@ public class Protocol1_14To1_14_1 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_14_1To1_14 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_14_1 getEntityRewriter() {
+        return entityRewriter;
     }
 }

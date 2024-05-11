@@ -17,20 +17,23 @@
  */
 package com.viaversion.viaversion.protocols.v1_14to1_14_1.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_14to1_14_1.Protocol1_14To1_14_1;
-import com.viaversion.viaversion.protocols.v1_14to1_14_1.metadata.MetadataRewriter1_14_1To1_14;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public class EntityPacketRewriter1_14_1 {
+public class EntityPacketRewriter1_14_1 extends EntityRewriter<ClientboundPackets1_14, Protocol1_14To1_14_1> {
 
-    public static void register(Protocol1_14To1_14_1 protocol) {
-        MetadataRewriter1_14_1To1_14 metadataRewriter = protocol.get(MetadataRewriter1_14_1To1_14.class);
+    public EntityPacketRewriter1_14_1(Protocol1_14To1_14_1 protocol) {
+        super(protocol);
+    }
 
+    @Override
+    protected void registerPackets() {
         protocol.registerClientbound(ClientboundPackets1_14.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
@@ -48,11 +51,11 @@ public class EntityPacketRewriter1_14_1 {
                 map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_14.METADATA_LIST); // 12 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST));
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_14.REMOVE_ENTITIES);
+        registerRemoveEntities(ClientboundPackets1_14.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_14.ADD_PLAYER, new PacketHandlers() {
             @Override
@@ -66,10 +69,21 @@ public class EntityPacketRewriter1_14_1 {
                 map(Types.BYTE); // 6 - Pitch
                 map(Types1_14.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_14.METADATA_LIST, EntityTypes1_14.PLAYER));
+                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST, EntityTypes1_14.PLAYER));
             }
         });
 
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_14.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+        registerMetadataRewriter(ClientboundPackets1_14.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+    }
+
+    @Override
+    protected void registerRewrites() {
+        filter().type(EntityTypes1_14.VILLAGER).addIndex(15);
+        filter().type(EntityTypes1_14.WANDERING_TRADER).addIndex(15);
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return EntityTypes1_14.getTypeFromId(type);
     }
 }

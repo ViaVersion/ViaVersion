@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter;
+package com.viaversion.viaversion.protocols.v1_11_1to1_12.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.AchievementTranslationMapping;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -33,7 +32,7 @@ public class TranslateRewriter {
     private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
-            String text = AchievementTranslationMapping.get(translate);
+            String text = AchievementTranslations1_12.get(translate);
             if (text != null) {
                 object.addProperty("translate", text);
             }
@@ -49,7 +48,7 @@ public class TranslateRewriter {
 
             String textValue = SerializerVersion.V1_9.toComponent(hoverEvent.get("value")).asUnformattedString();
 
-            if (AchievementTranslationMapping.get(textValue) == null) {
+            if (AchievementTranslations1_12.get(textValue) == null) {
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");
                 invalidText.addProperty("color", "red");
@@ -71,7 +70,7 @@ public class TranslateRewriter {
                 baseArray.add(typePart);
                 if (textValue.startsWith("achievement")) {
                     namePart.addProperty("translate", textValue);
-                    namePart.addProperty("color", AchievementTranslationMapping.isSpecial(textValue) ? "dark_purple" : "green");
+                    namePart.addProperty("color", AchievementTranslations1_12.isSpecial(textValue) ? "dark_purple" : "green");
                     typePart.addProperty("translate", "stats.tooltip.type.achievement");
                     JsonObject description = new JsonObject();
                     typePart.addProperty("italic", true);
