@@ -31,14 +31,13 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.ItemRewriter;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.metadata.MetadataRewriter1_9To1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class SpawnPackets {
     public static final ValueTransformer<Integer, Double> toNewDouble = new ValueTransformer<>(Type.DOUBLE) {
