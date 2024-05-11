@@ -19,8 +19,9 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.reflect.TypeToken;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.util.LogUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.IOException;
@@ -28,7 +29,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class BlockIdData {
     public static final String[] PREVIOUS = new String[0];
@@ -54,7 +54,7 @@ public class BlockIdData {
                 }
             }
         } catch (IOException e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to load block id mappings (1.12.2 -> 1.13)", e);
+            LogUtil.INSTANCE.error(Protocol1_12_2To1_13.class, "Failed to load block id mappings", e);
         }
 
         InputStream blockS = MappingData1_13.class.getClassLoader()
@@ -67,7 +67,7 @@ public class BlockIdData {
             );
             numberIdToString.putAll(map);
         } catch (IOException e) {
-            Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to load block number to string mappings (1.12.2)", e);
+            LogUtil.INSTANCE.error(Protocol1_12_2To1_13.class, "Failed to load block number to string mappings", e);
         }
     }
 }

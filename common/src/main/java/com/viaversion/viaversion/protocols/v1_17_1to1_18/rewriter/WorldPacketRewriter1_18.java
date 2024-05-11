@@ -41,6 +41,7 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.LogUtil;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -119,7 +120,7 @@ public final class WorldPacketRewriter1_18 {
                 final String id = idTag.getValue();
                 final int typeId = BlockEntities1_18.blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
                 if (typeId == -1) {
-                    Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
+                    LogUtil.INSTANCE.warning(Protocol1_17_1To1_18.class, "Unknown block entity " + id);
                 }
 
                 handleSpawners(typeId, tag);

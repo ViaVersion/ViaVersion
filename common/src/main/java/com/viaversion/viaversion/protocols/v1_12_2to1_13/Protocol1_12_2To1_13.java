@@ -69,12 +69,12 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.IdAndData;
+import com.viaversion.viaversion.util.LogUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
@@ -189,7 +189,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         }
                         wrapper.set(Types.STRING, 0, GsonUtil.getGson().toJson(json));
                     } catch (JsonParseException e) {
-                        Via.getPlatform().getLogger().log(Level.SEVERE, "Error transforming status response", e);
+                        LogUtil.INSTANCE.error(Protocol1_12_2To1_13.class, "Error transforming status response", e);
                     }
                 });
             }
@@ -214,7 +214,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     if (newIdRaw != null) {
                         newId = newIdRaw;
                     } else {
-                        Via.getPlatform().getLogger().warning("Could not find 1.13 -> 1.12.2 statistic mapping for " + name);
+                        LogUtil.INSTANCE.warning(Protocol1_12_2To1_13.class, "Cloud not find statistic mapping for " + name);
                     }
                 } else if (split.length > 2) {
                     String category = split[1];

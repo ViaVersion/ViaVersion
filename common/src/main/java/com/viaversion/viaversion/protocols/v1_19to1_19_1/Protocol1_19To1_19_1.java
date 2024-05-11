@@ -46,6 +46,7 @@ import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.ChatTypeStorage;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage1_19_1;
 import com.viaversion.viaversion.util.CipherUtil;
+import com.viaversion.viaversion.util.LogUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.TagUtil;
 import java.security.SignatureException;
@@ -297,7 +298,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                             data = new byte[]{1};
                             wrapper.set(Types.REMAINING_BYTES, 0, data);
                         } else {
-                            Via.getPlatform().getLogger().warning("Received unexpected data in velocity:player_info (length=" + data.length + ")");
+                            LogUtil.INSTANCE.warning(Protocol1_19To1_19_1.class, "Received unexpected data in velocity:player_info (length=" + data.length + ")");
                         }
                     }
                 });
@@ -318,7 +319,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             final JsonElement message
     ) {
         if (chatType == null) {
-            Via.getPlatform().getLogger().warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
+            LogUtil.INSTANCE.warning(Protocol1_19To1_19_1.class, "Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
             return null;
         }
 

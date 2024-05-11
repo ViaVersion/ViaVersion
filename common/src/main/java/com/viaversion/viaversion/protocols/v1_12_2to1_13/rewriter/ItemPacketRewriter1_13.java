@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
@@ -43,6 +42,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.LogUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,12 +119,9 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         if (!originalSource.isEmpty()) {
                             flags |= 1;
                             Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
-                            if (finalSource.isEmpty()) {
-                                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                    Via.getPlatform().getLogger().info("Could not handle unknown sound source " + originalSource + " falling back to default: master");
-                                }
+                            if (finalSource.isEmpty()) { // TODO conversion info
+                                LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                 finalSource = Optional.of(SoundSource.MASTER);
-
                             }
 
                             wrapper.write(Types.VAR_INT, finalSource.get().getId());

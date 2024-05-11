@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
@@ -48,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.LogUtil;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.Iterator;
@@ -89,9 +89,8 @@ public class WorldPacketRewriter1_13 {
                     String motive = wrapper.read(Types.STRING);
 
                     Optional<Integer> id = provider.getIntByIdentifier(motive);
-
-                    if (id.isEmpty() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
-                        Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
+                    if (id.isEmpty()) {
+                        LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Could not find painting motive: " + motive + " falling back to default (0)");
                     }
                     wrapper.write(Types.VAR_INT, id.orElse(0));
                 });
@@ -410,9 +409,7 @@ public class WorldPacketRewriter1_13 {
                     if (!VALID_BIOMES.contains(biome)) {
                         if (biome != 255 // is it generated naturally? *shrug*
                                 && latestBiomeWarn != biome) {
-                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
-                            }
+                            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Received invalid biome id " + biome);
                             latestBiomeWarn = biome;
                         }
                         chunk.getBiomeData()[i] = 1; // Plains

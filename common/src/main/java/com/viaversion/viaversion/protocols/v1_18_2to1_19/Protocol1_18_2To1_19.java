@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.data.MappingData1_19;
@@ -50,6 +51,7 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.LogUtil;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
@@ -172,7 +174,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                     final String argumentType = wrapper.read(Types.STRING);
                     final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
                     if (argumentTypeId == -1) {
-                        Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
+                        LogUtil.INSTANCE.warning(Protocol1_12_2To1_13.class, "Unknown command argument type: " + argumentType);
                     }
 
                     wrapper.write(Types.VAR_INT, argumentTypeId);
