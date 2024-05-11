@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.data.entity;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.NumberTag;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 
 public final class DimensionDataImpl implements DimensionData {

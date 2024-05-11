@@ -24,8 +24,8 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.ClientboundPackets1_15;
-import com.viaversion.viaversion.protocols.protocol1_15to1_14_4.Protocol1_15To1_14_4;
+import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
+import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import java.util.Arrays;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
@@ -39,7 +39,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
     private boolean swimmingMethodExists;
 
     public EntityToggleGlideListener(ViaVersionPlugin plugin) {
-        super(plugin, Protocol1_15To1_14_4.class);
+        super(plugin, Protocol1_14_4To1_15.class);
         try {
             Player.class.getMethod("isSwimming");
             swimmingMethodExists = true;
@@ -82,7 +82,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
             // leave 0x80 as 0 to stop gliding
             packet.write(Types1_14.METADATA_LIST, Arrays.asList(new Metadata(0, Types1_14.META_TYPES.byteType, bitmask)));
-            packet.scheduleSend(Protocol1_15To1_14_4.class);
+            packet.scheduleSend(Protocol1_14_4To1_15.class);
         }
     }
 }

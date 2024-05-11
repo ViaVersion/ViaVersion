@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.listeners.protocol1_19_4To1_19_3;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.protocol1_19_4to1_19_3.Protocol1_19_4To1_19_3;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.Protocol1_19_3To1_19_4;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +32,7 @@ import org.bukkit.inventory.PlayerInventory;
 public final class ArmorToggleListener extends ViaBukkitListener {
 
     public ArmorToggleListener(final ViaVersionPlugin plugin) {
-        super(plugin, Protocol1_19_4To1_19_3.class);
+        super(plugin, Protocol1_19_3To1_19_4.class);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

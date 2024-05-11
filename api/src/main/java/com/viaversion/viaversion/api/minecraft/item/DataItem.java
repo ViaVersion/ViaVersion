@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.item;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.google.gson.annotations.SerializedName;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import java.util.Objects;

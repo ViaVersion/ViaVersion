@@ -22,9 +22,9 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
-import com.github.steveice10.opennbt.tag.TagRegistry;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
-import com.github.steveice10.opennbt.tag.limiter.TagLimiter;
+import com.viaversion.nbt.io.TagRegistry;
+import com.viaversion.nbt.tag.Tag;
+import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;

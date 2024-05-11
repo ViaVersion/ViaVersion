@@ -21,8 +21,8 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static com.github.steveice10.opennbt.stringified.SNBT.deserialize;
-import static com.github.steveice10.opennbt.stringified.SNBT.deserializeCompoundTag;
+import static com.viaversion.nbt.stringified.SNBT.deserialize;
+import static com.viaversion.nbt.stringified.SNBT.deserializeCompoundTag;
 
 public class NBTTagTest {
 

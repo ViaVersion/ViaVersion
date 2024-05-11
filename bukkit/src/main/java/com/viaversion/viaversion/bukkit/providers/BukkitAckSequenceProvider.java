@@ -21,8 +21,8 @@ import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.tasks.protocol1_19to1_18_2.AckSequenceTask;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.provider.AckSequenceProvider;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.storage.SequenceStorage;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
 
 public final class BukkitAckSequenceProvider extends AckSequenceProvider {
 

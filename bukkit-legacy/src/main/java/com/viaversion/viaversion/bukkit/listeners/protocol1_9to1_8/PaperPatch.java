@@ -19,7 +19,7 @@ package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.bukkit.util.CollisionChecker;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,7 +34,7 @@ public class PaperPatch extends ViaBukkitListener {
     private final CollisionChecker CHECKER = CollisionChecker.getInstance();
 
     public PaperPatch(Plugin plugin) {
-        super(plugin, Protocol1_9To1_8.class);
+        super(plugin, Protocol1_8To1_9.class);
     }
 
     /*

@@ -16,7 +16,9 @@ sourceSets {
 
 dependencies {
     api(libs.fastutil)
-    api(libs.vianbt)
+    api(libs.vianbt) {
+        exclude("it.unimi.dsi", "fastutil")
+    }
     api(libs.gson)
     implementation(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")

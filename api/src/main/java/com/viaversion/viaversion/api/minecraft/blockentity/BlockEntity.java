@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.blockentity;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.nbt.tag.CompoundTag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface BlockEntity {
