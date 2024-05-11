@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public record FoodProperties(int nutrition, float saturationModifier, boolean canAlwaysEat, float eatSeconds,
@@ -31,7 +32,7 @@ public record FoodProperties(int nutrition, float saturationModifier, boolean ca
     public static final Type<FoodProperties> TYPE = new Type<>(FoodProperties.class) {
         @Override
         public FoodProperties read(final ByteBuf buffer) {
-            final int nutrition = Type.VAR_INT.readPrimitive(buffer);
+            final int nutrition = Types.VAR_INT.readPrimitive(buffer);
             final float saturationModifier = buffer.readFloat();
             final boolean canAlwaysEat = buffer.readBoolean();
             final float eatSeconds = buffer.readFloat();
@@ -41,7 +42,7 @@ public record FoodProperties(int nutrition, float saturationModifier, boolean ca
 
         @Override
         public void write(final ByteBuf buffer, final FoodProperties value) {
-            Type.VAR_INT.writePrimitive(buffer, value.nutrition);
+            Types.VAR_INT.writePrimitive(buffer, value.nutrition);
             buffer.writeFloat(value.saturationModifier);
             buffer.writeBoolean(value.canAlwaysEat);
             buffer.writeFloat(value.eatSeconds);

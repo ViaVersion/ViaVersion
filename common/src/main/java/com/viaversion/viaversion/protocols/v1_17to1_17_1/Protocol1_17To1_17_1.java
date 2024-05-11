@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
@@ -43,29 +44,29 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         registerClientbound(ClientboundPackets1_17.REMOVE_ENTITY, ClientboundPackets1_17_1.REMOVE_ENTITIES, wrapper -> {
             // Aaaaand back to an array again!
-            int entityId = wrapper.read(Type.VAR_INT);
-            wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+            int entityId = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
         });
 
         registerClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Container id
-                create(Type.VAR_INT, 0); // Add arbitrary state id
+                map(Types.UNSIGNED_BYTE); // Container id
+                create(Types.VAR_INT, 0); // Add arbitrary state id
             }
         });
 
         registerClientbound(ClientboundPackets1_17.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Container id
-                create(Type.VAR_INT, 0); // Add arbitrary state id
+                map(Types.UNSIGNED_BYTE); // Container id
+                create(Types.VAR_INT, 0); // Add arbitrary state id
                 handler(wrapper -> {
                     // Length encoded as var int now
-                    wrapper.write(Type.ITEM1_13_2_ARRAY, wrapper.read(Type.ITEM1_13_2_SHORT_ARRAY));
+                    wrapper.write(Types.ITEM1_13_2_ARRAY, wrapper.read(Types.ITEM1_13_2_SHORT_ARRAY));
 
                     // Carried item - should work like this
-                    wrapper.write(Type.ITEM1_13_2, null);
+                    wrapper.write(Types.ITEM1_13_2, null);
                 });
             }
         });
@@ -73,8 +74,8 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Container id
-                read(Type.VAR_INT); // Remove state id
+                map(Types.UNSIGNED_BYTE); // Container id
+                read(Types.VAR_INT); // Remove state id
             }
         });
 
@@ -83,12 +84,12 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
 
             // Write the item, edit the tag down the line
-            wrapper.write(Type.ITEM1_13_2, item);
+            wrapper.write(Types.ITEM1_13_2, item);
 
-            int slot = wrapper.read(Type.VAR_INT);
+            int slot = wrapper.read(Types.VAR_INT);
 
             // Save pages to tag
-            int pages = wrapper.read(Type.VAR_INT);
+            int pages = wrapper.read(Types.VAR_INT);
             ListTag<StringTag> pagesTag = new ListTag<>(StringTag.class);
             for (int i = 0; i < pages; i++) {
                 String page = wrapper.read(PAGE_STRING_TYPE);
@@ -102,7 +103,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
 
             tag.put("pages", pagesTag);
 
-            if (wrapper.read(Type.BOOLEAN)) {
+            if (wrapper.read(Types.BOOLEAN)) {
                 // Save the title to tag
                 String title = wrapper.read(TITLE_STRING_TYPE);
                 tag.put("title", new StringTag(title));
@@ -111,13 +112,13 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
                 tag.put("author", new StringTag(wrapper.user().getProtocolInfo().getUsername()));
 
                 // Write signing
-                wrapper.write(Type.BOOLEAN, true);
+                wrapper.write(Types.BOOLEAN, true);
             } else {
-                wrapper.write(Type.BOOLEAN, false);
+                wrapper.write(Types.BOOLEAN, false);
             }
 
             // Write the slot
-            wrapper.write(Type.VAR_INT, slot);
+            wrapper.write(Types.VAR_INT, slot);
         });
     }
 }

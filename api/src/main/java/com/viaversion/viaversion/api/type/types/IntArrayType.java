@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class IntArrayType extends Type<int[]> {
@@ -46,7 +47,7 @@ public class IntArrayType extends Type<int[]> {
         if (this.length != -1) {
             Preconditions.checkArgument(length == object.length, "Length does not match expected length");
         } else {
-            Type.VAR_INT.writePrimitive(buffer, object.length);
+            Types.VAR_INT.writePrimitive(buffer, object.length);
         }
         for (final int i : object) {
             buffer.writeInt(i);
@@ -55,7 +56,7 @@ public class IntArrayType extends Type<int[]> {
 
     @Override
     public int[] read(final ByteBuf buffer) {
-        final int length = this.length == -1 ? Type.VAR_INT.readPrimitive(buffer) : this.length;
+        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
         Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
         final int[] array = new int[length];
         for (int i = 0; i < length; i++) {

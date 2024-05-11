@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
@@ -83,23 +84,23 @@ public final class WorldPacketRewriter1_15 {
         protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT, Type.DOUBLE); // 2 - X
-                map(Type.FLOAT, Type.DOUBLE); // 3 - Y
-                map(Type.FLOAT, Type.DOUBLE); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.FLOAT, Types.DOUBLE); // 2 - X
+                map(Types.FLOAT, Types.DOUBLE); // 3 - Y
+                map(Types.FLOAT, Types.DOUBLE); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
+                    int id = wrapper.get(Types.INT, 0);
                     if (id == 3 || id == 23) {
-                        int data = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                        int data = wrapper.passthrough(Types.VAR_INT);
+                        wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (id == 32) {
-                        protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
+                        protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2));
                     }
                 });
             }

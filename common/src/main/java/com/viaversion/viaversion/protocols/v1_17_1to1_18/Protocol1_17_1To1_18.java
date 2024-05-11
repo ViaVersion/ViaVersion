@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -72,14 +73,14 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Language
-                map(Type.BYTE); // View distance
-                map(Type.VAR_INT); // Chat visibility
-                map(Type.BOOLEAN); // Chat colors
-                map(Type.UNSIGNED_BYTE); // Model customization
-                map(Type.VAR_INT); // Main hand
-                map(Type.BOOLEAN); // Text filtering enabled
-                read(Type.BOOLEAN); // Allow listing in server list preview
+                map(Types.STRING); // Language
+                map(Types.BYTE); // View distance
+                map(Types.VAR_INT); // Chat visibility
+                map(Types.BOOLEAN); // Chat colors
+                map(Types.UNSIGNED_BYTE); // Model customization
+                map(Types.VAR_INT); // Main hand
+                map(Types.BOOLEAN); // Text filtering enabled
+                read(Types.BOOLEAN); // Allow listing in server list preview
             }
         });
     }

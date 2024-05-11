@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -50,18 +51,18 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
         // Read palette
         ChunkSection chunkSection;
         if (bitsPerBlock != GLOBAL_PALETTE) {
-            int paletteLength = Type.VAR_INT.readPrimitive(buffer);
+            int paletteLength = Types.VAR_INT.readPrimitive(buffer);
             chunkSection = new ChunkSectionImpl(true, paletteLength);
             DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
             for (int i = 0; i < paletteLength; i++) {
-                blockPalette.addId(Type.VAR_INT.readPrimitive(buffer));
+                blockPalette.addId(Types.VAR_INT.readPrimitive(buffer));
             }
         } else {
             chunkSection = new ChunkSectionImpl(true);
         }
 
         // Read blocks
-        long[] blockData = Type.LONG_ARRAY_PRIMITIVE.read(buffer);
+        long[] blockData = Types.LONG_ARRAY_PRIMITIVE.read(buffer);
         if (blockData.length > 0) {
             int expectedLength = (int) Math.ceil(ChunkSection.SIZE * bitsPerBlock / 64.0);
             if (blockData.length == expectedLength) {
@@ -90,14 +91,14 @@ public class ChunkSectionType1_13 extends Type<ChunkSection> {
 
         // Write palette
         if (bitsPerBlock != GLOBAL_PALETTE) {
-            Type.VAR_INT.writePrimitive(buffer, blockPalette.size());
+            Types.VAR_INT.writePrimitive(buffer, blockPalette.size());
             for (int i = 0; i < blockPalette.size(); i++) {
-                Type.VAR_INT.writePrimitive(buffer, blockPalette.idByIndex(i));
+                Types.VAR_INT.writePrimitive(buffer, blockPalette.idByIndex(i));
             }
         }
 
         long[] data = CompactArrayUtil.createCompactArray(bitsPerBlock, ChunkSection.SIZE,
                 bitsPerBlock == GLOBAL_PALETTE ? blockPalette::idAt : blockPalette::paletteIndexAt);
-        Type.LONG_ARRAY_PRIMITIVE.write(buffer, data);
+        Types.LONG_ARRAY_PRIMITIVE.write(buffer, data);
     }
 }

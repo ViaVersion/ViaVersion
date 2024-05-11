@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacket1_20_2;
@@ -48,7 +49,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<ClientboundPacket1_20_2, ServerboundPacket1_20_3, Protocol1_20_2To1_20_3> {
 
     public BlockItemPacketRewriter1_20_3(final Protocol1_20_2To1_20_3 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY);
+        super(protocol, Types.ITEM1_20_2, Types.ITEM1_20_2_ARRAY);
     }
 
     @Override
@@ -73,25 +74,25 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_20_2.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.VAR_INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    final int id = wrapper.get(Type.VAR_INT, 0);
+                    final int id = wrapper.get(Types.VAR_INT, 0);
                     final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
                     if (id == particleMappings.id("vibration")) {
-                        final String resourceLocation = Key.stripMinecraftNamespace(wrapper.read(Type.STRING));
-                        wrapper.write(Type.VAR_INT, resourceLocation.equals("block") ? 0 : 1);
+                        final String resourceLocation = Key.stripMinecraftNamespace(wrapper.read(Types.STRING));
+                        wrapper.write(Types.VAR_INT, resourceLocation.equals("block") ? 0 : 1);
                     }
                 });
-                handler(getSpawnParticleHandler(Type.VAR_INT));
+                handler(getSpawnParticleHandler(Types.VAR_INT));
             }
         });
 
@@ -99,43 +100,43 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             @Override
             public void handleCraftingShaped(final PacketWrapper wrapper) {
                 // Move width and height down
-                final int width = wrapper.read(Type.VAR_INT);
-                final int height = wrapper.read(Type.VAR_INT);
+                final int width = wrapper.read(Types.VAR_INT);
+                final int height = wrapper.read(Types.VAR_INT);
 
-                wrapper.passthrough(Type.STRING); // Group
-                wrapper.passthrough(Type.VAR_INT); // Crafting book category
+                wrapper.passthrough(Types.STRING); // Group
+                wrapper.passthrough(Types.VAR_INT); // Crafting book category
 
-                wrapper.write(Type.VAR_INT, width);
-                wrapper.write(Type.VAR_INT, height);
+                wrapper.write(Types.VAR_INT, width);
+                wrapper.write(Types.VAR_INT, height);
                 final int ingredients = height * width;
                 for (int i = 0; i < ingredients; i++) {
                     handleIngredient(wrapper);
                 }
                 rewrite(wrapper.user(), wrapper.passthrough(itemType())); // Result
-                wrapper.passthrough(Type.BOOLEAN); // Show notification
+                wrapper.passthrough(Types.BOOLEAN); // Show notification
             }
         }.register(ClientboundPackets1_20_2.UPDATE_RECIPES);
 
         protocol.registerClientbound(ClientboundPackets1_20_2.EXPLODE, wrapper -> {
-            wrapper.passthrough(Type.DOUBLE); // X
-            wrapper.passthrough(Type.DOUBLE); // Y
-            wrapper.passthrough(Type.DOUBLE); // Z
-            wrapper.passthrough(Type.FLOAT); // Power
-            final int blocks = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Power
+            final int blocks = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < blocks; i++) {
-                wrapper.passthrough(Type.BYTE); // Relative X
-                wrapper.passthrough(Type.BYTE); // Relative Y
-                wrapper.passthrough(Type.BYTE); // Relative Z
+                wrapper.passthrough(Types.BYTE); // Relative X
+                wrapper.passthrough(Types.BYTE); // Relative Y
+                wrapper.passthrough(Types.BYTE); // Relative Z
             }
-            wrapper.passthrough(Type.FLOAT); // Knockback X
-            wrapper.passthrough(Type.FLOAT); // Knockback Y
-            wrapper.passthrough(Type.FLOAT); // Knockback Z
+            wrapper.passthrough(Types.FLOAT); // Knockback X
+            wrapper.passthrough(Types.FLOAT); // Knockback Y
+            wrapper.passthrough(Types.FLOAT); // Knockback Z
 
-            wrapper.write(Type.VAR_INT, 1); // Block interaction type - Destroy
+            wrapper.write(Types.VAR_INT, 1); // Block interaction type - Destroy
             wrapper.write(Types1_20_3.PARTICLE, new Particle(protocol.getMappingData().getParticleMappings().mappedId("explosion"))); // Small explosion particle
             wrapper.write(Types1_20_3.PARTICLE, new Particle(protocol.getMappingData().getParticleMappings().mappedId("explosion_emitter"))); // Large explosion particle
-            wrapper.write(Type.STRING, "minecraft:entity.generic.explode"); // Explosion sound
-            wrapper.write(Type.OPTIONAL_FLOAT, null); // Sound range
+            wrapper.write(Types.STRING, "minecraft:entity.generic.explode"); // Explosion sound
+            wrapper.write(Types.OPTIONAL_FLOAT, null); // Sound range
         });
     }
 

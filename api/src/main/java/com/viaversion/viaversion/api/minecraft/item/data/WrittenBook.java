@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public record WrittenBook(FilterableString title, String author, int generation, FilterableComponent[] pages,
@@ -32,8 +33,8 @@ public record WrittenBook(FilterableString title, String author, int generation,
         @Override
         public WrittenBook read(final ByteBuf buffer) {
             final FilterableString title = FilterableString.TYPE.read(buffer);
-            final String author = Type.STRING.read(buffer);
-            final int generation = Type.VAR_INT.readPrimitive(buffer);
+            final String author = Types.STRING.read(buffer);
+            final int generation = Types.VAR_INT.readPrimitive(buffer);
             final FilterableComponent[] pages = FilterableComponent.ARRAY_TYPE.read(buffer);
             final boolean resolved = buffer.readBoolean();
             return new WrittenBook(title, author, generation, pages, resolved);
@@ -42,8 +43,8 @@ public record WrittenBook(FilterableString title, String author, int generation,
         @Override
         public void write(final ByteBuf buffer, final WrittenBook value) {
             FilterableString.TYPE.write(buffer, value.title);
-            Type.STRING.write(buffer, value.author);
-            Type.VAR_INT.writePrimitive(buffer, value.generation);
+            Types.STRING.write(buffer, value.author);
+            Types.VAR_INT.writePrimitive(buffer, value.generation);
             FilterableComponent.ARRAY_TYPE.write(buffer, value.pages);
             buffer.writeBoolean(value.resolved);
         }

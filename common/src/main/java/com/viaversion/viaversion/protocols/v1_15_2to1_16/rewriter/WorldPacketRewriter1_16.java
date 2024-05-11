@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
@@ -54,9 +55,9 @@ public class WorldPacketRewriter1_16 {
         protocol.registerClientbound(ClientboundPackets1_15.LIGHT_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // x
-                map(Type.VAR_INT); // y
-                handler(wrapper -> wrapper.write(Type.BOOLEAN, true)); // Take neighbour's light into account as well
+                map(Types.VAR_INT); // x
+                map(Types.VAR_INT); // y
+                handler(wrapper -> wrapper.write(Types.BOOLEAN, true)); // Take neighbour's light into account as well
             }
         });
 
@@ -94,9 +95,9 @@ public class WorldPacketRewriter1_16 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_15.BLOCK_ENTITY_DATA, wrapper -> {
-            wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.UNSIGNED_BYTE); // Action
-            CompoundTag tag = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
+            wrapper.passthrough(Types.BLOCK_POSITION1_14); // Position
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Action
+            CompoundTag tag = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
             handleBlockEntity(protocol, wrapper.user(), tag);
         });
 

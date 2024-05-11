@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
 
@@ -31,19 +32,19 @@ public record ModifierData(UUID uuid, String name, double amount, int operation)
     public static final Type<ModifierData> TYPE = new Type<>(ModifierData.class) {
         @Override
         public ModifierData read(final ByteBuf buffer) {
-            final UUID uuid = Type.UUID.read(buffer);
-            final String name = Type.STRING.read(buffer);
+            final UUID uuid = Types.UUID.read(buffer);
+            final String name = Types.STRING.read(buffer);
             final double amount = buffer.readDouble();
-            final int operation = Type.VAR_INT.readPrimitive(buffer);
+            final int operation = Types.VAR_INT.readPrimitive(buffer);
             return new ModifierData(uuid, name, amount, operation);
         }
 
         @Override
         public void write(final ByteBuf buffer, final ModifierData value) {
-            Type.UUID.write(buffer, value.uuid);
-            Type.STRING.write(buffer, value.name);
+            Types.UUID.write(buffer, value.uuid);
+            Types.STRING.write(buffer, value.name);
             buffer.writeDouble(value.amount);
-            Type.VAR_INT.writePrimitive(buffer, value.operation);
+            Types.VAR_INT.writePrimitive(buffer, value.operation);
         }
     };
 

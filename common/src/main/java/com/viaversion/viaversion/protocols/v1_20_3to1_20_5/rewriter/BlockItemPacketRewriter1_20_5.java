@@ -74,6 +74,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -127,7 +128,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private static final StatePropertyMatcher[] EMPTY_PROPERTY_MATCHERS = new StatePropertyMatcher[0];
 
     public BlockItemPacketRewriter1_20_5(final Protocol1_20_3To1_20_5 protocol) {
-        super(protocol, Type.ITEM1_20_2, Type.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
+        super(protocol, Types.ITEM1_20_2, Types.ITEM1_20_2_ARRAY, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
     }
 
     @Override
@@ -139,17 +140,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerEffect(ClientboundPackets1_20_3.LEVEL_EVENT, 1010, 2001);
         blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new, (user, blockEntity) -> updateBlockEntityTag(user, null, blockEntity.tag()));
         protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
-            wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.VAR_INT); // Block entity type
+            wrapper.passthrough(Types.BLOCK_POSITION1_14); // Position
+            wrapper.passthrough(Types.VAR_INT); // Block entity type
 
-            CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
+            CompoundTag tag = wrapper.read(Types.COMPOUND_TAG);
             if (tag != null) {
                 updateBlockEntityTag(wrapper.user(), null, tag);
             } else {
                 // No longer nullable
                 tag = new CompoundTag();
             }
-            wrapper.write(Type.COMPOUND_TAG, tag);
+            wrapper.write(Types.COMPOUND_TAG, tag);
         });
 
         registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
@@ -160,144 +161,144 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.CONTAINER_SET_DATA);
         registerCreativeInvAction(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_20_5.CONTAINER_BUTTON_CLICK, wrapper -> {
-            final byte containerId = wrapper.read(Type.VAR_INT).byteValue();
-            final byte buttonId = wrapper.read(Type.VAR_INT).byteValue();
-            wrapper.write(Type.BYTE, containerId);
-            wrapper.write(Type.BYTE, buttonId);
+            final byte containerId = wrapper.read(Types.VAR_INT).byteValue();
+            final byte buttonId = wrapper.read(Types.VAR_INT).byteValue();
+            wrapper.write(Types.BYTE, containerId);
+            wrapper.write(Types.BYTE, buttonId);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_ADVANCEMENTS, wrapper -> {
-            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.STRING); // Identifier
-                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
 
                 // Display data
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.TAG); // Title
-                    wrapper.passthrough(Type.TAG); // Description
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.TAG); // Title
+                    wrapper.passthrough(Types.TAG); // Description
 
                     Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(itemType()));
                     wrapper.write(mappedItemType(), item);
 
-                    wrapper.passthrough(Type.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
-                        wrapper.passthrough(Type.STRING); // Background texture
+                        wrapper.passthrough(Types.STRING); // Background texture
                     }
-                    wrapper.passthrough(Type.FLOAT); // X
-                    wrapper.passthrough(Type.FLOAT); // Y
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
                 }
 
-                int requirements = wrapper.passthrough(Type.VAR_INT);
+                int requirements = wrapper.passthrough(Types.VAR_INT);
                 for (int array = 0; array < requirements; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY);
+                    wrapper.passthrough(Types.STRING_ARRAY);
                 }
 
-                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.LEVEL_PARTICLES, wrapper -> {
-            final int particleId = wrapper.read(Type.VAR_INT);
+            final int particleId = wrapper.read(Types.VAR_INT);
 
-            wrapper.passthrough(Type.BOOLEAN); // Long Distance
-            wrapper.passthrough(Type.DOUBLE); // X
-            wrapper.passthrough(Type.DOUBLE); // Y
-            wrapper.passthrough(Type.DOUBLE); // Z
-            wrapper.passthrough(Type.FLOAT); // Offset X
-            wrapper.passthrough(Type.FLOAT); // Offset Y
-            wrapper.passthrough(Type.FLOAT); // Offset Z
-            final float data = wrapper.passthrough(Type.FLOAT);
-            wrapper.passthrough(Type.INT); // Particle Count
+            wrapper.passthrough(Types.BOOLEAN); // Long Distance
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Offset X
+            wrapper.passthrough(Types.FLOAT); // Offset Y
+            wrapper.passthrough(Types.FLOAT); // Offset Z
+            final float data = wrapper.passthrough(Types.FLOAT);
+            wrapper.passthrough(Types.INT); // Particle Count
 
             // Read data and add it to Particle
             final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             final int mappedId = mappings.getNewId(particleId);
             final Particle particle = new Particle(mappedId);
             if (mappedId == mappings.mappedId("entity_effect")) {
-                particle.add(Type.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
+                particle.add(Types.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
             } else if (particleId == mappings.id("dust_color_transition")) {
                 for (int i = 0; i < 7; i++) {
-                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT));
+                    particle.add(Types.FLOAT, wrapper.read(Types.FLOAT));
                 }
                 // fromColor, scale, toColor -> fromColor, toColor, scale
-                particle.add(Type.FLOAT, particle.<Float>removeArgument(3).getValue());
+                particle.add(Types.FLOAT, particle.<Float>removeArgument(3).getValue());
             } else if (mappings.isBlockParticle(particleId)) {
-                final int blockStateId = wrapper.read(Type.VAR_INT);
-                particle.add(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
+                final int blockStateId = wrapper.read(Types.VAR_INT);
+                particle.add(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
-                final Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
             } else if (particleId == mappings.id("dust")) {
                 // R, g, b, scale
                 for (int i = 0; i < 4; i++) {
-                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT));
+                    particle.add(Types.FLOAT, wrapper.read(Types.FLOAT));
                 }
             } else if (particleId == mappings.id("vibration")) {
-                final int sourceTypeId = wrapper.read(Type.VAR_INT);
-                particle.add(Type.VAR_INT, sourceTypeId);
+                final int sourceTypeId = wrapper.read(Types.VAR_INT);
+                particle.add(Types.VAR_INT, sourceTypeId);
                 if (sourceTypeId == 0) { // Block
-                    particle.add(Type.POSITION1_14, wrapper.read(Type.POSITION1_14)); // Target block pos
+                    particle.add(Types.BLOCK_POSITION1_14, wrapper.read(Types.BLOCK_POSITION1_14)); // Target block pos
                 } else if (sourceTypeId == 1) { // Entity
-                    particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Target entity
-                    particle.add(Type.FLOAT, wrapper.read(Type.FLOAT)); // Y offset
+                    particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Target entity
+                    particle.add(Types.FLOAT, wrapper.read(Types.FLOAT)); // Y offset
                 } else {
                     Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + sourceTypeId);
                 }
-                particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Arrival in ticks
+                particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Arrival in ticks
             } else if (particleId == mappings.id("sculk_charge")) {
-                particle.add(Type.FLOAT, wrapper.read(Type.FLOAT)); // Roll
+                particle.add(Types.FLOAT, wrapper.read(Types.FLOAT)); // Roll
             } else if (particleId == mappings.id("shriek")) {
-                particle.add(Type.VAR_INT, wrapper.read(Type.VAR_INT)); // Delay
+                particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Delay
             }
 
             wrapper.write(Types1_20_5.PARTICLE, particle);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.EXPLODE, wrapper -> {
-            wrapper.passthrough(Type.DOUBLE); // X
-            wrapper.passthrough(Type.DOUBLE); // Y
-            wrapper.passthrough(Type.DOUBLE); // Z
-            wrapper.passthrough(Type.FLOAT); // Power
-            final int blocks = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Power
+            final int blocks = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < blocks; i++) {
-                wrapper.passthrough(Type.BYTE); // Relative X
-                wrapper.passthrough(Type.BYTE); // Relative Y
-                wrapper.passthrough(Type.BYTE); // Relative Z
+                wrapper.passthrough(Types.BYTE); // Relative X
+                wrapper.passthrough(Types.BYTE); // Relative Y
+                wrapper.passthrough(Types.BYTE); // Relative Z
             }
-            wrapper.passthrough(Type.FLOAT); // Knockback X
-            wrapper.passthrough(Type.FLOAT); // Knockback Y
-            wrapper.passthrough(Type.FLOAT); // Knockback Z
-            wrapper.passthrough(Type.VAR_INT); // Block interaction type
+            wrapper.passthrough(Types.FLOAT); // Knockback X
+            wrapper.passthrough(Types.FLOAT); // Knockback Y
+            wrapper.passthrough(Types.FLOAT); // Knockback Z
+            wrapper.passthrough(Types.VAR_INT); // Block interaction type
 
             protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Small explosion particle
             protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Large explosion particle
 
-            wrapper.write(Type.VAR_INT, 0); // "Empty" registry id to instead use the resource location that follows after
+            wrapper.write(Types.VAR_INT, 0); // "Empty" registry id to instead use the resource location that follows after
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.MERCHANT_OFFERS, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Container id
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT); // Container id
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final Item input = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item input = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM_COST, input);
 
-                final Item output = handleNonNullItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item output = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, output);
 
-                final Item secondInput = handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_20_2));
+                final Item secondInput = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.OPTIONAL_ITEM_COST, secondInput);
 
-                wrapper.passthrough(Type.BOOLEAN); // Out of stock
-                wrapper.passthrough(Type.INT); // Number of trade uses
-                wrapper.passthrough(Type.INT); // Maximum number of trade uses
-                wrapper.passthrough(Type.INT); // XP
-                wrapper.passthrough(Type.INT); // Special price
-                wrapper.passthrough(Type.FLOAT); // Price multiplier
-                wrapper.passthrough(Type.INT); // Demand
+                wrapper.passthrough(Types.BOOLEAN); // Out of stock
+                wrapper.passthrough(Types.INT); // Number of trade uses
+                wrapper.passthrough(Types.INT); // Maximum number of trade uses
+                wrapper.passthrough(Types.INT); // XP
+                wrapper.passthrough(Types.INT); // Special price
+                wrapper.passthrough(Types.FLOAT); // Price multiplier
+                wrapper.passthrough(Types.INT); // Demand
             }
         });
 
@@ -313,13 +314,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         };
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_RECIPES, wrapper -> {
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 // Change order and write the type as an int
-                final String type = wrapper.read(Type.STRING);
-                wrapper.passthrough(Type.STRING); // Recipe Identifier
+                final String type = wrapper.read(Types.STRING);
+                wrapper.passthrough(Types.STRING); // Recipe Identifier
 
-                wrapper.write(Type.VAR_INT, protocol.getMappingData().getRecipeSerializerMappings().mappedId(type));
+                wrapper.write(Types.VAR_INT, protocol.getMappingData().getRecipeSerializerMappings().mappedId(type));
                 recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
             }
         });

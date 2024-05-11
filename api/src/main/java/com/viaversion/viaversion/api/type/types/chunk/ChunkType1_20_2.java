@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_18;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,10 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
     public Chunk read(final ByteBuf buffer) {
         final int chunkX = buffer.readInt();
         final int chunkZ = buffer.readInt();
-        final CompoundTag heightMap = Type.COMPOUND_TAG.read(buffer);
+        final CompoundTag heightMap = Types.COMPOUND_TAG.read(buffer);
 
         // Read sections
-        final ByteBuf sectionsBuf = buffer.readBytes(Type.VAR_INT.readPrimitive(buffer));
+        final ByteBuf sectionsBuf = buffer.readBytes(Types.VAR_INT.readPrimitive(buffer));
         final ChunkSection[] sections = new ChunkSection[ySectionCount];
         try {
             for (int i = 0; i < ySectionCount; i++) {
@@ -61,10 +62,10 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
             sectionsBuf.release();
         }
 
-        final int blockEntitiesLength = Type.VAR_INT.readPrimitive(buffer);
+        final int blockEntitiesLength = Types.VAR_INT.readPrimitive(buffer);
         final List<BlockEntity> blockEntities = new ArrayList<>(blockEntitiesLength);
         for (int i = 0; i < blockEntitiesLength; i++) {
-            blockEntities.add(Type.BLOCK_ENTITY1_20_2.read(buffer));
+            blockEntities.add(Types.BLOCK_ENTITY1_20_2.read(buffer));
         }
 
         return new Chunk1_18(chunkX, chunkZ, sections, heightMap, blockEntities);
@@ -75,7 +76,7 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
         buffer.writeInt(chunk.getX());
         buffer.writeInt(chunk.getZ());
 
-        Type.COMPOUND_TAG.write(buffer, chunk.getHeightMap());
+        Types.COMPOUND_TAG.write(buffer, chunk.getHeightMap());
 
         final ByteBuf sectionBuffer = buffer.alloc().buffer();
         try {
@@ -83,15 +84,15 @@ public final class ChunkType1_20_2 extends Type<Chunk> {
                 sectionType.write(sectionBuffer, section);
             }
             sectionBuffer.readerIndex(0);
-            Type.VAR_INT.writePrimitive(buffer, sectionBuffer.readableBytes());
+            Types.VAR_INT.writePrimitive(buffer, sectionBuffer.readableBytes());
             buffer.writeBytes(sectionBuffer);
         } finally {
             sectionBuffer.release(); // release buffer
         }
 
-        Type.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());
+        Types.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());
         for (final BlockEntity blockEntity : chunk.blockEntities()) {
-            Type.BLOCK_ENTITY1_20_2.write(buffer, blockEntity);
+            Types.BLOCK_ENTITY1_20_2.write(buffer, blockEntity);
         }
     }
 }

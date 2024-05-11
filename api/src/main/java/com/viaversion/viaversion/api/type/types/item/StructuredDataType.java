@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -41,14 +42,14 @@ public class StructuredDataType extends Type<StructuredData<?>> {
 
     @Override
     public void write(final ByteBuf buffer, final StructuredData<?> object) {
-        Type.VAR_INT.writePrimitive(buffer, object.id());
+        Types.VAR_INT.writePrimitive(buffer, object.id());
         object.write(buffer);
     }
 
     @Override
     public StructuredData<?> read(final ByteBuf buffer) {
         Preconditions.checkNotNull(types, "StructuredDataType has not been initialized");
-        final int id = Type.VAR_INT.readPrimitive(buffer);
+        final int id = Types.VAR_INT.readPrimitive(buffer);
         final StructuredDataKey<?> key = this.types[id];
         if (key == null) {
             throw new IllegalArgumentException("No data component serializer found for id " + id);

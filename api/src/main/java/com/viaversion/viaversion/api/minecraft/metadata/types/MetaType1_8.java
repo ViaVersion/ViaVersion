@@ -24,22 +24,21 @@ package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 
 public enum MetaType1_8 implements MetaType {
-    Byte(0, Type.BYTE),
-    Short(1, Type.SHORT),
-    Int(2, Type.INT),
-    Float(3, Type.FLOAT),
-    String(4, Type.STRING),
-    Slot(5, Type.ITEM1_8),
-    Position(6, Type.VECTOR),
-    Rotation(7, Type.ROTATION);
+    BYTE(Types.BYTE),
+    SHORT(Types.SHORT),
+    INT(Types.INT),
+    FLOAT(Types.FLOAT),
+    STRING(Types.STRING),
+    ITEM(Types.ITEM1_8),
+    BLOCK_POSITION(Types.VECTOR),
+    ROTATIONS(Types.ROTATIONS);
 
-    private final int typeID;
-    private final Type type;
+    private final Type<?> type;
 
-    MetaType1_8(int typeID, Type type) {
-        this.typeID = typeID;
+    MetaType1_8(Type<?> type) {
         this.type = type;
     }
 
@@ -49,7 +48,7 @@ public enum MetaType1_8 implements MetaType {
 
     @Override
     public int typeId() {
-        return typeID;
+        return ordinal();
     }
 
     @Override

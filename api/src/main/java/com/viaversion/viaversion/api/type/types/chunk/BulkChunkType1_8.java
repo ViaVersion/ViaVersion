@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class BulkChunkType1_8 extends Type<Chunk[]> {
@@ -42,7 +43,7 @@ public class BulkChunkType1_8 extends Type<Chunk[]> {
     @Override
     public Chunk[] read(ByteBuf input) {
         final boolean skyLight = input.readBoolean();
-        final int count = Type.VAR_INT.readPrimitive(input);
+        final int count = Types.VAR_INT.readPrimitive(input);
         final Chunk[] chunks = new Chunk[count];
         final ChunkBulkSection[] chunkInfo = new ChunkBulkSection[count];
 
@@ -73,7 +74,7 @@ public class BulkChunkType1_8 extends Type<Chunk[]> {
             }
         }
         output.writeBoolean(skyLight);
-        Type.VAR_INT.writePrimitive(output, chunks.length);
+        Types.VAR_INT.writePrimitive(output, chunks.length);
 
         // Write metadata
         for (Chunk chunk : chunks) {

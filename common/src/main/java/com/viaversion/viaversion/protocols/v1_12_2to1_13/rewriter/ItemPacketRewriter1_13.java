@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
@@ -59,21 +60,21 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Slot Value
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.SHORT); // 1 - Slot ID
+                map(Types.ITEM1_8, Types.ITEM1_13); // 2 - Slot Value
 
-                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_13, 0)));
+                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_13, 0)));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM1_8_SHORT_ARRAY, Type.ITEM1_13_SHORT_ARRAY); // 1 - Window Values
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.ITEM1_8_SHORT_ARRAY, Types.ITEM1_13_SHORT_ARRAY); // 1 - Window Values
 
                 handler(wrapper -> {
-                    Item[] items = wrapper.get(Type.ITEM1_13_SHORT_ARRAY, 0);
+                    Item[] items = wrapper.get(Types.ITEM1_13_SHORT_ARRAY, 0);
                     for (Item item : items) {
                         handleItemToClient(wrapper.user(), item);
                     }
@@ -83,14 +84,14 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerClientbound(ClientboundPackets1_12_1.CONTAINER_SET_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Window id
-                map(Type.SHORT); // Property
-                map(Type.SHORT); // Value
+                map(Types.UNSIGNED_BYTE); // Window id
+                map(Types.SHORT); // Property
+                map(Types.SHORT); // Value
 
                 handler(wrapper -> {
-                    short property = wrapper.get(Type.SHORT, 0);
+                    short property = wrapper.get(Types.SHORT, 0);
                     if (property >= 4 && property <= 6) { // Enchantment id
-                        wrapper.set(Type.SHORT, 1, (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.get(Type.SHORT, 1)));
+                        wrapper.set(Types.SHORT, 1, (short) protocol.getMappingData().getEnchantmentMappings().getNewId(wrapper.get(Types.SHORT, 1)));
                     }
                 });
             }
@@ -100,21 +101,21 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerClientbound(ClientboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Channel
+                map(Types.STRING); // 0 - Channel
 
                 handlerSoftFail(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
+                    String channel = wrapper.get(Types.STRING, 0);
                     // Handle stopsound change
                     if (channel.equals("MC|StopSound")) {
-                        String originalSource = wrapper.read(Type.STRING);
-                        String originalSound = wrapper.read(Type.STRING);
+                        String originalSource = wrapper.read(Types.STRING);
+                        String originalSound = wrapper.read(Types.STRING);
 
                         // Reset the packet
                         wrapper.clearPacket();
                         wrapper.setPacketType(ClientboundPackets1_13.STOP_SOUND);
 
                         byte flags = 0;
-                        wrapper.write(Type.BYTE, flags); // Placeholder
+                        wrapper.write(Types.BYTE, flags); // Placeholder
                         if (!originalSource.isEmpty()) {
                             flags |= 1;
                             Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
@@ -126,41 +127,41 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
 
                             }
 
-                            wrapper.write(Type.VAR_INT, finalSource.get().getId());
+                            wrapper.write(Types.VAR_INT, finalSource.get().getId());
                         }
                         if (!originalSound.isEmpty()) {
                             flags |= 2;
-                            wrapper.write(Type.STRING, originalSound);
+                            wrapper.write(Types.STRING, originalSound);
                         }
 
-                        wrapper.set(Type.BYTE, 0, flags); // Update flags
+                        wrapper.set(Types.BYTE, 0, flags); // Update flags
                         return;
                     } else if (channel.equals("MC|TrList")) {
                         channel = "minecraft:trader_list";
-                        wrapper.passthrough(Type.INT); // Passthrough Window ID
+                        wrapper.passthrough(Types.INT); // Passthrough Window ID
 
-                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
                             // Input Item
-                            Item input = wrapper.read(Type.ITEM1_8);
+                            Item input = wrapper.read(Types.ITEM1_8);
                             handleItemToClient(wrapper.user(), input);
-                            wrapper.write(Type.ITEM1_13, input);
+                            wrapper.write(Types.ITEM1_13, input);
                             // Output Item
-                            Item output = wrapper.read(Type.ITEM1_8);
+                            Item output = wrapper.read(Types.ITEM1_8);
                             handleItemToClient(wrapper.user(), output);
-                            wrapper.write(Type.ITEM1_13, output);
+                            wrapper.write(Types.ITEM1_13, output);
 
-                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            boolean secondItem = wrapper.passthrough(Types.BOOLEAN); // Has second item
                             if (secondItem) {
                                 // Second Item
-                                Item second = wrapper.read(Type.ITEM1_8);
+                                Item second = wrapper.read(Types.ITEM1_8);
                                 handleItemToClient(wrapper.user(), second);
-                                wrapper.write(Type.ITEM1_13, second);
+                                wrapper.write(Types.ITEM1_13, second);
                             }
 
-                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                            wrapper.passthrough(Type.INT); // Number of tools uses
-                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Types.INT); // Number of tools uses
+                            wrapper.passthrough(Types.INT); // Maximum number of trade uses
                         }
                     } else {
                         String old = channel;
@@ -172,7 +173,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                             wrapper.cancel();
                             return;
                         } else if (channel.equals("minecraft:register") || channel.equals("minecraft:unregister")) {
-                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                             List<String> rewrittenChannels = new ArrayList<>();
                             for (String s : channels) {
                                 String rewritten = getNewPluginChannelId(s);
@@ -183,14 +184,14 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                                 }
                             }
                             if (!rewrittenChannels.isEmpty()) {
-                                wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                                wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                             } else {
                                 wrapper.cancel();
                                 return;
                             }
                         }
                     }
-                    wrapper.set(Type.STRING, 0, channel);
+                    wrapper.set(Types.STRING, 0, channel);
                 });
             }
         });
@@ -198,11 +199,11 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerClientbound(ClientboundPackets1_12_1.SET_EQUIPPED_ITEM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.VAR_INT); // 1 - Slot ID
-                map(Type.ITEM1_8, Type.ITEM1_13); // 2 - Item
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.VAR_INT); // 1 - Slot ID
+                map(Types.ITEM1_8, Types.ITEM1_13); // 2 - Item
 
-                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_13, 0)));
+                handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_13, 0)));
             }
         });
 
@@ -210,23 +211,23 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerServerbound(ServerboundPackets1_13.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot
-                map(Type.BYTE); // 2 - Button
-                map(Type.SHORT); // 3 - Action number
-                map(Type.VAR_INT); // 4 - Mode
-                map(Type.ITEM1_13, Type.ITEM1_8); // 5 - Clicked Item
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.SHORT); // 1 - Slot
+                map(Types.BYTE); // 2 - Button
+                map(Types.SHORT); // 3 - Action number
+                map(Types.VAR_INT); // 4 - Mode
+                map(Types.ITEM1_13, Types.ITEM1_8); // 5 - Clicked Item
 
-                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
 
         protocol.registerServerbound(ServerboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Channel
+                map(Types.STRING); // Channel
                 handlerSoftFail(wrapper -> {
-                    String channel = wrapper.get(Type.STRING, 0);
+                    String channel = wrapper.get(Types.STRING, 0);
                     String old = channel;
                     channel = getOldPluginChannelId(channel);
                     if (channel == null) {
@@ -236,7 +237,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         wrapper.cancel();
                         return;
                     } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
-                        String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                        String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                         List<String> rewrittenChannels = new ArrayList<>();
                         for (String s : channels) {
                             String rewritten = getOldPluginChannelId(s);
@@ -246,9 +247,9 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                                 Via.getPlatform().getLogger().warning("Ignoring plugin channel in serverbound " + channel + ": " + s);
                             }
                         }
-                        wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                        wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                     }
-                    wrapper.set(Type.STRING, 0, channel);
+                    wrapper.set(Types.STRING, 0, channel);
                 });
             }
         });
@@ -256,10 +257,10 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         protocol.registerServerbound(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // 0 - Slot
-                map(Type.ITEM1_13, Type.ITEM1_8); // 1 - Clicked Item
+                map(Types.SHORT); // 0 - Slot
+                map(Types.ITEM1_13, Types.ITEM1_8); // 1 - Clicked Item
 
-                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
     }

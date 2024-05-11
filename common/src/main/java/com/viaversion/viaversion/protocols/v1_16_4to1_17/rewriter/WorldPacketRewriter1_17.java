@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
@@ -49,7 +50,7 @@ public final class WorldPacketRewriter1_17 {
 
         protocol.registerClientbound(ClientboundPackets1_16_2.SET_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
-            int type = wrapper.read(Type.VAR_INT);
+            int type = wrapper.read(Types.VAR_INT);
             ClientboundPacketType packetType = switch (type) {
                 case 0 -> ClientboundPackets1_17.SET_BORDER_SIZE;
                 case 1 -> ClientboundPackets1_17.SET_BORDER_LERP_SIZE;
@@ -66,17 +67,17 @@ public final class WorldPacketRewriter1_17 {
         protocol.registerClientbound(ClientboundPackets1_16_2.LIGHT_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // x
-                map(Type.VAR_INT); // y
-                map(Type.BOOLEAN); // trust edges
+                map(Types.VAR_INT); // x
+                map(Types.VAR_INT); // y
+                map(Types.BOOLEAN); // trust edges
                 handler(wrapper -> {
-                    int skyLightMask = wrapper.read(Type.VAR_INT);
-                    int blockLightMask = wrapper.read(Type.VAR_INT);
+                    int skyLightMask = wrapper.read(Types.VAR_INT);
+                    int blockLightMask = wrapper.read(Types.VAR_INT);
                     // Now all written as a representation of BitSets
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(skyLightMask)); // Sky light mask
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(blockLightMask)); // Block light mask
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Type.VAR_INT))); // Empty sky light mask
-                    wrapper.write(Type.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Type.VAR_INT))); // Empty block light mask
+                    wrapper.write(Types.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(skyLightMask)); // Sky light mask
+                    wrapper.write(Types.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(blockLightMask)); // Block light mask
+                    wrapper.write(Types.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Types.VAR_INT))); // Empty sky light mask
+                    wrapper.write(Types.LONG_ARRAY_PRIMITIVE, toBitSetLongArray(wrapper.read(Types.VAR_INT))); // Empty block light mask
 
                     writeLightArrays(wrapper, skyLightMask);
                     writeLightArrays(wrapper, blockLightMask);
@@ -87,14 +88,14 @@ public final class WorldPacketRewriter1_17 {
                 List<byte[]> light = new ArrayList<>();
                 for (int i = 0; i < 18; i++) {
                     if (isSet(bitMask, i)) {
-                        light.add(wrapper.read(Type.BYTE_ARRAY_PRIMITIVE));
+                        light.add(wrapper.read(Types.BYTE_ARRAY_PRIMITIVE));
                     }
                 }
 
                 // Now needs the length of the bytearray-array
-                wrapper.write(Type.VAR_INT, light.size());
+                wrapper.write(Types.VAR_INT, light.size());
                 for (byte[] bytes : light) {
-                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, bytes);
+                    wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, bytes);
                 }
             }
 
@@ -152,8 +153,8 @@ public final class WorldPacketRewriter1_17 {
             if (section == null) continue;
 
             PacketWrapper blockChangePacket = wrapper.create(ClientboundPackets1_17.SECTION_BLOCKS_UPDATE);
-            blockChangePacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
-            blockChangePacket.write(Type.BOOLEAN, true); // Suppress light updates
+            blockChangePacket.write(Types.LONG, chunkPosition | (chunkY & 0xFFFFFL));
+            blockChangePacket.write(Types.BOOLEAN, true); // Suppress light updates
 
             //TODO this can be optimized
             BlockChangeRecord[] blockChangeRecords = new BlockChangeRecord[4096];
@@ -168,7 +169,7 @@ public final class WorldPacketRewriter1_17 {
                 }
             }
 
-            blockChangePacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, blockChangeRecords);
+            blockChangePacket.write(Types.VAR_LONG_BLOCK_CHANGE_ARRAY, blockChangeRecords);
             blockChangePacket.send(Protocol1_16_4To1_17.class);
         }
     }

@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import io.netty.buffer.ByteBuf;
@@ -163,14 +164,14 @@ public class ConfigurationState implements StorableObject {
         }
 
         final PacketWrapper settingsPacket = PacketWrapper.create(ServerboundPackets1_19_4.CLIENT_INFORMATION, connection);
-        settingsPacket.write(Type.STRING, clientInformation.language);
-        settingsPacket.write(Type.BYTE, clientInformation.viewDistance);
-        settingsPacket.write(Type.VAR_INT, clientInformation.chatVisibility);
-        settingsPacket.write(Type.BOOLEAN, clientInformation.showChatColors);
-        settingsPacket.write(Type.UNSIGNED_BYTE, clientInformation.modelCustomization);
-        settingsPacket.write(Type.VAR_INT, clientInformation.mainHand);
-        settingsPacket.write(Type.BOOLEAN, clientInformation.textFiltering);
-        settingsPacket.write(Type.BOOLEAN, clientInformation.allowListing);
+        settingsPacket.write(Types.STRING, clientInformation.language);
+        settingsPacket.write(Types.BYTE, clientInformation.viewDistance);
+        settingsPacket.write(Types.VAR_INT, clientInformation.chatVisibility);
+        settingsPacket.write(Types.BOOLEAN, clientInformation.showChatColors);
+        settingsPacket.write(Types.UNSIGNED_BYTE, clientInformation.modelCustomization);
+        settingsPacket.write(Types.VAR_INT, clientInformation.mainHand);
+        settingsPacket.write(Types.BOOLEAN, clientInformation.textFiltering);
+        settingsPacket.write(Types.BOOLEAN, clientInformation.allowListing);
         return settingsPacket;
     }
 

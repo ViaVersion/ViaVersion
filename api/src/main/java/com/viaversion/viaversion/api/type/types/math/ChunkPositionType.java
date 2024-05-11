@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types.math;
 
 import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class ChunkPositionType extends Type<ChunkPosition> {
@@ -34,12 +35,12 @@ public class ChunkPositionType extends Type<ChunkPosition> {
 
     @Override
     public ChunkPosition read(ByteBuf buffer) {
-        final long chunkKey = Type.LONG.readPrimitive(buffer);
+        final long chunkKey = Types.LONG.readPrimitive(buffer);
         return new ChunkPosition(chunkKey);
     }
 
     @Override
     public void write(ByteBuf buffer, ChunkPosition chunkPosition) {
-        Type.LONG.writePrimitive(buffer, chunkPosition.chunkKey());
+        Types.LONG.writePrimitive(buffer, chunkPosition.chunkKey());
     }
 }

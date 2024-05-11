@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -34,9 +35,9 @@ public record MapDecorations(Map<String, MapDecoration> decorations) {
         @Override
         public MapDecorations read(final ByteBuf buffer) {
             final Object2ObjectMap<String, MapDecoration> decorations = new Object2ObjectOpenHashMap<>();
-            final int size = Type.VAR_INT.readPrimitive(buffer);
+            final int size = Types.VAR_INT.readPrimitive(buffer);
             for (int i = 0; i < size; i++) {
-                final String id = Type.STRING.read(buffer);
+                final String id = Types.STRING.read(buffer);
                 final MapDecoration decoration = MapDecoration.TYPE.read(buffer);
                 decorations.put(id, decoration);
             }
@@ -45,9 +46,9 @@ public record MapDecorations(Map<String, MapDecoration> decorations) {
 
         @Override
         public void write(final ByteBuf buffer, final MapDecorations value) {
-            Type.VAR_INT.writePrimitive(buffer, value.decorations.size());
+            Types.VAR_INT.writePrimitive(buffer, value.decorations.size());
             for (final Map.Entry<String, MapDecoration> entry : value.decorations.entrySet()) {
-                Type.STRING.write(buffer, entry.getKey());
+                Types.STRING.write(buffer, entry.getKey());
                 MapDecoration.TYPE.write(buffer, entry.getValue());
             }
         }

@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesP
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -83,145 +84,145 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_20_2.COMMANDS);
 
         registerClientbound(ClientboundPackets1_20_2.SET_SCORE, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Owner
+            wrapper.passthrough(Types.STRING); // Owner
 
-            final int action = wrapper.read(Type.VAR_INT);
-            final String objectiveName = wrapper.read(Type.STRING);
+            final int action = wrapper.read(Types.VAR_INT);
+            final String objectiveName = wrapper.read(Types.STRING);
 
             if (action == 1) { // Reset score
-                wrapper.write(Type.OPTIONAL_STRING, objectiveName.isEmpty() ? null : objectiveName);
+                wrapper.write(Types.OPTIONAL_STRING, objectiveName.isEmpty() ? null : objectiveName);
                 wrapper.setPacketType(ClientboundPackets1_20_3.RESET_SCORE);
                 return;
             }
 
-            wrapper.write(Type.STRING, objectiveName);
-            wrapper.passthrough(Type.VAR_INT); // Score
+            wrapper.write(Types.STRING, objectiveName);
+            wrapper.passthrough(Types.VAR_INT); // Score
 
             // Null display and number format
-            wrapper.write(Type.OPTIONAL_TAG, null);
-            wrapper.write(Type.BOOLEAN, false);
+            wrapper.write(Types.OPTIONAL_TAG, null);
+            wrapper.write(Types.BOOLEAN, false);
         });
         registerClientbound(ClientboundPackets1_20_2.SET_OBJECTIVE, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Objective Name
-            final byte action = wrapper.passthrough(Type.BYTE); // Method
+            wrapper.passthrough(Types.STRING); // Objective Name
+            final byte action = wrapper.passthrough(Types.BYTE); // Method
             if (action == 0 || action == 2) {
                 convertComponent(wrapper); // Display Name
-                wrapper.passthrough(Type.VAR_INT); // Render type
-                wrapper.write(Type.BOOLEAN, false); // Null number format
+                wrapper.passthrough(Types.VAR_INT); // Render type
+                wrapper.write(Types.BOOLEAN, false); // Null number format
             }
         });
 
         registerServerbound(ServerboundPackets1_20_3.SET_JIGSAW_BLOCK, wrapper -> {
-            wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.STRING); // Name
-            wrapper.passthrough(Type.STRING); // Target
-            wrapper.passthrough(Type.STRING); // Pool
-            wrapper.passthrough(Type.STRING); // Final state
-            wrapper.passthrough(Type.STRING); // Joint type
-            wrapper.read(Type.VAR_INT); // Selection priority
-            wrapper.read(Type.VAR_INT); // Placement priority
+            wrapper.passthrough(Types.BLOCK_POSITION1_14); // Position
+            wrapper.passthrough(Types.STRING); // Name
+            wrapper.passthrough(Types.STRING); // Target
+            wrapper.passthrough(Types.STRING); // Pool
+            wrapper.passthrough(Types.STRING); // Final state
+            wrapper.passthrough(Types.STRING); // Joint type
+            wrapper.read(Types.VAR_INT); // Selection priority
+            wrapper.read(Types.VAR_INT); // Placement priority
         });
 
         // Components are now (mostly) written as nbt instead of json strings
         registerClientbound(ClientboundPackets1_20_2.UPDATE_ADVANCEMENTS, wrapper -> {
-            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.STRING); // Identifier
-                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
 
                 // Display data
-                if (wrapper.passthrough(Type.BOOLEAN)) {
+                if (wrapper.passthrough(Types.BOOLEAN)) {
                     convertComponent(wrapper); // Title
                     convertComponent(wrapper); // Description
-                    itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_20_2)); // Icon
-                    wrapper.passthrough(Type.VAR_INT); // Frame type
-                    final int flags = wrapper.passthrough(Type.INT);
+                    itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_20_2)); // Icon
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    final int flags = wrapper.passthrough(Types.INT);
                     if ((flags & 1) != 0) {
-                        wrapper.passthrough(Type.STRING); // Background texture
+                        wrapper.passthrough(Types.STRING); // Background texture
                     }
-                    wrapper.passthrough(Type.FLOAT); // X
-                    wrapper.passthrough(Type.FLOAT); // Y
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
                 }
 
-                final int requirements = wrapper.passthrough(Type.VAR_INT);
+                final int requirements = wrapper.passthrough(Types.VAR_INT);
                 for (int array = 0; array < requirements; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY);
+                    wrapper.passthrough(Types.STRING_ARRAY);
                 }
 
-                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
             }
         });
         registerClientbound(ClientboundPackets1_20_2.COMMAND_SUGGESTIONS, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Transaction id
-            wrapper.passthrough(Type.VAR_INT); // Start
-            wrapper.passthrough(Type.VAR_INT); // Length
+            wrapper.passthrough(Types.VAR_INT); // Transaction id
+            wrapper.passthrough(Types.VAR_INT); // Start
+            wrapper.passthrough(Types.VAR_INT); // Length
 
-            final int suggestions = wrapper.passthrough(Type.VAR_INT);
+            final int suggestions = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < suggestions; i++) {
-                wrapper.passthrough(Type.STRING); // Suggestion
+                wrapper.passthrough(Types.STRING); // Suggestion
                 convertOptionalComponent(wrapper); // Tooltip
             }
         });
         registerClientbound(ClientboundPackets1_20_2.MAP_ITEM_DATA, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Map id
-            wrapper.passthrough(Type.BYTE); // Scale
-            wrapper.passthrough(Type.BOOLEAN); // Locked
-            if (wrapper.passthrough(Type.BOOLEAN)) {
-                final int icons = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT); // Map id
+            wrapper.passthrough(Types.BYTE); // Scale
+            wrapper.passthrough(Types.BOOLEAN); // Locked
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                final int icons = wrapper.passthrough(Types.VAR_INT);
                 for (int i = 0; i < icons; i++) {
-                    wrapper.passthrough(Type.VAR_INT); // Type
-                    wrapper.passthrough(Type.BYTE); // X
-                    wrapper.passthrough(Type.BYTE); // Y
-                    wrapper.passthrough(Type.BYTE); // Rotation
+                    wrapper.passthrough(Types.VAR_INT); // Type
+                    wrapper.passthrough(Types.BYTE); // X
+                    wrapper.passthrough(Types.BYTE); // Y
+                    wrapper.passthrough(Types.BYTE); // Rotation
                     convertOptionalComponent(wrapper); // Display name
                 }
             }
         });
         registerClientbound(ClientboundPackets1_20_2.BOSS_EVENT, wrapper -> {
-            wrapper.passthrough(Type.UUID); // Id
+            wrapper.passthrough(Types.UUID); // Id
 
-            final int action = wrapper.passthrough(Type.VAR_INT);
+            final int action = wrapper.passthrough(Types.VAR_INT);
             if (action == 0 || action == 3) {
                 convertComponent(wrapper);
             }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_CHAT, wrapper -> {
-            wrapper.passthrough(Type.UUID); // Sender
-            wrapper.passthrough(Type.VAR_INT); // Index
-            wrapper.passthrough(Type.OPTIONAL_SIGNATURE_BYTES); // Signature
-            wrapper.passthrough(Type.STRING); // Plain content
-            wrapper.passthrough(Type.LONG); // Timestamp
-            wrapper.passthrough(Type.LONG); // Salt
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
 
-            final int lastSeen = wrapper.passthrough(Type.VAR_INT);
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < lastSeen; i++) {
-                final int index = wrapper.passthrough(Type.VAR_INT);
+                final int index = wrapper.passthrough(Types.VAR_INT);
                 if (index == 0) {
-                    wrapper.passthrough(Type.SIGNATURE_BYTES);
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
                 }
             }
 
             convertOptionalComponent(wrapper); // Unsigned content
 
-            final int filterMaskType = wrapper.passthrough(Type.VAR_INT);
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) {
-                wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE); // Mask
+                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
             }
 
-            wrapper.passthrough(Type.VAR_INT); // Chat type
+            wrapper.passthrough(Types.VAR_INT); // Chat type
             convertComponent(wrapper); // Sender
             convertOptionalComponent(wrapper); // Target
         });
         registerClientbound(ClientboundPackets1_20_2.SET_PLAYER_TEAM, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Team Name
-            final byte action = wrapper.passthrough(Type.BYTE); // Mode
+            wrapper.passthrough(Types.STRING); // Team Name
+            final byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {
                 convertComponent(wrapper); // Display Name
-                wrapper.passthrough(Type.BYTE); // Flags
-                wrapper.passthrough(Type.STRING); // Name Tag Visibility
-                wrapper.passthrough(Type.STRING); // Collision rule
-                wrapper.passthrough(Type.VAR_INT); // Color
+                wrapper.passthrough(Types.BYTE); // Flags
+                wrapper.passthrough(Types.STRING); // Name Tag Visibility
+                wrapper.passthrough(Types.STRING); // Collision rule
+                wrapper.passthrough(Types.VAR_INT); // Color
                 convertComponent(wrapper); // Prefix
                 convertComponent(wrapper); // Suffix
             }
@@ -236,16 +237,16 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_2.SET_SUBTITLE_TEXT, this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.DISGUISED_CHAT, wrapper -> {
             convertComponent(wrapper);
-            wrapper.passthrough(Type.VAR_INT); // Chat type
+            wrapper.passthrough(Types.VAR_INT); // Chat type
             convertComponent(wrapper); // Name
             convertOptionalComponent(wrapper); // Target name
         });
         registerClientbound(ClientboundPackets1_20_2.SYSTEM_CHAT, this::convertComponent);
         registerClientbound(ClientboundPackets1_20_2.OPEN_SCREEN, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Container id
+            wrapper.passthrough(Types.VAR_INT); // Container id
 
-            final int containerTypeId = wrapper.read(Type.VAR_INT);
-            wrapper.write(Type.VAR_INT, MAPPINGS.getMenuMappings().getNewId(containerTypeId));
+            final int containerTypeId = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT, MAPPINGS.getMenuMappings().getNewId(containerTypeId));
 
             convertComponent(wrapper);
         });
@@ -257,37 +258,37 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_2.PLAYER_COMBAT_KILL, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Duration
+                map(Types.VAR_INT); // Duration
                 handler(wrapper -> convertComponent(wrapper));
             }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_INFO_UPDATE, wrapper -> {
-            final BitSet actions = wrapper.passthrough(Type.PROFILE_ACTIONS_ENUM);
-            final int entries = wrapper.passthrough(Type.VAR_INT);
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
-                wrapper.passthrough(Type.UUID);
+                wrapper.passthrough(Types.UUID);
                 if (actions.get(0)) {
-                    wrapper.passthrough(Type.STRING); // Player Name
+                    wrapper.passthrough(Types.STRING); // Player Name
 
-                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
                     for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Type.STRING); // Name
-                        wrapper.passthrough(Type.STRING); // Value
-                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
                     }
                 }
-                if (actions.get(1) && wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.UUID); // Session UUID
-                    wrapper.passthrough(Type.PROFILE_KEY);
+                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.UUID); // Session UUID
+                    wrapper.passthrough(Types.PROFILE_KEY);
                 }
                 if (actions.get(2)) {
-                    wrapper.passthrough(Type.VAR_INT); // Gamemode
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
                 }
                 if (actions.get(3)) {
-                    wrapper.passthrough(Type.BOOLEAN); // Listed
+                    wrapper.passthrough(Types.BOOLEAN); // Listed
                 }
                 if (actions.get(4)) {
-                    wrapper.passthrough(Type.VAR_INT); // Latency
+                    wrapper.passthrough(Types.VAR_INT); // Latency
                 }
                 if (actions.get(5)) {
                     convertOptionalComponent(wrapper); // Display name
@@ -304,15 +305,15 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
     private PacketHandler resourcePackStatusHandler() {
         return wrapper -> {
-            wrapper.read(Type.UUID); // Pack UUID
+            wrapper.read(Types.UUID); // Pack UUID
 
-            final int action = wrapper.read(Type.VAR_INT);
+            final int action = wrapper.read(Types.VAR_INT);
             if (action == 4) { // Downloaded
                 wrapper.cancel();
             } else if (action > 4) { // Invalid url, failed reload, and discarded
-                wrapper.write(Type.VAR_INT, 2); // Failed download
+                wrapper.write(Types.VAR_INT, 2); // Failed download
             } else {
-                wrapper.write(Type.VAR_INT, action);
+                wrapper.write(Types.VAR_INT, action);
             }
         };
     }
@@ -321,26 +322,26 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         return wrapper -> {
             // Drop old resource packs first
             final PacketWrapper dropPacksPacket = wrapper.create(popType);
-            dropPacksPacket.write(Type.OPTIONAL_UUID, null);
+            dropPacksPacket.write(Types.OPTIONAL_UUID, null);
             dropPacksPacket.send(Protocol1_20_2To1_20_3.class);
 
             // Use the hash to write a pack uuid
-            final String url = wrapper.read(Type.STRING);
-            final String hash = wrapper.read(Type.STRING);
-            wrapper.write(Type.UUID, UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)));
-            wrapper.write(Type.STRING, url);
-            wrapper.write(Type.STRING, hash);
-            wrapper.passthrough(Type.BOOLEAN); // Required
+            final String url = wrapper.read(Types.STRING);
+            final String hash = wrapper.read(Types.STRING);
+            wrapper.write(Types.UUID, UUID.nameUUIDFromBytes(url.getBytes(StandardCharsets.UTF_8)));
+            wrapper.write(Types.STRING, url);
+            wrapper.write(Types.STRING, hash);
+            wrapper.passthrough(Types.BOOLEAN); // Required
             convertOptionalComponent(wrapper);
         };
     }
 
     private void convertComponent(final PacketWrapper wrapper) {
-        wrapper.write(Type.TAG, ComponentUtil.jsonToTag(wrapper.read(Type.COMPONENT)));
+        wrapper.write(Types.TAG, ComponentUtil.jsonToTag(wrapper.read(Types.COMPONENT)));
     }
 
     private void convertOptionalComponent(final PacketWrapper wrapper) {
-        wrapper.write(Type.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Type.OPTIONAL_COMPONENT)));
+        wrapper.write(Types.OPTIONAL_TAG, ComponentUtil.jsonToTag(wrapper.read(Types.OPTIONAL_COMPONENT)));
     }
 
     @Override

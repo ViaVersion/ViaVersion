@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -117,52 +118,52 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
-        Position position = wrapper.read(Type.POSITION1_8);
-        wrapper.write(Type.INT, position.x());
-        wrapper.write(Type.INT, position.y());
-        wrapper.write(Type.INT, position.z());
+        Position position = wrapper.read(Types.BLOCK_POSITION1_8);
+        wrapper.write(Types.INT, position.x());
+        wrapper.write(Types.INT, position.y());
+        wrapper.write(Types.INT, position.z());
     };
 
     public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
             w -> {
                 // Send fake declare commands
                 w.create(ClientboundPackets1_13.COMMANDS, wrapper -> {
-                    wrapper.write(Type.VAR_INT, 2); // Size
+                    wrapper.write(Types.VAR_INT, 2); // Size
                     // Write root node
-                    wrapper.write(Type.BYTE, (byte) 0); // Mark as command
-                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
+                    wrapper.write(Types.BYTE, (byte) 0); // Mark as command
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
 
                     // Write arg node
-                    wrapper.write(Type.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
-                    wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
+                    wrapper.write(Types.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
                     // Extra data
-                    wrapper.write(Type.STRING, "args"); // Arg name
-                    wrapper.write(Type.STRING, "brigadier:string");
-                    wrapper.write(Type.VAR_INT, 2); // Greedy
-                    wrapper.write(Type.STRING, "minecraft:ask_server"); // Ask server
+                    wrapper.write(Types.STRING, "args"); // Arg name
+                    wrapper.write(Types.STRING, "brigadier:string");
+                    wrapper.write(Types.VAR_INT, 2); // Greedy
+                    wrapper.write(Types.STRING, "minecraft:ask_server"); // Ask server
 
-                    wrapper.write(Type.VAR_INT, 0); // Root node index
+                    wrapper.write(Types.VAR_INT, 0); // Root node index
                 }).scheduleSend(Protocol1_12_2To1_13.class);
 
                 // Send tags packet
                 w.create(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
-                    wrapper.write(Type.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
+                    wrapper.write(Types.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
                     for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
-                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Types.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
-                    wrapper.write(Type.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
+                    wrapper.write(Types.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
                     for (Map.Entry<String, int[]> tag : MAPPINGS.getItemTags().entrySet()) {
-                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Types.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
-                    wrapper.write(Type.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
+                    wrapper.write(Types.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
                     for (Map.Entry<String, int[]> tag : MAPPINGS.getFluidTags().entrySet()) {
-                        wrapper.write(Type.STRING, tag.getKey());
+                        wrapper.write(Types.STRING, tag.getKey());
                         // Needs copy as other protocols may modify it
-                        wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
                     }
                 }).scheduleSend(Protocol1_12_2To1_13.class);
             };
@@ -175,21 +176,21 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_13.register(this);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
         registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING);
+                map(Types.STRING);
                 handler(wrapper -> {
-                    String response = wrapper.get(Type.STRING, 0);
+                    String response = wrapper.get(Types.STRING, 0);
                     try {
                         JsonObject json = GsonUtil.getGson().fromJson(response, JsonObject.class);
                         if (json.has("favicon")) {
                             json.addProperty("favicon", json.get("favicon").getAsString().replace("\n", ""));
                         }
-                        wrapper.set(Type.STRING, 0, GsonUtil.getGson().toJson(json));
+                        wrapper.set(Types.STRING, 0, GsonUtil.getGson().toJson(json));
                     } catch (JsonParseException e) {
                         Via.getPlatform().getLogger().log(Level.SEVERE, "Error transforming status response", e);
                     }
@@ -201,14 +202,14 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         // Statistics
         registerClientbound(ClientboundPackets1_12_1.AWARD_STATS, wrapper -> {
-            int size = wrapper.read(Type.VAR_INT);
+            int size = wrapper.read(Types.VAR_INT);
             List<StatisticData> remappedStats = new ArrayList<>();
             for (int i = 0; i < size; i++) {
-                String name = wrapper.read(Type.STRING);
+                String name = wrapper.read(Types.STRING);
                 String[] split = name.split("\\.");
                 int categoryId = 0;
                 int newId = -1;
-                int value = wrapper.read(Type.VAR_INT);
+                int value = wrapper.read(Types.VAR_INT);
                 if (split.length == 2) {
                     // Custom types
                     categoryId = 8;
@@ -237,11 +238,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     remappedStats.add(new StatisticData(categoryId, newId, value));
             }
 
-            wrapper.write(Type.VAR_INT, remappedStats.size()); // size
+            wrapper.write(Types.VAR_INT, remappedStats.size()); // size
             for (StatisticData stat : remappedStats) {
-                wrapper.write(Type.VAR_INT, stat.categoryId()); // category id
-                wrapper.write(Type.VAR_INT, stat.newId()); // statistics id
-                wrapper.write(Type.VAR_INT, stat.value()); // value
+                wrapper.write(Types.VAR_INT, stat.categoryId()); // category id
+                wrapper.write(Types.VAR_INT, stat.newId()); // statistics id
+                wrapper.write(Types.VAR_INT, stat.value()); // value
             }
         });
 
@@ -250,7 +251,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
 
         registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
-            wrapper.write(Type.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
+            wrapper.write(Types.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
 
             String input = wrapper.user().get(TabCompleteTracker.class).getInput();
             // Start & End
@@ -267,41 +268,41 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 length = input.length() - lastSpace;
             }
             // Write index + length
-            wrapper.write(Type.VAR_INT, index);
-            wrapper.write(Type.VAR_INT, length);
+            wrapper.write(Types.VAR_INT, index);
+            wrapper.write(Types.VAR_INT, length);
 
-            int count = wrapper.passthrough(Type.VAR_INT);
+            int count = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < count; i++) {
-                String suggestion = wrapper.read(Type.STRING);
+                String suggestion = wrapper.read(Types.STRING);
                 // If we're at the start then handle removing slash
                 if (suggestion.startsWith("/") && index == 0) {
                     suggestion = suggestion.substring(1);
                 }
-                wrapper.write(Type.STRING, suggestion);
-                wrapper.write(Type.OPTIONAL_COMPONENT, null); // Tooltip
+                wrapper.write(Types.STRING, suggestion);
+                wrapper.write(Types.OPTIONAL_COMPONENT, null); // Tooltip
             }
         });
 
         registerClientbound(ClientboundPackets1_12_1.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Id
-                map(Type.STRING); // Window type
-                handler(wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT))); // Title
+                map(Types.UNSIGNED_BYTE); // Id
+                map(Types.STRING); // Window type
+                handler(wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT))); // Title
             }
         });
 
         registerClientbound(ClientboundPackets1_12_1.COOLDOWN, wrapper -> {
-            int item = wrapper.read(Type.VAR_INT);
-            int ticks = wrapper.read(Type.VAR_INT);
+            int item = wrapper.read(Types.VAR_INT);
+            int ticks = wrapper.read(Types.VAR_INT);
             wrapper.cancel();
             if (item == 383) { // Spawn egg
                 for (int i = 0; i < 44; i++) {
                     int newItem = MAPPINGS.getItemMappings().getNewId(item << 16 | i);
                     if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
-                        packet.write(Type.VAR_INT, newItem);
-                        packet.write(Type.VAR_INT, ticks);
+                        packet.write(Types.VAR_INT, newItem);
+                        packet.write(Types.VAR_INT, ticks);
                         packet.send(Protocol1_12_2To1_13.class);
                     } else {
                         break;
@@ -312,8 +313,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     int newItem = MAPPINGS.getItemMappings().getNewId(IdAndData.toRawData(item, i));
                     if (newItem != -1) {
                         PacketWrapper packet = wrapper.create(ClientboundPackets1_13.COOLDOWN);
-                        packet.write(Type.VAR_INT, newItem);
-                        packet.write(Type.VAR_INT, ticks);
+                        packet.write(Types.VAR_INT, newItem);
+                        packet.write(Types.VAR_INT, ticks);
                         packet.send(Protocol1_12_2To1_13.class);
                     } else {
                         break;
@@ -327,18 +328,18 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION1_8); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Effect Id
+                map(Types.BLOCK_POSITION1_8); // Location
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    int data = wrapper.get(Type.INT, 1);
+                    int id = wrapper.get(Types.INT, 0);
+                    int data = wrapper.get(Types.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, getMappingData().getItemMappings().getNewId(IdAndData.toRawData(data)));
+                        wrapper.set(Types.INT, 1, getMappingData().getItemMappings().getNewId(IdAndData.toRawData(data)));
                     } else if (id == 2001) { // Block break + block break sound
                         int blockId = data & 0xFFF;
                         int blockData = data >> 12;
-                        wrapper.set(Type.INT, 1, WorldPacketRewriter1_13.toNewId(IdAndData.toRawData(blockId, blockData)));
+                        wrapper.set(Types.INT, 1, WorldPacketRewriter1_13.toNewId(IdAndData.toRawData(blockId, blockData)));
                     }
                 });
             }
@@ -347,8 +348,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.PLACE_GHOST_RECIPE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE);
-                handler(wrapper -> wrapper.write(Type.STRING, "viaversion:legacy/" + wrapper.read(Type.VAR_INT)));
+                map(Types.BYTE);
+                handler(wrapper -> wrapper.write(Types.STRING, "viaversion:legacy/" + wrapper.read(Types.VAR_INT)));
             }
         });
 
@@ -357,20 +358,20 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Map id
-                map(Type.BYTE); // 1 - Scale
-                map(Type.BOOLEAN); // 2 - Tracking Position
+                map(Types.VAR_INT); // 0 - Map id
+                map(Types.BYTE); // 1 - Scale
+                map(Types.BOOLEAN); // 2 - Tracking Position
                 handler(wrapper -> {
-                    int iconCount = wrapper.passthrough(Type.VAR_INT);
+                    int iconCount = wrapper.passthrough(Types.VAR_INT);
                     for (int i = 0; i < iconCount; i++) {
-                        byte directionAndType = wrapper.read(Type.BYTE);
+                        byte directionAndType = wrapper.read(Types.BYTE);
                         int type = (directionAndType & 0xF0) >> 4;
-                        wrapper.write(Type.VAR_INT, type);
-                        wrapper.passthrough(Type.BYTE); // Icon X
-                        wrapper.passthrough(Type.BYTE); // Icon Z
+                        wrapper.write(Types.VAR_INT, type);
+                        wrapper.passthrough(Types.BYTE); // Icon X
+                        wrapper.passthrough(Types.BYTE); // Icon Z
                         byte direction = (byte) (directionAndType & 0x0F);
-                        wrapper.write(Type.BYTE, direction);
-                        wrapper.write(Type.OPTIONAL_COMPONENT, null); // Display Name
+                        wrapper.write(Types.BYTE, direction);
+                        wrapper.write(Types.OPTIONAL_COMPONENT, null); // Display Name
                     }
                 });
             }
@@ -378,22 +379,22 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.RECIPE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // action
-                map(Type.BOOLEAN); // crafting book open
-                map(Type.BOOLEAN); // crafting filter active
+                map(Types.VAR_INT); // action
+                map(Types.BOOLEAN); // crafting book open
+                map(Types.BOOLEAN); // crafting filter active
                 handler(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, false); // smelting book open
-                    wrapper.write(Type.BOOLEAN, false); // smelting filter active
+                    wrapper.write(Types.BOOLEAN, false); // smelting book open
+                    wrapper.write(Types.BOOLEAN, false); // smelting filter active
                 });
                 handler(wrapper -> {
-                    int action = wrapper.get(Type.VAR_INT, 0);
+                    int action = wrapper.get(Types.VAR_INT, 0);
                     for (int i = 0; i < (action == 0 ? 2 : 1); i++) {
-                        int[] ids = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+                        int[] ids = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
                         String[] stringIds = new String[ids.length];
                         for (int j = 0; j < ids.length; j++) {
                             stringIds[j] = "viaversion:legacy/" + ids[j];
                         }
-                        wrapper.write(Type.STRING_ARRAY, stringIds);
+                        wrapper.write(Types.STRING_ARRAY, stringIds);
                     }
                     if (action == 0) {
                         wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, w -> writeDeclareRecipes(w)).send(Protocol1_12_2To1_13.class);
@@ -405,10 +406,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Dimension ID
+                map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
 
                     if (Via.getConfig().isServersideBlockConnections()) {
@@ -422,18 +423,18 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.SET_OBJECTIVE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Objective name
-                map(Type.BYTE); // 1 - Mode
+                map(Types.STRING); // 0 - Objective name
+                map(Types.BYTE); // 1 - Mode
                 handler(wrapper -> {
-                    byte mode = wrapper.get(Type.BYTE, 0);
+                    byte mode = wrapper.get(Types.BYTE, 0);
                     // On create or update
                     if (mode == 0 || mode == 2) {
-                        String value = wrapper.read(Type.STRING); // Value
-                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(value));
+                        String value = wrapper.read(Types.STRING); // Value
+                        wrapper.write(Types.COMPONENT, ComponentUtil.legacyToJson(value));
 
-                        String type = wrapper.read(Type.STRING);
+                        String type = wrapper.read(Types.STRING);
                         // integer or hearts
-                        wrapper.write(Type.VAR_INT, type.equals("integer") ? 0 : 1);
+                        wrapper.write(Types.VAR_INT, type.equals("integer") ? 0 : 1);
                     }
                 });
             }
@@ -442,26 +443,26 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_12_1.SET_PLAYER_TEAM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Team Name
-                map(Type.BYTE); // 1 - Mode
+                map(Types.STRING); // 0 - Team Name
+                map(Types.BYTE); // 1 - Mode
 
                 handler(wrapper -> {
-                    byte action = wrapper.get(Type.BYTE, 0);
+                    byte action = wrapper.get(Types.BYTE, 0);
 
                     if (action == 0 || action == 2) {
-                        String displayName = wrapper.read(Type.STRING); // Display Name
-                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(displayName));
+                        String displayName = wrapper.read(Types.STRING); // Display Name
+                        wrapper.write(Types.COMPONENT, ComponentUtil.legacyToJson(displayName));
 
-                        String prefix = wrapper.read(Type.STRING); // Prefix moved
-                        String suffix = wrapper.read(Type.STRING); // Suffix moved
+                        String prefix = wrapper.read(Types.STRING); // Prefix moved
+                        String suffix = wrapper.read(Types.STRING); // Suffix moved
 
-                        wrapper.passthrough(Type.BYTE); // Flags
+                        wrapper.passthrough(Types.BYTE); // Flags
 
-                        wrapper.passthrough(Type.STRING); // Name Tag Visibility
-                        wrapper.passthrough(Type.STRING); // Collision rule
+                        wrapper.passthrough(Types.STRING); // Name Tag Visibility
+                        wrapper.passthrough(Types.STRING); // Collision rule
 
                         // Handle new colors
-                        int colour = wrapper.read(Type.BYTE).intValue();
+                        int colour = wrapper.read(Types.BYTE).intValue();
                         if (colour == -1) {
                             colour = 21; // -1 changed to 21
                         }
@@ -472,27 +473,27 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                             suffix = ChatColorUtil.COLOR_CHAR + Character.toString(lastColorChar) + suffix;
                         }
 
-                        wrapper.write(Type.VAR_INT, colour);
+                        wrapper.write(Types.VAR_INT, colour);
 
-                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(prefix)); // Prefix
-                        wrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(suffix)); // Suffix
+                        wrapper.write(Types.COMPONENT, ComponentUtil.legacyToJson(prefix)); // Prefix
+                        wrapper.write(Types.COMPONENT, ComponentUtil.legacyToJson(suffix)); // Suffix
                     }
 
                     if (action == 0 || action == 3 || action == 4) {
-                        String[] names = wrapper.read(Type.STRING_ARRAY); // Entities
+                        String[] names = wrapper.read(Types.STRING_ARRAY); // Entities
                         for (int i = 0; i < names.length; i++) {
                             names[i] = rewriteTeamMemberName(names[i]);
                         }
-                        wrapper.write(Type.STRING_ARRAY, names);
+                        wrapper.write(Types.STRING_ARRAY, names);
                     }
                 });
 
             }
         });
         registerClientbound(ClientboundPackets1_12_1.SET_SCORE, wrapper -> {
-            String displayName = wrapper.read(Type.STRING); // Display Name
+            String displayName = wrapper.read(Types.STRING); // Display Name
             displayName = rewriteTeamMemberName(displayName);
-            wrapper.write(Type.STRING, displayName);
+            wrapper.write(Types.STRING, displayName);
         });
 
         componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
@@ -502,39 +503,39 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
 
         registerClientbound(ClientboundPackets1_12_1.TAB_LIST, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
         registerClientbound(ClientboundPackets1_12_1.UPDATE_ADVANCEMENTS, wrapper -> {
-            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
 
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.STRING); // Identifier
-                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
 
                 // Display data
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)); // Title
-                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)); // Description
-                    Item icon = wrapper.read(Type.ITEM1_8);
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Title
+                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Description
+                    Item icon = wrapper.read(Types.ITEM1_8);
                     itemRewriter.handleItemToClient(wrapper.user(), icon);
-                    wrapper.write(Type.ITEM1_13, icon); // Translate item to flat item
-                    wrapper.passthrough(Type.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Type.INT); // Flags
+                    wrapper.write(Types.ITEM1_13, icon); // Translate item to flat item
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
-                        wrapper.passthrough(Type.STRING); // Background texture
+                        wrapper.passthrough(Types.STRING); // Background texture
                     }
-                    wrapper.passthrough(Type.FLOAT); // X
-                    wrapper.passthrough(Type.FLOAT); // Y
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
                 }
 
-                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+                wrapper.passthrough(Types.STRING_ARRAY); // Criteria
 
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                int arrayLength = wrapper.passthrough(Types.VAR_INT);
                 for (int array = 0; array < arrayLength; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                    wrapper.passthrough(Types.STRING_ARRAY); // String array
                 }
             }
         });
@@ -556,12 +557,12 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     if (Via.getConfig().isDisable1_13AutoComplete()) {
                         wrapper.cancel();
                     }
-                    int tid = wrapper.read(Type.VAR_INT);
+                    int tid = wrapper.read(Types.VAR_INT);
                     // Save transaction id
                     wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
                 });
                 // Prepend /
-                map(Type.STRING, new ValueTransformer<>(Type.STRING) {
+                map(Types.STRING, new ValueTransformer<>(Types.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
                         wrapper.user().get(TabCompleteTracker.class).setInput(inputValue);
@@ -570,14 +571,14 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 });
                 // Fake the end of the packet
                 handler(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, false);
+                    wrapper.write(Types.BOOLEAN, false);
                     final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
-                    wrapper.write(Type.OPTIONAL_POSITION1_8, playerLookTarget);
+                    wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                         TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);
                         wrapper.cancel();
                         tracker.setTimeToSend(System.currentTimeMillis() + Via.getConfig().get1_13TabCompleteDelay() * 50L);
-                        tracker.setLastTabComplete(wrapper.get(Type.STRING, 0));
+                        tracker.setLastTabComplete(wrapper.get(Types.STRING, 0));
                     }
                 });
             }
@@ -585,13 +586,13 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         // New 0x0A - Edit book -> Plugin Message
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
-            Item item = wrapper.read(Type.ITEM1_13);
-            boolean isSigning = wrapper.read(Type.BOOLEAN);
+            Item item = wrapper.read(Types.ITEM1_13);
+            boolean isSigning = wrapper.read(Types.BOOLEAN);
 
             itemRewriter.handleItemToServer(wrapper.user(), item);
 
-            wrapper.write(Type.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
-            wrapper.write(Type.ITEM1_8, item);
+            wrapper.write(Types.STRING, isSigning ? "MC|BSign" : "MC|BEdit"); // Channel
+            wrapper.write(Types.ITEM1_8, item);
         });
 
         // New 0x0C - Query Entity NBT
@@ -599,23 +600,23 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         // New 0x15 - Pick Item -> Plugin Message
         registerServerbound(ServerboundPackets1_13.PICK_ITEM, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
-            wrapper.write(Type.STRING, "MC|PickItem"); // Channel
+            wrapper.write(Types.STRING, "MC|PickItem"); // Channel
         });
 
         registerServerbound(ServerboundPackets1_13.PLACE_RECIPE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // Window id
+                map(Types.BYTE); // Window id
 
                 handler(wrapper -> {
-                    String s = wrapper.read(Type.STRING);
+                    String s = wrapper.read(Types.STRING);
                     Integer id;
                     if (s.length() < 19 || (id = Ints.tryParse(s.substring(18))) == null) {
                         wrapper.cancel();
                         return;
                     }
 
-                    wrapper.write(Type.VAR_INT, id);
+                    wrapper.write(Types.VAR_INT, id);
                 });
             }
         });
@@ -623,13 +624,13 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.RECIPE_BOOK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Type
+                map(Types.VAR_INT); // 0 - Type
 
                 handler(wrapper -> {
-                    int type = wrapper.get(Type.VAR_INT, 0);
+                    int type = wrapper.get(Types.VAR_INT, 0);
 
                     if (type == 0) {
-                        String s = wrapper.read(Type.STRING);
+                        String s = wrapper.read(Types.STRING);
                         Integer id;
                         // Custom recipes
                         if (s.length() < 19 || (id = Ints.tryParse(s.substring(18))) == null) {
@@ -637,13 +638,13 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                             return;
                         }
 
-                        wrapper.write(Type.INT, id);
+                        wrapper.write(Types.INT, id);
                     }
                     if (type == 1) {
-                        wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Book Open
-                        wrapper.passthrough(Type.BOOLEAN); // Crafting Recipe Filter Active
-                        wrapper.read(Type.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
-                        wrapper.read(Type.BOOLEAN); // Smelting Recipe Filter Active | IGNORE NEW 1.13 FIELD
+                        wrapper.passthrough(Types.BOOLEAN); // Crafting Recipe Book Open
+                        wrapper.passthrough(Types.BOOLEAN); // Crafting Recipe Filter Active
+                        wrapper.read(Types.BOOLEAN); // Smelting Recipe Book Open | IGNORE NEW 1.13 FIELD
+                        wrapper.read(Types.BOOLEAN); // Smelting Recipe Filter Active | IGNORE NEW 1.13 FIELD
                     }
                 });
             }
@@ -651,15 +652,15 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         // New 0x1C - Name Item -> Plugin Message
         registerServerbound(ServerboundPackets1_13.RENAME_ITEM, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, wrapper -> {
-            wrapper.write(Type.STRING, "MC|ItemName"); // Channel
+            wrapper.write(Types.STRING, "MC|ItemName"); // Channel
         });
 
         // New 0x1F - Select Trade -> Plugin Message
         registerServerbound(ServerboundPackets1_13.SELECT_TRADE, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.STRING, "MC|TrSel"); // Channel
-                map(Type.VAR_INT, Type.INT); // Slot
+                create(Types.STRING, "MC|TrSel"); // Channel
+                map(Types.VAR_INT, Types.INT); // Slot
             }
         });
 
@@ -667,9 +668,9 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.SET_BEACON, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.STRING, "MC|Beacon"); // Channel
-                map(Type.VAR_INT, Type.INT); // Primary Effect
-                map(Type.VAR_INT, Type.INT); // Secondary Effect
+                create(Types.STRING, "MC|Beacon"); // Channel
+                map(Types.VAR_INT, Types.INT); // Primary Effect
+                map(Types.VAR_INT, Types.INT); // Secondary Effect
             }
         });
 
@@ -677,21 +678,21 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.SET_COMMAND_BLOCK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.STRING, "MC|AutoCmd"); // Channel
+                create(Types.STRING, "MC|AutoCmd"); // Channel
                 handler(POS_TO_3_INT);
-                map(Type.STRING); // Command
+                map(Types.STRING); // Command
                 handler(wrapper -> {
-                    int mode = wrapper.read(Type.VAR_INT);
-                    byte flags = wrapper.read(Type.BYTE);
+                    int mode = wrapper.read(Types.VAR_INT);
+                    byte flags = wrapper.read(Types.BYTE);
 
                     String stringMode = mode == 0 ? "SEQUENCE"
                             : mode == 1 ? "AUTO"
                             : "REDSTONE";
 
-                    wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Track output
-                    wrapper.write(Type.STRING, stringMode);
-                    wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Is conditional
-                    wrapper.write(Type.BOOLEAN, (flags & 0x4) != 0); // Automatic
+                    wrapper.write(Types.BOOLEAN, (flags & 0x1) != 0); // Track output
+                    wrapper.write(Types.STRING, stringMode);
+                    wrapper.write(Types.BOOLEAN, (flags & 0x2) != 0); // Is conditional
+                    wrapper.write(Types.BOOLEAN, (flags & 0x4) != 0); // Automatic
                 });
             }
         });
@@ -701,10 +702,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             @Override
             public void register() {
                 handler(wrapper -> {
-                    wrapper.write(Type.STRING, "MC|AdvCmd");
-                    wrapper.write(Type.BYTE, (byte) 1); // Type 1 for Entity
+                    wrapper.write(Types.STRING, "MC|AdvCmd");
+                    wrapper.write(Types.BYTE, (byte) 1); // Type 1 for Entity
                 });
-                map(Type.VAR_INT, Type.INT); // Entity id
+                map(Types.VAR_INT, Types.INT); // Entity id
             }
         });
 
@@ -714,15 +715,15 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.SET_STRUCTURE_BLOCK, ServerboundPackets1_12_1.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.STRING, "MC|Struct"); // Channel
+                create(Types.STRING, "MC|Struct"); // Channel
                 handler(POS_TO_3_INT);
-                map(Type.VAR_INT, new ValueTransformer<>(Type.BYTE) { // Action
+                map(Types.VAR_INT, new ValueTransformer<>(Types.BYTE) { // Action
                     @Override
                     public Byte transform(PacketWrapper wrapper, Integer action) {
                         return (byte) (action + 1);
                     }
                 }); // Action
-                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) {
+                map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, Integer mode) {
                         return mode == 0 ? "SAVE"
@@ -731,14 +732,14 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                                 : "DATA";
                     }
                 });
-                map(Type.STRING); // Name
-                map(Type.BYTE, Type.INT); // Offset X
-                map(Type.BYTE, Type.INT); // Offset Y
-                map(Type.BYTE, Type.INT); // Offset Z
-                map(Type.BYTE, Type.INT); // Size X
-                map(Type.BYTE, Type.INT); // Size Y
-                map(Type.BYTE, Type.INT); // Size Z
-                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) { // Mirror
+                map(Types.STRING); // Name
+                map(Types.BYTE, Types.INT); // Offset X
+                map(Types.BYTE, Types.INT); // Offset Y
+                map(Types.BYTE, Types.INT); // Offset Z
+                map(Types.BYTE, Types.INT); // Size X
+                map(Types.BYTE, Types.INT); // Size Y
+                map(Types.BYTE, Types.INT); // Size Z
+                map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) { // Mirror
                     @Override
                     public String transform(PacketWrapper wrapper, Integer mirror) {
                         return mirror == 0 ? "NONE"
@@ -746,7 +747,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                                 : "FRONT_BACK";
                     }
                 });
-                map(Type.VAR_INT, new ValueTransformer<>(Type.STRING) { // Rotation
+                map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) { // Rotation
                     @Override
                     public String transform(PacketWrapper wrapper, Integer rotation) {
                         return rotation == 0 ? "NONE"
@@ -755,68 +756,68 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                                 : "COUNTERCLOCKWISE_90";
                     }
                 });
-                map(Type.STRING);
+                map(Types.STRING);
                 handler(wrapper -> {
-                    float integrity = wrapper.read(Type.FLOAT);
-                    long seed = wrapper.read(Type.VAR_LONG);
-                    byte flags = wrapper.read(Type.BYTE);
+                    float integrity = wrapper.read(Types.FLOAT);
+                    long seed = wrapper.read(Types.VAR_LONG);
+                    byte flags = wrapper.read(Types.BYTE);
 
-                    wrapper.write(Type.BOOLEAN, (flags & 0x1) != 0); // Ignore Entities
-                    wrapper.write(Type.BOOLEAN, (flags & 0x2) != 0); // Show air
-                    wrapper.write(Type.BOOLEAN, (flags & 0x4) != 0); // Show bounding box
-                    wrapper.write(Type.FLOAT, integrity);
-                    wrapper.write(Type.VAR_LONG, seed);
+                    wrapper.write(Types.BOOLEAN, (flags & 0x1) != 0); // Ignore Entities
+                    wrapper.write(Types.BOOLEAN, (flags & 0x2) != 0); // Show air
+                    wrapper.write(Types.BOOLEAN, (flags & 0x4) != 0); // Show bounding box
+                    wrapper.write(Types.FLOAT, integrity);
+                    wrapper.write(Types.VAR_LONG, seed);
                 });
             }
         });
     }
 
     private void writeDeclareRecipes(PacketWrapper recipesPacket) {
-        recipesPacket.write(Type.VAR_INT, RecipeData.recipes.size());
+        recipesPacket.write(Types.VAR_INT, RecipeData.recipes.size());
         for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
-            recipesPacket.write(Type.STRING, entry.getKey()); // Id
-            recipesPacket.write(Type.STRING, entry.getValue().getType());
+            recipesPacket.write(Types.STRING, entry.getKey()); // Id
+            recipesPacket.write(Types.STRING, entry.getValue().getType());
             switch (entry.getValue().getType()) {
                 case "crafting_shapeless": {
-                    recipesPacket.write(Type.STRING, entry.getValue().getGroup());
-                    recipesPacket.write(Type.VAR_INT, entry.getValue().getIngredients().length);
+                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
+                    recipesPacket.write(Types.VAR_INT, entry.getValue().getIngredients().length);
                     for (Item[] ingredient : entry.getValue().getIngredients()) {
                         Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                         for (int i = 0; i < clone.length; i++) {
                             if (clone[i] == null) continue;
                             clone[i] = new DataItem(clone[i]);
                         }
-                        recipesPacket.write(Type.ITEM1_13_ARRAY, clone);
+                        recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
                     break;
                 }
                 case "crafting_shaped": {
-                    recipesPacket.write(Type.VAR_INT, entry.getValue().getWidth());
-                    recipesPacket.write(Type.VAR_INT, entry.getValue().getHeight());
-                    recipesPacket.write(Type.STRING, entry.getValue().getGroup());
+                    recipesPacket.write(Types.VAR_INT, entry.getValue().getWidth());
+                    recipesPacket.write(Types.VAR_INT, entry.getValue().getHeight());
+                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
                     for (Item[] ingredient : entry.getValue().getIngredients()) {
                         Item[] clone = ingredient.clone(); // Clone because array and item is mutable
                         for (int i = 0; i < clone.length; i++) {
                             if (clone[i] == null) continue;
                             clone[i] = new DataItem(clone[i]);
                         }
-                        recipesPacket.write(Type.ITEM1_13_ARRAY, clone);
+                        recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
                     break;
                 }
                 case "smelting": {
-                    recipesPacket.write(Type.STRING, entry.getValue().getGroup());
+                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
                     Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
                     for (int i = 0; i < clone.length; i++) {
                         if (clone[i] == null) continue;
                         clone[i] = new DataItem(clone[i]);
                     }
-                    recipesPacket.write(Type.ITEM1_13_ARRAY, clone);
-                    recipesPacket.write(Type.ITEM1_13, new DataItem(entry.getValue().getResult()));
-                    recipesPacket.write(Type.FLOAT, entry.getValue().getExperience());
-                    recipesPacket.write(Type.VAR_INT, entry.getValue().getCookingTime());
+                    recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
+                    recipesPacket.write(Types.FLOAT, entry.getValue().getExperience());
+                    recipesPacket.write(Types.VAR_INT, entry.getValue().getCookingTime());
                     break;
                 }
             }

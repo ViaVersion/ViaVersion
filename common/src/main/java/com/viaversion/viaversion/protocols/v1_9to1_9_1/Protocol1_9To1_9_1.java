@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_9to1_9_1;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 
@@ -36,27 +37,27 @@ public class Protocol1_9To1_9_1 extends AbstractProtocol<ClientboundPackets1_9, 
         registerClientbound(ClientboundPackets1_9.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Player ID
-                map(Type.UNSIGNED_BYTE); // 1 - Player Gamemode
+                map(Types.INT); // 0 - Player ID
+                map(Types.UNSIGNED_BYTE); // 1 - Player Gamemode
                 // 1.9.1 PRE 2 Changed this
-                map(Type.BYTE, Type.INT); // 2 - Player Dimension
-                map(Type.UNSIGNED_BYTE); // 3 - World Difficulty
-                map(Type.UNSIGNED_BYTE); // 4 - Max Players (Tab)
-                map(Type.STRING); // 5 - Level Type
-                map(Type.BOOLEAN); // 6 - Reduced Debug info
+                map(Types.BYTE, Types.INT); // 2 - Player Dimension
+                map(Types.UNSIGNED_BYTE); // 3 - World Difficulty
+                map(Types.UNSIGNED_BYTE); // 4 - Max Players (Tab)
+                map(Types.STRING); // 5 - Level Type
+                map(Types.BOOLEAN); // 6 - Reduced Debug info
             }
         });
 
         registerClientbound(ClientboundPackets1_9.SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Sound ID
+                map(Types.VAR_INT); // 0 - Sound ID
 
                 handler(wrapper -> {
-                    int sound = wrapper.get(Type.VAR_INT, 0);
+                    int sound = wrapper.get(Types.VAR_INT, 0);
 
                     if (sound >= 415) // Add 1 to every sound id since there is no Elytra sound on a 1.9 server
-                        wrapper.set(Type.VAR_INT, 0, sound + 1);
+                        wrapper.set(Types.VAR_INT, 0, sound + 1);
                 });
             }
         });

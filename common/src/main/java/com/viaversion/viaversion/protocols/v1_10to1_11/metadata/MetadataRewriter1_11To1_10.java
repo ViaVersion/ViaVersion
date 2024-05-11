@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
@@ -51,7 +51,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
         filter().type(EntityType.GUARDIAN).index(12).handler((event, meta) -> {
             boolean value = (((byte) meta.getValue()) & 0x02) == 0x02;
-            meta.setTypeAndValue(MetaType1_9.Boolean, value);
+            meta.setTypeAndValue(MetaType1_9.BOOLEAN, value);
         });
 
         filter().type(EntityType.ABSTRACT_SKELETON).removeIndex(12);
@@ -86,9 +86,9 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
 
             if ((type == EntityType.DONKEY || type == EntityType.MULE) && metadata.id() == 13) {
                 if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
-                    event.createExtraMeta(new Metadata(15, MetaType1_9.Boolean, true));
+                    event.createExtraMeta(new Metadata(15, MetaType1_9.BOOLEAN, true));
                 } else {
-                    event.createExtraMeta(new Metadata(15, MetaType1_9.Boolean, false));
+                    event.createExtraMeta(new Metadata(15, MetaType1_9.BOOLEAN, false));
                 }
             }
         });
@@ -114,11 +114,11 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
                 if (tracker.addHologram(entityId)) {
                     // Send movement
                     PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9_3.MOVE_ENTITY_POS, null, event.user());
-                    wrapper.write(Type.VAR_INT, entityId);
-                    wrapper.write(Type.SHORT, (short) 0);
-                    wrapper.write(Type.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
-                    wrapper.write(Type.SHORT, (short) 0);
-                    wrapper.write(Type.BOOLEAN, true);
+                    wrapper.write(Types.VAR_INT, entityId);
+                    wrapper.write(Types.SHORT, (short) 0);
+                    wrapper.write(Types.SHORT, (short) (128D * (-Via.getConfig().getHologramYOffset() * 32D)));
+                    wrapper.write(Types.SHORT, (short) 0);
+                    wrapper.write(Types.BOOLEAN, true);
 
                     wrapper.send(Protocol1_10To1_11.class);
                 }
@@ -175,7 +175,7 @@ public class MetadataRewriter1_11To1_10 extends EntityRewriter<ClientboundPacket
                 if (options.isPresent()) {
                     int value = (int) options.get().getValue();
                     if (value > 0 && value < 6) {
-                        metadata.add(new Metadata(16, MetaType1_9.VarInt, value - 1)); // Add profession type to new metadata
+                        metadata.add(new Metadata(16, MetaType1_9.VAR_INT, value - 1)); // Add profession type to new metadata
                         return EntityType.ZOMBIE_VILLAGER;
                     }
                     if (value == 6) {

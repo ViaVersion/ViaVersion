@@ -23,12 +23,13 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableString extends Filterable<String> {
 
-    public static final Type<FilterableString> TYPE = new FilterableType<>(Type.STRING, Type.OPTIONAL_STRING, FilterableString.class) {
+    public static final Type<FilterableString> TYPE = new FilterableType<>(Types.STRING, Types.OPTIONAL_STRING, FilterableString.class) {
         @Override
         protected FilterableString create(final String raw, final String filtered) {
             return new FilterableString(raw, filtered);

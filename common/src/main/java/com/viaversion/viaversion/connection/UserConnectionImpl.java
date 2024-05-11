@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
@@ -237,8 +238,8 @@ public class UserConnectionImpl implements UserConnection {
 
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
-                Type.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
-                Type.UUID.write(buf, generatePassthroughToken());
+                Types.VAR_INT.writePrimitive(buf, PacketWrapper.PASSTHROUGH_ID);
+                Types.UUID.write(buf, generatePassthroughToken());
             }
 
             buf.writeBytes(packet);
@@ -315,9 +316,9 @@ public class UserConnectionImpl implements UserConnection {
             return;
         }
 
-        int id = Type.VAR_INT.readPrimitive(buf);
+        int id = Types.VAR_INT.readPrimitive(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) {
-            if (!passthroughTokens.remove(Type.UUID.read(buf))) {
+            if (!passthroughTokens.remove(Types.UUID.read(buf))) {
                 throw new IllegalArgumentException("Invalid token");
             }
             return;

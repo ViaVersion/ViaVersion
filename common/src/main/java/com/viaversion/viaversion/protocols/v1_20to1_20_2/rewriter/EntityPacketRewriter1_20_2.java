@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
@@ -44,23 +45,23 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_4.ADD_PLAYER, ClientboundPackets1_20_2.ADD_ENTITY, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity id
-            wrapper.passthrough(Type.UUID); // UUID
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            wrapper.passthrough(Types.UUID); // UUID
 
-            wrapper.write(Type.VAR_INT, EntityTypes1_19_4.PLAYER.getId()); // Entity type id
+            wrapper.write(Types.VAR_INT, EntityTypes1_19_4.PLAYER.getId()); // Entity type id
 
-            wrapper.passthrough(Type.DOUBLE); // X
-            wrapper.passthrough(Type.DOUBLE); // Y
-            wrapper.passthrough(Type.DOUBLE); // Z
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
 
-            final byte yaw = wrapper.read(Type.BYTE); // Yaw
-            wrapper.passthrough(Type.BYTE); // Pitch
-            wrapper.write(Type.BYTE, yaw);
-            wrapper.write(Type.BYTE, yaw); // Head yaw
-            wrapper.write(Type.VAR_INT, 0); // Data
-            wrapper.write(Type.SHORT, (short) 0); // Velocity X
-            wrapper.write(Type.SHORT, (short) 0); // Velocity Y
-            wrapper.write(Type.SHORT, (short) 0); // Velocity Z
+            final byte yaw = wrapper.read(Types.BYTE); // Yaw
+            wrapper.passthrough(Types.BYTE); // Pitch
+            wrapper.write(Types.BYTE, yaw);
+            wrapper.write(Types.BYTE, yaw); // Head yaw
+            wrapper.write(Types.VAR_INT, 0); // Data
+            wrapper.write(Types.SHORT, (short) 0); // Velocity X
+            wrapper.write(Types.SHORT, (short) 0); // Velocity Y
+            wrapper.write(Types.SHORT, (short) 0); // Velocity Z
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.LOGIN, new PacketHandlers() {
@@ -68,33 +69,33 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             public void register() {
                 handler(wrapper -> {
                     // Just reorder written data, move dimension data to configuration phase
-                    wrapper.passthrough(Type.INT); // Entity id
-                    wrapper.passthrough(Type.BOOLEAN); // Hardcore
+                    wrapper.passthrough(Types.INT); // Entity id
+                    wrapper.passthrough(Types.BOOLEAN); // Hardcore
 
-                    final byte gamemode = wrapper.read(Type.BYTE);
-                    final byte previousGamemode = wrapper.read(Type.BYTE);
+                    final byte gamemode = wrapper.read(Types.BYTE);
+                    final byte previousGamemode = wrapper.read(Types.BYTE);
 
-                    wrapper.passthrough(Type.STRING_ARRAY); // World List
+                    wrapper.passthrough(Types.STRING_ARRAY); // World List
 
-                    final CompoundTag dimensionRegistry = wrapper.read(Type.NAMED_COMPOUND_TAG);
-                    final String dimensionType = wrapper.read(Type.STRING);
-                    final String world = wrapper.read(Type.STRING);
-                    final long seed = wrapper.read(Type.LONG);
+                    final CompoundTag dimensionRegistry = wrapper.read(Types.NAMED_COMPOUND_TAG);
+                    final String dimensionType = wrapper.read(Types.STRING);
+                    final String world = wrapper.read(Types.STRING);
+                    final long seed = wrapper.read(Types.LONG);
                     trackBiomeSize(wrapper.user(), dimensionRegistry); // Caches dimensions to access data like height later
                     cacheDimensionData(wrapper.user(), dimensionRegistry); // Tracks the amount of biomes sent for chunk data
 
-                    wrapper.passthrough(Type.VAR_INT); // Max players
-                    wrapper.passthrough(Type.VAR_INT); // View distance
-                    wrapper.passthrough(Type.VAR_INT); // Simulation distance
-                    wrapper.passthrough(Type.BOOLEAN); // Reduced debug info
-                    wrapper.passthrough(Type.BOOLEAN); // Show death screen
+                    wrapper.passthrough(Types.VAR_INT); // Max players
+                    wrapper.passthrough(Types.VAR_INT); // View distance
+                    wrapper.passthrough(Types.VAR_INT); // Simulation distance
+                    wrapper.passthrough(Types.BOOLEAN); // Reduced debug info
+                    wrapper.passthrough(Types.BOOLEAN); // Show death screen
 
-                    wrapper.write(Type.BOOLEAN, false); // Limited crafting
-                    wrapper.write(Type.STRING, dimensionType);
-                    wrapper.write(Type.STRING, world);
-                    wrapper.write(Type.LONG, seed);
-                    wrapper.write(Type.BYTE, gamemode);
-                    wrapper.write(Type.BYTE, previousGamemode);
+                    wrapper.write(Types.BOOLEAN, false); // Limited crafting
+                    wrapper.write(Types.STRING, dimensionType);
+                    wrapper.write(Types.STRING, world);
+                    wrapper.write(Types.LONG, seed);
+                    wrapper.write(Types.BYTE, gamemode);
+                    wrapper.write(Types.BYTE, previousGamemode);
 
                     // Debug, flat, last death pos, and portal cooldown at the end unchanged
 
@@ -135,38 +136,38 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
             @Override
             public void register() {
                 handler(wrapper -> {
-                    wrapper.passthrough(Type.STRING); // Dimension type
-                    wrapper.passthrough(Type.STRING); // World
-                    wrapper.passthrough(Type.LONG); // Seed
-                    wrapper.write(Type.BYTE, wrapper.read(Type.UNSIGNED_BYTE).byteValue()); // Gamemode
-                    wrapper.passthrough(Type.BYTE); // Previous gamemode
-                    wrapper.passthrough(Type.BOOLEAN); // Debug
-                    wrapper.passthrough(Type.BOOLEAN); // Flat
+                    wrapper.passthrough(Types.STRING); // Dimension type
+                    wrapper.passthrough(Types.STRING); // World
+                    wrapper.passthrough(Types.LONG); // Seed
+                    wrapper.write(Types.BYTE, wrapper.read(Types.UNSIGNED_BYTE).byteValue()); // Gamemode
+                    wrapper.passthrough(Types.BYTE); // Previous gamemode
+                    wrapper.passthrough(Types.BOOLEAN); // Debug
+                    wrapper.passthrough(Types.BOOLEAN); // Flat
 
                     // Move this to the end
-                    final byte dataToKeep = wrapper.read(Type.BYTE);
+                    final byte dataToKeep = wrapper.read(Types.BYTE);
 
-                    wrapper.passthrough(Type.OPTIONAL_GLOBAL_POSITION); // Last death position
-                    wrapper.passthrough(Type.VAR_INT); // Portal cooldown
+                    wrapper.passthrough(Types.OPTIONAL_GLOBAL_POSITION); // Last death position
+                    wrapper.passthrough(Types.VAR_INT); // Portal cooldown
 
-                    wrapper.write(Type.BYTE, dataToKeep);
+                    wrapper.write(Types.BYTE, dataToKeep);
                 });
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.UPDATE_MOB_EFFECT, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity id
-            wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) - 1); // Effect id
-            wrapper.passthrough(Type.BYTE); // Amplifier
-            wrapper.passthrough(Type.VAR_INT); // Duration
-            wrapper.passthrough(Type.BYTE); // Flags
-            wrapper.write(Type.OPTIONAL_COMPOUND_TAG, wrapper.read(Type.OPTIONAL_NAMED_COMPOUND_TAG)); // Factor data
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            wrapper.write(Types.VAR_INT, wrapper.read(Types.VAR_INT) - 1); // Effect id
+            wrapper.passthrough(Types.BYTE); // Amplifier
+            wrapper.passthrough(Types.VAR_INT); // Duration
+            wrapper.passthrough(Types.BYTE); // Flags
+            wrapper.write(Types.OPTIONAL_COMPOUND_TAG, wrapper.read(Types.OPTIONAL_NAMED_COMPOUND_TAG)); // Factor data
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.REMOVE_MOB_EFFECT, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity id
-            wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) - 1); // Effect id
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            wrapper.write(Types.VAR_INT, wrapper.read(Types.VAR_INT) - 1); // Effect id
         });
     }
 

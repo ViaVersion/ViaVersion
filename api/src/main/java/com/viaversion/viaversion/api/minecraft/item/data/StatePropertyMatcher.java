@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.util.Either;
 import io.netty.buffer.ByteBuf;
@@ -34,27 +35,27 @@ public record StatePropertyMatcher(String name, Either<String, RangedMatcher> ma
     public static final Type<StatePropertyMatcher> TYPE = new Type<>(StatePropertyMatcher.class) {
         @Override
         public StatePropertyMatcher read(final ByteBuf buffer) {
-            final String name = Type.STRING.read(buffer);
+            final String name = Types.STRING.read(buffer);
             if (buffer.readBoolean()) {
-                final String value = Type.STRING.read(buffer);
+                final String value = Types.STRING.read(buffer);
                 return new StatePropertyMatcher(name, Either.left(value));
             } else {
-                final String minValue = Type.OPTIONAL_STRING.read(buffer);
-                final String maxValue = Type.OPTIONAL_STRING.read(buffer);
+                final String minValue = Types.OPTIONAL_STRING.read(buffer);
+                final String maxValue = Types.OPTIONAL_STRING.read(buffer);
                 return new StatePropertyMatcher(name, Either.right(new RangedMatcher(minValue, maxValue)));
             }
         }
 
         @Override
         public void write(final ByteBuf buffer, final StatePropertyMatcher value) {
-            Type.STRING.write(buffer, value.name);
+            Types.STRING.write(buffer, value.name);
             if (value.matcher.isLeft()) {
                 buffer.writeBoolean(true);
-                Type.STRING.write(buffer, value.matcher.left());
+                Types.STRING.write(buffer, value.matcher.left());
             } else {
                 buffer.writeBoolean(false);
-                Type.OPTIONAL_STRING.write(buffer, value.matcher.right().minValue());
-                Type.OPTIONAL_STRING.write(buffer, value.matcher.right().maxValue());
+                Types.OPTIONAL_STRING.write(buffer, value.matcher.right().minValue());
+                Types.OPTIONAL_STRING.write(buffer, value.matcher.right().maxValue());
             }
         }
     };

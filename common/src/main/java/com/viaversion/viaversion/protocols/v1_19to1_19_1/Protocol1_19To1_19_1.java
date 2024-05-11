@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ClientboundPackets1_19;
@@ -71,11 +72,11 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_19.SYSTEM_CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.COMPONENT); // Content
+                map(Types.COMPONENT); // Content
                 handler(wrapper -> {
-                    final int type = wrapper.read(Type.VAR_INT);
+                    final int type = wrapper.read(Types.VAR_INT);
                     final boolean overlay = type == 2;
-                    wrapper.write(Type.BOOLEAN, overlay);
+                    wrapper.write(Types.BOOLEAN, overlay);
                 });
             }
         });
@@ -84,12 +85,12 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             public void register() {
                 handler(wrapper -> {
                     // Back to system chat
-                    final JsonElement signedContent = wrapper.read(Type.COMPONENT);
-                    final JsonElement unsignedContent = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    final int chatTypeId = wrapper.read(Type.VAR_INT);
-                    wrapper.read(Type.UUID); // Sender UUID
-                    final JsonElement senderName = wrapper.read(Type.COMPONENT);
-                    final JsonElement teamName = wrapper.read(Type.OPTIONAL_COMPONENT);
+                    final JsonElement signedContent = wrapper.read(Types.COMPONENT);
+                    final JsonElement unsignedContent = wrapper.read(Types.OPTIONAL_COMPONENT);
+                    final int chatTypeId = wrapper.read(Types.VAR_INT);
+                    wrapper.read(Types.UUID); // Sender UUID
+                    final JsonElement senderName = wrapper.read(Types.COMPONENT);
+                    final JsonElement teamName = wrapper.read(Types.OPTIONAL_COMPONENT);
 
                     final CompoundTag chatType = wrapper.user().get(ChatTypeStorage.class).chatType(chatTypeId);
                     final ChatDecorationResult decorationResult = decorateChatMessage(chatType, chatTypeId, senderName, teamName, unsignedContent != null ? unsignedContent : signedContent);
@@ -98,30 +99,30 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                         return;
                     }
 
-                    wrapper.write(Type.COMPONENT, decorationResult.content());
-                    wrapper.write(Type.BOOLEAN, decorationResult.overlay());
+                    wrapper.write(Types.COMPONENT, decorationResult.content());
+                    wrapper.write(Types.BOOLEAN, decorationResult.overlay());
                 });
-                read(Type.LONG); // Timestamp
-                read(Type.LONG); // Salt
-                read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                read(Types.LONG); // Timestamp
+                read(Types.LONG); // Salt
+                read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
             }
         });
         registerServerbound(ServerboundPackets1_19_1.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Message
-                map(Type.LONG); // Timestamp
-                map(Type.LONG); // Salt
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                map(Type.BOOLEAN); // Signed preview
+                map(Types.STRING); // Message
+                map(Types.LONG); // Timestamp
+                map(Types.LONG); // Salt
+                map(Types.BYTE_ARRAY_PRIMITIVE); // Signature
+                map(Types.BOOLEAN); // Signed preview
                 handler(wrapper -> {
                     final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
 
                     if (chatSession != null) {
                         final UUID sender = wrapper.user().getProtocolInfo().getUuid();
-                        final String message = wrapper.get(Type.STRING, 0);
-                        final long timestamp = wrapper.get(Type.LONG, 0);
-                        final long salt = wrapper.get(Type.LONG, 1);
+                        final String message = wrapper.get(Types.STRING, 0);
+                        final long timestamp = wrapper.get(Types.LONG, 0);
+                        final long salt = wrapper.get(Types.LONG, 1);
 
                         final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                         final DecoratableMessage decoratableMessage = new DecoratableMessage(message);
@@ -132,39 +133,39 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                             throw new RuntimeException(e);
                         }
 
-                        wrapper.set(Type.BYTE_ARRAY_PRIMITIVE, 0, signature); // Signature
-                        wrapper.set(Type.BOOLEAN, 0, decoratableMessage.isDecorated()); // Signed preview
+                        wrapper.set(Types.BYTE_ARRAY_PRIMITIVE, 0, signature); // Signature
+                        wrapper.set(Types.BOOLEAN, 0, decoratableMessage.isDecorated()); // Signed preview
                     }
                 });
-                read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
-                read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
+                read(Types.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(Types.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
         registerServerbound(ServerboundPackets1_19_1.CHAT_COMMAND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Command
-                map(Type.LONG); // Timestamp
-                map(Type.LONG); // Salt
+                map(Types.STRING); // Command
+                map(Types.LONG); // Timestamp
+                map(Types.LONG); // Salt
                 handler(wrapper -> {
                     final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
                     final SignableCommandArgumentsProvider argumentsProvider = Via.getManager().getProviders().get(SignableCommandArgumentsProvider.class);
 
-                    final int signatures = wrapper.read(Type.VAR_INT);
+                    final int signatures = wrapper.read(Types.VAR_INT);
                     for (int i = 0; i < signatures; i++) {
-                        wrapper.read(Type.STRING); // Argument name
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.read(Types.STRING); // Argument name
+                        wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
                     }
 
                     if (chatSession != null && argumentsProvider != null) {
                         final UUID sender = wrapper.user().getProtocolInfo().getUuid();
-                        final String message = wrapper.get(Type.STRING, 0);
-                        final long timestamp = wrapper.get(Type.LONG, 0);
-                        final long salt = wrapper.get(Type.LONG, 1);
+                        final String message = wrapper.get(Types.STRING, 0);
+                        final long timestamp = wrapper.get(Types.LONG, 0);
+                        final long salt = wrapper.get(Types.LONG, 1);
 
                         final List<Pair<String, String>> arguments = argumentsProvider.getSignableArguments(message);
 
-                        wrapper.write(Type.VAR_INT, arguments.size()); // Signature count
+                        wrapper.write(Types.VAR_INT, arguments.size()); // Signature count
                         for (Pair<String, String> argument : arguments) {
                             final MessageMetadata metadata = new MessageMetadata(sender, timestamp, salt);
                             final DecoratableMessage decoratableMessage = new DecoratableMessage(argument.value());
@@ -176,16 +177,16 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                                 throw new RuntimeException(e);
                             }
 
-                            wrapper.write(Type.STRING, argument.key()); // Argument name
-                            wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, signature); // Signature
+                            wrapper.write(Types.STRING, argument.key()); // Argument name
+                            wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, signature); // Signature
                         }
                     } else {
-                        wrapper.write(Type.VAR_INT, 0); // Signature count
+                        wrapper.write(Types.VAR_INT, 0); // Signature count
                     }
                 });
-                map(Type.BOOLEAN); // Signed preview
-                read(Type.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
-                read(Type.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
+                map(Types.BOOLEAN); // Signed preview
+                read(Types.PLAYER_MESSAGE_SIGNATURE_ARRAY); // Last seen messages
+                read(Types.OPTIONAL_PLAYER_MESSAGE_SIGNATURE); // Last received message
             }
         });
         cancelServerbound(ServerboundPackets1_19_1.CHAT_ACK);
@@ -193,16 +194,16 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_19.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
                 handler(wrapper -> {
                     final ChatTypeStorage chatTypeStorage = wrapper.user().get(ChatTypeStorage.class);
                     chatTypeStorage.clear();
 
-                    final CompoundTag registry = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
+                    final CompoundTag registry = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
                     final ListTag<CompoundTag> chatTypes = TagUtil.removeRegistryEntries(registry, "chat_type");
                     for (final CompoundTag chatType : chatTypes) {
                         final NumberTag idTag = chatType.getNumberTag("id");
@@ -218,42 +219,42 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_19.SERVER_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.OPTIONAL_COMPONENT); // Motd
-                map(Type.OPTIONAL_STRING); // Encoded icon
-                map(Type.BOOLEAN); // Previews chat
-                create(Type.BOOLEAN, Via.getConfig().enforceSecureChat()); // Enforces secure chat
+                map(Types.OPTIONAL_COMPONENT); // Motd
+                map(Types.OPTIONAL_STRING); // Encoded icon
+                map(Types.BOOLEAN); // Previews chat
+                create(Types.BOOLEAN, Via.getConfig().enforceSecureChat()); // Enforces secure chat
             }
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Name
+                map(Types.STRING); // Name
                 handler(wrapper -> {
-                    final ProfileKey profileKey = wrapper.read(Type.OPTIONAL_PROFILE_KEY); // Profile Key
+                    final ProfileKey profileKey = wrapper.read(Types.OPTIONAL_PROFILE_KEY); // Profile Key
 
                     final ChatSession1_19_0 chatSession = wrapper.user().get(ChatSession1_19_0.class);
-                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, chatSession == null ? null : chatSession.getProfileKey()); // Profile Key
+                    wrapper.write(Types.OPTIONAL_PROFILE_KEY, chatSession == null ? null : chatSession.getProfileKey()); // Profile Key
 
                     if (profileKey == null || chatSession != null) {
                         // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
                         wrapper.user().put(new NonceStorage(null));
                     }
                 });
-                read(Type.OPTIONAL_UUID); // Profile uuid
+                read(Types.OPTIONAL_UUID); // Profile uuid
             }
         });
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Server id
+                map(Types.STRING); // Server id
                 handler(wrapper -> {
                     if (wrapper.user().has(NonceStorage.class)) {
                         return;
                     }
 
-                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] publicKey = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] nonce = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
@@ -261,19 +262,19 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
+                map(Types.BYTE_ARRAY_PRIMITIVE); // Keys
                 handler(wrapper -> {
                     final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
                     if (nonceStorage.nonce() == null) {
                         return;
                     }
 
-                    final boolean isNonce = wrapper.read(Type.BOOLEAN);
-                    wrapper.write(Type.BOOLEAN, true);
+                    final boolean isNonce = wrapper.read(Types.BOOLEAN);
+                    wrapper.write(Types.BOOLEAN, true);
                     if (!isNonce) { // Should never be true at this point, but /shrug otherwise
-                        wrapper.read(Type.LONG); // Salt
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
+                        wrapper.read(Types.LONG); // Salt
+                        wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
                     }
                 });
             }
@@ -281,12 +282,12 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         registerClientbound(State.LOGIN, ClientboundLoginPackets.CUSTOM_QUERY.getId(), ClientboundLoginPackets.CUSTOM_QUERY.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT);
-                map(Type.STRING);
+                map(Types.VAR_INT);
+                map(Types.STRING);
                 handler(wrapper -> {
-                    String identifier = wrapper.get(Type.STRING, 0);
+                    String identifier = wrapper.get(Types.STRING, 0);
                     if (identifier.equals("velocity:player_info")) {
-                        byte[] data = wrapper.passthrough(Type.REMAINING_BYTES);
+                        byte[] data = wrapper.passthrough(Types.REMAINING_BYTES);
                         // Velocity modern forwarding version above 1 includes the players public key.
                         // This is an issue because the server will expect a 1.19 key and receive a 1.19.1 key.
                         // Velocity modern forwarding versions: https://github.com/PaperMC/Velocity/blob/1a3fba4250553702d9dcd05731d04347bfc24c9f/proxy/src/main/java/com/velocitypowered/proxy/connection/VelocityConstants.java#L27-L29
@@ -295,7 +296,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                             data[0] = 1;
                         } else if (data.length == 0) { // Or the version is omitted (default version would be used)
                             data = new byte[]{1};
-                            wrapper.set(Type.REMAINING_BYTES, 0, data);
+                            wrapper.set(Types.REMAINING_BYTES, 0, data);
                         } else {
                             Via.getPlatform().getLogger().warning("Received unexpected data in velocity:player_info (length=" + data.length + ")");
                         }

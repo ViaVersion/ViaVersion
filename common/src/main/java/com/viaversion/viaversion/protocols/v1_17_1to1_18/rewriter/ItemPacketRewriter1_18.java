@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
@@ -29,7 +30,7 @@ import com.viaversion.viaversion.rewriter.RecipeRewriter;
 public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPackets1_17_1, ServerboundPackets1_17, Protocol1_17_1To1_18> {
 
     public ItemPacketRewriter1_18(Protocol1_17_1To1_18 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -44,14 +45,14 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect id
-                map(Type.POSITION1_14); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Effect id
+                map(Types.BLOCK_POSITION1_14); // Location
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    int data = wrapper.get(Type.INT, 1);
+                    int id = wrapper.get(Types.INT, 0);
+                    int data = wrapper.get(Types.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
                     }
                 });
             }
@@ -60,38 +61,38 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Particle id
-                map(Type.BOOLEAN); // Override limiter
-                map(Type.DOUBLE); // X
-                map(Type.DOUBLE); // Y
-                map(Type.DOUBLE); // Z
-                map(Type.FLOAT); // Offset X
-                map(Type.FLOAT); // Offset Y
-                map(Type.FLOAT); // Offset Z
-                map(Type.FLOAT); // Max speed
-                map(Type.INT); // Particle Count
+                map(Types.INT); // Particle id
+                map(Types.BOOLEAN); // Override limiter
+                map(Types.DOUBLE); // X
+                map(Types.DOUBLE); // Y
+                map(Types.DOUBLE); // Z
+                map(Types.FLOAT); // Offset X
+                map(Types.FLOAT); // Offset Y
+                map(Types.FLOAT); // Offset Z
+                map(Types.FLOAT); // Max speed
+                map(Types.INT); // Particle Count
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
+                    int id = wrapper.get(Types.INT, 0);
                     if (id == 2) { // Barrier
-                        wrapper.set(Type.INT, 0, 3); // Block marker
-                        wrapper.write(Type.VAR_INT, 7754);
+                        wrapper.set(Types.INT, 0, 3); // Block marker
+                        wrapper.write(Types.VAR_INT, 7754);
                         return;
                     } else if (id == 3) { // Light block
-                        wrapper.write(Type.VAR_INT, 7786);
+                        wrapper.write(Types.VAR_INT, 7786);
                         return;
                     }
 
                     ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
                     if (mappings.isBlockParticle(id)) {
-                        int data = wrapper.passthrough(Type.VAR_INT);
-                        wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                        int data = wrapper.passthrough(Types.VAR_INT);
+                        wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (mappings.isItemParticle(id)) {
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2));
                     }
 
                     int newId = protocol.getMappingData().getNewParticleId(id);
                     if (newId != id) {
-                        wrapper.set(Type.INT, 0, newId);
+                        wrapper.set(Types.INT, 0, newId);
                     }
                 });
             }

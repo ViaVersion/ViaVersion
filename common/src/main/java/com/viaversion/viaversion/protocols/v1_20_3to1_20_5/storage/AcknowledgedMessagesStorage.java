@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import java.util.Arrays;
@@ -88,8 +89,8 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
         }
 
         final PacketWrapper chatSessionUpdate = wrapper.create(ServerboundPackets1_20_3.CHAT_SESSION_UPDATE);
-        chatSessionUpdate.write(Type.UUID, chatSession.sessionId());
-        chatSessionUpdate.write(Type.PROFILE_KEY, chatSession.profileKey());
+        chatSessionUpdate.write(Types.UUID, chatSession.sessionId());
+        chatSessionUpdate.write(Types.PROFILE_KEY, chatSession.profileKey());
         chatSessionUpdate.sendToServer(Protocol1_20_3To1_20_5.class);
         chatSession = null;
     }

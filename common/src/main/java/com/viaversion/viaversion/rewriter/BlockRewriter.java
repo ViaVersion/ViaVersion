@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.MathUtil;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -53,15 +54,15 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> legacy(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Type.POSITION1_8, Type.NAMED_COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_8, Types.NAMED_COMPOUND_TAG);
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> for1_14(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.NAMED_COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.NAMED_COMPOUND_TAG);
     }
 
     public static <C extends ClientboundPacketType> BlockRewriter<C> for1_20_2(final Protocol<C, ?, ?, ?> protocol) {
-        return new BlockRewriter<>(protocol, Type.POSITION1_14, Type.COMPOUND_TAG);
+        return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG);
     }
 
     public void registerBlockAction(C packetType) {
@@ -69,15 +70,15 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             @Override
             public void register() {
                 map(positionType); // Location
-                map(Type.UNSIGNED_BYTE); // Action id
-                map(Type.UNSIGNED_BYTE); // Action param
-                map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
+                map(Types.UNSIGNED_BYTE); // Action id
+                map(Types.UNSIGNED_BYTE); // Action param
+                map(Types.VAR_INT); // Block id - /!\ NOT BLOCK STATE
                 handler(wrapper -> {
                     if (protocol.getMappingData().getBlockMappings() == null) {
                         return;
                     }
 
-                    int id = wrapper.get(Type.VAR_INT, 0);
+                    int id = wrapper.get(Types.VAR_INT, 0);
                     int mappedId = protocol.getMappingData().getNewBlockId(id);
                     if (mappedId == -1) {
                         // Block (action) has been removed
@@ -85,7 +86,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                         return;
                     }
 
-                    wrapper.set(Type.VAR_INT, 0, mappedId);
+                    wrapper.set(Types.VAR_INT, 0, mappedId);
                 });
             }
         });
@@ -96,8 +97,8 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             @Override
             public void register() {
                 map(positionType);
-                map(Type.VAR_INT);
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 0))));
+                map(Types.VAR_INT);
+                handler(wrapper -> wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.VAR_INT, 0))));
             }
         });
     }
@@ -106,10 +107,10 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Chunk X
-                map(Type.INT); // 1 - Chunk Z
+                map(Types.INT); // 0 - Chunk X
+                map(Types.INT); // 1 - Chunk Z
                 handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Type.BLOCK_CHANGE_RECORD_ARRAY)) {
+                    for (BlockChangeRecord record : wrapper.passthrough(Types.BLOCK_CHANGE_ARRAY)) {
                         record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
                     }
                 });
@@ -121,10 +122,10 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.LONG); // Chunk position
-                map(Type.BOOLEAN); // Suppress light updates
+                map(Types.LONG); // Chunk position
+                map(Types.BOOLEAN); // Suppress light updates
                 handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
+                    for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
                         record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
                     }
                 });
@@ -136,9 +137,9 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.LONG); // Chunk position
+                map(Types.LONG); // Chunk position
                 handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY)) {
+                    for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
                         record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
                     }
                 });
@@ -155,16 +156,16 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect Id
+                map(Types.INT); // Effect Id
                 map(positionType); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    int data = wrapper.get(Type.INT, 1);
+                    int id = wrapper.get(Types.INT, 0);
+                    int data = wrapper.get(Types.INT, 1);
                     if (id == playRecordId && protocol.getMappingData().getItemMappings() != null) {
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
                     } else if (id == blockBreakId && protocol.getMappingData().getBlockStateMappings() != null) {
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
             }
@@ -221,12 +222,12 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, wrapper -> {
             final Position position = wrapper.passthrough(positionType);
 
-            final int blockEntityId = wrapper.read(Type.VAR_INT);
+            final int blockEntityId = wrapper.read(Types.VAR_INT);
             final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();
             if (mappings != null) {
-                wrapper.write(Type.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
+                wrapper.write(Types.VAR_INT, mappings.getNewIdOrDefault(blockEntityId, blockEntityId));
             } else {
-                wrapper.write(Type.VAR_INT, blockEntityId);
+                wrapper.write(Types.VAR_INT, blockEntityId);
             }
 
             final CompoundTag tag;

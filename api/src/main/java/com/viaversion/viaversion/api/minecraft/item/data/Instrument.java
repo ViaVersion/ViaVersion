@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 
@@ -33,16 +33,16 @@ public record Instrument(Holder<SoundEvent> soundEvent, int useDuration, float r
     public static final HolderType<Instrument> TYPE = new HolderType<>() {
         @Override
         public Instrument readDirect(final ByteBuf buffer) {
-            final Holder<SoundEvent> soundEvent = Type.SOUND_EVENT.read(buffer);
-            final int useDuration = Type.VAR_INT.readPrimitive(buffer);
+            final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
+            final int useDuration = Types.VAR_INT.readPrimitive(buffer);
             final float range = buffer.readFloat();
             return new Instrument(soundEvent, useDuration, range);
         }
 
         @Override
         public void writeDirect(final ByteBuf buffer, final Instrument value) {
-            Type.SOUND_EVENT.write(buffer, value.soundEvent());
-            Type.VAR_INT.writePrimitive(buffer, value.useDuration());
+            Types.SOUND_EVENT.write(buffer, value.soundEvent());
+            Types.VAR_INT.writePrimitive(buffer, value.useDuration());
             buffer.writeFloat(value.range());
         }
     };

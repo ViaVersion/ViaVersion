@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
@@ -60,8 +61,8 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.COMMAND_SUGGESTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT);
-                map(Type.STRING, new ValueTransformer<>(Type.STRING) {
+                map(Types.VAR_INT);
+                map(Types.STRING, new ValueTransformer<>(Types.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
                         // 1.13 starts sending slash at start, so we remove it for compatibility
@@ -74,14 +75,14 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.ITEM1_13);
-                map(Type.BOOLEAN);
+                map(Types.ITEM1_13);
+                map(Types.BOOLEAN);
                 handler(wrapper -> {
-                    Item item = wrapper.get(Type.ITEM1_13, 0);
+                    Item item = wrapper.get(Types.ITEM1_13, 0);
                     itemRewriter.handleItemToServer(wrapper.user(), item);
                 });
                 handler(wrapper -> {
-                    int hand = wrapper.read(Type.VAR_INT);
+                    int hand = wrapper.read(Types.VAR_INT);
                     if (hand == 1) {
                         wrapper.cancel();
                     }
@@ -92,18 +93,18 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_13.COMMAND_SUGGESTIONS, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Transaction id
-                map(Type.VAR_INT); // Start
-                map(Type.VAR_INT); // Length
-                map(Type.VAR_INT); // Count
+                map(Types.VAR_INT); // Transaction id
+                map(Types.VAR_INT); // Start
+                map(Types.VAR_INT); // Length
+                map(Types.VAR_INT); // Count
                 handler(wrapper -> {
-                    int start = wrapper.get(Type.VAR_INT, 1);
-                    wrapper.set(Type.VAR_INT, 1, start + 1); // Offset by +1 to take into account / at beginning
+                    int start = wrapper.get(Types.VAR_INT, 1);
+                    wrapper.set(Types.VAR_INT, 1, start + 1); // Offset by +1 to take into account / at beginning
                     // Passthrough suggestions
-                    int count = wrapper.get(Type.VAR_INT, 3);
+                    int count = wrapper.get(Types.VAR_INT, 3);
                     for (int i = 0; i < count; i++) {
-                        wrapper.passthrough(Type.STRING);
-                        wrapper.passthrough(Type.OPTIONAL_COMPONENT); // Tooltip
+                        wrapper.passthrough(Types.STRING);
+                        wrapper.passthrough(Types.OPTIONAL_COMPONENT); // Tooltip
                     }
                 });
             }
@@ -112,18 +113,18 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_13.BOSS_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UUID);
-                map(Type.VAR_INT);
+                map(Types.UUID);
+                map(Types.VAR_INT);
                 handler(wrapper -> {
-                    int action = wrapper.get(Type.VAR_INT, 0);
+                    int action = wrapper.get(Types.VAR_INT, 0);
                     if (action == 0) {
-                        wrapper.passthrough(Type.COMPONENT);
-                        wrapper.passthrough(Type.FLOAT);
-                        wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.VAR_INT);
-                        short flags = wrapper.read(Type.BYTE);
+                        wrapper.passthrough(Types.COMPONENT);
+                        wrapper.passthrough(Types.FLOAT);
+                        wrapper.passthrough(Types.VAR_INT);
+                        wrapper.passthrough(Types.VAR_INT);
+                        short flags = wrapper.read(Types.BYTE);
                         if ((flags & 0x02) != 0) flags |= 0x04;
-                        wrapper.write(Type.UNSIGNED_BYTE, flags);
+                        wrapper.write(Types.UNSIGNED_BYTE, flags);
                     }
                 });
             }

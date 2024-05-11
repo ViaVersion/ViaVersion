@@ -26,6 +26,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class BlockEntityType1_20_2 extends Type<BlockEntity> {
@@ -38,8 +39,8 @@ public class BlockEntityType1_20_2 extends Type<BlockEntity> {
     public BlockEntity read(final ByteBuf buffer) {
         final byte xz = buffer.readByte();
         final short y = buffer.readShort();
-        final int typeId = Type.VAR_INT.readPrimitive(buffer);
-        final CompoundTag tag = Type.COMPOUND_TAG.read(buffer);
+        final int typeId = Types.VAR_INT.readPrimitive(buffer);
+        final CompoundTag tag = Types.COMPOUND_TAG.read(buffer);
         return new BlockEntityImpl(xz, y, typeId, tag);
     }
 
@@ -47,7 +48,7 @@ public class BlockEntityType1_20_2 extends Type<BlockEntity> {
     public void write(final ByteBuf buffer, final BlockEntity entity) {
         buffer.writeByte(entity.packedXZ());
         buffer.writeShort(entity.y());
-        Type.VAR_INT.writePrimitive(buffer, entity.typeId());
-        Type.COMPOUND_TAG.write(buffer, entity.tag());
+        Types.VAR_INT.writePrimitive(buffer, entity.typeId());
+        Types.COMPOUND_TAG.write(buffer, entity.tag());
     }
 }

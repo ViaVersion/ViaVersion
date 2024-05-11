@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
@@ -31,17 +32,17 @@ public record AttributeModifier(int attribute, ModifierData modifier, int slotTy
     public static final Type<AttributeModifier> TYPE = new Type<>(AttributeModifier.class) {
         @Override
         public AttributeModifier read(final ByteBuf buffer) {
-            final int attribute = Type.VAR_INT.readPrimitive(buffer);
+            final int attribute = Types.VAR_INT.readPrimitive(buffer);
             final ModifierData modifier = ModifierData.TYPE.read(buffer);
-            final int slot = Type.VAR_INT.readPrimitive(buffer);
+            final int slot = Types.VAR_INT.readPrimitive(buffer);
             return new AttributeModifier(attribute, modifier, slot);
         }
 
         @Override
         public void write(final ByteBuf buffer, final AttributeModifier value) {
-            Type.VAR_INT.writePrimitive(buffer, value.attribute);
+            Types.VAR_INT.writePrimitive(buffer, value.attribute);
             ModifierData.TYPE.write(buffer, value.modifier);
-            Type.VAR_INT.writePrimitive(buffer, value.slotType);
+            Types.VAR_INT.writePrimitive(buffer, value.slotType);
         }
     };
     public static final Type<AttributeModifier[]> ARRAY_TYPE = new ArrayType<>(TYPE);

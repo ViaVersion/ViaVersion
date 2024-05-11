@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.Protocol1_16_1To1_16_2;
@@ -40,34 +41,34 @@ public class EntityPacketRewriter1_16_2 {
         protocol.registerClientbound(ClientboundPackets1_16.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
+                map(Types.INT); // Entity ID
                 handler(wrapper -> {
-                    short gamemode = wrapper.read(Type.UNSIGNED_BYTE);
-                    wrapper.write(Type.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
-                    wrapper.write(Type.BYTE, (byte) (gamemode & ~0x08)); // Gamemode
+                    short gamemode = wrapper.read(Types.UNSIGNED_BYTE);
+                    wrapper.write(Types.BOOLEAN, (gamemode & 0x08) != 0); // Hardcore
+                    wrapper.write(Types.BYTE, (byte) (gamemode & ~0x08)); // Gamemode
                 });
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
                 handler(wrapper -> {
                     // Throw away the old dimension registry, extra conversion would be too hard of a hit
-                    wrapper.read(Type.NAMED_COMPOUND_TAG);
-                    wrapper.write(Type.NAMED_COMPOUND_TAG, protocol.getMappingData().getDimensionRegistry());
+                    wrapper.read(Types.NAMED_COMPOUND_TAG);
+                    wrapper.write(Types.NAMED_COMPOUND_TAG, protocol.getMappingData().getDimensionRegistry());
 
                     // Instead of the dimension's resource key, it now just wants the data directly
-                    String dimensionType = wrapper.read(Type.STRING);
-                    wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
+                    String dimensionType = wrapper.read(Types.STRING);
+                    wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
                 });
-                map(Type.STRING); // Dimension
-                map(Type.LONG); // Seed
-                map(Type.UNSIGNED_BYTE, Type.VAR_INT); // Max players
+                map(Types.STRING); // Dimension
+                map(Types.LONG); // Seed
+                map(Types.UNSIGNED_BYTE, Types.VAR_INT); // Max players
                 // ...
                 handler(metadataRewriter.playerTrackerHandler());
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
-            String dimensionType = wrapper.read(Type.STRING);
-            wrapper.write(Type.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
+            String dimensionType = wrapper.read(Types.STRING);
+            wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
         });
     }
 

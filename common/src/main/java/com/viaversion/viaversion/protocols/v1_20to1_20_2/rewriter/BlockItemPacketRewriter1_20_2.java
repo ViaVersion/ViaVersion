@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
@@ -51,7 +52,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<ClientboundPackets1_19_4, ServerboundPackets1_20_2, Protocol1_20To1_20_2> {
 
     public BlockItemPacketRewriter1_20_2(final Protocol1_20To1_20_2 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -64,29 +65,29 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
         protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON, wrapper -> {
             // Effects start at 1 before 1.20.2
-            if (wrapper.passthrough(Type.BOOLEAN)) { // Primary effect
-                wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
+            if (wrapper.passthrough(Types.BOOLEAN)) { // Primary effect
+                wrapper.write(Types.VAR_INT, wrapper.read(Types.VAR_INT) + 1);
             }
-            if (wrapper.passthrough(Type.BOOLEAN)) { // Secondary effect
-                wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT) + 1);
+            if (wrapper.passthrough(Types.BOOLEAN)) { // Secondary effect
+                wrapper.write(Types.VAR_INT, wrapper.read(Types.VAR_INT) + 1);
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.FORGET_LEVEL_CHUNK, wrapper -> {
-            final int x = wrapper.read(Type.INT);
-            final int z = wrapper.read(Type.INT);
-            wrapper.write(Type.CHUNK_POSITION, new ChunkPosition(x, z));
+            final int x = wrapper.read(Types.INT);
+            final int z = wrapper.read(Types.INT);
+            wrapper.write(Types.CHUNK_POSITION, new ChunkPosition(x, z));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.TAG_QUERY, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Transaction id
-            wrapper.write(Type.COMPOUND_TAG, wrapper.read(Type.NAMED_COMPOUND_TAG));
+            wrapper.passthrough(Types.VAR_INT); // Transaction id
+            wrapper.write(Types.COMPOUND_TAG, wrapper.read(Types.NAMED_COMPOUND_TAG));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.BLOCK_ENTITY_DATA, wrapper -> {
-            wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.VAR_INT); // Type
-            wrapper.write(Type.COMPOUND_TAG, handleBlockEntity(wrapper.read(Type.NAMED_COMPOUND_TAG)));
+            wrapper.passthrough(Types.BLOCK_POSITION1_14); // Position
+            wrapper.passthrough(Types.VAR_INT); // Type
+            wrapper.write(Types.COMPOUND_TAG, handleBlockEntity(wrapper.read(Types.NAMED_COMPOUND_TAG)));
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
@@ -118,68 +119,68 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Window id
-                map(Type.VAR_INT); // State id
+                map(Types.UNSIGNED_BYTE); // Window id
+                map(Types.VAR_INT); // State id
                 handler(wrapper -> {
-                    final Item[] items = wrapper.read(Type.ITEM1_13_2_ARRAY);
+                    final Item[] items = wrapper.read(Types.ITEM1_13_2_ARRAY);
                     for (final Item item : items) {
                         handleItemToClient(wrapper.user(), item);
                     }
-                    wrapper.write(Type.ITEM1_20_2_ARRAY, items);
-                    wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))); // Carried item
+                    wrapper.write(Types.ITEM1_20_2_ARRAY, items);
+                    wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))); // Carried item
                 });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Window id
-                map(Type.VAR_INT); // State id
-                map(Type.SHORT); // Slot id
-                handler(wrapper -> wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))));
+                map(Types.UNSIGNED_BYTE); // Window id
+                map(Types.VAR_INT); // State id
+                map(Types.SHORT); // Slot id
+                handler(wrapper -> wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.UPDATE_ADVANCEMENTS, wrapper -> {
-            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            final int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            final int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.STRING); // Identifier
-                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
 
                 // Display data
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.COMPONENT); // Title
-                    wrapper.passthrough(Type.COMPONENT); // Description
-                    wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))); // Icon
-                    wrapper.passthrough(Type.VAR_INT); // Frame type
-                    final int flags = wrapper.passthrough(Type.INT); // Flags
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.COMPONENT); // Title
+                    wrapper.passthrough(Types.COMPONENT); // Description
+                    wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))); // Icon
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    final int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
-                        wrapper.passthrough(Type.STRING); // Background texture
+                        wrapper.passthrough(Types.STRING); // Background texture
                     }
-                    wrapper.passthrough(Type.FLOAT); // X
-                    wrapper.passthrough(Type.FLOAT); // Y
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
                 }
 
                 // Remove criterion triggers
-                wrapper.read(Type.STRING_ARRAY); // Criteria
+                wrapper.read(Types.STRING_ARRAY); // Criteria
 
-                final int requirements = wrapper.passthrough(Type.VAR_INT);
+                final int requirements = wrapper.passthrough(Types.VAR_INT);
                 for (int array = 0; array < requirements; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY);
+                    wrapper.passthrough(Types.STRING_ARRAY);
                 }
 
-                wrapper.passthrough(Type.BOOLEAN); // Send telemetry
+                wrapper.passthrough(Types.BOOLEAN); // Send telemetry
             }
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
+                map(Types.VAR_INT); // 0 - Entity ID
                 handler(wrapper -> {
                     byte slot;
                     do {
-                        slot = wrapper.passthrough(Type.BYTE);
-                        wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2)));
+                        slot = wrapper.passthrough(Types.BYTE);
+                        wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2)));
                     } while ((slot & 0xFFFFFF80) != 0);
                 });
             }
@@ -187,71 +188,71 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerServerbound(ServerboundPackets1_20_2.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Window Id
-                map(Type.VAR_INT); // State id
-                map(Type.SHORT); // Slot
-                map(Type.BYTE); // Button
-                map(Type.VAR_INT); // Mode
+                map(Types.UNSIGNED_BYTE); // Window Id
+                map(Types.VAR_INT); // State id
+                map(Types.SHORT); // Slot
+                map(Types.BYTE); // Button
+                map(Types.VAR_INT); // Mode
 
                 handler(wrapper -> {
                     // Affected items
-                    final int length = wrapper.passthrough(Type.VAR_INT);
+                    final int length = wrapper.passthrough(Types.VAR_INT);
                     for (int i = 0; i < length; i++) {
-                        wrapper.passthrough(Type.SHORT); // Slot
-                        wrapper.write(Type.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Type.ITEM1_20_2)));
+                        wrapper.passthrough(Types.SHORT); // Slot
+                        wrapper.write(Types.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Types.ITEM1_20_2)));
                     }
 
                     // Carried item
-                    wrapper.write(Type.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Type.ITEM1_20_2)));
+                    wrapper.write(Types.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Types.ITEM1_20_2)));
                 });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.MERCHANT_OFFERS, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Container id
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT); // Container id
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))); // Input
-                wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))); // Output
-                wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2))); // Second Item
+                wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))); // Input
+                wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))); // Output
+                wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2))); // Second Item
 
-                wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                wrapper.passthrough(Type.INT); // Number of tools uses
-                wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                wrapper.passthrough(Types.BOOLEAN); // Trade disabled
+                wrapper.passthrough(Types.INT); // Number of tools uses
+                wrapper.passthrough(Types.INT); // Maximum number of trade uses
 
-                wrapper.passthrough(Type.INT); // XP
-                wrapper.passthrough(Type.INT); // Special price
-                wrapper.passthrough(Type.FLOAT); // Price multiplier
-                wrapper.passthrough(Type.INT); // Demand
+                wrapper.passthrough(Types.INT); // XP
+                wrapper.passthrough(Types.INT); // Special price
+                wrapper.passthrough(Types.FLOAT); // Price multiplier
+                wrapper.passthrough(Types.INT); // Demand
             }
         });
         protocol.registerServerbound(ServerboundPackets1_20_2.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // 0 - Slot
-                handler(wrapper -> wrapper.write(Type.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Type.ITEM1_20_2)))); // 1 - Clicked Item
+                map(Types.SHORT); // 0 - Slot
+                handler(wrapper -> wrapper.write(Types.ITEM1_13_2, handleItemToServer(wrapper.user(), wrapper.read(Types.ITEM1_20_2)))); // 1 - Clicked Item
             }
         });
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.VAR_INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    final int id = wrapper.get(Type.VAR_INT, 0);
+                    final int id = wrapper.get(Types.VAR_INT, 0);
                     final ParticleMappings mappings = Protocol1_20To1_20_2.MAPPINGS.getParticleMappings();
                     if (mappings.isBlockParticle(id)) {
-                        final int data = wrapper.read(Type.VAR_INT);
-                        wrapper.write(Type.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
+                        final int data = wrapper.read(Types.VAR_INT);
+                        wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (mappings.isItemParticle(id)) {
-                        wrapper.write(Type.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_13_2)));
+                        wrapper.write(Types.ITEM1_20_2, handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_13_2)));
                     }
                 });
             }
@@ -260,53 +261,53 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         new RecipeRewriter1_19_4<>(protocol) {
             @Override
             public void handleCraftingShapeless(final PacketWrapper wrapper) {
-                wrapper.passthrough(Type.STRING); // Group
-                wrapper.passthrough(Type.VAR_INT); // Crafting book category
+                wrapper.passthrough(Types.STRING); // Group
+                wrapper.passthrough(Types.VAR_INT); // Crafting book category
                 handleIngredients(wrapper);
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
             }
 
             @Override
             public void handleSmelting(final PacketWrapper wrapper) {
-                wrapper.passthrough(Type.STRING); // Group
-                wrapper.passthrough(Type.VAR_INT); // Crafting book category
+                wrapper.passthrough(Types.STRING); // Group
+                wrapper.passthrough(Types.VAR_INT); // Crafting book category
                 handleIngredient(wrapper);
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
 
-                wrapper.passthrough(Type.FLOAT); // EXP
-                wrapper.passthrough(Type.VAR_INT); // Cooking time
+                wrapper.passthrough(Types.FLOAT); // EXP
+                wrapper.passthrough(Types.VAR_INT); // Cooking time
             }
 
             @Override
             public void handleCraftingShaped(final PacketWrapper wrapper) {
-                final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                wrapper.passthrough(Type.STRING); // Group
-                wrapper.passthrough(Type.VAR_INT); // Crafting book category
+                final int ingredients = wrapper.passthrough(Types.VAR_INT) * wrapper.passthrough(Types.VAR_INT);
+                wrapper.passthrough(Types.STRING); // Group
+                wrapper.passthrough(Types.VAR_INT); // Crafting book category
                 for (int i = 0; i < ingredients; i++) {
                     handleIngredient(wrapper);
                 }
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
 
-                wrapper.passthrough(Type.BOOLEAN); // Show notification
+                wrapper.passthrough(Types.BOOLEAN); // Show notification
             }
 
             @Override
             public void handleStonecutting(final PacketWrapper wrapper) {
-                wrapper.passthrough(Type.STRING); // Group
+                wrapper.passthrough(Types.STRING); // Group
                 handleIngredient(wrapper);
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
             }
 
             @Override
@@ -316,7 +317,7 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
             }
 
             @Override
@@ -327,13 +328,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
 
                 final Item result = wrapper.read(itemType());
                 rewrite(wrapper.user(), result);
-                wrapper.write(Type.ITEM1_20_2, result);
+                wrapper.write(Types.ITEM1_20_2, result);
             }
 
             @Override
             protected void handleIngredient(final PacketWrapper wrapper) {
                 final Item[] items = wrapper.read(itemArrayType());
-                wrapper.write(Type.ITEM1_20_2_ARRAY, items);
+                wrapper.write(Types.ITEM1_20_2_ARRAY, items);
                 for (final Item item : items) {
                     rewrite(wrapper.user(), item);
                 }

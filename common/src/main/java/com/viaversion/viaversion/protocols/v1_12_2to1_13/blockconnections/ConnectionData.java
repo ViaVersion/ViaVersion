@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
@@ -89,8 +90,8 @@ public final class ConnectionData {
             updateBlockStorage(user, pos.x(), pos.y(), pos.z(), newBlockState);
 
             PacketWrapper blockUpdatePacket = PacketWrapper.create(ClientboundPackets1_13.BLOCK_UPDATE, null, user);
-            blockUpdatePacket.write(Type.POSITION1_8, pos);
-            blockUpdatePacket.write(Type.VAR_INT, newBlockState);
+            blockUpdatePacket.write(Types.BLOCK_POSITION1_8, pos);
+            blockUpdatePacket.write(Types.VAR_INT, newBlockState);
             blockUpdatePacket.send(Protocol1_12_2To1_13.class);
         }
     }
@@ -720,9 +721,9 @@ public final class ConnectionData {
 
                     if (!updates.isEmpty()) {
                         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE, null, user);
-                        wrapper.write(Type.INT, chunkX + chunkDeltaX);
-                        wrapper.write(Type.INT, chunkZ + chunkDeltaZ);
-                        wrapper.write(Type.BLOCK_CHANGE_RECORD_ARRAY, updates.toArray(EMPTY_RECORDS));
+                        wrapper.write(Types.INT, chunkX + chunkDeltaX);
+                        wrapper.write(Types.INT, chunkZ + chunkDeltaZ);
+                        wrapper.write(Types.BLOCK_CHANGE_ARRAY, updates.toArray(EMPTY_RECORDS));
                         wrapper.send(Protocol1_12_2To1_13.class);
                         updates.clear();
                     }

@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
@@ -43,7 +44,7 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(Types1_14.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.blockStateType, Types1_14.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.optionalBlockStateType, Types1_14.META_TYPES.particleType);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
         filter().type(EntityTypes1_14.LIVING_ENTITY).addIndex(12);
@@ -112,9 +113,9 @@ public class MetadataRewriter1_14To1_13_2 extends EntityRewriter<ClientboundPack
             }
 
             PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.SET_EQUIPPED_ITEM, null, event.user());
-            equipmentPacket.write(Type.VAR_INT, event.entityId());
-            equipmentPacket.write(Type.VAR_INT, 4);
-            equipmentPacket.write(Type.ITEM1_13_2, armorItem);
+            equipmentPacket.write(Types.VAR_INT, event.entityId());
+            equipmentPacket.write(Types.VAR_INT, 4);
+            equipmentPacket.write(Types.ITEM1_13_2, armorItem);
             try {
                 equipmentPacket.scheduleSend(Protocol1_13_2To1_14.class);
             } catch (final Exception e) {

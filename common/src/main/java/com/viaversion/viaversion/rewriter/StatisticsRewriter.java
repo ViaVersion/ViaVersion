@@ -20,7 +20,7 @@ package com.viaversion.viaversion.rewriter;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StatisticsRewriter<C extends ClientboundPacketType> {
@@ -33,12 +33,12 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
 
     public void register(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Types.VAR_INT);
             int newSize = size;
             for (int i = 0; i < size; i++) {
-                int categoryId = wrapper.read(Type.VAR_INT);
-                int statisticId = wrapper.read(Type.VAR_INT);
-                int value = wrapper.read(Type.VAR_INT);
+                int categoryId = wrapper.read(Types.VAR_INT);
+                int statisticId = wrapper.read(Types.VAR_INT);
+                int value = wrapper.read(Types.VAR_INT);
                 if (categoryId == CUSTOM_STATS_CATEGORY && protocol.getMappingData().getStatisticsMappings() != null) {
                     // Rewrite custom statistics id
                     statisticId = protocol.getMappingData().getStatisticsMappings().getNewId(statisticId);
@@ -56,13 +56,13 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
                     }
                 }
 
-                wrapper.write(Type.VAR_INT, categoryId);
-                wrapper.write(Type.VAR_INT, statisticId);
-                wrapper.write(Type.VAR_INT, value);
+                wrapper.write(Types.VAR_INT, categoryId);
+                wrapper.write(Types.VAR_INT, statisticId);
+                wrapper.write(Types.VAR_INT, value);
             }
 
             if (newSize != size) {
-                wrapper.set(Type.VAR_INT, 0, newSize);
+                wrapper.set(Types.VAR_INT, 0, newSize);
             }
         });
     }

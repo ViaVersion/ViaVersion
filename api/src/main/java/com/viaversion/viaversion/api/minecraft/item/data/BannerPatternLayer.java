@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
@@ -33,14 +34,14 @@ public record BannerPatternLayer(Holder<BannerPattern> pattern, int dyeColor) {
         @Override
         public BannerPatternLayer read(final ByteBuf buffer) {
             final Holder<BannerPattern> pattern = BannerPattern.TYPE.read(buffer);
-            final int color = Type.VAR_INT.readPrimitive(buffer);
+            final int color = Types.VAR_INT.readPrimitive(buffer);
             return new BannerPatternLayer(pattern, color);
         }
 
         @Override
         public void write(final ByteBuf buffer, final BannerPatternLayer value) {
             BannerPattern.TYPE.write(buffer, value.pattern);
-            Type.VAR_INT.writePrimitive(buffer, value.dyeColor);
+            Types.VAR_INT.writePrimitive(buffer, value.dyeColor);
         }
     };
     public static final Type<BannerPatternLayer[]> ARRAY_TYPE = new ArrayType<>(TYPE);

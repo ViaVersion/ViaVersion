@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.DimensionDataImpl;
@@ -66,25 +67,25 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.UUID); // Entity UUID
-                map(Type.VAR_INT); // Entity type
-                map(Type.DOUBLE); // X
-                map(Type.DOUBLE); // Y
-                map(Type.DOUBLE); // Z
-                map(Type.BYTE); // Pitch
-                map(Type.BYTE); // Yaw
+                map(Types.VAR_INT); // Entity id
+                map(Types.UUID); // Entity UUID
+                map(Types.VAR_INT); // Entity type
+                map(Types.DOUBLE); // X
+                map(Types.DOUBLE); // Y
+                map(Types.DOUBLE); // Z
+                map(Types.BYTE); // Pitch
+                map(Types.BYTE); // Yaw
                 handler(wrapper -> {
-                    final byte yaw = wrapper.get(Type.BYTE, 1);
-                    wrapper.write(Type.BYTE, yaw); // Head yaw
+                    final byte yaw = wrapper.get(Types.BYTE, 1);
+                    wrapper.write(Types.BYTE, yaw); // Head yaw
                 });
-                map(Type.INT, Type.VAR_INT); // Data
+                map(Types.INT, Types.VAR_INT); // Data
                 handler(trackerHandler());
                 handler(wrapper -> {
-                    final int entityId = wrapper.get(Type.VAR_INT, 0);
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
                     final EntityType entityType = tracker(wrapper.user()).entityType(entityId);
                     if (entityType == EntityTypes1_19.FALLING_BLOCK) {
-                        wrapper.set(Type.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.VAR_INT, 2)));
+                        wrapper.set(Types.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.VAR_INT, 2)));
                     }
                 });
             }
@@ -93,31 +94,31 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_18.ADD_PAINTING, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.UUID); // Entity UUID
+                map(Types.VAR_INT); // Entity id
+                map(Types.UUID); // Entity UUID
                 handler(wrapper -> {
-                    wrapper.write(Type.VAR_INT, EntityTypes1_19.PAINTING.getId());
+                    wrapper.write(Types.VAR_INT, EntityTypes1_19.PAINTING.getId());
 
-                    final int motive = wrapper.read(Type.VAR_INT);
-                    final Position blockPosition = wrapper.read(Type.POSITION1_14);
-                    final byte direction = wrapper.read(Type.BYTE);
-                    wrapper.write(Type.DOUBLE, blockPosition.x() + 0.5d);
-                    wrapper.write(Type.DOUBLE, blockPosition.y() + 0.5d);
-                    wrapper.write(Type.DOUBLE, blockPosition.z() + 0.5d);
-                    wrapper.write(Type.BYTE, (byte) 0); // Pitch
-                    wrapper.write(Type.BYTE, (byte) 0); // Yaw
-                    wrapper.write(Type.BYTE, (byte) 0); // Head yaw
-                    wrapper.write(Type.VAR_INT, to3dId(direction)); // Data
-                    wrapper.write(Type.SHORT, (short) 0); // Velocity x
-                    wrapper.write(Type.SHORT, (short) 0); // Velocity y
-                    wrapper.write(Type.SHORT, (short) 0); // Velocity z
+                    final int motive = wrapper.read(Types.VAR_INT);
+                    final Position blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
+                    final byte direction = wrapper.read(Types.BYTE);
+                    wrapper.write(Types.DOUBLE, blockPosition.x() + 0.5d);
+                    wrapper.write(Types.DOUBLE, blockPosition.y() + 0.5d);
+                    wrapper.write(Types.DOUBLE, blockPosition.z() + 0.5d);
+                    wrapper.write(Types.BYTE, (byte) 0); // Pitch
+                    wrapper.write(Types.BYTE, (byte) 0); // Yaw
+                    wrapper.write(Types.BYTE, (byte) 0); // Head yaw
+                    wrapper.write(Types.VAR_INT, to3dId(direction)); // Data
+                    wrapper.write(Types.SHORT, (short) 0); // Velocity x
+                    wrapper.write(Types.SHORT, (short) 0); // Velocity y
+                    wrapper.write(Types.SHORT, (short) 0); // Velocity z
 
                     wrapper.send(Protocol1_18_2To1_19.class);
                     wrapper.cancel();
 
                     // Send motive in metadata
                     final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
-                    metaPacket.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0)); // Entity id
+                    metaPacket.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0)); // Entity id
                     final List<Metadata> metadata = new ArrayList<>();
                     metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
                     metaPacket.write(Types1_19.METADATA_LIST, metadata);
@@ -129,24 +130,24 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_18.ADD_MOB, ClientboundPackets1_19.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity ID
-                map(Type.UUID); // Entity UUID
-                map(Type.VAR_INT); // Entity Type
-                map(Type.DOUBLE); // X
-                map(Type.DOUBLE); // Y
-                map(Type.DOUBLE); // Z
+                map(Types.VAR_INT); // Entity ID
+                map(Types.UUID); // Entity UUID
+                map(Types.VAR_INT); // Entity Type
+                map(Types.DOUBLE); // X
+                map(Types.DOUBLE); // Y
+                map(Types.DOUBLE); // Z
                 handler(wrapper -> {
                     // Change order
-                    final byte yaw = wrapper.read(Type.BYTE);
-                    final byte pitch = wrapper.read(Type.BYTE);
-                    wrapper.write(Type.BYTE, pitch);
-                    wrapper.write(Type.BYTE, yaw);
+                    final byte yaw = wrapper.read(Types.BYTE);
+                    final byte pitch = wrapper.read(Types.BYTE);
+                    wrapper.write(Types.BYTE, pitch);
+                    wrapper.write(Types.BYTE, yaw);
                 });
-                map(Type.BYTE); // Head yaw
-                create(Type.VAR_INT, 0); // Data
-                map(Type.SHORT); // Velocity x
-                map(Type.SHORT); // Velocity y
-                map(Type.SHORT); // Velocity z
+                map(Types.BYTE); // Head yaw
+                create(Types.VAR_INT, 0); // Data
+                map(Types.SHORT); // Velocity x
+                map(Types.SHORT); // Velocity y
+                map(Types.SHORT); // Velocity z
                 handler(trackerHandler());
             }
         });
@@ -154,26 +155,26 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_18.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.VAR_INT); // Effect id
-                map(Type.BYTE); // Amplifier
-                map(Type.VAR_INT); // Duration
-                map(Type.BYTE); // Flags
-                create(Type.OPTIONAL_NAMED_COMPOUND_TAG, null); // No factor data
+                map(Types.VAR_INT); // Entity id
+                map(Types.VAR_INT); // Effect id
+                map(Types.BYTE); // Amplifier
+                map(Types.VAR_INT); // Duration
+                map(Types.BYTE); // Flags
+                create(Types.OPTIONAL_NAMED_COMPOUND_TAG, null); // No factor data
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_18.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Registry
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Registry
                 handler(wrapper -> {
-                    final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    final CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
 
                     // Add necessary chat types
                     tag.put("minecraft:chat_type", protocol.getMappingData().chatRegistry());
@@ -196,23 +197,23 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                     registryStorage.setDimensions(dimensionsMap);
                     writeDimensionKey(wrapper, registryStorage);
                 });
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.VAR_INT); // Max players
-                map(Type.VAR_INT); // Chunk radius
-                map(Type.VAR_INT); // Simulation distance
-                map(Type.BOOLEAN); // Reduced debug info
-                map(Type.BOOLEAN); // Show death screen
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
-                create(Type.OPTIONAL_GLOBAL_POSITION, null); // Last death location
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.VAR_INT); // Max players
+                map(Types.VAR_INT); // Chunk radius
+                map(Types.VAR_INT); // Simulation distance
+                map(Types.BOOLEAN); // Reduced debug info
+                map(Types.BOOLEAN); // Show death screen
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
+                create(Types.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(playerTrackerHandler());
                 handler(worldDataTrackerHandlerByKey());
                 handler(biomeSizeTracker());
                 handler(wrapper -> {
                     // Disable the chat preview
                     final PacketWrapper displayPreviewPacket = wrapper.create(ClientboundPackets1_19.SET_DISPLAY_CHAT_PREVIEW);
-                    displayPreviewPacket.write(Type.BOOLEAN, false);
+                    displayPreviewPacket.write(Types.BOOLEAN, false);
                     displayPreviewPacket.scheduleSend(Protocol1_18_2To1_19.class);
                 });
             }
@@ -221,52 +222,52 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
             @Override
             public void register() {
                 handler(wrapper -> writeDimensionKey(wrapper, wrapper.user().get(DimensionRegistryStorage.class)));
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.UNSIGNED_BYTE); // Gamemode
-                map(Type.BYTE); // Previous gamemode
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
-                map(Type.BOOLEAN); // Keep player data
-                create(Type.OPTIONAL_GLOBAL_POSITION, null); // Last death location
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.UNSIGNED_BYTE); // Gamemode
+                map(Types.BYTE); // Previous gamemode
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
+                map(Types.BOOLEAN); // Keep player data
+                create(Types.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(worldDataTrackerHandlerByKey());
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_18.PLAYER_INFO, wrapper -> {
-            final int action = wrapper.passthrough(Type.VAR_INT);
-            final int entries = wrapper.passthrough(Type.VAR_INT);
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
-                wrapper.passthrough(Type.UUID); // UUID
+                wrapper.passthrough(Types.UUID); // UUID
                 if (action == 0) { // Add player
-                    wrapper.passthrough(Type.STRING); // Player Name
+                    wrapper.passthrough(Types.STRING); // Player Name
 
-                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
                     for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Type.STRING); // Name
-                        wrapper.passthrough(Type.STRING); // Value
-                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
                     }
 
-                    wrapper.passthrough(Type.VAR_INT); // Gamemode
-                    wrapper.passthrough(Type.VAR_INT); // Ping
-                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                    wrapper.passthrough(Types.VAR_INT); // Ping
+                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
                     if (!Protocol1_18_2To1_19.isTextComponentNull(displayName)) {
-                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
                     } else {
-                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
                     }
 
                     // No public profile signature
-                    wrapper.write(Type.OPTIONAL_PROFILE_KEY, null);
+                    wrapper.write(Types.OPTIONAL_PROFILE_KEY, null);
                 } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                    wrapper.passthrough(Type.VAR_INT);
+                    wrapper.passthrough(Types.VAR_INT);
                 } else if (action == 3) { // Update display name
-                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT); // Display name
+                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT); // Display name
                     if (!Protocol1_18_2To1_19.isTextComponentNull(displayName)) {
-                        wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                        wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
                     } else {
-                        wrapper.write(Type.OPTIONAL_COMPONENT, null);
+                        wrapper.write(Types.OPTIONAL_COMPONENT, null);
                     }
                 }
             }
@@ -275,7 +276,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
 
     private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) {
         // Find dimension key by data
-        final CompoundTag currentDimension = wrapper.read(Type.NAMED_COMPOUND_TAG);
+        final CompoundTag currentDimension = wrapper.read(Types.NAMED_COMPOUND_TAG);
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
@@ -294,7 +295,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                     .key().getValue();
         }
 
-        wrapper.write(Type.STRING, dimensionKey);
+        wrapper.write(Types.STRING, dimensionKey);
     }
 
     private static int to3dId(final int id) {
@@ -327,14 +328,14 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                 final String resourceLocation = Key.stripMinecraftNamespace(particle.<String>getArgument(0).getValue());
                 if (resourceLocation.equals("entity")) {
                     // Add Y offset
-                    particle.getArguments().add(2, new Particle.ParticleData<>(Type.FLOAT, 0F));
+                    particle.getArguments().add(2, new Particle.ParticleData<>(Types.FLOAT, 0F));
                 }
             }
 
             rewriteParticle(event.user(), particle);
         });
 
-        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.blockStateType, null);
+        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.optionalBlockStateType, null);
 
         filter().type(EntityTypes1_19.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             // Convert to new block id

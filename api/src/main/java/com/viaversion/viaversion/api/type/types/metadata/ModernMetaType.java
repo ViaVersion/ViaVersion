@@ -24,7 +24,7 @@ package com.viaversion.viaversion.api.type.types.metadata;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public abstract class ModernMetaType extends MetaTypeTemplate {
@@ -34,7 +34,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
     public Metadata read(final ByteBuf buffer) {
         final short index = buffer.readUnsignedByte();
         if (index == END) return null; // End of metadata
-        final MetaType type = this.getType(Type.VAR_INT.readPrimitive(buffer));
+        final MetaType type = this.getType(Types.VAR_INT.readPrimitive(buffer));
         return new Metadata(index, type, type.type().read(buffer));
     }
 
@@ -47,7 +47,7 @@ public abstract class ModernMetaType extends MetaTypeTemplate {
         } else {
             buffer.writeByte(object.id());
             final MetaType type = object.metaType();
-            Type.VAR_INT.writePrimitive(buffer, type.typeId());
+            Types.VAR_INT.writePrimitive(buffer, type.typeId());
             type.type().write(buffer, object.getValue());
         }
     }

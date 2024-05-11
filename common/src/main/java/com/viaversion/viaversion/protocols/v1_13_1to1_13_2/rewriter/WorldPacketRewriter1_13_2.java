@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_13_1to1_13_2.rewriter;
 
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.Protocol1_13_1To1_13_2;
 
@@ -28,20 +29,20 @@ public class WorldPacketRewriter1_13_2 {
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT); // 2 - X
-                map(Type.FLOAT); // 3 - Y
-                map(Type.FLOAT); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.FLOAT); // 2 - X
+                map(Types.FLOAT); // 3 - Y
+                map(Types.FLOAT); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
+                    int id = wrapper.get(Types.INT, 0);
                     if (id == 27) {
-                        wrapper.write(Type.ITEM1_13_2, wrapper.read(Type.ITEM1_13));
+                        wrapper.write(Types.ITEM1_13_2, wrapper.read(Types.ITEM1_13));
                     }
                 });
             }

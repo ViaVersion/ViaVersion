@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
@@ -40,7 +40,7 @@ public class MovementTransmitterProvider implements Provider {
 
         try {
             final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY, userConnection);
-            playerMovement.write(Type.BOOLEAN, movementTracker.isGround()); // on ground
+            playerMovement.write(Types.BOOLEAN, movementTracker.isGround()); // on ground
             playerMovement.scheduleSendToServer(Protocol1_8To1_9.class);
         } catch (Throwable e) {
             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send player movement packet", e);

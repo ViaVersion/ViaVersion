@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 
@@ -62,7 +63,7 @@ public class CompoundTagType extends Type<CompoundTag> {
     public static final class OptionalCompoundTagType extends OptionalType<CompoundTag> {
 
         public OptionalCompoundTagType() {
-            super(Type.COMPOUND_TAG);
+            super(Types.COMPOUND_TAG);
         }
     }
 }

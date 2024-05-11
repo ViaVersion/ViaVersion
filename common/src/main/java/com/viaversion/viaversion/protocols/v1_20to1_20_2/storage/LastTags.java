@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundConfigurationPackets1_20_2;
 import java.util.ArrayList;
@@ -32,14 +33,14 @@ public class LastTags implements StorableObject {
     private final List<RegistryTags> registryTags = new ArrayList<>();
 
     public LastTags(final PacketWrapper wrapper) {
-        final int length = wrapper.passthrough(Type.VAR_INT);
+        final int length = wrapper.passthrough(Types.VAR_INT);
         for (int i = 0; i < length; i++) {
             final List<Tag> tags = new ArrayList<>();
-            final String registryKey = wrapper.passthrough(Type.STRING);
-            final int tagsSize = wrapper.passthrough(Type.VAR_INT);
+            final String registryKey = wrapper.passthrough(Types.STRING);
+            final int tagsSize = wrapper.passthrough(Types.VAR_INT);
             for (int j = 0; j < tagsSize; j++) {
-                final String key = wrapper.passthrough(Type.STRING);
-                final int[] ids = wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE);
+                final String key = wrapper.passthrough(Types.STRING);
+                final int[] ids = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
                 tags.add(new Tag(key, ids));
             }
 
@@ -53,13 +54,13 @@ public class LastTags implements StorableObject {
         }
 
         final PacketWrapper packet = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, connection);
-        packet.write(Type.VAR_INT, registryTags.size());
+        packet.write(Types.VAR_INT, registryTags.size());
         for (final RegistryTags registryTag : registryTags) {
-            packet.write(Type.STRING, registryTag.registryKey);
-            packet.write(Type.VAR_INT, registryTag.tags.size());
+            packet.write(Types.STRING, registryTag.registryKey);
+            packet.write(Types.VAR_INT, registryTag.tags.size());
             for (final Tag tag : registryTag.tags) {
-                packet.write(Type.STRING, tag.key);
-                packet.write(Type.VAR_INT_ARRAY_PRIMITIVE, Arrays.copyOf(tag.ids, tag.ids.length));
+                packet.write(Types.STRING, tag.key);
+                packet.write(Types.VAR_INT_ARRAY_PRIMITIVE, Arrays.copyOf(tag.ids, tag.ids.length));
             }
         }
         packet.send(Protocol1_20To1_20_2.class);

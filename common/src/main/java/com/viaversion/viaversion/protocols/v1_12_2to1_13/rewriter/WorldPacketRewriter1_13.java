@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
@@ -80,19 +81,19 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.ADD_PAINTING, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Entity UUID
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
 
                 handler(wrapper -> {
                     PaintingProvider provider = Via.getManager().getProviders().get(PaintingProvider.class);
-                    String motive = wrapper.read(Type.STRING);
+                    String motive = wrapper.read(Types.STRING);
 
                     Optional<Integer> id = provider.getIntByIdentifier(motive);
 
                     if (id.isEmpty() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
                         Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
                     }
-                    wrapper.write(Type.VAR_INT, id.orElse(0));
+                    wrapper.write(Types.VAR_INT, id.orElse(0));
                 });
             }
         });
@@ -100,14 +101,14 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8); // 0 - Location
-                map(Type.UNSIGNED_BYTE); // 1 - Action
-                map(Type.NAMED_COMPOUND_TAG); // 2 - NBT data
+                map(Types.BLOCK_POSITION1_8); // 0 - Location
+                map(Types.UNSIGNED_BYTE); // 1 - Action
+                map(Types.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION1_8, 0);
-                    short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    Position position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    short action = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
 
                     BlockEntityProvider provider = Via.getManager().getProviders().get(BlockEntityProvider.class);
                     int newId = provider.transform(wrapper.user(), position, tag, true);
@@ -130,15 +131,15 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8); // Location
-                map(Type.UNSIGNED_BYTE); // Action Id
-                map(Type.UNSIGNED_BYTE); // Action param
-                map(Type.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
+                map(Types.BLOCK_POSITION1_8); // Location
+                map(Types.UNSIGNED_BYTE); // Action Id
+                map(Types.UNSIGNED_BYTE); // Action param
+                map(Types.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
                 handler(wrapper -> {
-                    Position pos = wrapper.get(Type.POSITION1_8, 0);
-                    short action = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    short param = wrapper.get(Type.UNSIGNED_BYTE, 1);
-                    int blockId = wrapper.get(Type.VAR_INT, 0);
+                    Position pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    short action = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    short param = wrapper.get(Types.UNSIGNED_BYTE, 1);
+                    int blockId = wrapper.get(Types.VAR_INT, 0);
 
                     if (blockId == 25)
                         blockId = 73;
@@ -163,11 +164,11 @@ public class WorldPacketRewriter1_13 {
 
                     if (blockId == 73) { // Note block
                         PacketWrapper blockChange = wrapper.create(ClientboundPackets1_13.BLOCK_UPDATE);
-                        blockChange.write(Type.POSITION1_8, pos);
-                        blockChange.write(Type.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
+                        blockChange.write(Types.BLOCK_POSITION1_8, pos);
+                        blockChange.write(Types.VAR_INT, 249 + (action * 24 * 2) + (param * 2));
                         blockChange.send(Protocol1_12_2To1_13.class);
                     }
-                    wrapper.set(Type.VAR_INT, 0, blockId);
+                    wrapper.set(Types.VAR_INT, 0, blockId);
                 });
             }
         });
@@ -175,11 +176,11 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8);
-                map(Type.VAR_INT);
+                map(Types.BLOCK_POSITION1_8);
+                map(Types.VAR_INT);
                 handler(wrapper -> {
-                    Position position = wrapper.get(Type.POSITION1_8, 0);
-                    int newId = toNewId(wrapper.get(Type.VAR_INT, 0));
+                    Position position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    int newId = toNewId(wrapper.get(Types.VAR_INT, 0));
 
                     UserConnection userConnection = wrapper.user();
                     if (Via.getConfig().isServersideBlockConnections()) {
@@ -187,7 +188,7 @@ public class WorldPacketRewriter1_13 {
                         ConnectionData.updateBlockStorage(userConnection, position.x(), position.y(), position.z(), newId);
                     }
 
-                    wrapper.set(Type.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
+                    wrapper.set(Types.VAR_INT, 0, checkStorage(wrapper.user(), position, newId));
 
                     if (Via.getConfig().isServersideBlockConnections()) {
                         // Workaround for packet order issue
@@ -202,14 +203,14 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Chunk X
-                map(Type.INT); // 1 - Chunk Z
-                map(Type.BLOCK_CHANGE_RECORD_ARRAY); // 2 - Records
+                map(Types.INT); // 0 - Chunk X
+                map(Types.INT); // 1 - Chunk Z
+                map(Types.BLOCK_CHANGE_ARRAY); // 2 - Records
                 handler(wrapper -> {
-                    int chunkX = wrapper.get(Type.INT, 0);
-                    int chunkZ = wrapper.get(Type.INT, 1);
+                    int chunkX = wrapper.get(Types.INT, 0);
+                    int chunkZ = wrapper.get(Types.INT, 1);
                     UserConnection userConnection = wrapper.user();
-                    BlockChangeRecord[] records = wrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0);
+                    BlockChangeRecord[] records = wrapper.get(Types.BLOCK_CHANGE_ARRAY, 0);
                     // Convert ids
                     for (BlockChangeRecord record : records) {
                         int newBlock = toNewId(record.getBlockId());
@@ -264,25 +265,25 @@ public class WorldPacketRewriter1_13 {
                     return;
                 }
 
-                map(Type.FLOAT); // X
-                map(Type.FLOAT); // Y
-                map(Type.FLOAT); // Z
-                map(Type.FLOAT); // Radius
-                map(Type.INT); // Record Count
+                map(Types.FLOAT); // X
+                map(Types.FLOAT); // Y
+                map(Types.FLOAT); // Z
+                map(Types.FLOAT); // Radius
+                map(Types.INT); // Record Count
 
                 handler(wrapper -> {
                     UserConnection userConnection = wrapper.user();
-                    int x = (int) Math.floor(wrapper.get(Type.FLOAT, 0));
-                    int y = (int) Math.floor(wrapper.get(Type.FLOAT, 1));
-                    int z = (int) Math.floor(wrapper.get(Type.FLOAT, 2));
-                    int recordCount = wrapper.get(Type.INT, 0);
+                    int x = (int) Math.floor(wrapper.get(Types.FLOAT, 0));
+                    int y = (int) Math.floor(wrapper.get(Types.FLOAT, 1));
+                    int z = (int) Math.floor(wrapper.get(Types.FLOAT, 2));
+                    int recordCount = wrapper.get(Types.INT, 0);
                     Position[] records = new Position[recordCount];
 
                     for (int i = 0; i < recordCount; i++) {
                         Position position = new Position(
-                                x + wrapper.passthrough(Type.BYTE),
-                                (short) (y + wrapper.passthrough(Type.BYTE)),
-                                z + wrapper.passthrough(Type.BYTE));
+                                x + wrapper.passthrough(Types.BYTE),
+                                (short) (y + wrapper.passthrough(Types.BYTE)),
+                                z + wrapper.passthrough(Types.BYTE));
                         records[i] = position;
 
                         // Set to air
@@ -305,8 +306,8 @@ public class WorldPacketRewriter1_13 {
             public void register() {
                 if (Via.getConfig().isServersideBlockConnections()) {
                     handler(wrapper -> {
-                        int x = wrapper.passthrough(Type.INT);
-                        int z = wrapper.passthrough(Type.INT);
+                        int x = wrapper.passthrough(Types.INT);
+                        int z = wrapper.passthrough(Types.INT);
                         ConnectionData.blockConnectionProvider.unloadChunk(wrapper.user(), x, z);
                     });
                 }
@@ -316,11 +317,11 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING);
+                map(Types.STRING);
                 handler(wrapper -> {
-                    String sound = Key.stripMinecraftNamespace(wrapper.get(Type.STRING, 0));
+                    String sound = Key.stripMinecraftNamespace(wrapper.get(Types.STRING, 0));
                     String newSoundId = NamedSoundRewriter.getNewId(sound);
-                    wrapper.set(Type.STRING, 0, newSoundId);
+                    wrapper.set(Types.STRING, 0, newSoundId);
                 });
             }
         });
@@ -470,19 +471,19 @@ public class WorldPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.FLOAT); // 2 - X
-                map(Type.FLOAT); // 3 - Y
-                map(Type.FLOAT); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.FLOAT); // 2 - X
+                map(Types.FLOAT); // 3 - Y
+                map(Types.FLOAT); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
 
                 handler(wrapper -> {
-                    int particleId = wrapper.get(Type.INT, 0);
+                    int particleId = wrapper.get(Types.INT, 0);
 
                     // Get the data (Arrays are overrated)
                     int dataCount = 0;
@@ -495,7 +496,7 @@ public class WorldPacketRewriter1_13 {
 
                     Integer[] data = new Integer[dataCount];
                     for (int i = 0; i < data.length; i++)
-                        data[i] = wrapper.read(Type.VAR_INT);
+                        data[i] = wrapper.read(Types.VAR_INT);
 
                     Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
 
@@ -507,27 +508,27 @@ public class WorldPacketRewriter1_13 {
 
                     // Handle reddust particle color
                     if (particle.id() == 11) {
-                        int count = wrapper.get(Type.INT, 1);
-                        float speed = wrapper.get(Type.FLOAT, 6);
+                        int count = wrapper.get(Types.INT, 1);
+                        float speed = wrapper.get(Types.FLOAT, 6);
                         // Only handle for count = 0
                         if (count == 0) {
-                            wrapper.set(Type.INT, 1, 1);
-                            wrapper.set(Type.FLOAT, 6, 0f);
+                            wrapper.set(Types.INT, 1, 1);
+                            wrapper.set(Types.FLOAT, 6, 0f);
 
                             for (int i = 0; i < 3; i++) {
                                 //RGB values are represented by the X/Y/Z offset
-                                float colorValue = wrapper.get(Type.FLOAT, i + 3) * speed;
+                                float colorValue = wrapper.get(Types.FLOAT, i + 3) * speed;
                                 if (colorValue == 0 && i == 0) {
                                     // https://minecraft.gamepedia.com/User:Alphappy/reddust
                                     colorValue = 1;
                                 }
                                 particle.<Float>getArgument(i).setValue(colorValue);
-                                wrapper.set(Type.FLOAT, i + 3, 0f);
+                                wrapper.set(Types.FLOAT, i + 3, 0f);
                             }
                         }
                     }
 
-                    wrapper.set(Type.INT, 0, particle.id());
+                    wrapper.set(Types.INT, 0, particle.id());
                     for (Particle.ParticleData<?> particleData : particle.getArguments())
                         particleData.write(wrapper);
 
@@ -537,21 +538,21 @@ public class WorldPacketRewriter1_13 {
 
         // Incoming Packets
         protocol.registerServerbound(ServerboundPackets1_13.USE_ITEM_ON, wrapper -> {
-            Position pos = wrapper.passthrough(Type.POSITION1_8);
-            wrapper.passthrough(Type.VAR_INT); // block face
-            wrapper.passthrough(Type.VAR_INT); // hand
-            wrapper.passthrough(Type.FLOAT); // cursor x
-            wrapper.passthrough(Type.FLOAT); // cursor y
-            wrapper.passthrough(Type.FLOAT); // cursor z
+            Position pos = wrapper.passthrough(Types.BLOCK_POSITION1_8);
+            wrapper.passthrough(Types.VAR_INT); // block face
+            wrapper.passthrough(Types.VAR_INT); // hand
+            wrapper.passthrough(Types.FLOAT); // cursor x
+            wrapper.passthrough(Types.FLOAT); // cursor y
+            wrapper.passthrough(Types.FLOAT); // cursor z
 
             if (Via.getConfig().isServersideBlockConnections() && ConnectionData.needStoreBlocks()) {
                 ConnectionData.markModified(wrapper.user(), pos);
             }
         });
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_ACTION, wrapper -> {
-            int status = wrapper.passthrough(Type.VAR_INT); // Status
-            Position pos = wrapper.passthrough(Type.POSITION1_8); // Location
-            wrapper.passthrough(Type.UNSIGNED_BYTE); // block face
+            int status = wrapper.passthrough(Types.VAR_INT); // Status
+            Position pos = wrapper.passthrough(Types.BLOCK_POSITION1_8); // Location
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // block face
 
             // 0 = Started digging: if in creative this causes the block to break directly
             // There's no point in storing the finished digging as it may never show-up (creative)

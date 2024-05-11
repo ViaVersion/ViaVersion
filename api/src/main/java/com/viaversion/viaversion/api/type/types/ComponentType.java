@@ -28,6 +28,7 @@ import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class ComponentType extends Type<JsonElement> {
@@ -56,7 +57,7 @@ public class ComponentType extends Type<JsonElement> {
     public static final class OptionalComponentType extends OptionalType<JsonElement> {
 
         public OptionalComponentType() {
-            super(Type.COMPONENT);
+            super(Types.COMPONENT);
         }
     }
 }

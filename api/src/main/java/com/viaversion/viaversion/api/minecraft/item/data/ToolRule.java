@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -33,17 +34,17 @@ public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolea
     public static final Type<ToolRule> TYPE = new Type<>(ToolRule.class) {
         @Override
         public ToolRule read(final ByteBuf buffer) {
-            final HolderSet blocks = Type.HOLDER_SET.read(buffer);
-            final Float speed = Type.OPTIONAL_FLOAT.read(buffer);
-            final Boolean correctForDrops = Type.OPTIONAL_BOOLEAN.read(buffer);
+            final HolderSet blocks = Types.HOLDER_SET.read(buffer);
+            final Float speed = Types.OPTIONAL_FLOAT.read(buffer);
+            final Boolean correctForDrops = Types.OPTIONAL_BOOLEAN.read(buffer);
             return new ToolRule(blocks, speed, correctForDrops);
         }
 
         @Override
         public void write(final ByteBuf buffer, final ToolRule value) {
-            Type.HOLDER_SET.write(buffer, value.blocks);
-            Type.OPTIONAL_FLOAT.write(buffer, value.speed);
-            Type.OPTIONAL_BOOLEAN.write(buffer, value.correctForDrops);
+            Types.HOLDER_SET.write(buffer, value.blocks);
+            Types.OPTIONAL_FLOAT.write(buffer, value.speed);
+            Types.OPTIONAL_BOOLEAN.write(buffer, value.correctForDrops);
         }
     };
     public static final Type<ToolRule[]> ARRAY_TYPE = new ArrayType<>(TYPE);

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
@@ -52,30 +53,30 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_19_4.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity id
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
-                map(Type.STRING); // Dimension key
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.VAR_INT); // Max players
-                map(Type.VAR_INT); // Chunk radius
-                map(Type.VAR_INT); // Simulation distance
-                map(Type.BOOLEAN); // Reduced debug info
-                map(Type.BOOLEAN); // Show death screen
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
-                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
-                create(Type.VAR_INT, 0); // Portal cooldown
+                map(Types.INT); // Entity id
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Dimension registry
+                map(Types.STRING); // Dimension key
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.VAR_INT); // Max players
+                map(Types.VAR_INT); // Chunk radius
+                map(Types.VAR_INT); // Simulation distance
+                map(Types.BOOLEAN); // Reduced debug info
+                map(Types.BOOLEAN); // Show death screen
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
+                map(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
+                create(Types.VAR_INT, 0); // Portal cooldown
 
                 handler(dimensionDataHandler()); // Caches dimensions to access data like height later
                 handler(biomeSizeTracker()); // Tracks the amount of biomes sent for chunk data
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    final CompoundTag registry = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     final ListTag<CompoundTag> damageTypes = TagUtil.getRegistryEntries(registry, "damage_type");
                     int highestId = -1;
                     for (final CompoundTag damageType : damageTypes) {
@@ -110,16 +111,16 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_19_4.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Dimension
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.UNSIGNED_BYTE); // Gamemode
-                map(Type.BYTE); // Previous gamemode
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
-                map(Type.BYTE); // Data to keep
-                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
-                create(Type.VAR_INT, 0); // Portal cooldown
+                map(Types.STRING); // Dimension
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.UNSIGNED_BYTE); // Gamemode
+                map(Types.BYTE); // Previous gamemode
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
+                map(Types.BYTE); // Data to keep
+                map(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
+                create(Types.VAR_INT, 0); // Portal cooldown
                 handler(worldDataTrackerHandlerByKey()); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });

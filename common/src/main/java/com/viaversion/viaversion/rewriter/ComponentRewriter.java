@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -65,10 +66,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UUID);
-                map(Type.VAR_INT);
+                map(Types.UUID);
+                map(Types.VAR_INT);
                 handler(wrapper -> {
-                    final int action = wrapper.get(Type.VAR_INT, 0);
+                    final int action = wrapper.get(Types.VAR_INT, 0);
                     if (action == 0 || action == 3) {
                         passthroughAndProcess(wrapper);
                     }
@@ -82,10 +83,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      */
     public void registerCombatEvent(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            if (wrapper.passthrough(Type.VAR_INT) == 2) {
-                wrapper.passthrough(Type.VAR_INT);
-                wrapper.passthrough(Type.INT);
-                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+            if (wrapper.passthrough(Types.VAR_INT) == 2) {
+                wrapper.passthrough(Types.VAR_INT);
+                wrapper.passthrough(Types.INT);
+                processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
             }
         });
     }
@@ -95,25 +96,25 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
      */
     public void registerTitle(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final int action = wrapper.passthrough(Type.VAR_INT);
+            final int action = wrapper.passthrough(Types.VAR_INT);
             if (action >= 0 && action <= 2) {
-                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+                processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
             }
         });
     }
 
     public void registerPing() {
         // Always json
-        protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
+        protocol.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
     }
 
     public void registerLegacyOpenWindow(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Id
-                map(Type.STRING); // Window Type
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
+                map(Types.UNSIGNED_BYTE); // Id
+                map(Types.STRING); // Window Type
+                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
             }
         });
     }
@@ -122,8 +123,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Id
-                map(Type.VAR_INT); // Window Type
+                map(Types.VAR_INT); // Id
+                map(Types.VAR_INT); // Window Type
                 handler(wrapper -> passthroughAndProcess(wrapper));
             }
         });
@@ -140,9 +141,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT);
-                map(Type.INT);
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT)));
+                map(Types.VAR_INT);
+                map(Types.INT);
+                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
             }
         });
     }
@@ -151,7 +152,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Duration
+                map(Types.VAR_INT); // Duration
                 handler(wrapper -> passthroughAndProcess(wrapper));
             }
         });
@@ -160,10 +161,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     public void passthroughAndProcess(final PacketWrapper wrapper) {
         switch (type) {
             case JSON:
-                processText(wrapper.user(), wrapper.passthrough(Type.COMPONENT));
+                processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
                 break;
             case NBT:
-                processTag(wrapper.user(), wrapper.passthrough(Type.TAG));
+                processTag(wrapper.user(), wrapper.passthrough(Types.TAG));
                 break;
         }
     }

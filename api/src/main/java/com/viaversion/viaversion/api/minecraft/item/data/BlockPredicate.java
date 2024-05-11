@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -35,22 +36,22 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
     public static final Type<BlockPredicate> TYPE = new Type<>(BlockPredicate.class) {
         @Override
         public BlockPredicate read(final ByteBuf buffer) {
-            final HolderSet holders = Type.OPTIONAL_HOLDER_SET.read(buffer);
+            final HolderSet holders = Types.OPTIONAL_HOLDER_SET.read(buffer);
             final StatePropertyMatcher[] propertyMatchers = buffer.readBoolean() ? StatePropertyMatcher.ARRAY_TYPE.read(buffer) : null;
-            final CompoundTag tag = Type.OPTIONAL_COMPOUND_TAG.read(buffer);
+            final CompoundTag tag = Types.OPTIONAL_COMPOUND_TAG.read(buffer);
             return new BlockPredicate(holders, propertyMatchers, tag);
         }
 
         @Override
         public void write(final ByteBuf buffer, final BlockPredicate value) {
-            Type.OPTIONAL_HOLDER_SET.write(buffer, value.holderSet);
+            Types.OPTIONAL_HOLDER_SET.write(buffer, value.holderSet);
 
             buffer.writeBoolean(value.propertyMatchers != null);
             if (value.propertyMatchers != null) {
                 StatePropertyMatcher.ARRAY_TYPE.write(buffer, value.propertyMatchers);
             }
 
-            Type.OPTIONAL_COMPOUND_TAG.write(buffer, value.tag);
+            Types.OPTIONAL_COMPOUND_TAG.write(buffer, value.tag);
         }
     };
     public static final Type<BlockPredicate[]> ARRAY_TYPE = new ArrayType<>(TYPE);

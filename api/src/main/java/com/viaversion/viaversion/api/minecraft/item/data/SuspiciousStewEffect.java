@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
@@ -31,15 +32,15 @@ public record SuspiciousStewEffect(int mobEffect, int duration) {
     public static final Type<SuspiciousStewEffect> TYPE = new Type<>(SuspiciousStewEffect.class) {
         @Override
         public SuspiciousStewEffect read(final ByteBuf buffer) {
-            final int effect = Type.VAR_INT.readPrimitive(buffer);
-            final int duration = Type.VAR_INT.readPrimitive(buffer);
+            final int effect = Types.VAR_INT.readPrimitive(buffer);
+            final int duration = Types.VAR_INT.readPrimitive(buffer);
             return new SuspiciousStewEffect(effect, duration);
         }
 
         @Override
         public void write(final ByteBuf buffer, final SuspiciousStewEffect value) {
-            Type.VAR_INT.writePrimitive(buffer, value.mobEffect);
-            Type.VAR_INT.writePrimitive(buffer, value.duration);
+            Types.VAR_INT.writePrimitive(buffer, value.mobEffect);
+            Types.VAR_INT.writePrimitive(buffer, value.duration);
         }
     };
     public static final Type<SuspiciousStewEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);

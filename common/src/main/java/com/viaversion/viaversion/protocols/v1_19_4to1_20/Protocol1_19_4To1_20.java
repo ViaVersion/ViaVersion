@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -58,12 +58,12 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.AWARD_STATS);
 
         registerClientbound(ClientboundPackets1_19_4.PLAYER_COMBAT_END, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Duration
-            wrapper.read(Type.INT); // Killer ID
+            wrapper.passthrough(Types.VAR_INT); // Duration
+            wrapper.read(Types.INT); // Killer ID
         });
         registerClientbound(ClientboundPackets1_19_4.PLAYER_COMBAT_KILL, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Duration
-            wrapper.read(Type.INT); // Killer ID
+            wrapper.passthrough(Types.VAR_INT); // Duration
+            wrapper.read(Types.INT); // Killer ID
         });
     }
 

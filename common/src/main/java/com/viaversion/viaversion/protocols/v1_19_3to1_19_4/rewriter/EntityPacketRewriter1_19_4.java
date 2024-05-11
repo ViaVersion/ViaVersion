@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
@@ -46,20 +47,20 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity id
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
-                map(Type.STRING); // Dimension key
-                map(Type.STRING); // World
+                map(Types.INT); // Entity id
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Dimension registry
+                map(Types.STRING); // Dimension key
+                map(Types.STRING); // World
                 handler(dimensionDataHandler());
                 handler(biomeSizeTracker());
                 handler(worldDataTrackerHandlerByKey());
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    final CompoundTag registry = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     final CompoundTag damageTypeRegistry = protocol.getMappingData().damageTypesRegistry();
                     registry.put("minecraft:damage_type", damageTypeRegistry);
 
@@ -77,22 +78,22 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_3.PLAYER_POSITION, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.DOUBLE); // X
-                map(Type.DOUBLE); // Y
-                map(Type.DOUBLE); // Z
-                map(Type.FLOAT); // Yaw
-                map(Type.FLOAT); // Pitch
-                map(Type.BYTE); // Relative arguments
-                map(Type.VAR_INT); // Id
+                map(Types.DOUBLE); // X
+                map(Types.DOUBLE); // Y
+                map(Types.DOUBLE); // Z
+                map(Types.FLOAT); // Yaw
+                map(Types.FLOAT); // Pitch
+                map(Types.BYTE); // Relative arguments
+                map(Types.VAR_INT); // Id
                 handler(wrapper -> {
-                    if (wrapper.read(Type.BOOLEAN)) { // Dismount vehicle
+                    if (wrapper.read(Types.BOOLEAN)) { // Dismount vehicle
                         final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
                         if (playerVehicleTracker.getVehicleId() != -1) {
                             final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_19_4.BUNDLE_DELIMITER);
                             bundleStart.send(Protocol1_19_3To1_19_4.class);
                             final PacketWrapper setPassengers = wrapper.create(ClientboundPackets1_19_4.SET_PASSENGERS);
-                            setPassengers.write(Type.VAR_INT, playerVehicleTracker.getVehicleId()); // vehicle id
-                            setPassengers.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // passenger ids
+                            setPassengers.write(Types.VAR_INT, playerVehicleTracker.getVehicleId()); // vehicle id
+                            setPassengers.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // passenger ids
                             setPassengers.send(Protocol1_19_3To1_19_4.class);
                             wrapper.send(Protocol1_19_3To1_19_4.class);
                             wrapper.cancel();
@@ -109,18 +110,18 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_3.SET_PASSENGERS, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.VAR_INT); // vehicle id
-                map(Type.VAR_INT_ARRAY_PRIMITIVE); // passenger ids
+                map(Types.VAR_INT); // vehicle id
+                map(Types.VAR_INT_ARRAY_PRIMITIVE); // passenger ids
                 handler(wrapper -> {
                     final PlayerVehicleTracker playerVehicleTracker = wrapper.user().get(PlayerVehicleTracker.class);
                     final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
-                    final int vehicleId = wrapper.get(Type.VAR_INT, 0);
+                    final int vehicleId = wrapper.get(Types.VAR_INT, 0);
 
                     if (playerVehicleTracker.getVehicleId() == vehicleId) {
                         playerVehicleTracker.setVehicleId(-1);
                     }
 
-                    final int[] passengerIds = wrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0);
+                    final int[] passengerIds = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
                     for (int passengerId : passengerIds) {
                         if (passengerId == clientEntityId) {
                             playerVehicleTracker.setVehicleId(vehicleId);
@@ -135,22 +136,22 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
             @Override
             protected void register() {
                 handler(wrapper -> {
-                    final int entityId = wrapper.read(Type.VAR_INT); // entity id
+                    final int entityId = wrapper.read(Types.VAR_INT); // entity id
                     final int clientEntityId = wrapper.user().getEntityTracker(Protocol1_19_3To1_19_4.class).clientEntityId();
                     if (entityId != clientEntityId) {
-                        wrapper.write(Type.VAR_INT, entityId); // entity id
+                        wrapper.write(Types.VAR_INT, entityId); // entity id
                         return;
                     }
 
                     wrapper.setPacketType(ClientboundPackets1_19_4.PLAYER_POSITION);
-                    wrapper.passthrough(Type.DOUBLE); // x
-                    wrapper.passthrough(Type.DOUBLE); // y
-                    wrapper.passthrough(Type.DOUBLE); // z
-                    wrapper.write(Type.FLOAT, wrapper.read(Type.BYTE) * 360F / 256F); // yaw
-                    wrapper.write(Type.FLOAT, wrapper.read(Type.BYTE) * 360F / 256F); // pitch
-                    wrapper.read(Type.BOOLEAN); // on ground
-                    wrapper.write(Type.BYTE, (byte) 0); // flags
-                    wrapper.write(Type.VAR_INT, -1); // teleport id
+                    wrapper.passthrough(Types.DOUBLE); // x
+                    wrapper.passthrough(Types.DOUBLE); // y
+                    wrapper.passthrough(Types.DOUBLE); // z
+                    wrapper.write(Types.FLOAT, wrapper.read(Types.BYTE) * 360F / 256F); // yaw
+                    wrapper.write(Types.FLOAT, wrapper.read(Types.BYTE) * 360F / 256F); // pitch
+                    wrapper.read(Types.BOOLEAN); // on ground
+                    wrapper.write(Types.BYTE, (byte) 0); // flags
+                    wrapper.write(Types.VAR_INT, -1); // teleport id
                 });
             }
         });
@@ -158,16 +159,16 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_3.ANIMATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
+                map(Types.VAR_INT); // Entity id
                 handler(wrapper -> {
-                    final short action = wrapper.read(Type.UNSIGNED_BYTE);
+                    final short action = wrapper.read(Types.UNSIGNED_BYTE);
                     if (action != 1) {
-                        wrapper.write(Type.UNSIGNED_BYTE, action);
+                        wrapper.write(Types.UNSIGNED_BYTE, action);
                         return;
                     }
 
                     wrapper.setPacketType(ClientboundPackets1_19_4.HURT_ANIMATION);
-                    wrapper.write(Type.FLOAT, 0F);
+                    wrapper.write(Types.FLOAT, 0F);
                 });
             }
         });
@@ -175,30 +176,30 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_3.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Dimension
-                map(Type.STRING); // World
+                map(Types.STRING); // Dimension
+                map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey());
                 handler(wrapper -> wrapper.user().put(new PlayerVehicleTracker()));
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_3.ENTITY_EVENT, wrapper -> {
-            final int entityId = wrapper.read(Type.INT);
-            final byte event = wrapper.read(Type.BYTE);
+            final int entityId = wrapper.read(Types.INT);
+            final byte event = wrapper.read(Types.BYTE);
 
             final int damageType = damageTypeFromEntityEvent(event);
             if (damageType != -1) {
                 wrapper.setPacketType(ClientboundPackets1_19_4.DAMAGE_EVENT);
-                wrapper.write(Type.VAR_INT, entityId);
-                wrapper.write(Type.VAR_INT, damageType);
-                wrapper.write(Type.VAR_INT, 0); // No source entity
-                wrapper.write(Type.VAR_INT, 0); // No direct source entity
-                wrapper.write(Type.BOOLEAN, false); // No source position
+                wrapper.write(Types.VAR_INT, entityId);
+                wrapper.write(Types.VAR_INT, damageType);
+                wrapper.write(Types.VAR_INT, 0); // No source entity
+                wrapper.write(Types.VAR_INT, 0); // No direct source entity
+                wrapper.write(Types.BOOLEAN, false); // No source position
                 return;
             }
 
-            wrapper.write(Type.INT, entityId);
-            wrapper.write(Type.BYTE, event);
+            wrapper.write(Types.INT, entityId);
+            wrapper.write(Types.BYTE, event);
         });
 
         registerTrackerWithData1_19(ClientboundPackets1_19_3.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);

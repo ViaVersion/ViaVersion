@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import com.viaversion.viaversion.util.MathUtil;
 import io.netty.buffer.ByteBuf;
@@ -47,8 +48,8 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         if (bitsPerValue == 0) {
             // Single value storage
             palette = new DataPaletteImpl(type.size(), 1);
-            palette.addId(Type.VAR_INT.readPrimitive(buffer));
-            Type.LONG_ARRAY_PRIMITIVE.read(buffer); // Just eat it if not empty - thanks, Hypixel
+            palette.addId(Types.VAR_INT.readPrimitive(buffer));
+            Types.LONG_ARRAY_PRIMITIVE.read(buffer); // Just eat it if not empty - thanks, Hypixel
             return palette;
         }
 
@@ -60,17 +61,17 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
         // Read palette
         if (bitsPerValue != globalPaletteBits) {
-            final int paletteLength = Type.VAR_INT.readPrimitive(buffer);
+            final int paletteLength = Types.VAR_INT.readPrimitive(buffer);
             palette = new DataPaletteImpl(type.size(), paletteLength);
             for (int i = 0; i < paletteLength; i++) {
-                palette.addId(Type.VAR_INT.readPrimitive(buffer));
+                palette.addId(Types.VAR_INT.readPrimitive(buffer));
             }
         } else {
             palette = new DataPaletteImpl(type.size());
         }
 
         // Read values
-        final long[] values = Type.LONG_ARRAY_PRIMITIVE.read(buffer);
+        final long[] values = Types.LONG_ARRAY_PRIMITIVE.read(buffer);
         if (values.length > 0) {
             final int valuesPerLong = (char) (64 / bitsPerValue);
             final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
@@ -88,8 +89,8 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         if (size == 1) {
             // Single value palette
             buffer.writeByte(0); // 0 bit storage
-            Type.VAR_INT.writePrimitive(buffer, palette.idByIndex(0));
-            Type.VAR_INT.writePrimitive(buffer, 0); // Empty values length
+            Types.VAR_INT.writePrimitive(buffer, palette.idByIndex(0));
+            Types.VAR_INT.writePrimitive(buffer, 0); // Empty values length
             return;
         }
 
@@ -104,12 +105,12 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
         if (bitsPerValue != globalPaletteBits) {
             // Write palette
-            Type.VAR_INT.writePrimitive(buffer, size);
+            Types.VAR_INT.writePrimitive(buffer, size);
             for (int i = 0; i < size; i++) {
-                Type.VAR_INT.writePrimitive(buffer, palette.idByIndex(i));
+                Types.VAR_INT.writePrimitive(buffer, palette.idByIndex(i));
             }
         }
 
-        Type.LONG_ARRAY_PRIMITIVE.write(buffer, CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt));
+        Types.LONG_ARRAY_PRIMITIVE.write(buffer, CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt));
     }
 }
