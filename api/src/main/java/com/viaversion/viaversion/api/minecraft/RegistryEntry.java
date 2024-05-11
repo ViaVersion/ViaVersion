@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.nbt.tag.Tag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record RegistryEntry(String key, @Nullable Tag tag) {

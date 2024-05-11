@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.providers.BossBarProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.providers.BossBarProvider;
 import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
 import com.viaversion.viaversion.velocity.providers.VelocityVersionProvider;

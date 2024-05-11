@@ -21,9 +21,9 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ArmorType;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.ArmorType;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -47,7 +47,7 @@ public class ArmorListener extends ViaBukkitListener {
     private static final UUID ARMOR_ATTRIBUTE = UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150");
 
     public ArmorListener(Plugin plugin) {
-        super(plugin, Protocol1_9To1_8.class);
+        super(plugin, Protocol1_8To1_9.class);
     }
 
     public void sendArmorUpdate(Player player) {
@@ -68,7 +68,7 @@ public class ArmorListener extends ViaBukkitListener {
         wrapper.write(Type.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
         wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
         wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 = add number
-        wrapper.scheduleSend(Protocol1_9To1_8.class);
+        wrapper.scheduleSend(Protocol1_8To1_9.class);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
