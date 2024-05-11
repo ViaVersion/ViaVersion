@@ -33,7 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class SpawnPackets1_9 {
                             wrapper1.write(Types.VAR_INT, entityID);
                             List<Metadata> meta = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
-                            ItemRewriter.toClient(item); // Rewrite so that it gets the right nbt
+                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item); // Rewrite so that it gets the right nbt
                             // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                             Metadata potion = new Metadata(5, MetaType1_9.ITEM, item);
                             meta.add(potion);
@@ -199,7 +199,7 @@ public class SpawnPackets1_9 {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
                         Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();
@@ -277,7 +277,7 @@ public class SpawnPackets1_9 {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
                         Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();

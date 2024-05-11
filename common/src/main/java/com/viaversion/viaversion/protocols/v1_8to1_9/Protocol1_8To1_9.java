@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8.packet.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.metadata.MetadataRewriter1_9To1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.BossBarProvider;
@@ -63,7 +62,8 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
             return ComponentUtil.convertJsonOrEmpty(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
         }
     };
-    private final MetadataRewriter1_9To1_8 metadataRewriter = new MetadataRewriter1_9To1_8(this);
+    private final EntityPacketRewriter1_9 entityRewriter = new EntityPacketRewriter1_9(this);
+    private final ItemPacketRewriter1_9 itemRewriter = new ItemPacketRewriter1_9(this);
 
     public Protocol1_8To1_9() {
         super(ClientboundPackets1_8.class, ClientboundPackets1_9.class, ServerboundPackets1_8.class, ServerboundPackets1_9.class);
@@ -100,8 +100,6 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
         // Other Handlers
         SpawnPackets1_9.register(this);
-        ItemPacketRewriter1_9.register(this);
-        EntityPacketRewriter1_9.register(this);
         PlayerPackets1_9.register(this);
         WorldPacketRewriter1_9.register(this);
     }
@@ -136,7 +134,12 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
     }
 
     @Override
-    public MetadataRewriter1_9To1_8 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_9 getEntityRewriter() {
+        return entityRewriter;
+    }
+
+    @Override
+    public ItemPacketRewriter1_9 getItemRewriter() {
+        return itemRewriter;
     }
 }
