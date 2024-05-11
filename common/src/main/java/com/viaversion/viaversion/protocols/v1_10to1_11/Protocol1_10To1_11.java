@@ -28,14 +28,13 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.PotionColorMapping;
-import com.viaversion.viaversion.protocols.v1_10to1_11.metadata.MetadataRewriter1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.BlockEntityRewriter;
-import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityIdRewriter;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.PotionColors1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityPacketRewriter1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityNames1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityNames1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.ItemPacketRewriter1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
@@ -51,7 +50,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
         }
     };
 
-    private final MetadataRewriter1_11 entityRewriter = new MetadataRewriter1_11(this);
+    private final EntityPacketRewriter1_11 entityRewriter = new EntityPacketRewriter1_11(this);
     private final ItemPacketRewriter1_11 itemRewriter = new ItemPacketRewriter1_11(this);
 
     public Protocol1_10To1_11() {
@@ -62,94 +61,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity id
-                map(Types.UUID); // 1 - UUID
-                map(Types.BYTE); // 2 - Type
-
-                // Track Entity
-                handler(entityRewriter.objectTrackerHandler());
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.UUID); // 1 - Entity UUID
-                map(Types.UNSIGNED_BYTE, Types.VAR_INT); // 2 - Entity Type
-                map(Types.DOUBLE); // 3 - X
-                map(Types.DOUBLE); // 4 - Y
-                map(Types.DOUBLE); // 5 - Z
-                map(Types.BYTE); // 6 - Yaw
-                map(Types.BYTE); // 7 - Pitch
-                map(Types.BYTE); // 8 - Head Pitch
-                map(Types.SHORT); // 9 - Velocity X
-                map(Types.SHORT); // 10 - Velocity Y
-                map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.METADATA_LIST); // 12 - Metadata
-
-                handler(wrapper -> {
-                    int entityId = wrapper.get(Types.VAR_INT, 0);
-                    // Change Type :)
-                    int type = wrapper.get(Types.VAR_INT, 1);
-
-                    EntityTypes1_11.EntityType entType = MetadataRewriter1_11.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
-                    if (entType != null) {
-                        wrapper.set(Types.VAR_INT, 1, entType.getId());
-
-                        // Register Type ID
-                        wrapper.user().getEntityTracker(Protocol1_10To1_11.class).addEntity(entityId, entType);
-                        entityRewriter.handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
-                    }
-                });
-            }
-        });
-
         new SoundRewriter<>(this, this::getNewSoundId).registerSound(ClientboundPackets1_9_3.SOUND);
-
-        registerClientbound(ClientboundPackets1_9_3.TAKE_ITEM_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Collected entity id
-                map(Types.VAR_INT); // 1 - Collector entity id
-
-                handler(wrapper -> {
-                    wrapper.write(Types.VAR_INT, 1); // 2 - Pickup Count
-                });
-            }
-        });
-
-        entityRewriter.registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.METADATA_LIST);
-
-        registerClientbound(ClientboundPackets1_9_3.TELEPORT_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity id
-                map(Types.DOUBLE); // 1 - x
-                map(Types.DOUBLE); // 2 - y
-                map(Types.DOUBLE); // 3 - z
-                map(Types.BYTE); // 4 - yaw
-                map(Types.BYTE); // 5 - pitch
-                map(Types.BOOLEAN); // 6 - onGround
-
-                handler(wrapper -> {
-                    int entityID = wrapper.get(Types.VAR_INT, 0);
-                    if (Via.getConfig().isHologramPatch()) {
-                        EntityTracker1_11 tracker = wrapper.user().getEntityTracker(Protocol1_10To1_11.class);
-                        if (tracker.isHologram(entityID)) {
-                            Double newValue = wrapper.get(Types.DOUBLE, 1);
-                            newValue -= (Via.getConfig().getHologramYOffset());
-                            wrapper.set(Types.DOUBLE, 1, newValue);
-                        }
-                    }
-                });
-            }
-        });
-
-        entityRewriter.registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
 
         registerClientbound(ClientboundPackets1_9_3.SET_TITLES, new PacketHandlers() {
             @Override
@@ -187,28 +99,6 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
             }
         });
 
-        registerClientbound(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BLOCK_POSITION1_8); // 0 - Position
-                map(Types.UNSIGNED_BYTE); // 1 - Action
-                map(Types.NAMED_COMPOUND_TAG); // 2 - NBT data
-
-                handler(wrapper -> {
-                    CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
-                    if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 1) {
-                        EntityIdRewriter.toClientSpawner(tag);
-                    }
-
-                    StringTag idTag = tag.getStringTag("id");
-                    if (idTag != null) {
-                        // Handle new identifier
-                        idTag.setValue(BlockEntityRewriter.toNewIdentifier(idTag.getValue()));
-                    }
-                });
-            }
-        });
-
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
@@ -223,11 +113,11 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
                 String identifier = idTag.getValue();
                 if (identifier.equals("MobSpawner")) {
-                    EntityIdRewriter.toClientSpawner(tag);
+                    EntityNames1_11.toClientSpawner(tag);
                 }
 
                 // Handle new identifier
-                idTag.setValue(BlockEntityRewriter.toNewIdentifier(identifier));
+                idTag.setValue(BlockEntityNames1_11.toNewIdentifier(identifier));
             }
         });
 
@@ -268,7 +158,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                     if (effectID == 2002) {
                         int data = packetWrapper.get(Types.INT, 1);
                         boolean isInstant = false;
-                        Pair<Integer, Boolean> newData = PotionColorMapping.getNewData(data);
+                        Pair<Integer, Boolean> newData = PotionColors1_11.getNewData(data);
                         if (newData == null) {
                             Via.getPlatform().getLogger().warning("Received unknown 1.11 -> 1.10.2 potion data (" + data + ")");
                             data = 0;
@@ -357,7 +247,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
     }
 
     @Override
-    public MetadataRewriter1_11 getEntityRewriter() {
+    public EntityPacketRewriter1_11 getEntityRewriter() {
         return entityRewriter;
     }
 

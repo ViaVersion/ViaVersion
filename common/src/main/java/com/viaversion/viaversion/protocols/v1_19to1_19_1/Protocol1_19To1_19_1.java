@@ -34,18 +34,17 @@ import com.viaversion.viaversion.api.minecraft.signature.storage.ChatSession1_19
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ClientboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.data.ChatDecorationResult;
-import com.viaversion.viaversion.protocols.v1_19to1_19_1.data.ChatRegistry;
+import com.viaversion.viaversion.protocols.v1_19to1_19_1.data.ChatRegistry1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.ChatTypeStorage;
-import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage;
+import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage1_19_1;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.TagUtil;
@@ -211,7 +210,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                     }
 
                     // Replace chat types - they won't actually be used
-                    registry.put("minecraft:chat_type", ChatRegistry.chatRegistry());
+                    registry.put("minecraft:chat_type", ChatRegistry1_19_1.chatRegistry());
                 });
             }
         });
@@ -238,7 +237,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
 
                     if (profileKey == null || chatSession != null) {
                         // Modified client that doesn't include the profile key, or already done in 1.18->1.19 protocol; no need to map it
-                        wrapper.user().put(new NonceStorage(null));
+                        wrapper.user().put(new NonceStorage1_19_1(null));
                     }
                 });
                 read(Types.OPTIONAL_UUID); // Profile uuid
@@ -249,13 +248,13 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Types.STRING); // Server id
                 handler(wrapper -> {
-                    if (wrapper.user().has(NonceStorage.class)) {
+                    if (wrapper.user().has(NonceStorage1_19_1.class)) {
                         return;
                     }
 
                     final byte[] publicKey = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     final byte[] nonce = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
-                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
+                    wrapper.user().put(new NonceStorage1_19_1(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
         });
@@ -264,7 +263,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             public void register() {
                 map(Types.BYTE_ARRAY_PRIMITIVE); // Keys
                 handler(wrapper -> {
-                    final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
+                    final NonceStorage1_19_1 nonceStorage = wrapper.user().remove(NonceStorage1_19_1.class);
                     if (nonceStorage.nonce() == null) {
                         return;
                     }

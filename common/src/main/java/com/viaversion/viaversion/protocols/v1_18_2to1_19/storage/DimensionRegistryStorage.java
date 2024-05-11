@@ -27,7 +27,7 @@ public final class DimensionRegistryStorage implements StorableObject {
     private Map<CompoundTag, String> dimensions;
 
     public @Nullable String dimensionKey(final CompoundTag dimensionData) {
-        return dimensions.get(dimensionData); // HMMMMMMMMMMM
+        return dimensions.get(dimensionData);
     }
 
     public void setDimensions(final Map<CompoundTag, String> dimensions) {

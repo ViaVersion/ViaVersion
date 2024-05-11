@@ -17,20 +17,23 @@
  */
 package com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
-import com.viaversion.viaversion.protocols.v1_13to1_13_1.metadata.MetadataRewriter1_13_1To1_13;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public class EntityPacketRewriter1_13_1 {
+public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPackets1_13, Protocol1_13To1_13_1> {
 
-    public static void register(Protocol1_13To1_13_1 protocol) {
-        MetadataRewriter1_13_1To1_13 metadataRewriter = protocol.get(MetadataRewriter1_13_1To1_13.class);
+    public EntityPacketRewriter1_13_1(Protocol1_13To1_13_1 protocol) {
+        super(protocol);
+    }
 
+    @Override
+    protected void registerPackets() {
         protocol.registerClientbound(ClientboundPackets1_13.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
@@ -79,7 +82,7 @@ public class EntityPacketRewriter1_13_1 {
                 map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_13.METADATA_LIST); // 12 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_13.METADATA_LIST));
             }
         });
 
@@ -95,11 +98,31 @@ public class EntityPacketRewriter1_13_1 {
                 map(Types.BYTE); // 6 - Pitch
                 map(Types1_13.METADATA_LIST); // 7 - Metadata
 
-                handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
+                handler(trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
         });
 
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13.METADATA_LIST);
+        registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
+        registerMetadataRewriter(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13.METADATA_LIST);
+    }
+
+    @Override
+    protected void registerRewrites() {
+        registerMetaTypeHandler(Types1_13.META_TYPES.itemType, Types1_13.META_TYPES.optionalBlockStateType, Types1_13.META_TYPES.particleType);
+        filter().type(EntityTypes1_13.EntityType.MINECART_ABSTRACT).index(9).handler((event, meta) -> {
+            int data = meta.value();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+        filter().type(EntityTypes1_13.EntityType.ABSTRACT_ARROW).addIndex(7); // Shooter UUID
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return EntityTypes1_13.getTypeFromId(type, false);
+    }
+
+    @Override
+    public EntityType objectTypeFromId(int type) {
+        return EntityTypes1_13.getTypeFromId(type, true);
     }
 }

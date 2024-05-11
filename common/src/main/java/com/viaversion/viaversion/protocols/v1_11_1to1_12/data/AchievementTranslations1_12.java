@@ -21,7 +21,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AchievementTranslationMapping {
+public class AchievementTranslations1_12 {
 
     private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150, 0.99f);
     private static final Set<String> SPECIAL_ACHIEVEMENTS = new HashSet<>(10);

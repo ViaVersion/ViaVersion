@@ -28,12 +28,10 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_13to1_13_1.metadata.MetadataRewriter1_13_1To1_13;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.EntityPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.ItemPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.WorldPacketRewriter1_13_1;
@@ -43,7 +41,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_13, ServerboundPackets1_13, ServerboundPackets1_13> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2");
-    private final MetadataRewriter1_13_1To1_13 entityRewriter = new MetadataRewriter1_13_1To1_13(this);
+    private final EntityPacketRewriter1_13_1 entityRewriter = new EntityPacketRewriter1_13_1(this);
     private final ItemPacketRewriter1_13_1 itemRewriter = new ItemPacketRewriter1_13_1(this);
     private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
 
@@ -55,7 +53,6 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     protected void registerPackets() {
         super.registerPackets();
 
-        EntityPacketRewriter1_13_1.register(this);
         WorldPacketRewriter1_13_1.register(this);
 
         registerServerbound(ServerboundPackets1_13.COMMAND_SUGGESTION, new PacketHandlers() {
@@ -148,7 +145,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_13_1To1_13 getEntityRewriter() {
+    public EntityPacketRewriter1_13_1 getEntityRewriter() {
         return entityRewriter;
     }
 

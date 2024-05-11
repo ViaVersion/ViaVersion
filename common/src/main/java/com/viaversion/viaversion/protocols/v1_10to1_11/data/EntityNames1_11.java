@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
+package com.viaversion.viaversion.protocols.v1_10to1_11.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -24,7 +24,7 @@ import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.util.Key;
 
-public class EntityIdRewriter {
+public class EntityNames1_11 {
     private static final BiMap<String, String> oldToNewNames = HashBiMap.create();
 
     static {

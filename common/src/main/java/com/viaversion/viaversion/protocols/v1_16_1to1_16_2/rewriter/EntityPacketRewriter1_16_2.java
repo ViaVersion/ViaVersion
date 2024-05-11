@@ -19,24 +19,28 @@ package com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.Protocol1_16_1To1_16_2;
-import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.metadata.MetadataRewriter1_16_2To1_16_1;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
 
-public class EntityPacketRewriter1_16_2 {
+public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPackets1_16, Protocol1_16_1To1_16_2> {
 
-    public static void register(Protocol1_16_1To1_16_2 protocol) {
-        MetadataRewriter1_16_2To1_16_1 metadataRewriter = protocol.get(MetadataRewriter1_16_2To1_16_1.class);
-        metadataRewriter.registerTrackerWithData(ClientboundPackets1_16.ADD_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.ADD_MOB);
-        metadataRewriter.registerTracker(ClientboundPackets1_16.ADD_PLAYER, EntityTypes1_16_2.PLAYER);
-        metadataRewriter.registerMetadataRewriter(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.METADATA_LIST);
-        metadataRewriter.registerRemoveEntities(ClientboundPackets1_16.REMOVE_ENTITIES);
+    public EntityPacketRewriter1_16_2(Protocol1_16_1To1_16_2 protocol) {
+        super(protocol);
+    }
+
+    @Override
+    protected void registerPackets() {
+        registerTrackerWithData(ClientboundPackets1_16.ADD_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
+        registerTracker(ClientboundPackets1_16.ADD_MOB);
+        registerTracker(ClientboundPackets1_16.ADD_PLAYER, EntityTypes1_16_2.PLAYER);
+        registerMetadataRewriter(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.METADATA_LIST);
+        registerRemoveEntities(ClientboundPackets1_16.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_16.LOGIN, new PacketHandlers() {
             @Override
@@ -62,7 +66,7 @@ public class EntityPacketRewriter1_16_2 {
                 map(Types.LONG); // Seed
                 map(Types.UNSIGNED_BYTE, Types.VAR_INT); // Max players
                 // ...
-                handler(metadataRewriter.playerTrackerHandler());
+                handler(playerTrackerHandler());
             }
         });
 
@@ -72,7 +76,34 @@ public class EntityPacketRewriter1_16_2 {
         });
     }
 
-    public static CompoundTag getDimensionData(String dimensionType) {
+    @Override
+    protected void registerRewrites() {
+        registerMetaTypeHandler(Types1_16.META_TYPES.itemType, Types1_16.META_TYPES.optionalBlockStateType, Types1_16.META_TYPES.particleType);
+        filter().type(EntityTypes1_16_2.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
+            int data = meta.value();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+        filter().type(EntityTypes1_16_2.ABSTRACT_PIGLIN).handler((metadatas, meta) -> {
+            if (meta.id() == 15) {
+                meta.setId(16);
+            } else if (meta.id() == 16) {
+                meta.setId(15);
+            }
+        });
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return EntityTypes1_16_2.getTypeFromId(type);
+    }
+
+
+    private CompoundTag getDimensionData(String dimensionType) {
         CompoundTag tag = Protocol1_16_1To1_16_2.MAPPINGS.getDimensionDataMap().get(dimensionType);
         if (tag == null) {
             Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
