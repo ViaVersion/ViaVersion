@@ -24,12 +24,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityIds;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityIds1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
@@ -388,7 +387,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 tag = new CompoundTag();
             }
             CompoundTag entityTag = new CompoundTag();
-            String entityName = EntityIds.ENTITY_ID_TO_NAME.get((int) item.data());
+            String entityName = EntityIds1_8.ENTITY_ID_TO_NAME.get((int) item.data());
             if (entityName != null) {
                 StringTag id = new StringTag(entityName);
                 entityTag.put("id", id);
@@ -406,7 +405,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 item.setIdentifier(438); // splash id
                 item.setData((short) (item.data() - 8192));
             }
-            String name = PotionIds.potionNameFromDamage(item.data());
+            String name = PotionIds1_8.potionNameFromDamage(item.data());
             StringTag potion = new StringTag(Key.namespaced(name));
             tag.put("Potion", potion);
             item.setTag(tag);
@@ -443,8 +442,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 CompoundTag entityTag = tag.getCompoundTag("EntityTag");
                 StringTag id = entityTag.getStringTag("id");
                 if (id != null) {
-                    if (EntityIds.ENTITY_NAME_TO_ID.containsKey(id.getValue())) {
-                        data = EntityIds.ENTITY_NAME_TO_ID.get(id.getValue());
+                    if (EntityIds1_8.ENTITY_NAME_TO_ID.containsKey(id.getValue())) {
+                        data = EntityIds1_8.ENTITY_NAME_TO_ID.get(id.getValue());
                     }
                 }
                 tag.remove("EntityTag");
@@ -458,8 +457,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             if (tag != null && tag.getStringTag("Potion") != null) {
                 StringTag potion = tag.getStringTag("Potion");
                 String potionName = Key.stripMinecraftNamespace(potion.getValue());
-                if (PotionIds.POTION_NAME_TO_ID.containsKey(potionName)) {
-                    data = PotionIds.POTION_NAME_TO_ID.get(potionName);
+                if (PotionIds1_8.POTION_NAME_TO_ID.containsKey(potionName)) {
+                    data = PotionIds1_8.POTION_NAME_TO_ID.get(potionName);
                 }
                 tag.remove("Potion");
             }
@@ -474,8 +473,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             if (tag != null && tag.getStringTag("Potion") != null) {
                 StringTag potion = tag.getStringTag("Potion");
                 String potionName = Key.stripMinecraftNamespace(potion.getValue());
-                if (PotionIds.POTION_NAME_TO_ID.containsKey(potionName)) {
-                    data = PotionIds.POTION_NAME_TO_ID.get(potionName) + 8192;
+                if (PotionIds1_8.POTION_NAME_TO_ID.containsKey(potionName)) {
+                    data = PotionIds1_8.POTION_NAME_TO_ID.get(potionName) + 8192;
                 }
                 tag.remove("Potion");
             }

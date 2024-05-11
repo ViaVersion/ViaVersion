@@ -27,24 +27,23 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
-import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8.packet.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.BossBarProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CommandBlockProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CompressionProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.EntityIdProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.HandItemProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MainHandProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CompressionProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.HandItemProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.EntityPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemPacketRewriter1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.PlayerPackets1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.SpawnPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.PlayerPacketRewriter1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.SpawnPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.WorldPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.CommandBlockStorage;
@@ -99,8 +98,8 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
         });
 
         // Other Handlers
-        SpawnPackets1_9.register(this);
-        PlayerPackets1_9.register(this);
+        SpawnPacketRewriter1_9.register(this);
+        PlayerPacketRewriter1_9.register(this);
         WorldPacketRewriter1_9.register(this);
     }
 

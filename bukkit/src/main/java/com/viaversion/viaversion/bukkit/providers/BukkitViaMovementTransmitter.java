@@ -20,7 +20,7 @@ package com.viaversion.viaversion.bukkit.providers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MovementTransmitterProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
