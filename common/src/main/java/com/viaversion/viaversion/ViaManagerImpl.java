@@ -41,7 +41,7 @@ import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.task.TabCompleteThread;
-import com.viaversion.viaversion.protocols.v1_8to1_9.ViaIdleThread;
+import com.viaversion.viaversion.protocols.v1_8to1_9.task.ViaIdleThread;
 import com.viaversion.viaversion.scheduler.TaskScheduler;
 import com.viaversion.viaversion.update.UpdateUtil;
 import java.util.ArrayList;

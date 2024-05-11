@@ -26,10 +26,10 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.ItemRewriter;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.chat.ChatRewriter;
-import com.viaversion.viaversion.protocols.v1_8to1_9.chat.GameMode;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ChatRewriter;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.GameMode;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.providers.CompressionProvider;
@@ -37,8 +37,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.providers.MainHandProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
-import com.viaversion.viaversion.util.ComponentUtil;
-import java.util.logging.Level;
 
 public class PlayerPackets1_9 {
     public static void register(Protocol1_8To1_9 protocol) {
