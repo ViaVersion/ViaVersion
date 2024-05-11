@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter;
+package com.viaversion.viaversion.protocols.v1_11_1to1_12.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.google.gson.JsonArray;

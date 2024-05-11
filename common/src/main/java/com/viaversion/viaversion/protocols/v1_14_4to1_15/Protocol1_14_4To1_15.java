@@ -23,14 +23,12 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
-import com.viaversion.viaversion.protocols.v1_14_4to1_15.metadata.MetadataRewriter1_15To1_14_4;
-import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.EntityPacketRewriter1_15;
+import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.ItemPacketRewriter1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.WorldPacketRewriter1_15;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -40,7 +38,7 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_14_4, ClientboundPackets1_15, ServerboundPackets1_14, ServerboundPackets1_14> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.14", "1.15");
-    private final MetadataRewriter1_15To1_14_4 metadataRewriter = new MetadataRewriter1_15To1_14_4(this);
+    private final EntityPacketRewriter1_15 entityRewriter = new EntityPacketRewriter1_15(this);
     private final ItemPacketRewriter1_15 itemRewriter = new ItemPacketRewriter1_15(this);
     private final TagRewriter<ClientboundPackets1_14_4> tagRewriter = new TagRewriter<>(this);
 
@@ -52,7 +50,6 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     protected void registerPackets() {
         super.registerPackets();
 
-        EntityPacketRewriter1_15.register(this);
         WorldPacketRewriter1_15.register(this);
 
         SoundRewriter<ClientboundPackets1_14_4> soundRewriter = new SoundRewriter<>(this);
@@ -91,8 +88,8 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_15To1_14_4 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_15 getEntityRewriter() {
+        return entityRewriter;
     }
 
     @Override

@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -40,12 +39,11 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.TranslationMappings;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.metadata.MetadataRewriter1_16To1_15_2;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ComponentRewriter1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.provider.PlayerAbilitiesProvider;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ItemPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.WorldPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
@@ -63,9 +61,9 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
 
     private static final UUID ZERO_UUID = new UUID(0, 0);
     public static final MappingData MAPPINGS = new MappingDataBase("1.15", "1.16");
-    private final MetadataRewriter1_16To1_15_2 metadataRewriter = new MetadataRewriter1_16To1_15_2(this);
+    private final EntityPacketRewriter1_16 entityRewriter = new EntityPacketRewriter1_16(this);
     private final ItemPacketRewriter1_16 itemRewriter = new ItemPacketRewriter1_16(this);
-    private final TranslationMappings componentRewriter = new TranslationMappings(this);
+    private final ComponentRewriter1_16 componentRewriter = new ComponentRewriter1_16(this);
     private final TagRewriter<ClientboundPackets1_15> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_15_2To1_16() {
@@ -76,7 +74,6 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     protected void registerPackets() {
         super.registerPackets();
 
-        EntityPacketRewriter1_16.register(this);
         WorldPacketRewriter1_16.register(this);
 
         tagRewriter.register(ClientboundPackets1_15.UPDATE_TAGS, RegistryType.ENTITY);
@@ -287,8 +284,8 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_16To1_15_2 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_16 getEntityRewriter() {
+        return entityRewriter;
     }
 
     @Override
@@ -296,7 +293,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         return itemRewriter;
     }
 
-    public TranslationMappings getComponentRewriter() {
+    public ComponentRewriter1_16 getComponentRewriter() {
         return componentRewriter;
     }
 

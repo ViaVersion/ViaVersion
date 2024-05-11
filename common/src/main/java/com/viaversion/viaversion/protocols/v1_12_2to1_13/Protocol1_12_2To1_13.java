@@ -35,7 +35,6 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
@@ -56,11 +55,10 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.RecipeData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticMappings;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.metadata.MetadataRewriter1_13To1_12_2;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage;
@@ -84,7 +82,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
-    private final MetadataRewriter1_13To1_12_2 entityRewriter = new MetadataRewriter1_13To1_12_2(this);
+    private final EntityPacketRewriter1_13 entityRewriter = new EntityPacketRewriter1_13(this);
     private final ItemPacketRewriter1_13 itemRewriter = new ItemPacketRewriter1_13(this);
     private final ComponentRewriter1_13<ClientboundPackets1_12_1> componentRewriter = new ComponentRewriter1_13<>(this);
 
@@ -172,7 +170,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     protected void registerPackets() {
         super.registerPackets();
 
-        EntityPacketRewriter1_13.register(this);
         WorldPacketRewriter1_13.register(this);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
@@ -904,7 +901,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_13To1_12_2 getEntityRewriter() {
+    public EntityPacketRewriter1_13 getEntityRewriter() {
         return entityRewriter;
     }
 
