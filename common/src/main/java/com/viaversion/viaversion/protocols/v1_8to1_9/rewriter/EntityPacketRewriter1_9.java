@@ -19,23 +19,31 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 
 import com.google.common.collect.ImmutableList;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.EulerAngle;
+import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.metadata.MetadataRewriter1_9To1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.MetaIndex1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
+import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.Triple;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class EntityPacketRewriter1_9 {
+public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_8, Protocol1_8To1_9> {
     public static final ValueTransformer<Byte, Short> toNewShort = new ValueTransformer<>(Types.SHORT) {
         @Override
         public Short transform(PacketWrapper wrapper, Byte inputValue) {
@@ -51,7 +59,12 @@ public class EntityPacketRewriter1_9 {
         }
     };
 
-    public static void register(Protocol1_8To1_9 protocol) {
+    public EntityPacketRewriter1_9(Protocol1_8To1_9 protocol) {
+        super(protocol);
+    }
+
+    @Override
+    protected void registerPackets() {
         // Attach Entity Packet
         protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_LINK, new PacketHandlers() {
 
@@ -175,7 +188,7 @@ public class EntityPacketRewriter1_9 {
                 // Item Rewriter
                 handler(wrapper -> {
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
-                    ItemRewriter.toClient(stack);
+                    protocol.getItemRewriter().handleItemToClient(wrapper.user(), stack);
                 });
                 // Blocking
                 handler(wrapper -> {
@@ -203,7 +216,7 @@ public class EntityPacketRewriter1_9 {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.get(MetadataRewriter1_9To1_8.class).handleMetadata(entityId, metadataList, wrapper.user());
+                        handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
                         wrapper.cancel();
                     }
@@ -280,11 +293,11 @@ public class EntityPacketRewriter1_9 {
                         List<Triple<UUID, Double, Byte>> modifiers = new ArrayList<>(modifiersToRead);
                         for (int j = 0; j < modifiersToRead; j++) {
                             modifiers.add(
-                                    new Triple<>(
-                                            wrapper.read(Types.UUID),
-                                            wrapper.read(Types.DOUBLE), // Amount
-                                            wrapper.read(Types.BYTE) // Operation
-                                    )
+                                new Triple<>(
+                                    wrapper.read(Types.UUID),
+                                    wrapper.read(Types.DOUBLE), // Amount
+                                    wrapper.read(Types.BYTE) // Operation
+                                )
                             );
                         }
                         properties.put(key, new Pair<>(value, modifiers));
@@ -294,9 +307,9 @@ public class EntityPacketRewriter1_9 {
                     // Higher values hides the cooldown but it bugs visual animation on hand
                     // when removing item from hand with inventory gui
                     properties.put("generic.attackSpeed", new Pair<>(15.9, ImmutableList.of( // Neutralize modifiers
-                            new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
-                            new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
-                            new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
+                        new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
+                        new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
+                        new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
                     )));
 
                     wrapper.write(Types.INT, properties.size());
@@ -371,5 +384,116 @@ public class EntityPacketRewriter1_9 {
                 });
             }
         });
+    }
+
+    @Override
+    protected void registerRewrites() {
+        filter().handler(this::handleMetadata);
+    }
+
+    private void handleMetadata(MetaHandlerEvent event, Metadata metadata) {
+        EntityType type = event.entityType();
+        MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.id());
+        if (metaIndex == null) {
+            // Almost certainly bad data, remove it
+            event.cancel();
+            return;
+        }
+
+        if (metaIndex.getNewType() == null) {
+            event.cancel();
+            return;
+        }
+
+        metadata.setId(metaIndex.getNewIndex());
+        metadata.setMetaTypeUnsafe(metaIndex.getNewType());
+
+        Object value = metadata.getValue();
+        switch (metaIndex.getNewType()) {
+            case BYTE:
+                // convert from int, byte
+                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
+                    metadata.setValue(value);
+                }
+                if (metaIndex.getOldType() == MetaType1_8.INT) {
+                    metadata.setValue(((Integer) value).byteValue());
+                }
+                // After writing the last one
+                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityTypes1_10.EntityType.PLAYER) {
+                    byte val = 0;
+                    if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
+                        val = 1;
+                    }
+                    int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
+                    MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
+                    event.createExtraMeta(new Metadata(newIndex, metaType, val));
+                }
+                break;
+            case OPTIONAL_UUID:
+                String owner = (String) value;
+                UUID toWrite = null;
+                if (!owner.isEmpty()) {
+                    try {
+                        toWrite = UUID.fromString(owner);
+                    } catch (Exception ignored) {
+                    }
+                }
+                metadata.setValue(toWrite);
+                break;
+            case VAR_INT:
+                // convert from int, short, byte
+                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
+                    metadata.setValue(((Byte) value).intValue());
+                }
+                if (metaIndex.getOldType() == MetaType1_8.SHORT) {
+                    metadata.setValue(((Short) value).intValue());
+                }
+                if (metaIndex.getOldType() == MetaType1_8.INT) {
+                    metadata.setValue(value);
+                }
+                break;
+            case FLOAT, STRING:
+                metadata.setValue(value);
+                break;
+            case BOOLEAN:
+                if (metaIndex == MetaIndex1_8.AGEABLE_CREATURE_AGE)
+                    metadata.setValue((Byte) value < 0);
+                else
+                    metadata.setValue((Byte) value != 0);
+                break;
+            case ITEM:
+                metadata.setValue(value);
+                protocol.getItemRewriter().handleItemToClient(event.user(), (Item) metadata.getValue());
+                break;
+            case BLOCK_POSITION:
+                Vector vector = (Vector) value;
+                metadata.setValue(vector);
+                break;
+            case ROTATIONS:
+                EulerAngle angle = (EulerAngle) value;
+                metadata.setValue(angle);
+                break;
+            case COMPONENT:
+                // Was previously also a component, so just convert it
+                String text = (String) value;
+                metadata.setValue(ComponentUtil.convertJsonOrEmpty(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
+                break;
+            case OPTIONAL_BLOCK_STATE:
+                // Convert from int, short, byte
+                metadata.setValue(((Number) value).intValue());
+                break;
+            default:
+                throw new RuntimeException("Unhandled MetaDataType: " + metaIndex.getNewType());
+        }
+    }
+
+    @Override
+    public EntityType typeFromId(int type) {
+        return EntityTypes1_10.getTypeFromId(type, false);
+    }
+
+    @Override
+    public EntityType objectTypeFromId(int type) {
+        return EntityTypes1_10.getTypeFromId(type, true);
     }
 }

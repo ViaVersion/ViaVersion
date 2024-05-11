@@ -33,7 +33,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_10to1_11.data.PotionColorMapping;
-import com.viaversion.viaversion.protocols.v1_10to1_11.metadata.MetadataRewriter1_11To1_10;
+import com.viaversion.viaversion.protocols.v1_10to1_11.metadata.MetadataRewriter1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.BlockEntityRewriter;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.ItemPacketRewriter1_11;
@@ -51,7 +51,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
         }
     };
 
-    private final MetadataRewriter1_11To1_10 entityRewriter = new MetadataRewriter1_11To1_10(this);
+    private final MetadataRewriter1_11 entityRewriter = new MetadataRewriter1_11(this);
     private final ItemPacketRewriter1_11 itemRewriter = new ItemPacketRewriter1_11(this);
 
     public Protocol1_10To1_11() {
@@ -96,7 +96,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                     // Change Type :)
                     int type = wrapper.get(Types.VAR_INT, 1);
 
-                    EntityTypes1_11.EntityType entType = MetadataRewriter1_11To1_10.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    EntityTypes1_11.EntityType entType = MetadataRewriter1_11.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
                     if (entType != null) {
                         wrapper.set(Types.VAR_INT, 1, entType.getId());
 
@@ -357,7 +357,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
     }
 
     @Override
-    public MetadataRewriter1_11To1_10 getEntityRewriter() {
+    public MetadataRewriter1_11 getEntityRewriter() {
         return entityRewriter;
     }
 
