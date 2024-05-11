@@ -409,7 +409,7 @@ public class WorldPacketRewriter1_13 {
                     if (!VALID_BIOMES.contains(biome)) {
                         if (biome != 255 // is it generated naturally? *shrug*
                                 && latestBiomeWarn != biome) {
-                            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Received invalid biome id " + biome);
+                            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Received invalid biome id: " + biome);
                             latestBiomeWarn = biome;
                         }
                         chunk.getBiomeData()[i] = 1; // Plains

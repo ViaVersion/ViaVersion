@@ -53,7 +53,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         try {
             tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
         } catch (Exception e) {
-            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Error reading NBT in show_item: " + value, e);
+            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, () -> "Error reading NBT in show_item: " + value, e);
             return;
         }
 
@@ -83,7 +83,7 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
             showItem.addProperty("text", SerializerVersion.V1_13.toSNBT(tag));
             hoverEvent.add("value", newValue);
         } catch (Exception e) {
-            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Error writing NBT in show_item: " + value, e);
+            LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, () -> "Error writing NBT in show_item: " + value, e);
         }
     }
 

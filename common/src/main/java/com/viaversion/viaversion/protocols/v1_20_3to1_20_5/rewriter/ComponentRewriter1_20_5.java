@@ -215,7 +215,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             try {
                 tagTag = tag != null ? (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue()) : null;
             } catch (final Exception e) {
-                LogUtil.INSTANCE.conversionWarning(Protocol1_20_3To1_20_5.class, "Error reading NBT in show_item: " + contentsTag, e);
+                LogUtil.INSTANCE.conversionWarning(Protocol1_20_3To1_20_5.class, () -> "Error reading NBT in show_item: " + contentsTag, e);
                 return;
             }
 

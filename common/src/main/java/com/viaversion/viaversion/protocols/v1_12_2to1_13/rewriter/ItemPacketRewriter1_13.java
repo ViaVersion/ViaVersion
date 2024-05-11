@@ -119,8 +119,9 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         if (!originalSource.isEmpty()) {
                             flags |= 1;
                             Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
-                            if (finalSource.isEmpty()) { // TODO conversion info
-                                LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class, "Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                            if (finalSource.isEmpty()) {
+                                LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class,
+                                    "Could not handle unknown sound source {0} falling back to default: master", originalSource);
                                 finalSource = Optional.of(SoundSource.MASTER);
                             }
 

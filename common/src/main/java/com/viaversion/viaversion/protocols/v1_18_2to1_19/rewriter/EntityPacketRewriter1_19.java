@@ -281,7 +281,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         if (dimensionKey == null) {
             LogUtil.INSTANCE.conversionWarning(Protocol1_18_2To1_19.class, "The server tried to send dimension data from a dimension the client wasn't told about on join. " +
                 "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
-                " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+                " Received dimension: {0}. Known dimensions: {1}", currentDimension, registryStorage.dimensions());
 
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()

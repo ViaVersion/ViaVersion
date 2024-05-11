@@ -19,6 +19,7 @@ package com.viaversion.viaversion.util;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,9 +35,9 @@ public class LogUtil {
         this.logger = logger;
     }
 
-    public void conversionWarning(Class<? extends Protocol> protocol, String message) {
+    public void conversionWarning(Class<? extends Protocol> protocol, String message, Object... args) {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-            logger.warning(toDirection(protocol) + ": " + message);
+            logger.log(Level.WARNING, toDirection(protocol) + ": " + message, args);
         }
     }
 
@@ -46,21 +47,27 @@ public class LogUtil {
         }
     }
 
-    // ---------------------------------------------------------------------------------
-
-    public void warning(Class<? extends Protocol> protocol, final String message) {
-        logger.warning(toDirection(protocol) + ": " + message);
+    public void conversionWarning(Class<? extends Protocol> protocol, Supplier<String> message, Throwable t) {
+        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+            logger.log(Level.WARNING, toDirection(protocol) + ": " + message.get(), t);
+        }
     }
 
-    public void error(Class<? extends Protocol> protocol, String message) {
-        logger.severe(toDirection(protocol) + ": " + message);
+    // ---------------------------------------------------------------------------------
+
+    public void warning(Class<? extends Protocol> protocol, final String message, Object... args) {
+        logger.log(Level.WARNING, toDirection(protocol) + ": " + message, args);
+    }
+
+    public void error(Class<? extends Protocol> protocol, String message, Object... args) {
+        logger.log(Level.SEVERE, toDirection(protocol) + ": " + message, args);
     }
 
     public void error(Class<? extends Protocol> protocol, String message, Throwable t) {
         logger.log(Level.SEVERE, toDirection(protocol) + ": " + message, t);
     }
 
-    public static String toDirection(Class<? extends Protocol> protocol) {
+    private String toDirection(Class<? extends Protocol> protocol) {
         return protocol.getSimpleName().
             replace("Protocol", "").
             replace("To", "->").
