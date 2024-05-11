@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_17_1to1_18.data;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
-public final class BlockEntities {
+public final class BlockEntities1_18 {
     private static final Object2IntMap<String> BLOCK_ENTITY_IDS = new Object2IntOpenHashMap<>();
 
     static {

@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
@@ -30,12 +29,11 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.ComponentRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.MappingData1_14;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.metadata.MetadataRewriter1_14To1_13_2;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.EntityPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.EntityPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.ItemPacketRewriter1_14;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPackets1_14;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.WorldPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
@@ -47,7 +45,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
 
     public static final MappingData1_14 MAPPINGS = new MappingData1_14();
-    private final MetadataRewriter1_14To1_13_2 metadataRewriter = new MetadataRewriter1_14To1_13_2(this);
+    private final EntityPacketRewriter1_14 entityRewriter = new EntityPacketRewriter1_14(this);
     private final ItemPacketRewriter1_14 itemRewriter = new ItemPacketRewriter1_14(this);
 
     public Protocol1_13_2To1_14() {
@@ -58,9 +56,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     protected void registerPackets() {
         super.registerPackets();
 
-        EntityPacketRewriter1_14.register(this);
         WorldPacketRewriter1_14.register(this);
-        PlayerPackets1_14.register(this);
+        PlayerPacketRewriter1_14.register(this);
 
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_13.SOUND);
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
@@ -177,8 +174,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
-    public MetadataRewriter1_14To1_13_2 getEntityRewriter() {
-        return metadataRewriter;
+    public EntityPacketRewriter1_14 getEntityRewriter() {
+        return entityRewriter;
     }
 
     @Override

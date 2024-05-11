@@ -31,13 +31,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds1_18;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
@@ -56,7 +55,7 @@ public final class WorldPacketRewriter1_18 {
                 map(Types.BLOCK_POSITION1_14);
                 handler(wrapper -> {
                     final short id = wrapper.read(Types.UNSIGNED_BYTE);
-                    final int newId = BlockEntityIds.newId(id);
+                    final int newId = BlockEntityIds1_18.newId(id);
                     wrapper.write(Types.VAR_INT, newId);
 
                     handleSpawners(newId, wrapper.passthrough(Types.NAMED_COMPOUND_TAG));
@@ -118,7 +117,7 @@ public final class WorldPacketRewriter1_18 {
                 }
 
                 final String id = idTag.getValue();
-                final int typeId = BlockEntities.blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
+                final int typeId = BlockEntities1_18.blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
                 if (typeId == -1) {
                     Via.getPlatform().getLogger().warning("Unknown block entity: " + id);
                 }

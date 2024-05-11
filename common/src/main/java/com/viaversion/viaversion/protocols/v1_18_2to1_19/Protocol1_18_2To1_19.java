@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -43,7 +42,7 @@ import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.ItemPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter.WorldPacketRewriter1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.DimensionRegistryStorage;
-import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.NonceStorage;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.NonceStorage1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -249,7 +248,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                 handler(wrapper -> {
                     final byte[] publicKey = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     final byte[] nonce = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
-                    wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
+                    wrapper.user().put(new NonceStorage1_19(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
         });
@@ -272,7 +271,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                         wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     } else {
                         // 🧂
-                        final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
+                        final NonceStorage1_19 nonceStorage = wrapper.user().remove(NonceStorage1_19.class);
                         if (nonceStorage == null) {
                             throw new IllegalArgumentException("Server sent nonce is missing");
                         }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_15_2to1_16.data;
+package com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -27,10 +27,10 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TranslationMappings extends ComponentRewriter<ClientboundPackets1_15> {
+public class ComponentRewriter1_16 extends ComponentRewriter<ClientboundPackets1_15> {
     private final Map<String, String> mappings = new HashMap<>();
 
-    public TranslationMappings(Protocol1_15_2To1_16 protocol) {
+    public ComponentRewriter1_16(Protocol1_15_2To1_16 protocol) {
         super(protocol, ReadType.JSON);
         mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
         mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");

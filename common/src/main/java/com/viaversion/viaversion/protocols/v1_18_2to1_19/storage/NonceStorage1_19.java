@@ -15,20 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_19to1_19_1.data;
+package com.viaversion.viaversion.protocols.v1_18_2to1_19.storage;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class ChatRegistry {
-
-    private static final CompoundTag chatRegistry;
-
-    static {
-        chatRegistry = MappingDataLoader.INSTANCE.loadNBTFromFile("chat-registry-1.19.1.nbt");
-    }
-
-    public static CompoundTag chatRegistry() {
-        return chatRegistry.copy();
-    }
+public record NonceStorage1_19(byte[] nonce) implements StorableObject {
 }
