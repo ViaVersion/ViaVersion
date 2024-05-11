@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;

@@ -15,32 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.velocity.providers;
+package com.viaversion.viaversion.protocols.v1_8to1_9.provider;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
-import com.viaversion.viaversion.velocity.storage.VelocityStorage;
+import com.viaversion.viaversion.api.platform.providers.Provider;
 import java.util.UUID;
 
-public class VelocityBossBarProvider extends BossBarProvider {
-    @Override
+public class BossBarProvider implements Provider {
+
     public void handleAdd(UserConnection user, UUID barUUID) {
-        if (user.has(VelocityStorage.class)) {
-            VelocityStorage storage = user.get(VelocityStorage.class);
-            // Check if bossbars are supported by bungee, static maybe
-            if (storage.getBossbar() != null) {
-                storage.getBossbar().add(barUUID);
-            }
-        }
     }
 
-    @Override
     public void handleRemove(UserConnection user, UUID barUUID) {
-        if (user.has(VelocityStorage.class)) {
-            VelocityStorage storage = user.get(VelocityStorage.class);
-            if (storage.getBossbar() != null) {
-                storage.getBossbar().remove(barUUID);
-            }
-        }
     }
 }

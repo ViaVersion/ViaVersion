@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1.BukkitInventoryUpdateTask;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.providers.InventoryQuickMoveProvider;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.storage.ItemTransaction;
 import com.viaversion.viaversion.util.ReflectionUtil;
 import java.lang.reflect.Field;

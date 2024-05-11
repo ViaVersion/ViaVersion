@@ -33,7 +33,7 @@ import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.MetaIndex1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
@@ -105,9 +105,9 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.INT, SpawnPackets1_9.toNewDouble); // 1 - X - Needs to be divided by 32
-                map(Types.INT, SpawnPackets1_9.toNewDouble); // 2 - Y - Needs to be divided by 32
-                map(Types.INT, SpawnPackets1_9.toNewDouble); // 3 - Z - Needs to be divided by 32
+                map(Types.INT, SpawnPacketRewriter1_9.toNewDouble); // 1 - X - Needs to be divided by 32
+                map(Types.INT, SpawnPacketRewriter1_9.toNewDouble); // 2 - Y - Needs to be divided by 32
+                map(Types.INT, SpawnPacketRewriter1_9.toNewDouble); // 3 - Z - Needs to be divided by 32
 
                 map(Types.BYTE); // 4 - Pitch
                 map(Types.BYTE); // 5 - Yaw
@@ -393,7 +393,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
     private void handleMetadata(MetaHandlerEvent event, Metadata metadata) {
         EntityType type = event.entityType();
-        MetaIndex metaIndex = MetaIndex.searchIndex(type, metadata.id());
+        MetaIndex1_8 metaIndex = MetaIndex1_8.searchIndex(type, metadata.id());
         if (metaIndex == null) {
             // Almost certainly bad data, remove it
             event.cancel();
@@ -419,13 +419,13 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
-                if (metaIndex == MetaIndex.ENTITY_STATUS && type == EntityTypes1_10.EntityType.PLAYER) {
+                if (metaIndex == MetaIndex1_8.ENTITY_STATUS && type == EntityTypes1_10.EntityType.PLAYER) {
                     byte val = 0;
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
                     }
-                    int newIndex = MetaIndex.PLAYER_HAND.getNewIndex();
-                    MetaType metaType = MetaIndex.PLAYER_HAND.getNewType();
+                    int newIndex = MetaIndex1_8.PLAYER_HAND.getNewIndex();
+                    MetaType metaType = MetaIndex1_8.PLAYER_HAND.getNewType();
                     event.createExtraMeta(new Metadata(newIndex, metaType, val));
                 }
                 break;
