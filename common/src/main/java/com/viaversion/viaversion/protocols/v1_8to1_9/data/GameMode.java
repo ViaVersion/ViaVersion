@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_8to1_9.chat;
+package com.viaversion.viaversion.protocols.v1_8to1_9.data;
 
 public enum GameMode {
     SURVIVAL(0, "Survival Mode"),

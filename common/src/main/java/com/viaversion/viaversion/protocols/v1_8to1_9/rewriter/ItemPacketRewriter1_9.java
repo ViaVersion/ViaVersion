@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.ItemRewriter;
+import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
