@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
@@ -33,7 +34,7 @@ import com.viaversion.viaversion.util.Key;
 public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPackets1_18, ServerboundPackets1_19, Protocol1_18_2To1_19> {
 
     public ItemPacketRewriter1_19(Protocol1_18_2To1_19 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -46,30 +47,30 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT, Type.VAR_INT); // 0 - Particle ID
-                map(Type.BOOLEAN); // 1 - Long Distance
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.FLOAT); // 5 - Offset X
-                map(Type.FLOAT); // 6 - Offset Y
-                map(Type.FLOAT); // 7 - Offset Z
-                map(Type.FLOAT); // 8 - Particle Data
-                map(Type.INT); // 9 - Particle Count
+                map(Types.INT, Types.VAR_INT); // 0 - Particle ID
+                map(Types.BOOLEAN); // 1 - Long Distance
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.FLOAT); // 5 - Offset X
+                map(Types.FLOAT); // 6 - Offset Y
+                map(Types.FLOAT); // 7 - Offset Z
+                map(Types.FLOAT); // 8 - Particle Data
+                map(Types.INT); // 9 - Particle Count
                 handler(wrapper -> {
-                    final int id = wrapper.get(Type.VAR_INT, 0);
+                    final int id = wrapper.get(Types.VAR_INT, 0);
                     final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
                     if (id == particleMappings.id("vibration")) {
-                        wrapper.read(Type.POSITION1_14); // Remove position
+                        wrapper.read(Types.BLOCK_POSITION1_14); // Remove position
 
-                        final String resourceLocation = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
+                        final String resourceLocation = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
                         if (resourceLocation.equals("entity")) {
-                            wrapper.passthrough(Type.VAR_INT); // Target entity
-                            wrapper.write(Type.FLOAT, 0F); // Y offset
+                            wrapper.passthrough(Types.VAR_INT); // Target entity
+                            wrapper.write(Types.FLOAT, 0F); // Y offset
                         }
                     }
                 });
-                handler(getSpawnParticleHandler(Type.VAR_INT));
+                handler(getSpawnParticleHandler(Types.VAR_INT));
             }
         });
 
@@ -81,27 +82,27 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Container id
+                map(Types.VAR_INT); // Container id
                 handler(wrapper -> {
-                    final int size = wrapper.read(Type.UNSIGNED_BYTE);
-                    wrapper.write(Type.VAR_INT, size);
+                    final int size = wrapper.read(Types.UNSIGNED_BYTE);
+                    wrapper.write(Types.VAR_INT, size);
                     for (int i = 0; i < size; i++) {
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // First item
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // First item
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
 
-                        if (wrapper.read(Type.BOOLEAN)) {
-                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
+                        if (wrapper.read(Types.BOOLEAN)) {
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2));
                         } else {
-                            wrapper.write(Type.ITEM1_13_2, null);
+                            wrapper.write(Types.ITEM1_13_2, null);
                         }
 
-                        wrapper.passthrough(Type.BOOLEAN); // Out of stock
-                        wrapper.passthrough(Type.INT); // Uses
-                        wrapper.passthrough(Type.INT); // Max uses
-                        wrapper.passthrough(Type.INT); // Xp
-                        wrapper.passthrough(Type.INT); // Special price diff
-                        wrapper.passthrough(Type.FLOAT); // Price multiplier
-                        wrapper.passthrough(Type.INT); //Demand
+                        wrapper.passthrough(Types.BOOLEAN); // Out of stock
+                        wrapper.passthrough(Types.INT); // Uses
+                        wrapper.passthrough(Types.INT); // Max uses
+                        wrapper.passthrough(Types.INT); // Xp
+                        wrapper.passthrough(Types.INT); // Special price diff
+                        wrapper.passthrough(Types.FLOAT); // Price multiplier
+                        wrapper.passthrough(Types.INT); //Demand
                     }
                 });
             }
@@ -110,29 +111,29 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
         protocol.registerServerbound(ServerboundPackets1_19.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Action
-                map(Type.POSITION1_14); // Block position
-                map(Type.UNSIGNED_BYTE); // Direction
+                map(Types.VAR_INT); // Action
+                map(Types.BLOCK_POSITION1_14); // Block position
+                map(Types.UNSIGNED_BYTE); // Direction
                 handler(sequenceHandler());
             }
         });
         protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Hand
-                map(Type.POSITION1_14); // Block position
-                map(Type.VAR_INT); // Direction
-                map(Type.FLOAT); // X
-                map(Type.FLOAT); // Y
-                map(Type.FLOAT); // Z
-                map(Type.BOOLEAN); // Inside
+                map(Types.VAR_INT); // Hand
+                map(Types.BLOCK_POSITION1_14); // Block position
+                map(Types.VAR_INT); // Direction
+                map(Types.FLOAT); // X
+                map(Types.FLOAT); // Y
+                map(Types.FLOAT); // Z
+                map(Types.BOOLEAN); // Inside
                 handler(sequenceHandler());
             }
         });
         protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Hand
+                map(Types.VAR_INT); // Hand
                 handler(sequenceHandler());
             }
         });
@@ -142,7 +143,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
 
     private PacketHandler sequenceHandler() {
         return wrapper -> {
-            final int sequence = wrapper.read(Type.VAR_INT);
+            final int sequence = wrapper.read(Types.VAR_INT);
             final AckSequenceProvider provider = Via.getManager().getProviders().get(AckSequenceProvider.class);
             provider.handleSequence(wrapper.user(), sequence);
         };

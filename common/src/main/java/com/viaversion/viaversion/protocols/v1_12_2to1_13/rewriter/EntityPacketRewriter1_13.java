@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
@@ -36,20 +37,20 @@ public class EntityPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity id
-                map(Type.UUID); // 1 - UUID
-                map(Type.BYTE); // 2 - Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Pitch
-                map(Type.BYTE); // 7 - Yaw
-                map(Type.INT); // 8 - Data
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.UUID); // 1 - UUID
+                map(Types.BYTE); // 2 - Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Pitch
+                map(Types.BYTE); // 7 - Yaw
+                map(Types.INT); // 8 - Data
 
                 // Track Entity
                 handler(wrapper -> {
-                    int entityId = wrapper.get(Type.VAR_INT, 0);
-                    byte type = wrapper.get(Type.BYTE, 0);
+                    int entityId = wrapper.get(Types.VAR_INT, 0);
+                    byte type = wrapper.get(Types.BYTE, 0);
                     EntityTypes1_13.EntityType entType = EntityTypes1_13.getTypeFromId(type, true);
                     if (entType == null) return;
 
@@ -57,14 +58,14 @@ public class EntityPacketRewriter1_13 {
                     wrapper.user().getEntityTracker(Protocol1_12_2To1_13.class).addEntity(entityId, entType);
 
                     if (entType.is(EntityTypes1_13.EntityType.FALLING_BLOCK)) {
-                        int oldId = wrapper.get(Type.INT, 0);
+                        int oldId = wrapper.get(Types.INT, 0);
                         int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
-                        wrapper.set(Type.INT, 0, WorldPacketRewriter1_13.toNewId(combined));
+                        wrapper.set(Types.INT, 0, WorldPacketRewriter1_13.toNewId(combined));
                     }
 
                     // Fix ItemFrame hitbox
                     if (entType.is(EntityTypes1_13.EntityType.ITEM_FRAME)) {
-                        int data = wrapper.get(Type.INT, 0);
+                        int data = wrapper.get(Types.INT, 0);
                         switch (data) {
                             case 0 -> data = 3; // South
                             case 1 -> data = 4; // West
@@ -72,7 +73,7 @@ public class EntityPacketRewriter1_13 {
                             case 3 -> data = 5; // East
                         }
 
-                        wrapper.set(Type.INT, 0, data);
+                        wrapper.set(Types.INT, 0, data);
                     }
                 });
             }
@@ -81,18 +82,18 @@ public class EntityPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Entity UUID
-                map(Type.VAR_INT); // 2 - Entity Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Yaw
-                map(Type.BYTE); // 7 - Pitch
-                map(Type.BYTE); // 8 - Head Pitch
-                map(Type.SHORT); // 9 - Velocity X
-                map(Type.SHORT); // 10 - Velocity Y
-                map(Type.SHORT); // 11 - Velocity Z
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
+                map(Types.VAR_INT); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 12 - Metadata
 
                 handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST));
@@ -102,13 +103,13 @@ public class EntityPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Player UUID
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.BYTE); // 5 - Yaw
-                map(Type.BYTE); // 6 - Pitch
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Player UUID
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.BYTE); // 5 - Yaw
+                map(Types.BYTE); // 6 - Pitch
                 map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 7 - Metadata
 
                 handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
@@ -118,13 +119,13 @@ public class EntityPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
                     ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
+                    int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
                 handler(metadataRewriter.playerTrackerHandler());
@@ -135,18 +136,18 @@ public class EntityPacketRewriter1_13 {
         protocol.registerClientbound(ClientboundPackets1_12_1.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.BYTE); // Effect id
-                map(Type.BYTE); // Amplifier
-                map(Type.VAR_INT); // Duration
+                map(Types.VAR_INT); // Entity id
+                map(Types.BYTE); // Effect id
+                map(Types.BYTE); // Amplifier
+                map(Types.VAR_INT); // Duration
 
                 handler(packetWrapper -> {
-                    byte flags = packetWrapper.read(Type.BYTE); // Input Flags
+                    byte flags = packetWrapper.read(Types.BYTE); // Input Flags
 
                     if (Via.getConfig().isNewEffectIndicator())
                         flags |= 0x04;
 
-                    packetWrapper.write(Type.BYTE, flags);
+                    packetWrapper.write(Types.BYTE, flags);
                 });
             }
         });

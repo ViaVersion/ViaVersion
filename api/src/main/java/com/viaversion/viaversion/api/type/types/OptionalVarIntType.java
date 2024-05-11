@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class OptionalVarIntType extends Type<Integer> {
@@ -33,16 +34,16 @@ public class OptionalVarIntType extends Type<Integer> {
 
     @Override
     public Integer read(final ByteBuf buffer) {
-        final int value = Type.VAR_INT.readPrimitive(buffer);
+        final int value = Types.VAR_INT.readPrimitive(buffer);
         return value == 0 ? null : value - 1;
     }
 
     @Override
     public void write(final ByteBuf buffer, final Integer object) {
         if (object == null) {
-            Type.VAR_INT.writePrimitive(buffer, 0);
+            Types.VAR_INT.writePrimitive(buffer, 0);
         } else {
-            Type.VAR_INT.writePrimitive(buffer, object + 1);
+            Types.VAR_INT.writePrimitive(buffer, object + 1);
         }
     }
 }

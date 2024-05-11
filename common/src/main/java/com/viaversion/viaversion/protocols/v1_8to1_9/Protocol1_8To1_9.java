@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8.packet.ServerboundPackets1_8;
@@ -56,7 +57,7 @@ import com.viaversion.viaversion.util.SerializerVersion;
 
 public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_9, ServerboundPackets1_8, ServerboundPackets1_9> {
 
-    public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<>(Type.COMPONENT) {
+    public static final ValueTransformer<String, JsonElement> STRING_TO_JSON = new ValueTransformer<>(Types.COMPONENT) {
         @Override
         public JsonElement transform(PacketWrapper wrapper, String line) {
             return ComponentUtil.convertJsonOrEmpty(line, SerializerVersion.V1_8, SerializerVersion.V1_9);
@@ -89,12 +90,12 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
         super.registerPackets();
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
-            if (wrapper.isReadable(Type.COMPONENT, 0)) {
+            if (wrapper.isReadable(Types.COMPONENT, 0)) {
                 // Already written as component in the base protocol
                 return;
             }
 
-            STRING_TO_JSON.write(wrapper, wrapper.read(Type.STRING));
+            STRING_TO_JSON.write(wrapper, wrapper.read(Types.STRING));
         });
 
         // Other Handlers

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 
@@ -31,15 +32,15 @@ public record BannerPattern(String assetId, String translationKey) {
     public static final HolderType<BannerPattern> TYPE = new HolderType<>() {
         @Override
         public BannerPattern readDirect(final ByteBuf buffer) {
-            final String assetId = Type.STRING.read(buffer);
-            final String translationKey = Type.STRING.read(buffer);
+            final String assetId = Types.STRING.read(buffer);
+            final String translationKey = Types.STRING.read(buffer);
             return new BannerPattern(assetId, translationKey);
         }
 
         @Override
         public void writeDirect(final ByteBuf buffer, final BannerPattern value) {
-            Type.STRING.write(buffer, value.assetId);
-            Type.STRING.write(buffer, value.translationKey);
+            Types.STRING.write(buffer, value.assetId);
+            Types.STRING.write(buffer, value.translationKey);
         }
     };
 

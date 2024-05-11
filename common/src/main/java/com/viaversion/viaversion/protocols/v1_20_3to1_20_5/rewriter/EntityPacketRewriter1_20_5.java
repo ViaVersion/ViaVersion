@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
@@ -75,10 +76,10 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
             final PacketWrapper knownPacksPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
-            knownPacksPacket.write(Type.VAR_INT, 0); // No known packs, everything is sent here
+            knownPacksPacket.write(Types.VAR_INT, 0); // No known packs, everything is sent here
             knownPacksPacket.send(Protocol1_20_3To1_20_5.class);
 
-            final CompoundTag registryData = wrapper.read(Type.COMPOUND_TAG);
+            final CompoundTag registryData = wrapper.read(Types.COMPOUND_TAG);
             cacheDimensionData(wrapper.user(), registryData);
             trackBiomeSize(wrapper.user(), registryData);
 
@@ -172,8 +173,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 }
 
                 final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
-                registryPacket.write(Type.STRING, type);
-                registryPacket.write(Type.REGISTRY_ENTRY_ARRAY, registryEntries);
+                registryPacket.write(Types.STRING, type);
+                registryPacket.write(Types.REGISTRY_ENTRY_ARRAY, registryEntries);
                 registryPacket.send(Protocol1_20_3To1_20_5.class);
             }
 
@@ -181,17 +182,17 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             // Send banner patterns and default wolf variant
             final PacketWrapper wolfVariantsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
-            wolfVariantsPacket.write(Type.STRING, "minecraft:wolf_variant");
+            wolfVariantsPacket.write(Types.STRING, "minecraft:wolf_variant");
             final CompoundTag paleWolf = new CompoundTag();
             paleWolf.putString("wild_texture", "entity/wolf/wolf");
             paleWolf.putString("tame_texture", "entity/wolf/wolf_tame");
             paleWolf.putString("angry_texture", "entity/wolf/wolf_angry");
             paleWolf.put("biomes", new ListTag<>(StringTag.class));
-            wolfVariantsPacket.write(Type.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", paleWolf)});
+            wolfVariantsPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("minecraft:pale", paleWolf)});
             wolfVariantsPacket.send(Protocol1_20_3To1_20_5.class);
 
             final PacketWrapper bannerPatternsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
-            bannerPatternsPacket.write(Type.STRING, "minecraft:banner_pattern");
+            bannerPatternsPacket.write(Types.STRING, "minecraft:banner_pattern");
             final RegistryEntry[] patternEntries = new RegistryEntry[BannerPatterns1_20_5.keys().length];
             final String[] keys = BannerPatterns1_20_5.keys();
             for (int i = 0; i < keys.length; i++) {
@@ -202,35 +203,35 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 pattern.putString("translation_key", "block.minecraft.banner." + key);
                 patternEntries[i] = new RegistryEntry(resourceLocation, pattern);
             }
-            bannerPatternsPacket.write(Type.REGISTRY_ENTRY_ARRAY, patternEntries);
+            bannerPatternsPacket.write(Types.REGISTRY_ENTRY_ARRAY, patternEntries);
             bannerPatternsPacket.send(Protocol1_20_3To1_20_5.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.STRING_ARRAY); // World List
-                map(Type.VAR_INT); // Max players
-                map(Type.VAR_INT); // View distance
-                map(Type.VAR_INT); // Simulation distance
-                map(Type.BOOLEAN); // Reduced debug info
-                map(Type.BOOLEAN); // Show death screen
-                map(Type.BOOLEAN); // Limited crafting
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.STRING_ARRAY); // World List
+                map(Types.VAR_INT); // Max players
+                map(Types.VAR_INT); // View distance
+                map(Types.VAR_INT); // Simulation distance
+                map(Types.BOOLEAN); // Reduced debug info
+                map(Types.BOOLEAN); // Show death screen
+                map(Types.BOOLEAN); // Limited crafting
                 handler(wrapper -> {
-                    final String dimensionKey = wrapper.read(Type.STRING);
+                    final String dimensionKey = wrapper.read(Types.STRING);
                     final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
-                    wrapper.write(Type.VAR_INT, data.id());
+                    wrapper.write(Types.VAR_INT, data.id());
                 });
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous gamemode
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
-                map(Type.OPTIONAL_GLOBAL_POSITION); // Last death location
-                map(Type.VAR_INT); // Portal cooldown
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous gamemode
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
+                map(Types.OPTIONAL_GLOBAL_POSITION); // Last death location
+                map(Types.VAR_INT); // Portal cooldown
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
@@ -238,15 +239,15 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
                     if (storage.secureChatEnforced() != null) {
                         // Just put in what we know if this is sent multiple times
-                        wrapper.write(Type.BOOLEAN, storage.isSecureChatEnforced());
+                        wrapper.write(Types.BOOLEAN, storage.isSecureChatEnforced());
                     } else {
-                        wrapper.write(Type.BOOLEAN, Via.getConfig().enforceSecureChat());
+                        wrapper.write(Types.BOOLEAN, Via.getConfig().enforceSecureChat());
                     }
 
                     storage.clear();
 
                     // Handle creative interaction range
-                    final byte gamemode = wrapper.get(Type.BYTE, 0);
+                    final byte gamemode = wrapper.get(Types.BYTE, 0);
                     if (gamemode == CREATIVE_MODE_ID) {
                         sendRangeAttributes(wrapper.user(), true);
                     }
@@ -255,58 +256,58 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.RESPAWN, wrapper -> {
-            final String dimensionKey = wrapper.read(Type.STRING);
+            final String dimensionKey = wrapper.read(Types.STRING);
             final DimensionData data = tracker(wrapper.user()).dimensionData(dimensionKey);
-            wrapper.write(Type.VAR_INT, data.id());
+            wrapper.write(Types.VAR_INT, data.id());
 
-            wrapper.passthrough(Type.STRING); // World
+            wrapper.passthrough(Types.STRING); // World
             worldDataTrackerHandlerByKey1_20_5(0).handle(wrapper); // Tracks world height and name for chunk data and entity (un)tracking
-            wrapper.passthrough(Type.LONG); // Seed
+            wrapper.passthrough(Types.LONG); // Seed
 
-            final byte gamemode = wrapper.passthrough(Type.BYTE);
+            final byte gamemode = wrapper.passthrough(Types.BYTE);
             sendRangeAttributes(wrapper.user(), gamemode == CREATIVE_MODE_ID);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_MOB_EFFECT, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity ID
-            wrapper.passthrough(Type.VAR_INT); // Effect ID
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            wrapper.passthrough(Types.VAR_INT); // Effect ID
 
-            final byte amplifier = wrapper.read(Type.BYTE);
-            wrapper.write(Type.VAR_INT, (int) amplifier);
+            final byte amplifier = wrapper.read(Types.BYTE);
+            wrapper.write(Types.VAR_INT, (int) amplifier);
 
-            wrapper.passthrough(Type.VAR_INT); // Duration
-            wrapper.passthrough(Type.BYTE); // Flags
-            wrapper.read(Type.OPTIONAL_COMPOUND_TAG); // Remove factor data
+            wrapper.passthrough(Types.VAR_INT); // Duration
+            wrapper.passthrough(Types.BYTE); // Flags
+            wrapper.read(Types.OPTIONAL_COMPOUND_TAG); // Remove factor data
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_ATTRIBUTES, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity ID
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
                 // From a string to a registry int ID
-                final String attributeIdentifier = wrapper.read(Type.STRING);
+                final String attributeIdentifier = wrapper.read(Types.STRING);
                 final int mappedId = Attributes1_20_5.keyToId(attributeIdentifier);
-                wrapper.write(Type.VAR_INT, mappedId != -1 ? mappedId : 0);
+                wrapper.write(Types.VAR_INT, mappedId != -1 ? mappedId : 0);
 
-                wrapper.passthrough(Type.DOUBLE); // Base
-                final int modifierSize = wrapper.passthrough(Type.VAR_INT);
+                wrapper.passthrough(Types.DOUBLE); // Base
+                final int modifierSize = wrapper.passthrough(Types.VAR_INT);
                 for (int j = 0; j < modifierSize; j++) {
-                    wrapper.passthrough(Type.UUID); // ID
-                    wrapper.passthrough(Type.DOUBLE); // Amount
-                    wrapper.passthrough(Type.BYTE); // Operation
+                    wrapper.passthrough(Types.UUID); // ID
+                    wrapper.passthrough(Types.DOUBLE); // Amount
+                    wrapper.passthrough(Types.BYTE); // Operation
                 }
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.GAME_EVENT, wrapper -> {
             // If the gamemode changed to/from creative, update the range attribute
-            final short event = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            final short event = wrapper.passthrough(Types.UNSIGNED_BYTE);
             if (event != 3) {
                 return;
             }
 
             // Resend attributes either with their original list or with the creative range modifier added
-            final float value = wrapper.passthrough(Type.FLOAT);
+            final float value = wrapper.passthrough(Types.FLOAT);
             sendRangeAttributes(wrapper.user(), value == CREATIVE_MODE_ID);
         });
     }
@@ -364,25 +365,25 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     private void sendRangeAttributes(final UserConnection connection, final boolean creativeMode) {
         final PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, connection);
-        wrapper.write(Type.VAR_INT, tracker(connection).clientEntityId());
-        wrapper.write(Type.VAR_INT, 2); // Number of attributes
+        wrapper.write(Types.VAR_INT, tracker(connection).clientEntityId());
+        wrapper.write(Types.VAR_INT, 2); // Number of attributes
         writeAttribute(wrapper, "player.block_interaction_range", 4.5, creativeMode ? CREATIVE_BLOCK_INTERACTION_RANGE : null, 0.5);
         writeAttribute(wrapper, "player.entity_interaction_range", 3.0, creativeMode ? CREATIVE_ENTITY_INTERACTION_RANGE : null, 2.0);
         wrapper.scheduleSend(Protocol1_20_3To1_20_5.class);
     }
 
     private void writeAttribute(final PacketWrapper wrapper, final String attributeId, final double base, @Nullable final UUID modifierId, final double amount) {
-        wrapper.write(Type.VAR_INT, Attributes1_20_5.keyToId(attributeId));
-        wrapper.write(Type.DOUBLE, base);
+        wrapper.write(Types.VAR_INT, Attributes1_20_5.keyToId(attributeId));
+        wrapper.write(Types.DOUBLE, base);
         if (modifierId != null) {
             // Single modifier
-            wrapper.write(Type.VAR_INT, 1);
-            wrapper.write(Type.UUID, modifierId);
-            wrapper.write(Type.DOUBLE, amount);
-            wrapper.write(Type.BYTE, (byte) 0); // Add
+            wrapper.write(Types.VAR_INT, 1);
+            wrapper.write(Types.UUID, modifierId);
+            wrapper.write(Types.DOUBLE, amount);
+            wrapper.write(Types.BYTE, (byte) 0); // Add
         } else {
             // No modifiers
-            wrapper.write(Type.VAR_INT, 0);
+            wrapper.write(Types.VAR_INT, 0);
         }
     }
 
@@ -433,7 +434,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
 
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
-            particle.add(Type.INT, withAlpha(effectColor));
+            particle.add(Types.INT, withAlpha(effectColor));
             meta.setTypeAndValue(Types1_20_5.META_TYPES.particlesType, new Particle[]{particle});
         });
 
@@ -449,7 +450,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     if (color != 0) {
                         // Add default particle with data
                         final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
-                        particle.add(Type.INT, withAlpha(color));
+                        particle.add(Types.INT, withAlpha(color));
                         event.createExtraMeta(new Metadata(10, Types1_20_5.META_TYPES.particleType, particle));
                     }
                 } else {
@@ -501,7 +502,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
         super.rewriteParticle(connection, particle);
         if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
-            particle.add(Type.INT, 0); // Default color, changed in the area effect handler
+            particle.add(Types.INT, 0); // Default color, changed in the area effect handler
         }
     }
 

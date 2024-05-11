@@ -20,6 +20,7 @@ package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorType;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
@@ -59,14 +60,14 @@ public class ArmorListener extends ViaBukkitListener {
         }
 
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.UPDATE_ATTRIBUTES, null, getUserConnection(player));
-        wrapper.write(Type.VAR_INT, player.getEntityId()); // Player ID
-        wrapper.write(Type.INT, 1); // only 1 property
-        wrapper.write(Type.STRING, "generic.armor");
-        wrapper.write(Type.DOUBLE, 0D); //default 0 armor
-        wrapper.write(Type.VAR_INT, 1); // 1 modifier
-        wrapper.write(Type.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
-        wrapper.write(Type.DOUBLE, (double) armor); // the modifier value
-        wrapper.write(Type.BYTE, (byte) 0);// the modifier operation, 0 = add number
+        wrapper.write(Types.VAR_INT, player.getEntityId()); // Player ID
+        wrapper.write(Types.INT, 1); // only 1 property
+        wrapper.write(Types.STRING, "generic.armor");
+        wrapper.write(Types.DOUBLE, 0D); //default 0 armor
+        wrapper.write(Types.VAR_INT, 1); // 1 modifier
+        wrapper.write(Types.UUID, ARMOR_ATTRIBUTE); // armor modifier uuid
+        wrapper.write(Types.DOUBLE, (double) armor); // the modifier value
+        wrapper.write(Types.BYTE, (byte) 0);// the modifier operation, 0 = add number
         wrapper.scheduleSend(Protocol1_8To1_9.class);
     }
 

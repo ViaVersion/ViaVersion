@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
@@ -47,8 +48,8 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.STRING); // Registry
-                map(Type.REGISTRY_ENTRY_ARRAY); // Data
+                map(Types.STRING); // Registry
+                map(Types.REGISTRY_ENTRY_ARRAY); // Data
                 handler(registryDataHandler1_20_5()); // Caches dimensions to access data like height later and tracks the amount of biomes sent for chunk data
             }
         });
@@ -56,17 +57,17 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_20_5.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity id
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.STRING_ARRAY); // World List
-                map(Type.VAR_INT); // Max players
-                map(Type.VAR_INT); // View distance
-                map(Type.VAR_INT); // Simulation distance
-                map(Type.BOOLEAN); // Reduced debug info
-                map(Type.BOOLEAN); // Show death screen
-                map(Type.BOOLEAN); // Limited crafting
-                map(Type.VAR_INT); // Dimension id
-                map(Type.STRING); // World
+                map(Types.INT); // Entity id
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.STRING_ARRAY); // World List
+                map(Types.VAR_INT); // Max players
+                map(Types.VAR_INT); // View distance
+                map(Types.VAR_INT); // Simulation distance
+                map(Types.BOOLEAN); // Reduced debug info
+                map(Types.BOOLEAN); // Show death screen
+                map(Types.BOOLEAN); // Limited crafting
+                map(Types.VAR_INT); // Dimension id
+                map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey1_20_5(3)); // Tracks world height and name for chunk data and entity (un)tracking
                 handler(playerTrackerHandler());
             }
@@ -75,8 +76,8 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_20_5.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Dimension
-                map(Type.STRING); // World
+                map(Types.VAR_INT); // Dimension
+                map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey1_20_5(0)); // Tracks world height and name for chunk data and entity (un)tracking
             }
         });

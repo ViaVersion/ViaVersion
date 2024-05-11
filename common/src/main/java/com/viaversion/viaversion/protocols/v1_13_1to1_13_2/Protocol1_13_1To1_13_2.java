@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.rewriter.EntityPacketRewriter1_13_2;
@@ -42,38 +43,38 @@ public class Protocol1_13_1To1_13_2 extends AbstractProtocol<ClientboundPackets1
         registerServerbound(ServerboundPackets1_13.EDIT_BOOK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.ITEM1_13_2, Type.ITEM1_13);
+                map(Types.ITEM1_13_2, Types.ITEM1_13);
             }
         });
 
         registerClientbound(ClientboundPackets1_13.UPDATE_ADVANCEMENTS, wrapper -> {
-            wrapper.passthrough(Type.BOOLEAN); // Reset/clear
-            int size = wrapper.passthrough(Type.VAR_INT); // Mapping size
+            wrapper.passthrough(Types.BOOLEAN); // Reset/clear
+            int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
 
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.STRING); // Identifier
-                wrapper.passthrough(Type.OPTIONAL_STRING); // Parent
+                wrapper.passthrough(Types.STRING); // Identifier
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Parent
 
                 // Display data
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.COMPONENT); // Title
-                    wrapper.passthrough(Type.COMPONENT); // Description
-                    Item icon = wrapper.read(Type.ITEM1_13);
-                    wrapper.write(Type.ITEM1_13_2, icon);
-                    wrapper.passthrough(Type.VAR_INT); // Frame type
-                    int flags = wrapper.passthrough(Type.INT); // Flags
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.COMPONENT); // Title
+                    wrapper.passthrough(Types.COMPONENT); // Description
+                    Item icon = wrapper.read(Types.ITEM1_13);
+                    wrapper.write(Types.ITEM1_13_2, icon);
+                    wrapper.passthrough(Types.VAR_INT); // Frame type
+                    int flags = wrapper.passthrough(Types.INT); // Flags
                     if ((flags & 1) != 0) {
-                        wrapper.passthrough(Type.STRING); // Background texture
+                        wrapper.passthrough(Types.STRING); // Background texture
                     }
-                    wrapper.passthrough(Type.FLOAT); // X
-                    wrapper.passthrough(Type.FLOAT); // Y
+                    wrapper.passthrough(Types.FLOAT); // X
+                    wrapper.passthrough(Types.FLOAT); // Y
                 }
 
-                wrapper.passthrough(Type.STRING_ARRAY); // Criteria
+                wrapper.passthrough(Types.STRING_ARRAY); // Criteria
 
-                int arrayLength = wrapper.passthrough(Type.VAR_INT);
+                int arrayLength = wrapper.passthrough(Types.VAR_INT);
                 for (int array = 0; array < arrayLength; array++) {
-                    wrapper.passthrough(Type.STRING_ARRAY); // String array
+                    wrapper.passthrough(Types.STRING_ARRAY); // String array
                 }
             }
         });

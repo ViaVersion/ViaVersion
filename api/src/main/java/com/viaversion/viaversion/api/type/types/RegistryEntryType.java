@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class RegistryEntryType extends Type<RegistryEntry> {
@@ -34,12 +35,12 @@ public class RegistryEntryType extends Type<RegistryEntry> {
 
     @Override
     public RegistryEntry read(final ByteBuf buffer) {
-        return new RegistryEntry(Type.STRING.read(buffer), Type.OPTIONAL_TAG.read(buffer));
+        return new RegistryEntry(Types.STRING.read(buffer), Types.OPTIONAL_TAG.read(buffer));
     }
 
     @Override
     public void write(final ByteBuf buffer, final RegistryEntry entry) {
-        Type.STRING.write(buffer, entry.key());
-        Type.OPTIONAL_TAG.write(buffer, entry.tag());
+        Types.STRING.write(buffer, entry.key());
+        Types.OPTIONAL_TAG.write(buffer, entry.tag());
     }
 }

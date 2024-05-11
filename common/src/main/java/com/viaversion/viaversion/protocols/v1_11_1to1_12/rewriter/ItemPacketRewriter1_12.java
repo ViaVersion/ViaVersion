@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.providers.InventoryQuickMoveProvider;
@@ -32,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_12, Protocol1_11_1To1_12> {
 
     public ItemPacketRewriter1_12(Protocol1_11_1To1_12 protocol) {
-        super(protocol, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
+        super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY);
     }
 
     @Override
@@ -45,25 +46,25 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
         protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Channel
+                map(Types.STRING); // 0 - Channel
 
                 handlerSoftFail(wrapper -> {
-                    if (wrapper.get(Type.STRING, 0).equals("MC|TrList")) {
-                        wrapper.passthrough(Type.INT); // Passthrough Window ID
+                    if (wrapper.get(Types.STRING, 0).equals("MC|TrList")) {
+                        wrapper.passthrough(Types.INT); // Passthrough Window ID
 
-                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
-                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Input Item
-                            handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Output Item
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Input Item
+                            handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Output Item
 
-                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            boolean secondItem = wrapper.passthrough(Types.BOOLEAN); // Has second item
                             if (secondItem) {
-                                handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_8)); // Second Item
+                                handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Second Item
                             }
 
-                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                            wrapper.passthrough(Type.INT); // Number of tools uses
-                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Types.INT); // Number of tools uses
+                            wrapper.passthrough(Types.INT); // Maximum number of trade uses
                         }
                     }
                 });
@@ -74,26 +75,26 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
         protocol.registerServerbound(ServerboundPackets1_12.CONTAINER_CLICK, new PacketHandlers() {
                     @Override
                     public void register() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Type.SHORT); // 1 - Slot
-                        map(Type.BYTE); // 2 - Button
-                        map(Type.SHORT); // 3 - Action number
-                        map(Type.VAR_INT); // 4 - Mode
-                        map(Type.ITEM1_8); // 5 - Clicked Item
+                        map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                        map(Types.SHORT); // 1 - Slot
+                        map(Types.BYTE); // 2 - Button
+                        map(Types.SHORT); // 3 - Action number
+                        map(Types.VAR_INT); // 4 - Mode
+                        map(Types.ITEM1_8); // 5 - Clicked Item
 
                         handler(wrapper -> {
-                            Item item = wrapper.get(Type.ITEM1_8, 0);
+                            Item item = wrapper.get(Types.ITEM1_8, 0);
                             if (!Via.getConfig().is1_12QuickMoveActionFix()) {
                                 handleItemToServer(wrapper.user(), item);
                                 return;
                             }
-                            byte button = wrapper.get(Type.BYTE, 0);
-                            int mode = wrapper.get(Type.VAR_INT, 0);
+                            byte button = wrapper.get(Types.BYTE, 0);
+                            int mode = wrapper.get(Types.VAR_INT, 0);
                             // QUICK_MOVE PATCH (Shift + (click/double click))
                             if (mode == 1 && button == 0 && item == null) {
-                                short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                                short slotId = wrapper.get(Type.SHORT, 0);
-                                short actionId = wrapper.get(Type.SHORT, 1);
+                                short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                                short slotId = wrapper.get(Types.SHORT, 0);
+                                short actionId = wrapper.get(Types.SHORT, 1);
                                 InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
                                 boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
                                 if (succeed) {

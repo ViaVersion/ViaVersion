@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
@@ -56,7 +57,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
         // Cancelling can only be done by updating the player's metadata
         if (event.isGliding() && event.isCancelled()) {
             PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, null, getUserConnection(player));
-            packet.write(Type.VAR_INT, player.getEntityId());
+            packet.write(Types.VAR_INT, player.getEntityId());
 
             byte bitmask = 0;
             // Collect other metadata for the mitmask

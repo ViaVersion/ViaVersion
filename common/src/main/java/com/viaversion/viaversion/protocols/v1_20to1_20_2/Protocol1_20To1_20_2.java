@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -81,11 +82,11 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         final PacketHandlers sanitizeCustomPayload = new PacketHandlers() {
             @Override
             protected void register() {
-                map(Type.STRING); // Channel
+                map(Types.STRING); // Channel
                 handlerSoftFail(wrapper -> {
-                    final String channel = Key.namespaced(wrapper.get(Type.STRING, 0));
+                    final String channel = Key.namespaced(wrapper.get(Types.STRING, 0));
                     if (channel.equals("minecraft:brand")) {
-                        wrapper.passthrough(Type.STRING);
+                        wrapper.passthrough(Types.STRING);
                         wrapper.clearInputBuffer();
                     }
                 });
@@ -95,10 +96,10 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, sanitizeCustomPayload);
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
-            final String url = wrapper.passthrough(Type.STRING);
-            final String hash = wrapper.passthrough(Type.STRING);
-            final boolean required = wrapper.passthrough(Type.BOOLEAN);
-            final JsonElement prompt = wrapper.passthrough(Type.OPTIONAL_COMPONENT);
+            final String url = wrapper.passthrough(Types.STRING);
+            final String hash = wrapper.passthrough(Types.STRING);
+            final boolean required = wrapper.passthrough(Types.BOOLEAN);
+            final JsonElement prompt = wrapper.passthrough(Types.OPTIONAL_COMPONENT);
             wrapper.user().put(new LastResourcePack(url, hash, required, prompt));
         });
 
@@ -114,15 +115,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
 
         registerClientbound(ClientboundPackets1_19_4.SET_DISPLAY_OBJECTIVE, wrapper -> {
-            final byte slot = wrapper.read(Type.BYTE);
-            wrapper.write(Type.VAR_INT, (int) slot);
+            final byte slot = wrapper.read(Types.BYTE);
+            wrapper.write(Types.VAR_INT, (int) slot);
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), wrapper -> {
-            wrapper.passthrough(Type.STRING); // Name
+            wrapper.passthrough(Types.STRING); // Name
 
-            final UUID uuid = wrapper.read(Type.UUID);
-            wrapper.write(Type.OPTIONAL_UUID, uuid);
+            final UUID uuid = wrapper.read(Types.UUID);
+            wrapper.write(Types.OPTIONAL_UUID, uuid);
         });
 
         // Deal with the new CONFIGURATION protocol state the client expects
@@ -159,14 +160,14 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CLIENT_INFORMATION.getId(), -1, wrapper -> {
             final ConfigurationState.ClientInformation clientInformation = new ConfigurationState.ClientInformation(
-                    wrapper.read(Type.STRING), // Language
-                    wrapper.read(Type.BYTE), // View distance
-                    wrapper.read(Type.VAR_INT), // Chat visibility
-                    wrapper.read(Type.BOOLEAN), // Chat colors
-                    wrapper.read(Type.UNSIGNED_BYTE), // Model customization
-                    wrapper.read(Type.VAR_INT), // Main hand
-                    wrapper.read(Type.BOOLEAN), // Text filtering enabled
-                    wrapper.read(Type.BOOLEAN) // Allow listing in server list preview
+                    wrapper.read(Types.STRING), // Language
+                    wrapper.read(Types.BYTE), // View distance
+                    wrapper.read(Types.VAR_INT), // Chat visibility
+                    wrapper.read(Types.BOOLEAN), // Chat colors
+                    wrapper.read(Types.UNSIGNED_BYTE), // Model customization
+                    wrapper.read(Types.VAR_INT), // Main hand
+                    wrapper.read(Types.BOOLEAN), // Text filtering enabled
+                    wrapper.read(Types.BOOLEAN) // Allow listing in server list preview
             );
 
             // Store it to re-send it when another ClientboundLoginPacket is sent, since the client will only send it
@@ -204,10 +205,10 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         registerServerbound(ServerboundPackets1_20_2.PING_REQUEST, null, wrapper -> {
             wrapper.cancel();
-            final long time = wrapper.read(Type.LONG);
+            final long time = wrapper.read(Types.LONG);
 
             final PacketWrapper responsePacket = wrapper.create(ClientboundPackets1_20_2.PONG_RESPONSE);
-            responsePacket.write(Type.LONG, time);
+            responsePacket.write(Types.LONG, time);
             responsePacket.sendFuture(Protocol1_20To1_20_2.class);
         });
     }
@@ -294,7 +295,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         protocolInfo.setServerState(State.CONFIGURATION);
 
         final PacketWrapper registryDataPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, connection);
-        registryDataPacket.write(Type.COMPOUND_TAG, dimensionRegistry);
+        registryDataPacket.write(Types.COMPOUND_TAG, dimensionRegistry);
         registryDataPacket.send(Protocol1_20To1_20_2.class);
 
         // If we tracked enables features, they'd be sent here
@@ -309,10 +310,10 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         if (lastResourcePack != null && connection.getProtocolInfo().protocolVersion() == ProtocolVersion.v1_20_2) {
             // The client for some reason drops the resource pack when reentering the configuration state
             final PacketWrapper resourcePackPacket = PacketWrapper.create(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, connection);
-            resourcePackPacket.write(Type.STRING, lastResourcePack.url());
-            resourcePackPacket.write(Type.STRING, lastResourcePack.hash());
-            resourcePackPacket.write(Type.BOOLEAN, lastResourcePack.required());
-            resourcePackPacket.write(Type.OPTIONAL_COMPONENT, lastResourcePack.prompt());
+            resourcePackPacket.write(Types.STRING, lastResourcePack.url());
+            resourcePackPacket.write(Types.STRING, lastResourcePack.hash());
+            resourcePackPacket.write(Types.BOOLEAN, lastResourcePack.required());
+            resourcePackPacket.write(Types.OPTIONAL_COMPONENT, lastResourcePack.prompt());
             resourcePackPacket.send(Protocol1_20To1_20_2.class);
         }
 

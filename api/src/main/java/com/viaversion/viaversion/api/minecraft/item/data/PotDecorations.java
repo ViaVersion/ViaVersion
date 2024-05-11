@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public final class PotDecorations {
@@ -30,12 +31,12 @@ public final class PotDecorations {
     public static final Type<PotDecorations> TYPE = new Type<>(PotDecorations.class) {
         @Override
         public PotDecorations read(final ByteBuf buffer) {
-            return new PotDecorations(Type.VAR_INT_ARRAY_PRIMITIVE.read(buffer));
+            return new PotDecorations(Types.VAR_INT_ARRAY_PRIMITIVE.read(buffer));
         }
 
         @Override
         public void write(final ByteBuf buffer, final PotDecorations value) {
-            Type.VAR_INT_ARRAY_PRIMITIVE.write(buffer, value.itemIds());
+            Types.VAR_INT_ARRAY_PRIMITIVE.write(buffer, value.itemIds());
         }
     };
 

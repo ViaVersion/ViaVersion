@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean> {
@@ -55,7 +56,7 @@ public class BooleanType extends Type<Boolean> implements TypeConverter<Boolean>
     public static final class OptionalBooleanType extends OptionalType<Boolean> {
 
         public OptionalBooleanType() {
-            super(Type.BOOLEAN);
+            super(Types.BOOLEAN);
         }
     }
 }

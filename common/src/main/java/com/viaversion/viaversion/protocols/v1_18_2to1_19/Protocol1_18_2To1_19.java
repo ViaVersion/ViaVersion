@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -89,144 +90,144 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_18.SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Sound id
-                map(Type.VAR_INT); // Source
-                map(Type.INT); // X
-                map(Type.INT); // Y
-                map(Type.INT); // Z
-                map(Type.FLOAT); // Volume
-                map(Type.FLOAT); // Pitch
-                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
+                map(Types.VAR_INT); // Sound id
+                map(Types.VAR_INT); // Source
+                map(Types.INT); // X
+                map(Types.INT); // Y
+                map(Types.INT); // Z
+                map(Types.FLOAT); // Volume
+                map(Types.FLOAT); // Pitch
+                handler(wrapper -> wrapper.write(Types.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
         registerClientbound(ClientboundPackets1_18.SOUND_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Sound id
-                map(Type.VAR_INT); // Source
-                map(Type.VAR_INT); // Entity id
-                map(Type.FLOAT); // Volume
-                map(Type.FLOAT); // Pitch
-                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
+                map(Types.VAR_INT); // Sound id
+                map(Types.VAR_INT); // Source
+                map(Types.VAR_INT); // Entity id
+                map(Types.FLOAT); // Volume
+                map(Types.FLOAT); // Pitch
+                handler(wrapper -> wrapper.write(Types.LONG, randomLong())); // Seed
                 handler(soundRewriter.getSoundHandler());
             }
         });
         registerClientbound(ClientboundPackets1_18.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Sound name
-                map(Type.VAR_INT); // Source
-                map(Type.INT); // X
-                map(Type.INT); // Y
-                map(Type.INT); // Z
-                map(Type.FLOAT); // Volume
-                map(Type.FLOAT); // Pitch
-                handler(wrapper -> wrapper.write(Type.LONG, randomLong())); // Seed
+                map(Types.STRING); // Sound name
+                map(Types.VAR_INT); // Source
+                map(Types.INT); // X
+                map(Types.INT); // Y
+                map(Types.INT); // Z
+                map(Types.FLOAT); // Volume
+                map(Types.FLOAT); // Pitch
+                handler(wrapper -> wrapper.write(Types.LONG, randomLong())); // Seed
             }
         });
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_18.AWARD_STATS);
 
-        final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT)));
+        final PacketHandler singleNullTextComponentMapper = wrapper -> wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT)));
         registerClientbound(ClientboundPackets1_18.SET_TITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_SUBTITLE_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_ACTION_BAR_TEXT, singleNullTextComponentMapper);
         registerClientbound(ClientboundPackets1_18.SET_OBJECTIVE, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Objective Name
-            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            wrapper.passthrough(Types.STRING); // Objective Name
+            byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {
-                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Display Name
             }
         });
         registerClientbound(ClientboundPackets1_18.SET_PLAYER_TEAM, wrapper -> {
-            wrapper.passthrough(Type.STRING); // Team Name
-            byte action = wrapper.passthrough(Type.BYTE); // Mode
+            wrapper.passthrough(Types.STRING); // Team Name
+            byte action = wrapper.passthrough(Types.BYTE); // Mode
             if (action == 0 || action == 2) {
-                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Display Name
-                wrapper.passthrough(Type.BYTE); // Flags
-                wrapper.passthrough(Type.STRING); // Name Tag Visibility
-                wrapper.passthrough(Type.STRING); // Collision rule
-                wrapper.passthrough(Type.VAR_INT); // Color
-                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Prefix
-                wrapper.write(Type.COMPONENT, mapTextComponentIfNull(wrapper.read(Type.COMPONENT))); // Suffix
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Display Name
+                wrapper.passthrough(Types.BYTE); // Flags
+                wrapper.passthrough(Types.STRING); // Name Tag Visibility
+                wrapper.passthrough(Types.STRING); // Collision rule
+                wrapper.passthrough(Types.VAR_INT); // Color
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Prefix
+                wrapper.write(Types.COMPONENT, mapTextComponentIfNull(wrapper.read(Types.COMPONENT))); // Suffix
             }
         });
 
         final CommandRewriter<ClientboundPackets1_18> commandRewriter = new CommandRewriter<>(this);
         registerClientbound(ClientboundPackets1_18.COMMANDS, wrapper -> {
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final byte flags = wrapper.passthrough(Type.BYTE);
-                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                final byte flags = wrapper.passthrough(Types.BYTE);
+                wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE); // Children indices
                 if ((flags & 0x08) != 0) {
-                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                    wrapper.passthrough(Types.VAR_INT); // Redirect node index
                 }
 
                 final int nodeType = flags & 0x03;
                 if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                    wrapper.passthrough(Type.STRING); // Name
+                    wrapper.passthrough(Types.STRING); // Name
                 }
 
                 if (nodeType == 2) { // Argument node
-                    final String argumentType = wrapper.read(Type.STRING);
+                    final String argumentType = wrapper.read(Types.STRING);
                     final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
                     if (argumentTypeId == -1) {
                         Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
                     }
 
-                    wrapper.write(Type.VAR_INT, argumentTypeId);
+                    wrapper.write(Types.VAR_INT, argumentTypeId);
                     commandRewriter.handleArgument(wrapper, argumentType);
 
                     if ((flags & 0x10) != 0) {
-                        wrapper.passthrough(Type.STRING); // Suggestion type
+                        wrapper.passthrough(Types.STRING); // Suggestion type
                     }
                 }
             }
 
-            wrapper.passthrough(Type.VAR_INT); // Root node index
+            wrapper.passthrough(Types.VAR_INT); // Root node index
         });
 
         // Make every message a system message, including player ones; we don't want to analyze and remove player names from the original component
         registerClientbound(ClientboundPackets1_18.CHAT, ClientboundPackets1_19.SYSTEM_CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.COMPONENT); // Message
+                map(Types.COMPONENT); // Message
                 handler(wrapper -> {
-                    final int type = wrapper.read(Type.BYTE);
-                    wrapper.write(Type.VAR_INT, type == 0 ? 1 : type);
+                    final int type = wrapper.read(Types.BYTE);
+                    wrapper.write(Types.VAR_INT, type == 0 ? 1 : type);
                 });
-                read(Type.UUID); // Sender
+                read(Types.UUID); // Sender
             }
         });
 
         registerServerbound(ServerboundPackets1_19.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Message
-                read(Type.LONG); // Timestamp
-                read(Type.LONG); // Salt
-                read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                read(Type.BOOLEAN); // Signed preview
+                map(Types.STRING); // Message
+                read(Types.LONG); // Timestamp
+                read(Types.LONG); // Salt
+                read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
+                read(Types.BOOLEAN); // Signed preview
             }
         });
         registerServerbound(ServerboundPackets1_19.CHAT_COMMAND, ServerboundPackets1_17.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Command
-                read(Type.LONG); // Timestamp
-                read(Type.LONG); // Salt
+                map(Types.STRING); // Command
+                read(Types.LONG); // Timestamp
+                read(Types.LONG); // Salt
                 handler(wrapper -> {
-                    final String command = wrapper.get(Type.STRING, 0);
-                    wrapper.set(Type.STRING, 0, "/" + command);
+                    final String command = wrapper.get(Types.STRING, 0);
+                    wrapper.set(Types.STRING, 0, "/" + command);
 
-                    final int signatures = wrapper.read(Type.VAR_INT);
+                    final int signatures = wrapper.read(Types.VAR_INT);
                     for (int i = 0; i < signatures; i++) {
-                        wrapper.read(Type.STRING); // Argument name
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.read(Types.STRING); // Argument name
+                        wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
                     }
                 });
-                read(Type.BOOLEAN); // Signed preview
+                read(Types.BOOLEAN); // Signed preview
             }
         });
         cancelServerbound(ServerboundPackets1_19.CHAT_PREVIEW);
@@ -235,19 +236,19 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UUID); // UUID
-                map(Type.STRING); // Name
-                create(Type.VAR_INT, 0); // No properties
+                map(Types.UUID); // UUID
+                map(Types.STRING); // Name
+                create(Types.VAR_INT, 0); // No properties
             }
         });
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Server id
+                map(Types.STRING); // Server id
                 handler(wrapper -> {
-                    final byte[] publicKey = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
-                    final byte[] nonce = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] publicKey = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
+                    final byte[] nonce = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     wrapper.user().put(new NonceStorage(CipherUtil.encryptNonce(publicKey, nonce)));
                 });
             }
@@ -256,19 +257,19 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Name
-                read(Type.OPTIONAL_PROFILE_KEY); // Public profile key
+                map(Types.STRING); // Name
+                read(Types.OPTIONAL_PROFILE_KEY); // Public profile key
             }
         });
 
         registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE_ARRAY_PRIMITIVE); // Keys
+                map(Types.BYTE_ARRAY_PRIMITIVE); // Keys
                 handler(wrapper -> {
-                    if (wrapper.read(Type.BOOLEAN)) {
+                    if (wrapper.read(Types.BOOLEAN)) {
                         // Nonce, just pass it through
-                        wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                        wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
                     } else {
                         // 🧂
                         final NonceStorage nonceStorage = wrapper.user().remove(NonceStorage.class);
@@ -276,9 +277,9 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                             throw new IllegalArgumentException("Server sent nonce is missing");
                         }
 
-                        wrapper.read(Type.LONG); // Salt
-                        wrapper.read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
+                        wrapper.read(Types.LONG); // Salt
+                        wrapper.read(Types.BYTE_ARRAY_PRIMITIVE); // Signature
+                        wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, nonceStorage.nonce());
                     }
                 });
             }

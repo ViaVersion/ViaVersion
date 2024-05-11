@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -39,54 +40,54 @@ public class CommandRewriter<C extends ClientboundPacketType> {
 
         // Register default parsers
         this.parserHandlers.put("brigadier:double", wrapper -> {
-            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.DOUBLE); // Min Value
-            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.DOUBLE); // Max Value
+            byte propertyFlags = wrapper.passthrough(Types.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Types.DOUBLE); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Types.DOUBLE); // Max Value
         });
         this.parserHandlers.put("brigadier:float", wrapper -> {
-            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.FLOAT); // Min Value
-            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.FLOAT); // Max Value
+            byte propertyFlags = wrapper.passthrough(Types.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Types.FLOAT); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Types.FLOAT); // Max Value
         });
         this.parserHandlers.put("brigadier:integer", wrapper -> {
-            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.INT); // Min Value
-            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.INT); // Max Value
+            byte propertyFlags = wrapper.passthrough(Types.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Types.INT); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Types.INT); // Max Value
         });
         this.parserHandlers.put("brigadier:long", wrapper -> {
-            byte propertyFlags = wrapper.passthrough(Type.BYTE); // Flags
-            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Type.LONG); // Min Value
-            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Type.LONG); // Max Value
+            byte propertyFlags = wrapper.passthrough(Types.BYTE); // Flags
+            if ((propertyFlags & 0x01) != 0) wrapper.passthrough(Types.LONG); // Min Value
+            if ((propertyFlags & 0x02) != 0) wrapper.passthrough(Types.LONG); // Max Value
         });
-        this.parserHandlers.put("brigadier:string", wrapper -> wrapper.passthrough(Type.VAR_INT)); // Flags
-        this.parserHandlers.put("minecraft:entity", wrapper -> wrapper.passthrough(Type.BYTE)); // Flags
-        this.parserHandlers.put("minecraft:score_holder", wrapper -> wrapper.passthrough(Type.BYTE)); // Flags
-        this.parserHandlers.put("minecraft:resource", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location
-        this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location/tag
-        this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location
-        this.parserHandlers.put("minecraft:resource_key", wrapper -> wrapper.passthrough(Type.STRING)); // Resource location/tag
+        this.parserHandlers.put("brigadier:string", wrapper -> wrapper.passthrough(Types.VAR_INT)); // Flags
+        this.parserHandlers.put("minecraft:entity", wrapper -> wrapper.passthrough(Types.BYTE)); // Flags
+        this.parserHandlers.put("minecraft:score_holder", wrapper -> wrapper.passthrough(Types.BYTE)); // Flags
+        this.parserHandlers.put("minecraft:resource", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location
+        this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location/tag
+        this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location
+        this.parserHandlers.put("minecraft:resource_key", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location/tag
     }
 
     public void registerDeclareCommands(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                byte flags = wrapper.passthrough(Type.BYTE);
-                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                byte flags = wrapper.passthrough(Types.BYTE);
+                wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE); // Children indices
                 if ((flags & 0x08) != 0) {
-                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                    wrapper.passthrough(Types.VAR_INT); // Redirect node index
                 }
 
                 byte nodeType = (byte) (flags & 0x03);
                 if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                    wrapper.passthrough(Type.STRING); // Name
+                    wrapper.passthrough(Types.STRING); // Name
                 }
 
                 if (nodeType == 2) { // Argument node
-                    String argumentType = wrapper.read(Type.STRING);
+                    String argumentType = wrapper.read(Types.STRING);
                     String newArgumentType = handleArgumentType(argumentType);
                     if (newArgumentType != null) {
-                        wrapper.write(Type.STRING, newArgumentType);
+                        wrapper.write(Types.STRING, newArgumentType);
                     }
 
                     // Always call the handler using the previous name
@@ -94,53 +95,53 @@ public class CommandRewriter<C extends ClientboundPacketType> {
                 }
 
                 if ((flags & 0x10) != 0) {
-                    wrapper.passthrough(Type.STRING); // Suggestion type
+                    wrapper.passthrough(Types.STRING); // Suggestion type
                 }
             }
 
-            wrapper.passthrough(Type.VAR_INT); // Root node index
+            wrapper.passthrough(Types.VAR_INT); // Root node index
         });
     }
 
     public void registerDeclareCommands1_19(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Type.VAR_INT);
+            int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                byte flags = wrapper.passthrough(Type.BYTE);
-                wrapper.passthrough(Type.VAR_INT_ARRAY_PRIMITIVE); // Children indices
+                byte flags = wrapper.passthrough(Types.BYTE);
+                wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE); // Children indices
                 if ((flags & 0x08) != 0) {
-                    wrapper.passthrough(Type.VAR_INT); // Redirect node index
+                    wrapper.passthrough(Types.VAR_INT); // Redirect node index
                 }
 
                 byte nodeType = (byte) (flags & 0x03);
                 if (nodeType == 1 || nodeType == 2) { // Literal/argument node
-                    wrapper.passthrough(Type.STRING); // Name
+                    wrapper.passthrough(Types.STRING); // Name
                 }
 
                 if (nodeType == 2) { // Argument node
-                    int argumentTypeId = wrapper.read(Type.VAR_INT);
+                    int argumentTypeId = wrapper.read(Types.VAR_INT);
                     String argumentType = argumentType(argumentTypeId);
                     if (argumentType == null) {
                         // Modded servers may send unknown argument types that are ignored by the client
                         // Adjust the id to the hopefully still assumed out-of-bounds pos...
-                        wrapper.write(Type.VAR_INT, mapInvalidArgumentType(argumentTypeId));
+                        wrapper.write(Types.VAR_INT, mapInvalidArgumentType(argumentTypeId));
                         continue;
                     }
 
                     String newArgumentType = handleArgumentType(argumentType);
                     Preconditions.checkNotNull(newArgumentType, "No mapping for argument type %s", argumentType);
-                    wrapper.write(Type.VAR_INT, mappedArgumentTypeId(newArgumentType));
+                    wrapper.write(Types.VAR_INT, mappedArgumentTypeId(newArgumentType));
 
                     // Always call the handler using the previous name
                     handleArgument(wrapper, argumentType);
 
                     if ((flags & 0x10) != 0) {
-                        wrapper.passthrough(Type.STRING); // Suggestion type
+                        wrapper.passthrough(Types.STRING); // Suggestion type
                     }
                 }
             }
 
-            wrapper.passthrough(Type.VAR_INT); // Root node index
+            wrapper.passthrough(Types.VAR_INT); // Root node index
         });
     }
 

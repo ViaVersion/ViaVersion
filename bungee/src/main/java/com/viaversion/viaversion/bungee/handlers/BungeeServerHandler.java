@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolPipeline;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.bungee.storage.BungeeStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
@@ -186,8 +187,8 @@ public class BungeeServerHandler implements Listener {
             if (user.getProtocolInfo().getPipeline().contains(Protocol1_8To1_9.class)) {
                 for (UUID uuid : storage.getBossbar()) {
                     PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, null, user);
-                    wrapper.write(Type.UUID, uuid);
-                    wrapper.write(Type.VAR_INT, 1); // remove
+                    wrapper.write(Types.UUID, uuid);
+                    wrapper.write(Types.VAR_INT, 1); // remove
                     wrapper.send(Protocol1_8To1_9.class);
                 }
             }

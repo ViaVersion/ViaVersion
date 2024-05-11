@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public final class GameProfileType extends Type<GameProfile> {
@@ -34,14 +35,14 @@ public final class GameProfileType extends Type<GameProfile> {
 
     @Override
     public GameProfile read(final ByteBuf buffer) {
-        final String name = Type.OPTIONAL_STRING.read(buffer);
-        final java.util.UUID id = Type.OPTIONAL_UUID.read(buffer);
-        final int propertyCount = Type.VAR_INT.readPrimitive(buffer);
+        final String name = Types.OPTIONAL_STRING.read(buffer);
+        final java.util.UUID id = Types.OPTIONAL_UUID.read(buffer);
+        final int propertyCount = Types.VAR_INT.readPrimitive(buffer);
         final GameProfile.Property[] properties = new GameProfile.Property[propertyCount];
         for (int i = 0; i < propertyCount; i++) {
-            final String propertyName = Type.STRING.read(buffer);
-            final String propertyValue = Type.STRING.read(buffer);
-            final String propertySignature = Type.OPTIONAL_STRING.read(buffer);
+            final String propertyName = Types.STRING.read(buffer);
+            final String propertyValue = Types.STRING.read(buffer);
+            final String propertySignature = Types.OPTIONAL_STRING.read(buffer);
             properties[i] = new GameProfile.Property(propertyName, propertyValue, propertySignature);
         }
         return new GameProfile(name, id, properties);
@@ -49,13 +50,13 @@ public final class GameProfileType extends Type<GameProfile> {
 
     @Override
     public void write(final ByteBuf buffer, final GameProfile value) {
-        Type.OPTIONAL_STRING.write(buffer, value.name());
-        Type.OPTIONAL_UUID.write(buffer, value.id());
-        Type.VAR_INT.writePrimitive(buffer, value.properties().length);
+        Types.OPTIONAL_STRING.write(buffer, value.name());
+        Types.OPTIONAL_UUID.write(buffer, value.id());
+        Types.VAR_INT.writePrimitive(buffer, value.properties().length);
         for (final GameProfile.Property property : value.properties()) {
-            Type.STRING.write(buffer, property.name());
-            Type.STRING.write(buffer, property.value());
-            Type.OPTIONAL_STRING.write(buffer, property.signature());
+            Types.STRING.write(buffer, property.name());
+            Types.STRING.write(buffer, property.value());
+            Types.OPTIONAL_STRING.write(buffer, property.signature());
         }
     }
 }

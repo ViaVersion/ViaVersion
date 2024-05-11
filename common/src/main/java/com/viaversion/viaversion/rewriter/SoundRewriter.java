@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 
 public class SoundRewriter<C extends ClientboundPacketType> {
     protected final Protocol<C, ?, ?, ?> protocol;
@@ -43,7 +43,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Sound id
+                map(Types.VAR_INT); // Sound id
                 handler(getSoundHandler());
             }
         });
@@ -55,10 +55,10 @@ public class SoundRewriter<C extends ClientboundPacketType> {
 
     public PacketHandler soundHolderHandler() {
         return wrapper -> {
-            Holder<SoundEvent> soundEventHolder = wrapper.read(Type.SOUND_EVENT);
+            Holder<SoundEvent> soundEventHolder = wrapper.read(Types.SOUND_EVENT);
             if (soundEventHolder.isDirect()) {
                 // Is followed by the resource loation
-                wrapper.write(Type.SOUND_EVENT, soundEventHolder);
+                wrapper.write(Types.SOUND_EVENT, soundEventHolder);
                 return;
             }
 
@@ -72,18 +72,18 @@ public class SoundRewriter<C extends ClientboundPacketType> {
                 soundEventHolder = Holder.of(mappedId);
             }
 
-            wrapper.write(Type.SOUND_EVENT, soundEventHolder);
+            wrapper.write(Types.SOUND_EVENT, soundEventHolder);
         };
     }
 
     public PacketHandler getSoundHandler() {
         return wrapper -> {
-            int soundId = wrapper.get(Type.VAR_INT, 0);
+            int soundId = wrapper.get(Types.VAR_INT, 0);
             int mappedId = idRewriter.rewrite(soundId);
             if (mappedId == -1) {
                 wrapper.cancel();
             } else if (soundId != mappedId) {
-                wrapper.set(Type.VAR_INT, 0, mappedId);
+                wrapper.set(Types.VAR_INT, 0, mappedId);
             }
         };
     }

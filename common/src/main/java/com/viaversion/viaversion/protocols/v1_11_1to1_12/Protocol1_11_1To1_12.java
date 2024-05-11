@@ -34,6 +34,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -67,9 +68,9 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity id
-                map(Type.UUID); // 1 - UUID
-                map(Type.BYTE); // 2 - Type
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.UUID); // 1 - UUID
+                map(Types.BYTE); // 2 - Type
 
                 // Track Entity
                 handler(metadataRewriter.objectTrackerHandler());
@@ -79,18 +80,18 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Entity UUID
-                map(Type.VAR_INT); // 2 - Entity Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Yaw
-                map(Type.BYTE); // 7 - Pitch
-                map(Type.BYTE); // 8 - Head Pitch
-                map(Type.SHORT); // 9 - Velocity X
-                map(Type.SHORT); // 10 - Velocity Y
-                map(Type.SHORT); // 11 - Velocity Z
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
+                map(Types.VAR_INT); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_12.METADATA_LIST); // 12 - Metadata
 
                 // Track mob and rewrite metadata
@@ -100,11 +101,11 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
 
         registerClientbound(ClientboundPackets1_9_3.CHAT, wrapper -> {
             if (!Via.getConfig().is1_12NBTArrayFix()) return;
-            final JsonElement element = wrapper.passthrough(Type.COMPONENT);
+            final JsonElement element = wrapper.passthrough(Types.COMPONENT);
             TranslateRewriter.toClient(wrapper.user(), element);
             ChatItemRewriter.toClient(element);
 
-            wrapper.set(Type.COMPONENT, 0, element);
+            wrapper.set(Types.COMPONENT, 0, element);
         });
 
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
@@ -143,18 +144,18 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT);
-                map(Type.UNSIGNED_BYTE);
-                map(Type.INT);
+                map(Types.INT);
+                map(Types.UNSIGNED_BYTE);
+                map(Types.INT);
                 handler(wrapper -> {
                     UserConnection user = wrapper.user();
                     ClientWorld clientChunks = user.get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
+                    int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
 
                     // Reset recipes
                     if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)) {
-                        wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, packetWrapper -> packetWrapper.write(Type.VAR_INT, 0))
+                        wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, packetWrapper -> packetWrapper.write(Types.VAR_INT, 0))
                                 .scheduleSend(Protocol1_12_2To1_13.class);
                     }
                 });
@@ -163,10 +164,10 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT);
+                map(Types.INT);
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }
@@ -182,12 +183,12 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         registerServerbound(ServerboundPackets1_12.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Locale
-                map(Type.BYTE); // 1 - view distance
-                map(Type.VAR_INT); // 2 - chat mode
-                map(Type.BOOLEAN); // 3 - chat colors
-                map(Type.UNSIGNED_BYTE); // 4 - chat flags
-                map(Type.VAR_INT); // 5 - main hand
+                map(Types.STRING); // 0 - Locale
+                map(Types.BYTE); // 1 - view distance
+                map(Types.VAR_INT); // 2 - chat mode
+                map(Types.BOOLEAN); // 3 - chat colors
+                map(Types.UNSIGNED_BYTE); // 4 - chat flags
+                map(Types.VAR_INT); // 5 - main hand
                 handler(wrapper -> {
                     // As part of the fix for MC-111054, the max length of
                     // the locale was raised to 16 (from 7), and the client
@@ -198,9 +199,9 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                     // The fix is to just silently lower the length.  The
                     // server doesn't actually use the locale anywhere, so
                     // this is fine.
-                    String locale = wrapper.get(Type.STRING, 0);
+                    String locale = wrapper.get(Types.STRING, 0);
                     if (locale.length() > 7) {
-                        wrapper.set(Type.STRING, 0, locale.substring(0, 7));
+                        wrapper.set(Types.STRING, 0, locale.substring(0, 7));
                     }
                 });
             }

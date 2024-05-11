@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -64,10 +65,10 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
 
         registerClientbound(ClientboundPackets1_16_2.UPDATE_TAGS, wrapper -> {
             // Tags are now generically written with resource location - 5 different Vanilla types
-            wrapper.write(Type.VAR_INT, 5);
+            wrapper.write(Types.VAR_INT, 5);
             for (RegistryType type : RegistryType.getValues()) {
                 // Prefix with resource location
-                wrapper.write(Type.STRING, type.resourceLocation());
+                wrapper.write(Types.STRING, type.resourceLocation());
 
                 // Id conversion
                 tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
@@ -79,11 +80,11 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
             }
 
             // New Game Event tags type
-            wrapper.write(Type.STRING, RegistryType.GAME_EVENT.resourceLocation());
-            wrapper.write(Type.VAR_INT, NEW_GAME_EVENT_TAGS.length);
+            wrapper.write(Types.STRING, RegistryType.GAME_EVENT.resourceLocation());
+            wrapper.write(Types.VAR_INT, NEW_GAME_EVENT_TAGS.length);
             for (String tag : NEW_GAME_EVENT_TAGS) {
-                wrapper.write(Type.STRING, tag);
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, EMPTY_ARRAY);
+                wrapper.write(Types.STRING, tag);
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, EMPTY_ARRAY);
             }
         });
 
@@ -94,31 +95,31 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND_ENTITY);
 
         registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
-            wrapper.passthrough(Type.STRING);
-            wrapper.passthrough(Type.STRING);
-            wrapper.write(Type.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
-            wrapper.write(Type.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
+            wrapper.passthrough(Types.STRING);
+            wrapper.passthrough(Types.STRING);
+            wrapper.write(Types.BOOLEAN, Via.getConfig().isForcedUse1_17ResourcePack()); // Required
+            wrapper.write(Types.OPTIONAL_COMPONENT, Via.getConfig().get1_17ResourcePackPrompt()); // Prompt message
         });
 
         registerClientbound(ClientboundPackets1_16_2.MAP_ITEM_DATA, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT);
-            wrapper.passthrough(Type.BYTE);
-            wrapper.read(Type.BOOLEAN); // Tracking position removed
-            wrapper.passthrough(Type.BOOLEAN);
+            wrapper.passthrough(Types.VAR_INT);
+            wrapper.passthrough(Types.BYTE);
+            wrapper.read(Types.BOOLEAN); // Tracking position removed
+            wrapper.passthrough(Types.BOOLEAN);
 
-            int size = wrapper.read(Type.VAR_INT);
+            int size = wrapper.read(Types.VAR_INT);
             // Write whether markers exist or not
             if (size != 0) {
-                wrapper.write(Type.BOOLEAN, true);
-                wrapper.write(Type.VAR_INT, size);
+                wrapper.write(Types.BOOLEAN, true);
+                wrapper.write(Types.VAR_INT, size);
             } else {
-                wrapper.write(Type.BOOLEAN, false);
+                wrapper.write(Types.BOOLEAN, false);
             }
         });
 
         registerClientbound(ClientboundPackets1_16_2.SET_TITLES, null, wrapper -> {
             // Title packet actions have been split into individual packets (the content hasn't changed)
-            int type = wrapper.read(Type.VAR_INT);
+            int type = wrapper.read(Types.VAR_INT);
             ClientboundPacketType packetType;
             switch (type) {
                 case 0 -> packetType = ClientboundPackets1_17.SET_TITLE_TEXT;
@@ -127,11 +128,11 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 case 3 -> packetType = ClientboundPackets1_17.SET_TITLES_ANIMATION;
                 case 4 -> {
                     packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                    wrapper.write(Type.BOOLEAN, false); // Reset times
+                    wrapper.write(Types.BOOLEAN, false); // Reset times
                 }
                 case 5 -> {
                     packetType = ClientboundPackets1_17.CLEAR_TITLES;
-                    wrapper.write(Type.BOOLEAN, true); // Reset times
+                    wrapper.write(Types.BOOLEAN, true); // Reset times
                 }
                 default -> throw new IllegalArgumentException("Invalid title type received: " + type);
             }
@@ -142,32 +143,32 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_16_2.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLOAT); // X
-                map(Type.FLOAT); // Y
-                map(Type.FLOAT); // Z
-                map(Type.FLOAT); // Strength
-                handler(wrapper -> wrapper.write(Type.VAR_INT, wrapper.read(Type.INT))); // Collection length is now a var int
+                map(Types.FLOAT); // X
+                map(Types.FLOAT); // Y
+                map(Types.FLOAT); // Z
+                map(Types.FLOAT); // Strength
+                handler(wrapper -> wrapper.write(Types.VAR_INT, wrapper.read(Types.INT))); // Collection length is now a var int
             }
         });
 
         registerClientbound(ClientboundPackets1_16_2.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_14);
-                handler(wrapper -> wrapper.write(Type.FLOAT, 0f)); // Angle (which Mojang just forgot to write to the buffer, lol)
+                map(Types.BLOCK_POSITION1_14);
+                handler(wrapper -> wrapper.write(Types.FLOAT, 0f)); // Angle (which Mojang just forgot to write to the buffer, lol)
             }
         });
 
         registerServerbound(ServerboundPackets1_17.CLIENT_INFORMATION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Locale
-                map(Type.BYTE); // View distance
-                map(Type.VAR_INT); // Chat mode
-                map(Type.BOOLEAN); // Chat colors
-                map(Type.UNSIGNED_BYTE); // Chat flags
-                map(Type.VAR_INT); // Main hand
-                read(Type.BOOLEAN); // Text filtering
+                map(Types.STRING); // Locale
+                map(Types.BYTE); // View distance
+                map(Types.VAR_INT); // Chat mode
+                map(Types.BOOLEAN); // Chat colors
+                map(Types.UNSIGNED_BYTE); // Chat flags
+                map(Types.VAR_INT); // Main hand
+                read(Types.BOOLEAN); // Text filtering
             }
         });
     }

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
@@ -30,9 +31,9 @@ public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boole
     public static final Type<FireworkExplosion> TYPE = new Type<>(FireworkExplosion.class) {
         @Override
         public FireworkExplosion read(final ByteBuf buffer) {
-            final int shape = Type.VAR_INT.readPrimitive(buffer);
-            final int[] colors = Type.INT_ARRAY_PRIMITIVE.read(buffer);
-            final int[] fadeColors = Type.INT_ARRAY_PRIMITIVE.read(buffer);
+            final int shape = Types.VAR_INT.readPrimitive(buffer);
+            final int[] colors = Types.INT_ARRAY_PRIMITIVE.read(buffer);
+            final int[] fadeColors = Types.INT_ARRAY_PRIMITIVE.read(buffer);
             final boolean hasTrail = buffer.readBoolean();
             final boolean hasTwinkle = buffer.readBoolean();
             return new FireworkExplosion(shape, colors, fadeColors, hasTrail, hasTwinkle);
@@ -40,9 +41,9 @@ public record FireworkExplosion(int shape, int[] colors, int[] fadeColors, boole
 
         @Override
         public void write(final ByteBuf buffer, final FireworkExplosion value) {
-            Type.VAR_INT.writePrimitive(buffer, value.shape);
-            Type.INT_ARRAY_PRIMITIVE.write(buffer, value.colors);
-            Type.INT_ARRAY_PRIMITIVE.write(buffer, value.fadeColors);
+            Types.VAR_INT.writePrimitive(buffer, value.shape);
+            Types.INT_ARRAY_PRIMITIVE.write(buffer, value.colors);
+            Types.INT_ARRAY_PRIMITIVE.write(buffer, value.fadeColors);
             buffer.writeBoolean(value.hasTrail);
             buffer.writeBoolean(value.hasTwinkle);
         }

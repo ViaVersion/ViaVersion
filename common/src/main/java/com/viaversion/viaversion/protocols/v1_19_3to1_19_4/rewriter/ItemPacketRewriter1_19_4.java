@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter.RecipeRewriter1_19_3;
@@ -31,7 +32,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPackets1_19_3, ServerboundPackets1_19_4, Protocol1_19_3To1_19_4> {
 
     public ItemPacketRewriter1_19_4(final Protocol1_19_3To1_19_4 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -46,23 +47,23 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
         protocol.registerClientbound(ClientboundPackets1_19_3.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION1_14); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Effect Id
+                map(Types.BLOCK_POSITION1_14); // Location
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    int data = wrapper.get(Type.INT, 1);
+                    int id = wrapper.get(Types.INT, 0);
+                    int data = wrapper.get(Types.INT, 1);
                     if (id == 1010) { // Play record
                         if (data >= 1092 && data <= 1106) {
                             // These IDs are valid records
-                            wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                            wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
                         } else {
                             // Send stop record instead
-                            wrapper.set(Type.INT, 0, 1011);
-                            wrapper.set(Type.INT, 1, 0);
+                            wrapper.set(Types.INT, 0, 1011);
+                            wrapper.set(Types.INT, 1, 0);
                         }
                     } else if (id == 2001) { // Block break + block break sound
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
             }
@@ -71,13 +72,13 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
         protocol.registerClientbound(ClientboundPackets1_19_3.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Container id
-                map(Type.VAR_INT); // Container type
-                map(Type.COMPONENT); // Title
+                map(Types.VAR_INT); // Container id
+                map(Types.VAR_INT); // Container type
+                map(Types.COMPONENT); // Title
                 handler(wrapper -> {
-                    final int windowType = wrapper.get(Type.VAR_INT, 1);
+                    final int windowType = wrapper.get(Types.VAR_INT, 1);
                     if (windowType >= 21) { // New smithing menu
-                        wrapper.set(Type.VAR_INT, 1, windowType + 1);
+                        wrapper.set(Types.VAR_INT, 1, windowType + 1);
                     }
                 });
             }
@@ -98,7 +99,7 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
             @Override
             public void handleCraftingShaped(final PacketWrapper wrapper) {
                 super.handleCraftingShaped(wrapper);
-                wrapper.write(Type.BOOLEAN, true); // Show notification
+                wrapper.write(Types.BOOLEAN, true); // Show notification
             }
         }.register(ClientboundPackets1_19_3.UPDATE_RECIPES);
     }

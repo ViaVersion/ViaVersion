@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
 
@@ -31,14 +32,14 @@ public record PotionEffect(int effect, PotionEffectData effectData) {
     public static final Type<PotionEffect> TYPE = new Type<>(PotionEffect.class) {
         @Override
         public PotionEffect read(final ByteBuf buffer) {
-            final int effect = Type.VAR_INT.readPrimitive(buffer);
+            final int effect = Types.VAR_INT.readPrimitive(buffer);
             final PotionEffectData effectData = PotionEffectData.TYPE.read(buffer);
             return new PotionEffect(effect, effectData);
         }
 
         @Override
         public void write(final ByteBuf buffer, final PotionEffect value) {
-            Type.VAR_INT.writePrimitive(buffer, value.effect);
+            Types.VAR_INT.writePrimitive(buffer, value.effect);
             PotionEffectData.TYPE.write(buffer, value.effectData);
         }
     };

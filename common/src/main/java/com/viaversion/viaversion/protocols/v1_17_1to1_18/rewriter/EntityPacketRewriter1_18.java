@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
@@ -43,19 +44,19 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_17_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Registry
-                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.VAR_INT); // Max players
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Registry
+                map(Types.NAMED_COMPOUND_TAG); // Current dimension data
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.VAR_INT); // Max players
                 handler(wrapper -> {
-                    int chunkRadius = wrapper.passthrough(Type.VAR_INT);
-                    wrapper.write(Type.VAR_INT, chunkRadius); // Simulation distance
+                    int chunkRadius = wrapper.passthrough(Types.VAR_INT);
+                    wrapper.write(Types.VAR_INT, chunkRadius); // Simulation distance
                 });
                 handler(worldDataTrackerHandler(1));
                 handler(biomeSizeTracker());
@@ -65,10 +66,10 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_17_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
-                map(Type.STRING); // World
+                map(Types.NAMED_COMPOUND_TAG); // Current dimension data
+                map(Types.STRING); // World
                 handler(wrapper -> {
-                    final String world = wrapper.get(Type.STRING, 0);
+                    final String world = wrapper.get(Types.STRING, 0);
                     final EntityTracker tracker = tracker(wrapper.user());
                     if (!world.equals(tracker.currentWorld())) {
                         wrapper.user().get(ChunkLightStorage.class).clear();
@@ -86,9 +87,9 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
             final Particle particle = (Particle) meta.getValue();
             if (particle.id() == 2) { // Barrier
                 particle.setId(3); // Block marker
-                particle.add(Type.VAR_INT, 7754); // Barrier state
+                particle.add(Types.VAR_INT, 7754); // Barrier state
             } else if (particle.id() == 3) { // Light block
-                particle.add(Type.VAR_INT, 7786); // Light block state
+                particle.add(Types.VAR_INT, 7786); // Light block state
             } else {
                 rewriteParticle(event.user(), particle);
             }

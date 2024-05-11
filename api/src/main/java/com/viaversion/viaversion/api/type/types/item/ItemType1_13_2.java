@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.item;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -40,9 +41,9 @@ public class ItemType1_13_2 extends Type<Item> {
             return null;
         } else {
             Item item = new DataItem();
-            item.setIdentifier(Type.VAR_INT.readPrimitive(buffer));
+            item.setIdentifier(Types.VAR_INT.readPrimitive(buffer));
             item.setAmount(buffer.readByte());
-            item.setTag(Type.NAMED_COMPOUND_TAG.read(buffer));
+            item.setTag(Types.NAMED_COMPOUND_TAG.read(buffer));
             return item;
         }
     }
@@ -53,9 +54,9 @@ public class ItemType1_13_2 extends Type<Item> {
             buffer.writeBoolean(false);
         } else {
             buffer.writeBoolean(true);
-            Type.VAR_INT.writePrimitive(buffer, object.identifier());
+            Types.VAR_INT.writePrimitive(buffer, object.identifier());
             buffer.writeByte(object.amount());
-            Type.NAMED_COMPOUND_TAG.write(buffer, object.tag());
+            Types.NAMED_COMPOUND_TAG.write(buffer, object.tag());
         }
     }
 }

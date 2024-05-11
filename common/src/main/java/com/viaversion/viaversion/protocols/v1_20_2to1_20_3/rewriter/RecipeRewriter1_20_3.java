@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.RecipeRewriter1_19_4;
 
 public class RecipeRewriter1_20_3<C extends ClientboundPacketType> extends RecipeRewriter1_19_4<C> {
@@ -32,16 +33,16 @@ public class RecipeRewriter1_20_3<C extends ClientboundPacketType> extends Recip
 
     @Override
     public void handleCraftingShaped(final PacketWrapper wrapper) {
-        wrapper.passthrough(Type.STRING); // Group
-        wrapper.passthrough(Type.VAR_INT); // Crafting book category
-        final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
+        wrapper.passthrough(Types.STRING); // Group
+        wrapper.passthrough(Types.VAR_INT); // Crafting book category
+        final int ingredients = wrapper.passthrough(Types.VAR_INT) * wrapper.passthrough(Types.VAR_INT);
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
 
         final Item item = rewrite(wrapper.user(), wrapper.read(itemType())); // Result
         wrapper.write(mappedItemType(), item);
-        wrapper.passthrough(Type.BOOLEAN); // Show notification
+        wrapper.passthrough(Types.BOOLEAN); // Show notification
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
@@ -58,38 +59,38 @@ public class WorldPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION1_8); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Effect Id
+                map(Types.BLOCK_POSITION1_8); // Location
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
+                    int id = wrapper.get(Types.INT, 0);
                     if (id == 2000) { // Smoke
-                        int data = wrapper.get(Type.INT, 1);
+                        int data = wrapper.get(Types.INT, 1);
                         switch (data) {
                             case 1: // North
-                                wrapper.set(Type.INT, 1, 2); // North
+                                wrapper.set(Types.INT, 1, 2); // North
                                 break;
                             case 0: // North-West
                             case 3: // West
                             case 6: // South-West
-                                wrapper.set(Type.INT, 1, 4); // West
+                                wrapper.set(Types.INT, 1, 4); // West
                                 break;
                             case 2: // North-East
                             case 5: // East
                             case 8: // South-East
-                                wrapper.set(Type.INT, 1, 5); // East
+                                wrapper.set(Types.INT, 1, 5); // East
                                 break;
                             case 7: // South
-                                wrapper.set(Type.INT, 1, 3); // South
+                                wrapper.set(Types.INT, 1, 3); // South
                                 break;
                             default: // Self and other directions
-                                wrapper.set(Type.INT, 1, 0); // Down
+                                wrapper.set(Types.INT, 1, 0); // Down
                                 break;
                         }
                     } else if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(wrapper.get(Type.INT, 1)));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(wrapper.get(Types.INT, 1)));
                     } else if (id == 2001) { // Block break + block break sound
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(wrapper.get(Type.INT, 1)));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.INT, 1)));
                     }
                 });
             }
@@ -98,14 +99,14 @@ public class WorldPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
                     // Store the player
                     ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
+                    int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
             }
@@ -114,10 +115,10 @@ public class WorldPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Dimension ID
+                map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }

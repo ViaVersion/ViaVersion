@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemRewriter;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
@@ -36,14 +37,14 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Property Key
-                map(Type.SHORT); // 2 - Property Value
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.SHORT); // 1 - Property Key
+                map(Types.SHORT); // 2 - Property Value
 
                 handler(wrapper -> {
-                    final short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final short property = wrapper.get(Type.SHORT, 0);
-                    short value = wrapper.get(Type.SHORT, 1);
+                    final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    final short property = wrapper.get(Types.SHORT, 0);
+                    short value = wrapper.get(Types.SHORT, 1);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equalsIgnoreCase("minecraft:enchanting_table")) {
                         if (property > 3 && property < 7) {
@@ -51,13 +52,13 @@ public class ItemPacketRewriter1_9 {
                             final short level = (short) (value >> 8);
                             final short enchantID = (short) (value & 0xFF);
                             wrapper.create(wrapper.getId(), propertyPacket -> {
-                                propertyPacket.write(Type.UNSIGNED_BYTE, windowId);
-                                propertyPacket.write(Type.SHORT, property);
-                                propertyPacket.write(Type.SHORT, enchantID);
+                                propertyPacket.write(Types.UNSIGNED_BYTE, windowId);
+                                propertyPacket.write(Types.SHORT, property);
+                                propertyPacket.write(Types.SHORT, enchantID);
                             }).scheduleSend(Protocol1_8To1_9.class);
 
-                            wrapper.set(Type.SHORT, 0, (short) (property + 3));
-                            wrapper.set(Type.SHORT, 1, level);
+                            wrapper.set(Types.SHORT, 0, (short) (property + 3));
+                            wrapper.set(Types.SHORT, 1, level);
                         }
                     }
                 });
@@ -67,22 +68,22 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.STRING); // 1 - Window Type
-                map(Type.STRING, Protocol1_8To1_9.STRING_TO_JSON); // 2 - Window Title
-                map(Type.UNSIGNED_BYTE); // 3 - Slot Count
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.STRING); // 1 - Window Type
+                map(Types.STRING, Protocol1_8To1_9.STRING_TO_JSON); // 2 - Window Title
+                map(Types.UNSIGNED_BYTE); // 3 - Slot Count
                 // There is a horse parameter after this, we don't handle it and let it passthrough
                 // Inventory tracking
                 handler(wrapper -> {
-                    String inventory = wrapper.get(Type.STRING, 0);
+                    String inventory = wrapper.get(Types.STRING, 0);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     inventoryTracker.setInventory(inventory);
                 });
                 // Brewing patch
                 handler(wrapper -> {
-                    String inventory = wrapper.get(Type.STRING, 0);
+                    String inventory = wrapper.get(Types.STRING, 0);
                     if (inventory.equals("minecraft:brewing_stand")) {
-                        wrapper.set(Type.UNSIGNED_BYTE, 1, (short) (wrapper.get(Type.UNSIGNED_BYTE, 1) + 1));
+                        wrapper.set(Types.UNSIGNED_BYTE, 1, (short) (wrapper.get(Types.UNSIGNED_BYTE, 1) + 1));
                     }
                 });
             }
@@ -90,11 +91,11 @@ public class ItemPacketRewriter1_9 {
         protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.ITEM1_8); // 2 - Slot Value
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.SHORT); // 1 - Slot ID
+                map(Types.ITEM1_8); // 2 - Slot Value
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM1_8, 0);
+                    Item stack = wrapper.get(Types.ITEM1_8, 0);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
@@ -104,8 +105,8 @@ public class ItemPacketRewriter1_9 {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 
-                        short slotID = wrapper.get(Type.SHORT, 0);
-                        byte windowId = wrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
+                        short slotID = wrapper.get(Types.SHORT, 0);
+                        byte windowId = wrapper.get(Types.UNSIGNED_BYTE, 0).byteValue();
 
                         // Store item in slot
                         inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());
@@ -120,10 +121,10 @@ public class ItemPacketRewriter1_9 {
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
 
-                    short slotID = wrapper.get(Type.SHORT, 0);
+                    short slotID = wrapper.get(Types.SHORT, 0);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
                         if (slotID >= 4) {
-                            wrapper.set(Type.SHORT, 0, (short) (slotID + 1));
+                            wrapper.set(Types.SHORT, 0, (short) (slotID + 1));
                         }
                     }
                 });
@@ -133,12 +134,12 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.ITEM1_8_SHORT_ARRAY); // 1 - Window Values
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.ITEM1_8_SHORT_ARRAY); // 1 - Window Values
 
                 handler(wrapper -> {
-                    Item[] stacks = wrapper.get(Type.ITEM1_8_SHORT_ARRAY, 0);
-                    Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    Item[] stacks = wrapper.get(Types.ITEM1_8_SHORT_ARRAY, 0);
+                    Short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
@@ -166,7 +167,7 @@ public class ItemPacketRewriter1_9 {
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
-                        Item[] oldStack = wrapper.get(Type.ITEM1_8_SHORT_ARRAY, 0);
+                        Item[] oldStack = wrapper.get(Types.ITEM1_8_SHORT_ARRAY, 0);
                         Item[] newStack = new Item[oldStack.length + 1];
                         for (int i = 0; i < newStack.length; i++) {
                             if (i > 4) {
@@ -177,7 +178,7 @@ public class ItemPacketRewriter1_9 {
                                 }
                             }
                         }
-                        wrapper.set(Type.ITEM1_8_SHORT_ARRAY, 0, newStack);
+                        wrapper.set(Types.ITEM1_8_SHORT_ARRAY, 0, newStack);
                     }
                 });
             }
@@ -186,12 +187,12 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
                 // Inventory tracking
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     inventoryTracker.setInventory(null);
-                    inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
+                    inventoryTracker.resetInventory(wrapper.get(Types.UNSIGNED_BYTE, 0));
                 });
             }
         });
@@ -200,10 +201,10 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Map ID
-                map(Type.BYTE); // 1 - Map Scale
+                map(Types.VAR_INT); // 0 - Map ID
+                map(Types.BYTE); // 1 - Map Scale
                 handler(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, true); // 2 - Show marker
+                    wrapper.write(Types.BOOLEAN, true); // 2 - Show marker
                 });
                 // Everything else is passed through
             }
@@ -215,10 +216,10 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.SHORT); // 0 - Slot ID
-                map(Type.ITEM1_8); // 1 - Item
+                map(Types.SHORT); // 0 - Slot ID
+                map(Types.ITEM1_8); // 1 - Item
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM1_8, 0);
+                    Item stack = wrapper.get(Types.ITEM1_8, 0);
 
                     boolean showShieldWhenSwordInHand = Via.getConfig().isShowShieldWhenSwordInHand()
                             && Via.getConfig().isShieldBlocking();
@@ -226,7 +227,7 @@ public class ItemPacketRewriter1_9 {
                     if (showShieldWhenSwordInHand) {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                        short slotID = wrapper.get(Type.SHORT, 0);
+                        short slotID = wrapper.get(Types.SHORT, 0);
 
                         // Update item in slot
                         inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.identifier());
@@ -239,17 +240,17 @@ public class ItemPacketRewriter1_9 {
                 });
                 // Elytra throw patch
                 handler(wrapper -> {
-                    final short slot = wrapper.get(Type.SHORT, 0);
+                    final short slot = wrapper.get(Types.SHORT, 0);
                     boolean throwItem = (slot == 45);
                     if (throwItem) {
                         // Send a packet wiping the slot
                         wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
-                            w.write(Type.UNSIGNED_BYTE, (short) 0);
-                            w.write(Type.SHORT, slot);
-                            w.write(Type.ITEM1_8, null);
+                            w.write(Types.UNSIGNED_BYTE, (short) 0);
+                            w.write(Types.SHORT, slot);
+                            w.write(Types.ITEM1_8, null);
                         }).send(Protocol1_8To1_9.class);
                         // Finally reset to simulate throwing item
-                        wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
+                        wrapper.set(Types.SHORT, 0, (short) -999); // Set slot to -999
                     }
                 });
             }
@@ -259,20 +260,20 @@ public class ItemPacketRewriter1_9 {
 
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // 0 - Window ID
-                map(Type.SHORT); // 1 - Slot ID
-                map(Type.BYTE); // 2 - Button
-                map(Type.SHORT); // 3 - Action
-                map(Type.VAR_INT, Type.BYTE); // 4 - Mode
-                map(Type.ITEM1_8); // 5 - Clicked Item
+                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.SHORT); // 1 - Slot ID
+                map(Types.BYTE); // 2 - Button
+                map(Types.SHORT); // 3 - Action
+                map(Types.VAR_INT, Types.BYTE); // 4 - Mode
+                map(Types.ITEM1_8); // 5 - Clicked Item
                 handler(wrapper -> {
-                    Item stack = wrapper.get(Type.ITEM1_8, 0);
+                    Item stack = wrapper.get(Types.ITEM1_8, 0);
 
                     if (Via.getConfig().isShowShieldWhenSwordInHand()) {
-                        Short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                        byte mode = wrapper.get(Type.BYTE, 1);
-                        short hoverSlot = wrapper.get(Type.SHORT, 0);
-                        byte button = wrapper.get(Type.BYTE, 0);
+                        Short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                        byte mode = wrapper.get(Types.BYTE, 1);
+                        short hoverSlot = wrapper.get(Types.SHORT, 0);
+                        byte button = wrapper.get(Types.BYTE, 0);
 
                         // Move items in inventory to track the sword location
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
@@ -283,8 +284,8 @@ public class ItemPacketRewriter1_9 {
                 });
                 // Brewing patch and elytra throw patch
                 handler(wrapper -> {
-                    final short windowID = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final short slot = wrapper.get(Type.SHORT, 0);
+                    final short windowID = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    final short slot = wrapper.get(Types.SHORT, 0);
                     boolean throwItem = (slot == 45 && windowID == 0);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     if (inventoryTracker.getInventory() != null && inventoryTracker.getInventory().equals("minecraft:brewing_stand")) {
@@ -292,21 +293,21 @@ public class ItemPacketRewriter1_9 {
                             throwItem = true;
                         }
                         if (slot > 4) {
-                            wrapper.set(Type.SHORT, 0, (short) (slot - 1));
+                            wrapper.set(Types.SHORT, 0, (short) (slot - 1));
                         }
                     }
 
                     if (throwItem) {
                         // Send a packet wiping the slot
                         wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
-                            w.write(Type.UNSIGNED_BYTE, windowID);
-                            w.write(Type.SHORT, slot);
-                            w.write(Type.ITEM1_8, null);
+                            w.write(Types.UNSIGNED_BYTE, windowID);
+                            w.write(Types.SHORT, slot);
+                            w.write(Types.ITEM1_8, null);
                         }).scheduleSend(Protocol1_8To1_9.class);
                         // Finally reset to simulate throwing item
-                        wrapper.set(Type.BYTE, 0, (byte) 0); // Set button to 0
-                        wrapper.set(Type.BYTE, 1, (byte) 0); // Set mode to 0
-                        wrapper.set(Type.SHORT, 0, (short) -999); // Set slot to -999
+                        wrapper.set(Types.BYTE, 0, (byte) 0); // Set button to 0
+                        wrapper.set(Types.BYTE, 1, (byte) 0); // Set mode to 0
+                        wrapper.set(Types.SHORT, 0, (short) -999); // Set slot to -999
                     }
                 });
             }
@@ -318,13 +319,13 @@ public class ItemPacketRewriter1_9 {
 
                     @Override
                     public void register() {
-                        map(Type.UNSIGNED_BYTE); // 0 - Window ID
+                        map(Types.UNSIGNED_BYTE); // 0 - Window ID
 
                         // Inventory tracking
                         handler(wrapper -> {
                             InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                             inventoryTracker.setInventory(null);
-                            inventoryTracker.resetInventory(wrapper.get(Type.UNSIGNED_BYTE, 0));
+                            inventoryTracker.resetInventory(wrapper.get(Types.UNSIGNED_BYTE, 0));
                         });
                     }
                 });
@@ -334,7 +335,7 @@ public class ItemPacketRewriter1_9 {
                 PacketHandlers() {
                     @Override
                     public void register() {
-                        map(Type.SHORT); // 0 - Slot id
+                        map(Types.SHORT); // 0 - Slot id
 
                         // Blocking patch
                         handler(wrapper -> {
@@ -352,7 +353,7 @@ public class ItemPacketRewriter1_9 {
 
                             if (showShieldWhenSwordInHand) {
                                 // Update current held item slot index
-                                entityTracker.setHeldItemSlot(wrapper.get(Type.SHORT, 0));
+                                entityTracker.setHeldItemSlot(wrapper.get(Types.SHORT, 0));
 
                                 // Sync shield item in offhand with main hand
                                 entityTracker.syncShieldWithSword();

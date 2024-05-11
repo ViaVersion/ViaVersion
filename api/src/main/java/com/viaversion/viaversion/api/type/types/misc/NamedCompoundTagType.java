@@ -27,6 +27,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -94,7 +95,7 @@ public class NamedCompoundTagType extends Type<CompoundTag> {
     public static final class OptionalNamedCompoundTagType extends OptionalType<CompoundTag> {
 
         public OptionalNamedCompoundTagType() {
-            super(Type.NAMED_COMPOUND_TAG);
+            super(Types.NAMED_COMPOUND_TAG);
         }
     }
 }

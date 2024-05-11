@@ -24,12 +24,13 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class FilterableComponent extends Filterable<Tag> {
 
-    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Type.TAG, Type.OPTIONAL_TAG, FilterableComponent.class) {
+    public static final Type<FilterableComponent> TYPE = new FilterableType<>(Types.TAG, Types.OPTIONAL_TAG, FilterableComponent.class) {
         @Override
         protected FilterableComponent create(final Tag raw, final Tag filtered) {
             return new FilterableComponent(raw, filtered);

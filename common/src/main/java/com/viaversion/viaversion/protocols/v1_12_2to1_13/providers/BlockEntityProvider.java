@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.providers.blockentities.BannerHandler;
@@ -80,8 +81,8 @@ public class BlockEntityProvider implements Provider {
 
     private void sendBlockChange(UserConnection user, Position position, int blockId) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_UPDATE, null, user);
-        wrapper.write(Type.POSITION1_8, position);
-        wrapper.write(Type.VAR_INT, blockId);
+        wrapper.write(Types.BLOCK_POSITION1_8, position);
+        wrapper.write(Types.VAR_INT, blockId);
 
         wrapper.send(Protocol1_12_2To1_13.class);
     }

@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.AttributeMappings;
@@ -43,7 +44,7 @@ import java.util.UUID;
 public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15, ServerboundPackets1_16, Protocol1_15_2To1_16> {
 
     public ItemPacketRewriter1_16(Protocol1_15_2To1_16 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_SHORT_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_SHORT_ARRAY);
     }
 
     @Override
@@ -51,25 +52,25 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         // clear cursor item to prevent client to try dropping it during navigation between multiple inventories causing arm swing
         PacketHandler cursorRemapper = wrapper -> {
             PacketWrapper clearPacket = wrapper.create(ClientboundPackets1_16.CONTAINER_SET_SLOT);
-            clearPacket.write(Type.UNSIGNED_BYTE, (short) -1);
-            clearPacket.write(Type.SHORT, (short) -1);
-            clearPacket.write(Type.ITEM1_13_2, null);
+            clearPacket.write(Types.UNSIGNED_BYTE, (short) -1);
+            clearPacket.write(Types.SHORT, (short) -1);
+            clearPacket.write(Types.ITEM1_13_2, null);
             clearPacket.send(Protocol1_15_2To1_16.class);
         };
 
         protocol.registerClientbound(ClientboundPackets1_15.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Window Id
-                map(Type.VAR_INT); // Window Type
-                map(Type.COMPONENT); // Window Title
+                map(Types.VAR_INT); // Window Id
+                map(Types.VAR_INT); // Window Type
+                map(Types.COMPONENT); // Window Title
 
                 handler(cursorRemapper);
                 handler(wrapper -> {
                     InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
-                    int windowType = wrapper.get(Type.VAR_INT, 1);
+                    int windowType = wrapper.get(Types.VAR_INT, 1);
                     if (windowType >= 20) { // smithing added with id 20
-                        wrapper.set(Type.VAR_INT, 1, ++windowType);
+                        wrapper.set(Types.VAR_INT, 1, ++windowType);
                     }
                     inventoryTracker.setInventoryOpen(true);
                 });
@@ -90,16 +91,16 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         protocol.registerClientbound(ClientboundPackets1_15.CONTAINER_SET_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // Window Id
-                map(Type.SHORT); // Property
-                map(Type.SHORT); // Value
+                map(Types.UNSIGNED_BYTE); // Window Id
+                map(Types.SHORT); // Property
+                map(Types.SHORT); // Value
 
                 handler(wrapper -> {
-                    short property = wrapper.get(Type.SHORT, 0);
+                    short property = wrapper.get(Types.SHORT, 0);
                     if (property >= 4 && property <= 6) { // Enchantment id
-                        short enchantmentId = wrapper.get(Type.SHORT, 1);
+                        short enchantmentId = wrapper.get(Types.SHORT, 1);
                         if (enchantmentId >= 11) { // soul_speed added with id 11
-                            wrapper.set(Type.SHORT, 1, ++enchantmentId);
+                            wrapper.set(Types.SHORT, 1, ++enchantmentId);
                         }
                     }
                 });
@@ -115,12 +116,12 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         protocol.registerClientbound(ClientboundPackets1_15.SET_EQUIPPED_ITEM, ClientboundPackets1_16.SET_EQUIPMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
+                map(Types.VAR_INT); // 0 - Entity ID
 
                 handler(wrapper -> {
-                    int slot = wrapper.read(Type.VAR_INT);
-                    wrapper.write(Type.BYTE, (byte) slot);
-                    handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2));
+                    int slot = wrapper.read(Types.VAR_INT);
+                    wrapper.write(Types.BYTE, (byte) slot);
+                    handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2));
                 });
             }
         });
@@ -135,9 +136,9 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             inventoryTracker.setInventoryOpen(false);
         });
 
-        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
+        protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_15.LEVEL_PARTICLES, Type.DOUBLE);
+        registerSpawnParticle(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
     }
 
     @Override

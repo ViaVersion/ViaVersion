@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -33,8 +34,8 @@ public record PotionEffectData(int amplifier, int duration, boolean ambient, boo
     public static final Type<PotionEffectData> TYPE = new Type<>(PotionEffectData.class) {
         @Override
         public PotionEffectData read(final ByteBuf buffer) {
-            final int amplifier = Type.VAR_INT.readPrimitive(buffer);
-            final int duration = Type.VAR_INT.readPrimitive(buffer);
+            final int amplifier = Types.VAR_INT.readPrimitive(buffer);
+            final int duration = Types.VAR_INT.readPrimitive(buffer);
             final boolean ambient = buffer.readBoolean();
             final boolean showParticles = buffer.readBoolean();
             final boolean showIcon = buffer.readBoolean();
@@ -44,8 +45,8 @@ public record PotionEffectData(int amplifier, int duration, boolean ambient, boo
 
         @Override
         public void write(final ByteBuf buffer, final PotionEffectData value) {
-            Type.VAR_INT.writePrimitive(buffer, value.amplifier);
-            Type.VAR_INT.writePrimitive(buffer, value.duration);
+            Types.VAR_INT.writePrimitive(buffer, value.amplifier);
+            Types.VAR_INT.writePrimitive(buffer, value.duration);
             buffer.writeBoolean(value.ambient);
             buffer.writeBoolean(value.showParticles);
             buffer.writeBoolean(value.showIcon);

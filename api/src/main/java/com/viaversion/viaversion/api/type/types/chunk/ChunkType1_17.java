@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
@@ -51,12 +52,12 @@ public final class ChunkType1_17 extends Type<Chunk> {
         int chunkX = input.readInt();
         int chunkZ = input.readInt();
 
-        BitSet sectionsMask = BitSet.valueOf(Type.LONG_ARRAY_PRIMITIVE.read(input));
-        CompoundTag heightMap = Type.NAMED_COMPOUND_TAG.read(input);
+        BitSet sectionsMask = BitSet.valueOf(Types.LONG_ARRAY_PRIMITIVE.read(input));
+        CompoundTag heightMap = Types.NAMED_COMPOUND_TAG.read(input);
 
-        int[] biomeData = Type.VAR_INT_ARRAY_PRIMITIVE.read(input);
+        int[] biomeData = Types.VAR_INT_ARRAY_PRIMITIVE.read(input);
 
-        ByteBuf data = input.readSlice(Type.VAR_INT.readPrimitive(input));
+        ByteBuf data = input.readSlice(Types.VAR_INT.readPrimitive(input));
 
         // Read sections
         ChunkSection[] sections = new ChunkSection[ySectionCount];
@@ -69,7 +70,7 @@ public final class ChunkType1_17 extends Type<Chunk> {
             sections[i] = section;
         }
 
-        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Type.NAMED_COMPOUND_TAG_ARRAY.read(input)));
+        List<CompoundTag> nbtData = new ArrayList<>(Arrays.asList(Types.NAMED_COMPOUND_TAG_ARRAY.read(input)));
         return new BaseChunk(chunkX, chunkZ, true, false, sectionsMask, sections, biomeData, heightMap, nbtData);
     }
 
@@ -78,11 +79,11 @@ public final class ChunkType1_17 extends Type<Chunk> {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
 
-        Type.LONG_ARRAY_PRIMITIVE.write(output, chunk.getChunkMask().toLongArray());
-        Type.NAMED_COMPOUND_TAG.write(output, chunk.getHeightMap());
+        Types.LONG_ARRAY_PRIMITIVE.write(output, chunk.getChunkMask().toLongArray());
+        Types.NAMED_COMPOUND_TAG.write(output, chunk.getHeightMap());
 
         // Write biome data
-        Type.VAR_INT_ARRAY_PRIMITIVE.write(output, chunk.getBiomeData());
+        Types.VAR_INT_ARRAY_PRIMITIVE.write(output, chunk.getBiomeData());
 
         ByteBuf buf = output.alloc().buffer();
         try {
@@ -94,13 +95,13 @@ public final class ChunkType1_17 extends Type<Chunk> {
                 Types1_16.CHUNK_SECTION.write(buf, section);
             }
             buf.readerIndex(0);
-            Type.VAR_INT.writePrimitive(output, buf.readableBytes());
+            Types.VAR_INT.writePrimitive(output, buf.readableBytes());
             output.writeBytes(buf);
         } finally {
             buf.release(); // release buffer
         }
 
         // Write Block Entities
-        Type.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
+        Types.NAMED_COMPOUND_TAG_ARRAY.write(output, chunk.getBlockEntities().toArray(EMPTY_COMPOUNDS));
     }
 }

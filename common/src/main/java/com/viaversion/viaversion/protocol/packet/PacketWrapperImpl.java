@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.util.PipelineUtil;
@@ -193,14 +194,14 @@ public class PacketWrapperImpl implements PacketWrapper {
         readableObjects.clear();
         // If the buffer has readable bytes, copy them.
         if (inputBuffer.isReadable()) {
-            passthrough(Type.REMAINING_BYTES);
+            passthrough(Types.REMAINING_BYTES);
         }
     }
 
     @Override
     public void writeToBuffer(ByteBuf buffer) throws InformativeException {
         if (id != -1) {
-            Type.VAR_INT.writePrimitive(buffer, id);
+            Types.VAR_INT.writePrimitive(buffer, id);
         }
         if (!readableObjects.isEmpty()) {
             packetValues.addAll(readableObjects);

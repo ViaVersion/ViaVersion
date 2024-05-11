@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.GameMode;
@@ -86,9 +87,9 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
     public void setSecondHand(int entityID, Item item) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.SET_EQUIPPED_ITEM, null, user());
-        wrapper.write(Type.VAR_INT, entityID);
-        wrapper.write(Type.VAR_INT, 1); // slot
-        wrapper.write(Type.ITEM1_8, this.itemInSecondHand = item);
+        wrapper.write(Types.VAR_INT, entityID);
+        wrapper.write(Types.VAR_INT, 1); // slot
+        wrapper.write(Types.ITEM1_8, this.itemInSecondHand = item);
         wrapper.scheduleSend(Protocol1_8To1_9.class);
     }
 
@@ -160,7 +161,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         for (Metadata metadata : new ArrayList<>(metadataList)) {
             if (type == EntityType.SKELETON) {
                 if ((getMetaByIndex(metadataList, 12)) == null) {
-                    metadataList.add(new Metadata(12, MetaType1_9.Boolean, true));
+                    metadataList.add(new Metadata(12, MetaType1_9.BOOLEAN, true));
                 }
             }
 
@@ -193,7 +194,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 if (metadata.id() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
                     metadataList.add(new Metadata(
                             13, // Main hand
-                            MetaType1_9.Byte,
+                            MetaType1_9.BYTE,
                             (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
                     ));
                 }
@@ -212,11 +213,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                             knownHolograms.add(entityId);
                             // Send movement
                             PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.MOVE_ENTITY_POS, null, user());
-                            wrapper.write(Type.VAR_INT, entityId);
-                            wrapper.write(Type.SHORT, (short) 0);
-                            wrapper.write(Type.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
-                            wrapper.write(Type.SHORT, (short) 0);
-                            wrapper.write(Type.BOOLEAN, true);
+                            wrapper.write(Types.VAR_INT, entityId);
+                            wrapper.write(Types.SHORT, (short) 0);
+                            wrapper.write(Types.SHORT, (short) (128D * (Via.getConfig().getHologramYOffset() * 32D)));
+                            wrapper.write(Types.SHORT, (short) 0);
+                            wrapper.write(Types.BOOLEAN, true);
                             wrapper.scheduleSend(Protocol1_8To1_9.class);
                         }
                     }
@@ -272,24 +273,24 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
     public void sendTeamPacket(boolean add, boolean now) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.SET_PLAYER_TEAM, null, user());
-        wrapper.write(Type.STRING, "viaversion"); // Use viaversion as name
+        wrapper.write(Types.STRING, "viaversion"); // Use viaversion as name
         if (add) {
             // add
             if (!teamExists) {
-                wrapper.write(Type.BYTE, (byte) 0); // make team
-                wrapper.write(Type.STRING, "viaversion");
-                wrapper.write(Type.STRING, "§f"); // prefix
-                wrapper.write(Type.STRING, ""); // suffix
-                wrapper.write(Type.BYTE, (byte) 0); // friendly fire
-                wrapper.write(Type.STRING, ""); // nametags
-                wrapper.write(Type.STRING, "never"); // collision rule :)
-                wrapper.write(Type.BYTE, (byte) 15); // color
+                wrapper.write(Types.BYTE, (byte) 0); // make team
+                wrapper.write(Types.STRING, "viaversion");
+                wrapper.write(Types.STRING, "§f"); // prefix
+                wrapper.write(Types.STRING, ""); // suffix
+                wrapper.write(Types.BYTE, (byte) 0); // friendly fire
+                wrapper.write(Types.STRING, ""); // nametags
+                wrapper.write(Types.STRING, "never"); // collision rule :)
+                wrapper.write(Types.BYTE, (byte) 15); // color
             } else {
-                wrapper.write(Type.BYTE, (byte) 3);
+                wrapper.write(Types.BYTE, (byte) 3);
             }
-            wrapper.write(Type.STRING_ARRAY, new String[]{user().getProtocolInfo().getUsername()});
+            wrapper.write(Types.STRING_ARRAY, new String[]{user().getProtocolInfo().getUsername()});
         } else {
-            wrapper.write(Type.BYTE, (byte) 1); // remove team
+            wrapper.write(Types.BYTE, (byte) 1); // remove team
         }
         teamExists = add;
         if (now) {

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.Array;
 
@@ -41,7 +42,7 @@ public class ArrayType<T> extends Type<T[]> {
 
     @Override
     public T[] read(ByteBuf buffer) {
-        int amount = Type.VAR_INT.readPrimitive(buffer);
+        int amount = Types.VAR_INT.readPrimitive(buffer);
         T[] array = (T[]) Array.newInstance(elementType.getOutputClass(), amount);
 
         for (int i = 0; i < amount; i++) {
@@ -52,7 +53,7 @@ public class ArrayType<T> extends Type<T[]> {
 
     @Override
     public void write(ByteBuf buffer, T[] object) {
-        Type.VAR_INT.writePrimitive(buffer, object.length);
+        Types.VAR_INT.writePrimitive(buffer, object.length);
         for (T o : object) {
             elementType.write(buffer, o);
         }

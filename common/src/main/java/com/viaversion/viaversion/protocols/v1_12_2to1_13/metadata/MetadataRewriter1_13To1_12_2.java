@@ -40,7 +40,7 @@ public class MetadataRewriter1_13To1_12_2 extends EntityRewriter<ClientboundPack
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> Types1_13.META_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
         filter().metaType(Types1_13.META_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(event.user(), meta.value())));
-        filter().metaType(Types1_13.META_TYPES.blockStateType).handler(((event, meta) -> {
+        filter().metaType(Types1_13.META_TYPES.optionalBlockStateType).handler(((event, meta) -> {
             final int oldId = meta.value();
             if (oldId != 0) {
                 final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
