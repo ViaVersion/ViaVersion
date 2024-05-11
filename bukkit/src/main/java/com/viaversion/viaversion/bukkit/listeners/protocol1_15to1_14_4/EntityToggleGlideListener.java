@@ -55,7 +55,7 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
         // Cancelling can only be done by updating the player's metadata
         if (event.isGliding() && event.isCancelled()) {
-            PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.ENTITY_METADATA, null, getUserConnection(player));
+            PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, null, getUserConnection(player));
             packet.write(Type.VAR_INT, player.getEntityId());
 
             byte bitmask = 0;

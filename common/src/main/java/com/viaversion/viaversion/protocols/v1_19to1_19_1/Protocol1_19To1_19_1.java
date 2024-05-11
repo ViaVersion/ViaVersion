@@ -106,7 +106,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                 read(Type.BYTE_ARRAY_PRIMITIVE); // Signature
             }
         });
-        registerServerbound(ServerboundPackets1_19_1.CHAT_MESSAGE, new PacketHandlers() {
+        registerServerbound(ServerboundPackets1_19_1.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Message
@@ -190,7 +190,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         });
         cancelServerbound(ServerboundPackets1_19_1.CHAT_ACK);
 
-        registerClientbound(ClientboundPackets1_19.JOIN_GAME, new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_19.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // Entity ID

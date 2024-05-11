@@ -162,7 +162,7 @@ public class ConfigurationState implements StorableObject {
             return null;
         }
 
-        final PacketWrapper settingsPacket = PacketWrapper.create(ServerboundPackets1_19_4.CLIENT_SETTINGS, connection);
+        final PacketWrapper settingsPacket = PacketWrapper.create(ServerboundPackets1_19_4.CLIENT_INFORMATION, connection);
         settingsPacket.write(Type.STRING, clientInformation.language);
         settingsPacket.write(Type.BYTE, clientInformation.viewDistance);
         settingsPacket.write(Type.VAR_INT, clientInformation.chatVisibility);

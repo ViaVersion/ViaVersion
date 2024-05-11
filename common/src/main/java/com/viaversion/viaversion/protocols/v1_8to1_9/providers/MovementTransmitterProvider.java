@@ -39,7 +39,7 @@ public class MovementTransmitterProvider implements Provider {
         movementTracker.incrementIdlePacket();
 
         try {
-            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.PLAYER_MOVEMENT, userConnection);
+            final PacketWrapper playerMovement = PacketWrapper.create(ServerboundPackets1_8.MOVE_PLAYER_STATUS_ONLY, userConnection);
             playerMovement.write(Type.BOOLEAN, movementTracker.isGround()); // on ground
             playerMovement.scheduleSendToServer(Protocol1_8To1_9.class);
         } catch (Throwable e) {

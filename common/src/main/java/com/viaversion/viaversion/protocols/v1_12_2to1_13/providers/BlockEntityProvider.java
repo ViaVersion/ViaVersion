@@ -79,7 +79,7 @@ public class BlockEntityProvider implements Provider {
     }
 
     private void sendBlockChange(UserConnection user, Position position, int blockId) {
-        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_CHANGE, null, user);
+        PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_UPDATE, null, user);
         wrapper.write(Type.POSITION1_8, position);
         wrapper.write(Type.VAR_INT, blockId);
 

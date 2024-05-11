@@ -37,12 +37,12 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
 
     @Override
     public void registerPackets() {
-        registerSetSlot(ClientboundPackets1_9_3.SET_SLOT);
-        registerWindowItems(ClientboundPackets1_9_3.WINDOW_ITEMS);
-        registerEntityEquipment(ClientboundPackets1_9_3.ENTITY_EQUIPMENT);
+        registerSetSlot(ClientboundPackets1_9_3.CONTAINER_SET_SLOT);
+        registerWindowItems(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
+        registerEntityEquipment(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
 
         // Plugin message -> Trading
-        protocol.registerClientbound(ClientboundPackets1_9_3.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // 0 - Channel
@@ -71,7 +71,7 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
         });
 
 
-        protocol.registerServerbound(ServerboundPackets1_12.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_12.CONTAINER_CLICK, new PacketHandlers() {
                     @Override
                     public void register() {
                         map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -108,7 +108,7 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
                 }
         );
 
-        registerCreativeInvAction(ServerboundPackets1_12.CREATIVE_INVENTORY_ACTION);
+        registerCreativeInvAction(ServerboundPackets1_12.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

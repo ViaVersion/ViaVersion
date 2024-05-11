@@ -36,7 +36,7 @@ public class TabCompleteTracker implements StorableObject {
 
     public void sendPacketToServer(UserConnection connection) {
         if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
-        PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.TAB_COMPLETE, null, connection);
+        PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.COMMAND_SUGGESTION, null, connection);
         wrapper.write(Type.STRING, lastTabComplete);
         wrapper.write(Type.BOOLEAN, false);
         final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);

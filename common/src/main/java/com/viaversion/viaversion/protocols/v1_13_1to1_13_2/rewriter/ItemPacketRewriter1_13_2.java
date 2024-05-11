@@ -27,7 +27,7 @@ import com.viaversion.viaversion.util.Key;
 public class ItemPacketRewriter1_13_2 {
 
     public static void register(Protocol1_13_1To1_13_2 protocol) {
-        protocol.registerClientbound(ClientboundPackets1_13.SET_SLOT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -35,7 +35,7 @@ public class ItemPacketRewriter1_13_2 {
                 map(Type.ITEM1_13, Type.ITEM1_13_2); // 2 - Slot Value
             }
         });
-        protocol.registerClientbound(ClientboundPackets1_13.WINDOW_ITEMS, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -43,7 +43,7 @@ public class ItemPacketRewriter1_13_2 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.PLUGIN_MESSAGE, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.STRING); // Channel
@@ -73,7 +73,7 @@ public class ItemPacketRewriter1_13_2 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.ENTITY_EQUIPMENT, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_13.SET_EQUIPPED_ITEM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // 0 - Entity ID
@@ -82,7 +82,7 @@ public class ItemPacketRewriter1_13_2 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_13.DECLARE_RECIPES, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
             int recipesNo = wrapper.passthrough(Type.VAR_INT);
             for (int i = 0; i < recipesNo; i++) {
                 wrapper.passthrough(Type.STRING); // Id
@@ -113,7 +113,7 @@ public class ItemPacketRewriter1_13_2 {
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_13.CLICK_WINDOW, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_13.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.UNSIGNED_BYTE); // 0 - Window ID
@@ -124,7 +124,7 @@ public class ItemPacketRewriter1_13_2 {
                 map(Type.ITEM1_13_2, Type.ITEM1_13); // 5 - Clicked Item
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_13.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // 0 - Slot

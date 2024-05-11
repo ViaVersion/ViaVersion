@@ -39,11 +39,11 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
     @Override
     public void registerPackets() {
         registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_18.WINDOW_ITEMS);
-        registerSetSlot1_17_1(ClientboundPackets1_18.SET_SLOT);
-        registerAdvancements(ClientboundPackets1_18.ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_18.ENTITY_EQUIPMENT);
-        protocol.registerClientbound(ClientboundPackets1_18.SPAWN_PARTICLE, new PacketHandlers() {
+        registerWindowItems1_17_1(ClientboundPackets1_18.CONTAINER_SET_CONTENT);
+        registerSetSlot1_17_1(ClientboundPackets1_18.CONTAINER_SET_SLOT);
+        registerAdvancements(ClientboundPackets1_18.UPDATE_ADVANCEMENTS);
+        registerEntityEquipmentArray(ClientboundPackets1_18.SET_EQUIPMENT);
+        protocol.registerClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT, Type.VAR_INT); // 0 - Particle ID
@@ -73,12 +73,12 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        registerClickWindow1_17_1(ServerboundPackets1_19.CLICK_WINDOW);
-        registerCreativeInvAction(ServerboundPackets1_19.CREATIVE_INVENTORY_ACTION);
+        registerClickWindow1_17_1(ServerboundPackets1_19.CONTAINER_CLICK);
+        registerCreativeInvAction(ServerboundPackets1_19.SET_CREATIVE_MODE_SLOT);
 
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.WINDOW_PROPERTY);
+        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.CONTAINER_SET_DATA);
 
-        protocol.registerClientbound(ClientboundPackets1_18.TRADE_LIST, new PacketHandlers() {
+        protocol.registerClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Container id
@@ -107,7 +107,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_DIGGING, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Action
@@ -116,7 +116,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
                 handler(sequenceHandler());
             }
         });
-        protocol.registerServerbound(ServerboundPackets1_19.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        protocol.registerServerbound(ServerboundPackets1_19.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // Hand
@@ -137,7 +137,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
             }
         });
 
-        new RecipeRewriter<>(protocol).register(ClientboundPackets1_18.DECLARE_RECIPES);
+        new RecipeRewriter<>(protocol).register(ClientboundPackets1_18.UPDATE_RECIPES);
     }
 
     private PacketHandler sequenceHandler() {
