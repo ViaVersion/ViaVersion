@@ -27,8 +27,8 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossFlag;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -228,12 +228,12 @@ public class CommonBoss implements BossBar {
     }
 
     private void sendPacketConnection(UserConnection conn, PacketWrapper wrapper) {
-        if (conn.getProtocolInfo() == null || !conn.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
+        if (conn.getProtocolInfo() == null || !conn.getProtocolInfo().getPipeline().contains(Protocol1_8To1_9.class)) {
             connections.remove(conn.getProtocolInfo().getUuid());
             return;
         }
         try {
-            wrapper.scheduleSend(Protocol1_9To1_8.class);
+            wrapper.scheduleSend(Protocol1_8To1_9.class);
         } catch (Exception e) {
             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to send bossbar packet", e);
         }

@@ -24,9 +24,9 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.Protocol1_9To1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import java.util.Collections;
 import java.util.logging.Level;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -44,8 +44,8 @@ public class ElytraPatch implements Listener {
         UserConnection user = Via.getManager().getConnectionManager().getConnectedClient(event.getPlayer().getUniqueId());
         if (user == null) return;
 
-        if (user.getProtocolInfo().getPipeline().contains(Protocol1_9To1_8.class)) {
-            EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
+        if (user.getProtocolInfo().getPipeline().contains(Protocol1_8To1_9.class)) {
+            EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
             int entityId = tracker.getProvidedEntityId();
 
             PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.ENTITY_METADATA, null, user);
@@ -53,7 +53,7 @@ public class ElytraPatch implements Listener {
             wrapper.write(Type.VAR_INT, entityId);
             wrapper.write(Types1_9.METADATA_LIST, Collections.singletonList(new Metadata(0, MetaType1_9.Byte, (byte) 0)));
 
-            wrapper.scheduleSend(Protocol1_9To1_8.class);
+            wrapper.scheduleSend(Protocol1_8To1_9.class);
         }
     }
 }

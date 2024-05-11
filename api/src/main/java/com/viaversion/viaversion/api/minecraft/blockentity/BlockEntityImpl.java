@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.blockentity;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.nbt.tag.CompoundTag;
 
 public record BlockEntityImpl(byte packedXZ, short y, int typeId, CompoundTag tag) implements BlockEntity {
 

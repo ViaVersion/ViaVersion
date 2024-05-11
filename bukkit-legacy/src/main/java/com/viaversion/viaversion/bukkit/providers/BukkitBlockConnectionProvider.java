@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.bukkit.providers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.blockconnections.providers.BlockConnectionProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;

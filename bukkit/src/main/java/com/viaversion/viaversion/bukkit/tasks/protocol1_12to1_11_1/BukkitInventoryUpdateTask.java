@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import com.viaversion.viaversion.protocols.protocol1_12to1_11_1.storage.ItemTransaction;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.storage.ItemTransaction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

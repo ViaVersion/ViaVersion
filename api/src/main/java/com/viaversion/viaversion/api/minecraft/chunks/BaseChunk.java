@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft.chunks;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import java.util.BitSet;
 import java.util.List;

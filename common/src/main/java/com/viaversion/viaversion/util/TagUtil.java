@@ -17,9 +17,9 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.ListTag;
-import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.Tag;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 

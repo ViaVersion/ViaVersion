@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.bukkit.util.NMSUtil;
-import com.viaversion.viaversion.protocols.protocol1_19to1_18_2.Protocol1_19To1_18_2;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -42,7 +42,7 @@ public final class BlockBreakListener extends ViaBukkitListener {
     }
 
     public BlockBreakListener(ViaVersionPlugin plugin) {
-        super(plugin, Protocol1_19To1_18_2.class);
+        super(plugin, Protocol1_18_2To1_19.class);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
