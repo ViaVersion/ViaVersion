@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossFlag;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -242,30 +243,30 @@ public class CommonBoss implements BossBar {
     private PacketWrapper getPacket(UpdateAction action, UserConnection connection) {
         try {
             PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, null, connection);
-            wrapper.write(Type.UUID, uuid);
-            wrapper.write(Type.VAR_INT, action.getId());
+            wrapper.write(Types.UUID, uuid);
+            wrapper.write(Types.VAR_INT, action.getId());
             switch (action) {
                 case ADD:
-                    wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(title));
-                    wrapper.write(Type.FLOAT, health);
-                    wrapper.write(Type.VAR_INT, color.getId());
-                    wrapper.write(Type.VAR_INT, style.getId());
-                    wrapper.write(Type.BYTE, (byte) flagToBytes());
+                    wrapper.write(Types.COMPONENT, ComponentUtil.plainToJson(title));
+                    wrapper.write(Types.FLOAT, health);
+                    wrapper.write(Types.VAR_INT, color.getId());
+                    wrapper.write(Types.VAR_INT, style.getId());
+                    wrapper.write(Types.BYTE, (byte) flagToBytes());
                     break;
                 case REMOVE:
                     break;
                 case UPDATE_HEALTH:
-                    wrapper.write(Type.FLOAT, health);
+                    wrapper.write(Types.FLOAT, health);
                     break;
                 case UPDATE_TITLE:
-                    wrapper.write(Type.COMPONENT, ComponentUtil.plainToJson(title));
+                    wrapper.write(Types.COMPONENT, ComponentUtil.plainToJson(title));
                     break;
                 case UPDATE_STYLE:
-                    wrapper.write(Type.VAR_INT, color.getId());
-                    wrapper.write(Type.VAR_INT, style.getId());
+                    wrapper.write(Types.VAR_INT, color.getId());
+                    wrapper.write(Types.VAR_INT, style.getId());
                     break;
                 case UPDATE_FLAGS:
-                    wrapper.write(Type.BYTE, (byte) flagToBytes());
+                    wrapper.write(Types.BYTE, (byte) flagToBytes());
                     break;
             }
 

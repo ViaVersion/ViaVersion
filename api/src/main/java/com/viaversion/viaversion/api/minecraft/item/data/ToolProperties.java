@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock) {
@@ -32,7 +33,7 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
         public ToolProperties read(final ByteBuf buffer) {
             final ToolRule[] rules = ToolRule.ARRAY_TYPE.read(buffer);
             final float defaultMiningSpeed = buffer.readFloat();
-            final int damagePerBlock = Type.VAR_INT.readPrimitive(buffer);
+            final int damagePerBlock = Types.VAR_INT.readPrimitive(buffer);
             return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock);
         }
 
@@ -40,7 +41,7 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
         public void write(final ByteBuf buffer, final ToolProperties value) {
             ToolRule.ARRAY_TYPE.write(buffer, value.rules());
             buffer.writeFloat(value.defaultMiningSpeed());
-            Type.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
+            Types.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
         }
     };
 

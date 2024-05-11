@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.providers;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -80,7 +80,7 @@ public class CompressionProvider implements Provider {
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
             if (!in.isReadable()) return;
 
-            int outLength = Type.VAR_INT.readPrimitive(in);
+            int outLength = Types.VAR_INT.readPrimitive(in);
             if (outLength == 0) {
                 out.add(in.readBytes(in.readableBytes()));
                 return;
@@ -135,7 +135,7 @@ public class CompressionProvider implements Provider {
                 return;
             }
 
-            Type.VAR_INT.writePrimitive(out, frameLength);
+            Types.VAR_INT.writePrimitive(out, frameLength);
 
             ByteBuf temp = in;
             if (!in.hasArray()) {

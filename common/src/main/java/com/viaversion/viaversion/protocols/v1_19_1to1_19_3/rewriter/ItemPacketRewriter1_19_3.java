@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ServerboundPackets1_19_3;
@@ -34,7 +35,7 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
     private static final int MISC_CRAFTING_BOOK_CATEGORY = 0;
 
     public ItemPacketRewriter1_19_3(final Protocol1_19_1To1_19_3 protocol) {
-        super(protocol, Type.ITEM1_13_2, Type.ITEM1_13_2_ARRAY);
+        super(protocol, Types.ITEM1_13_2, Types.ITEM1_13_2_ARRAY);
     }
 
     @Override
@@ -60,50 +61,50 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
 
         final RecipeRewriter<ClientboundPackets1_19_1> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_19_1.UPDATE_RECIPES, wrapper -> {
-            final int size = wrapper.passthrough(Type.VAR_INT);
+            final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Type.STRING));
-                wrapper.passthrough(Type.STRING); // Recipe Identifier
+                final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
+                wrapper.passthrough(Types.STRING); // Recipe Identifier
                 switch (type) {
                     case "crafting_shapeless": {
-                        wrapper.passthrough(Type.STRING); // Group
-                        wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
-                        final int ingredients = wrapper.passthrough(Type.VAR_INT);
+                        wrapper.passthrough(Types.STRING); // Group
+                        wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                        final int ingredients = wrapper.passthrough(Types.VAR_INT);
                         for (int j = 0; j < ingredients; j++) {
-                            final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
+                            final Item[] items = wrapper.passthrough(Types.ITEM1_13_2_ARRAY); // Ingredients
                             for (final Item item : items) {
                                 handleItemToClient(wrapper.user(), item);
                             }
                         }
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
                         break;
                     }
                     case "crafting_shaped": {
-                        final int ingredients = wrapper.passthrough(Type.VAR_INT) * wrapper.passthrough(Type.VAR_INT);
-                        wrapper.passthrough(Type.STRING); // Group
-                        wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                        final int ingredients = wrapper.passthrough(Types.VAR_INT) * wrapper.passthrough(Types.VAR_INT);
+                        wrapper.passthrough(Types.STRING); // Group
+                        wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                         for (int j = 0; j < ingredients; j++) {
-                            final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
+                            final Item[] items = wrapper.passthrough(Types.ITEM1_13_2_ARRAY); // Ingredients
                             for (final Item item : items) {
                                 handleItemToClient(wrapper.user(), item);
                             }
                         }
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
                         break;
                     }
                     case "smelting":
                     case "campfire_cooking":
                     case "blasting":
                     case "smoking":
-                        wrapper.passthrough(Type.STRING); // Group
-                        wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
-                        final Item[] items = wrapper.passthrough(Type.ITEM1_13_2_ARRAY); // Ingredients
+                        wrapper.passthrough(Types.STRING); // Group
+                        wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                        final Item[] items = wrapper.passthrough(Types.ITEM1_13_2_ARRAY); // Ingredients
                         for (final Item item : items) {
                             handleItemToClient(wrapper.user(), item);
                         }
-                        handleItemToClient(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)); // Result
-                        wrapper.passthrough(Type.FLOAT); // EXP
-                        wrapper.passthrough(Type.VAR_INT); // Cooking time
+                        handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
+                        wrapper.passthrough(Types.FLOAT); // EXP
+                        wrapper.passthrough(Types.VAR_INT); // Cooking time
                         break;
                     case "crafting_special_armordye":
                     case "crafting_special_bookcloning":
@@ -118,7 +119,7 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                     case "crafting_special_shulkerboxcoloring":
                     case "crafting_special_suspiciousstew":
                     case "crafting_special_repairitem":
-                        wrapper.write(Type.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                        wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                         break;
                     default:
                         recipeRewriter.handleRecipeType(wrapper, type);
@@ -130,9 +131,9 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
         protocol.registerClientbound(ClientboundPackets1_19_1.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLOAT, Type.DOUBLE); // X
-                map(Type.FLOAT, Type.DOUBLE); // Y
-                map(Type.FLOAT, Type.DOUBLE); // Z
+                map(Types.FLOAT, Types.DOUBLE); // X
+                map(Types.FLOAT, Types.DOUBLE); // Y
+                map(Types.FLOAT, Types.DOUBLE); // Z
             }
         });
     }

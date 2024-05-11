@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
@@ -49,7 +50,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         registerMetadataRewriter(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_16_2.REMOVE_ENTITIES, null, wrapper -> {
-            int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+            int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
             wrapper.cancel();
 
             EntityTracker entityTracker = wrapper.user().getEntityTracker(Protocol1_16_4To1_17.class);
@@ -58,7 +59,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
                 // Send individual remove packets
                 PacketWrapper newPacket = wrapper.create(ClientboundPackets1_17.REMOVE_ENTITY);
-                newPacket.write(Type.VAR_INT, entityId);
+                newPacket.write(Types.VAR_INT, entityId);
                 newPacket.send(Protocol1_16_4To1_17.class);
             }
         });
@@ -66,23 +67,23 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_16_2.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Registry
-                map(Type.NAMED_COMPOUND_TAG); // Current dimension
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Registry
+                map(Types.NAMED_COMPOUND_TAG); // Current dimension
                 handler(wrapper -> {
                     // Add new dimension fields
-                    CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    CompoundTag registry = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(registry, "dimension_type");
                     for (CompoundTag dimension : dimensions) {
                         CompoundTag dimensionCompound = dimension.getCompoundTag("element");
                         addNewDimensionData(dimensionCompound);
                     }
 
-                    CompoundTag currentDimensionTag = wrapper.get(Type.NAMED_COMPOUND_TAG, 1);
+                    CompoundTag currentDimensionTag = wrapper.get(Types.NAMED_COMPOUND_TAG, 1);
                     addNewDimensionData(currentDimensionTag);
                 });
                 handler(playerTrackerHandler());
@@ -90,35 +91,35 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, wrapper -> {
-            CompoundTag dimensionData = wrapper.passthrough(Type.NAMED_COMPOUND_TAG);
+            CompoundTag dimensionData = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
             addNewDimensionData(dimensionData);
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_ATTRIBUTES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                handler(wrapper -> wrapper.write(Type.VAR_INT, wrapper.read(Type.INT))); // Collection length is now a var int
+                map(Types.VAR_INT); // Entity id
+                handler(wrapper -> wrapper.write(Types.VAR_INT, wrapper.read(Types.INT))); // Collection length is now a var int
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.DOUBLE);
-                map(Type.DOUBLE);
-                map(Type.DOUBLE);
-                map(Type.FLOAT);
-                map(Type.FLOAT);
-                map(Type.BYTE);
-                map(Type.VAR_INT);
-                create(Type.BOOLEAN, false); // Dismount vehicle
+                map(Types.DOUBLE);
+                map(Types.DOUBLE);
+                map(Types.DOUBLE);
+                map(Types.FLOAT);
+                map(Types.FLOAT);
+                map(Types.BYTE);
+                map(Types.VAR_INT);
+                create(Types.BOOLEAN, false); // Dismount vehicle
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.PLAYER_COMBAT, null, wrapper -> {
             // Combat packet actions have been split into individual packets (the content hasn't changed)
-            int type = wrapper.read(Type.VAR_INT);
+            int type = wrapper.read(Types.VAR_INT);
             ClientboundPacketType packetType = switch (type) {
                 case 0 -> ClientboundPackets1_17.PLAYER_COMBAT_ENTER;
                 case 1 -> ClientboundPackets1_17.PLAYER_COMBAT_END;
@@ -143,7 +144,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
                 meta.setValue(pose + 1);
             }
         });
-        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.blockStateType, Types1_17.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.optionalBlockStateType, Types1_17.META_TYPES.particleType);
 
         // Ticks frozen added with id 7
         filter().type(EntityTypes1_17.ENTITY).addIndex(7);

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -31,7 +32,7 @@ public record PotionContents(@Nullable Integer potion, @Nullable Integer customC
     public static final Type<PotionContents> TYPE = new Type<>(PotionContents.class) {
         @Override
         public PotionContents read(final ByteBuf buffer) {
-            final Integer potion = buffer.readBoolean() ? Type.VAR_INT.readPrimitive(buffer) : null;
+            final Integer potion = buffer.readBoolean() ? Types.VAR_INT.readPrimitive(buffer) : null;
             final Integer customColor = buffer.readBoolean() ? buffer.readInt() : null;
             final PotionEffect[] customEffects = PotionEffect.ARRAY_TYPE.read(buffer);
             return new PotionContents(potion, customColor, customEffects);
@@ -41,7 +42,7 @@ public record PotionContents(@Nullable Integer potion, @Nullable Integer customC
         public void write(final ByteBuf buffer, final PotionContents value) {
             buffer.writeBoolean(value.potion != null);
             if (value.potion != null) {
-                Type.VAR_INT.writePrimitive(buffer, value.potion);
+                Types.VAR_INT.writePrimitive(buffer, value.potion);
             }
 
             buffer.writeBoolean(value.customColor != null);

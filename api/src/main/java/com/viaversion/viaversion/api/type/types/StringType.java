@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.nio.charset.StandardCharsets;
 
@@ -45,7 +46,7 @@ public class StringType extends Type<String> {
 
     @Override
     public String read(ByteBuf buffer) {
-        int len = Type.VAR_INT.readPrimitive(buffer);
+        int len = Types.VAR_INT.readPrimitive(buffer);
 
         Preconditions.checkArgument(len <= maxLength * MAX_CHAR_UTF_8_LENGTH,
                 "Cannot receive string longer than Short.MAX_VALUE * " + MAX_CHAR_UTF_8_LENGTH + " bytes (got %s bytes)", len);
@@ -66,14 +67,14 @@ public class StringType extends Type<String> {
         }
 
         byte[] b = object.getBytes(StandardCharsets.UTF_8);
-        Type.VAR_INT.writePrimitive(buffer, b.length);
+        Types.VAR_INT.writePrimitive(buffer, b.length);
         buffer.writeBytes(b);
     }
 
     public static final class OptionalStringType extends OptionalType<String> {
 
         public OptionalStringType() {
-            super(Type.STRING);
+            super(Types.STRING);
         }
     }
 }

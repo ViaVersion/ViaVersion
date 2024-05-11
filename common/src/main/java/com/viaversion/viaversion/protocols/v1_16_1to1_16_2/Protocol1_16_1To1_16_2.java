@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
@@ -64,23 +65,23 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
 
         // Recipe book data has been split into 2 separate packets
         registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_CHANGE_SETTINGS, ServerboundPackets1_16.RECIPE_BOOK_UPDATE, wrapper -> {
-            int recipeType = wrapper.read(Type.VAR_INT);
-            boolean open = wrapper.read(Type.BOOLEAN);
-            boolean filter = wrapper.read(Type.BOOLEAN);
-            wrapper.write(Type.VAR_INT, 1); // Settings
-            wrapper.write(Type.BOOLEAN, recipeType == 0 && open); // Crafting
-            wrapper.write(Type.BOOLEAN, filter);
-            wrapper.write(Type.BOOLEAN, recipeType == 1 && open); // Furnace
-            wrapper.write(Type.BOOLEAN, filter);
-            wrapper.write(Type.BOOLEAN, recipeType == 2 && open); // Blast Furnace
-            wrapper.write(Type.BOOLEAN, filter);
-            wrapper.write(Type.BOOLEAN, recipeType == 3 && open); // Smoker
-            wrapper.write(Type.BOOLEAN, filter);
+            int recipeType = wrapper.read(Types.VAR_INT);
+            boolean open = wrapper.read(Types.BOOLEAN);
+            boolean filter = wrapper.read(Types.BOOLEAN);
+            wrapper.write(Types.VAR_INT, 1); // Settings
+            wrapper.write(Types.BOOLEAN, recipeType == 0 && open); // Crafting
+            wrapper.write(Types.BOOLEAN, filter);
+            wrapper.write(Types.BOOLEAN, recipeType == 1 && open); // Furnace
+            wrapper.write(Types.BOOLEAN, filter);
+            wrapper.write(Types.BOOLEAN, recipeType == 2 && open); // Blast Furnace
+            wrapper.write(Types.BOOLEAN, filter);
+            wrapper.write(Types.BOOLEAN, recipeType == 3 && open); // Smoker
+            wrapper.write(Types.BOOLEAN, filter);
         });
         registerServerbound(ServerboundPackets1_16_2.RECIPE_BOOK_SEEN_RECIPE, ServerboundPackets1_16.RECIPE_BOOK_UPDATE, wrapper -> {
-            String recipe = wrapper.read(Type.STRING);
-            wrapper.write(Type.VAR_INT, 0); // Shown
-            wrapper.write(Type.STRING, recipe);
+            String recipe = wrapper.read(Types.STRING);
+            wrapper.write(Types.VAR_INT, 0); // Shown
+            wrapper.write(Types.STRING, recipe);
         });
     }
 

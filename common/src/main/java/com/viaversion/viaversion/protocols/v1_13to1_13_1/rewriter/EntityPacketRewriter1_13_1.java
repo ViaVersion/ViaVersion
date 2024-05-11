@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
@@ -33,26 +34,26 @@ public class EntityPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity id
-                map(Type.UUID); // 1 - UUID
-                map(Type.BYTE); // 2 - Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Pitch
-                map(Type.BYTE); // 7 - Yaw
-                map(Type.INT); // 8 - Data
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.UUID); // 1 - UUID
+                map(Types.BYTE); // 2 - Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Pitch
+                map(Types.BYTE); // 7 - Yaw
+                map(Types.INT); // 8 - Data
 
                 // Track Entity
                 handler(wrapper -> {
-                    int entityId = wrapper.get(Type.VAR_INT, 0);
-                    byte type = wrapper.get(Type.BYTE, 0);
+                    int entityId = wrapper.get(Types.VAR_INT, 0);
+                    byte type = wrapper.get(Types.BYTE, 0);
                     EntityTypes1_13.EntityType entType = EntityTypes1_13.getTypeFromId(type, true);
 
                     if (entType != null) {
                         if (entType.is(EntityTypes1_13.EntityType.FALLING_BLOCK)) {
-                            int data = wrapper.get(Type.INT, 0);
-                            wrapper.set(Type.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                            int data = wrapper.get(Types.INT, 0);
+                            wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                         }
                         // Register Type ID
                         wrapper.user().getEntityTracker(Protocol1_13To1_13_1.class).addEntity(entityId, entType);
@@ -64,18 +65,18 @@ public class EntityPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Entity UUID
-                map(Type.VAR_INT); // 2 - Entity Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Yaw
-                map(Type.BYTE); // 7 - Pitch
-                map(Type.BYTE); // 8 - Head Pitch
-                map(Type.SHORT); // 9 - Velocity X
-                map(Type.SHORT); // 10 - Velocity Y
-                map(Type.SHORT); // 11 - Velocity Z
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
+                map(Types.VAR_INT); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_13.METADATA_LIST); // 12 - Metadata
 
                 handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST));
@@ -85,13 +86,13 @@ public class EntityPacketRewriter1_13_1 {
         protocol.registerClientbound(ClientboundPackets1_13.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Player UUID
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.BYTE); // 5 - Yaw
-                map(Type.BYTE); // 6 - Pitch
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Player UUID
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.BYTE); // 5 - Yaw
+                map(Types.BYTE); // 6 - Pitch
                 map(Types1_13.METADATA_LIST); // 7 - Metadata
 
                 handler(metadataRewriter.trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));

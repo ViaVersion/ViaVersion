@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
@@ -52,20 +53,20 @@ public final class WorldPacketRewriter1_18 {
         protocol.registerClientbound(ClientboundPackets1_17_1.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_14);
+                map(Types.BLOCK_POSITION1_14);
                 handler(wrapper -> {
-                    final short id = wrapper.read(Type.UNSIGNED_BYTE);
+                    final short id = wrapper.read(Types.UNSIGNED_BYTE);
                     final int newId = BlockEntityIds.newId(id);
-                    wrapper.write(Type.VAR_INT, newId);
+                    wrapper.write(Types.VAR_INT, newId);
 
-                    handleSpawners(newId, wrapper.passthrough(Type.NAMED_COMPOUND_TAG));
+                    handleSpawners(newId, wrapper.passthrough(Types.NAMED_COMPOUND_TAG));
                 });
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_17_1.LIGHT_UPDATE, wrapper -> {
-            final int chunkX = wrapper.passthrough(Type.VAR_INT);
-            final int chunkZ = wrapper.passthrough(Type.VAR_INT);
+            final int chunkX = wrapper.passthrough(Types.VAR_INT);
+            final int chunkZ = wrapper.passthrough(Types.VAR_INT);
 
             if (wrapper.user().get(ChunkLightStorage.class).isLoaded(chunkX, chunkZ)) {
                 if (!Via.getConfig().cache1_17Light()) {
@@ -78,22 +79,22 @@ public final class WorldPacketRewriter1_18 {
                 wrapper.cancel();
             }
 
-            final boolean trustEdges = wrapper.passthrough(Type.BOOLEAN);
-            final long[] skyLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
-            final long[] blockLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
-            final long[] emptySkyLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
-            final long[] emptyBlockLightMask = wrapper.passthrough(Type.LONG_ARRAY_PRIMITIVE);
+            final boolean trustEdges = wrapper.passthrough(Types.BOOLEAN);
+            final long[] skyLightMask = wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE);
+            final long[] blockLightMask = wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE);
+            final long[] emptySkyLightMask = wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE);
+            final long[] emptyBlockLightMask = wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE);
 
-            final int skyLightLenght = wrapper.passthrough(Type.VAR_INT);
+            final int skyLightLenght = wrapper.passthrough(Types.VAR_INT);
             final byte[][] skyLight = new byte[skyLightLenght][];
             for (int i = 0; i < skyLightLenght; i++) {
-                skyLight[i] = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                skyLight[i] = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
             }
 
-            final int blockLightLength = wrapper.passthrough(Type.VAR_INT);
+            final int blockLightLength = wrapper.passthrough(Types.VAR_INT);
             final byte[][] blockLight = new byte[blockLightLength][];
             for (int i = 0; i < blockLightLength; i++) {
-                blockLight[i] = wrapper.passthrough(Type.BYTE_ARRAY_PRIMITIVE);
+                blockLight[i] = wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE);
             }
 
             final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
@@ -171,33 +172,33 @@ public final class WorldPacketRewriter1_18 {
 
                 final BitSet emptyLightMask = new BitSet();
                 emptyLightMask.set(0, tracker.currentWorldSectionHeight() + 2);
-                wrapper.write(Type.BOOLEAN, false);
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, new long[0]);
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, new long[0]);
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
-                wrapper.write(Type.VAR_INT, 0);
-                wrapper.write(Type.VAR_INT, 0);
+                wrapper.write(Types.BOOLEAN, false);
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, new long[0]);
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, new long[0]);
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, emptyLightMask.toLongArray());
+                wrapper.write(Types.VAR_INT, 0);
+                wrapper.write(Types.VAR_INT, 0);
             } else {
-                wrapper.write(Type.BOOLEAN, light.trustEdges());
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.skyLightMask());
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.blockLightMask());
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptySkyLightMask());
-                wrapper.write(Type.LONG_ARRAY_PRIMITIVE, light.emptyBlockLightMask());
-                wrapper.write(Type.VAR_INT, light.skyLight().length);
+                wrapper.write(Types.BOOLEAN, light.trustEdges());
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, light.skyLightMask());
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, light.blockLightMask());
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, light.emptySkyLightMask());
+                wrapper.write(Types.LONG_ARRAY_PRIMITIVE, light.emptyBlockLightMask());
+                wrapper.write(Types.VAR_INT, light.skyLight().length);
                 for (final byte[] skyLight : light.skyLight()) {
-                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, skyLight);
+                    wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, skyLight);
                 }
-                wrapper.write(Type.VAR_INT, light.blockLight().length);
+                wrapper.write(Types.VAR_INT, light.blockLight().length);
                 for (final byte[] blockLight : light.blockLight()) {
-                    wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, blockLight);
+                    wrapper.write(Types.BYTE_ARRAY_PRIMITIVE, blockLight);
                 }
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_17_1.FORGET_LEVEL_CHUNK, wrapper -> {
-            final int chunkX = wrapper.passthrough(Type.INT);
-            final int chunkZ = wrapper.passthrough(Type.INT);
+            final int chunkX = wrapper.passthrough(Types.INT);
+            final int chunkZ = wrapper.passthrough(Types.INT);
             wrapper.user().get(ChunkLightStorage.class).clear(chunkX, chunkZ);
         });
     }

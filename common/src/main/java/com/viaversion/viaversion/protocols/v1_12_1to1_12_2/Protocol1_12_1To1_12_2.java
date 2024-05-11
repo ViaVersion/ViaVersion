@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_1to1_12_2;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
 
@@ -34,14 +34,14 @@ public class Protocol1_12_1To1_12_2 extends AbstractProtocol<ClientboundPackets1
         registerClientbound(ClientboundPackets1_12_1.KEEP_ALIVE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT, Type.LONG);
+                map(Types.VAR_INT, Types.LONG);
             }
         });
 
         registerServerbound(ServerboundPackets1_12_1.KEEP_ALIVE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.LONG, Type.VAR_INT);
+                map(Types.LONG, Types.VAR_INT);
             }
         });
     }

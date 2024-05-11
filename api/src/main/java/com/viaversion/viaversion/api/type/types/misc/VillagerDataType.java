@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class VillagerDataType extends Type<VillagerData> {
@@ -33,13 +34,13 @@ public class VillagerDataType extends Type<VillagerData> {
 
     @Override
     public VillagerData read(ByteBuf buffer) {
-        return new VillagerData(Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer), Type.VAR_INT.readPrimitive(buffer));
+        return new VillagerData(Types.VAR_INT.readPrimitive(buffer), Types.VAR_INT.readPrimitive(buffer), Types.VAR_INT.readPrimitive(buffer));
     }
 
     @Override
     public void write(ByteBuf buffer, VillagerData object) {
-        Type.VAR_INT.writePrimitive(buffer, object.type());
-        Type.VAR_INT.writePrimitive(buffer, object.profession());
-        Type.VAR_INT.writePrimitive(buffer, object.level());
+        Types.VAR_INT.writePrimitive(buffer, object.type());
+        Types.VAR_INT.writePrimitive(buffer, object.profession());
+        Types.VAR_INT.writePrimitive(buffer, object.level());
     }
 }

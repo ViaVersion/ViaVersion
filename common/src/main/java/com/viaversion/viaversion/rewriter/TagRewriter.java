@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -136,21 +137,21 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
     public PacketHandler getGenericHandler() {
         return wrapper -> {
-            final int length = wrapper.passthrough(Type.VAR_INT);
+            final int length = wrapper.passthrough(Types.VAR_INT);
             int editedLength = length;
             for (int i = 0; i < length; i++) {
-                String registryKey = wrapper.read(Type.STRING);
+                String registryKey = wrapper.read(Types.STRING);
                 if (toRemove.contains(registryKey)) {
-                    wrapper.set(Type.VAR_INT, 0, --editedLength);
-                    int tagsSize = wrapper.read(Type.VAR_INT);
+                    wrapper.set(Types.VAR_INT, 0, --editedLength);
+                    int tagsSize = wrapper.read(Types.VAR_INT);
                     for (int j = 0; j < tagsSize; j++) {
-                        wrapper.read(Type.STRING);
-                        wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+                        wrapper.read(Types.STRING);
+                        wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
                     }
                     continue;
                 }
 
-                wrapper.write(Type.STRING, registryKey);
+                wrapper.write(Types.STRING, registryKey);
                 registryKey = Key.stripMinecraftNamespace(registryKey);
 
                 RegistryType type = RegistryType.getByKey(registryKey);
@@ -168,20 +169,20 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
     }
 
     public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename) {
-        int tagsSize = wrapper.read(Type.VAR_INT);
-        wrapper.write(Type.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
+        int tagsSize = wrapper.read(Types.VAR_INT);
+        wrapper.write(Types.VAR_INT, newTags != null ? tagsSize + newTags.size() : tagsSize); // add new tags count
 
         for (int i = 0; i < tagsSize; i++) {
-            String key = wrapper.read(Type.STRING);
+            String key = wrapper.read(Types.STRING);
             if (tagsToRename != null) {
                 String renamedKey = tagsToRename.get(key);
                 if (renamedKey != null) {
                     key = renamedKey;
                 }
             }
-            wrapper.write(Type.STRING, key);
+            wrapper.write(Types.STRING, key);
 
-            int[] ids = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+            int[] ids = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
             if (rewriteFunction != null) {
                 // Map ids and filter out new blocks
                 IntList idList = new IntArrayList(ids.length);
@@ -192,18 +193,18 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
                     }
                 }
 
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, idList.toArray(EMPTY_ARRAY));
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, idList.toArray(EMPTY_ARRAY));
             } else {
                 // Write the original array
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, ids);
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, ids);
             }
         }
 
         // Send new tags if present
         if (newTags != null) {
             for (TagData tag : newTags) {
-                wrapper.write(Type.STRING, tag.identifier());
-                wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, tag.entries());
+                wrapper.write(Types.STRING, tag.identifier());
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.entries());
             }
         }
     }

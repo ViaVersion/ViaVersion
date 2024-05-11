@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
@@ -44,7 +45,7 @@ import java.util.List;
 
 public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_9_3, ServerboundPackets1_9, ServerboundPackets1_9_3> {
 
-    public static final ValueTransformer<Short, Short> ADJUST_PITCH = new ValueTransformer<>(Type.UNSIGNED_BYTE, Type.UNSIGNED_BYTE) {
+    public static final ValueTransformer<Short, Short> ADJUST_PITCH = new ValueTransformer<>(Types.UNSIGNED_BYTE, Types.UNSIGNED_BYTE) {
         @Override
         public Short transform(PacketWrapper wrapper, Short inputValue) {
             return (short) Math.round(inputValue / 63.5F * 63.0F);
@@ -60,18 +61,18 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         // Sign update packet
         registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, wrapper -> {
             //read data
-            Position position = wrapper.read(Type.POSITION1_8);
+            Position position = wrapper.read(Types.BLOCK_POSITION1_8);
             JsonElement[] lines = new JsonElement[4];
             for (int i = 0; i < 4; i++) {
-                lines[i] = wrapper.read(Type.COMPONENT);
+                lines[i] = wrapper.read(Types.COMPONENT);
             }
 
             wrapper.clearInputBuffer();
 
             //write data
             wrapper.setPacketType(ClientboundPackets1_9_3.BLOCK_ENTITY_DATA);
-            wrapper.write(Type.POSITION1_8, position); //Block location
-            wrapper.write(Type.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
+            wrapper.write(Types.BLOCK_POSITION1_8, position); //Block location
+            wrapper.write(Types.UNSIGNED_BYTE, (short) 9); //Action type (9 update sign)
 
             //Create nbt
             CompoundTag tag = new CompoundTag();
@@ -83,7 +84,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                 tag.put("Text" + (i + 1), new StringTag(lines[i].toString()));
             }
 
-            wrapper.write(Type.NAMED_COMPOUND_TAG, tag);
+            wrapper.write(Types.NAMED_COMPOUND_TAG, tag);
         });
 
         registerClientbound(ClientboundPackets1_9.LEVEL_CHUNK, wrapper -> {
@@ -115,13 +116,13 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 1);
+                    int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }
@@ -130,10 +131,10 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Dimension ID
+                map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }
@@ -143,12 +144,12 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         registerClientbound(ClientboundPackets1_9.SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Sound name
-                map(Type.VAR_INT); // 1 - Sound Category
-                map(Type.INT); // 2 - x
-                map(Type.INT); // 3 - y
-                map(Type.INT); // 4 - z
-                map(Type.FLOAT); // 5 - Volume
+                map(Types.VAR_INT); // 0 - Sound name
+                map(Types.VAR_INT); // 1 - Sound Category
+                map(Types.INT); // 2 - x
+                map(Types.INT); // 3 - y
+                map(Types.INT); // 4 - z
+                map(Types.FLOAT); // 5 - Volume
                 map(ADJUST_PITCH); // 6 - Pitch
             }
         });

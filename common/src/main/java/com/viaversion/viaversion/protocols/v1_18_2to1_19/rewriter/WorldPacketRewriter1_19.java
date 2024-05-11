@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
@@ -61,17 +61,17 @@ public final class WorldPacketRewriter1_19 {
 
         protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON, wrapper -> {
             // Primary effect
-            if (wrapper.read(Type.BOOLEAN)) {
-                wrapper.passthrough(Type.VAR_INT);
+            if (wrapper.read(Types.BOOLEAN)) {
+                wrapper.passthrough(Types.VAR_INT);
             } else {
-                wrapper.write(Type.VAR_INT, -1);
+                wrapper.write(Types.VAR_INT, -1);
             }
 
             // Secondary effect
-            if (wrapper.read(Type.BOOLEAN)) {
-                wrapper.passthrough(Type.VAR_INT);
+            if (wrapper.read(Types.BOOLEAN)) {
+                wrapper.passthrough(Types.VAR_INT);
             } else {
-                wrapper.write(Type.VAR_INT, -1);
+                wrapper.write(Types.VAR_INT, -1);
             }
         });
     }

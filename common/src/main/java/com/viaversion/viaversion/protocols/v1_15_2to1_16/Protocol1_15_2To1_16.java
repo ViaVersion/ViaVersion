@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -85,13 +86,13 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         // Login Success
         registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
             // Transform string to a uuid
-            UUID uuid = UUID.fromString(wrapper.read(Type.STRING));
-            wrapper.write(Type.UUID, uuid);
+            UUID uuid = UUID.fromString(wrapper.read(Types.STRING));
+            wrapper.write(Types.UUID, uuid);
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
         registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), wrapper -> {
-            String original = wrapper.passthrough(Type.STRING);
+            String original = wrapper.passthrough(Types.STRING);
             JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
             JsonObject players = object.getAsJsonObject("players");
             if (players == null) return;
@@ -120,7 +121,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
             // Replace data if changed
             if (splitSamples.size() != sample.size()) {
                 players.add("sample", splitSamples);
-                wrapper.set(Type.STRING, 0, object.toString());
+                wrapper.set(Types.STRING, 0, object.toString());
             }
         });
 
@@ -128,11 +129,11 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         registerClientbound(ClientboundPackets1_15.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.COMPONENT);
-                map(Type.BYTE);
+                map(Types.COMPONENT);
+                map(Types.BYTE);
                 handler(wrapper -> {
-                    componentRewriter.processText(wrapper.user(), wrapper.get(Type.COMPONENT, 0));
-                    wrapper.write(Type.UUID, ZERO_UUID); // Sender uuid - always send as 'system'
+                    componentRewriter.processText(wrapper.user(), wrapper.get(Types.COMPONENT, 0));
+                    wrapper.write(Types.UUID, ZERO_UUID); // Sender uuid - always send as 'system'
                 });
             }
         });
@@ -145,30 +146,30 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND_ENTITY);
 
         registerServerbound(ServerboundPackets1_16.INTERACT, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Entity Id
-            int action = wrapper.passthrough(Type.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT); // Entity Id
+            int action = wrapper.passthrough(Types.VAR_INT);
             if (action == 0 || action == 2) {
                 if (action == 2) {
                     // Location
-                    wrapper.passthrough(Type.FLOAT);
-                    wrapper.passthrough(Type.FLOAT);
-                    wrapper.passthrough(Type.FLOAT);
+                    wrapper.passthrough(Types.FLOAT);
+                    wrapper.passthrough(Types.FLOAT);
+                    wrapper.passthrough(Types.FLOAT);
                 }
 
-                wrapper.passthrough(Type.VAR_INT); // Hand
+                wrapper.passthrough(Types.VAR_INT); // Hand
             }
 
             // New boolean: Whether the client is sneaking/pressing shift
-            wrapper.read(Type.BOOLEAN);
+            wrapper.read(Types.BOOLEAN);
         });
 
         if (Via.getConfig().isIgnoreLong1_16ChannelNames()) {
             registerServerbound(ServerboundPackets1_16.CUSTOM_PAYLOAD, new PacketHandlers() {
                 @Override
                 public void register() {
-                    map(Type.STRING); // Channel
+                    map(Types.STRING); // Channel
                     handlerSoftFail(wrapper -> {
-                        final String channel = wrapper.get(Type.STRING, 0);
+                        final String channel = wrapper.get(Types.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {
@@ -176,7 +177,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
-                            String[] channels = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                             List<String> checkedChannels = new ArrayList<>(channels.length);
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
@@ -195,7 +196,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                                 return;
                             }
 
-                            wrapper.write(Type.REMAINING_BYTES, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
+                            wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
                         }
                     });
                 }
@@ -203,11 +204,11 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         }
 
         registerServerbound(ServerboundPackets1_16.PLAYER_ABILITIES, wrapper -> {
-            wrapper.passthrough(Type.BYTE); // Flags
+            wrapper.passthrough(Types.BYTE); // Flags
 
             final PlayerAbilitiesProvider playerAbilities = Via.getManager().getProviders().get(PlayerAbilitiesProvider.class);
-            wrapper.write(Type.FLOAT, playerAbilities.getFlyingSpeed(wrapper.user()));
-            wrapper.write(Type.FLOAT, playerAbilities.getWalkingSpeed(wrapper.user()));
+            wrapper.write(Types.FLOAT, playerAbilities.getFlyingSpeed(wrapper.user()));
+            wrapper.write(Types.FLOAT, playerAbilities.getWalkingSpeed(wrapper.user()));
         });
 
         cancelServerbound(ServerboundPackets1_16.JIGSAW_GENERATE);

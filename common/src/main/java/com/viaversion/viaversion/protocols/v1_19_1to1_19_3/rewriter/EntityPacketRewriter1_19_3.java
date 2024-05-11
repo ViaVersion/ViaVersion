@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
@@ -49,14 +50,14 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity id
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Dimension registry
-                map(Type.STRING); // Dimension key
-                map(Type.STRING); // World
+                map(Types.INT); // Entity id
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Dimension registry
+                map(Types.STRING); // Dimension key
+                map(Types.STRING); // World
                 handler(dimensionDataHandler());
                 handler(biomeSizeTracker());
                 handler(worldDataTrackerHandlerByKey());
@@ -64,8 +65,8 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 handler(wrapper -> {
                     // Also enable vanilla features
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
-                    enableFeaturesPacket.write(Type.VAR_INT, 1);
-                    enableFeaturesPacket.write(Type.STRING, "minecraft:vanilla");
+                    enableFeaturesPacket.write(Types.VAR_INT, 1);
+                    enableFeaturesPacket.write(Types.STRING, "minecraft:vanilla");
                     enableFeaturesPacket.scheduleSend(Protocol1_19_1To1_19_3.class);
                 });
             }
@@ -74,35 +75,35 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_19_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // Dimension
-                map(Type.STRING); // World
-                map(Type.LONG); // Seed
-                map(Type.UNSIGNED_BYTE); // Gamemode
-                map(Type.BYTE); // Previous gamemode
-                map(Type.BOOLEAN); // Debug
-                map(Type.BOOLEAN); // Flat
+                map(Types.STRING); // Dimension
+                map(Types.STRING); // World
+                map(Types.LONG); // Seed
+                map(Types.UNSIGNED_BYTE); // Gamemode
+                map(Types.BYTE); // Previous gamemode
+                map(Types.BOOLEAN); // Debug
+                map(Types.BOOLEAN); // Flat
                 handler(worldDataTrackerHandlerByKey());
                 handler(wrapper -> {
-                    final boolean keepAttributes = wrapper.read(Type.BOOLEAN);
+                    final boolean keepAttributes = wrapper.read(Types.BOOLEAN);
                     byte keepDataMask = 0x02; // Always keep entity data
                     if (keepAttributes) {
                         keepDataMask |= 0x01;
                     }
-                    wrapper.write(Type.BYTE, keepDataMask);
+                    wrapper.write(Types.BYTE, keepDataMask);
                 });
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_19_1.PLAYER_INFO, ClientboundPackets1_19_3.PLAYER_INFO_UPDATE, wrapper -> {
-            final int action = wrapper.read(Type.VAR_INT);
+            final int action = wrapper.read(Types.VAR_INT);
             if (action == 4) { // Remove player
                 // Write into new packet type
-                final int entries = wrapper.read(Type.VAR_INT);
+                final int entries = wrapper.read(Types.VAR_INT);
                 final UUID[] uuidsToRemove = new UUID[entries];
                 for (int i = 0; i < entries; i++) {
-                    uuidsToRemove[i] = wrapper.read(Type.UUID);
+                    uuidsToRemove[i] = wrapper.read(Types.UUID);
                 }
-                wrapper.write(Type.UUID_ARRAY, uuidsToRemove);
+                wrapper.write(Types.UUID_ARRAY, uuidsToRemove);
                 wrapper.setPacketType(ClientboundPackets1_19_3.PLAYER_INFO_REMOVE);
                 return;
             }
@@ -116,34 +117,34 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 set.set(action == 1 ? action + 1 : action + 2);
             }
 
-            wrapper.write(Type.PROFILE_ACTIONS_ENUM, set);
-            final int entries = wrapper.passthrough(Type.VAR_INT);
+            wrapper.write(Types.PROFILE_ACTIONS_ENUM, set);
+            final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
-                wrapper.passthrough(Type.UUID); // UUID
+                wrapper.passthrough(Types.UUID); // UUID
                 if (action == 0) { // Add player
-                    wrapper.passthrough(Type.STRING); // Player Name
+                    wrapper.passthrough(Types.STRING); // Player Name
 
-                    final int properties = wrapper.passthrough(Type.VAR_INT);
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
                     for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Type.STRING); // Name
-                        wrapper.passthrough(Type.STRING); // Value
-                        wrapper.passthrough(Type.OPTIONAL_STRING); // Signature
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
                     }
 
-                    final int gamemode = wrapper.read(Type.VAR_INT);
-                    final int ping = wrapper.read(Type.VAR_INT);
-                    final JsonElement displayName = wrapper.read(Type.OPTIONAL_COMPONENT);
-                    wrapper.read(Type.OPTIONAL_PROFILE_KEY);
+                    final int gamemode = wrapper.read(Types.VAR_INT);
+                    final int ping = wrapper.read(Types.VAR_INT);
+                    final JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT);
+                    wrapper.read(Types.OPTIONAL_PROFILE_KEY);
 
-                    wrapper.write(Type.BOOLEAN, false); // No chat session data
-                    wrapper.write(Type.VAR_INT, gamemode);
-                    wrapper.write(Type.BOOLEAN, true); // Also update listed
-                    wrapper.write(Type.VAR_INT, ping);
-                    wrapper.write(Type.OPTIONAL_COMPONENT, displayName);
+                    wrapper.write(Types.BOOLEAN, false); // No chat session data
+                    wrapper.write(Types.VAR_INT, gamemode);
+                    wrapper.write(Types.BOOLEAN, true); // Also update listed
+                    wrapper.write(Types.VAR_INT, ping);
+                    wrapper.write(Types.OPTIONAL_COMPONENT, displayName);
                 } else if (action == 1 || action == 2) { // Update gamemode/update latency
-                    wrapper.passthrough(Type.VAR_INT);
+                    wrapper.passthrough(Types.VAR_INT);
                 } else if (action == 3) { // Update display name
-                    wrapper.passthrough(Type.OPTIONAL_COMPONENT);
+                    wrapper.passthrough(Types.OPTIONAL_COMPONENT);
                 }
             }
         });
@@ -152,7 +153,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         filter().mapMetaType(typeId -> Types1_19_3.META_TYPES.byId(typeId >= 2 ? typeId + 1 : typeId)); // Long added
-        registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.blockStateType, Types1_19_3.META_TYPES.particleType);
+        registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.optionalBlockStateType, Types1_19_3.META_TYPES.particleType);
 
         filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, meta) -> {
             // Sitting pose added

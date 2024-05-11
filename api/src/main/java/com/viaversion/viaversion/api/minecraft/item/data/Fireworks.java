@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public record Fireworks(int flightDuration, FireworkExplosion[] explosions) {
@@ -30,14 +31,14 @@ public record Fireworks(int flightDuration, FireworkExplosion[] explosions) {
     public static final Type<Fireworks> TYPE = new Type<>(Fireworks.class) {
         @Override
         public Fireworks read(final ByteBuf buffer) {
-            final int flightDuration = Type.VAR_INT.readPrimitive(buffer);
+            final int flightDuration = Types.VAR_INT.readPrimitive(buffer);
             final FireworkExplosion[] explosions = FireworkExplosion.ARRAY_TYPE.read(buffer);
             return new Fireworks(flightDuration, explosions);
         }
 
         @Override
         public void write(final ByteBuf buffer, final Fireworks value) {
-            Type.VAR_INT.writePrimitive(buffer, value.flightDuration);
+            Types.VAR_INT.writePrimitive(buffer, value.flightDuration);
             FireworkExplosion.ARRAY_TYPE.write(buffer, value.explosions);
         }
     };

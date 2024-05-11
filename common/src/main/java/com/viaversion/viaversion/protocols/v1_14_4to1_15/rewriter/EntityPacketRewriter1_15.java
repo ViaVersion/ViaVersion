@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
@@ -41,37 +42,37 @@ public final class EntityPacketRewriter1_15 {
         protocol.registerClientbound(ClientboundPackets1_14_4.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Entity UUID
-                map(Type.VAR_INT); // 2 - Entity Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Yaw
-                map(Type.BYTE); // 7 - Pitch
-                map(Type.BYTE); // 8 - Head Pitch
-                map(Type.SHORT); // 9 - Velocity X
-                map(Type.SHORT); // 10 - Velocity Y
-                map(Type.SHORT); // 11 - Velocity Z
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Entity UUID
+                map(Types.VAR_INT); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
 
                 handler(metadataRewriter.trackerHandler());
-                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Type.VAR_INT, 0), metadataRewriter));
+                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Types.VAR_INT, 0), metadataRewriter));
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_14_4.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Player UUID
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.BYTE); // 5 - Yaw
-                map(Type.BYTE); // 6 - Pitch
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Player UUID
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.BYTE); // 5 - Yaw
+                map(Types.BYTE); // 6 - Pitch
 
                 handler(wrapper -> {
-                    int entityId = wrapper.get(Type.VAR_INT, 0);
+                    int entityId = wrapper.get(Types.VAR_INT, 0);
                     wrapper.user().getEntityTracker(Protocol1_14_4To1_15.class).addEntity(entityId, EntityTypes1_15.PLAYER);
 
                     sendMetadataPacket(wrapper, entityId, metadataRewriter);
@@ -82,26 +83,26 @@ public final class EntityPacketRewriter1_15 {
         protocol.registerClientbound(ClientboundPackets1_14_4.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT);
-                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+                map(Types.INT);
+                handler(wrapper -> wrapper.write(Types.LONG, 0L)); // Level Seed
             }
         });
 
         protocol.registerClientbound(ClientboundPackets1_14_4.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
                 handler(metadataRewriter.playerTrackerHandler());
-                handler(wrapper -> wrapper.write(Type.LONG, 0L)); // Level Seed
+                handler(wrapper -> wrapper.write(Types.LONG, 0L)); // Level Seed
 
-                map(Type.UNSIGNED_BYTE); // 3 - Max Players
-                map(Type.STRING); // 4 - Level Type
-                map(Type.VAR_INT); // 5 - View Distance
-                map(Type.BOOLEAN); // 6 - Reduce Debug Info
+                map(Types.UNSIGNED_BYTE); // 3 - Max Players
+                map(Types.STRING); // 4 - Level Type
+                map(Types.VAR_INT); // 5 - View Distance
+                map(Types.BOOLEAN); // 6 - Reduce Debug Info
 
-                handler(wrapper -> wrapper.write(Type.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
+                handler(wrapper -> wrapper.write(Types.BOOLEAN, !Via.getConfig().is1_15InstantRespawn())); // Show Death Screen
             }
         });
 
@@ -124,7 +125,7 @@ public final class EntityPacketRewriter1_15 {
         rewriter.handleMetadata(entityId, metadata, wrapper.user());
 
         PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
-        metadataPacket.write(Type.VAR_INT, entityId);
+        metadataPacket.write(Types.VAR_INT, entityId);
         metadataPacket.write(Types1_14.METADATA_LIST, metadata);
         metadataPacket.send(Protocol1_14_4To1_15.class);
     }

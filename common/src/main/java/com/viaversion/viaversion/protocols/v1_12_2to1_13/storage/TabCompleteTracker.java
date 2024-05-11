@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.providers.PlayerLookTargetProvider;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
@@ -37,10 +38,10 @@ public class TabCompleteTracker implements StorableObject {
     public void sendPacketToServer(UserConnection connection) {
         if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
         PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.COMMAND_SUGGESTION, null, connection);
-        wrapper.write(Type.STRING, lastTabComplete);
-        wrapper.write(Type.BOOLEAN, false);
+        wrapper.write(Types.STRING, lastTabComplete);
+        wrapper.write(Types.BOOLEAN, false);
         final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
-        wrapper.write(Type.OPTIONAL_POSITION1_8, playerLookTarget);
+        wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
         wrapper.scheduleSendToServer(Protocol1_12_2To1_13.class);
         lastTabComplete = null;
     }

@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
@@ -58,36 +59,36 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_DESTRUCTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT);
-                map(Type.POSITION1_8, Type.POSITION1_14);
-                map(Type.BYTE);
+                map(Types.VAR_INT);
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
+                map(Types.BYTE);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8, Type.POSITION1_14);
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8, Type.POSITION1_14); // Location
-                map(Type.UNSIGNED_BYTE); // Action id
-                map(Type.UNSIGNED_BYTE); // Action param
-                map(Type.VAR_INT); // Block id - /!\ NOT BLOCK STATE
-                handler(wrapper -> wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Type.VAR_INT, 0))));
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14); // Location
+                map(Types.UNSIGNED_BYTE); // Action id
+                map(Types.UNSIGNED_BYTE); // Action param
+                map(Types.VAR_INT); // Block id - /!\ NOT BLOCK STATE
+                handler(wrapper -> wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockId(wrapper.get(Types.VAR_INT, 0))));
             }
         });
         protocol.registerClientbound(ClientboundPackets1_13.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8, Type.POSITION1_14);
-                map(Type.VAR_INT);
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
+                map(Types.VAR_INT);
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.VAR_INT, 0);
+                    int id = wrapper.get(Types.VAR_INT, 0);
 
-                    wrapper.set(Type.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(id));
+                    wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(id));
                 });
             }
         });
@@ -95,9 +96,9 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.CHANGE_DIFFICULTY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE);
+                map(Types.UNSIGNED_BYTE);
                 handler(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, false);  // Added in 19w11a. Maybe https://bugs.mojang.com/browse/MC-44471 ?
+                    wrapper.write(Types.BOOLEAN, false);  // Added in 19w11a. Maybe https://bugs.mojang.com/browse/MC-44471 ?
                 });
             }
         });
@@ -107,17 +108,17 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.FLOAT); // X
-                map(Type.FLOAT); // Y
-                map(Type.FLOAT); // Z
-                map(Type.FLOAT); // Radius
+                map(Types.FLOAT); // X
+                map(Types.FLOAT); // Y
+                map(Types.FLOAT); // Z
+                map(Types.FLOAT); // Radius
                 handler(wrapper -> {
                     for (int i = 0; i < 3; i++) {
-                        float coord = wrapper.get(Type.FLOAT, i);
+                        float coord = wrapper.get(Types.FLOAT, i);
 
                         if (coord < 0f) {
                             coord = (int) coord;
-                            wrapper.set(Type.FLOAT, i, coord);
+                            wrapper.set(Types.FLOAT, i, coord);
                         }
                     }
                 });
@@ -183,8 +184,8 @@ public class WorldPacketRewriter1_14 {
             chunk.setHeightMap(heightMap);
 
             PacketWrapper lightPacket = wrapper.create(ClientboundPackets1_14.LIGHT_UPDATE);
-            lightPacket.write(Type.VAR_INT, chunk.getX());
-            lightPacket.write(Type.VAR_INT, chunk.getZ());
+            lightPacket.write(Types.VAR_INT, chunk.getX());
+            lightPacket.write(Types.VAR_INT, chunk.getZ());
 
             int skyLightMask = chunk.isFullChunk() ? 0x3ffff : 0; // all 18 bits set if ground up
             int blockLightMask = 0;
@@ -197,30 +198,30 @@ public class WorldPacketRewriter1_14 {
                 blockLightMask |= (1 << (i + 1));
             }
 
-            lightPacket.write(Type.VAR_INT, skyLightMask);
-            lightPacket.write(Type.VAR_INT, blockLightMask);
-            lightPacket.write(Type.VAR_INT, 0);  // empty sky light mask
-            lightPacket.write(Type.VAR_INT, 0);  // empty block light mask
+            lightPacket.write(Types.VAR_INT, skyLightMask);
+            lightPacket.write(Types.VAR_INT, blockLightMask);
+            lightPacket.write(Types.VAR_INT, 0);  // empty sky light mask
+            lightPacket.write(Types.VAR_INT, 0);  // empty block light mask
 
             // not sending skylight/setting empty skylight causes client lag due to some weird calculations
             // only do this on the initial chunk send (not when chunk.isGroundUp() is false)
             if (chunk.isFullChunk())
-                lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk below 0
+                lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk below 0
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null || !section.getLight().hasSkyLight()) {
                     if (chunk.isFullChunk()) {
-                        lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT);
+                        lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT);
                     }
                     continue;
                 }
-                lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getLight().getSkyLight());
+                lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, section.getLight().getSkyLight());
             }
             if (chunk.isFullChunk())
-                lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk above 255
+                lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, FULL_LIGHT); // chunk above 255
 
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null) continue;
-                lightPacket.write(Type.BYTE_ARRAY_PRIMITIVE, section.getLight().getBlockLight());
+                lightPacket.write(Types.BYTE_ARRAY_PRIMITIVE, section.getLight().getBlockLight());
             }
 
             EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
@@ -230,8 +231,8 @@ public class WorldPacketRewriter1_14 {
                     || diffX >= SERVERSIDE_VIEW_DISTANCE
                     || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
                 PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.SET_CHUNK_CACHE_CENTER); // Set center chunk
-                fakePosLook.write(Type.VAR_INT, chunk.getX());
-                fakePosLook.write(Type.VAR_INT, chunk.getZ());
+                fakePosLook.write(Types.VAR_INT, chunk.getX());
+                fakePosLook.write(Types.VAR_INT, chunk.getZ());
                 fakePosLook.send(Protocol1_13_2To1_14.class);
                 entityTracker.setChunkCenterX(chunk.getX());
                 entityTracker.setChunkCenterZ(chunk.getZ());
@@ -250,16 +251,16 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Effect Id
-                map(Type.POSITION1_8, Type.POSITION1_14); // Location
-                map(Type.INT); // Data
+                map(Types.INT); // Effect Id
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14); // Location
+                map(Types.INT); // Data
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.INT, 0);
-                    int data = wrapper.get(Type.INT, 1);
+                    int id = wrapper.get(Types.INT, 0);
+                    int data = wrapper.get(Types.INT, 1);
                     if (id == 1010) { // Play record
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewItemId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
                     } else if (id == 2001) { // Block break + block break sound
-                        wrapper.set(Type.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
+                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
                     }
                 });
             }
@@ -268,11 +269,11 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT);
-                map(Type.BYTE);
-                map(Type.BOOLEAN);
+                map(Types.VAR_INT);
+                map(Types.BYTE);
+                map(Types.BOOLEAN);
                 handler(wrapper -> {
-                    wrapper.write(Type.BOOLEAN, false);  // new value, probably if the map is locked (added in 19w02a), old maps are not locked
+                    wrapper.write(Types.BOOLEAN, false);  // new value, probably if the map is locked (added in 19w02a), old maps are not locked
                 });
             }
         });
@@ -280,20 +281,20 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Dimension ID
+                map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                     EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
                     // The client may reset the center chunk if dimension is changed
                     entityTracker.setForceSendCenterChunk(true);
                 });
                 handler(wrapper -> {
-                    short difficulty = wrapper.read(Type.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
+                    short difficulty = wrapper.read(Types.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
                     PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.CHANGE_DIFFICULTY);
-                    difficultyPacket.write(Type.UNSIGNED_BYTE, difficulty);
-                    difficultyPacket.write(Type.BOOLEAN, false); // Unknown value added in 19w11a
+                    difficultyPacket.write(Types.UNSIGNED_BYTE, difficulty);
+                    difficultyPacket.write(Types.BOOLEAN, false); // Unknown value added in 19w11a
                     difficultyPacket.scheduleSend(protocol.getClass());
                 });
                 handler(wrapper -> {
@@ -308,14 +309,14 @@ public class WorldPacketRewriter1_14 {
         protocol.registerClientbound(ClientboundPackets1_13.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION1_8, Type.POSITION1_14);
+                map(Types.BLOCK_POSITION1_8, Types.BLOCK_POSITION1_14);
             }
         });
     }
 
     static void sendViewDistancePacket(UserConnection connection) {
         PacketWrapper setViewDistance = PacketWrapper.create(ClientboundPackets1_14.SET_CHUNK_CACHE_RADIUS, connection);
-        setViewDistance.write(Type.VAR_INT, WorldPacketRewriter1_14.SERVERSIDE_VIEW_DISTANCE);
+        setViewDistance.write(Types.VAR_INT, WorldPacketRewriter1_14.SERVERSIDE_VIEW_DISTANCE);
         setViewDistance.send(Protocol1_13_2To1_14.class);
     }
 

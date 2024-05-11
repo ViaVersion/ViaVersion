@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class HolderSetType extends Type<HolderSet> {
@@ -35,15 +36,15 @@ public class HolderSetType extends Type<HolderSet> {
 
     @Override
     public HolderSet read(final ByteBuf buffer) {
-        final int size = Type.VAR_INT.readPrimitive(buffer) - 1;
+        final int size = Types.VAR_INT.readPrimitive(buffer) - 1;
         if (size == -1) {
-            final String tag = Type.STRING.read(buffer);
+            final String tag = Types.STRING.read(buffer);
             return HolderSet.of(tag);
         }
 
         final int[] values = new int[size];
         for (int i = 0; i < size; i++) {
-            values[i] = Type.VAR_INT.readPrimitive(buffer);
+            values[i] = Types.VAR_INT.readPrimitive(buffer);
         }
         return HolderSet.of(values);
     }
@@ -51,13 +52,13 @@ public class HolderSetType extends Type<HolderSet> {
     @Override
     public void write(final ByteBuf buffer, final HolderSet object) {
         if (object.hasTagKey()) {
-            Type.VAR_INT.writePrimitive(buffer, 0);
-            Type.STRING.write(buffer, object.tagKey());
+            Types.VAR_INT.writePrimitive(buffer, 0);
+            Types.STRING.write(buffer, object.tagKey());
         } else {
             final int[] values = object.ids();
-            Type.VAR_INT.writePrimitive(buffer, values.length + 1);
+            Types.VAR_INT.writePrimitive(buffer, values.length + 1);
             for (final int value : values) {
-                Type.VAR_INT.writePrimitive(buffer, value);
+                Types.VAR_INT.writePrimitive(buffer, value);
             }
         }
     }
@@ -65,7 +66,7 @@ public class HolderSetType extends Type<HolderSet> {
     public static final class OptionalHolderSetType extends OptionalType<HolderSet> {
 
         public OptionalHolderSetType() {
-            super(Type.HOLDER_SET);
+            super(Types.HOLDER_SET);
         }
     }
 }

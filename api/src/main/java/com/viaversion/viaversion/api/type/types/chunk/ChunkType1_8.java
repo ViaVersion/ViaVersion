@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.util.ChunkUtil;
 import io.netty.buffer.ByteBuf;
@@ -57,7 +58,7 @@ public class ChunkType1_8 extends Type<Chunk> {
         final int chunkZ = input.readInt();
         final boolean fullChunk = input.readBoolean();
         final int bitmask = input.readUnsignedShort();
-        final int dataLength = Type.VAR_INT.readPrimitive(input);
+        final int dataLength = Types.VAR_INT.readPrimitive(input);
         final byte[] data = new byte[dataLength];
         input.readBytes(data);
 
@@ -81,7 +82,7 @@ public class ChunkType1_8 extends Type<Chunk> {
         output.writeBoolean(chunk.isFullChunk());
         output.writeShort(chunk.getBitmask());
         final byte[] data = serialize(chunk);
-        Type.VAR_INT.writePrimitive(output, data.length);
+        Types.VAR_INT.writePrimitive(output, data.length);
         output.writeBytes(data);
     }
 

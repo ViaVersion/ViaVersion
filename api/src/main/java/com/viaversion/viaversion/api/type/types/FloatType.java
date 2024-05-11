@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.TypeConverter;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class FloatType extends Type<Float> implements TypeConverter<Float> {
@@ -72,7 +73,7 @@ public class FloatType extends Type<Float> implements TypeConverter<Float> {
     public static final class OptionalFloatType extends OptionalType<Float> {
 
         public OptionalFloatType() {
-            super(Type.FLOAT);
+            super(Types.FLOAT);
         }
     }
 }

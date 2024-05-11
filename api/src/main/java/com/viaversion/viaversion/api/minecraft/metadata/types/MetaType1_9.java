@@ -24,27 +24,26 @@ package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 
 public enum MetaType1_9 implements MetaType {
-    Byte(0, Type.BYTE),
-    VarInt(1, Type.VAR_INT),
-    Float(2, Type.FLOAT),
-    String(3, Type.STRING),
-    Chat(4, Type.COMPONENT),
-    Slot(5, Type.ITEM1_8),
-    Boolean(6, Type.BOOLEAN),
-    Vector3F(7, Type.ROTATION),
-    Position(8, Type.POSITION1_8),
-    OptPosition(9, Type.OPTIONAL_POSITION1_8),
-    Direction(10, Type.VAR_INT),
-    OptUUID(11, Type.OPTIONAL_UUID),
-    BlockID(12, Type.VAR_INT);
+    BYTE(Types.BYTE),
+    VAR_INT(Types.VAR_INT),
+    FLOAT(Types.FLOAT),
+    STRING(Types.STRING),
+    COMPONENT(Types.COMPONENT),
+    ITEM(Types.ITEM1_8),
+    BOOLEAN(Types.BOOLEAN),
+    ROTATIONS(Types.ROTATIONS),
+    BLOCK_POSITION(Types.BLOCK_POSITION1_8),
+    OPTIONAL_BLOCK_POSITION(Types.OPTIONAL_POSITION1_8),
+    DIRECTION(Types.VAR_INT),
+    OPTIONAL_UUID(Types.OPTIONAL_UUID),
+    OPTIONAL_BLOCK_STATE(Types.VAR_INT);
 
-    private final int typeID;
-    private final Type type;
+    private final Type<?> type;
 
-    MetaType1_9(int typeID, Type type) {
-        this.typeID = typeID;
+    MetaType1_9(Type<?> type) {
         this.type = type;
     }
 
@@ -54,7 +53,7 @@ public enum MetaType1_9 implements MetaType {
 
     @Override
     public int typeId() {
-        return typeID;
+        return ordinal();
     }
 
     @Override

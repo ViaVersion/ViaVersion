@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -69,7 +70,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
             public void handleArgument(final PacketWrapper wrapper, final String argumentType) {
                 if (argumentType.equals("minecraft:time")) {
                     // Minimum
-                    wrapper.write(Type.INT, 0);
+                    wrapper.write(Types.INT, 0);
                 } else {
                     super.handleArgument(wrapper, argumentType);
                 }
@@ -77,19 +78,19 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
         }.registerDeclareCommands1_19(ClientboundPackets1_19_3.COMMANDS);
 
         registerClientbound(ClientboundPackets1_19_3.SERVER_DATA, wrapper -> {
-            JsonElement element = wrapper.read(Type.OPTIONAL_COMPONENT);
+            JsonElement element = wrapper.read(Types.OPTIONAL_COMPONENT);
             if (element != null) {
-                wrapper.write(Type.COMPONENT, element);
+                wrapper.write(Types.COMPONENT, element);
             } else {
-                wrapper.write(Type.COMPONENT, ComponentUtil.emptyJsonComponent());
+                wrapper.write(Types.COMPONENT, ComponentUtil.emptyJsonComponent());
             }
 
-            final String iconBase64 = wrapper.read(Type.OPTIONAL_STRING);
+            final String iconBase64 = wrapper.read(Types.OPTIONAL_STRING);
             byte[] iconBytes = null;
             if (iconBase64 != null && iconBase64.startsWith("data:image/png;base64,")) {
                 iconBytes = Base64.getDecoder().decode(iconBase64.substring("data:image/png;base64,".length()).getBytes(StandardCharsets.UTF_8));
             }
-            wrapper.write(Type.OPTIONAL_BYTE_ARRAY_PRIMITIVE, iconBytes);
+            wrapper.write(Types.OPTIONAL_BYTE_ARRAY_PRIMITIVE, iconBytes);
         });
     }
 

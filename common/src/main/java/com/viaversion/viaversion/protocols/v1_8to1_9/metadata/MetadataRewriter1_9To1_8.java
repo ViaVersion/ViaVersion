@@ -64,12 +64,12 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
 
         Object value = metadata.getValue();
         switch (metaIndex.getNewType()) {
-            case Byte:
+            case BYTE:
                 // convert from int, byte
-                if (metaIndex.getOldType() == MetaType1_8.Byte) {
+                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
                     metadata.setValue(value);
                 }
-                if (metaIndex.getOldType() == MetaType1_8.Int) {
+                if (metaIndex.getOldType() == MetaType1_8.INT) {
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
@@ -83,7 +83,7 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                     event.createExtraMeta(new Metadata(newIndex, metaType, val));
                 }
                 break;
-            case OptUUID:
+            case OPTIONAL_UUID:
                 String owner = (String) value;
                 UUID toWrite = null;
                 if (!owner.isEmpty()) {
@@ -94,45 +94,45 @@ public class MetadataRewriter1_9To1_8 extends EntityRewriter<ClientboundPackets1
                 }
                 metadata.setValue(toWrite);
                 break;
-            case VarInt:
+            case VAR_INT:
                 // convert from int, short, byte
-                if (metaIndex.getOldType() == MetaType1_8.Byte) {
+                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
                     metadata.setValue(((Byte) value).intValue());
                 }
-                if (metaIndex.getOldType() == MetaType1_8.Short) {
+                if (metaIndex.getOldType() == MetaType1_8.SHORT) {
                     metadata.setValue(((Short) value).intValue());
                 }
-                if (metaIndex.getOldType() == MetaType1_8.Int) {
+                if (metaIndex.getOldType() == MetaType1_8.INT) {
                     metadata.setValue(value);
                 }
                 break;
-            case Float, String:
+            case FLOAT, STRING:
                 metadata.setValue(value);
                 break;
-            case Boolean:
+            case BOOLEAN:
                 if (metaIndex == MetaIndex.AGEABLE_CREATURE_AGE)
                     metadata.setValue((Byte) value < 0);
                 else
                     metadata.setValue((Byte) value != 0);
                 break;
-            case Slot:
+            case ITEM:
                 metadata.setValue(value);
                 ItemRewriter.toClient((Item) metadata.getValue());
                 break;
-            case Position:
+            case BLOCK_POSITION:
                 Vector vector = (Vector) value;
                 metadata.setValue(vector);
                 break;
-            case Vector3F:
+            case ROTATIONS:
                 EulerAngle angle = (EulerAngle) value;
                 metadata.setValue(angle);
                 break;
-            case Chat:
+            case COMPONENT:
                 // Was previously also a component, so just convert it
                 String text = (String) value;
                 metadata.setValue(ComponentUtil.convertJsonOrEmpty(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
                 break;
-            case BlockID:
+            case OPTIONAL_BLOCK_STATE:
                 // Convert from int, short, byte
                 metadata.setValue(((Number) value).intValue());
                 break;

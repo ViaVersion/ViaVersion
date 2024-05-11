@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.math;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class PositionType1_8 extends Type<Position> {
@@ -51,7 +52,7 @@ public class PositionType1_8 extends Type<Position> {
     public static final class OptionalPositionType extends OptionalType<Position> {
 
         public OptionalPositionType() {
-            super(Type.POSITION1_8);
+            super(Types.BLOCK_POSITION1_8);
         }
     }
 }

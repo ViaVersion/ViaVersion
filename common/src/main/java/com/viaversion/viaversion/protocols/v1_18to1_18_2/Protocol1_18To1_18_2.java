@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -45,42 +46,42 @@ public final class Protocol1_18To1_18_2 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_18.UPDATE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.BYTE, Type.VAR_INT); // Effect id
+                map(Types.VAR_INT); // Entity id
+                map(Types.BYTE, Types.VAR_INT); // Effect id
             }
         });
 
         registerClientbound(ClientboundPackets1_18.REMOVE_MOB_EFFECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // Entity id
-                map(Type.BYTE, Type.VAR_INT); // Effect id
+                map(Types.VAR_INT); // Entity id
+                map(Types.BYTE, Types.VAR_INT); // Effect id
             }
         });
 
         registerClientbound(ClientboundPackets1_18.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // Entity ID
-                map(Type.BOOLEAN); // Hardcore
-                map(Type.BYTE); // Gamemode
-                map(Type.BYTE); // Previous Gamemode
-                map(Type.STRING_ARRAY); // World List
-                map(Type.NAMED_COMPOUND_TAG); // Registry
-                map(Type.NAMED_COMPOUND_TAG); // Current dimension data
+                map(Types.INT); // Entity ID
+                map(Types.BOOLEAN); // Hardcore
+                map(Types.BYTE); // Gamemode
+                map(Types.BYTE); // Previous Gamemode
+                map(Types.STRING_ARRAY); // World List
+                map(Types.NAMED_COMPOUND_TAG); // Registry
+                map(Types.NAMED_COMPOUND_TAG); // Current dimension data
                 handler(wrapper -> {
-                    final CompoundTag registry = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+                    final CompoundTag registry = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     final ListTag<CompoundTag> dimensions = TagUtil.getRegistryEntries(registry, "dimension_type");
                     for (final CompoundTag dimension : dimensions) {
                         addTagPrefix(dimension.getCompoundTag("element"));
                     }
 
-                    addTagPrefix(wrapper.get(Type.NAMED_COMPOUND_TAG, 1));
+                    addTagPrefix(wrapper.get(Types.NAMED_COMPOUND_TAG, 1));
                 });
             }
         });
 
-        registerClientbound(ClientboundPackets1_18.RESPAWN, wrapper -> addTagPrefix(wrapper.passthrough(Type.NAMED_COMPOUND_TAG)));
+        registerClientbound(ClientboundPackets1_18.RESPAWN, wrapper -> addTagPrefix(wrapper.passthrough(Types.NAMED_COMPOUND_TAG)));
     }
 
     private void addTagPrefix(CompoundTag tag) {

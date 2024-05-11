@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class PlayerMessageSignatureType extends Type<PlayerMessageSignature> {
@@ -35,19 +36,19 @@ public class PlayerMessageSignatureType extends Type<PlayerMessageSignature> {
 
     @Override
     public PlayerMessageSignature read(final ByteBuf buffer) {
-        return new PlayerMessageSignature(Type.UUID.read(buffer), Type.BYTE_ARRAY_PRIMITIVE.read(buffer));
+        return new PlayerMessageSignature(Types.UUID.read(buffer), Types.BYTE_ARRAY_PRIMITIVE.read(buffer));
     }
 
     @Override
     public void write(final ByteBuf buffer, final PlayerMessageSignature value) {
-        Type.UUID.write(buffer, value.uuid());
-        Type.BYTE_ARRAY_PRIMITIVE.write(buffer, value.signatureBytes());
+        Types.UUID.write(buffer, value.uuid());
+        Types.BYTE_ARRAY_PRIMITIVE.write(buffer, value.signatureBytes());
     }
 
     public static final class OptionalPlayerMessageSignatureType extends OptionalType<PlayerMessageSignature> {
 
         public OptionalPlayerMessageSignatureType() {
-            super(Type.PLAYER_MESSAGE_SIGNATURE);
+            super(Types.PLAYER_MESSAGE_SIGNATURE);
         }
     }
 }

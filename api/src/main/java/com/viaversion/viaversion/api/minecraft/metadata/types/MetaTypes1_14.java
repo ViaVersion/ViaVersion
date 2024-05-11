@@ -24,29 +24,30 @@ package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 
 public final class MetaTypes1_14 extends AbstractMetaTypes {
 
-    public final MetaType byteType = add(0, Type.BYTE);
-    public final MetaType varIntType = add(1, Type.VAR_INT);
-    public final MetaType floatType = add(2, Type.FLOAT);
-    public final MetaType stringType = add(3, Type.STRING);
-    public final MetaType componentType = add(4, Type.COMPONENT);
-    public final MetaType optionalComponentType = add(5, Type.OPTIONAL_COMPONENT);
-    public final MetaType itemType = add(6, Type.ITEM1_13_2);
-    public final MetaType booleanType = add(7, Type.BOOLEAN);
-    public final MetaType rotationType = add(8, Type.ROTATION);
-    public final MetaType positionType = add(9, Type.POSITION1_14);
-    public final MetaType optionalPositionType = add(10, Type.OPTIONAL_POSITION_1_14);
-    public final MetaType directionType = add(11, Type.VAR_INT);
-    public final MetaType optionalUUIDType = add(12, Type.OPTIONAL_UUID);
-    public final MetaType blockStateType = add(13, Type.VAR_INT);
-    public final MetaType nbtType = add(14, Type.NAMED_COMPOUND_TAG);
+    public final MetaType byteType = add(0, Types.BYTE);
+    public final MetaType varIntType = add(1, Types.VAR_INT);
+    public final MetaType floatType = add(2, Types.FLOAT);
+    public final MetaType stringType = add(3, Types.STRING);
+    public final MetaType componentType = add(4, Types.COMPONENT);
+    public final MetaType optionalComponentType = add(5, Types.OPTIONAL_COMPONENT);
+    public final MetaType itemType = add(6, Types.ITEM1_13_2);
+    public final MetaType booleanType = add(7, Types.BOOLEAN);
+    public final MetaType rotationsType = add(8, Types.ROTATIONS);
+    public final MetaType blockPositionType = add(9, Types.BLOCK_POSITION1_14);
+    public final MetaType optionalBlockPositionType = add(10, Types.OPTIONAL_POSITION_1_14);
+    public final MetaType directionType = add(11, Types.VAR_INT);
+    public final MetaType optionalUUIDType = add(12, Types.OPTIONAL_UUID);
+    public final MetaType optionalBlockStateType = add(13, Types.VAR_INT);
+    public final MetaType compoundTagType = add(14, Types.NAMED_COMPOUND_TAG);
     public final MetaType particleType;
-    public final MetaType villagerDatatType = add(16, Type.VILLAGER_DATA);
-    public final MetaType optionalVarIntType = add(17, Type.OPTIONAL_VAR_INT);
-    public final MetaType poseType = add(18, Type.VAR_INT);
+    public final MetaType villagerDatatType = add(16, Types.VILLAGER_DATA);
+    public final MetaType optionalVarIntType = add(17, Types.OPTIONAL_VAR_INT);
+    public final MetaType poseType = add(18, Types.VAR_INT);
 
     public MetaTypes1_14(final ParticleType particleType) {
         super(19);

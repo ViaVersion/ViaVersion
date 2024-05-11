@@ -19,12 +19,13 @@ package com.viaversion.viaversion.protocols.base;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import java.util.UUID;
 
 public class BaseProtocol1_16 extends BaseProtocol1_7 {
 
     @Override
     protected UUID passthroughLoginUUID(final PacketWrapper wrapper) {
-        return wrapper.passthrough(Type.UUID);
+        return wrapper.passthrough(Types.UUID);
     }
 }

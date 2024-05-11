@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
@@ -40,7 +41,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
-    public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<>(Type.FLOAT) {
+    public static final ValueTransformer<Short, Float> TO_NEW_PITCH = new ValueTransformer<>(Types.FLOAT) {
         @Override
         public Float transform(PacketWrapper wrapper, Short inputValue) {
             return inputValue / 63.0F;
@@ -71,13 +72,13 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.CUSTOM_SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Sound name
-                map(Type.VAR_INT); // 1 - Sound Category
-                map(Type.INT); // 2 - x
-                map(Type.INT); // 3 - y
-                map(Type.INT); // 4 - z
-                map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
+                map(Types.STRING); // 0 - Sound name
+                map(Types.VAR_INT); // 1 - Sound Category
+                map(Types.INT); // 2 - x
+                map(Types.INT); // 3 - y
+                map(Types.INT); // 4 - z
+                map(Types.FLOAT); // 5 - Volume
+                map(Types.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
             }
         });
 
@@ -85,17 +86,17 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.SOUND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Sound name
-                map(Type.VAR_INT); // 1 - Sound Category
-                map(Type.INT); // 2 - x
-                map(Type.INT); // 3 - y
-                map(Type.INT); // 4 - z
-                map(Type.FLOAT); // 5 - Volume
-                map(Type.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
+                map(Types.VAR_INT); // 0 - Sound name
+                map(Types.VAR_INT); // 1 - Sound Category
+                map(Types.INT); // 2 - x
+                map(Types.INT); // 3 - y
+                map(Types.INT); // 4 - z
+                map(Types.FLOAT); // 5 - Volume
+                map(Types.UNSIGNED_BYTE, TO_NEW_PITCH); // 6 - Pitch
 
                 handler(wrapper -> {
-                    int id = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.set(Type.VAR_INT, 0, getNewSoundId(id));
+                    int id = wrapper.get(Types.VAR_INT, 0);
+                    wrapper.set(Types.VAR_INT, 0, getNewSoundId(id));
                 });
             }
         });
@@ -104,7 +105,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
+                map(Types.VAR_INT); // 0 - Entity ID
                 map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
             }
         });
@@ -113,18 +114,18 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity id
-                map(Type.UUID); // 1 - UUID
-                map(Type.UNSIGNED_BYTE); // 2 - Entity Type
-                map(Type.DOUBLE); // 3 - X
-                map(Type.DOUBLE); // 4 - Y
-                map(Type.DOUBLE); // 5 - Z
-                map(Type.BYTE); // 6 - Yaw
-                map(Type.BYTE); // 7 - Pitch
-                map(Type.BYTE); // 8 - Head Pitch
-                map(Type.SHORT); // 9 - Velocity X
-                map(Type.SHORT); // 10 - Velocity Y
-                map(Type.SHORT); // 11 - Velocity Z
+                map(Types.VAR_INT); // 0 - Entity id
+                map(Types.UUID); // 1 - UUID
+                map(Types.UNSIGNED_BYTE); // 2 - Entity Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Yaw
+                map(Types.BYTE); // 7 - Pitch
+                map(Types.BYTE); // 8 - Head Pitch
+                map(Types.SHORT); // 9 - Velocity X
+                map(Types.SHORT); // 10 - Velocity Y
+                map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 12 - Metadata
             }
         });
@@ -133,13 +134,13 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // 0 - Entity ID
-                map(Type.UUID); // 1 - Player UUID
-                map(Type.DOUBLE); // 2 - X
-                map(Type.DOUBLE); // 3 - Y
-                map(Type.DOUBLE); // 4 - Z
-                map(Type.BYTE); // 5 - Yaw
-                map(Type.BYTE); // 6 - Pitch
+                map(Types.VAR_INT); // 0 - Entity ID
+                map(Types.UUID); // 1 - Player UUID
+                map(Types.DOUBLE); // 2 - X
+                map(Types.DOUBLE); // 3 - Y
+                map(Types.DOUBLE); // 4 - Z
+                map(Types.BYTE); // 5 - Yaw
+                map(Types.BYTE); // 6 - Pitch
                 map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 7 - Metadata list
             }
         });
@@ -148,14 +149,14 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Entity ID
-                map(Type.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Type.INT); // 2 - Dimension
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                    int dimensionId = wrapper.get(Type.INT, 1);
+                    int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }
@@ -165,12 +166,12 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // 0 - Dimension ID
+                map(Types.INT); // 0 - Dimension ID
 
                 handler(wrapper -> {
                     ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
 
-                    int dimensionId = wrapper.get(Type.INT, 0);
+                    int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
             }
@@ -194,12 +195,12 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
         registerClientbound(ClientboundPackets1_9_3.RESOURCE_PACK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - URL
-                map(Type.STRING); // 1 - Hash
+                map(Types.STRING); // 0 - URL
+                map(Types.STRING); // 1 - Hash
 
                 handler(wrapper -> {
                     ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
-                    tracker.setLastHash(wrapper.get(Type.STRING, 1)); // Store the hash for resourcepack status
+                    tracker.setLastHash(wrapper.get(Types.STRING, 1)); // Store the hash for resourcepack status
                 });
             }
         });
@@ -210,8 +211,8 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             public void register() {
                 handler(wrapper -> {
                     ResourcePackTracker tracker = wrapper.user().get(ResourcePackTracker.class);
-                    wrapper.write(Type.STRING, tracker.getLastHash());
-                    wrapper.write(Type.VAR_INT, wrapper.read(Type.VAR_INT));
+                    wrapper.write(Types.STRING, tracker.getLastHash());
+                    wrapper.write(Types.VAR_INT, wrapper.read(Types.VAR_INT));
                 });
             }
         });

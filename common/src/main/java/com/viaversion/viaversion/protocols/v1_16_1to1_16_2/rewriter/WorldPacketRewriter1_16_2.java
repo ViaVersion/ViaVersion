@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
@@ -66,15 +67,15 @@ public class WorldPacketRewriter1_16_2 {
         protocol.registerClientbound(ClientboundPackets1_16.CHUNK_BLOCKS_UPDATE, ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE, wrapper -> {
             wrapper.cancel();
 
-            int chunkX = wrapper.read(Type.INT);
-            int chunkZ = wrapper.read(Type.INT);
+            int chunkX = wrapper.read(Types.INT);
+            int chunkZ = wrapper.read(Types.INT);
 
             long chunkPosition = 0;
             chunkPosition |= (chunkX & 0x3FFFFFL) << 42;
             chunkPosition |= (chunkZ & 0x3FFFFFL) << 20;
 
             List<BlockChangeRecord>[] sectionRecords = new List[16];
-            BlockChangeRecord[] blockChangeRecord = wrapper.read(Type.BLOCK_CHANGE_RECORD_ARRAY);
+            BlockChangeRecord[] blockChangeRecord = wrapper.read(Types.BLOCK_CHANGE_ARRAY);
             for (BlockChangeRecord record : blockChangeRecord) {
                 int chunkY = record.getY() >> 4;
                 List<BlockChangeRecord> list = sectionRecords[chunkY];
@@ -93,9 +94,9 @@ public class WorldPacketRewriter1_16_2 {
                 if (sectionRecord == null) continue;
 
                 PacketWrapper newPacket = wrapper.create(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
-                newPacket.write(Type.LONG, chunkPosition | (chunkY & 0xFFFFFL));
-                newPacket.write(Type.BOOLEAN, false); // Ignore light updates
-                newPacket.write(Type.VAR_LONG_BLOCK_CHANGE_RECORD_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));
+                newPacket.write(Types.LONG, chunkPosition | (chunkY & 0xFFFFFL));
+                newPacket.write(Types.BOOLEAN, false); // Ignore light updates
+                newPacket.write(Types.VAR_LONG_BLOCK_CHANGE_ARRAY, sectionRecord.toArray(EMPTY_RECORDS));
                 newPacket.send(Protocol1_16_1To1_16_2.class);
             }
         });

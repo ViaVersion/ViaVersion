@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_14_2to1_14_3;
 
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 
@@ -31,25 +32,25 @@ public class Protocol1_14_2To1_14_3 extends AbstractProtocol<ClientboundPackets1
     @Override
     protected void registerPackets() {
         registerClientbound(ClientboundPackets1_14.MERCHANT_OFFERS, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT);
-            int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+            wrapper.passthrough(Types.VAR_INT);
+            int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Type.ITEM1_13_2);
-                wrapper.passthrough(Type.ITEM1_13_2);
-                if (wrapper.passthrough(Type.BOOLEAN)) {
-                    wrapper.passthrough(Type.ITEM1_13_2);
+                wrapper.passthrough(Types.ITEM1_13_2);
+                wrapper.passthrough(Types.ITEM1_13_2);
+                if (wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.ITEM1_13_2);
                 }
-                wrapper.passthrough(Type.BOOLEAN);
-                wrapper.passthrough(Type.INT);
-                wrapper.passthrough(Type.INT);
-                wrapper.passthrough(Type.INT);
-                wrapper.passthrough(Type.INT);
-                wrapper.passthrough(Type.FLOAT);
+                wrapper.passthrough(Types.BOOLEAN);
+                wrapper.passthrough(Types.INT);
+                wrapper.passthrough(Types.INT);
+                wrapper.passthrough(Types.INT);
+                wrapper.passthrough(Types.INT);
+                wrapper.passthrough(Types.FLOAT);
             }
-            wrapper.passthrough(Type.VAR_INT);
-            wrapper.passthrough(Type.VAR_INT);
-            boolean regularVillager = wrapper.passthrough(Type.BOOLEAN);
-            wrapper.write(Type.BOOLEAN, regularVillager); // new boolean added in pre-1
+            wrapper.passthrough(Types.VAR_INT);
+            wrapper.passthrough(Types.VAR_INT);
+            boolean regularVillager = wrapper.passthrough(Types.BOOLEAN);
+            wrapper.write(Types.BOOLEAN, regularVillager); // new boolean added in pre-1
         });
     }
 }

@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -33,10 +34,10 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) {
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
-            final int size = Type.VAR_INT.readPrimitive(buffer);
+            final int size = Types.VAR_INT.readPrimitive(buffer);
             for (int i = 0; i < size; i++) {
-                final int id = Type.VAR_INT.readPrimitive(buffer);
-                final int level = Type.VAR_INT.readPrimitive(buffer);
+                final int id = Types.VAR_INT.readPrimitive(buffer);
+                final int level = Types.VAR_INT.readPrimitive(buffer);
                 enchantments.put(id, level);
             }
 
@@ -45,10 +46,10 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) {
 
         @Override
         public void write(final ByteBuf buffer, final Enchantments value) {
-            Type.VAR_INT.writePrimitive(buffer, value.enchantments.size());
+            Types.VAR_INT.writePrimitive(buffer, value.enchantments.size());
             for (final Int2IntMap.Entry entry : value.enchantments.int2IntEntrySet()) {
-                Type.VAR_INT.writePrimitive(buffer, entry.getIntKey());
-                Type.VAR_INT.writePrimitive(buffer, entry.getIntValue());
+                Types.VAR_INT.writePrimitive(buffer, entry.getIntKey());
+                Types.VAR_INT.writePrimitive(buffer, entry.getIntValue());
             }
             buffer.writeBoolean(value.showInTooltip());
         }

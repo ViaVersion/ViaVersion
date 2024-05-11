@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
@@ -60,7 +61,7 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_14_4.AWARD_STATS);
 
-        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Type.ITEM1_13_2)));
+        registerServerbound(ServerboundPackets1_14.EDIT_BOOK, wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
         tagRewriter.register(ClientboundPackets1_14_4.UPDATE_TAGS, RegistryType.ENTITY);
     }

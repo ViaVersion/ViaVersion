@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityIdRewriter;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
@@ -30,7 +31,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_10To1_11> {
 
     public ItemPacketRewriter1_11(Protocol1_10To1_11 protocol) {
-        super(protocol, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
+        super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY);
     }
 
     @Override
@@ -43,24 +44,24 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
         protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // 0 - Channel
+                map(Types.STRING); // 0 - Channel
 
                 handler(wrapper -> {
-                    if (wrapper.get(Type.STRING, 0).equals("MC|TrList")) {
-                        wrapper.passthrough(Type.INT); // Passthrough Window ID
+                    if (wrapper.get(Types.STRING, 0).equals("MC|TrList")) {
+                        wrapper.passthrough(Types.INT); // Passthrough Window ID
 
-                        int size = wrapper.passthrough(Type.UNSIGNED_BYTE);
+                        int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
                         for (int i = 0; i < size; i++) {
-                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Input Item
-                            EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Output Item
+                            EntityIdRewriter.toClientItem(wrapper.passthrough(Types.ITEM1_8)); // Input Item
+                            EntityIdRewriter.toClientItem(wrapper.passthrough(Types.ITEM1_8)); // Output Item
 
-                            boolean secondItem = wrapper.passthrough(Type.BOOLEAN); // Has second item
+                            boolean secondItem = wrapper.passthrough(Types.BOOLEAN); // Has second item
                             if (secondItem)
-                                EntityIdRewriter.toClientItem(wrapper.passthrough(Type.ITEM1_8)); // Second Item
+                                EntityIdRewriter.toClientItem(wrapper.passthrough(Types.ITEM1_8)); // Second Item
 
-                            wrapper.passthrough(Type.BOOLEAN); // Trade disabled
-                            wrapper.passthrough(Type.INT); // Number of tools uses
-                            wrapper.passthrough(Type.INT); // Maximum number of trade uses
+                            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
+                            wrapper.passthrough(Types.INT); // Number of tools uses
+                            wrapper.passthrough(Types.INT); // Maximum number of trade uses
                         }
                     }
                 });
