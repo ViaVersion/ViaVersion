@@ -23,6 +23,8 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.viaversion.viaversion.util.ProtocolUtil.toNiceName;
+
 /**
  * Utility for protocol-specific logging messages.
  */
@@ -37,40 +39,33 @@ public class LogUtil {
 
     public void conversionWarning(Class<? extends Protocol> protocol, String message, Object... args) {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-            logger.log(Level.WARNING, toDirection(protocol) + ": " + message, args);
+            logger.log(Level.WARNING, toNiceName(protocol) + ": " + message, args);
         }
     }
 
     public void conversionWarning(Class<? extends Protocol> protocol, String message, Throwable t) {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-            logger.log(Level.WARNING, toDirection(protocol) + ": " + message, t);
+            logger.log(Level.WARNING, toNiceName(protocol) + ": " + message, t);
         }
     }
 
     public void conversionWarning(Class<? extends Protocol> protocol, Supplier<String> message, Throwable t) {
         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-            logger.log(Level.WARNING, toDirection(protocol) + ": " + message.get(), t);
+            logger.log(Level.WARNING, toNiceName(protocol) + ": " + message.get(), t);
         }
     }
 
     // ---------------------------------------------------------------------------------
 
     public void warning(Class<? extends Protocol> protocol, final String message, Object... args) {
-        logger.log(Level.WARNING, toDirection(protocol) + ": " + message, args);
+        logger.log(Level.WARNING, toNiceName(protocol) + ": " + message, args);
     }
 
     public void error(Class<? extends Protocol> protocol, String message, Object... args) {
-        logger.log(Level.SEVERE, toDirection(protocol) + ": " + message, args);
+        logger.log(Level.SEVERE, toNiceName(protocol) + ": " + message, args);
     }
 
     public void error(Class<? extends Protocol> protocol, String message, Throwable t) {
-        logger.log(Level.SEVERE, toDirection(protocol) + ": " + message, t);
-    }
-
-    private String toDirection(Class<? extends Protocol> protocol) {
-        return protocol.getSimpleName().
-            replace("Protocol", "").
-            replace("To", "->").
-            replace("_", ".");
+        logger.log(Level.SEVERE, toNiceName(protocol) + ": " + message, t);
     }
 }

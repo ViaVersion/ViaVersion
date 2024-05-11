@@ -214,7 +214,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     if (newIdRaw != null) {
                         newId = newIdRaw;
                     } else {
-                        LogUtil.INSTANCE.warning(Protocol1_12_2To1_13.class, "Cloud not find statistic mapping for " + name);
+                        LogUtil.INSTANCE.warning(Protocol1_12_2To1_13.class, "Could not find statistic mapping for " + name);
                     }
                 } else if (split.length > 2) {
                     String category = split[1];

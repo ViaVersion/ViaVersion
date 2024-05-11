@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.util;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypeMap;
@@ -69,5 +70,18 @@ public final class ProtocolUtil {
     public static String toNiceHex(int id) {
         final String hex = Integer.toHexString(id).toUpperCase(Locale.ROOT);
         return (hex.length() == 1 ? "0x0" : "0x") + hex;
+    }
+
+    /**
+     * Returns a readable name of a protocol. For example, "Protocol1_12_2To1_13" becomes "1.12.2->1.13".
+     *
+     * @param protocol protocol class
+     * @return readable name of the protocol
+     */
+    public static String toNiceName(Class<? extends Protocol> protocol) {
+        return protocol.getSimpleName().
+            replace("Protocol", "").
+            replace("To", "->").
+            replace("_", ".");
     }
 }
