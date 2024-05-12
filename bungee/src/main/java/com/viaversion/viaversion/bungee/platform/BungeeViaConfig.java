@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class BungeeViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "velocity-ping-interval", "velocity-ping-save", "velocity-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
@@ -33,8 +34,8 @@ public class BungeeViaConfig extends AbstractViaConfig {
     private boolean bungeePingSave;
     private Map<String, Integer> bungeeServerProtocols;
 
-    public BungeeViaConfig(File folder) {
-        super(new File(folder, "config.yml"));
+    public BungeeViaConfig(File folder, Logger logger) {
+        super(new File(folder, "config.yml"), logger);
     }
 
     @Override

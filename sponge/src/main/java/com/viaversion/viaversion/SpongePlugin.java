@@ -86,7 +86,7 @@ public class SpongePlugin implements ViaPlatform<Player> {
     @Listener
     public void constructPlugin(ConstructPluginEvent event) {
         // Setup Plugin
-        conf = new SpongeViaConfig(configDir.toFile());
+        conf = new SpongeViaConfig(configDir.toFile(), getLogger());
 
         // Init platform
         Via.init(ViaManagerImpl.builder()

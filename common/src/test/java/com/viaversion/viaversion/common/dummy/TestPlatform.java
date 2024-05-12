@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 public final class TestPlatform implements ViaPlatform {
 
     private static final Logger log = Logger.getGlobal();
-    private final TestConfig testConfig = new TestConfig(null);
+    private final TestConfig testConfig = new TestConfig(null, log);
 
     @Override
     public Logger getLogger() {
