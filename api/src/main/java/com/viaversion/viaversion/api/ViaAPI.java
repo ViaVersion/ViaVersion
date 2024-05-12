@@ -78,7 +78,6 @@ public interface ViaAPI<T> {
 
     /**
      * Returns the protocol version of a player.
-     * This will also retrieve the version from ProtocolSupport if it's being used.
      *
      * @param player the platform's player object, e.g. Bukkit this is Player
      * @return protocol version, for example (47=1.8-1.8.8, 107=1.9, 108=1.9.1), or -1 if no longer connected
@@ -89,7 +88,6 @@ public interface ViaAPI<T> {
 
     /**
      * Returns the protocol version of a player.
-     * This will also retrieve the version from ProtocolSupport if it's being used.
      *
      * @param player the platform's player object, e.g. Bukkit this is Player
      * @return the protocol version object (see {@link ProtocolVersion}), or ProtocolVersion.unknown if not connected
@@ -109,7 +107,6 @@ public interface ViaAPI<T> {
 
     /**
      * Returns the protocol version of a player.
-     * This will also retrieve the version from ProtocolSupport if it's being used.
      *
      * @param uuid UUID of a player
      * @return the protocol version object (see {@link ProtocolVersion}), or ProtocolVersion.unknown if not connected
