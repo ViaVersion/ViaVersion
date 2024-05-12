@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 public class ProtocolLogger {
 
     private final Logger logger;
-    private final Class<? extends Protocol> protocol;
+    private final String name;
 
     public ProtocolLogger(final Class<? extends Protocol> protocol) {
         this(Via.getPlatform().getLogger(), protocol);
@@ -36,7 +36,7 @@ public class ProtocolLogger {
 
     public ProtocolLogger(final Logger logger, final Class<? extends Protocol> protocol) {
         this.logger = logger;
-        this.protocol = protocol;
+        this.name = ProtocolUtil.toNiceName(protocol);
     }
 
     public void log(final Level level, final String msg) {
@@ -56,6 +56,6 @@ public class ProtocolLogger {
     }
 
     private String formatMessage(final String msg) {
-        return "(" + ProtocolUtil.toNiceName(protocol) + ") " + msg;
+        return "(" + name + ") " + msg;
     }
 }

@@ -572,12 +572,12 @@ public class WorldPacketRewriter1_13 {
         newId = Protocol1_12_2To1_13.MAPPINGS.getBlockMappings().getNewId(IdAndData.removeData(oldId)); // Remove data
         if (newId != -1) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                Via.getPlatform().getLogger().warning("Missing block " + oldId);
+                Protocol1_12_2To1_13.LOGGER.warning("Missing block " + oldId);
             }
             return newId;
         }
         if (!Via.getConfig().isSuppressConversionWarnings()) {
-            Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
+            Protocol1_12_2To1_13.LOGGER.warning("Missing block completely " + oldId);
         }
         // Default air
         return 0;
