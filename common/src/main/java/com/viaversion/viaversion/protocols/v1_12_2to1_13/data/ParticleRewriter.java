@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
@@ -96,7 +95,7 @@ public class ParticleRewriter {
 
     public static Particle rewriteParticle(int particleId, Integer[] data) {
         if (particleId >= particles.size()) {
-            Via.getPlatform().getLogger().severe("Failed to transform particles with id " + particleId + " and data " + Arrays.toString(data));
+            Protocol1_12_2To1_13.LOGGER.severe("Failed to transform particles with id " + particleId + " and data " + Arrays.toString(data));
             return null;
         }
 

@@ -81,7 +81,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                     // Change Type :)
                     int type = wrapper.get(Types.VAR_INT, 1);
 
-                    EntityTypes1_11.EntityType entType = EntityPacketRewriter1_11.rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    EntityTypes1_11.EntityType entType = rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
                     if (entType != null) {
                         wrapper.set(Types.VAR_INT, 1, entType.getId());
 
@@ -253,7 +253,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         return EntityTypes1_11.getTypeFromId(type, true);
     }
 
-    public static EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
+    public EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
         Optional<EntityType> optType = EntityType.findById(numType);
         if (optType.isEmpty()) {
             Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with metadata: " + metadata);
@@ -326,16 +326,16 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             }
         } catch (Exception e) {
             if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("An error occurred with entity type rewriter");
-                Via.getPlatform().getLogger().warning("Metadata: " + metadata);
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error: ", e);
+                protocol.getLogger().warning("An error occurred with entity type rewriter");
+                protocol.getLogger().warning("Metadata: " + metadata);
+                protocol.getLogger().log(Level.WARNING, "Error: ", e);
             }
         }
 
         return type;
     }
 
-    public static Optional<Metadata> getById(List<Metadata> metadatas, int id) {
+    public Optional<Metadata> getById(List<Metadata> metadatas, int id) {
         for (Metadata metadata : metadatas) {
             if (metadata.id() == id) return Optional.of(metadata);
         }

@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.configuration;
 
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
@@ -412,7 +413,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public boolean isSuppressConversionWarnings() {
-        return suppressConversionWarnings;
+        return suppressConversionWarnings && !Via.getManager().isDebug(); // Debug mode overrules config
     }
 
     @Override

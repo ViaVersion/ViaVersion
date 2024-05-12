@@ -25,13 +25,11 @@ import com.viaversion.nbt.tag.Tag;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
@@ -44,6 +42,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -127,7 +126,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                 }
 
                 if (typeId == -1) {
-                    Via.getPlatform().getLogger().warning("Can't open inventory for 1.14 player! Type: " + type + " Size: " + slots);
+                    protocol.getLogger().warning("Can't open inventory for player! Type: " + type + " Size: " + slots);
                 }
 
                 wrapper.write(Types.VAR_INT, typeId);

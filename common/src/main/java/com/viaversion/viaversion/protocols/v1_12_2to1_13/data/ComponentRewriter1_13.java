@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.logging.Level;
 
@@ -54,8 +55,8 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
         try {
             tag = ComponentUtil.deserializeLegacyShowItem(value, SerializerVersion.V1_12);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.12.2 NBT in show_item: " + value, e);
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Protocol1_12_2To1_13.LOGGER.log(Level.WARNING, "Error reading NBT in show_item: " + value, e);
             }
             return;
         }
@@ -86,8 +87,8 @@ public class ComponentRewriter1_13<C extends ClientboundPacketType> extends Comp
             showItem.addProperty("text", SerializerVersion.V1_13.toSNBT(tag));
             hoverEvent.add("value", newValue);
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.13 NBT in show_item: " + value, e);
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Protocol1_12_2To1_13.LOGGER.log(Level.WARNING, "Error writing NBT in show_item: " + value, e);
             }
         }
     }

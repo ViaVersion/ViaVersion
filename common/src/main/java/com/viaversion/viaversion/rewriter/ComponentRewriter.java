@@ -34,7 +34,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -176,7 +175,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             return root;
         } catch (final JsonSyntaxException e) {
             if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().severe("Error when trying to parse json: " + value);
+                protocol.getLogger().severe("Error when trying to parse json: " + value);
                 throw e;
             }
             // Yay to malformed json being accepted

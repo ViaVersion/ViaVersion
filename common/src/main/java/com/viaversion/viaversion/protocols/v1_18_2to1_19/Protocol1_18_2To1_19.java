@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_18_2to1_19;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -50,6 +49,7 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
@@ -172,7 +172,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                     final String argumentType = wrapper.read(Types.STRING);
                     final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
                     if (argumentTypeId == -1) {
-                        Via.getPlatform().getLogger().warning("Unknown command argument type: " + argumentType);
+                        getLogger().warning("Unknown command argument type: " + argumentType);
                     }
 
                     wrapper.write(Types.VAR_INT, argumentTypeId);

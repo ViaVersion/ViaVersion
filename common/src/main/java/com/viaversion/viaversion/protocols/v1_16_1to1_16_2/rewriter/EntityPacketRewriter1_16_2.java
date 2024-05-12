@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16_2;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -106,7 +105,7 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
     private CompoundTag getDimensionData(String dimensionType) {
         CompoundTag tag = Protocol1_16_1To1_16_2.MAPPINGS.getDimensionDataMap().get(dimensionType);
         if (tag == null) {
-            Via.getPlatform().getLogger().severe("Could not get dimension data of " + dimensionType);
+            protocol.getLogger().severe("Could not get dimension data of " + dimensionType);
             throw new NullPointerException("Dimension data for " + dimensionType + " is null!");
         }
         return tag.copy();
