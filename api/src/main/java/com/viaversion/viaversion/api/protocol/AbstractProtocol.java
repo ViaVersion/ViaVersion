@@ -356,8 +356,8 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
         PacketMapping packetMapping = PacketMapping.of(mappedPacketType, handler);
         if (!override && packetMappings.hasMapping(packetType)) {
-            Via.getPlatform().getLogger().log(Level.WARNING, packetType + " already registered!" +
-                    " If override is intentional, set override to true. Stacktrace: ", new Exception());
+            getLogger().log(Level.WARNING, packetType + " already registered!" +
+                " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
         packetMappings.addMapping(packetType, packetMapping);
     }

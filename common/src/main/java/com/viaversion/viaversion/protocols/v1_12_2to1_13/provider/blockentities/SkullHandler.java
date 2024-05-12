@@ -19,9 +19,9 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.NumberTag;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 
@@ -35,7 +35,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
         Position position = new Position(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
 
         if (!storage.contains(position)) {
-            Via.getPlatform().getLogger().warning("Received an head update packet, but there is no head! O_o " + tag);
+            Protocol1_12_2To1_13.LOGGER.warning("Received an head update packet, but there is no head! O_o " + tag);
             return -1;
         }
 
@@ -51,7 +51,7 @@ public class SkullHandler implements BlockEntityProvider.BlockEntityHandler {
                 id += rot.asInt();
             }
         } else {
-            Via.getPlatform().getLogger().warning("Why does this block have the skull block entity? " + tag);
+            Protocol1_12_2To1_13.LOGGER.warning("Why does this block have the skull block entity? " + tag);
             return -1;
         }
 

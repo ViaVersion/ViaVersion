@@ -49,7 +49,6 @@ import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.ProtocolUtil;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,7 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -396,14 +394,14 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 int blockHeight = height.asInt();
                 tracker.setCurrentWorldSectionHeight(blockHeight >> 4);
             } else {
-                Via.getPlatform().getLogger().warning("Height missing in dimension data: " + registryData);
+                protocol.getLogger().warning("Height missing in dimension data: " + registryData);
             }
 
             NumberTag minY = registryData.getNumberTag("min_y");
             if (minY != null) {
                 tracker.setCurrentMinY(minY.asInt());
             } else {
-                Via.getPlatform().getLogger().warning("Min Y missing in dimension data: " + registryData);
+                protocol.getLogger().warning("Min Y missing in dimension data: " + registryData);
             }
 
             String world = wrapper.get(Types.STRING, 0);
@@ -421,7 +419,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             String dimensionKey = wrapper.get(Types.STRING, 0);
             DimensionData dimensionData = tracker.dimensionData(dimensionKey);
             if (dimensionData == null) {
-                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + dimensionKey + ", falling back to overworld");
+                protocol.getLogger().severe("Dimension data missing for dimension: " + dimensionKey + ", falling back to overworld");
                 dimensionData = tracker.dimensionData("minecraft:overworld");
                 Preconditions.checkNotNull(dimensionData, "Overworld data missing");
             }
@@ -444,7 +442,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             int dimensionId = wrapper.get(Types.VAR_INT, dimensionIdIndex);
             DimensionData dimensionData = tracker.dimensionData(dimensionId);
             if (dimensionData == null) {
-                Via.getPlatform().getLogger().severe("Dimension data missing for dimension: " + dimensionId + ", falling back to overworld");
+                protocol.getLogger().severe("Dimension data missing for dimension: " + dimensionId + ", falling back to overworld");
                 dimensionData = tracker.dimensionData("minecraft:overworld");
                 Preconditions.checkNotNull(dimensionData, "Overworld data missing");
             }
@@ -603,12 +601,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
     private void logException(Exception e, @Nullable EntityType type, List<Metadata> metadataList, Metadata metadata) {
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {
-            Logger logger = Via.getPlatform().getLogger();
-            logger.severe("An error occurred in metadata handler " + this.getClass().getSimpleName()
+            protocol.getLogger().severe("An error occurred in metadata handler " + this.getClass().getSimpleName()
                 + " for " + (type != null ? type.name() : "untracked") + " entity type: " + metadata);
-            logger.severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
+            protocol.getLogger().severe(metadataList.stream().sorted(Comparator.comparingInt(Metadata::id))
                 .map(Metadata::toString).collect(Collectors.joining("\n", "Full metadata: ", "")));
-            logger.log(Level.SEVERE, "Error: ", e);
+            protocol.getLogger().log(Level.SEVERE, "Error: ", e);
         }
     }
 }

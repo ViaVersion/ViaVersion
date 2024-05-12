@@ -73,7 +73,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -245,7 +244,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Target entity
                     particle.add(Types.FLOAT, wrapper.read(Types.FLOAT)); // Y offset
                 } else {
-                    Via.getPlatform().getLogger().warning("Unknown vibration path position source type: " + sourceTypeId);
+                    protocol.getLogger().warning("Unknown vibration path position source type: " + sourceTypeId);
                 }
                 particle.add(Types.VAR_INT, wrapper.read(Types.VAR_INT)); // Arrival in ticks
             } else if (particleId == mappings.id("sculk_charge")) {
@@ -785,7 +784,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 tag = SNBT.deserializeCompoundTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
             } catch (final Exception e) {
                 if (Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to parse block predicate tag: " + rawPredicate.substring(tagStartIndex, tagEndIndex + 1), e);
+                    Protocol1_20_3To1_20_5.LOGGER.log(Level.SEVERE, "Failed to parse block predicate tag: " + rawPredicate.substring(tagStartIndex, tagEndIndex + 1), e);
                 }
             }
         }

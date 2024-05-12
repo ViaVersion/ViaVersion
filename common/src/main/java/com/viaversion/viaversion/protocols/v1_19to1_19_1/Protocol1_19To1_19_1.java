@@ -411,7 +411,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                         argument = targetName;
                         break;
                     default:
-                        Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
+                        LOGGER.warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
                     arguments.add(SerializerVersion.V1_18.toComponent(argument));
