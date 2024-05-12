@@ -89,7 +89,6 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
@@ -99,6 +98,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
@@ -215,7 +215,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             try {
                 tagTag = tag != null ? (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue()) : null;
             } catch (final Exception e) {
-                LogUtil.INSTANCE.conversionWarning(Protocol1_20_3To1_20_5.class, () -> "Error reading NBT in show_item: " + contentsTag, e);
+                Protocol1_20_3To1_20_5.LOGGER.log(Level.WARNING, "Error reading NBT in show_item: " + contentsTag, e);
                 return;
             }
 
@@ -247,7 +247,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 try {
                     components = toTag(data, false);
                 } catch (final Exception e) {
-                    LogUtil.INSTANCE.conversionWarning(Protocol1_20_3To1_20_5.class, "Error writing components in show_item!", e);
+                    Protocol1_20_3To1_20_5.LOGGER.log(Level.WARNING, "Error writing components in show_item!", e);
                     return;
                 }
                 contentsTag.put("components", components);

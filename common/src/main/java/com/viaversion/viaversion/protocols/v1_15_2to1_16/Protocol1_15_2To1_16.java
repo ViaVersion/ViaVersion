@@ -52,7 +52,8 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
+import com.viaversion.viaversion.util.ProtocolLogger;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
 
     private static final UUID ZERO_UUID = new UUID(0, 0);
     public static final MappingData MAPPINGS = new MappingDataBase("1.15", "1.16");
+    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_15_2To1_16.class);
     private final EntityPacketRewriter1_16 entityRewriter = new EntityPacketRewriter1_16(this);
     private final ItemPacketRewriter1_16 itemRewriter = new ItemPacketRewriter1_16(this);
     private final ComponentRewriter1_16 componentRewriter = new ComponentRewriter1_16(this);
@@ -170,15 +172,18 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                         final String channel = wrapper.get(Types.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
-                            LogUtil.INSTANCE.conversionWarning(Protocol1_15_2To1_16.class, "Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
+                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                LOGGER.warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
+                            }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
                             String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
                             List<String> checkedChannels = new ArrayList<>(channels.length);
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
-                                    LogUtil.INSTANCE.conversionWarning(Protocol1_15_2To1_16.class, "Ignoring serverbound plugin channel register of '"
-                                        + registeredChannel + "', as it is longer than 32 characters");
+                                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                        LOGGER.warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 32 characters");
+                                    }
                                     continue;
                                 }
 

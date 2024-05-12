@@ -34,10 +34,12 @@ import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.WorldPacketR
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.ProtocolLogger;
 
 public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1_16, ClientboundPackets1_16_2, ServerboundPackets1_16, ServerboundPackets1_16_2> {
 
     public static final MappingData1_16_2 MAPPINGS = new MappingData1_16_2();
+    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_16_1To1_16_2.class);
     private final EntityPacketRewriter1_16_2 entityRewriter = new EntityPacketRewriter1_16_2(this);
     private final ItemPacketRewriter1_16_2 itemRewriter = new ItemPacketRewriter1_16_2(this);
     private final TagRewriter<ClientboundPackets1_16> tagRewriter = new TagRewriter<>(this);

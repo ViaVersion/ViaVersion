@@ -86,7 +86,7 @@ public class TranslateRewriter {
                 hoverEvent.addProperty("action", "show_text");
                 hoverEvent.add("value", baseArray);
             } catch (Exception e) {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                if (!Via.getConfig().isSuppressConversionWarnings()) {
                     Via.getPlatform().getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
                 }
                 JsonObject invalidText = new JsonObject();

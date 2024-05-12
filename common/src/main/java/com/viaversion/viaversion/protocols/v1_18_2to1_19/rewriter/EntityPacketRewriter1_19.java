@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -42,7 +43,6 @@ import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.DimensionRegistryStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
@@ -279,9 +279,11 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
-            LogUtil.INSTANCE.conversionWarning(Protocol1_18_2To1_19.class, "The server tried to send dimension data from a dimension the client wasn't told about on join. " +
-                "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
-                " Received dimension: {0}. Known dimensions: {1}", currentDimension, registryStorage.dimensions());
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Protocol1_18_2To1_19.LOGGER.warning("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
+                    "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
+                    " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+            }
 
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()

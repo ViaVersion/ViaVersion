@@ -69,16 +69,18 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.IdAndData;
-import com.viaversion.viaversion.util.LogUtil;
+import com.viaversion.viaversion.util.ProtocolLogger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_12_1, ClientboundPackets1_13, ServerboundPackets1_12_1, ServerboundPackets1_13> {
 
     public static final MappingData1_13 MAPPINGS = new MappingData1_13();
+    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_12_2To1_13.class);
     // These are arbitrary rewrite values, it just needs an invalid color code character.
     private static final Map<Character, Character> SCOREBOARD_TEAM_NAME_REWRITE = new HashMap<>();
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
@@ -189,7 +191,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         }
                         wrapper.set(Types.STRING, 0, GsonUtil.getGson().toJson(json));
                     } catch (JsonParseException e) {
-                        LogUtil.INSTANCE.error(Protocol1_12_2To1_13.class, "Error transforming status response", e);
+                        LOGGER.log(Level.SEVERE, "Error transforming status response", e);
                     }
                 });
             }
@@ -214,7 +216,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     if (newIdRaw != null) {
                         newId = newIdRaw;
                     } else {
-                        LogUtil.INSTANCE.warning(Protocol1_12_2To1_13.class, "Could not find statistic mapping for " + name);
+                        LOGGER.warning("Could not find statistic mapping for " + name);
                     }
                 } else if (split.length > 2) {
                     String category = split[1];

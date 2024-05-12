@@ -36,7 +36,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
+
 import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
@@ -64,7 +64,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 outputName = map.end();
                 break;
             default:
-                LogUtil.INSTANCE.warning(Protocol1_15_2To1_16.class, "Invalid dimension id: " + dimension);
+                Protocol1_15_2To1_16.LOGGER.warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
                 outputName = map.overworld();
         }

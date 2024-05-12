@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import com.viaversion.viaversion.util.LogUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ParticleRewriter {
@@ -96,7 +95,7 @@ public class ParticleRewriter {
 
     public static Particle rewriteParticle(int particleId, Integer[] data) {
         if (particleId >= particles.size()) {
-            LogUtil.INSTANCE.error(Protocol1_12_2To1_13.class, "Failed to transform particles with id " + particleId + " and data " + Arrays.toString(data));
+            Protocol1_12_2To1_13.LOGGER.severe("Failed to transform particles with id " + particleId + " and data " + Arrays.toString(data));
             return null;
         }
 

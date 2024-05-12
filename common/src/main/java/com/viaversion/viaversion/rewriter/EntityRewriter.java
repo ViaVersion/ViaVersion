@@ -49,7 +49,7 @@ import com.viaversion.viaversion.rewriter.meta.MetaFilter;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
 import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
+import com.viaversion.viaversion.util.ProtocolUtil;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -396,14 +396,14 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 int blockHeight = height.asInt();
                 tracker.setCurrentWorldSectionHeight(blockHeight >> 4);
             } else {
-                LogUtil.INSTANCE.warning(protocol.getClass(), "Height missing in dimension data: " + registryData);
+                Via.getPlatform().getLogger().warning("Height missing in dimension data: " + registryData);
             }
 
             NumberTag minY = registryData.getNumberTag("min_y");
             if (minY != null) {
                 tracker.setCurrentMinY(minY.asInt());
             } else {
-                LogUtil.INSTANCE.warning(protocol.getClass(), "Min Y missing in dimension data: " + registryData);
+                Via.getPlatform().getLogger().warning("Min Y missing in dimension data: " + registryData);
             }
 
             String world = wrapper.get(Types.STRING, 0);

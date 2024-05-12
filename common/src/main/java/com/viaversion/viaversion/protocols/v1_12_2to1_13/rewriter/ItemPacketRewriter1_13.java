@@ -42,7 +42,8 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
+import com.viaversion.viaversion.util.ProtocolLogger;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,8 +121,9 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                             flags |= 1;
                             Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
                             if (finalSource.isEmpty()) {
-                                LogUtil.INSTANCE.conversionWarning(Protocol1_12_2To1_13.class,
-                                    "Could not handle unknown sound source {0} falling back to default: master", originalSource);
+                                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                    Protocol1_12_2To1_13.LOGGER.warning("Could not handle unknown sound source " + originalSource + " falling back to default: master");
+                                }
                                 finalSource = Optional.of(SoundSource.MASTER);
                             }
 
@@ -165,7 +167,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         String old = channel;
                         channel = getNewPluginChannelId(channel);
                         if (channel == null) {
-                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            if (!Via.getConfig().isSuppressConversionWarnings()) {
                                 Via.getPlatform().getLogger().warning("Ignoring clientbound plugin message with channel: " + old);
                             }
                             wrapper.cancel();
@@ -177,7 +179,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                                 String rewritten = getNewPluginChannelId(s);
                                 if (rewritten != null) {
                                     rewrittenChannels.add(rewritten);
-                                } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                } else if (!Via.getConfig().isSuppressConversionWarnings()) {
                                     Via.getPlatform().getLogger().warning("Ignoring plugin channel in clientbound " + Key.stripMinecraftNamespace(channel).toUpperCase(Locale.ROOT) + ": " + s);
                                 }
                             }
@@ -229,7 +231,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     String old = channel;
                     channel = getOldPluginChannelId(channel);
                     if (channel == null) {
-                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                        if (!Via.getConfig().isSuppressConversionWarnings()) {
                             Via.getPlatform().getLogger().warning("Ignoring serverbound plugin message with channel: " + old);
                         }
                         wrapper.cancel();
@@ -241,7 +243,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                             String rewritten = getOldPluginChannelId(s);
                             if (rewritten != null) {
                                 rewrittenChannels.add(rewritten);
-                            } else if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            } else if (!Via.getConfig().isSuppressConversionWarnings()) {
                                 Via.getPlatform().getLogger().warning("Ignoring plugin channel in serverbound " + channel + ": " + s);
                             }
                         }
@@ -463,7 +465,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
             } else if (Protocol1_12_2To1_13.MAPPINGS.getItemMappings().getNewId(IdAndData.removeData(rawId)) != -1) {
                 rawId = IdAndData.removeData(rawId);
             } else {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                if (!Via.getConfig().isSuppressConversionWarnings()) {
                     Via.getPlatform().getLogger().warning("Failed to get 1.13 item for " + item.identifier());
                 }
                 rawId = 16; // Stone
@@ -545,7 +547,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         }
 
         if (rawId == null) {
-            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
                 Via.getPlatform().getLogger().warning("Failed to get 1.12 item for " + item.identifier());
             }
             rawId = 0x10000; // Stone

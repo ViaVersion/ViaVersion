@@ -42,7 +42,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.LogUtil;
+
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -126,7 +126,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                 }
 
                 if (typeId == -1) {
-                    LogUtil.INSTANCE.warning(Protocol1_13_2To1_14.class, "Can't open inventory for player! Type: " + type + " Size: " + slots);
+                    Protocol1_13_2To1_14.LOGGER.warning("Can't open inventory for player! Type: " + type + " Size: " + slots);
                 }
 
                 wrapper.write(Types.VAR_INT, typeId);

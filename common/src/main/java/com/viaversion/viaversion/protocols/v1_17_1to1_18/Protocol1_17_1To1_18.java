@@ -39,10 +39,12 @@ import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPacke
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.ProtocolLogger;
 
 public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPackets1_17_1, ClientboundPackets1_18, ServerboundPackets1_17, ServerboundPackets1_17> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.17", "1.18");
+    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_17_1To1_18.class);
     private final EntityPacketRewriter1_18 entityRewriter = new EntityPacketRewriter1_18(this);
     private final ItemPacketRewriter1_18 itemRewriter = new ItemPacketRewriter1_18(this);
     private final TagRewriter<ClientboundPackets1_17_1> tagRewriter = new TagRewriter<>(this);
