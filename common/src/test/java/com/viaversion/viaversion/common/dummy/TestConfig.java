@@ -23,11 +23,12 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public final class TestConfig extends AbstractViaConfig {
 
-    public TestConfig(File file) {
-        super(file);
+    public TestConfig(File file, Logger logger) {
+        super(file, logger);
     }
 
     @Override

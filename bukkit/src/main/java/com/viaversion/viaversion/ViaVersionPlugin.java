@@ -46,20 +46,18 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionizedServer");
     private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler = new BukkitCommandHandler();
-    private final BukkitViaConfig conf = new BukkitViaConfig(getDataFolder());
+    private final BukkitViaConfig conf;
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
     private boolean protocolSupport;
     private boolean lateBind;
@@ -67,6 +65,7 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     public ViaVersionPlugin() {
         instance = this;
 
+        conf = new BukkitViaConfig(getDataFolder(), getLogger());
         Via.init(ViaManagerImpl.builder()
                 .platform(this)
                 .commandHandler(commandHandler)
