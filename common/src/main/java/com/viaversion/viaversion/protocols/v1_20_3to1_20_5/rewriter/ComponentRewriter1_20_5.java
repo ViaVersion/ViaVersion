@@ -215,8 +215,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             try {
                 tagTag = tag != null ? (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue()) : null;
             } catch (final Exception e) {
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                    Via.getPlatform().getLogger().log(Level.WARNING, "Error reading 1.20.3 NBT in show_item: " + contentsTag, e);
+                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                    protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + contentsTag, e);
                 }
                 return;
             }
@@ -249,8 +249,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 try {
                     components = toTag(data, false);
                 } catch (final Exception e) {
-                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                        Via.getPlatform().getLogger().log(Level.WARNING, "Error writing 1.20.5 components in show_item!", e);
+                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
                     }
                     return;
                 }

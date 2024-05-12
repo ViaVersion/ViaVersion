@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -199,7 +198,7 @@ public class SpawnPacketRewriter1_9 {
                     if (tracker.hasEntity(entityId)) {
                         protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
-                        Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
+                        protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();
                     }
                 });
@@ -277,7 +276,7 @@ public class SpawnPacketRewriter1_9 {
                     if (tracker.hasEntity(entityId)) {
                         protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
                     } else {
-                        Via.getPlatform().getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
+                        protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();
                     }
                 });

@@ -36,11 +36,12 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+
 import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
 
-    private static final PacketHandler DIMENSION_HANDLER = wrapper -> {
+    private final PacketHandler DIMENSION_HANDLER = wrapper -> {
         WorldIdentifiers map = Via.getConfig().get1_16WorldNamesMap();
         WorldIdentifiers userMap = wrapper.user().get(WorldIdentifiers.class);
         if (userMap != null) {
@@ -63,7 +64,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 outputName = map.end();
                 break;
             default:
-                Via.getPlatform().getLogger().warning("Invalid dimension id: " + dimension);
+                protocol.getLogger().warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
                 outputName = map.overworld();
         }
@@ -166,7 +167,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {
                         if (!Via.getConfig().isSuppressConversionWarnings()) {
-                            Via.getPlatform().getLogger().warning("Invalid attribute: " + key);
+                            protocol.getLogger().warning("Invalid attribute: " + key);
                         }
                         actualSize--;
                         wrapper.read(Types.DOUBLE);

@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
@@ -89,9 +88,8 @@ public class WorldPacketRewriter1_13 {
                     String motive = wrapper.read(Types.STRING);
 
                     Optional<Integer> id = provider.getIntByIdentifier(motive);
-
-                    if (id.isEmpty() && (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug())) {
-                        Via.getPlatform().getLogger().warning("Could not find painting motive: " + motive + " falling back to default (0)");
+                    if (id.isEmpty() && !Via.getConfig().isSuppressConversionWarnings()) {
+                        Protocol1_12_2To1_13.LOGGER.warning("Could not find painting motive: " + motive + " falling back to default (0)");
                     }
                     wrapper.write(Types.VAR_INT, id.orElse(0));
                 });
@@ -410,8 +408,8 @@ public class WorldPacketRewriter1_13 {
                     if (!VALID_BIOMES.contains(biome)) {
                         if (biome != 255 // is it generated naturally? *shrug*
                                 && latestBiomeWarn != biome) {
-                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                Via.getPlatform().getLogger().warning("Received invalid biome id " + biome);
+                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                Protocol1_12_2To1_13.LOGGER.warning("Received invalid biome id: " + biome);
                             }
                             latestBiomeWarn = biome;
                         }
@@ -573,13 +571,13 @@ public class WorldPacketRewriter1_13 {
         }
         newId = Protocol1_12_2To1_13.MAPPINGS.getBlockMappings().getNewId(IdAndData.removeData(oldId)); // Remove data
         if (newId != -1) {
-            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Missing block " + oldId);
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                Protocol1_12_2To1_13.LOGGER.warning("Missing block " + oldId);
             }
             return newId;
         }
-        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-            Via.getPlatform().getLogger().warning("Missing block completely " + oldId);
+        if (!Via.getConfig().isSuppressConversionWarnings()) {
+            Protocol1_12_2To1_13.LOGGER.warning("Missing block completely " + oldId);
         }
         // Default air
         return 0;

@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_17_1to1_18.data;
 
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
 import java.util.Arrays;
 
 public final class BlockEntityIds1_18 {
@@ -45,7 +45,7 @@ public final class BlockEntityIds1_18 {
     public static int newId(final int id) {
         final int newId;
         if (id < 0 || id > IDS.length || (newId = IDS[id]) == -1) {
-            Via.getPlatform().getLogger().warning("Received out of bounds block entity id: " + id);
+            Protocol1_17_1To1_18.LOGGER.warning("Received out of bounds block entity id: " + id);
             return -1;
         }
         return newId;

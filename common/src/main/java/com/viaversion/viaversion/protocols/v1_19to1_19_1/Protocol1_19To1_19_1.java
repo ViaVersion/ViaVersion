@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.ChatTypeStorage
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage1_19_1;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.TagUtil;
 import java.security.SignatureException;
 import java.util.ArrayList;
@@ -61,6 +62,8 @@ import net.lenni0451.mcstructs.text.components.TranslationComponent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPackets1_19, ClientboundPackets1_19_1, ServerboundPackets1_19, ServerboundPackets1_19_1> {
+
+    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_19To1_19_1.class);
 
     public Protocol1_19To1_19_1() {
         super(ClientboundPackets1_19.class, ClientboundPackets1_19_1.class, ServerboundPackets1_19.class, ServerboundPackets1_19_1.class);
@@ -297,7 +300,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                             data = new byte[]{1};
                             wrapper.set(Types.REMAINING_BYTES, 0, data);
                         } else {
-                            Via.getPlatform().getLogger().warning("Received unexpected data in velocity:player_info (length=" + data.length + ")");
+                            LOGGER.warning("Received unexpected data in velocity:player_info (length=" + data.length + ")");
                         }
                     }
                 });
@@ -310,6 +313,11 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         connection.put(new ChatTypeStorage());
     }
 
+    @Override
+    public ProtocolLogger getLogger() {
+        return LOGGER;
+    }
+
     public static @Nullable ChatDecorationResult decorateChatMessage(
             final CompoundTag chatType,
             final int chatTypeId,
@@ -318,7 +326,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             final JsonElement message
     ) {
         if (chatType == null) {
-            Via.getPlatform().getLogger().warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
+            LOGGER.warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
             return null;
         }
 
@@ -403,7 +411,7 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
                         argument = targetName;
                         break;
                     default:
-                        Via.getPlatform().getLogger().warning("Unknown parameter for chat decoration: " + element.getValue());
+                        LOGGER.warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
                     arguments.add(SerializerVersion.V1_18.toComponent(argument));

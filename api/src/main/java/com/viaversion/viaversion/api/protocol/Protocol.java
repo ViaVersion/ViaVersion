@@ -39,6 +39,7 @@ import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.util.ProtocolLogger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -346,6 +347,13 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
     default @Nullable MappingData getMappingData() {
         return null;
     }
+
+    /**
+     * Returns the protocol's logger.
+     *
+     * @return logger
+     */
+    ProtocolLogger getLogger();
 
     /**
      * Returns the protocol's entity rewriter if present.

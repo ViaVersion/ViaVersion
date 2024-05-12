@@ -52,6 +52,7 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.GsonUtil;
 import com.viaversion.viaversion.util.Key;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -170,7 +171,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                Via.getPlatform().getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
+                                getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
@@ -179,8 +180,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
                                     if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                        Via.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '"
-                                                + registeredChannel + "', as it is longer than 32 characters");
+                                        getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 32 characters");
                                     }
                                     continue;
                                 }

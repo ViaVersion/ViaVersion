@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
@@ -65,7 +64,7 @@ public class BlockEntityProvider implements Provider {
         BlockEntityHandler handler = handlers.get(idTag.getValue());
         if (handler == null) {
             if (Via.getManager().isDebug()) {
-                Via.getPlatform().getLogger().warning("Unhandled BlockEntity " + idTag.getValue() + " full tag: " + tag);
+                Protocol1_12_2To1_13.LOGGER.warning("Unhandled BlockEntity " + idTag.getValue() + " full tag: " + tag);
             }
             return -1;
         }

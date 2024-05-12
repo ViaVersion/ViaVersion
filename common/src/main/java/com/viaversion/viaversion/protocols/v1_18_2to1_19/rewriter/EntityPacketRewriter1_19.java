@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
@@ -274,16 +273,16 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         });
     }
 
-    private static void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) {
+    private void writeDimensionKey(final PacketWrapper wrapper, final DimensionRegistryStorage registryStorage) {
         // Find dimension key by data
         final CompoundTag currentDimension = wrapper.read(Types.NAMED_COMPOUND_TAG);
         addMonsterSpawnData(currentDimension);
         String dimensionKey = registryStorage.dimensionKey(currentDimension);
         if (dimensionKey == null) {
             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                Via.getPlatform().getLogger().warning("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
-                        "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
-                        " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
+                protocol.getLogger().warning("The server tried to send dimension data from a dimension the client wasn't told about on join. " +
+                    "Plugins and mods have to make sure they are not creating new dimension types while players are online, and proxies need to make sure they don't scramble dimension data." +
+                    " Received dimension: " + currentDimension + ". Known dimensions: " + registryStorage.dimensions());
             }
 
             // Try to find the most similar dimension
@@ -298,7 +297,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         wrapper.write(Types.STRING, dimensionKey);
     }
 
-    private static int to3dId(final int id) {
+    private int to3dId(final int id) {
         return switch (id) {
             case -1 -> 1; // Up/down -> Up
             case 2 -> 2; // North
@@ -309,7 +308,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         };
     }
 
-    private static void addMonsterSpawnData(final CompoundTag dimension) {
+    private void addMonsterSpawnData(final CompoundTag dimension) {
         // The actual values here don't matter
         dimension.put("monster_spawn_block_light_limit", new IntTag(0));
         dimension.put("monster_spawn_light_level", new IntTag(11));

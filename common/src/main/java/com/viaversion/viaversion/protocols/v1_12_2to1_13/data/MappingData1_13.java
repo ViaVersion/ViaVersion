@@ -87,7 +87,7 @@ public class MappingData1_13 extends MappingDataBase {
                 String oldChannel = entry.getKey();
                 String newChannel = entry.getValue().getAsString();
                 if (!Key.isValid(newChannel)) {
-                    Via.getPlatform().getLogger().warning("Channel '" + newChannel + "' is not a valid 1.13 plugin channel, please check your configuration!");
+                    getLogger().warning("Channel '" + newChannel + "' is not a valid 1.13 plugin channel, please check your configuration!");
                     continue;
                 }
                 channelMappings.put(oldChannel, newChannel);
