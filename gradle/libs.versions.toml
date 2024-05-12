@@ -5,7 +5,7 @@ metadata.format.version = "1.1"
 gson = "2.10.1"
 fastutil = "8.5.12"
 vianbt = "5.0.0-SNAPSHOT"
-mcstructs = "2.5.0-SNAPSHOT"
+mcstructs = "5-2.5.0-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
@@ -13,13 +13,13 @@ guava = "17.0"
 snakeYaml = "1.18"
 snakeYaml2 = "2.0"
 
-junit = "5.9.3"
-checkerQual = "3.39.0"
+junit = "5.10.2"
+checkerQual = "3.43.0"
 
 # Platforms
-paper = "1.17.1-R0.1-SNAPSHOT"
+paper = "1.20.4-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
-bungee = "1.19-R0.1-SNAPSHOT"
+bungee = "1.20-R0.3-SNAPSHOT"
 sponge = "8.0.0"
 velocity = "3.1.1"
 
