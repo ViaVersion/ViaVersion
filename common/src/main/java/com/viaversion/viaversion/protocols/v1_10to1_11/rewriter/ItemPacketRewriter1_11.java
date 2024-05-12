@@ -45,7 +45,7 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
             public void register() {
                 map(Types.STRING); // 0 - Channel
 
-                handler(wrapper -> {
+                handlerSoftFail(wrapper -> {
                     if (wrapper.get(Types.STRING, 0).equals("MC|TrList")) {
                         wrapper.passthrough(Types.INT); // Passthrough Window ID
 
