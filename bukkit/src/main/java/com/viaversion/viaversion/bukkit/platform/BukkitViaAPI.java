@@ -22,10 +22,8 @@ import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.bukkit.util.ProtocolSupportUtil;
 import io.netty.buffer.ByteBuf;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class BukkitViaAPI extends ViaAPIBase<Player> {
@@ -46,27 +44,11 @@ public class BukkitViaAPI extends ViaAPIBase<Player> {
         if (connection != null) {
             return connection.getProtocolInfo().protocolVersion();
         }
-
-        if (isProtocolSupport()) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player != null) {
-                return ProtocolSupportUtil.getProtocolVersion(player);
-            }
-        }
         return ProtocolVersion.unknown;
     }
 
     @Override
     public void sendRawPacket(Player player, ByteBuf packet) throws IllegalArgumentException {
         sendRawPacket(player.getUniqueId(), packet);
-    }
-
-    /**
-     * Returns if ProtocolSupport is also being used.
-     *
-     * @return true if ProtocolSupport is used
-     */
-    public boolean isProtocolSupport() {
-        return plugin.isProtocolSupport();
     }
 }

@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.bukkit.compat.ProtocolSupportCompat;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4.EntityToggleGlideListener;
@@ -76,12 +75,6 @@ public class BukkitViaLoader implements ViaPlatformLoader {
 
         /* Base Protocol */
         final ViaVersionPlugin plugin = (ViaVersionPlugin) Bukkit.getPluginManager().getPlugin("ViaVersion");
-
-        // Add ProtocolSupport ConnectListener if necessary.
-        if (plugin.isProtocolSupport() && ProtocolSupportCompat.isMultiplatformPS()) {
-            ProtocolSupportCompat.registerPSConnectListener(plugin);
-        }
-
         if (!Via.getAPI().getServerVersion().isKnown()) {
             Via.getPlatform().getLogger().severe("Server version has not been loaded yet, cannot register additional listeners");
             return;

@@ -54,7 +54,6 @@ public interface ConnectionManager {
      * Returns the frontend UserConnection from the player connected to this proxy server
      * Returns null when there isn't a server or connection was not found
      * When ViaVersion is reloaded, this method may not return some players.
-     * May not return ProtocolSupport players.
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
@@ -67,7 +66,6 @@ public interface ConnectionManager {
      * Returns the UUID from the frontend connection to this proxy server
      * Returns null when there isn't a server or this connection isn't frontend, or it doesn't have an id
      * When ViaVersion is reloaded, this method may not return some players.
-     * May not return ProtocolSupport players.
      * <p>
      * Note that connections are removed as soon as their channel is closed,
      * so avoid using this method during player quits for example.
@@ -81,7 +79,6 @@ public interface ConnectionManager {
      * May contain duplicated UUIDs on multiple ProtocolInfo.
      * May contain frontend, backend and/or client-sided connections.
      * When ViaVersion is reloaded, this method may not return some players.
-     * May not contain ProtocolSupport players.
      *
      * @return connected UserConnections
      */
@@ -91,7 +88,6 @@ public interface ConnectionManager {
      * Returns a map containing the UUIDs and frontend UserConnections from players connected to this proxy server
      * Returns empty list when there isn't a server
      * When ViaVersion is reloaded, this method may not return some players.
-     * May not contain ProtocolSupport players.
      *
      * @return map containing the UUIDs and frontend UserConnections from players connected to this proxy server
      */

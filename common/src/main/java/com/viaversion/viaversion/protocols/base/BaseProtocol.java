@@ -84,7 +84,7 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
 
             // Only allow newer clients (or 1.9.2 on 1.9.4 server if the server supports it)
             ProtocolManager protocolManager = Via.getManager().getProtocolManager();
-            if (info.protocolVersion().newerThanOrEqualTo(serverProtocol) || Via.getPlatform().isOldClientsAllowed()) {
+            if (info.protocolVersion().newerThanOrEqualTo(serverProtocol)) {
                 protocolPath = protocolManager.getProtocolPath(info.protocolVersion(), serverProtocol);
             }
 

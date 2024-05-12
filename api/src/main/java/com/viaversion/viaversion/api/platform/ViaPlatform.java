@@ -201,15 +201,6 @@ public interface ViaPlatform<T> {
     JsonObject getDump();
 
     /**
-     * Get if older clients are allowed using ViaVersion.
-     *
-     * @return True if allowed
-     */
-    default boolean isOldClientsAllowed() {
-        return true;
-    }
-
-    /**
      * Returns an immutable collection of classes to be checked as unsupported software with their software name.
      * If any of the classes exist at runtime, a warning about their potential instability will be given to the console.
      *

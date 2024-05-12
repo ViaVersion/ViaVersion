@@ -59,7 +59,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     private final BukkitCommandHandler commandHandler = new BukkitCommandHandler();
     private final BukkitViaConfig conf;
     private final ViaAPI<Player> api = new BukkitViaAPI(this);
-    private boolean protocolSupport;
     private boolean lateBind;
 
     public ViaVersionPlugin() {
@@ -78,7 +77,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public void onLoad() {
-        protocolSupport = Bukkit.getPluginManager().getPlugin("ProtocolSupport") != null;
         lateBind = !((BukkitViaInjector) Via.getManager().getInjector()).isBinded();
 
         if (!lateBind) {
@@ -242,11 +240,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public boolean isOldClientsAllowed() {
-        return !protocolSupport; // Use protocolsupport for older clients
-    }
-
-    @Override
     public BukkitViaConfig getConf() {
         return conf;
     }
@@ -277,10 +270,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     public boolean isLateBind() {
         return lateBind;
-    }
-
-    public boolean isProtocolSupport() {
-        return protocolSupport;
     }
 
     /**
