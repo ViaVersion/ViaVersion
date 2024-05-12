@@ -72,7 +72,7 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
             "Consider moving Via plugins to your backend server or switching to Velocity.");
 
         api = new BungeeViaAPI();
-        config = new BungeeViaConfig(getDataFolder());
+        config = new BungeeViaConfig(getDataFolder(), getLogger());
         BungeeCommandHandler commandHandler = new BungeeCommandHandler();
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new BungeeCommand(commandHandler));
 

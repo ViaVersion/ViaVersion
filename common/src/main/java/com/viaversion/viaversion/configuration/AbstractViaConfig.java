@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -89,8 +90,8 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean translateOcelotToCat;
     private boolean enforceSecureChat;
 
-    protected AbstractViaConfig(final File configFile) {
-        super(configFile);
+    protected AbstractViaConfig(final File configFile, final Logger logger) {
+        super(configFile, logger);
     }
 
     @Override
@@ -180,12 +181,12 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
                 if (c == '<') {
                     if (lowerBound.isKnown()) {
-                        LOGGER.warning("Already set lower bound " + lowerBound + " overridden by " + protocolVersion.getName());
+                        logger.warning("Already set lower bound " + lowerBound + " overridden by " + protocolVersion.getName());
                     }
                     lowerBound = protocolVersion;
                 } else {
                     if (upperBound.isKnown()) {
-                        LOGGER.warning("Already set upper bound " + upperBound + " overridden by " + protocolVersion.getName());
+                        logger.warning("Already set upper bound " + upperBound + " overridden by " + protocolVersion.getName());
                     }
                     upperBound = protocolVersion;
                 }
@@ -199,7 +200,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
             // Add single protocol version and check for duplication
             if (!blockedProtocols.add(protocolVersion)) {
-                LOGGER.warning("Duplicated blocked protocol version " + protocolVersion);
+                logger.warning("Duplicated blocked protocol version " + protocolVersion);
             }
         }
 
@@ -209,7 +210,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
             final ProtocolVersion finalUpperBound = upperBound;
             blockedProtocols.removeIf(version -> {
                 if (finalLowerBound.isKnown() && version.olderThan(finalLowerBound) || finalUpperBound.isKnown() && version.newerThan(finalUpperBound)) {
-                    LOGGER.warning("Blocked protocol version " + version + " already covered by upper or lower bound");
+                    logger.warning("Blocked protocol version " + version + " already covered by upper or lower bound");
                     return true;
                 }
                 return false;
@@ -221,7 +222,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private @Nullable ProtocolVersion protocolVersion(String s) {
         ProtocolVersion protocolVersion = ProtocolVersion.getClosest(s);
         if (protocolVersion == null) {
-            LOGGER.warning("Unknown protocol version in block-versions: " + s);
+            logger.warning("Unknown protocol version in block-versions: " + s);
             return null;
         }
         return protocolVersion;

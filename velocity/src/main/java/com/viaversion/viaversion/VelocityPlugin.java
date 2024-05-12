@@ -96,8 +96,8 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         VelocityCommandHandler commandHandler = new VelocityCommandHandler();
         PROXY.getCommandManager().register("viaver", commandHandler, "vvvelocity", "viaversion");
         api = new VelocityViaAPI();
-        conf = new VelocityViaConfig(configDir.toFile());
         logger = new LoggerWrapper(loggerslf4j);
+        conf = new VelocityViaConfig(configDir.toFile(), logger);
         Via.init(ViaManagerImpl.builder()
                 .platform(this)
                 .commandHandler(commandHandler)

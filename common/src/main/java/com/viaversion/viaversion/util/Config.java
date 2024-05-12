@@ -38,7 +38,6 @@ import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
-    protected static final Logger LOGGER = Logger.getLogger("ViaVersion Config");
     private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
@@ -50,6 +49,7 @@ public abstract class Config {
 
     private final CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;
+    protected final Logger logger;
     private Map<String, Object> config;
 
     /**
@@ -57,9 +57,11 @@ public abstract class Config {
      * To load config see {@link #reload()}
      *
      * @param configFile The location of where the config is loaded/saved.
+     * @param logger     The logger to use.
      */
-    protected Config(File configFile) {
+    protected Config(File configFile, Logger logger) {
         this.configFile = configFile;
+        this.logger = logger;
     }
 
     public URL getDefaultConfigURL() {
@@ -232,7 +234,7 @@ public abstract class Config {
                 if (type.isInstance(o1)) {
                     filteredValues.add(type.cast(o1));
                 } else if (invalidValueMessage != null) {
-                    LOGGER.warning(String.format(invalidValueMessage, o1));
+                    logger.warning(String.format(invalidValueMessage, o1));
                 }
             }
             return filteredValues;
