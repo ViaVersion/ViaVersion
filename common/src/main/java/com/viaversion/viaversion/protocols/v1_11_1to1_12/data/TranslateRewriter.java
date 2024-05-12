@@ -88,7 +88,7 @@ public class TranslateRewriter {
                 hoverEvent.add("value", baseArray);
             } catch (Exception e) {
                 if (!Via.getConfig().isSuppressConversionWarnings()) {
-                    Protocol1_11_1To1_12.LOGGER.log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
+                    protocol.getLogger().log(Level.WARNING, "Error rewriting show_achievement: " + hoverEvent, e);
                 }
                 JsonObject invalidText = new JsonObject();
                 invalidText.addProperty("text", "Invalid statistic/achievement!");

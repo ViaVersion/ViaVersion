@@ -40,13 +40,11 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
-import com.viaversion.viaversion.util.ProtocolLogger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
 
     public static final MappingData1_14 MAPPINGS = new MappingData1_14();
-    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_13_2To1_14.class);
     private final EntityPacketRewriter1_14 entityRewriter = new EntityPacketRewriter1_14(this);
     private final ItemPacketRewriter1_14 itemRewriter = new ItemPacketRewriter1_14(this);
 

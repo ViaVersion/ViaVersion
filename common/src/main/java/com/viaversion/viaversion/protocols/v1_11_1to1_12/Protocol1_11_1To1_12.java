@@ -48,11 +48,8 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
-import com.viaversion.viaversion.util.ProtocolLogger;
 
 public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_12, ServerboundPackets1_9_3, ServerboundPackets1_12> {
-
-    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_11_1To1_12.class);
 
     private final EntityPacketRewriter1_12 entityRewriter = new EntityPacketRewriter1_12(this);
     private final ItemPacketRewriter1_12 itemRewriter = new ItemPacketRewriter1_12(this);

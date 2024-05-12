@@ -313,6 +313,11 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
         connection.put(new ChatTypeStorage());
     }
 
+    @Override
+    public ProtocolLogger getLogger() {
+        return LOGGER;
+    }
+
     public static @Nullable ChatDecorationResult decorateChatMessage(
             final CompoundTag chatType,
             final int chatTypeId,

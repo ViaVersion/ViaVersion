@@ -903,6 +903,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     @Override
+    public ProtocolLogger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
     public EntityPacketRewriter1_13 getEntityRewriter() {
         return entityRewriter;
     }

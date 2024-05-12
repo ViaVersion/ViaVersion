@@ -39,11 +39,9 @@ import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viaversion.util.ProtocolLogger;
 
 public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
-    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_10To1_11.class);
     private static final ValueTransformer<Float, Short> toOldByte = new ValueTransformer<>(Types.UNSIGNED_BYTE) {
         @Override
         public Short transform(PacketWrapper wrapper, Float inputValue) {
@@ -161,7 +159,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                         boolean isInstant = false;
                         Pair<Integer, Boolean> newData = PotionColors1_11.getNewData(data);
                         if (newData == null) {
-                            LOGGER.warning("Received unknown potion data: " + data);
+                            getLogger().warning("Received unknown potion data: " + data);
                             data = 0;
                         } else {
                             data = newData.key();

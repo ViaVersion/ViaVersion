@@ -126,7 +126,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
                 }
 
                 if (typeId == -1) {
-                    Protocol1_13_2To1_14.LOGGER.warning("Can't open inventory for player! Type: " + type + " Size: " + slots);
+                    protocol.getLogger().warning("Can't open inventory for player! Type: " + type + " Size: " + slots);
                 }
 
                 wrapper.write(Types.VAR_INT, typeId);

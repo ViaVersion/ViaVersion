@@ -119,7 +119,7 @@ public final class WorldPacketRewriter1_18 {
                 final String id = idTag.getValue();
                 final int typeId = BlockEntities1_18.blockEntityIds().getInt(Key.stripMinecraftNamespace(id));
                 if (typeId == -1) {
-                    Protocol1_17_1To1_18.LOGGER.warning("Unknown block entity: " + id);
+                    protocol.getLogger().warning("Unknown block entity: " + id);
                 }
 
                 handleSpawners(typeId, tag);

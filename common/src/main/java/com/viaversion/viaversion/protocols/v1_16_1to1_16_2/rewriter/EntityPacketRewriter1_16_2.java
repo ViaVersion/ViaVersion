@@ -105,7 +105,7 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
     private CompoundTag getDimensionData(String dimensionType) {
         CompoundTag tag = Protocol1_16_1To1_16_2.MAPPINGS.getDimensionDataMap().get(dimensionType);
         if (tag == null) {
-            Protocol1_16_1To1_16_2.LOGGER.severe("Could not get dimension data of " + dimensionType);
+            protocol.getLogger().severe("Could not get dimension data of " + dimensionType);
             throw new NullPointerException("Dimension data for " + dimensionType + " is null!");
         }
         return tag.copy();

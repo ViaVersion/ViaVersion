@@ -63,7 +63,6 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPacket1_20_3, ClientboundPacket1_20_5, ServerboundPacket1_20_3, ServerboundPacket1_20_5> {
 
     public static final MappingData1_20_5 MAPPINGS = new MappingData1_20_5();
-    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_20_3To1_20_5.class);
     // Mojang will remove this in the next release, so if we were to set this to false,
     // people would miss the changes and not fix their plugins before forcefully running into the errors then
     public static boolean strictErrorHandling = System.getProperty("viaversion.strict-error-handling1_20_5", "true").equalsIgnoreCase("true");

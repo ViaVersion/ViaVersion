@@ -49,14 +49,12 @@ import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.ProtocolLogger;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPackets1_18, ClientboundPackets1_19, ServerboundPackets1_17, ServerboundPackets1_19> {
 
     public static final MappingData1_19 MAPPINGS = new MappingData1_19();
-    public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_18_2To1_19.class);
     private final EntityPacketRewriter1_19 entityRewriter = new EntityPacketRewriter1_19(this);
     private final ItemPacketRewriter1_19 itemRewriter = new ItemPacketRewriter1_19(this);
     private final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
@@ -174,7 +172,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
                     final String argumentType = wrapper.read(Types.STRING);
                     final int argumentTypeId = MAPPINGS.getArgumentTypeMappings().mappedId(argumentType);
                     if (argumentTypeId == -1) {
-                        LOGGER.warning("Unknown command argument type: " + argumentType);
+                        getLogger().warning("Unknown command argument type: " + argumentType);
                     }
 
                     wrapper.write(Types.VAR_INT, argumentTypeId);

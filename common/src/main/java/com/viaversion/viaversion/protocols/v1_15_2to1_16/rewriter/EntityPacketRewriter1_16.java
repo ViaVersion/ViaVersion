@@ -41,7 +41,7 @@ import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
 
-    private static final PacketHandler DIMENSION_HANDLER = wrapper -> {
+    private final PacketHandler DIMENSION_HANDLER = wrapper -> {
         WorldIdentifiers map = Via.getConfig().get1_16WorldNamesMap();
         WorldIdentifiers userMap = wrapper.user().get(WorldIdentifiers.class);
         if (userMap != null) {
@@ -64,7 +64,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 outputName = map.end();
                 break;
             default:
-                Protocol1_15_2To1_16.LOGGER.warning("Invalid dimension id: " + dimension);
+                protocol.getLogger().warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
                 outputName = map.overworld();
         }

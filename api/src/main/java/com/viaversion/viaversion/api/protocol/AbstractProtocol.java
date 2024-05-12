@@ -42,6 +42,7 @@ import com.viaversion.viaversion.api.rewriter.MappingDataListener;
 import com.viaversion.viaversion.api.rewriter.Rewriter;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.ProtocolUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,6 +72,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     protected final PacketMappings serverboundMappings;
     private final Map<Class<?>, Object> storedObjects = new HashMap<>();
     private boolean initialized;
+    private ProtocolLogger logger;
 
     @Deprecated
     protected AbstractProtocol() {
@@ -97,6 +99,10 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         Preconditions.checkArgument(!initialized, "Protocol has already been initialized");
         initialized = true;
 
+        // Create logger if protocol does not have one
+        if (getLogger() == null) {
+            logger = new ProtocolLogger(getClass());
+        }
         registerPackets();
         registerConfigurationChangeHandlers();
 
@@ -413,6 +419,11 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
                 throw CancelException.generate();
             }
         }
+    }
+
+    @Override
+    public ProtocolLogger getLogger() {
+        return logger;
     }
 
     private void printRemapError(Direction direction, State state, int unmappedPacketId, int mappedPacketId, InformativeException e) {
