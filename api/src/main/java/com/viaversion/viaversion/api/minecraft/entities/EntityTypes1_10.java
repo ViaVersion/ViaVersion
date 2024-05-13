@@ -27,137 +27,156 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-// 1.10 Entity / Object ids
 public class EntityTypes1_10 {
 
-    public static EntityType getTypeFromId(int typeID, boolean isObject) {
+    public static EntityType getTypeFromId(final int typeId, final boolean object) {
         Optional<EntityType> type;
 
-        if (isObject)
-            type = ObjectType.getPCEntity(typeID);
-        else
-            type = EntityType.findById(typeID);
-
+        if (object) {
+            type = ObjectType.getEntityType(typeId);
+        } else {
+            type = EntityType.findById(typeId);
+        }
         if (type.isEmpty()) {
-            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeID + " isObject=" + isObject);
+            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeId + " objectType=" + object);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
-
         return type.get();
     }
 
     public enum EntityType implements com.viaversion.viaversion.api.minecraft.entities.EntityType {
-        ENTITY(-1),
-        DROPPED_ITEM(1, ENTITY),
+
+        ENTITY,
+
+        AREA_EFFECT_CLOUD(3, ENTITY),
+        END_CRYSTAL(200, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
-        LEASH_HITCH(8, ENTITY), // Actually entity hanging, but it doesn't make a lot of difference for metadata
-        PAINTING(9, ENTITY), // Actually entity hanging, but it doesn't make a lot of difference for metadata
-        ARROW(10, ENTITY),
-        SNOWBALL(11, ENTITY), // Actually EntityProjectile
-        FIREBALL(12, ENTITY),
-        SMALL_FIREBALL(13, ENTITY),
-        ENDER_PEARL(14, ENTITY), // Actually EntityProjectile
-        ENDER_SIGNAL(15, ENTITY),
-        THROWN_EXP_BOTTLE(17, ENTITY),
-        ITEM_FRAME(18, ENTITY), // Actually EntityHanging
-        WITHER_SKULL(19, ENTITY),
-        PRIMED_TNT(20, ENTITY),
+        EYE_OF_ENDER(15, ENTITY),
         FALLING_BLOCK(21, ENTITY),
-        FIREWORK(22, ENTITY),
-        TIPPED_ARROW(23, ARROW),
-        SPECTRAL_ARROW(24, ARROW),
+        ITEM(1, ENTITY),
+        TNT(20, ENTITY),
+
+        // Hanging entities
+        HANGING_ENTITY(ENTITY),
+        LEASH_KNOT(8, HANGING_ENTITY),
+        ITEM_FRAME(18, HANGING_ENTITY),
+        PAINTING(9, HANGING_ENTITY),
+
+        // Projectiles
+        PROJECTILE(ENTITY),
+        FIREWORK_ROCKET(22, ENTITY),
         SHULKER_BULLET(25, ENTITY),
-        DRAGON_FIREBALL(26, FIREBALL),
+        SNOWBALL(11, PROJECTILE),
+        ENDER_PEARL(14, PROJECTILE),
+        EGG(7, PROJECTILE),
+        EXPERIENCE_BOTTLE(17, PROJECTILE),
+        POTION(16, PROJECTILE),
+        FISHING_HOOK(ENTITY),
 
-        ENTITY_LIVING(-1, ENTITY),
-        ENTITY_INSENTIENT(-1, ENTITY_LIVING),
-        ENTITY_AGEABLE(-1, ENTITY_INSENTIENT),
-        ENTITY_TAMEABLE_ANIMAL(-1, ENTITY_AGEABLE),
-        ENTITY_HUMAN(-1, ENTITY_LIVING),
+        ABSTRACT_ARROW(ENTITY),
+        ARROW(10, ABSTRACT_ARROW),
+        SPECTRAL_ARROW(24, ABSTRACT_ARROW),
 
-        ARMOR_STAND(30, ENTITY_LIVING),
+        ABSTRACT_FIREBALL(ENTITY),
+        DRAGON_FIREBALL(26, ABSTRACT_FIREBALL),
+        FIREBALL(12, ABSTRACT_FIREBALL),
+        SMALL_FIREBALL(13, ABSTRACT_FIREBALL),
+        WITHER_SKULL(19, ABSTRACT_FIREBALL),
 
         // Vehicles
-        MINECART_ABSTRACT(-1, ENTITY),
-        MINECART_COMMAND(40, MINECART_ABSTRACT),
         BOAT(41, ENTITY),
-        MINECART_RIDEABLE(42, MINECART_ABSTRACT),
-        MINECART_CHEST(43, MINECART_ABSTRACT),
-        MINECART_FURNACE(44, MINECART_ABSTRACT),
-        MINECART_TNT(45, MINECART_ABSTRACT),
-        MINECART_HOPPER(46, MINECART_ABSTRACT),
-        MINECART_MOB_SPAWNER(47, MINECART_ABSTRACT),
 
-        CREEPER(50, ENTITY_INSENTIENT),
-        SKELETON(51, ENTITY_INSENTIENT),
-        SPIDER(52, ENTITY_INSENTIENT),
-        GIANT(53, ENTITY_INSENTIENT),
-        ZOMBIE(54, ENTITY_INSENTIENT),
-        SLIME(55, ENTITY_INSENTIENT),
-        GHAST(56, ENTITY_INSENTIENT),
-        PIG_ZOMBIE(57, ZOMBIE),
-        ENDERMAN(58, ENTITY_INSENTIENT),
-        CAVE_SPIDER(59, SPIDER),
-        SILVERFISH(60, ENTITY_INSENTIENT),
-        BLAZE(61, ENTITY_INSENTIENT),
+        ABSTRACT_MINECART(ENTITY),
+        MINECART(42, ABSTRACT_MINECART),
+        FURNACE_MINECART(44, ABSTRACT_MINECART),
+        COMMAND_BLOCK_MINECART(40, ABSTRACT_MINECART),
+        TNT_MINECART(45, ABSTRACT_MINECART),
+        SPAWNER_MINECART(47, ABSTRACT_MINECART),
+
+        ABSTRACT_MINECART_CONTAINER(ABSTRACT_MINECART),
+        CHEST_MINECART(43, ABSTRACT_MINECART_CONTAINER),
+        HOPPER_MINECART(46, ABSTRACT_MINECART_CONTAINER),
+
+        LIVING_ENTITY_BASE(ENTITY),
+        ARMOR_STAND(30, LIVING_ENTITY_BASE),
+        PLAYER(LIVING_ENTITY_BASE), // Needed for entity (un)tracking
+
+        // Living entities as a larger subclass
+        LIVING_ENTITY(48, LIVING_ENTITY_BASE),
+        ENDER_DRAGON(63, LIVING_ENTITY),
+        ABSTRACT_CREATURE(LIVING_ENTITY),
+        SLIME(55, LIVING_ENTITY),
         MAGMA_CUBE(62, SLIME),
-        ENDER_DRAGON(63, ENTITY_INSENTIENT),
-        WITHER(64, ENTITY_INSENTIENT),
-        BAT(65, ENTITY_INSENTIENT),
-        WITCH(66, ENTITY_INSENTIENT),
-        ENDERMITE(67, ENTITY_INSENTIENT),
-        GUARDIAN(68, ENTITY_INSENTIENT),
-        IRON_GOLEM(99, ENTITY_INSENTIENT), // moved up to avoid illegal forward references
-        SHULKER(69, IRON_GOLEM),
-        PIG(90, ENTITY_AGEABLE),
-        SHEEP(91, ENTITY_AGEABLE),
-        COW(92, ENTITY_AGEABLE),
-        CHICKEN(93, ENTITY_AGEABLE),
-        SQUID(94, ENTITY_INSENTIENT),
-        WOLF(95, ENTITY_TAMEABLE_ANIMAL),
-        MUSHROOM_COW(96, COW),
-        SNOWMAN(97, IRON_GOLEM),
-        OCELOT(98, ENTITY_TAMEABLE_ANIMAL),
-        HORSE(100, ENTITY_AGEABLE),
-        RABBIT(101, ENTITY_AGEABLE),
-        POLAR_BEAR(102, ENTITY_AGEABLE),
-        VILLAGER(120, ENTITY_AGEABLE),
-        ENDER_CRYSTAL(200, ENTITY),
-        SPLASH_POTION(-1, ENTITY),
-        LINGERING_POTION(-1, SPLASH_POTION),
-        AREA_EFFECT_CLOUD(-1, ENTITY),
-        EGG(-1, ENTITY),
-        FISHING_HOOK(-1, ENTITY),
-        LIGHTNING(-1, ENTITY),
-        WEATHER(-1, ENTITY),
-        PLAYER(-1, ENTITY_HUMAN),
-        COMPLEX_PART(-1, ENTITY);
+
+        // Flying entities
+        FLYING_MOB(LIVING_ENTITY),
+        GHAST(56, FLYING_MOB),
+
+        AMBIENT_CREATURE(LIVING_ENTITY),
+        BAT(65, AMBIENT_CREATURE),
+
+        ABSTRACT_GOLEM(ABSTRACT_CREATURE),
+        SNOW_GOLEM(97, ABSTRACT_GOLEM),
+        IRON_GOLEM(99, ABSTRACT_GOLEM),
+        SHULKER(69, ABSTRACT_GOLEM),
+
+        WATER_ANIMAL(LIVING_ENTITY),
+        SQUID(94, WATER_ANIMAL),
+
+        // Ageable mobs and (tamable) animals
+        ABSTRACT_AGEABLE(ABSTRACT_CREATURE),
+        VILLAGER(120, ABSTRACT_AGEABLE),
+
+        ABSTRACT_ANIMAL(ABSTRACT_AGEABLE),
+        CHICKEN(93, ABSTRACT_ANIMAL),
+        COW(92, ABSTRACT_ANIMAL),
+        MOOSHROOM(96, COW),
+        PIG(90, ABSTRACT_ANIMAL),
+        POLAR_BEAR(102, ABSTRACT_ANIMAL),
+        RABBIT(101, ABSTRACT_ANIMAL),
+        SHEEP(91, ABSTRACT_ANIMAL),
+        HORSE(100, ABSTRACT_ANIMAL),
+
+        TAMABLE_ANIMAL(ABSTRACT_ANIMAL),
+        OCELOT(98, TAMABLE_ANIMAL),
+        WOLF(95, TAMABLE_ANIMAL),
+
+        // Monsters
+        ABSTRACT_MONSTER(49, ABSTRACT_CREATURE),
+        BLAZE(61, ABSTRACT_MONSTER),
+        CREEPER(50, ABSTRACT_MONSTER),
+        ENDERMITE(67, ABSTRACT_MONSTER),
+        ENDERMAN(58, ABSTRACT_MONSTER),
+        GIANT(53, ABSTRACT_MONSTER),
+        SILVERFISH(60, ABSTRACT_MONSTER),
+        WITCH(66, ABSTRACT_MONSTER),
+        WITHER(64, ABSTRACT_MONSTER),
+        SKELETON(51, ABSTRACT_MONSTER),
+        ZOMBIE(54, ABSTRACT_MONSTER),
+        ZOMBIE_PIGMEN(57, ZOMBIE),
+
+        GUARDIAN(68, ABSTRACT_MONSTER),
+        SPIDER(52, ABSTRACT_MONSTER),
+        CAVE_SPIDER(59, SPIDER);
 
         private static final Map<Integer, EntityType> TYPES = new HashMap<>();
 
         private final int id;
         private final EntityType parent;
 
-        EntityType(int id) {
-            this.id = id;
+        EntityType() {
+            this.id = -1;
             this.parent = null;
+        }
+
+        EntityType(EntityType parent) {
+            this.id = -1;
+            this.parent = parent;
         }
 
         EntityType(int id, EntityType parent) {
             this.id = id;
             this.parent = parent;
-        }
-
-        static {
-            for (EntityType type : EntityType.values()) {
-                TYPES.put(type.id, type);
-            }
-        }
-
-        public static Optional<EntityType> findById(int id) {
-            if (id == -1)  // Check if this is called
-                return Optional.empty();
-            return Optional.ofNullable(TYPES.get(id));
         }
 
         @Override
@@ -179,16 +198,27 @@ public class EntityTypes1_10 {
         public boolean isAbstractType() {
             return id != -1;
         }
+
+        static {
+            for (EntityType type : EntityType.values()) {
+                TYPES.put(type.id, type);
+            }
+        }
+
+        public static Optional<EntityType> findById(final int id) {
+            if (id == -1) return Optional.empty();
+            return Optional.ofNullable(TYPES.get(id));
+        }
     }
 
     public enum ObjectType implements com.viaversion.viaversion.api.minecraft.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
-        ITEM(2, EntityType.DROPPED_ITEM),
+        ITEM(2, EntityType.ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
-        MINECART(10, EntityType.MINECART_RIDEABLE),
-        TNT_PRIMED(50, EntityType.PRIMED_TNT),
-        ENDER_CRYSTAL(51, EntityType.ENDER_CRYSTAL),
-        TIPPED_ARROW(60, EntityType.TIPPED_ARROW),
+        MINECART(10, EntityType.MINECART), // There are multiple types, but we don't need them
+        TNT_PRIMED(50, EntityType.TNT),
+        ENDER_CRYSTAL(51, EntityType.END_CRYSTAL),
+        TIPPED_ARROW(60, EntityType.ARROW),
         SNOWBALL(61, EntityType.SNOWBALL),
         EGG(62, EntityType.EGG),
         FIREBALL(63, EntityType.FIREBALL),
@@ -198,11 +228,11 @@ public class EntityTypes1_10 {
         SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
-        ENDER_SIGNAL(72, EntityType.ENDER_SIGNAL),
-        POTION(73, EntityType.SPLASH_POTION),
-        THROWN_EXP_BOTTLE(75, EntityType.THROWN_EXP_BOTTLE),
-        FIREWORK(76, EntityType.FIREWORK),
-        LEASH(77, EntityType.LEASH_HITCH),
+        EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),
+        POTION(73, EntityType.POTION),
+        EXPERIENCE_BOTTLE(75, EntityType.EXPERIENCE_BOTTLE),
+        FIREWORK_ROCKET(76, EntityType.FIREWORK_ROCKET),
+        LEASH(77, EntityType.LEASH_KNOT),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
@@ -234,13 +264,12 @@ public class EntityTypes1_10 {
             return type;
         }
 
-        public static Optional<ObjectType> findById(int id) {
-            if (id == -1)
-                return Optional.empty();
+        public static Optional<ObjectType> findById(final int id) {
+            if (id == -1) return Optional.empty();
             return Optional.ofNullable(TYPES.get(id));
         }
 
-        public static Optional<EntityType> getPCEntity(int id) {
+        public static Optional<EntityType> getEntityType(final int id) {
             Optional<ObjectType> output = findById(id);
             return output.map(objectType -> objectType.type);
         }

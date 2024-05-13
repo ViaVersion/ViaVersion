@@ -195,7 +195,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
 
         filter().type(EntityTypes1_13.EntityType.ZOMBIE).addIndex(15); // Shaking
 
-        filter().type(EntityTypes1_13.EntityType.MINECART_ABSTRACT).index(9).handler((event, meta) -> {
+        filter().type(EntityTypes1_13.EntityType.ABSTRACT_MINECART).index(9).handler((event, meta) -> {
             final int oldId = meta.value();
             final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
             final int newId = WorldPacketRewriter1_13.toNewId(combined);

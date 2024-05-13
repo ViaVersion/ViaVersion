@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -419,7 +419,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
-                if (metaIndex == MetaIndex1_8.ENTITY_STATUS && type == EntityTypes1_10.EntityType.PLAYER) {
+                if (metaIndex == MetaIndex1_8.ENTITY_STATUS && type == EntityTypes1_9.EntityType.PLAYER) {
                     byte val = 0;
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
@@ -456,7 +456,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 metadata.setValue(value);
                 break;
             case BOOLEAN:
-                if (metaIndex == MetaIndex1_8.AGEABLE_CREATURE_AGE)
+                if (metaIndex == MetaIndex1_8.ABSTRACT_AGEABLE_AGE)
                     metadata.setValue((Byte) value < 0);
                 else
                     metadata.setValue((Byte) value != 0);
@@ -489,11 +489,11 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
     @Override
     public EntityType typeFromId(int type) {
-        return EntityTypes1_10.getTypeFromId(type, false);
+        return EntityTypes1_9.getTypeFromId(type, false);
     }
 
     @Override
     public EntityType objectTypeFromId(int type) {
-        return EntityTypes1_10.getTypeFromId(type, true);
+        return EntityTypes1_9.getTypeFromId(type, true);
     }
 }

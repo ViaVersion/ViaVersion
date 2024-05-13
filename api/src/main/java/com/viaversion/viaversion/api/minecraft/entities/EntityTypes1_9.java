@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class EntityTypes1_12 {
+public class EntityTypes1_9 {
 
     public static EntityType getTypeFromId(final int typeId, final boolean object) {
         Optional<EntityType> type;
@@ -38,7 +38,7 @@ public class EntityTypes1_12 {
             type = EntityType.findById(typeId);
         }
         if (type.isEmpty()) {
-            Via.getPlatform().getLogger().severe("Could not find 1.12 type id " + typeId + " objectType=" + object);
+            Via.getPlatform().getLogger().severe("Could not find 1.9 type id " + typeId + " objectType=" + object);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type.get();
@@ -50,12 +50,12 @@ public class EntityTypes1_12 {
 
         AREA_EFFECT_CLOUD(3, ENTITY),
         END_CRYSTAL(200, ENTITY),
-        EVOKER_FANGS(33, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
         EYE_OF_ENDER(15, ENTITY),
         FALLING_BLOCK(21, ENTITY),
         ITEM(1, ENTITY),
         TNT(20, ENTITY),
+        LIGHTNING_BOLT(ENTITY), // Needed for entity (un)tracking
 
         // Hanging entities
         HANGING_ENTITY(ENTITY),
@@ -66,7 +66,6 @@ public class EntityTypes1_12 {
         // Projectiles
         PROJECTILE(ENTITY),
         FIREWORK_ROCKET(22, ENTITY),
-        LLAMA_SPIT(104, ENTITY),
         SHULKER_BULLET(25, ENTITY),
         SNOWBALL(11, PROJECTILE),
         ENDER_PEARL(14, PROJECTILE),
@@ -104,7 +103,7 @@ public class EntityTypes1_12 {
         PLAYER(ENTITY), // Needed for entity (un)tracking
 
         // Living entities as a larger subclass
-        LIVING_ENTITY(LIVING_ENTITY_BASE),
+        LIVING_ENTITY(48, LIVING_ENTITY_BASE),
         ENDER_DRAGON(63, LIVING_ENTITY),
         ABSTRACT_CREATURE(LIVING_ENTITY),
         SLIME(55, LIVING_ENTITY),
@@ -122,7 +121,7 @@ public class EntityTypes1_12 {
         IRON_GOLEM(99, ABSTRACT_GOLEM),
         SHULKER(69, ABSTRACT_GOLEM),
 
-        WATER_ANIMAL(ABSTRACT_CREATURE),
+        WATER_ANIMAL(LIVING_ENTITY),
         SQUID(94, WATER_ANIMAL),
 
         // Ageable mobs and (tamable) animals
@@ -134,61 +133,31 @@ public class EntityTypes1_12 {
         COW(92, ABSTRACT_ANIMAL),
         MOOSHROOM(96, COW),
         PIG(90, ABSTRACT_ANIMAL),
-        POLAR_BEAR(102, ABSTRACT_ANIMAL),
         RABBIT(101, ABSTRACT_ANIMAL),
         SHEEP(91, ABSTRACT_ANIMAL),
+        HORSE(100, ABSTRACT_ANIMAL),
 
         TAMABLE_ANIMAL(ABSTRACT_ANIMAL),
         OCELOT(98, TAMABLE_ANIMAL),
         WOLF(95, TAMABLE_ANIMAL),
 
-        ABSTRACT_SHOULDER_RIDING(TAMABLE_ANIMAL),
-        PARROT(105, ABSTRACT_SHOULDER_RIDING),
-
-        // Horses
-        ABSTRACT_HORSE(ABSTRACT_ANIMAL),
-        HORSE(100, ABSTRACT_HORSE),
-        SKELETON_HORSE(28, ABSTRACT_HORSE),
-        ZOMBIE_HORSE(29, ABSTRACT_HORSE),
-
-        CHESTED_HORSE(ABSTRACT_HORSE),
-        DONKEY(31, CHESTED_HORSE),
-        MULE(32, CHESTED_HORSE),
-        LLAMA(103, CHESTED_HORSE),
-
         // Monsters
-        ABSTRACT_MONSTER(ABSTRACT_CREATURE),
+        ABSTRACT_MONSTER(49, ABSTRACT_CREATURE),
         BLAZE(61, ABSTRACT_MONSTER),
         CREEPER(50, ABSTRACT_MONSTER),
         ENDERMITE(67, ABSTRACT_MONSTER),
         ENDERMAN(58, ABSTRACT_MONSTER),
         GIANT(53, ABSTRACT_MONSTER),
         SILVERFISH(60, ABSTRACT_MONSTER),
-        VEX(35, ABSTRACT_MONSTER),
         WITCH(66, ABSTRACT_MONSTER),
         WITHER(64, ABSTRACT_MONSTER),
-
-        ABSTRACT_SKELETON(ABSTRACT_MONSTER),
-        SKELETON(51, ABSTRACT_SKELETON),
-        STRAY(6, ABSTRACT_SKELETON),
-        WITHER_SKELETON(5, ABSTRACT_SKELETON),
-
+        SKELETON(51, ABSTRACT_MONSTER),
         ZOMBIE(54, ABSTRACT_MONSTER),
-        HUSK(23, ZOMBIE),
         ZOMBIE_PIGMEN(57, ZOMBIE),
-        ZOMBIE_VILLAGER(27, ZOMBIE),
 
         GUARDIAN(68, ABSTRACT_MONSTER),
-        ELDER_GUARDIAN(4, GUARDIAN),
         SPIDER(52, ABSTRACT_MONSTER),
-        CAVE_SPIDER(59, ABSTRACT_MONSTER),
-
-        // Illagers
-        ABSTRACT_ILLAGER(ABSTRACT_MONSTER),
-        SPELLCASTER_ILLAGER(ABSTRACT_ILLAGER),
-        VINDICATOR(36, ABSTRACT_ILLAGER),
-        EVOKER(34, SPELLCASTER_ILLAGER),
-        ILLUSIONER(37, SPELLCASTER_ILLAGER);
+        CAVE_SPIDER(59, SPIDER);
 
         private static final Map<Integer, EntityType> TYPES = new HashMap<>();
 
@@ -257,7 +226,6 @@ public class EntityTypes1_12 {
         ENDER_PEARL(65, EntityType.ENDER_PEARL),
         WITHER_SKULL(66, EntityType.WITHER_SKULL),
         SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
-        LLAMA_SPIT(68, EntityType.LLAMA_SPIT),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
         EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),
@@ -266,7 +234,6 @@ public class EntityTypes1_12 {
         FIREWORK_ROCKET(76, EntityType.FIREWORK_ROCKET),
         LEASH(77, EntityType.LEASH_KNOT),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        EVOKER_FANGS(79, EntityType.EVOKER_FANGS),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK),
         SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
