@@ -54,12 +54,12 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.slf4j.Logger;
 
 @Plugin(
-        id = "viaversion",
-        name = "ViaVersion",
-        version = VersionInfo.VERSION,
-        authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv", "EnZaXD", "RK_01"},
-        description = "Allow newer Minecraft versions to connect to an older server version.",
-        url = "https://viaversion.com"
+    id = "viaversion",
+    name = "ViaVersion",
+    version = VersionInfo.VERSION,
+    authors = {"_MylesC", "creeper123123321", "Gerrygames", "kennytv", "Matsv", "EnZaXD", "RK_01"},
+    description = "Allow newer Minecraft versions to connect to an older server version.",
+    url = "https://viaversion.com"
 )
 public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     public static final LegacyComponentSerializer COMPONENT_SERIALIZER = LegacyComponentSerializer.builder().character(ChatColorUtil.COLOR_CHAR).extractUrls().build();
@@ -99,10 +99,10 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         logger = new LoggerWrapper(loggerslf4j);
         conf = new VelocityViaConfig(configDir.toFile(), logger);
         Via.init(ViaManagerImpl.builder()
-                .platform(this)
-                .commandHandler(commandHandler)
-                .loader(new VelocityViaLoader())
-                .injector(new VelocityViaInjector()).build());
+            .platform(this)
+            .commandHandler(commandHandler)
+            .loader(new VelocityViaLoader())
+            .injector(new VelocityViaInjector()).build());
         conf.reload();
     }
 
@@ -143,9 +143,9 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public PlatformTask runRepeatingAsync(final Runnable runnable, final long ticks) {
         return new VelocityViaTask(
-                PROXY.getScheduler()
-                        .buildTask(this, runnable)
-                        .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()
+            PROXY.getScheduler()
+                .buildTask(this, runnable)
+                .repeat(ticks * 50, TimeUnit.MILLISECONDS).schedule()
         );
     }
 
@@ -157,9 +157,9 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public PlatformTask runSync(Runnable runnable, long delay) {
         return new VelocityViaTask(
-                PROXY.getScheduler()
-                        .buildTask(this, runnable)
-                        .delay(delay * 50, TimeUnit.MILLISECONDS).schedule()
+            PROXY.getScheduler()
+                .buildTask(this, runnable)
+                .delay(delay * 50, TimeUnit.MILLISECONDS).schedule()
         );
     }
 
@@ -171,8 +171,8 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     @Override
     public ViaCommandSender[] getOnlinePlayers() {
         return PROXY.getAllPlayers().stream()
-                .map(VelocityCommandSender::new)
-                .toArray(ViaCommandSender[]::new);
+            .map(VelocityCommandSender::new)
+            .toArray(ViaCommandSender[]::new);
     }
 
     @Override
@@ -219,11 +219,11 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         List<PluginInfo> plugins = new ArrayList<>();
         for (PluginContainer p : PROXY.getPluginManager().getPlugins()) {
             plugins.add(new PluginInfo(
-                    true,
-                    p.getDescription().getName().orElse(p.getDescription().getId()),
-                    p.getDescription().getVersion().orElse("Unknown Version"),
-                    p.getInstance().map(instance -> instance.getClass().getCanonicalName()).orElse("Unknown"),
-                    p.getDescription().getAuthors()
+                true,
+                p.getDescription().getName().orElse(p.getDescription().getId()),
+                p.getDescription().getVersion().orElse("Unknown Version"),
+                p.getInstance().map(instance -> instance.getClass().getCanonicalName()).orElse("Unknown"),
+                p.getDescription().getAuthors()
             ));
         }
         extra.add("plugins", GsonUtil.getGson().toJsonTree(plugins));

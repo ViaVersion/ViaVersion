@@ -17,13 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.v1_19to1_19_1;
 
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
-import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
@@ -48,13 +48,13 @@ import com.viaversion.viaversion.protocols.v1_19to1_19_1.storage.NonceStorage1_1
 import com.viaversion.viaversion.util.CipherUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.ProtocolLogger;
+import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.viaversion.viaversion.util.SerializerVersion;
 import net.lenni0451.mcstructs.core.TextFormatting;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
@@ -319,11 +319,11 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
     }
 
     public static @Nullable ChatDecorationResult decorateChatMessage(
-            final CompoundTag chatType,
-            final int chatTypeId,
-            final JsonElement senderName,
-            @Nullable final JsonElement teamName,
-            final JsonElement message
+        final CompoundTag chatType,
+        final int chatTypeId,
+        final JsonElement senderName,
+        @Nullable final JsonElement teamName,
+        final JsonElement message
     ) {
         if (chatType == null) {
             LOGGER.warning("Chat message has unknown chat type id " + chatTypeId + ". Message: " + message);
@@ -351,10 +351,10 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
     }
 
     public static JsonElement translatabaleComponentFromTag(
-            final CompoundTag tag,
-            final JsonElement senderName,
-            @Nullable final JsonElement targetName,
-            final JsonElement message
+        final CompoundTag tag,
+        final JsonElement senderName,
+        @Nullable final JsonElement targetName,
+        final JsonElement message
     ) {
         final String translationKey = tag.getStringTag("translation_key").getValue();
         final Style style = new Style();

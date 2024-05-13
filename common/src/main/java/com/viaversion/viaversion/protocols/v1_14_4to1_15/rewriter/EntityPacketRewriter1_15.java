@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_15;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -108,13 +108,13 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerMetadataRewriter(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_14_4.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_14_4.REMOVE_ENTITIES);
     }
 
     @Override
     protected void registerRewrites() {
-        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.optionalBlockStateType, Types1_14.META_TYPES.particleType);
+        registerEntityDataTypeHandler(Types1_14.ENTITY_DATA_TYPES.itemType, Types1_14.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_14.ENTITY_DATA_TYPES.particleType);
         filter().type(EntityTypes1_15.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
@@ -127,7 +127,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
     private void sendMetadataPacket(PacketWrapper wrapper, int entityId) {
         // Meta is no longer included in the spawn packets, but sent separately
-        List<Metadata> metadata = wrapper.read(Types1_14.METADATA_LIST);
+        List<EntityData> metadata = wrapper.read(Types1_14.ENTITY_DATA_LIST);
         if (metadata.isEmpty()) {
             return;
         }
@@ -137,11 +137,11 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
         wrapper.cancel();
 
         // Handle meta
-        handleMetadata(entityId, metadata, wrapper.user());
+        handleEntityData(entityId, metadata, wrapper.user());
 
         PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
         metadataPacket.write(Types.VAR_INT, entityId);
-        metadataPacket.write(Types1_14.METADATA_LIST, metadata);
+        metadataPacket.write(Types1_14.ENTITY_DATA_LIST, metadata);
         metadataPacket.send(Protocol1_14_4To1_15.class);
     }
 

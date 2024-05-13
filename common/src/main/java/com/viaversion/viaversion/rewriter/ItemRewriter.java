@@ -53,7 +53,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     @Override
-    public @Nullable Item handleItemToClient(final UserConnection connection,  @Nullable Item item) {
+    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
         if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
             item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));
@@ -70,7 +70,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         return item;
     }
 
-    public void registerWindowItems(C packetType) {
+    public void registerSetContent(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -86,7 +86,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerWindowItems1_17_1(C packetType) {
+    public void registerSetContent1_17_1(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -105,7 +105,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerOpenWindow(C packetType) {
+    public void registerOpenScreen(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -148,7 +148,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Sub 1.16
-    public void registerEntityEquipment(C packetType) {
+    public void registerSetEquippedItem(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -160,7 +160,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // 1.16+
-    public void registerEntityEquipmentArray(C packetType) {
+    public void registerSetEquipment(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -178,7 +178,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerCreativeInvAction(S packetType) {
+    public void registerSetCreativeModeSlot(S packetType) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -188,7 +188,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerClickWindow(S packetType) {
+    public void registerContainerClick(S packetType) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -202,7 +202,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerClickWindow1_17_1(S packetType) {
+    public void registerContainerClick1_17_1(S packetType) {
         protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -227,7 +227,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerSetCooldown(C packetType) {
+    public void registerCooldown(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int itemId = wrapper.read(Types.VAR_INT);
             wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewItemId(itemId));
@@ -235,7 +235,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // 1.14.4+
-    public void registerTradeList(C packetType) {
+    public void registerMerchantOffers(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT);
             int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
@@ -260,7 +260,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerTradeList1_19(C packetType) {
+    public void registerMerchantOffers1_19(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
             int size = wrapper.passthrough(Types.VAR_INT);
@@ -282,7 +282,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Hopefully the item cost weirdness is temporary
-    public void registerTradeList1_20_5(
+    public void registerMerchantOffers1_20_5(
         final C packetType,
         final Type<Item> costType, final Type<Item> mappedCostType,
         final Type<Item> optionalCostType, final Type<Item> mappedOptionalCostType
@@ -383,7 +383,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerWindowPropertyEnchantmentHandler(C packetType) {
+    public void registerContainerSetData(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -405,7 +405,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Not the very best place for this, but has to stay here until *everything* is abstracted
-    public void registerSpawnParticle(C packetType, Type<?> coordType) {
+    public void registerLevelParticles(C packetType, Type<?> coordType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -419,12 +419,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Types.FLOAT); // 7 - Offset Z
                 map(Types.FLOAT); // 8 - Particle Data
                 map(Types.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler());
+                handler(levelParticlesHandler());
             }
         });
     }
 
-    public void registerSpawnParticle1_19(C packetType) {
+    public void registerLevelParticles1_19(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -438,12 +438,12 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Types.FLOAT); // 7 - Offset Z
                 map(Types.FLOAT); // 8 - Particle Data
                 map(Types.INT); // 9 - Particle Count
-                handler(getSpawnParticleHandler(Types.VAR_INT));
+                handler(levelParticlesHandler(Types.VAR_INT));
             }
         });
     }
 
-    public void registerSpawnParticle1_20_5(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
+    public void registerLevelParticles1_20_5(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -494,11 +494,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public PacketHandler getSpawnParticleHandler() {
-        return getSpawnParticleHandler(Types.INT);
+    public PacketHandler levelParticlesHandler() {
+        return levelParticlesHandler(Types.INT);
     }
 
-    public PacketHandler getSpawnParticleHandler(Type<Integer> idType) {
+    public PacketHandler levelParticlesHandler(Type<Integer> idType) {
         return wrapper -> {
             int id = wrapper.get(idType, 0);
             if (id == -1) {

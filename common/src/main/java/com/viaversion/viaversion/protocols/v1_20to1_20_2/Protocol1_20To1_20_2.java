@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_20to1_20_2;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.gson.JsonElement;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -34,7 +34,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.exception.CancelException;
@@ -55,8 +54,8 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePac
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastTags;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import java.util.UUID;
 import com.viaversion.viaversion.util.Key;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPackets1_19_4, ClientboundPackets1_20_2, ServerboundPackets1_19_4, ServerboundPackets1_20_2> {
@@ -76,8 +75,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         super.registerPackets();
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND_ENTITY);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
 
         final PacketHandlers sanitizeCustomPayload = new PacketHandlers() {
             @Override
@@ -160,14 +159,14 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
         registerServerbound(State.CONFIGURATION, ServerboundConfigurationPackets1_20_2.CLIENT_INFORMATION.getId(), -1, wrapper -> {
             final ConfigurationState.ClientInformation clientInformation = new ConfigurationState.ClientInformation(
-                    wrapper.read(Types.STRING), // Language
-                    wrapper.read(Types.BYTE), // View distance
-                    wrapper.read(Types.VAR_INT), // Chat visibility
-                    wrapper.read(Types.BOOLEAN), // Chat colors
-                    wrapper.read(Types.UNSIGNED_BYTE), // Model customization
-                    wrapper.read(Types.VAR_INT), // Main hand
-                    wrapper.read(Types.BOOLEAN), // Text filtering enabled
-                    wrapper.read(Types.BOOLEAN) // Allow listing in server list preview
+                wrapper.read(Types.STRING), // Language
+                wrapper.read(Types.BYTE), // View distance
+                wrapper.read(Types.VAR_INT), // Chat visibility
+                wrapper.read(Types.BOOLEAN), // Chat colors
+                wrapper.read(Types.UNSIGNED_BYTE), // Model customization
+                wrapper.read(Types.VAR_INT), // Main hand
+                wrapper.read(Types.BOOLEAN), // Text filtering enabled
+                wrapper.read(Types.BOOLEAN) // Allow listing in server list preview
             );
 
             // Store it to re-send it when another ClientboundLoginPacket is sent, since the client will only send it

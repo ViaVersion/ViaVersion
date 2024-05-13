@@ -31,8 +31,8 @@ public class ProbeSubCmd implements ViaSubCommand {
     @Override
     public String description() {
         return "Forces ViaVersion to scan server protocol versions " +
-                (((BungeeViaConfig) Via.getConfig()).getBungeePingInterval() == -1 ?
-                        "" : "(Also happens at an interval)");
+            (((BungeeViaConfig) Via.getConfig()).getBungeePingInterval() == -1 ?
+                "" : "(Also happens at an interval)");
     }
 
     @Override

@@ -42,9 +42,9 @@ public class WorldPacketRewriter1_16_2 {
     public static void register(Protocol1_16_1To1_16_2 protocol) {
         BlockRewriter<ClientboundPackets1_16> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_16.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_16.BLOCK_UPDATE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16.BLOCK_BREAK_ACK);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_16.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_16.BLOCK_UPDATE);
+        blockRewriter.registerBlockBreakAck(ClientboundPackets1_16.BLOCK_BREAK_ACK);
 
         protocol.registerClientbound(ClientboundPackets1_16.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_16.TYPE);
@@ -101,6 +101,6 @@ public class WorldPacketRewriter1_16_2 {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_16.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_16.LEVEL_EVENT, 1010, 2001);
     }
 }

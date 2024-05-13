@@ -27,7 +27,7 @@ public record BlockedProtocolVersionsImpl(Set<ProtocolVersion> singleBlockedVers
     @Override
     public boolean contains(final ProtocolVersion protocolVersion) {
         return blocksBelow.isKnown() && protocolVersion.olderThan(blocksBelow)
-                || blocksAbove.isKnown() && protocolVersion.newerThan(blocksAbove)
-                || singleBlockedVersions.contains(protocolVersion);
+            || blocksAbove.isKnown() && protocolVersion.newerThan(blocksAbove)
+            || singleBlockedVersions.contains(protocolVersion);
     }
 }

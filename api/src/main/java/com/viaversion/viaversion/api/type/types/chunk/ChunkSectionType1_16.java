@@ -69,7 +69,7 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
             if (blockData.length == expectedLength) {
                 DataPalette blockPalette = chunkSection.palette(PaletteType.BLOCKS);
                 CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerBlock, ChunkSection.SIZE, blockData,
-                        bitsPerBlock == GLOBAL_PALETTE ? blockPalette::setIdAt : blockPalette::setPaletteIndexAt);
+                    bitsPerBlock == GLOBAL_PALETTE ? blockPalette::setIdAt : blockPalette::setPaletteIndexAt);
             }
         }
 
@@ -99,7 +99,7 @@ public class ChunkSectionType1_16 extends Type<ChunkSection> {
         }
 
         long[] data = CompactArrayUtil.createCompactArrayWithPadding(bitsPerBlock, ChunkSection.SIZE,
-                bitsPerBlock == GLOBAL_PALETTE ? blockPalette::idAt : blockPalette::paletteIndexAt);
+            bitsPerBlock == GLOBAL_PALETTE ? blockPalette::idAt : blockPalette::paletteIndexAt);
         Types.LONG_ARRAY_PRIMITIVE.write(buffer, data);
     }
 }

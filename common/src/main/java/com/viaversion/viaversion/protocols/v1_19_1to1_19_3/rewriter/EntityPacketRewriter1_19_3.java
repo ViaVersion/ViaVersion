@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
@@ -44,7 +43,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_19_1.ADD_ENTITY, EntityTypes1_19_3.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_19_1.ADD_EXPERIENCE_ORB, EntityTypes1_19_3.EXPERIENCE_ORB);
         registerTracker(ClientboundPackets1_19_1.ADD_PLAYER, EntityTypes1_19_3.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_19_1.SET_ENTITY_DATA, Types1_19.METADATA_LIST, Types1_19_3.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_19_1.SET_ENTITY_DATA, Types1_19.ENTITY_DATA_LIST, Types1_19_3.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_1.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_1.LOGIN, new PacketHandlers() {
@@ -152,8 +151,8 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(typeId -> Types1_19_3.META_TYPES.byId(typeId >= 2 ? typeId + 1 : typeId)); // Long added
-        registerMetaTypeHandler(Types1_19_3.META_TYPES.itemType, Types1_19_3.META_TYPES.optionalBlockStateType, Types1_19_3.META_TYPES.particleType);
+        filter().mapDataType(typeId -> Types1_19_3.ENTITY_DATA_TYPES.byId(typeId >= 2 ? typeId + 1 : typeId)); // Long added
+        registerEntityDataTypeHandler(Types1_19_3.ENTITY_DATA_TYPES.itemType, Types1_19_3.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_3.ENTITY_DATA_TYPES.particleType);
 
         filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, meta) -> {
             // Sitting pose added

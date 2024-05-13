@@ -49,8 +49,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
 
     modrinth {
         val mcVersions: List<String> = (property("mcVersions") as String)
-                .split(",")
-                .map { it.trim() }
+            .split(",")
+            .map { it.trim() }
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("viaversion")
         versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")

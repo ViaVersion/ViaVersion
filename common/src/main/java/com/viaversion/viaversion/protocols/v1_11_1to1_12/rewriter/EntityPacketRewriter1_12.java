@@ -62,15 +62,15 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.METADATA_LIST); // 12 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST); // 12 - Metadata
 
                 // Track mob and rewrite metadata
-                handler(trackerAndRewriterHandler(Types1_12.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_12.ENTITY_DATA_LIST));
             }
         });
 
         registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
-        registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_12.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_12.ENTITY_DATA_LIST);
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
@@ -214,12 +213,12 @@ public class ConfigurationState implements StorableObject {
         @Override
         public String toString() {
             return "QueuedPacket{" +
-                    "buf=" + buf +
-                    ", clientbound=" + clientbound +
-                    ", packetType=" + packetType +
-                    ", packetId=" + packetId +
-                    ", skipCurrentPipeline=" + skipCurrentPipeline +
-                    '}';
+                "buf=" + buf +
+                ", clientbound=" + clientbound +
+                ", packetType=" + packetType +
+                ", packetId=" + packetId +
+                ", skipCurrentPipeline=" + skipCurrentPipeline +
+                '}';
         }
     }
 

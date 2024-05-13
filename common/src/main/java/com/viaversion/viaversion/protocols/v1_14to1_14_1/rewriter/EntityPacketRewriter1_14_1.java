@@ -49,9 +49,9 @@ public class EntityPacketRewriter1_14_1 extends EntityRewriter<ClientboundPacket
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_14.METADATA_LIST); // 12 - Metadata
+                map(Types1_14.ENTITY_DATA_LIST); // 12 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST));
             }
         });
 
@@ -67,13 +67,13 @@ public class EntityPacketRewriter1_14_1 extends EntityRewriter<ClientboundPacket
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_14.METADATA_LIST); // 7 - Metadata
+                map(Types1_14.ENTITY_DATA_LIST); // 7 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST, EntityTypes1_14.PLAYER));
+                handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST, EntityTypes1_14.PLAYER));
             }
         });
 
-        registerMetadataRewriter(ClientboundPackets1_14.SET_ENTITY_DATA, Types1_14.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_14.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST);
     }
 
     @Override

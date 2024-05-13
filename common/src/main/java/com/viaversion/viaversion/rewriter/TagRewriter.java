@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -223,11 +222,11 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
         MappingData mappingData = protocol.getMappingData();
         return switch (tagType) {
             case BLOCK ->
-                    mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
+                mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
             case ITEM ->
-                    mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
+                mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
             case ENTITY ->
-                    protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
+                protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
             case FLUID, GAME_EVENT -> null;
         };
     }

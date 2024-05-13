@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.util.ChunkUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import java.util.ArrayList;
 import java.util.logging.Level;
 

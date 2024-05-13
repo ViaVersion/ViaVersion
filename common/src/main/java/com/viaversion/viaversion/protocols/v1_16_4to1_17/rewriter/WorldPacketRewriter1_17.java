@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16_2;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
@@ -43,10 +42,10 @@ public final class WorldPacketRewriter1_17 {
     public static void register(Protocol1_16_4To1_17 protocol) {
         BlockRewriter<ClientboundPackets1_16_2> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_16_2.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_16_2.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_16_2.BLOCK_BREAK_ACK);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_16_2.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_16_2.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_16_2.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerBlockBreakAck(ClientboundPackets1_16_2.BLOCK_BREAK_ACK);
 
         protocol.registerClientbound(ClientboundPackets1_16_2.SET_BORDER, null, wrapper -> {
             // Border packet actions have been split into individual packets (the content hasn't changed)
@@ -140,7 +139,7 @@ public final class WorldPacketRewriter1_17 {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_16_2.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_16_2.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void writeMultiBlockChangePacket(PacketWrapper wrapper, Chunk chunk) {

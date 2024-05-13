@@ -17,33 +17,31 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter;
 
+import com.google.common.base.Joiner;
+import com.google.common.primitives.Ints;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Ints;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SoundSource;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SpawnEggRewriter;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
+import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Key;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -672,8 +670,8 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
-                            ? Key.stripMinecraftNamespace((String) value)
-                            : null);
+                        ? Key.stripMinecraftNamespace((String) value)
+                        : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanPlaceOn.add(new StringTag(newValue));
@@ -692,8 +690,8 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                 for (Tag oldTag : old) {
                     Object value = oldTag.getValue();
                     String[] newValues = BlockIdData.fallbackReverseMapping.get(value instanceof String
-                            ? Key.stripMinecraftNamespace((String) value)
-                            : null);
+                        ? Key.stripMinecraftNamespace((String) value)
+                        : null);
                     if (newValues != null) {
                         for (String newValue : newValues) {
                             newCanDestroy.add(new StringTag(newValue));
@@ -739,15 +737,15 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
 
     public static boolean isDamageable(int id) {
         return id >= 256 && id <= 259 // iron shovel, pickaxe, axe, flint and steel
-                || id == 261 // bow
-                || id >= 267 && id <= 279 // iron sword, wooden+stone+diamond swords, shovels, pickaxes, axes
-                || id >= 283 && id <= 286 // gold sword, shovel, pickaxe, axe
-                || id >= 290 && id <= 294 // hoes
-                || id >= 298 && id <= 317 // armors
-                || id == 346 // fishing rod
-                || id == 359 // shears
-                || id == 398 // carrot on a stick
-                || id == 442 // shield
-                || id == 443; // elytra
+            || id == 261 // bow
+            || id >= 267 && id <= 279 // iron sword, wooden+stone+diamond swords, shovels, pickaxes, axes
+            || id >= 283 && id <= 286 // gold sword, shovel, pickaxe, axe
+            || id >= 290 && id <= 294 // hoes
+            || id >= 298 && id <= 317 // armors
+            || id == 346 // fishing rod
+            || id == 359 // shears
+            || id == 398 // carrot on a stick
+            || id == 442 // shield
+            || id == 443; // elytra
     }
 }

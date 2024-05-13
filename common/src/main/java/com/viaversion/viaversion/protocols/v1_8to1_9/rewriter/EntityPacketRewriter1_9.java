@@ -24,23 +24,23 @@ import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.MetaIndex1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -210,13 +210,13 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_8.METADATA_LIST, Types1_9.METADATA_LIST); // 1 - Metadata List
+                map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST); // 1 - Metadata List
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        handleMetadata(entityId, metadataList, wrapper.user());
+                        handleEntityData(entityId, metadataList, wrapper.user());
                     } else {
                         wrapper.cancel();
                     }
@@ -224,7 +224,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
                 // Handler for meta data
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.handleMetadata(entityID, metadataList);
@@ -232,7 +232,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
                 // Cancel packet if list empty
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     if (metadataList.isEmpty()) {
                         wrapper.cancel();
                     }
@@ -391,7 +391,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
         filter().handler(this::handleMetadata);
     }
 
-    private void handleMetadata(MetaHandlerEvent event, Metadata metadata) {
+    private void handleMetadata(EntityDataHandlerEvent event, EntityData metadata) {
         EntityType type = event.entityType();
         MetaIndex1_8 metaIndex = MetaIndex1_8.searchIndex(type, metadata.id());
         if (metaIndex == null) {
@@ -406,16 +406,16 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
         }
 
         metadata.setId(metaIndex.getNewIndex());
-        metadata.setMetaTypeUnsafe(metaIndex.getNewType());
+        metadata.setDataTypeUnsafe(metaIndex.getNewType());
 
         Object value = metadata.getValue();
         switch (metaIndex.getNewType()) {
             case BYTE:
                 // convert from int, byte
-                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
+                if (metaIndex.getOldType() == EntityDataTypes1_8.BYTE) {
                     metadata.setValue(value);
                 }
-                if (metaIndex.getOldType() == MetaType1_8.INT) {
+                if (metaIndex.getOldType() == EntityDataTypes1_8.INT) {
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
@@ -425,8 +425,8 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                         val = 1;
                     }
                     int newIndex = MetaIndex1_8.PLAYER_HAND.getNewIndex();
-                    MetaType metaType = MetaIndex1_8.PLAYER_HAND.getNewType();
-                    event.createExtraMeta(new Metadata(newIndex, metaType, val));
+                    EntityDataType metaType = MetaIndex1_8.PLAYER_HAND.getNewType();
+                    event.createExtraData(new EntityData(newIndex, metaType, val));
                 }
                 break;
             case OPTIONAL_UUID:
@@ -442,13 +442,13 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 break;
             case VAR_INT:
                 // convert from int, short, byte
-                if (metaIndex.getOldType() == MetaType1_8.BYTE) {
+                if (metaIndex.getOldType() == EntityDataTypes1_8.BYTE) {
                     metadata.setValue(((Byte) value).intValue());
                 }
-                if (metaIndex.getOldType() == MetaType1_8.SHORT) {
+                if (metaIndex.getOldType() == EntityDataTypes1_8.SHORT) {
                     metadata.setValue(((Short) value).intValue());
                 }
-                if (metaIndex.getOldType() == MetaType1_8.INT) {
+                if (metaIndex.getOldType() == EntityDataTypes1_8.INT) {
                     metadata.setValue(value);
                 }
                 break;

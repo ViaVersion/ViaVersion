@@ -21,10 +21,9 @@ import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_3;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -46,7 +45,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_20_2.ADD_ENTITY, EntityTypes1_20_3.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_2.SET_ENTITY_DATA, Types1_20_2.METADATA_LIST, Types1_20_3.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_20_2.SET_ENTITY_DATA, Types1_20_2.ENTITY_DATA_LIST, Types1_20_3.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_2.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_2.REGISTRY_DATA, new PacketHandlers() {
@@ -105,16 +104,16 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
     @Override
     protected void registerRewrites() {
         filter().handler((event, meta) -> {
-            final MetaType type = meta.metaType();
-            if (type == Types1_20_2.META_TYPES.componentType) {
-                meta.setTypeAndValue(Types1_20_3.META_TYPES.componentType, ComponentUtil.jsonToTag(meta.value()));
-            } else if (type == Types1_20_2.META_TYPES.optionalComponentType) {
-                meta.setTypeAndValue(Types1_20_3.META_TYPES.optionalComponentType, ComponentUtil.jsonToTag(meta.value()));
+            final EntityDataType type = meta.dataType();
+            if (type == Types1_20_2.ENTITY_DATA_TYPES.componentType) {
+                meta.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.componentType, ComponentUtil.jsonToTag(meta.value()));
+            } else if (type == Types1_20_2.ENTITY_DATA_TYPES.optionalComponentType) {
+                meta.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.jsonToTag(meta.value()));
             } else {
-                meta.setMetaType(Types1_20_3.META_TYPES.byId(type.typeId()));
+                meta.setDataType(Types1_20_3.ENTITY_DATA_TYPES.byId(type.typeId()));
             }
         });
-        filter().metaType(Types1_20_3.META_TYPES.particleType).handler((event, meta) -> {
+        filter().dataType(Types1_20_3.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = meta.value();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
             if (particle.id() == particleMappings.id("vibration")) {
@@ -130,12 +129,12 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
             rewriteParticle(event.user(), particle);
         });
 
-        registerMetaTypeHandler(
-                Types1_20_3.META_TYPES.itemType,
-                Types1_20_3.META_TYPES.blockStateType,
-                Types1_20_3.META_TYPES.optionalBlockStateType,
-                Types1_20_3.META_TYPES.particleType,
-                null);
+        registerEntityDataTypeHandler(
+            Types1_20_3.ENTITY_DATA_TYPES.itemType,
+            Types1_20_3.ENTITY_DATA_TYPES.blockStateType,
+            Types1_20_3.ENTITY_DATA_TYPES.optionalBlockStateType,
+            Types1_20_3.ENTITY_DATA_TYPES.particleType,
+            null);
 
         filter().type(EntityTypes1_20_3.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();

@@ -40,9 +40,9 @@ public class VelocityStorage implements StorableObject {
         try {
             clientPlaySessionHandler = Class.forName("com.velocitypowered.proxy.connection.client.ClientPlaySessionHandler");
             getServerBossBars = clientPlaySessionHandler
-                    .getDeclaredMethod("getServerBossBars");
+                .getDeclaredMethod("getServerBossBars");
             getMinecraftConnection = Class.forName("com.velocitypowered.proxy.connection.client.ConnectedPlayer")
-                    .getDeclaredMethod("getMinecraftConnection");
+                .getDeclaredMethod("getMinecraftConnection");
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             Via.getPlatform().getLogger().log(Level.SEVERE, "Failed to initialize Velocity bossbar support, bossbars will not work.", e);
         }

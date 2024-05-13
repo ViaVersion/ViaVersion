@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.StringTag;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;

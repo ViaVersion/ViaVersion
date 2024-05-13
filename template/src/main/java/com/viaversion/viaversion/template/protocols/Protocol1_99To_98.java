@@ -60,8 +60,8 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_5> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND_ENTITY);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND_ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
         new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES);
@@ -105,7 +105,7 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
 
     @Override
     public void init(final UserConnection connection) {
-        // Register the entity tracker - used for entity id/metadata rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
+        // Register the entity tracker - used for entity id/entity data rewriting AND for tracking world data sent to the client (then used for chunk data rewriting)
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
     }
 

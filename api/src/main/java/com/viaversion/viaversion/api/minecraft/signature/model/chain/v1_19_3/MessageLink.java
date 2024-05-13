@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.minecraft.signature.model.chain.v1_19_3;
 
 import com.google.common.primitives.Ints;
 import com.viaversion.viaversion.api.minecraft.signature.util.DataConsumer;
-
 import java.util.UUID;
 
 public class MessageLink {

@@ -112,9 +112,9 @@ public final class Particle implements IdHolder {
         @Override
         public String toString() {
             return "ParticleData{" +
-                    "type=" + type +
-                    ", value=" + value +
-                    '}';
+                "type=" + type +
+                ", value=" + value +
+                '}';
         }
     }
 }

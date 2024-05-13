@@ -64,9 +64,9 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
 
         tagRewriter.registerGeneric(ClientboundPackets1_17_1.UPDATE_TAGS);
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:lava_pool_stone_cannot_replace", "minecraft:big_dripleaf_placeable",
-                "minecraft:wolves_spawnable_on", "minecraft:rabbits_spawnable_on", "minecraft:polar_bears_spawnable_on_in_frozen_ocean", "minecraft:parrots_spawnable_on",
-                "minecraft:mooshrooms_spawnable_on", "minecraft:goats_spawnable_on", "minecraft:foxes_spawnable_on", "minecraft:axolotls_spawnable_on", "minecraft:animals_spawnable_on",
-                "minecraft:azalea_grows_on", "minecraft:azalea_root_replaceable", "minecraft:replaceable_plants", "minecraft:terracotta");
+            "minecraft:wolves_spawnable_on", "minecraft:rabbits_spawnable_on", "minecraft:polar_bears_spawnable_on_in_frozen_ocean", "minecraft:parrots_spawnable_on",
+            "minecraft:mooshrooms_spawnable_on", "minecraft:goats_spawnable_on", "minecraft:foxes_spawnable_on", "minecraft:axolotls_spawnable_on", "minecraft:animals_spawnable_on",
+            "minecraft:azalea_grows_on", "minecraft:azalea_root_replaceable", "minecraft:replaceable_plants", "minecraft:terracotta");
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:dirt", "minecraft:terracotta");
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_17_1.AWARD_STATS);
@@ -89,13 +89,13 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         Types1_18.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("block_marker", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.ITEM1_13_2)
-                .reader("vibration", ParticleType.Readers.VIBRATION);
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("block_marker", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+            .reader("item", ParticleType.Readers.ITEM1_13_2)
+            .reader("vibration", ParticleType.Readers.VIBRATION);
 
         super.onMappingDataLoaded();
     }

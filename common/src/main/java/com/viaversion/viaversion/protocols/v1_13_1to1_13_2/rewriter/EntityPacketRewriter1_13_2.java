@@ -17,10 +17,9 @@
  */
 package com.viaversion.viaversion.protocols.v1_13_1to1_13_2.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
@@ -31,8 +30,8 @@ public class EntityPacketRewriter1_13_2 {
 
     public static void register(Protocol1_13_1To1_13_2 protocol) {
         final PacketHandler metaTypeHandler = wrapper -> {
-            for (Metadata metadata : wrapper.get(Types1_13_2.METADATA_LIST, 0)) {
-                metadata.setMetaType(Types1_13_2.META_TYPES.byId(metadata.metaType().typeId()));
+            for (EntityData metadata : wrapper.get(Types1_13_2.ENTITY_DATA_LIST, 0)) {
+                metadata.setDataType(Types1_13_2.ENTITY_DATA_TYPES.byId(metadata.dataType().typeId()));
             }
         };
 
@@ -51,7 +50,7 @@ public class EntityPacketRewriter1_13_2 {
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_13.METADATA_LIST, Types1_13_2.METADATA_LIST); // 12 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 12 - Metadata
 
                 handler(metaTypeHandler);
             }
@@ -67,7 +66,7 @@ public class EntityPacketRewriter1_13_2 {
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_13.METADATA_LIST, Types1_13_2.METADATA_LIST); // 7 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 7 - Metadata
 
                 handler(metaTypeHandler);
             }
@@ -77,7 +76,7 @@ public class EntityPacketRewriter1_13_2 {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_13.METADATA_LIST, Types1_13_2.METADATA_LIST); // 1 - Metadata list
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 1 - Metadata list
 
                 handler(metaTypeHandler);
             }

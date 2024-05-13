@@ -70,11 +70,11 @@ public class StatisticsRewriter<C extends ClientboundPacketType> {
     protected @Nullable IdRewriteFunction getRewriter(RegistryType type) {
         return switch (type) {
             case BLOCK ->
-                    protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
+                protocol.getMappingData().getBlockMappings() != null ? id -> protocol.getMappingData().getNewBlockId(id) : null;
             case ITEM ->
-                    protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
+                protocol.getMappingData().getItemMappings() != null ? id -> protocol.getMappingData().getNewItemId(id) : null;
             case ENTITY ->
-                    protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
+                protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
             default -> throw new IllegalArgumentException("Unknown registry type in statistics packet: " + type);
         };
     }

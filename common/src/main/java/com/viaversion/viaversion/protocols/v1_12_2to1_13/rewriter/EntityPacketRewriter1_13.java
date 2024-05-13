@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
@@ -102,9 +102,9 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 12 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 12 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_13.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST));
             }
         });
 
@@ -118,9 +118,9 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_12.METADATA_LIST, Types1_13.METADATA_LIST); // 7 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 7 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_13.METADATA_LIST, EntityTypes1_13.EntityType.PLAYER));
+                handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
         });
 
@@ -161,14 +161,14 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
         });
 
         registerRemoveEntities(ClientboundPackets1_12_1.REMOVE_ENTITIES);
-        registerMetadataRewriter(ClientboundPackets1_12_1.SET_ENTITY_DATA, Types1_12.METADATA_LIST, Types1_13.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_12_1.SET_ENTITY_DATA, Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST);
     }
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(typeId -> Types1_13.META_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
-        filter().metaType(Types1_13.META_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(event.user(), meta.value())));
-        filter().metaType(Types1_13.META_TYPES.optionalBlockStateType).handler(((event, meta) -> {
+        filter().mapDataType(typeId -> Types1_13.ENTITY_DATA_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
+        filter().dataType(Types1_13.ENTITY_DATA_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(event.user(), meta.value())));
+        filter().dataType(Types1_13.ENTITY_DATA_TYPES.optionalBlockStateType).handler(((event, meta) -> {
             final int oldId = meta.value();
             if (oldId != 0) {
                 final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
@@ -182,9 +182,9 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
 
         filter().index(2).handler(((event, meta) -> {
             if (meta.getValue() != null && !((String) meta.getValue()).isEmpty()) {
-                meta.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) meta.getValue()));
+                meta.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) meta.getValue()));
             } else {
-                meta.setTypeAndValue(Types1_13.META_TYPES.optionalComponentType, null);
+                meta.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, null);
             }
         }));
 
@@ -205,14 +205,14 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
         filter().type(EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD).handler((event, meta) -> {
             if (meta.id() == 9) {
                 int particleId = meta.value();
-                Metadata parameter1Meta = event.metaAtIndex(10);
-                Metadata parameter2Meta = event.metaAtIndex(11);
+                EntityData parameter1Meta = event.dataAtIndex(10);
+                EntityData parameter2Meta = event.dataAtIndex(11);
                 int parameter1 = parameter1Meta != null ? parameter1Meta.value() : 0;
                 int parameter2 = parameter2Meta != null ? parameter2Meta.value() : 0;
 
                 Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.id() != -1) {
-                    event.createExtraMeta(new Metadata(9, Types1_13.META_TYPES.particleType, particle));
+                    event.createExtraData(new EntityData(9, Types1_13.ENTITY_DATA_TYPES.particleType, particle));
                 }
             }
             if (meta.id() >= 9) {

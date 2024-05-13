@@ -77,7 +77,7 @@ public final class DebugHandlerImpl implements DebugHandler {
     @Override
     public boolean shouldLog(final PacketWrapper wrapper, final Direction direction) {
         return packetTypesToLog.isEmpty() && serverboundPacketIdsToLog.isEmpty() && clientboundPacketIdsToLog.isEmpty()
-                || (wrapper.getPacketType() != null && packetTypesToLog.contains(wrapper.getPacketType().getName()))
-                || (direction == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).contains(wrapper.getId());
+            || (wrapper.getPacketType() != null && packetTypesToLog.contains(wrapper.getPacketType().getName()))
+            || (direction == Direction.SERVERBOUND ? serverboundPacketIdsToLog : clientboundPacketIdsToLog).contains(wrapper.getId());
     }
 }

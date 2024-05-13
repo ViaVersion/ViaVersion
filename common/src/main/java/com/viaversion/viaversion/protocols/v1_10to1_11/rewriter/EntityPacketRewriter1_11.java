@@ -23,8 +23,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -74,20 +74,20 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.METADATA_LIST); // 12 - Metadata
+                map(Types1_9.ENTITY_DATA_LIST); // 12 - Metadata
 
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     // Change Type :)
                     int type = wrapper.get(Types.VAR_INT, 1);
 
-                    EntityTypes1_11.EntityType entType = rewriteEntityType(type, wrapper.get(Types1_9.METADATA_LIST, 0));
+                    EntityTypes1_11.EntityType entType = rewriteEntityType(type, wrapper.get(Types1_9.ENTITY_DATA_LIST, 0));
                     if (entType != null) {
                         wrapper.set(Types.VAR_INT, 1, entType.getId());
 
                         // Register Type ID
                         wrapper.user().getEntityTracker(Protocol1_10To1_11.class).addEntity(entityId, entType);
-                        handleMetadata(entityId, wrapper.get(Types1_9.METADATA_LIST, 0), wrapper.user());
+                        handleEntityData(entityId, wrapper.get(Types1_9.ENTITY_DATA_LIST, 0), wrapper.user());
                     }
                 });
             }
@@ -105,7 +105,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        registerMetadataRewriter(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_9_3.SET_ENTITY_DATA, Types1_9.ENTITY_DATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_9_3.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
@@ -168,7 +168,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
 
         filter().type(EntityType.GUARDIAN).index(12).handler((event, meta) -> {
             boolean value = (((byte) meta.getValue()) & 0x02) == 0x02;
-            meta.setTypeAndValue(MetaType1_9.BOOLEAN, value);
+            meta.setTypeAndValue(EntityDataTypes1_9.BOOLEAN, value);
         });
 
         filter().type(EntityType.ABSTRACT_SKELETON).removeIndex(12);
@@ -203,9 +203,9 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
 
             if ((type == EntityType.DONKEY || type == EntityType.MULE) && metadata.id() == 13) {
                 if ((((byte) metadata.getValue()) & 0x08) == 0x08) {
-                    event.createExtraMeta(new Metadata(15, MetaType1_9.BOOLEAN, true));
+                    event.createExtraData(new EntityData(15, EntityDataTypes1_9.BOOLEAN, true));
                 } else {
-                    event.createExtraMeta(new Metadata(15, MetaType1_9.BOOLEAN, false));
+                    event.createExtraData(new EntityData(15, EntityDataTypes1_9.BOOLEAN, false));
                 }
             }
         });
@@ -215,9 +215,9 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            Metadata flags = event.metaAtIndex(11);
-            Metadata customName = event.metaAtIndex(2);
-            Metadata customNameVisible = event.metaAtIndex(3);
+            EntityData flags = event.dataAtIndex(11);
+            EntityData customName = event.dataAtIndex(2);
+            EntityData customNameVisible = event.dataAtIndex(3);
             if (flags == null || customName == null || customNameVisible == null) {
                 return;
             }
@@ -253,9 +253,9 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         return EntityTypes1_11.getTypeFromId(type, true);
     }
 
-    public EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
-        Optional<EntityType> optType = EntityType.findById(numType);
-        if (optType.isEmpty()) {
+    public EntityType rewriteEntityType(int numType, List<EntityData> metadata) {
+        EntityType type = EntityType.findById(numType);
+        if (type == null) {
             Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with metadata: " + metadata);
             return null;
         }
@@ -265,7 +265,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         try {
             if (type.is(EntityType.GUARDIAN)) {
                 // ElderGuardian - 4
-                Optional<Metadata> options = getById(metadata, 12);
+                Optional<EntityData> options = getById(metadata, 12);
                 if (options.isPresent()) {
                     if ((((byte) options.get().getValue()) & 0x04) == 0x04) {
                         return EntityType.ELDER_GUARDIAN;
@@ -275,7 +275,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             if (type.is(EntityType.SKELETON)) {
                 // WitherSkeleton - 5
                 // Stray - 6
-                Optional<Metadata> options = getById(metadata, 12);
+                Optional<EntityData> options = getById(metadata, 12);
                 if (options.isPresent()) {
                     if (((int) options.get().getValue()) == 1) {
                         return EntityType.WITHER_SKELETON;
@@ -288,11 +288,11 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             if (type.is(EntityType.ZOMBIE)) {
                 // ZombieVillager - 27
                 // Husk - 23
-                Optional<Metadata> options = getById(metadata, 13);
+                Optional<EntityData> options = getById(metadata, 13);
                 if (options.isPresent()) {
                     int value = (int) options.get().getValue();
                     if (value > 0 && value < 6) {
-                        metadata.add(new Metadata(16, MetaType1_9.VAR_INT, value - 1)); // Add profession type to new metadata
+                        metadata.add(new EntityData(16, EntityDataTypes1_9.VAR_INT, value - 1)); // Add profession type to new metadata
                         return EntityType.ZOMBIE_VILLAGER;
                     }
                     if (value == 6) {
@@ -305,7 +305,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 // ZombieHorse - 29
                 // Donkey - 31
                 // Mule - 32
-                Optional<Metadata> options = getById(metadata, 14);
+                Optional<EntityData> options = getById(metadata, 14);
                 if (options.isPresent()) {
                     if (((int) options.get().getValue()) == 0) {
                         return EntityType.HORSE;
@@ -335,8 +335,8 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         return type;
     }
 
-    public Optional<Metadata> getById(List<Metadata> metadatas, int id) {
-        for (Metadata metadata : metadatas) {
+    public Optional<EntityData> getById(List<EntityData> metadatas, int id) {
+        for (EntityData metadata : metadatas) {
             if (metadata.id() == id) return Optional.of(metadata);
         }
         return Optional.empty();

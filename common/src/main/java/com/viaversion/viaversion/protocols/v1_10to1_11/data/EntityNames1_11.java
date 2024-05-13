@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_10to1_11.data;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.StringTag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.util.Key;
 

@@ -37,9 +37,9 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
     @Override
     public void registerPackets() {
         registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
-        registerWindowItems(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
+        registerSetContent(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
         registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
-        registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
+        registerCooldown(ClientboundPackets1_13.COOLDOWN);
 
         protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
@@ -72,7 +72,7 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
+        registerSetEquippedItem(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol) {
             @Override
@@ -95,9 +95,9 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
             }
         });
 
-        registerClickWindow(ServerboundPackets1_13.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick(ServerboundPackets1_13.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT);
 
-        registerSpawnParticle(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
+        registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
     }
 }

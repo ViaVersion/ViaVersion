@@ -81,7 +81,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
 
         tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:bookshelf_books", "minecraft:hanging_signs", "minecraft:stripped_logs");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:all_hanging_signs", "minecraft:ceiling_hanging_signs", "minecraft:invalid_spawn_inside",
-                "minecraft:stripped_logs", "minecraft:wall_hanging_signs");
+            "minecraft:stripped_logs", "minecraft:wall_hanging_signs");
         tagRewriter.registerGeneric(ClientboundPackets1_19_1.UPDATE_TAGS);
 
         entityRewriter.register();
@@ -124,7 +124,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
                     case "minecraft:resource" -> "minecraft:resource_key";
                     case "minecraft:resource_or_tag" -> "minecraft:resource_or_tag_key";
                     case "minecraft:entity_summon", "minecraft:item_enchantment", "minecraft:mob_effect" ->
-                            "minecraft:resource";
+                        "minecraft:resource";
                     default -> argumentType;
                 };
             }
@@ -348,15 +348,15 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     protected void onMappingDataLoaded() {
         Types1_19_3.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("block_marker", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.ITEM1_13_2)
-                .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-                .reader("shriek", ParticleType.Readers.SHRIEK);
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("block_marker", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+            .reader("item", ParticleType.Readers.ITEM1_13_2)
+            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
+            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+            .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19_3.initialize(this);
 
         super.onMappingDataLoaded();

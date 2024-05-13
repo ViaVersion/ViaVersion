@@ -38,7 +38,7 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
         registerTrackerWithData(ClientboundPackets1_16.ADD_ENTITY, EntityTypes1_16_2.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_16.ADD_MOB);
         registerTracker(ClientboundPackets1_16.ADD_PLAYER, EntityTypes1_16_2.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_16.SET_ENTITY_DATA, Types1_16.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_16.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_16.LOGIN, new PacketHandlers() {
@@ -77,7 +77,7 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
 
     @Override
     protected void registerRewrites() {
-        registerMetaTypeHandler(Types1_16.META_TYPES.itemType, Types1_16.META_TYPES.optionalBlockStateType, Types1_16.META_TYPES.particleType);
+        registerEntityDataTypeHandler(Types1_16.ENTITY_DATA_TYPES.itemType, Types1_16.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_16.ENTITY_DATA_TYPES.particleType);
         filter().type(EntityTypes1_16_2.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));

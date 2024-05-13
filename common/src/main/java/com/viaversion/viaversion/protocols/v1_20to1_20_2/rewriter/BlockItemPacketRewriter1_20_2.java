@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -32,7 +31,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -58,10 +57,10 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPackets1_19_4> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_19_4.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_19_4.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_19_4.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerEffect(ClientboundPackets1_19_4.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_19_4.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_19_4.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_19_4.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_19_4.LEVEL_EVENT, 1010, 2001);
 
         protocol.registerServerbound(ServerboundPackets1_20_2.SET_BEACON, wrapper -> {
             // Effects start at 1 before 1.20.2
@@ -93,13 +92,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             final Type<Chunk> chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.read(chunkType);
 
             final Type<Chunk> newChunkType = new ChunkType1_20_2(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             wrapper.write(newChunkType, chunk);
 
             for (final ChunkSection section : chunk.getSections()) {

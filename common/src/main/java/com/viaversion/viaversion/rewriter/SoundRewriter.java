@@ -49,7 +49,7 @@ public class SoundRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void register1_19_3Sound(C packetType) {
+    public void registerSound1_19_3(C packetType) {
         protocol.registerClientbound(packetType, soundHolderHandler());
     }
 

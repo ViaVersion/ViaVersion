@@ -23,18 +23,17 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
@@ -60,10 +59,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final IntSet validBlocking = new IntOpenHashSet();
     private final IntSet knownHolograms = new IntOpenHashSet();
     private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterAccess(250, TimeUnit.MILLISECONDS)
-            .<Position, Boolean>build()
-            .asMap());
+        .maximumSize(1000)
+        .expireAfterAccess(250, TimeUnit.MILLISECONDS)
+        .<Position, Boolean>build()
+        .asMap());
     private boolean blocking;
     private boolean autoTeam;
     private Position currentlyDigging;
@@ -152,16 +151,16 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         blockInteractions.add(p);
     }
 
-    public void handleMetadata(int entityId, List<Metadata> metadataList) {
+    public void handleMetadata(int entityId, List<EntityData> metadataList) {
         com.viaversion.viaversion.api.minecraft.entities.EntityType type = entityType(entityId);
         if (type == null) {
             return;
         }
 
-        for (Metadata metadata : new ArrayList<>(metadataList)) {
+        for (EntityData metadata : new ArrayList<>(metadataList)) {
             if (type == EntityType.SKELETON) {
                 if ((getMetaByIndex(metadataList, 12)) == null) {
-                    metadataList.add(new Metadata(12, MetaType1_9.BOOLEAN, true));
+                    metadataList.add(new EntityData(12, EntityDataTypes1_9.BOOLEAN, true));
                 }
             }
 
@@ -192,23 +191,23 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     }
                 }
                 if (metadata.id() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
-                    metadataList.add(new Metadata(
-                            13, // Main hand
-                            MetaType1_9.BYTE,
-                            (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
+                    metadataList.add(new EntityData(
+                        13, // Main hand
+                        EntityDataTypes1_9.BYTE,
+                        (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
                     ));
                 }
             }
             if (type == EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
                 if (metadata.id() == 0 && getMetaByIndex(metadataList, 10) != null) {
-                    Metadata meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
+                    EntityData meta = getMetaByIndex(metadataList, 10); //Only happens if the armorstand is small
                     byte data = (byte) metadata.getValue();
                     // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
-                    Metadata displayName;
-                    Metadata displayNameVisible;
+                    EntityData displayName;
+                    EntityData displayNameVisible;
                     if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                            && (displayName = getMetaByIndex(metadataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
-                            && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
+                        && (displayName = getMetaByIndex(metadataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
+                        && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
                             // Send movement
@@ -263,8 +262,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
     }
 
-    public Metadata getMetaByIndex(List<Metadata> list, int index) {
-        for (Metadata meta : list)
+    public EntityData getMetaByIndex(List<EntityData> list, int index) {
+        for (EntityData meta : list)
             if (index == meta.id()) {
                 return meta;
             }

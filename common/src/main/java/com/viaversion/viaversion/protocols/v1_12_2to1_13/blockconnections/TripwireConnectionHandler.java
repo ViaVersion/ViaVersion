@@ -39,9 +39,9 @@ public class TripwireConnectionHandler implements ConnectionHandler {
                 TRIPWIRE_HOOKS.put(blockData.getSavedBlockStateId(), BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)));
             } else if (blockData.getMinecraftKey().equals("minecraft:tripwire")) {
                 TripwireData tripwireData = new TripwireData(
-                        blockData.getValue("attached").equals("true"),
-                        blockData.getValue("disarmed").equals("true"),
-                        blockData.getValue("powered").equals("true")
+                    blockData.getValue("attached").equals("true"),
+                    blockData.getValue("disarmed").equals("true"),
+                    blockData.getValue("powered").equals("true")
                 );
 
                 TRIPWIRE_DATA_MAP.put(blockData.getSavedBlockStateId(), tripwireData);

@@ -39,12 +39,12 @@ public class BlockIdData {
     public static void init() {
         // Data from https://minecraft.gamepedia.com/1.13/Flattening
         InputStream stream = MappingData1_13.class.getClassLoader()
-                .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
+            .getResourceAsStream("assets/viaversion/data/blockIds1.12to1.13.json");
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             Map<String, String[]> map = GsonUtil.getGson().fromJson(
-                    reader,
-                    new TypeToken<Map<String, String[]>>() {
-                    }.getType());
+                reader,
+                new TypeToken<Map<String, String[]>>() {
+                }.getType());
             blockIdMapping.putAll(map);
             for (Map.Entry<String, String[]> entry : blockIdMapping.entrySet()) {
                 for (String val : entry.getValue()) {
@@ -58,12 +58,12 @@ public class BlockIdData {
         }
 
         InputStream blockS = MappingData1_13.class.getClassLoader()
-                .getResourceAsStream("assets/viaversion/data/blockNumberToString1.12.json");
+            .getResourceAsStream("assets/viaversion/data/blockNumberToString1.12.json");
         try (InputStreamReader blockR = new InputStreamReader(blockS)) {
             Map<Integer, String> map = GsonUtil.getGson().fromJson(
-                    blockR,
-                    new TypeToken<Map<Integer, String>>() {
-                    }.getType()
+                blockR,
+                new TypeToken<Map<Integer, String>>() {
+                }.getType()
             );
             numberIdToString.putAll(map);
         } catch (IOException e) {

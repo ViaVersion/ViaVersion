@@ -35,15 +35,15 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
-import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EffectIds1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.SoundEffects1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.EffectIds1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.SoundEffects1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -303,7 +303,7 @@ public class WorldPacketRewriter1_9 {
 
                 // Method to identify the sword in hand
                 boolean isSword = showShieldWhenSwordInHand ? tracker.hasSwordInHand()
-                        : item != null && Protocol1_8To1_9.isSword(item.identifier());
+                    : item != null && Protocol1_8To1_9.isSword(item.identifier());
 
                 if (isSword) {
                     if (hand == 0 && !tracker.isBlocking()) {
@@ -320,7 +320,7 @@ public class WorldPacketRewriter1_9 {
 
                     // Use the main hand to trigger the blocking
                     boolean blockUsingMainHand = Via.getConfig().isNoDelayShieldBlocking()
-                            && !showShieldWhenSwordInHand;
+                        && !showShieldWhenSwordInHand;
 
                     if (blockUsingMainHand && hand == 1 || !blockUsingMainHand && hand == 0) {
                         wrapper.cancel();

@@ -213,9 +213,9 @@ public class WorldPacketRewriter1_13 {
                     for (BlockChangeRecord record : records) {
                         int newBlock = toNewId(record.getBlockId());
                         Position position = new Position(
-                                record.getSectionX() + (chunkX << 4),
-                                record.getY(),
-                                record.getSectionZ() + (chunkZ << 4));
+                            record.getSectionX() + (chunkX << 4),
+                            record.getY(),
+                            record.getSectionZ() + (chunkZ << 4));
 
                         record.setBlockId(checkStorage(wrapper.user(), position, newBlock));
                         if (Via.getConfig().isServersideBlockConnections()) {
@@ -228,9 +228,9 @@ public class WorldPacketRewriter1_13 {
                             int blockState = record.getBlockId();
 
                             Position position = new Position(
-                                    record.getSectionX() + (chunkX * 16),
-                                    record.getY(),
-                                    record.getSectionZ() + (chunkZ * 16));
+                                record.getSectionX() + (chunkX * 16),
+                                record.getY(),
+                                record.getSectionZ() + (chunkZ * 16));
 
                             ConnectionHandler handler = ConnectionData.getConnectionHandler(blockState);
                             if (handler != null) {
@@ -246,9 +246,9 @@ public class WorldPacketRewriter1_13 {
 
                         for (BlockChangeRecord record : records) {
                             Position position = new Position(
-                                    record.getSectionX() + (chunkX * 16),
-                                    record.getY(),
-                                    record.getSectionZ() + (chunkZ * 16));
+                                record.getSectionX() + (chunkX * 16),
+                                record.getY(),
+                                record.getSectionZ() + (chunkZ * 16));
                             ConnectionData.update(userConnection, position);
                         }
                     }
@@ -279,9 +279,9 @@ public class WorldPacketRewriter1_13 {
 
                     for (int i = 0; i < recordCount; i++) {
                         Position position = new Position(
-                                x + wrapper.passthrough(Types.BYTE),
-                                (short) (y + wrapper.passthrough(Types.BYTE)),
-                                z + wrapper.passthrough(Types.BYTE));
+                            x + wrapper.passthrough(Types.BYTE),
+                            (short) (y + wrapper.passthrough(Types.BYTE)),
+                            z + wrapper.passthrough(Types.BYTE));
                         records[i] = position;
 
                         // Set to air
@@ -407,7 +407,7 @@ public class WorldPacketRewriter1_13 {
                     int biome = chunk.getBiomeData()[i];
                     if (!VALID_BIOMES.contains(biome)) {
                         if (biome != 255 // is it generated naturally? *shrug*
-                                && latestBiomeWarn != biome) {
+                            && latestBiomeWarn != biome) {
                             if (!Via.getConfig().isSuppressConversionWarnings()) {
                                 Protocol1_12_2To1_13.LOGGER.warning("Received invalid biome id: " + biome);
                             }

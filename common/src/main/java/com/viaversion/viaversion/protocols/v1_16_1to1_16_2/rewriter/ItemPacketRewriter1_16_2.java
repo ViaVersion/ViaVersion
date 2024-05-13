@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter;
 
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.Protocol1_16_1To1_16_2;
@@ -33,11 +32,11 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_16.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16.CONTAINER_SET_CONTENT);
-        registerTradeList(ClientboundPackets1_16.MERCHANT_OFFERS);
+        registerCooldown(ClientboundPackets1_16.COOLDOWN);
+        registerSetContent(ClientboundPackets1_16.CONTAINER_SET_CONTENT);
+        registerMerchantOffers(ClientboundPackets1_16.MERCHANT_OFFERS);
         registerSetSlot(ClientboundPackets1_16.CONTAINER_SET_SLOT);
-        registerEntityEquipmentArray(ClientboundPackets1_16.SET_EQUIPMENT);
+        registerSetEquipment(ClientboundPackets1_16.SET_EQUIPMENT);
         registerAdvancements(ClientboundPackets1_16.UPDATE_ADVANCEMENTS);
 
         protocol.registerClientbound(ClientboundPackets1_16.RECIPE, wrapper -> {
@@ -55,10 +54,10 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_16_2.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_16_2.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick(ServerboundPackets1_16_2.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_16_2.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
+        registerLevelParticles(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
     }
 }

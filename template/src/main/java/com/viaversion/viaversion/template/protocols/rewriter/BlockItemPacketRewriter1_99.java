@@ -40,29 +40,29 @@ public final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Cl
     @Override
     public void registerPackets() {
         // Register block and block state id changes
-        // Other places using block state id mappings: Spawn particle, entity metadata, entity spawn (falling blocks)
+        // Other places using block state id mappings: Spawn particle, entity data, entity spawn (falling blocks)
         // Tags and statistics use block (!) ids
         final BlockRewriter<ClientboundPacket1_20_5> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_20_5.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_20_5.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerEffect(ClientboundPackets1_20_5.LEVEL_EVENT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_20_5.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_20_5.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_20_5.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_5.BLOCK_ENTITY_DATA);
 
         // Registers item id changes
-        // Other places using item ids are: Entity metadata, tags, statistics, effect
+        // Other places using item ids are: Entity data, tags, statistics, effect
         // registerOpenWindow(ClientboundPackets1_20_5.OPEN_WINDOW); - If a new container type was added
-        registerSetCooldown(ClientboundPackets1_20_5.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
+        registerCooldown(ClientboundPackets1_20_5.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_SLOT);
         registerAdvancements1_20_3(ClientboundPackets1_20_5.UPDATE_ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_20_5.SET_EQUIPMENT);
-        registerClickWindow1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
-        registerTradeList1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
-        registerCreativeInvAction(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_5.CONTAINER_SET_DATA);
-        registerSpawnParticle1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
+        registerSetEquipment(ClientboundPackets1_20_5.SET_EQUIPMENT);
+        registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
+        registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
+        registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
+        registerContainerSetData(ClientboundPackets1_20_5.CONTAINER_SET_DATA);
+        registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
 
         new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_20_5.UPDATE_RECIPES);

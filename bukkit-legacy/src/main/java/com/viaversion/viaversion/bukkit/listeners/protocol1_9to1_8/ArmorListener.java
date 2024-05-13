@@ -19,11 +19,10 @@ package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorTypes1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.ArmorTypes1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -76,7 +75,7 @@ public class ArmorListener extends ViaBukkitListener {
         HumanEntity human = e.getWhoClicked();
         if (human instanceof final Player player && e.getInventory() instanceof CraftingInventory) {
             if ((e.getCurrentItem() != null && ArmorTypes1_8.isArmor(e.getCurrentItem().getTypeId()))
-                    || (e.getRawSlot() >= 5 && e.getRawSlot() <= 8)) {
+                || (e.getRawSlot() >= 5 && e.getRawSlot() <= 8)) {
                 sendDelayedArmorUpdate(player);
             }
         }

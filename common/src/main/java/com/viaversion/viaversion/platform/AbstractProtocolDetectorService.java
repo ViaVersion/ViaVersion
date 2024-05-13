@@ -19,7 +19,6 @@ package com.viaversion.viaversion.platform;
 
 import com.viaversion.viaversion.api.platform.ProtocolDetectorService;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.api.protocol.version.VersionType;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.Map;

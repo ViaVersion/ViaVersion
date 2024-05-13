@@ -23,12 +23,11 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
@@ -47,11 +46,11 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             return inputValue / 63.0F;
         }
     };
-    public static final ValueTransformer<List<Metadata>, List<Metadata>> TRANSFORM_METADATA = new ValueTransformer<>(Types1_9.METADATA_LIST) {
+    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_METADATA = new ValueTransformer<>(Types1_9.ENTITY_DATA_LIST) {
         @Override
-        public List<Metadata> transform(PacketWrapper wrapper, List<Metadata> inputValue) {
-            List<Metadata> metaList = new CopyOnWriteArrayList<>(inputValue);
-            for (Metadata m : metaList) {
+        public List<EntityData> transform(PacketWrapper wrapper, List<EntityData> inputValue) {
+            List<EntityData> metaList = new CopyOnWriteArrayList<>(inputValue);
+            for (EntityData m : metaList) {
                 if (m.id() >= 5)
                     m.setId(m.id() + 1);
             }
@@ -106,7 +105,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
             }
         });
 
@@ -126,7 +125,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 12 - Metadata
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 12 - Metadata
             }
         });
 
@@ -141,7 +140,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_9.METADATA_LIST, TRANSFORM_METADATA); // 7 - Metadata list
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 7 - Metadata list
             }
         });
 

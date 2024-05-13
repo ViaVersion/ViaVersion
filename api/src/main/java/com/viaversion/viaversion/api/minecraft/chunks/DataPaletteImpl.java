@@ -137,6 +137,7 @@ public final class DataPaletteImpl implements DataPalette {
 
     interface ChunkData {
         int get(int idx);
+
         void set(int idx, int val);
     }
 

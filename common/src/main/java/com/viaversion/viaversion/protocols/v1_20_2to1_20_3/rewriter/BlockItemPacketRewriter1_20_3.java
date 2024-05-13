@@ -55,21 +55,21 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPacket1_20_2> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_20_2.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_20_2.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_2.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerEffect(ClientboundPackets1_20_2.LEVEL_EVENT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_20_2.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_20_2.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_2.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_20_2.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_2.BLOCK_ENTITY_DATA);
 
-        registerSetCooldown(ClientboundPackets1_20_2.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_20_2.CONTAINER_SET_CONTENT);
+        registerCooldown(ClientboundPackets1_20_2.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_20_2.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_20_2.CONTAINER_SET_SLOT);
-        registerEntityEquipmentArray(ClientboundPackets1_20_2.SET_EQUIPMENT);
-        registerClickWindow1_17_1(ServerboundPackets1_20_3.CONTAINER_CLICK);
-        registerTradeList1_19(ClientboundPackets1_20_2.MERCHANT_OFFERS);
-        registerCreativeInvAction(ServerboundPackets1_20_3.SET_CREATIVE_MODE_SLOT);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_2.CONTAINER_SET_DATA);
+        registerSetEquipment(ClientboundPackets1_20_2.SET_EQUIPMENT);
+        registerContainerClick1_17_1(ServerboundPackets1_20_3.CONTAINER_CLICK);
+        registerMerchantOffers1_19(ClientboundPackets1_20_2.MERCHANT_OFFERS);
+        registerSetCreativeModeSlot(ServerboundPackets1_20_3.SET_CREATIVE_MODE_SLOT);
+        registerContainerSetData(ClientboundPackets1_20_2.CONTAINER_SET_DATA);
 
         protocol.registerClientbound(ClientboundPackets1_20_2.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
@@ -92,7 +92,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
                         wrapper.write(Types.VAR_INT, resourceLocation.equals("block") ? 0 : 1);
                     }
                 });
-                handler(getSpawnParticleHandler(Types.VAR_INT));
+                handler(levelParticlesHandler(Types.VAR_INT));
             }
         });
 

@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
 import com.viaversion.viaversion.api.type.types.version.Types1_18;
@@ -39,7 +38,7 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
 
     @Override
     public void registerPackets() {
-        registerMetadataRewriter(ClientboundPackets1_17_1.SET_ENTITY_DATA, Types1_17.METADATA_LIST, Types1_18.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_17_1.SET_ENTITY_DATA, Types1_17.ENTITY_DATA_LIST, Types1_18.ENTITY_DATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.LOGIN, new PacketHandlers() {
             @Override
@@ -82,8 +81,8 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_18.META_TYPES::byId);
-        filter().metaType(Types1_18.META_TYPES.particleType).handler((event, meta) -> {
+        filter().mapDataType(Types1_18.ENTITY_DATA_TYPES::byId);
+        filter().dataType(Types1_18.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = (Particle) meta.getValue();
             if (particle.id() == 2) { // Barrier
                 particle.setId(3); // Block marker
@@ -95,7 +94,7 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
             }
         });
 
-        registerMetaTypeHandler(Types1_18.META_TYPES.itemType, null, null);
+        registerEntityDataTypeHandler(Types1_18.ENTITY_DATA_TYPES.itemType, null, null);
     }
 
     @Override

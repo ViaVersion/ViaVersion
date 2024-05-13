@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.signature.model.MessageMetadata;
 import com.viaversion.viaversion.api.minecraft.signature.model.chain.v1_19_3.MessageBody;
 import com.viaversion.viaversion.api.minecraft.signature.model.chain.v1_19_3.MessageLink;
-
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.util.UUID;

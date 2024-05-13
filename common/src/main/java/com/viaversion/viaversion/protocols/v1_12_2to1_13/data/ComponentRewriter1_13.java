@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.NumberTag;
-import com.viaversion.nbt.tag.ShortTag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.ShortTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.ProtocolLogger;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.logging.Level;
 

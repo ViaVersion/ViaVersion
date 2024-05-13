@@ -27,8 +27,8 @@ public final class NMSUtil {
     private static boolean loadDebugProperty() {
         try {
             Class<?> serverClass = nms(
-                    "MinecraftServer",
-                    "net.minecraft.server.MinecraftServer"
+                "MinecraftServer",
+                "net.minecraft.server.MinecraftServer"
             );
             Object server = serverClass.getDeclaredMethod("getServer").invoke(null);
             return (boolean) serverClass.getMethod("isDebugging").invoke(server);

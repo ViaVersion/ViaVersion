@@ -81,9 +81,9 @@ public class StairConnectionHandler implements ConnectionHandler {
             }
 
             StairData stairData = new StairData(
-                    blockData.getValue("half").equals("bottom"),
-                    shape, (byte) type,
-                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
+                blockData.getValue("half").equals("bottom"),
+                shape, (byte) type,
+                BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT))
             );
 
             STAIR_DATA_MAP.put(blockData.getSavedBlockStateId(), stairData);

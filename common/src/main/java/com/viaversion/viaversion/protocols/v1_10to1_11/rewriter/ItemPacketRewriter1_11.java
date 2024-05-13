@@ -36,8 +36,8 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
     @Override
     public void registerPackets() {
         registerSetSlot(ClientboundPackets1_9_3.CONTAINER_SET_SLOT);
-        registerWindowItems(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
-        registerEntityEquipment(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
+        registerSetContent(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
+        registerSetEquippedItem(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
 
         // Plugin message Packet -> Trading
         protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
@@ -68,8 +68,8 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
             }
         });
 
-        registerClickWindow(ServerboundPackets1_9_3.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick(ServerboundPackets1_9_3.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

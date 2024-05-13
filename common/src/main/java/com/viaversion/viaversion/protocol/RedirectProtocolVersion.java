@@ -20,11 +20,11 @@ package com.viaversion.viaversion.protocol;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.SubVersionRange;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Comparator;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Special protocol version that compares to another version. This can be used for e.g. April Fool versions which are depending 
+ * Special protocol version that compares to another version. This can be used for e.g. April Fool versions which are depending
  * on vanilla game versions.
  */
 public class RedirectProtocolVersion extends ProtocolVersion {

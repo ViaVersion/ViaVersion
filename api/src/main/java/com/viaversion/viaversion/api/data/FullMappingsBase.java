@@ -54,6 +54,15 @@ public class FullMappingsBase implements FullMappings {
         this.mappings = mappings;
     }
 
+    private static Object2IntMap<String> toInverseMap(final List<String> list) {
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(list.size());
+        map.defaultReturnValue(-1);
+        for (int i = 0; i < list.size(); i++) {
+            map.put(list.get(i), i);
+        }
+        return map;
+    }
+
     @Override
     public int id(final String identifier) {
         return stringToId.getInt(Key.stripMinecraftNamespace(identifier));
@@ -118,14 +127,5 @@ public class FullMappingsBase implements FullMappings {
     @Override
     public FullMappings inverse() {
         return new FullMappingsBase(mappedStringToId, stringToId, mappedIdToString, idToString, mappings.inverse());
-    }
-
-    private static Object2IntMap<String> toInverseMap(final List<String> list) {
-        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(list.size());
-        map.defaultReturnValue(-1);
-        for (int i = 0; i < list.size(); i++) {
-            map.put(list.get(i), i);
-        }
-        return map;
     }
 }

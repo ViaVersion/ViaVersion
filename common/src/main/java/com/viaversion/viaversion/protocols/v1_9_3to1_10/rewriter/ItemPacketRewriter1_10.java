@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_9_3to1_10.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPackets1_9_3;
@@ -34,7 +33,7 @@ public class ItemPacketRewriter1_10 extends ItemRewriter<ClientboundPackets1_9_3
 
     @Override
     public void registerPackets() {
-        registerCreativeInvAction(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
+        registerSetCreativeModeSlot(ServerboundPackets1_9_3.SET_CREATIVE_MODE_SLOT);
     }
 
     @Override

@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
@@ -42,17 +41,17 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_16_2.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_16_2.CONTAINER_SET_CONTENT);
-        registerTradeList(ClientboundPackets1_16_2.MERCHANT_OFFERS);
+        registerCooldown(ClientboundPackets1_16_2.COOLDOWN);
+        registerSetContent(ClientboundPackets1_16_2.CONTAINER_SET_CONTENT);
+        registerMerchantOffers(ClientboundPackets1_16_2.MERCHANT_OFFERS);
         registerSetSlot(ClientboundPackets1_16_2.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_16_2.UPDATE_ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_16_2.SET_EQUIPMENT);
-        registerSpawnParticle(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
+        registerSetEquipment(ClientboundPackets1_16_2.SET_EQUIPMENT);
+        registerLevelParticles(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.UPDATE_RECIPES);
 
-        registerCreativeInvAction(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
+        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 

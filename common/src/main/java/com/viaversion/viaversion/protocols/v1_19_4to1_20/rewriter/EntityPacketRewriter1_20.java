@@ -25,9 +25,8 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_20;
@@ -47,7 +46,7 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_19_4.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_19_4.SET_ENTITY_DATA, Types1_19_4.METADATA_LIST, Types1_20.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_19_4.SET_ENTITY_DATA, Types1_19_4.ENTITY_DATA_LIST, Types1_20.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_19_4.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_19_4.LOGIN, new PacketHandlers() {
@@ -128,17 +127,17 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_20.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_20.META_TYPES.itemType, Types1_20.META_TYPES.blockStateType, Types1_20.META_TYPES.optionalBlockStateType, Types1_20.META_TYPES.particleType, null);
+        filter().mapDataType(Types1_20.ENTITY_DATA_TYPES::byId);
+        registerEntityDataTypeHandler(Types1_20.ENTITY_DATA_TYPES.itemType, Types1_20.ENTITY_DATA_TYPES.blockStateType, Types1_20.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_20.ENTITY_DATA_TYPES.particleType, null);
 
         // Rotate item display by 180 degrees around the Y axis
         filter().type(EntityTypes1_19_4.ITEM_DISPLAY).handler((event, meta) -> {
-            if (event.trackedEntity().hasSentMetadata() || event.hasExtraMeta()) {
+            if (event.trackedEntity().hasSentEntityData() || event.hasExtraData()) {
                 return;
             }
 
-            if (event.metaAtIndex(12) == null) {
-                event.createExtraMeta(new Metadata(12, Types1_20.META_TYPES.quaternionType, Y_FLIPPED_ROTATION));
+            if (event.dataAtIndex(12) == null) {
+                event.createExtraData(new EntityData(12, Types1_20.ENTITY_DATA_TYPES.quaternionType, Y_FLIPPED_ROTATION));
             }
         });
         filter().type(EntityTypes1_19_4.ITEM_DISPLAY).index(12).handler((event, meta) -> {

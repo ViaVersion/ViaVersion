@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.common.type;
 
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -39,30 +38,30 @@ class ItemTypeTest {
     void testNormalItemRead() {
         // Test item read
         Assertions.assertEquals(
-                new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null),
-                Types.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{
-                        127, -1,
-                        -128,
-                        1, 1,
-                        0
-                }))
+            new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null),
+            Types.ITEM1_8.read(Unpooled.wrappedBuffer(new byte[]{
+                127, -1,
+                -128,
+                1, 1,
+                0
+            }))
         );
         Assertions.assertEquals(
-                new DataItem(420, (byte) 53, (short) 0, null),
-                Types.ITEM1_13.read(Unpooled.wrappedBuffer(new byte[]{
-                        1, (byte) 164,
-                        53,
-                        0
-                }))
+            new DataItem(420, (byte) 53, (short) 0, null),
+            Types.ITEM1_13.read(Unpooled.wrappedBuffer(new byte[]{
+                1, (byte) 164,
+                53,
+                0
+            }))
         );
         Assertions.assertEquals(
-                new DataItem(268435456, (byte) 127, (short) 0, null),
-                Types.ITEM1_13_2.read(Unpooled.wrappedBuffer(new byte[]{
-                        1,
-                        -128, -128, -128, -128, 1,
-                        127,
-                        0
-                }))
+            new DataItem(268435456, (byte) 127, (short) 0, null),
+            Types.ITEM1_13_2.read(Unpooled.wrappedBuffer(new byte[]{
+                1,
+                -128, -128, -128, -128, 1,
+                127,
+                0
+            }))
         );
     }
 
@@ -86,23 +85,23 @@ class ItemTypeTest {
         // Test item write
         Types.ITEM1_8.write(buf, new DataItem(Short.MAX_VALUE, (byte) -128, (short) 257, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
-                127, -1,
-                -128,
-                1, 1,
-                0
+            127, -1,
+            -128,
+            1, 1,
+            0
         });
         Types.ITEM1_13.write(buf, new DataItem(420, (byte) 53, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
-                1, (byte) 164,
-                53,
-                0
+            1, (byte) 164,
+            53,
+            0
         });
         Types.ITEM1_13_2.write(buf, new DataItem(268435456, (byte) 127, (short) 0, null));
         Assertions.assertArrayEquals(toBytes(buf), new byte[]{
-                1,
-                -128, -128, -128, -128, 1,
-                127,
-                0
+            1,
+            -128, -128, -128, -128, 1,
+            127,
+            0
         });
     }
 

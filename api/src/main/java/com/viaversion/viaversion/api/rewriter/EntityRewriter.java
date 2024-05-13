@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.rewriter;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import java.util.List;
 
@@ -65,7 +65,7 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * @param metadataList full, mutable list of metadata
      * @param connection   user connection
      */
-    void handleMetadata(int entityId, List<Metadata> metadataList, UserConnection connection);
+    void handleEntityData(int entityId, List<EntityData> metadataList, UserConnection connection);
 
     /**
      * Returns the entity tracker for the current protocol.

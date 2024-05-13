@@ -59,12 +59,12 @@ public class VelocityVersionProvider implements VersionProvider {
         ProtocolVersion playerVersion = user.getProtocolInfo().protocolVersion();
 
         IntStream versions = com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS.stream()
-                .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);
+            .mapToInt(com.velocitypowered.api.network.ProtocolVersion::getProtocol);
 
         // Modern forwarding mode needs 1.13 Login plugin message
         if (VelocityViaInjector.GET_PLAYER_INFO_FORWARDING_MODE != null
-                && ((Enum<?>) VelocityViaInjector.GET_PLAYER_INFO_FORWARDING_MODE.invoke(VelocityPlugin.PROXY.getConfiguration()))
-                .name().equals("MODERN")) {
+            && ((Enum<?>) VelocityViaInjector.GET_PLAYER_INFO_FORWARDING_MODE.invoke(VelocityPlugin.PROXY.getConfiguration()))
+            .name().equals("MODERN")) {
             versions = versions.filter(ver -> ver >= ProtocolVersion.v1_13.getVersion());
         }
         int[] compatibleProtocols = versions.toArray();

@@ -17,19 +17,18 @@
  */
 package com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter;
 
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.LongArrayTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_16;
@@ -47,10 +46,10 @@ public class WorldPacketRewriter1_16 {
     public static void register(Protocol1_15_2To1_16 protocol) {
         BlockRewriter<ClientboundPackets1_15> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_15.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_15.BLOCK_UPDATE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_15.CHUNK_BLOCKS_UPDATE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_15.BLOCK_BREAK_ACK);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_15.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_15.BLOCK_UPDATE);
+        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_15.CHUNK_BLOCKS_UPDATE);
+        blockRewriter.registerBlockBreakAck(ClientboundPackets1_15.BLOCK_BREAK_ACK);
 
         protocol.registerClientbound(ClientboundPackets1_15.LIGHT_UPDATE, new PacketHandlers() {
             @Override
@@ -101,7 +100,7 @@ public class WorldPacketRewriter1_16 {
             handleBlockEntity(protocol, wrapper.user(), tag);
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_15.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_15.LEVEL_EVENT, 1010, 2001);
     }
 
     private static void handleBlockEntity(Protocol1_15_2To1_16 protocol, UserConnection connection, CompoundTag compoundTag) {

@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 public final class TrackedEntityImpl implements TrackedEntity {
     private final EntityType entityType;
     private StoredEntityData data;
-    private boolean sentMetadata;
+    private boolean sentEntityData;
 
     public TrackedEntityImpl(final EntityType entityType) {
         this.entityType = entityType;
@@ -49,21 +49,21 @@ public final class TrackedEntityImpl implements TrackedEntity {
     }
 
     @Override
-    public boolean hasSentMetadata() {
-        return sentMetadata;
+    public boolean hasSentEntityData() {
+        return sentEntityData;
     }
 
     @Override
-    public void sentMetadata(final boolean sentMetadata) {
-        this.sentMetadata = sentMetadata;
+    public void sentEntityData(final boolean sentEntityData) {
+        this.sentEntityData = sentEntityData;
     }
 
     @Override
     public String toString() {
         return "TrackedEntityImpl{" +
-                "entityType=" + entityType +
-                ", data=" + data +
-                ", sentMetadata=" + sentMetadata +
-                '}';
+            "entityType=" + entityType +
+            ", data=" + data +
+            ", sentEntityData=" + sentEntityData +
+            '}';
     }
 }

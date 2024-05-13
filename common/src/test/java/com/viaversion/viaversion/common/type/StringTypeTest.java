@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.common.type;
 
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

@@ -22,9 +22,8 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;

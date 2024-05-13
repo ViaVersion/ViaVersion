@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
@@ -35,10 +34,10 @@ public final class WorldPacketRewriter1_15 {
     public static void register(Protocol1_14_4To1_15 protocol) {
         BlockRewriter<ClientboundPackets1_14_4> blockRewriter = BlockRewriter.for1_14(protocol);
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_14_4.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_14_4.BLOCK_UPDATE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_14_4.CHUNK_BLOCKS_UPDATE);
-        blockRewriter.registerAcknowledgePlayerDigging(ClientboundPackets1_14_4.BLOCK_BREAK_ACK);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_14_4.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_14_4.BLOCK_UPDATE);
+        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_14_4.CHUNK_BLOCKS_UPDATE);
+        blockRewriter.registerBlockBreakAck(ClientboundPackets1_14_4.BLOCK_BREAK_ACK);
 
         protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_CHUNK, wrapper -> {
             Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
@@ -80,7 +79,7 @@ public final class WorldPacketRewriter1_15 {
             }
         });
 
-        blockRewriter.registerEffect(ClientboundPackets1_14_4.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_14_4.LEVEL_EVENT, 1010, 2001);
         protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {

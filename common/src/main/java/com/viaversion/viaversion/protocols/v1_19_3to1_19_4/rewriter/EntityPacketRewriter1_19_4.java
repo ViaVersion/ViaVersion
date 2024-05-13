@@ -25,7 +25,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
@@ -204,7 +203,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
 
         registerTrackerWithData1_19(ClientboundPackets1_19_3.ADD_ENTITY, EntityTypes1_19_4.FALLING_BLOCK);
         registerRemoveEntities(ClientboundPackets1_19_3.REMOVE_ENTITIES);
-        registerMetadataRewriter(ClientboundPackets1_19_3.SET_ENTITY_DATA, Types1_19_3.METADATA_LIST, Types1_19_4.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_19_3.SET_ENTITY_DATA, Types1_19_3.ENTITY_DATA_LIST, Types1_19_4.ENTITY_DATA_LIST);
     }
 
     private int damageTypeFromEntityEvent(byte entityEvent) {
@@ -220,8 +219,8 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(typeId -> Types1_19_4.META_TYPES.byId(typeId >= 14 ? typeId + 1 : typeId)); // Optional block state (and map block state=14 to optional block state)
-        registerMetaTypeHandler(Types1_19_4.META_TYPES.itemType, Types1_19_4.META_TYPES.blockStateType, Types1_19_4.META_TYPES.optionalBlockStateType, Types1_19_4.META_TYPES.particleType, null);
+        filter().mapDataType(typeId -> Types1_19_4.ENTITY_DATA_TYPES.byId(typeId >= 14 ? typeId + 1 : typeId)); // Optional block state (and map block state=14 to optional block state)
+        registerEntityDataTypeHandler(Types1_19_4.ENTITY_DATA_TYPES.itemType, Types1_19_4.ENTITY_DATA_TYPES.blockStateType, Types1_19_4.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_4.ENTITY_DATA_TYPES.particleType, null);
 
         filter().type(EntityTypes1_19_4.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();

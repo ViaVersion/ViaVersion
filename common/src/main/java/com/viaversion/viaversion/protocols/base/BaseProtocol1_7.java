@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvide
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
@@ -156,11 +155,11 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
             if (Via.getManager().isDebug()) {
                 // Print out the route to console
                 Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
-                        new Object[]{
-                                username,
-                                info.protocolVersion().getName(),
-                                Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
-                        });
+                    new Object[]{
+                        username,
+                        info.protocolVersion().getName(),
+                        Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
+                    });
             }
         });
 

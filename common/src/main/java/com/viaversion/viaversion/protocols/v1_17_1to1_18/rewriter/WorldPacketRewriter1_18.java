@@ -35,8 +35,8 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities1_18;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
@@ -98,8 +98,8 @@ public final class WorldPacketRewriter1_18 {
 
             final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
             lightStorage.storeLight(chunkX, chunkZ,
-                    new ChunkLightStorage.ChunkLight(trustEdges, skyLightMask, blockLightMask,
-                            emptySkyLightMask, emptyBlockLightMask, skyLight, blockLight));
+                new ChunkLightStorage.ChunkLight(trustEdges, skyLightMask, blockLightMask,
+                    emptySkyLightMask, emptyBlockLightMask, skyLight, blockLight));
         });
 
         protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_CHUNK, ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
@@ -157,15 +157,15 @@ public final class WorldPacketRewriter1_18 {
 
             final Chunk chunk = new Chunk1_18(oldChunk.getX(), oldChunk.getZ(), sections, oldChunk.getHeightMap(), blockEntities);
             wrapper.write(new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent())), chunk);
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent())), chunk);
 
             final ChunkLightStorage lightStorage = wrapper.user().get(ChunkLightStorage.class);
             final boolean alreadyLoaded = !lightStorage.addLoadedChunk(chunk.getX(), chunk.getZ());
 
             // Append light data to chunk packet
             final ChunkLightStorage.ChunkLight light = Via.getConfig().cache1_17Light() ?
-                    lightStorage.getLight(chunk.getX(), chunk.getZ()) : lightStorage.removeLight(chunk.getX(), chunk.getZ());
+                lightStorage.getLight(chunk.getX(), chunk.getZ()) : lightStorage.removeLight(chunk.getX(), chunk.getZ());
             if (light == null) {
                 protocol.getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
 

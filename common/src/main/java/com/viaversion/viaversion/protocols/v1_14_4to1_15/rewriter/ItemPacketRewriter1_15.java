@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter;
 
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.packet.ClientboundPackets1_14_4;
@@ -33,16 +32,16 @@ public class ItemPacketRewriter1_15 extends ItemRewriter<ClientboundPackets1_14_
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_14_4.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_14_4.CONTAINER_SET_CONTENT);
-        registerTradeList(ClientboundPackets1_14_4.MERCHANT_OFFERS);
+        registerCooldown(ClientboundPackets1_14_4.COOLDOWN);
+        registerSetContent(ClientboundPackets1_14_4.CONTAINER_SET_CONTENT);
+        registerMerchantOffers(ClientboundPackets1_14_4.MERCHANT_OFFERS);
         registerSetSlot(ClientboundPackets1_14_4.CONTAINER_SET_SLOT);
-        registerEntityEquipment(ClientboundPackets1_14_4.SET_EQUIPPED_ITEM);
+        registerSetEquippedItem(ClientboundPackets1_14_4.SET_EQUIPPED_ITEM);
         registerAdvancements(ClientboundPackets1_14_4.UPDATE_ADVANCEMENTS);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_14_4.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_14.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick(ServerboundPackets1_14.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
     }
 }

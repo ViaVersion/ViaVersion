@@ -20,7 +20,6 @@ package com.viaversion.viaversion.bukkit.platform;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BukkitViaTask(BukkitTask task) implements PlatformTask<BukkitTask> {
 

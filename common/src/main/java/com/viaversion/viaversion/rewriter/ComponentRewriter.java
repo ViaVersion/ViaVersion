@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.rewriter;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.nbt.tag.Tag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -61,7 +61,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, this::passthroughAndProcess);
     }
 
-    public void registerBossBar(final C packetType) {
+    public void registerBossEvent(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -80,7 +80,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     /**
      * Handles sub 1.17 combat event components.
      */
-    public void registerCombatEvent(final C packetType) {
+    public void registerPlayerCombat(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             if (wrapper.passthrough(Types.VAR_INT) == 2) {
                 wrapper.passthrough(Types.VAR_INT);
@@ -118,7 +118,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerOpenWindow(final C packetType) {
+    public void registerOpenScreen(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -136,7 +136,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerCombatKill(final C packetType) {
+    public void registerPlayerCombatKill(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -147,7 +147,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerCombatKill1_20(final C packetType) {
+    public void registerPlayerCombatKill1_20(final C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {

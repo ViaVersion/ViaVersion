@@ -38,10 +38,10 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPackets1_19_3> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_19_3.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_19_3.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_19_3.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_19_3.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_19_3.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_19_3.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_19_3.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_19_3.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_19_3.BLOCK_ENTITY_DATA);
 
         protocol.registerClientbound(ClientboundPackets1_19_3.LEVEL_EVENT, new PacketHandlers() {
@@ -84,16 +84,16 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
             }
         });
 
-        registerSetCooldown(ClientboundPackets1_19_3.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_CONTENT);
+        registerCooldown(ClientboundPackets1_19_3.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_19_3.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_19_3.UPDATE_ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_19_3.SET_EQUIPMENT);
-        registerTradeList1_19(ClientboundPackets1_19_3.MERCHANT_OFFERS);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_19_3.CONTAINER_SET_DATA);
-        registerSpawnParticle1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
-        registerCreativeInvAction(ServerboundPackets1_19_4.SET_CREATIVE_MODE_SLOT);
-        registerClickWindow1_17_1(ServerboundPackets1_19_4.CONTAINER_CLICK);
+        registerSetEquipment(ClientboundPackets1_19_3.SET_EQUIPMENT);
+        registerMerchantOffers1_19(ClientboundPackets1_19_3.MERCHANT_OFFERS);
+        registerContainerSetData(ClientboundPackets1_19_3.CONTAINER_SET_DATA);
+        registerLevelParticles1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
+        registerSetCreativeModeSlot(ServerboundPackets1_19_4.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick1_17_1(ServerboundPackets1_19_4.CONTAINER_CLICK);
 
         new RecipeRewriter1_19_3<>(protocol) {
             @Override

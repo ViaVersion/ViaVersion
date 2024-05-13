@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
@@ -39,11 +38,11 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_18.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_18.CONTAINER_SET_CONTENT);
+        registerCooldown(ClientboundPackets1_18.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_18.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_18.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_18.UPDATE_ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_18.SET_EQUIPMENT);
+        registerSetEquipment(ClientboundPackets1_18.SET_EQUIPMENT);
         protocol.registerClientbound(ClientboundPackets1_18.LEVEL_PARTICLES, new PacketHandlers() {
             @Override
             public void register() {
@@ -70,14 +69,14 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
                         }
                     }
                 });
-                handler(getSpawnParticleHandler(Types.VAR_INT));
+                handler(levelParticlesHandler(Types.VAR_INT));
             }
         });
 
-        registerClickWindow1_17_1(ServerboundPackets1_19.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_19.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick1_17_1(ServerboundPackets1_19.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_19.SET_CREATIVE_MODE_SLOT);
 
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_18.CONTAINER_SET_DATA);
+        registerContainerSetData(ClientboundPackets1_18.CONTAINER_SET_DATA);
 
         protocol.registerClientbound(ClientboundPackets1_18.MERCHANT_OFFERS, new PacketHandlers() {
             @Override

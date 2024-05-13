@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -36,7 +36,6 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
-
 import java.util.UUID;
 
 public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1_15, Protocol1_15_2To1_16> {
@@ -108,7 +107,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
         registerTrackerWithData(ClientboundPackets1_15.ADD_ENTITY, EntityTypes1_16.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_15.ADD_MOB);
         registerTracker(ClientboundPackets1_15.ADD_PLAYER, EntityTypes1_16.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_15.SET_ENTITY_DATA, Types1_14.METADATA_LIST, Types1_16.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_15.SET_ENTITY_DATA, Types1_14.ENTITY_DATA_LIST, Types1_16.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_15.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_15.RESPAWN, new PacketHandlers() {
@@ -207,8 +206,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_16.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_16.META_TYPES.itemType, Types1_16.META_TYPES.optionalBlockStateType, Types1_16.META_TYPES.particleType);
+        filter().mapDataType(Types1_16.ENTITY_DATA_TYPES::byId);
+        registerEntityDataTypeHandler(Types1_16.ENTITY_DATA_TYPES.itemType, Types1_16.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_16.ENTITY_DATA_TYPES.particleType);
         filter().type(EntityTypes1_16.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
             int data = meta.value();
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
@@ -217,7 +216,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
         filter().type(EntityTypes1_16.WOLF).index(16).handler((event, meta) -> {
             byte mask = meta.value();
             int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
-            event.createExtraMeta(new Metadata(20, Types1_16.META_TYPES.varIntType, angerTime));
+            event.createExtraData(new EntityData(20, Types1_16.ENTITY_DATA_TYPES.varIntType, angerTime));
         });
     }
 

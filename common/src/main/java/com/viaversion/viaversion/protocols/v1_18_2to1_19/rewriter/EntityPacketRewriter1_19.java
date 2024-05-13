@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
+import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
-import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -60,7 +60,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
     @Override
     public void registerPackets() {
         registerTracker(ClientboundPackets1_18.ADD_PLAYER, EntityTypes1_19.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_18.SET_ENTITY_DATA, Types1_18.METADATA_LIST, Types1_19.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_18.SET_ENTITY_DATA, Types1_18.ENTITY_DATA_LIST, Types1_19.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_18.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundPackets1_18.ADD_ENTITY, new PacketHandlers() {
@@ -118,9 +118,9 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                     // Send motive in metadata
                     final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
                     metaPacket.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0)); // Entity id
-                    final List<Metadata> metadata = new ArrayList<>();
-                    metadata.add(new Metadata(8, Types1_19.META_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
-                    metaPacket.write(Types1_19.METADATA_LIST, metadata);
+                    final List<EntityData> metadata = new ArrayList<>();
+                    metadata.add(new EntityData(8, Types1_19.ENTITY_DATA_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
+                    metaPacket.write(Types1_19.ENTITY_DATA_LIST, metadata);
                     metaPacket.send(Protocol1_18_2To1_19.class);
                 });
             }
@@ -287,11 +287,11 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
 
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()
-                    .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
-                    .filter(it -> it.value().containsKey("min_y") && it.value().containsKey("height"))
-                    .max(Comparator.comparingInt(it -> it.value().size()))
-                    .orElseThrow(() -> new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension))
-                    .key().getValue();
+                .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
+                .filter(it -> it.value().containsKey("min_y") && it.value().containsKey("height"))
+                .max(Comparator.comparingInt(it -> it.value().size()))
+                .orElseThrow(() -> new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension))
+                .key().getValue();
         }
 
         wrapper.write(Types.STRING, dimensionKey);
@@ -316,8 +316,8 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_19.META_TYPES::byId);
-        filter().metaType(Types1_19.META_TYPES.particleType).handler((event, meta) -> {
+        filter().mapDataType(Types1_19.ENTITY_DATA_TYPES::byId);
+        filter().dataType(Types1_19.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
             final Particle particle = (Particle) meta.getValue();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
             if (particle.id() == particleMappings.id("vibration")) {
@@ -334,7 +334,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
             rewriteParticle(event.user(), particle);
         });
 
-        registerMetaTypeHandler(Types1_19.META_TYPES.itemType, Types1_19.META_TYPES.optionalBlockStateType, null);
+        registerEntityDataTypeHandler(Types1_19.ENTITY_DATA_TYPES.itemType, Types1_19.ENTITY_DATA_TYPES.optionalBlockStateType, null);
 
         filter().type(EntityTypes1_19.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             // Convert to new block id
@@ -342,7 +342,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
             meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
-        filter().type(EntityTypes1_19.CAT).index(19).mapMetaType(typeId -> Types1_19.META_TYPES.catVariantType);
+        filter().type(EntityTypes1_19.CAT).index(19).mapDataType(typeId -> Types1_19.ENTITY_DATA_TYPES.catVariantType);
     }
 
     @Override

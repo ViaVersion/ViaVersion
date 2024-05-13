@@ -17,14 +17,14 @@
  */
 package com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter;
 
+import com.google.common.collect.Sets;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.DoubleTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -42,7 +42,6 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
-
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -65,7 +64,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_13.COOLDOWN);
+        registerCooldown(ClientboundPackets1_13.COOLDOWN);
         registerAdvancements(ClientboundPackets1_13.UPDATE_ADVANCEMENTS);
 
         protocol.registerClientbound(ClientboundPackets1_13.OPEN_SCREEN, null, wrapper -> {
@@ -134,7 +133,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             }
         });
 
-        registerWindowItems(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
+        registerSetContent(ClientboundPackets1_13.CONTAINER_SET_CONTENT);
         registerSetSlot(ClientboundPackets1_13.CONTAINER_SET_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_13.CUSTOM_PAYLOAD, new PacketHandlers() {
@@ -188,7 +187,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             }
         });
 
-        registerEntityEquipment(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
+        registerSetEquippedItem(ClientboundPackets1_13.SET_EQUIPPED_ITEM);
 
         RecipeRewriter<ClientboundPackets1_13> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_13.UPDATE_RECIPES, wrapper -> {
@@ -210,7 +209,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
         });
 
 
-        registerClickWindow(ServerboundPackets1_14.CONTAINER_CLICK);
+        registerContainerClick(ServerboundPackets1_14.CONTAINER_CLICK);
 
         protocol.registerServerbound(ServerboundPackets1_14.SELECT_TRADE, wrapper -> {
             // Selecting trade now moves the items, we need to resync the inventory
@@ -227,9 +226,9 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             resyncPacket.scheduleSendToServer(Protocol1_13_2To1_14.class);
         });
 
-        registerCreativeInvAction(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
+        registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
 
-        registerSpawnParticle(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
+        registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
     }
 
     @Override

@@ -84,14 +84,14 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_3.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_3> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_3.SOUND_ENTITY);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_3.SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_3.SOUND_ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.AWARD_STATS);
 
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
-        componentRewriter.registerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
+        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Types.STRING); // Server ID

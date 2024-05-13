@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_9_1to1_9_3;
 
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.StringTag;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -32,7 +32,6 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
@@ -103,10 +102,10 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
                     int id = blocks.idAt(idx) >> 4;
                     if (FakeTileEntities1_9_1.isTileEntity(id)) {
                         tags.add(FakeTileEntities1_9_1.createTileEntity(
-                                ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
-                                ChunkSection.yFromIndex(idx) + (s << 4),
-                                ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
-                                id
+                            ChunkSection.xFromIndex(idx) + (chunk.getX() << 4),
+                            ChunkSection.yFromIndex(idx) + (s << 4),
+                            ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4),
+                            id
                         ));
                     }
                 }

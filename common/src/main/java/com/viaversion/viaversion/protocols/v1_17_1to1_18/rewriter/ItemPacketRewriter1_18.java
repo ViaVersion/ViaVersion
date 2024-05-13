@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter;
 
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
@@ -35,12 +34,12 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
 
     @Override
     public void registerPackets() {
-        registerSetCooldown(ClientboundPackets1_17_1.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_CONTENT);
-        registerTradeList(ClientboundPackets1_17_1.MERCHANT_OFFERS);
+        registerCooldown(ClientboundPackets1_17_1.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_CONTENT);
+        registerMerchantOffers(ClientboundPackets1_17_1.MERCHANT_OFFERS);
         registerSetSlot1_17_1(ClientboundPackets1_17_1.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_17_1.UPDATE_ADVANCEMENTS);
-        registerEntityEquipmentArray(ClientboundPackets1_17_1.SET_EQUIPMENT);
+        registerSetEquipment(ClientboundPackets1_17_1.SET_EQUIPMENT);
 
         protocol.registerClientbound(ClientboundPackets1_17_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
@@ -100,7 +99,7 @@ public final class ItemPacketRewriter1_18 extends ItemRewriter<ClientboundPacket
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_17_1.UPDATE_RECIPES);
 
-        registerClickWindow1_17_1(ServerboundPackets1_17.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick1_17_1(ServerboundPackets1_17.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_17.SET_CREATIVE_MODE_SLOT);
     }
 }

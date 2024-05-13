@@ -106,9 +106,9 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             }
         });
 
-        registerSetCooldown(ClientboundPackets1_15.COOLDOWN);
-        registerWindowItems(ClientboundPackets1_15.CONTAINER_SET_CONTENT);
-        registerTradeList(ClientboundPackets1_15.MERCHANT_OFFERS);
+        registerCooldown(ClientboundPackets1_15.COOLDOWN);
+        registerSetContent(ClientboundPackets1_15.CONTAINER_SET_CONTENT);
+        registerMerchantOffers(ClientboundPackets1_15.MERCHANT_OFFERS);
         registerSetSlot(ClientboundPackets1_15.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_15.UPDATE_ADVANCEMENTS);
 
@@ -127,8 +127,8 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_15.UPDATE_RECIPES);
 
-        registerClickWindow(ServerboundPackets1_16.CONTAINER_CLICK);
-        registerCreativeInvAction(ServerboundPackets1_16.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick(ServerboundPackets1_16.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_16.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerServerbound(ServerboundPackets1_16.CONTAINER_CLOSE, wrapper -> {
             InventoryTracker1_16 inventoryTracker = wrapper.user().get(InventoryTracker1_16.class);
@@ -137,7 +137,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
 
-        registerSpawnParticle(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
+        registerLevelParticles(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
     }
 
     @Override
@@ -240,7 +240,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         }
 
         String mappedAttribute = (inverse ? Attributes1_16.attributeIdentifierMappings().inverse()
-                : Attributes1_16.attributeIdentifierMappings()).get(attributeName);
+            : Attributes1_16.attributeIdentifierMappings()).get(attributeName);
         if (mappedAttribute == null) return;
 
         attributeNameTag.setValue(mappedAttribute);

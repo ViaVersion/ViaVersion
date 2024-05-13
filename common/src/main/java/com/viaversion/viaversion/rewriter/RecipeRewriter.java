@@ -150,7 +150,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Additions
     }
 
-    protected @Nullable Item rewrite(UserConnection connection,  @Nullable Item item) {
+    protected @Nullable Item rewrite(UserConnection connection, @Nullable Item item) {
         if (protocol.getItemRewriter() != null) {
             return protocol.getItemRewriter().handleItemToClient(connection, item);
         }

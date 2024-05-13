@@ -48,11 +48,11 @@ public interface TrackedEntity {
     boolean hasData();
 
     /**
-     * Returns whether metadata has already been sent at least once for this entity.
+     * Returns whether entity data has already been sent at least once for this entity.
      *
-     * @return whether metadata has already been sent at least once for this entity
+     * @return whether entity data has already been sent at least once for this entity
      */
-    boolean hasSentMetadata();
+    boolean hasSentEntityData();
 
-    void sentMetadata(boolean sentMetadata);
+    void sentEntityData(boolean sentEntityData);
 }

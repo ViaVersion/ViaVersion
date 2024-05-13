@@ -77,7 +77,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
             if (values.length == expectedLength) { // Thanks, Hypixel
                 CompactArrayUtil.iterateCompactArrayWithPadding(bitsPerValue, type.size(), values,
-                        bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
+                    bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
             }
         }
         return palette;

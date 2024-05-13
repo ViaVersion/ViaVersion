@@ -29,10 +29,9 @@ import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
@@ -71,7 +70,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
-        registerMetadataRewriter(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.METADATA_LIST, Types1_20_5.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, Types1_20_5.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
@@ -393,31 +392,31 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(typeId -> {
+        filter().mapDataType(typeId -> {
             int id = typeId;
-            if (id >= Types1_20_5.META_TYPES.particlesType.typeId()) {
+            if (id >= Types1_20_5.ENTITY_DATA_TYPES.particlesType.typeId()) {
                 id++;
             }
-            if (id >= Types1_20_5.META_TYPES.wolfVariantType.typeId()) {
+            if (id >= Types1_20_5.ENTITY_DATA_TYPES.wolfVariantType.typeId()) {
                 id++;
             }
-            if (id >= Types1_20_5.META_TYPES.armadilloState.typeId()) {
+            if (id >= Types1_20_5.ENTITY_DATA_TYPES.armadilloState.typeId()) {
                 id++;
             }
-            return Types1_20_5.META_TYPES.byId(id);
+            return Types1_20_5.ENTITY_DATA_TYPES.byId(id);
         });
 
-        registerMetaTypeHandler(
-            Types1_20_5.META_TYPES.itemType,
-            Types1_20_5.META_TYPES.blockStateType,
-            Types1_20_5.META_TYPES.optionalBlockStateType,
-            Types1_20_5.META_TYPES.particleType,
+        registerEntityDataTypeHandler(
+            Types1_20_5.ENTITY_DATA_TYPES.itemType,
+            Types1_20_5.ENTITY_DATA_TYPES.blockStateType,
+            Types1_20_5.ENTITY_DATA_TYPES.optionalBlockStateType,
+            Types1_20_5.ENTITY_DATA_TYPES.particleType,
             null
         );
-        filter().metaType(Types1_20_5.META_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
-        filter().metaType(Types1_20_5.META_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
+        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
+        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
 
-        filter().metaType(Types1_20_5.META_TYPES.itemType).handler((event, meta) -> {
+        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.itemType).handler((event, meta) -> {
             final Item item = meta.value();
             if (item != null && item.amount() <= 0) {
                 // No longer accepted by the client, needs to be properly empty
@@ -429,13 +428,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final int effectColor = meta.value();
             if (effectColor == 0) {
                 // No effect
-                meta.setTypeAndValue(Types1_20_5.META_TYPES.particlesType, new Particle[0]);
+                meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
                 return;
             }
 
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
             particle.add(Types.INT, withAlpha(effectColor));
-            meta.setTypeAndValue(Types1_20_5.META_TYPES.particlesType, new Particle[]{particle});
+            meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
         });
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
@@ -444,14 +443,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final int metaIndex = event.index();
             if (metaIndex == 9) {
                 // If the color is found first
-                final Metadata particleData = event.metaAtIndex(11);
+                final EntityData particleData = event.dataAtIndex(11);
                 final int color = meta.value();
                 if (particleData == null) {
                     if (color != 0) {
                         // Add default particle with data
                         final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
                         particle.add(Types.INT, withAlpha(color));
-                        event.createExtraMeta(new Metadata(10, Types1_20_5.META_TYPES.particleType, particle));
+                        event.createExtraData(new EntityData(10, Types1_20_5.ENTITY_DATA_TYPES.particleType, particle));
                     }
                 } else {
                     addColor(particleData, color);
@@ -467,8 +466,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
             if (metaIndex == 11) {
                 // If the particle is found first
-                final Metadata colorData = event.metaAtIndex(9);
-                if (colorData != null && colorData.metaType() == Types1_20_5.META_TYPES.varIntType) {
+                final EntityData colorData = event.dataAtIndex(9);
+                if (colorData != null && colorData.dataType() == Types1_20_5.ENTITY_DATA_TYPES.varIntType) {
                     addColor(meta, colorData.value());
                 }
             }
@@ -487,7 +486,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         });
     }
 
-    private void addColor(@Nullable final Metadata particleMeta, final int color) {
+    private void addColor(@Nullable final EntityData particleMeta, final int color) {
         if (particleMeta == null) {
             return;
         }

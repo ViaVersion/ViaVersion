@@ -59,8 +59,8 @@ public class UserConnectionImpl implements UserConnection {
     private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new HashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
-            .expireAfterWrite(10, TimeUnit.SECONDS)
-            .<UUID, Boolean>build().asMap());
+        .expireAfterWrite(10, TimeUnit.SECONDS)
+        .<UUID, Boolean>build().asMap());
     private final ProtocolInfo protocolInfo = new ProtocolInfoImpl();
     private final Channel channel;
     private final boolean clientSide;
@@ -167,7 +167,7 @@ public class UserConnectionImpl implements UserConnection {
         if (clientSide) {
             // We'll just assume that Via decoder isn't wrapping the original decoder
             act = () -> getChannel().pipeline()
-                    .context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
+                .context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
         } else {
             act = () -> channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
         }
@@ -234,7 +234,7 @@ public class UserConnectionImpl implements UserConnection {
         try {
             // We'll use passing through because there are some encoder wrappers
             ChannelHandlerContext context = PipelineUtil
-                    .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
+                .getPreviousContext(Via.getManager().getInjector().getDecoderName(), channel.pipeline());
 
             if (shouldTransformPacket()) {
                 // Bypass serverbound packet decoder transforming
@@ -268,7 +268,7 @@ public class UserConnectionImpl implements UserConnection {
 
     private void sendRawPacketToServerClientSide(final ByteBuf packet, boolean currentThread) {
         Runnable act = () -> getChannel().pipeline()
-                .context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+            .context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
         if (currentThread) {
             act.run();
         } else {

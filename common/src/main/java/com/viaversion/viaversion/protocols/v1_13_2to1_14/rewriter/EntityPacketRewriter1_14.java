@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -137,9 +137,9 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 12 - Metadata
+                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 12 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST));
+                handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST));
             }
         });
 
@@ -165,9 +165,9 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST); // 7 - Metadata
+                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 7 - Metadata
 
-                handler(trackerAndRewriterHandler(Types1_14.METADATA_LIST, EntityTypes1_14.PLAYER));
+                handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST, EntityTypes1_14.PLAYER));
             }
         });
 
@@ -184,12 +184,12 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
                         PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
                         metadataPacket.write(Types.VAR_INT, entityId);
-                        List<Metadata> metadataList = new LinkedList<>();
+                        List<EntityData> metadataList = new LinkedList<>();
                         if (tracker.clientEntityId() != entityId) {
-                            metadataList.add(new Metadata(6, Types1_14.META_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
+                            metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
                         }
-                        metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalBlockPositionType, null));
-                        metadataPacket.write(Types1_14.METADATA_LIST, metadataList);
+                        metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, null));
+                        metadataPacket.write(Types1_14.ENTITY_DATA_LIST, metadataList);
                         metadataPacket.scheduleSend(Protocol1_13_2To1_14.class);
                     }
                 });
@@ -242,24 +242,24 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     tracker.setSleeping(entityId, true);
 
                     Position position = wrapper.read(Types.BLOCK_POSITION1_8);
-                    List<Metadata> metadataList = new LinkedList<>();
-                    metadataList.add(new Metadata(12, Types1_14.META_TYPES.optionalBlockPositionType, position));
+                    List<EntityData> metadataList = new LinkedList<>();
+                    metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, position));
                     if (tracker.clientEntityId() != entityId) {
-                        metadataList.add(new Metadata(6, Types1_14.META_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
+                        metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
                     }
-                    wrapper.write(Types1_14.METADATA_LIST, metadataList);
+                    wrapper.write(Types1_14.ENTITY_DATA_LIST, metadataList);
                 });
             }
         });
 
         registerRemoveEntities(ClientboundPackets1_13.REMOVE_ENTITIES);
-        registerMetadataRewriter(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.METADATA_LIST, Types1_14.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_13.SET_ENTITY_DATA, Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST);
     }
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_14.META_TYPES::byId);
-        registerMetaTypeHandler(Types1_14.META_TYPES.itemType, Types1_14.META_TYPES.optionalBlockStateType, Types1_14.META_TYPES.particleType);
+        filter().mapDataType(Types1_14.ENTITY_DATA_TYPES::byId);
+        registerEntityDataTypeHandler(Types1_14.ENTITY_DATA_TYPES.itemType, Types1_14.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_14.ENTITY_DATA_TYPES.particleType);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
         filter().type(EntityTypes1_14.LIVING_ENTITY).addIndex(12);
@@ -291,7 +291,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     tracker.setRiptide(entityId, (((Number) meta.getValue()).byteValue() & 0x4) != 0);
                 }
                 if (meta.id() == 0 || meta.id() == 7) {
-                    event.createExtraMeta(new Metadata(6, Types1_14.META_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
+                    event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }
         });
@@ -302,7 +302,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 int entityId = event.entityId();
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                     | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
-                event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
+                event.createExtraData(new EntityData(13, Types1_14.ENTITY_DATA_TYPES.byteType, tracker.getInsentientData(entityId)));
                 event.cancel(); // "Are hands held up"
             } else if (meta.id() > 16) {
                 meta.setId(meta.id() - 1);
@@ -339,17 +339,17 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
         });
 
         filter().type(EntityTypes1_14.VILLAGER).index(15).handler((event, meta) -> {
-            meta.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId(meta.value()), 0));
+            meta.setTypeAndValue(Types1_14.ENTITY_DATA_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId(meta.value()), 0));
         });
 
         filter().type(EntityTypes1_14.ZOMBIE_VILLAGER).index(18).handler((event, meta) -> {
-            meta.setTypeAndValue(Types1_14.META_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId(meta.value()), 0));
+            meta.setTypeAndValue(Types1_14.ENTITY_DATA_TYPES.villagerDatatType, new VillagerData(2, getNewProfessionId(meta.value()), 0));
         });
 
         filter().type(EntityTypes1_14.ABSTRACT_ARROW).addIndex(9); // Piercing level added
 
         filter().type(EntityTypes1_14.FIREWORK_ROCKET).index(8).handler((event, meta) -> {
-            meta.setMetaType(Types1_14.META_TYPES.optionalVarIntType);
+            meta.setDataType(Types1_14.ENTITY_DATA_TYPES.optionalVarIntType);
             if (meta.getValue().equals(0)) {
                 meta.setValue(null); // https://bugs.mojang.com/browse/MC-111480
             }
@@ -360,7 +360,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             int entityId = event.entityId();
             tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                 | ((boolean) meta.getValue() ? 0x4 : 0))); // New attacking
-            event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
+            event.createExtraData(new EntityData(13, Types1_14.ENTITY_DATA_TYPES.byteType, tracker.getInsentientData(entityId)));
             event.cancel();  // "Is swinging arms"
         });
 
@@ -370,7 +370,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 int entityId = event.entityId();
                 tracker.setInsentientData(entityId, (byte) ((tracker.getInsentientData(entityId) & ~0x4)
                     | (((Number) meta.getValue()).byteValue() != 0 ? 0x4 : 0))); // New attacking
-                event.createExtraMeta(new Metadata(13, Types1_14.META_TYPES.byteType, tracker.getInsentientData(entityId)));
+                event.createExtraData(new EntityData(13, Types1_14.ENTITY_DATA_TYPES.byteType, tracker.getInsentientData(entityId)));
                 event.cancel(); // "Has target (aggressive state)"
             } else if (event.index() > 14) {
                 meta.setId(meta.id() - 1);

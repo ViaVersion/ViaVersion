@@ -52,8 +52,8 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
         tagRewriter.registerGeneric(ClientboundPackets1_19_4.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_19_4.SOUND_ENTITY);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_4.AWARD_STATS);
 
@@ -70,15 +70,15 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
     @Override
     protected void onMappingDataLoaded() {
         Types1_20.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("block_marker", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.ITEM1_13_2)
-                .reader("vibration", ParticleType.Readers.VIBRATION1_19)
-                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-                .reader("shriek", ParticleType.Readers.SHRIEK);
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("block_marker", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+            .reader("item", ParticleType.Readers.ITEM1_13_2)
+            .reader("vibration", ParticleType.Readers.VIBRATION1_19)
+            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+            .reader("shriek", ParticleType.Readers.SHRIEK);
 
         super.onMappingDataLoaded();
     }

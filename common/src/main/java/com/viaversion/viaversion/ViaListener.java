@@ -50,7 +50,7 @@ public abstract class ViaListener {
     protected boolean isOnPipe(UUID uuid) {
         UserConnection userConnection = getUserConnection(uuid);
         return userConnection != null &&
-                (requiredPipeline == null || userConnection.getProtocolInfo().getPipeline().contains(requiredPipeline));
+            (requiredPipeline == null || userConnection.getProtocolInfo().getPipeline().contains(requiredPipeline));
     }
 
     /**

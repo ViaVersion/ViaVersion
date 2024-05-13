@@ -47,8 +47,8 @@ public class PositionType1_14 extends Type<Position> {
     @Override
     public void write(ByteBuf buffer, Position object) {
         buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
-                | (object.y() & 0xfff)
-                | ((((long) object.z()) & 0x3ffffff) << 12));
+            | (object.y() & 0xfff)
+            | ((((long) object.z()) & 0x3ffffff) << 12));
     }
 
     public static final class OptionalPosition1_14Type extends OptionalType<Position> {

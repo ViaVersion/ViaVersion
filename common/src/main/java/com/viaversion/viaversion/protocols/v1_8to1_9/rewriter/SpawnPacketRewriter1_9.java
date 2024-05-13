@@ -21,16 +21,16 @@ import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import java.util.ArrayList;
@@ -102,13 +102,13 @@ public class SpawnPacketRewriter1_9 {
                         // Convert this to meta data, woo!
                         PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
                             wrapper1.write(Types.VAR_INT, entityID);
-                            List<Metadata> meta = new ArrayList<>();
+                            List<EntityData> meta = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
                             protocol.getItemRewriter().handleItemToClient(wrapper.user(), item); // Rewrite so that it gets the right nbt
                             // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
-                            Metadata potion = new Metadata(5, MetaType1_9.ITEM, item);
+                            EntityData potion = new EntityData(5, EntityDataTypes1_9.ITEM, item);
                             meta.add(potion);
-                            wrapper1.write(Types1_9.METADATA_LIST, meta);
+                            wrapper1.write(Types1_9.ENTITY_DATA_LIST, meta);
                         });
                         // Fix packet order
                         wrapper.send(Protocol1_8To1_9.class);
@@ -190,13 +190,13 @@ public class SpawnPacketRewriter1_9 {
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
 
-                map(Types1_8.METADATA_LIST, Types1_9.METADATA_LIST);
+                map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleEntityData(entityId, metadataList, wrapper.user());
                     } else {
                         protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();
@@ -204,7 +204,7 @@ public class SpawnPacketRewriter1_9 {
                 });
                 // Handler for meta data
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.handleMetadata(entityID, metadataList);
@@ -267,14 +267,14 @@ public class SpawnPacketRewriter1_9 {
                     }
                 });
 
-                map(Types1_8.METADATA_LIST, Types1_9.METADATA_LIST);
+                map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
 
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.getEntityRewriter().handleMetadata(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleEntityData(entityId, metadataList, wrapper.user());
                     } else {
                         protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
                         metadataList.clear();
@@ -283,7 +283,7 @@ public class SpawnPacketRewriter1_9 {
 
                 // Handler for meta data
                 handler(wrapper -> {
-                    List<Metadata> metadataList = wrapper.get(Types1_9.METADATA_LIST, 0);
+                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.handleMetadata(entityID, metadataList);

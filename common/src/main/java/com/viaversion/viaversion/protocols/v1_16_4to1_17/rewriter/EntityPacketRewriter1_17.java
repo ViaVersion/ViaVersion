@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_17;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.api.type.types.version.Types1_17;
@@ -47,7 +46,7 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         registerTrackerWithData(ClientboundPackets1_16_2.ADD_ENTITY, EntityTypes1_17.FALLING_BLOCK);
         registerTracker(ClientboundPackets1_16_2.ADD_MOB);
         registerTracker(ClientboundPackets1_16_2.ADD_PLAYER, EntityTypes1_17.PLAYER);
-        registerMetadataRewriter(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.METADATA_LIST, Types1_17.METADATA_LIST);
+        registerSetEntityData(ClientboundPackets1_16_2.SET_ENTITY_DATA, Types1_16.ENTITY_DATA_LIST, Types1_17.ENTITY_DATA_LIST);
 
         protocol.registerClientbound(ClientboundPackets1_16_2.REMOVE_ENTITIES, null, wrapper -> {
             int[] entityIds = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
@@ -136,15 +135,15 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().mapMetaType(Types1_17.META_TYPES::byId);
-        filter().metaType(Types1_17.META_TYPES.poseType).handler((event, meta) -> {
+        filter().mapDataType(Types1_17.ENTITY_DATA_TYPES::byId);
+        filter().dataType(Types1_17.ENTITY_DATA_TYPES.poseType).handler((event, meta) -> {
             int pose = meta.value();
             if (pose > 5) {
                 // Added LONG_JUMP at 6
                 meta.setValue(pose + 1);
             }
         });
-        registerMetaTypeHandler(Types1_17.META_TYPES.itemType, Types1_17.META_TYPES.optionalBlockStateType, Types1_17.META_TYPES.particleType);
+        registerEntityDataTypeHandler(Types1_17.ENTITY_DATA_TYPES.itemType, Types1_17.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_17.ENTITY_DATA_TYPES.particleType);
 
         // Ticks frozen added with id 7
         filter().type(EntityTypes1_17.ENTITY).addIndex(7);

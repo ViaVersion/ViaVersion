@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
@@ -52,9 +51,9 @@ public class WorldPacketRewriter1_13_1 {
             }
         });
 
-        blockRewriter.registerBlockAction(ClientboundPackets1_13.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_13.BLOCK_UPDATE);
-        blockRewriter.registerMultiBlockChange(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_13.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_13.BLOCK_UPDATE);
+        blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_13.CHUNK_BLOCKS_UPDATE);
 
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_EVENT, new PacketHandlers() {
             @Override

@@ -22,7 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.math;
 
-import com.viaversion.viaversion.api.minecraft.metadata.ChunkPosition;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;

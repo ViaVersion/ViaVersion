@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.rewriter;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.common.base.Preconditions;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
@@ -66,7 +66,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         return new BlockRewriter<>(protocol, Types.BLOCK_POSITION1_14, Types.COMPOUND_TAG);
     }
 
-    public void registerBlockAction(C packetType) {
+    public void registerBlockEvent(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -93,7 +93,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerBlockChange(C packetType) {
+    public void registerBlockUpdate(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -104,7 +104,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerMultiBlockChange(C packetType) {
+    public void registerChunkBlocksUpdate(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -119,7 +119,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerVarLongMultiBlockChange(C packetType) {
+    public void registerSectionBlocksUpdate(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -134,7 +134,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerVarLongMultiBlockChange1_20(C packetType) {
+    public void registerSectionBlocksUpdate1_20(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -148,12 +148,12 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerAcknowledgePlayerDigging(C packetType) {
+    public void registerBlockBreakAck(C packetType) {
         // Same exact handler
-        registerBlockChange(packetType);
+        registerBlockUpdate(packetType);
     }
 
-    public void registerEffect(C packetType, int playRecordId, int blockBreakId) {
+    public void registerLevelEvent(C packetType, int playRecordId, int blockBreakId) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -173,15 +173,15 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
-    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
-        registerChunkData1_19(packetType, chunkTypeSupplier, null);
+    public void registerLevelChunk1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
+        registerLevelChunk1_19(packetType, chunkTypeSupplier, null);
     }
 
-    public void registerChunkData1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
-        protocol.registerClientbound(packetType, chunkDataHandler1_19(chunkTypeSupplier, blockEntityHandler));
+    public void registerLevelChunk1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
+        protocol.registerClientbound(packetType, chunkHandler1_19(chunkTypeSupplier, blockEntityHandler));
     }
 
-    public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
+    public PacketHandler chunkHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         return wrapper -> {
             final Chunk chunk = handleChunk1_19(wrapper, chunkTypeSupplier);
             final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
@@ -205,7 +205,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         };
     }
 
-    public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) throws Exception {
+    public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) {
         final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
         Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
         Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");

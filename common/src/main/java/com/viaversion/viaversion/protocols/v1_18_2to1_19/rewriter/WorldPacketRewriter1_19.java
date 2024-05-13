@@ -35,10 +35,10 @@ public final class WorldPacketRewriter1_19 {
 
     public static void register(final Protocol1_18_2To1_19 protocol) {
         final BlockRewriter<ClientboundPackets1_18> blockRewriter = BlockRewriter.for1_14(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_18.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_18.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerEffect(ClientboundPackets1_18.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_18.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_18.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_18.LEVEL_EVENT, 1010, 2001);
 
         protocol.cancelClientbound(ClientboundPackets1_18.BLOCK_BREAK_ACK);
 
@@ -47,8 +47,8 @@ public final class WorldPacketRewriter1_19 {
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
             final ChunkType1_18 chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.passthrough(chunkType);
             for (final ChunkSection section : chunk.getSections()) {
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);

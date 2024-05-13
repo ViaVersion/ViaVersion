@@ -135,10 +135,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     @Override
     public void registerPackets() {
         final BlockRewriter<ClientboundPacket1_20_3> blockRewriter = BlockRewriter.for1_20_2(protocol);
-        blockRewriter.registerBlockAction(ClientboundPackets1_20_3.BLOCK_EVENT);
-        blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_UPDATE);
-        blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerEffect(ClientboundPackets1_20_3.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerBlockEvent(ClientboundPackets1_20_3.BLOCK_EVENT);
+        blockRewriter.registerBlockUpdate(ClientboundPackets1_20_3.BLOCK_UPDATE);
+        blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_3.SECTION_BLOCKS_UPDATE);
+        blockRewriter.registerLevelEvent(ClientboundPackets1_20_3.LEVEL_EVENT, 1010, 2001);
         protocol.registerClientbound(ClientboundPackets1_20_3.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_20_2::new);
             for (int i = 0; i < chunk.blockEntities().size(); i++) {
@@ -171,13 +171,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.write(Types.COMPOUND_TAG, tag);
         });
 
-        registerSetCooldown(ClientboundPackets1_20_3.COOLDOWN);
-        registerWindowItems1_17_1(ClientboundPackets1_20_3.CONTAINER_SET_CONTENT);
+        registerCooldown(ClientboundPackets1_20_3.COOLDOWN);
+        registerSetContent1_17_1(ClientboundPackets1_20_3.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_20_3.CONTAINER_SET_SLOT);
-        registerEntityEquipmentArray(ClientboundPackets1_20_3.SET_EQUIPMENT);
-        registerClickWindow1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
-        registerWindowPropertyEnchantmentHandler(ClientboundPackets1_20_3.CONTAINER_SET_DATA);
-        registerCreativeInvAction(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
+        registerSetEquipment(ClientboundPackets1_20_3.SET_EQUIPMENT);
+        registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
+        registerContainerSetData(ClientboundPackets1_20_3.CONTAINER_SET_DATA);
+        registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_20_5.CONTAINER_BUTTON_CLICK, wrapper -> {
             final byte containerId = wrapper.read(Types.VAR_INT).byteValue();
             final byte buttonId = wrapper.read(Types.VAR_INT).byteValue();

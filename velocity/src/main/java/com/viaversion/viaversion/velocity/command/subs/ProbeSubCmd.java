@@ -31,8 +31,8 @@ public class ProbeSubCmd implements ViaSubCommand {
     @Override
     public String description() {
         return "Forces ViaVersion to scan server protocol versions " +
-                (((VelocityViaConfig) Via.getConfig()).getVelocityPingInterval() == -1 ?
-                        "" : "(Also happens at an interval)");
+            (((VelocityViaConfig) Via.getConfig()).getVelocityPingInterval() == -1 ?
+                "" : "(Also happens at an interval)");
     }
 
     @Override
