@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.rewriter;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.common.base.Preconditions;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
@@ -186,8 +186,8 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
             final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.passthrough(chunkType);
             for (final ChunkSection section : chunk.getSections()) {
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);

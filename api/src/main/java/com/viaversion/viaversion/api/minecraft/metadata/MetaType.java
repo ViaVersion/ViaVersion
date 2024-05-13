@@ -68,9 +68,9 @@ public interface MetaType {
         @Override
         public String toString() {
             return "MetaType{" +
-                    "typeId=" + typeId +
-                    ", type=" + type +
-                    '}';
+                "typeId=" + typeId +
+                ", type=" + type +
+                '}';
         }
 
         @Override

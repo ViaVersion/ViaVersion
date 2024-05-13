@@ -17,11 +17,11 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import java.util.logging.Level;
 import net.lenni0451.mcstructs.text.ATextComponent;

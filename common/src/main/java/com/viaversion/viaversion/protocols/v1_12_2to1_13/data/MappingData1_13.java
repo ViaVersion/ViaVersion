@@ -17,16 +17,16 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
-import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntArrayTag;
-import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.nbt.tag.Tag;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.io.CharStreams;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntArrayTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.BiMappings;
 import com.viaversion.viaversion.api.data.Int2IntMapBiMappings;
@@ -95,13 +95,13 @@ public class MappingData1_13 extends MappingDataBase {
         }
 
         Map<String, String> translationMappingData = GsonUtil.getGson().fromJson(
-                new InputStreamReader(MappingData1_13.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
-                new TypeToken<Map<String, String>>() {
-                }.getType());
+            new InputStreamReader(MappingData1_13.class.getClassLoader().getResourceAsStream("assets/viaversion/data/mapping-lang-1.12-1.13.json")),
+            new TypeToken<Map<String, String>>() {
+            }.getType());
 
         String[] unmappedTranslationLines;
         try (Reader reader = new InputStreamReader(MappingData1_13.class.getClassLoader()
-                .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
+            .getResourceAsStream("assets/viaversion/data/en_US.properties"), StandardCharsets.UTF_8)) {
             unmappedTranslationLines = CharStreams.toString(reader).split("\n");
         } catch (IOException e) {
             throw new RuntimeException(e);

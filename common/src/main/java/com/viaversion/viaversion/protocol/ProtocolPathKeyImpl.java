@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocol;
 
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import java.util.Objects;
 
-public record ProtocolPathKeyImpl(ProtocolVersion clientProtocolVersion, ProtocolVersion serverProtocolVersion) implements ProtocolPathKey {
+public record ProtocolPathKeyImpl(ProtocolVersion clientProtocolVersion,
+                                  ProtocolVersion serverProtocolVersion) implements ProtocolPathKey {
 }

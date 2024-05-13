@@ -24,14 +24,14 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.api.minecraft.GameMode;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CompressionProvider;
@@ -164,7 +164,7 @@ public class PlayerPacketRewriter1_9 {
                         final EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                         String teamName = wrapper.get(Types.STRING, 0);
                         if (entityTracker.isAutoTeam()
-                                && teamName.equals(entityTracker.getCurrentTeam())) {
+                            && teamName.equals(entityTracker.getCurrentTeam())) {
                             // team was removed
                             // Workaround for packet order issue
                             wrapper.send(Protocol1_8To1_9.class);
@@ -258,13 +258,13 @@ public class PlayerPacketRewriter1_9 {
                             wrapper.passthrough(Types.VAR_INT); // ping
                             String displayName = wrapper.read(Types.OPTIONAL_STRING);
                             wrapper.write(Types.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_8To1_9.STRING_TO_JSON.transform(wrapper, displayName) : null);
+                                Protocol1_8To1_9.STRING_TO_JSON.transform(wrapper, displayName) : null);
                         } else if ((action == 1) || (action == 2)) { // update gamemode || update latency
                             wrapper.passthrough(Types.VAR_INT);
                         } else if (action == 3) { // update display name
                             String displayName = wrapper.read(Types.OPTIONAL_STRING);
                             wrapper.write(Types.OPTIONAL_COMPONENT, displayName != null ?
-                                    Protocol1_8To1_9.STRING_TO_JSON.transform(wrapper, displayName) : null);
+                                Protocol1_8To1_9.STRING_TO_JSON.transform(wrapper, displayName) : null);
                         }
                     }
                 });

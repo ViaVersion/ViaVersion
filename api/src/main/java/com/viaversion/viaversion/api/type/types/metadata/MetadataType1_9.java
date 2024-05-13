@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.type.types.metadata;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
-import com.viaversion.viaversion.api.type.types.metadata.ModernMetaType;
 
 public class MetadataType1_9 extends ModernMetaType {
     @Override

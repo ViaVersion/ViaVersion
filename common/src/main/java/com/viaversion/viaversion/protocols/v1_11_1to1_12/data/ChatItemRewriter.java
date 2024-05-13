@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_11_1to1_12.data;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 

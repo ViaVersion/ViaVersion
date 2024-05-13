@@ -27,7 +27,7 @@ public enum GameMode {
     SURVIVAL("Survival Mode"),
     CREATIVE("Creative Mode"),
     ADVENTURE("Adventure Mode"),
-    SPECTATOR( "Spectator Mode");
+    SPECTATOR("Spectator Mode");
 
     private final String text;
 

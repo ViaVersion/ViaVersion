@@ -90,8 +90,8 @@ public record MetaFilter(@Nullable EntityType type, boolean filterFamily,
         // Check if no specific index is filtered or the indexes are equal
         // Then check if the filter has no entity type or the type is equal to or part of the filtered parent type
         return (this.index == -1 || metadata.id() == this.index)
-                && (this.type == null || matchesType(type))
-                && (this.metaType == null || metadata.metaType() == this.metaType);
+            && (this.type == null || matchesType(type))
+            && (this.metaType == null || metadata.metaType() == this.metaType);
     }
 
     private boolean matchesType(EntityType type) {
@@ -126,12 +126,12 @@ public record MetaFilter(@Nullable EntityType type, boolean filterFamily,
     @Override
     public String toString() {
         return "MetaFilter{" +
-                "type=" + type +
-                ", filterFamily=" + filterFamily +
-                ", metaType=" + metaType +
-                ", index=" + index +
-                ", handler=" + handler +
-                '}';
+            "type=" + type +
+            ", filterFamily=" + filterFamily +
+            ", metaType=" + metaType +
+            ", index=" + index +
+            ", handler=" + handler +
+            '}';
     }
 
     public static final class Builder {

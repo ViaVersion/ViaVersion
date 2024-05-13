@@ -50,9 +50,9 @@ class VineConnectionHandler implements ConnectionHandler {
 
     private boolean isAttachedToBlock(UserConnection user, Position position) {
         return isAttachedToBlock(user, position, BlockFace.EAST)
-                || isAttachedToBlock(user, position, BlockFace.WEST)
-                || isAttachedToBlock(user, position, BlockFace.NORTH)
-                || isAttachedToBlock(user, position, BlockFace.SOUTH);
+            || isAttachedToBlock(user, position, BlockFace.WEST)
+            || isAttachedToBlock(user, position, BlockFace.NORTH)
+            || isAttachedToBlock(user, position, BlockFace.SOUTH);
     }
 
     private boolean isAttachedToBlock(UserConnection user, Position position, BlockFace blockFace) {

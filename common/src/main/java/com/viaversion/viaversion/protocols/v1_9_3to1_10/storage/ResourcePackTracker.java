@@ -33,7 +33,7 @@ public class ResourcePackTracker implements StorableObject {
     @Override
     public String toString() {
         return "ResourcePackTracker{" +
-                "lastHash='" + lastHash + '\'' +
-                '}';
+            "lastHash='" + lastHash + '\'' +
+            '}';
     }
 }

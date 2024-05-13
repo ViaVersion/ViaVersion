@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;

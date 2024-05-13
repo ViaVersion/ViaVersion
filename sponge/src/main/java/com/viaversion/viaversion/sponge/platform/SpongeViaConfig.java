@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class SpongeViaConfig extends AbstractViaConfig {
     private static final List<String> UNSUPPORTED = Arrays.asList("bungee-ping-interval",
-            "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
-            "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
+        "bungee-ping-save", "bungee-servers", "velocity-ping-interval", "velocity-ping-save", "velocity-servers",
+        "quick-move-action-fix", "change-1_9-hitbox", "change-1_14-hitbox", "blockconnection-method");
 
     public SpongeViaConfig(File folder, java.util.logging.Logger logger) {
         super(new File(folder, "config.yml"), logger);

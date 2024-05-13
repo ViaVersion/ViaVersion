@@ -29,9 +29,9 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.ComponentRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.MappingData1_14;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.EntityPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.EntityPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.ItemPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.WorldPacketRewriter1_14;
@@ -89,15 +89,15 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
             // Minecraft crashes if we not send signs tags
             wrapper.write(Types.STRING, "minecraft:signs");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    MAPPINGS.getNewBlockId(150), MAPPINGS.getNewBlockId(155)
+                MAPPINGS.getNewBlockId(150), MAPPINGS.getNewBlockId(155)
             });
             wrapper.write(Types.STRING, "minecraft:wall_signs");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    MAPPINGS.getNewBlockId(155)
+                MAPPINGS.getNewBlockId(155)
             });
             wrapper.write(Types.STRING, "minecraft:standing_signs");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    MAPPINGS.getNewBlockId(150)
+                MAPPINGS.getNewBlockId(150)
             });
             // Fences and walls tags - used for block connections
             wrapper.write(Types.STRING, "minecraft:fences");
@@ -118,7 +118,7 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
             // Should fix fuel shift clicking
             wrapper.write(Types.STRING, "minecraft:signs");
             wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                    MAPPINGS.getNewItemId(541)
+                MAPPINGS.getNewItemId(541)
             });
             // Arrows tag (used by bow)
             wrapper.write(Types.STRING, "minecraft:arrows");
@@ -147,15 +147,15 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
 
         EntityTypes1_14.initialize(this);
         Types1_13_2.PARTICLE.filler(this, false)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.ITEM1_13_2);
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("item", ParticleType.Readers.ITEM1_13_2);
         Types1_14.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("item", ParticleType.Readers.ITEM1_13_2);
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("item", ParticleType.Readers.ITEM1_13_2);
 
         super.onMappingDataLoaded();
     }

@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_13;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
@@ -228,8 +227,8 @@ public class WorldPacketRewriter1_14 {
             int diffX = Math.abs(entityTracker.getChunkCenterX() - chunk.getX());
             int diffZ = Math.abs(entityTracker.getChunkCenterZ() - chunk.getZ());
             if (entityTracker.isForceSendCenterChunk()
-                    || diffX >= SERVERSIDE_VIEW_DISTANCE
-                    || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
+                || diffX >= SERVERSIDE_VIEW_DISTANCE
+                || diffZ >= SERVERSIDE_VIEW_DISTANCE) {
                 PacketWrapper fakePosLook = wrapper.create(ClientboundPackets1_14.SET_CHUNK_CACHE_CENTER); // Set center chunk
                 fakePosLook.write(Types.VAR_INT, chunk.getX());
                 fakePosLook.write(Types.VAR_INT, chunk.getZ());

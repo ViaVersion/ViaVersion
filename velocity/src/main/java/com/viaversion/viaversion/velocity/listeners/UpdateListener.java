@@ -26,7 +26,7 @@ public class UpdateListener {
     @Subscribe
     public void onJoin(PostLoginEvent e) {
         if (e.getPlayer().hasPermission("viaversion.update")
-                && Via.getConfig().isCheckForUpdates()) {
+            && Via.getConfig().isCheckForUpdates()) {
             UpdateUtil.sendUpdateMessage(e.getPlayer().getUniqueId());
         }
     }

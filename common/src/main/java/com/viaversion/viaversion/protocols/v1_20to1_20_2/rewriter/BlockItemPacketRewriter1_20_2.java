@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_20to1_20_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -93,13 +92,13 @@ public final class BlockItemPacketRewriter1_20_2 extends ItemRewriter<Clientboun
         protocol.registerClientbound(ClientboundPackets1_19_4.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
             final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
             final Type<Chunk> chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().size()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.read(chunkType);
 
             final Type<Chunk> newChunkType = new ChunkType1_20_2(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             wrapper.write(newChunkType, chunk);
 
             for (final ChunkSection section : chunk.getSections()) {

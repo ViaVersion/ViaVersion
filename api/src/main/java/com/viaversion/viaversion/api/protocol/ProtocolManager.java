@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.VersionedPacketTransformer;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
-import com.viaversion.viaversion.api.protocol.version.VersionType;
 import io.netty.buffer.ByteBuf;
 import java.util.Collection;
 import java.util.List;

@@ -25,7 +25,6 @@ package com.viaversion.viaversion.api.minecraft.signature.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.signature.util.DataConsumer;
-
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;

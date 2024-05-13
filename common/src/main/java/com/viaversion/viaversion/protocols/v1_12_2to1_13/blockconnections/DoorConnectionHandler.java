@@ -50,12 +50,12 @@ public class DoorConnectionHandler implements ConnectionHandler {
             int id = blockData.getSavedBlockStateId();
 
             DoorData doorData = new DoorData(
-                    blockData.getValue("half").equals("lower"),
-                    blockData.getValue("hinge").equals("right"),
-                    blockData.getValue("powered").equals("true"),
-                    blockData.getValue("open").equals("true"),
-                    BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)),
-                    type
+                blockData.getValue("half").equals("lower"),
+                blockData.getValue("hinge").equals("right"),
+                blockData.getValue("powered").equals("true"),
+                blockData.getValue("open").equals("true"),
+                BlockFace.valueOf(blockData.getValue("facing").toUpperCase(Locale.ROOT)),
+                type
             );
 
             DOOR_DATA_MAP.put(id, doorData);

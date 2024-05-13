@@ -40,8 +40,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class BukkitViaInjector extends LegacyViaInjector {
 
     private static final boolean HAS_WORLD_VERSION_PROTOCOL_VERSION = PaperViaInjector.hasClass("net.minecraft.SharedConstants")
-            && PaperViaInjector.hasClass("net.minecraft.WorldVersion")
-            && !PaperViaInjector.hasClass("com.mojang.bridge.game.GameVersion");
+        && PaperViaInjector.hasClass("net.minecraft.WorldVersion")
+        && !PaperViaInjector.hasClass("com.mojang.bridge.game.GameVersion");
 
     @Override
     public void inject() throws ReflectiveOperationException {
@@ -104,8 +104,8 @@ public class BukkitViaInjector extends LegacyViaInjector {
 
         // Grab the ping class and find the field to access it
         Class<?> pingClazz = NMSUtil.nms(
-                "ServerPing",
-                "net.minecraft.network.protocol.status.ServerPing"
+            "ServerPing",
+            "net.minecraft.network.protocol.status.ServerPing"
         );
         Object ping = null;
         for (Field field : serverClazz.getDeclaredFields()) {
@@ -119,8 +119,8 @@ public class BukkitViaInjector extends LegacyViaInjector {
 
         // Now get the ServerData inside ServerPing
         Class<?> serverDataClass = NMSUtil.nms(
-                "ServerPing$ServerData",
-                "net.minecraft.network.protocol.status.ServerPing$ServerData"
+            "ServerPing$ServerData",
+            "net.minecraft.network.protocol.status.ServerPing$ServerData"
         );
         Object serverData = null;
         for (Field field : pingClazz.getDeclaredFields()) {
@@ -150,12 +150,12 @@ public class BukkitViaInjector extends LegacyViaInjector {
     @Override
     protected @Nullable Object getServerConnection() throws ReflectiveOperationException {
         Class<?> serverClass = NMSUtil.nms(
-                "MinecraftServer",
-                "net.minecraft.server.MinecraftServer"
+            "MinecraftServer",
+            "net.minecraft.server.MinecraftServer"
         );
         Class<?> connectionClass = NMSUtil.nms(
-                "ServerConnection",
-                "net.minecraft.server.network.ServerConnection"
+            "ServerConnection",
+            "net.minecraft.server.network.ServerConnection"
         );
 
         Object server = ReflectionUtil.invokeStatic(serverClass, "getServer");

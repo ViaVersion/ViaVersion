@@ -22,11 +22,10 @@
  */
 package com.viaversion.viaversion.api.protocol.packet.provider;
 
+import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-
-import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class PacketTypeArrayMap<P extends PacketType> implements PacketTypeMap<P> {

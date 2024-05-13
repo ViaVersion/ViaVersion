@@ -18,25 +18,25 @@
 package com.viaversion.viaversion.bukkit.util;
 
 import com.viaversion.viaversion.api.Via;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-
 import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.logging.Level;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 
 public class CollisionChecker {
     private static final CollisionChecker INSTANCE;
+
     static {
         CollisionChecker instance = null;
         try {
             instance = new CollisionChecker();
         } catch (ReflectiveOperationException ex) {
             Via.getPlatform().getLogger().log(
-                    Level.WARNING,
-                    "Couldn't find reflection methods/fields to calculate bounding boxes.\n" +
-                            "Placing non-full blocks where the player stands may fail.", ex);
+                Level.WARNING,
+                "Couldn't find reflection methods/fields to calculate bounding boxes.\n" +
+                    "Placing non-full blocks where the player stands may fail.", ex);
         }
         INSTANCE = instance;
     }
@@ -65,12 +65,12 @@ public class CollisionChecker {
         GET_BLOCK_BY_ID = NMSUtil.nms("Block").getDeclaredMethod("getById", int.class);
 
         GET_COLLISIONS = GET_BLOCK_BY_ID.getReturnType().getDeclaredMethod("a",
-                world,
-                blockPosition,
-                GET_BLOCK_TYPE.getReturnType(),
-                GET_ENTITY_BB.getReturnType(),
-                List.class,
-                GET_ENTITY_HANDLE.getReturnType());
+            world,
+            blockPosition,
+            GET_BLOCK_TYPE.getReturnType(),
+            GET_ENTITY_BB.getReturnType(),
+            List.class,
+            GET_ENTITY_HANDLE.getReturnType());
 
         SET_POSITION = mutableBlockPosition.getDeclaredMethod("c", int.class, int.class, int.class);
         BLOCK_POSITION = mutableBlockPosition.getConstructor().newInstance();
@@ -93,12 +93,12 @@ public class CollisionChecker {
             List<?> collisions = new DummyList<>();
 
             GET_COLLISIONS.invoke(nmsBlock,
-                    nmsWorld,
-                    BLOCK_POSITION,
-                    GET_BLOCK_TYPE.invoke(nmsWorld, BLOCK_POSITION),
-                    GET_ENTITY_BB.invoke(nmsPlayer),
-                    collisions,
-                    nmsPlayer);
+                nmsWorld,
+                BLOCK_POSITION,
+                GET_BLOCK_TYPE.invoke(nmsWorld, BLOCK_POSITION),
+                GET_ENTITY_BB.invoke(nmsPlayer),
+                collisions,
+                nmsPlayer);
             return !collisions.isEmpty();
         } catch (ReflectiveOperationException ex) {
             return null;

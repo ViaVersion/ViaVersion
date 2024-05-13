@@ -17,10 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_11_1to1_12;
 
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.StringTag;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
@@ -36,13 +36,13 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.EntityPacketRewriter1_12;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.ChatItemRewriter;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.TranslateRewriter;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ClientboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.ChatItemRewriter;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.EntityPacketRewriter1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.rewriter.ItemPacketRewriter1_12;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.data.TranslateRewriter;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
@@ -116,7 +116,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                     // Reset recipes
                     if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)) {
                         wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, packetWrapper -> packetWrapper.write(Types.VAR_INT, 0))
-                                .scheduleSend(Protocol1_12_2To1_13.class);
+                            .scheduleSend(Protocol1_12_2To1_13.class);
                     }
                 });
             }

@@ -22,6 +22,14 @@
  */
 package com.viaversion.viaversion.api.data;
 
+import com.google.common.annotations.Beta;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import com.viaversion.nbt.io.NBTIO;
+import com.viaversion.nbt.io.TagReader;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -29,14 +37,6 @@ import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.viaversion.nbt.io.NBTIO;
-import com.viaversion.nbt.io.TagReader;
-import com.google.common.annotations.Beta;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.GsonUtil;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;

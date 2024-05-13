@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.type.types.metadata;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaTypes;
-import com.viaversion.viaversion.api.type.types.metadata.ModernMetaType;
 
 public final class MetadataType extends ModernMetaType {
 

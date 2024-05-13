@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
 public class StringType extends Type<String> {
     // String#length() (used to limit the string in Minecraft source code) uses char[]#length
     private static final int MAX_CHAR_UTF_8_LENGTH = Character.toString(Character.MAX_VALUE)
-            .getBytes(StandardCharsets.UTF_8).length;
+        .getBytes(StandardCharsets.UTF_8).length;
     private final int maxLength;
 
     public StringType() {
@@ -49,13 +49,13 @@ public class StringType extends Type<String> {
         int len = Types.VAR_INT.readPrimitive(buffer);
 
         Preconditions.checkArgument(len <= maxLength * MAX_CHAR_UTF_8_LENGTH,
-                "Cannot receive string longer than Short.MAX_VALUE * " + MAX_CHAR_UTF_8_LENGTH + " bytes (got %s bytes)", len);
+            "Cannot receive string longer than Short.MAX_VALUE * " + MAX_CHAR_UTF_8_LENGTH + " bytes (got %s bytes)", len);
 
         String string = buffer.toString(buffer.readerIndex(), len, StandardCharsets.UTF_8);
         buffer.skipBytes(len);
 
         Preconditions.checkArgument(string.length() <= maxLength,
-                "Cannot receive string longer than Short.MAX_VALUE characters (got %s bytes)", string.length());
+            "Cannot receive string longer than Short.MAX_VALUE characters (got %s bytes)", string.length());
 
         return string;
     }

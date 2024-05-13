@@ -104,7 +104,7 @@ public final class Metadata {
         Preconditions.checkNotNull(metaType);
         if (value != null && !metaType.type().getOutputClass().isAssignableFrom(value.getClass())) {
             throw new IllegalArgumentException("Metadata value and metaType are incompatible. Type=" + metaType
-                    + ", value=" + value + " (" + value.getClass().getSimpleName() + ")");
+                + ", value=" + value + " (" + value.getClass().getSimpleName() + ")");
         }
         return value;
     }
@@ -135,9 +135,9 @@ public final class Metadata {
     @Override
     public String toString() {
         return "Metadata{" +
-                "id=" + id +
-                ", metaType=" + metaType +
-                ", value=" + value +
-                '}';
+            "id=" + id +
+            ", metaType=" + metaType +
+            ", value=" + value +
+            '}';
     }
 }

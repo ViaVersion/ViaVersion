@@ -131,11 +131,11 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
         });
 
         registerMetaTypeHandler(
-                Types1_20_3.META_TYPES.itemType,
-                Types1_20_3.META_TYPES.blockStateType,
-                Types1_20_3.META_TYPES.optionalBlockStateType,
-                Types1_20_3.META_TYPES.particleType,
-                null);
+            Types1_20_3.META_TYPES.itemType,
+            Types1_20_3.META_TYPES.blockStateType,
+            Types1_20_3.META_TYPES.optionalBlockStateType,
+            Types1_20_3.META_TYPES.particleType,
+            null);
 
         filter().type(EntityTypes1_20_3.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
             final int blockState = meta.value();

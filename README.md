@@ -8,7 +8,7 @@
 it works on any platform you can think of.**
 
 The base ViaVersion jar runs on Paper, Velocity, Bungee, and Sponge. We also have projects integrating ViaVersion to run
-on Fabric, Forge, or as a standalone proxy to  join from basically any client version on any server version from the
+on Fabric, Forge, or as a standalone proxy to join from basically any client version on any server version from the
 past decade. **See [HERE](https://github.com/ViaVersion) for an overview of the different Via\* projects.**
 
 Supported Versions:

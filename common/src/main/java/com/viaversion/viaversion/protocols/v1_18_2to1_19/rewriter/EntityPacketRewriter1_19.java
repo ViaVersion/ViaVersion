@@ -17,12 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
+import com.google.common.collect.Maps;
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
-import com.google.common.collect.Maps;
-import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
@@ -287,11 +287,11 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
 
             // Try to find the most similar dimension
             dimensionKey = registryStorage.dimensions().entrySet().stream()
-                    .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
-                    .filter(it -> it.value().containsKey("min_y") && it.value().containsKey("height"))
-                    .max(Comparator.comparingInt(it -> it.value().size()))
-                    .orElseThrow(() -> new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension))
-                    .key().getValue();
+                .map(it -> new Pair<>(it, Maps.difference(currentDimension.getValue(), it.getKey().getValue()).entriesInCommon()))
+                .filter(it -> it.value().containsKey("min_y") && it.value().containsKey("height"))
+                .max(Comparator.comparingInt(it -> it.value().size()))
+                .orElseThrow(() -> new IllegalArgumentException("Dimension not found in registry data from join packet: " + currentDimension))
+                .key().getValue();
         }
 
         wrapper.write(Types.STRING, dimensionKey);

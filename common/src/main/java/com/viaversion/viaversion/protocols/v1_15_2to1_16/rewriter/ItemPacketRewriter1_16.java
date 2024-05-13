@@ -240,7 +240,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         }
 
         String mappedAttribute = (inverse ? Attributes1_16.attributeIdentifierMappings().inverse()
-                : Attributes1_16.attributeIdentifierMappings()).get(attributeName);
+            : Attributes1_16.attributeIdentifierMappings()).get(attributeName);
         if (mappedAttribute == null) return;
 
         attributeNameTag.setValue(mappedAttribute);

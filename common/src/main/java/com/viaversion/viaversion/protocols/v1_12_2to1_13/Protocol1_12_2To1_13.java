@@ -42,10 +42,6 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
-import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
@@ -55,15 +51,19 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.RecipeData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticMappings;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
+import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
+import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -125,48 +125,48 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     };
 
     public static final PacketHandler SEND_DECLARE_COMMANDS_AND_TAGS =
-            w -> {
-                // Send fake declare commands
-                w.create(ClientboundPackets1_13.COMMANDS, wrapper -> {
-                    wrapper.write(Types.VAR_INT, 2); // Size
-                    // Write root node
-                    wrapper.write(Types.BYTE, (byte) 0); // Mark as command
-                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
+        w -> {
+            // Send fake declare commands
+            w.create(ClientboundPackets1_13.COMMANDS, wrapper -> {
+                wrapper.write(Types.VAR_INT, 2); // Size
+                // Write root node
+                wrapper.write(Types.BYTE, (byte) 0); // Mark as command
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{1}); // 1 child at index 1
 
-                    // Write arg node
-                    wrapper.write(Types.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
-                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
-                    // Extra data
-                    wrapper.write(Types.STRING, "args"); // Arg name
-                    wrapper.write(Types.STRING, "brigadier:string");
-                    wrapper.write(Types.VAR_INT, 2); // Greedy
-                    wrapper.write(Types.STRING, "minecraft:ask_server"); // Ask server
+                // Write arg node
+                wrapper.write(Types.BYTE, (byte) (0x02 | 0x04 | 0x10)); // Mark as command
+                wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[0]); // No children
+                // Extra data
+                wrapper.write(Types.STRING, "args"); // Arg name
+                wrapper.write(Types.STRING, "brigadier:string");
+                wrapper.write(Types.VAR_INT, 2); // Greedy
+                wrapper.write(Types.STRING, "minecraft:ask_server"); // Ask server
 
-                    wrapper.write(Types.VAR_INT, 0); // Root node index
-                }).scheduleSend(Protocol1_12_2To1_13.class);
+                wrapper.write(Types.VAR_INT, 0); // Root node index
+            }).scheduleSend(Protocol1_12_2To1_13.class);
 
-                // Send tags packet
-                w.create(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
-                    wrapper.write(Types.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
-                    for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
-                        wrapper.write(Types.STRING, tag.getKey());
-                        // Needs copy as other protocols may modify it
-                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
-                    }
-                    wrapper.write(Types.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
-                    for (Map.Entry<String, int[]> tag : MAPPINGS.getItemTags().entrySet()) {
-                        wrapper.write(Types.STRING, tag.getKey());
-                        // Needs copy as other protocols may modify it
-                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
-                    }
-                    wrapper.write(Types.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
-                    for (Map.Entry<String, int[]> tag : MAPPINGS.getFluidTags().entrySet()) {
-                        wrapper.write(Types.STRING, tag.getKey());
-                        // Needs copy as other protocols may modify it
-                        wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
-                    }
-                }).scheduleSend(Protocol1_12_2To1_13.class);
-            };
+            // Send tags packet
+            w.create(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
+                wrapper.write(Types.VAR_INT, MAPPINGS.getBlockTags().size()); // block tags
+                for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
+                    wrapper.write(Types.STRING, tag.getKey());
+                    // Needs copy as other protocols may modify it
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                }
+                wrapper.write(Types.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
+                for (Map.Entry<String, int[]> tag : MAPPINGS.getItemTags().entrySet()) {
+                    wrapper.write(Types.STRING, tag.getKey());
+                    // Needs copy as other protocols may modify it
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                }
+                wrapper.write(Types.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
+                for (Map.Entry<String, int[]> tag : MAPPINGS.getFluidTags().entrySet()) {
+                    wrapper.write(Types.STRING, tag.getKey());
+                    // Needs copy as other protocols may modify it
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                }
+            }).scheduleSend(Protocol1_12_2To1_13.class);
+        };
 
     @Override
     protected void registerPackets() {
@@ -685,8 +685,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     byte flags = wrapper.read(Types.BYTE);
 
                     String stringMode = mode == 0 ? "SEQUENCE"
-                            : mode == 1 ? "AUTO"
-                            : "REDSTONE";
+                        : mode == 1 ? "AUTO"
+                        : "REDSTONE";
 
                     wrapper.write(Types.BOOLEAN, (flags & 0x1) != 0); // Track output
                     wrapper.write(Types.STRING, stringMode);
@@ -726,9 +726,9 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     @Override
                     public String transform(PacketWrapper wrapper, Integer mode) {
                         return mode == 0 ? "SAVE"
-                                : mode == 1 ? "LOAD"
-                                : mode == 2 ? "CORNER"
-                                : "DATA";
+                            : mode == 1 ? "LOAD"
+                            : mode == 2 ? "CORNER"
+                            : "DATA";
                     }
                 });
                 map(Types.STRING); // Name
@@ -742,17 +742,17 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     @Override
                     public String transform(PacketWrapper wrapper, Integer mirror) {
                         return mirror == 0 ? "NONE"
-                                : mirror == 1 ? "LEFT_RIGHT"
-                                : "FRONT_BACK";
+                            : mirror == 1 ? "LEFT_RIGHT"
+                            : "FRONT_BACK";
                     }
                 });
                 map(Types.VAR_INT, new ValueTransformer<>(Types.STRING) { // Rotation
                     @Override
                     public String transform(PacketWrapper wrapper, Integer rotation) {
                         return rotation == 0 ? "NONE"
-                                : rotation == 1 ? "CLOCKWISE_90"
-                                : rotation == 2 ? "CLOCKWISE_180"
-                                : "COUNTERCLOCKWISE_90";
+                            : rotation == 1 ? "CLOCKWISE_90"
+                            : rotation == 2 ? "CLOCKWISE_180"
+                            : "COUNTERCLOCKWISE_90";
                     }
                 });
                 map(Types.STRING);
@@ -830,10 +830,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         BlockIdData.init();
 
         Types1_13.PARTICLE.rawFiller()
-                .reader(3, ParticleType.Readers.BLOCK)
-                .reader(20, ParticleType.Readers.DUST)
-                .reader(11, ParticleType.Readers.DUST)
-                .reader(27, ParticleType.Readers.ITEM1_13);
+            .reader(3, ParticleType.Readers.BLOCK)
+            .reader(20, ParticleType.Readers.DUST)
+            .reader(11, ParticleType.Readers.DUST)
+            .reader(27, ParticleType.Readers.ITEM1_13);
 
         if (Via.getConfig().isServersideBlockConnections() && Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {
             BlockConnectionStorage.init();

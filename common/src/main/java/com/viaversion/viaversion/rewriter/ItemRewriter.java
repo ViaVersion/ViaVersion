@@ -53,7 +53,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     @Override
-    public @Nullable Item handleItemToClient(final UserConnection connection,  @Nullable Item item) {
+    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable Item item) {
         if (item == null) return null;
         if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
             item.setIdentifier(protocol.getMappingData().getNewItemId(item.identifier()));

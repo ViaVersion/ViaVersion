@@ -64,12 +64,12 @@ public class VelocityViaInjector implements ViaInjector {
         Object channelInitializerHolder = ReflectionUtil.invoke(connectionManager, "getServerChannelInitializer");
         ChannelInitializer originalInitializer = getInitializer();
         channelInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
-                .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer, false));
+            .invoke(channelInitializerHolder, new VelocityChannelInitializer(originalInitializer, false));
 
         Object backendInitializerHolder = ReflectionUtil.invoke(connectionManager, "getBackendChannelInitializer");
         ChannelInitializer backendInitializer = getBackendInitializer();
         backendInitializerHolder.getClass().getMethod("set", ChannelInitializer.class)
-                .invoke(backendInitializerHolder, new VelocityChannelInitializer(backendInitializer, true));
+            .invoke(backendInitializerHolder, new VelocityChannelInitializer(backendInitializer, true));
     }
 
     @Override
@@ -98,8 +98,8 @@ public class VelocityViaInjector implements ViaInjector {
     public static int getLowestSupportedProtocolVersion() {
         try {
             if (GET_PLAYER_INFO_FORWARDING_MODE != null
-                    && ((Enum<?>) GET_PLAYER_INFO_FORWARDING_MODE.invoke(VelocityPlugin.PROXY.getConfiguration()))
-                    .name().equals("MODERN")) {
+                && ((Enum<?>) GET_PLAYER_INFO_FORWARDING_MODE.invoke(VelocityPlugin.PROXY.getConfiguration()))
+                .name().equals("MODERN")) {
                 return ProtocolVersion.v1_13.getVersion();
             }
         } catch (IllegalAccessException | InvocationTargetException ignored) {

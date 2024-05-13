@@ -26,7 +26,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
 import com.viaversion.viaversion.api.minecraft.signature.util.DataConsumer;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 

@@ -61,9 +61,9 @@ public final class TrackedEntityImpl implements TrackedEntity {
     @Override
     public String toString() {
         return "TrackedEntityImpl{" +
-                "entityType=" + entityType +
-                ", data=" + data +
-                ", sentMetadata=" + sentMetadata +
-                '}';
+            "entityType=" + entityType +
+            ", data=" + data +
+            ", sentMetadata=" + sentMetadata +
+            '}';
     }
 }

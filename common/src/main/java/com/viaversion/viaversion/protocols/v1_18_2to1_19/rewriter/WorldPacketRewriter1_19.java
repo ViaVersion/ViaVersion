@@ -47,8 +47,8 @@ public final class WorldPacketRewriter1_19 {
             Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
             Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
             final ChunkType1_18 chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
             final Chunk chunk = wrapper.passthrough(chunkType);
             for (final ChunkSection section : chunk.getSections()) {
                 final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);

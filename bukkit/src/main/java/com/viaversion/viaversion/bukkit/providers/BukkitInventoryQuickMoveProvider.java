@@ -118,7 +118,7 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
         } else {
             // if not true we got too many slots (version inventory slot changes)?
             String cause = "Too many inventory slots: slotId: " + slotId + " invSlotCount: " + inv.countSlots()
-                    + " invType: " + inv.getType() + " topInvType: " + tinvtype;
+                + " invType: " + inv.getType() + " topInvType: " + tinvtype;
             Via.getPlatform().getLogger().severe("Failed to get an item to create a window click packet. Please report this issue to the ViaVersion Github: " + cause);
         }
         Object packet = null;

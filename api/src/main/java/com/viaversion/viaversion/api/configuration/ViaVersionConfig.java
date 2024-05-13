@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.WorldIdentifiers;
 import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface ViaVersionConfig extends Config {
 

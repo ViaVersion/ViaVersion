@@ -66,11 +66,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
         conf = new BukkitViaConfig(getDataFolder(), getLogger());
         Via.init(ViaManagerImpl.builder()
-                .platform(this)
-                .commandHandler(commandHandler)
-                .injector(new BukkitViaInjector())
-                .loader(new BukkitViaLoader(this))
-                .build());
+            .platform(this)
+            .commandHandler(commandHandler)
+            .injector(new BukkitViaInjector())
+            .loader(new BukkitViaLoader(this))
+            .build());
 
         conf.reload();
     }
@@ -253,13 +253,13 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     public final Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
         final List<UnsupportedSoftware> list = new ArrayList<>(ViaPlatform.super.getUnsupportedSoftwareClasses());
         list.add(new UnsupportedServerSoftware.Builder().name("Yatopia").reason(UnsupportedServerSoftware.Reason.DANGEROUS_SERVER_SOFTWARE)
-                .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
-                .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")
-                .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
-                .addMethod("org.bukkit.Server", "getLastTickTime").build());
+            .addClassName("org.yatopiamc.yatopia.server.YatopiaConfig")
+            .addClassName("net.yatopia.api.event.PlayerAttackEntityEvent")
+            .addClassName("yatopiamc.org.yatopia.server.YatopiaConfig") // Only the best kind of software relocates its own classes to hide itself :tinfoilhat:
+            .addMethod("org.bukkit.Server", "getLastTickTime").build());
         list.add(new UnsupportedPlugin.Builder().name("software to mess with message signing").reason(UnsupportedPlugin.Reason.SECURE_CHAT_BYPASS)
-                .addPlugin("NoEncryption").addPlugin("NoReport")
-                .addPlugin("NoChatReports").addPlugin("NoChatReport").build());
+            .addPlugin("NoEncryption").addPlugin("NoReport")
+            .addPlugin("NoChatReports").addPlugin("NoChatReport").build());
         return Collections.unmodifiableList(list);
     }
 

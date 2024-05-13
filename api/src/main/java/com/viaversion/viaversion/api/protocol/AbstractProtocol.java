@@ -62,7 +62,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
  * @param <SU> unmapped serverbound packet type
  */
 public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM extends ClientboundPacketType,
-        SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
+    SM extends ServerboundPacketType, SU extends ServerboundPacketType> implements Protocol<CU, CM, SM, SU> {
     protected final Class<CU> unmappedClientboundPacketType;
     protected final Class<CM> mappedClientboundPacketType;
     protected final Class<SM> mappedServerboundPacketType;
@@ -108,21 +108,21 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
         // Register the rest of the ids with no handlers if necessary
         if (unmappedClientboundPacketType != null && mappedClientboundPacketType != null
-                && unmappedClientboundPacketType != mappedClientboundPacketType) {
+            && unmappedClientboundPacketType != mappedClientboundPacketType) {
             registerPacketIdChanges(
-                    packetTypesProvider.unmappedClientboundPacketTypes(),
-                    packetTypesProvider.mappedClientboundPacketTypes(),
-                    this::hasRegisteredClientbound,
-                    this::registerClientbound
+                packetTypesProvider.unmappedClientboundPacketTypes(),
+                packetTypesProvider.mappedClientboundPacketTypes(),
+                this::hasRegisteredClientbound,
+                this::registerClientbound
             );
         }
         if (mappedServerboundPacketType != null && unmappedServerboundPacketType != null &&
-                mappedServerboundPacketType != unmappedServerboundPacketType) {
+            mappedServerboundPacketType != unmappedServerboundPacketType) {
             registerPacketIdChanges(
-                    packetTypesProvider.unmappedServerboundPacketTypes(),
-                    packetTypesProvider.mappedServerboundPacketTypes(),
-                    this::hasRegisteredServerbound,
-                    this::registerServerbound
+                packetTypesProvider.unmappedServerboundPacketTypes(),
+                packetTypesProvider.mappedServerboundPacketTypes(),
+                this::hasRegisteredServerbound,
+                this::registerServerbound
             );
         }
     }
@@ -173,10 +173,10 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
     }
 
     private <U extends PacketType, M extends PacketType> void registerPacketIdChanges(
-            Map<State, PacketTypeMap<U>> unmappedPacketTypes,
-            Map<State, PacketTypeMap<M>> mappedPacketTypes,
-            Predicate<U> registeredPredicate,
-            BiConsumer<U, M> registerConsumer
+        Map<State, PacketTypeMap<U>> unmappedPacketTypes,
+        Map<State, PacketTypeMap<M>> mappedPacketTypes,
+        Predicate<U> registeredPredicate,
+        BiConsumer<U, M> registerConsumer
     ) {
         for (Map.Entry<State, PacketTypeMap<M>> entry : mappedPacketTypes.entrySet()) {
             PacketTypeMap<M> mappedTypes = entry.getValue();
@@ -241,10 +241,10 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
 
     protected PacketTypesProvider<CU, CM, SM, SU> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
-                packetTypeMap(unmappedClientboundPacketType, unmappedClientboundPacketType),
-                packetTypeMap(mappedClientboundPacketType, mappedClientboundPacketType),
-                packetTypeMap(mappedServerboundPacketType, mappedServerboundPacketType),
-                packetTypeMap(unmappedServerboundPacketType, unmappedServerboundPacketType)
+            packetTypeMap(unmappedClientboundPacketType, unmappedClientboundPacketType),
+            packetTypeMap(mappedClientboundPacketType, mappedClientboundPacketType),
+            packetTypeMap(mappedServerboundPacketType, mappedServerboundPacketType),
+            packetTypeMap(unmappedServerboundPacketType, unmappedServerboundPacketType)
         );
     }
 
@@ -280,7 +280,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
         if (!override && serverboundMappings.hasMapping(state, unmappedPacketId)) {
             Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
-                    " If this override is intentional, set override to true. Stacktrace: ", new Exception());
+                " If this override is intentional, set override to true. Stacktrace: ", new Exception());
         }
         serverboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
@@ -296,7 +296,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         PacketMapping packetMapping = PacketMapping.of(mappedPacketId, handler);
         if (!override && clientboundMappings.hasMapping(state, unmappedPacketId)) {
             Via.getPlatform().getLogger().log(Level.WARNING, unmappedPacketId + " already registered!" +
-                    " If override is intentional, set override to true. Stacktrace: ", new Exception());
+                " If override is intentional, set override to true. Stacktrace: ", new Exception());
         }
         clientboundMappings.addMapping(state, unmappedPacketId, packetMapping);
     }
@@ -349,9 +349,9 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         if (mappedPacketType != null) {
             checkPacketType(mappedPacketType, mappedPacketClass == null || mappedPacketClass.isInstance(mappedPacketType));
             Preconditions.checkArgument(packetType.state() == mappedPacketType.state(),
-                    "Packet type state does not match mapped packet type state");
+                "Packet type state does not match mapped packet type state");
             Preconditions.checkArgument(packetType.direction() == mappedPacketType.direction(),
-                    "Packet type direction does not match mapped packet type state");
+                "Packet type direction does not match mapped packet type state");
         }
 
         PacketMapping packetMapping = PacketMapping.of(mappedPacketType, handler);
@@ -440,7 +440,7 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName() + " IN REMAP OF " + packetType + " (" + ProtocolUtil.toNiceHex(unmappedPacketId) + ")");
         } else {
             Via.getPlatform().getLogger().warning("ERROR IN " + getClass().getSimpleName()
-                    + " IN REMAP OF " + state + " " + ProtocolUtil.toNiceHex(unmappedPacketId) + "->" + ProtocolUtil.toNiceHex(mappedPacketId));
+                + " IN REMAP OF " + state + " " + ProtocolUtil.toNiceHex(unmappedPacketId) + "->" + ProtocolUtil.toNiceHex(mappedPacketId));
         }
     }
 

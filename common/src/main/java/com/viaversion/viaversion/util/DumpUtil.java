@@ -60,17 +60,17 @@ public final class DumpUtil {
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         final ViaPlatform<?> platform = Via.getPlatform();
         final VersionInfo version = new VersionInfo(
-                System.getProperty("java.version"),
-                System.getProperty("os.name"),
-                protocolVersion.getVersionType(),
-                protocolVersion.getVersion(),
-                protocolVersion.getName(),
-                Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toCollection(LinkedHashSet::new)),
-                platform.getPlatformName(),
-                platform.getPlatformVersion(),
-                platform.getPluginVersion(),
-                com.viaversion.viaversion.util.VersionInfo.getImplementationVersion(),
-                Via.getManager().getSubPlatforms()
+            System.getProperty("java.version"),
+            System.getProperty("os.name"),
+            protocolVersion.getVersionType(),
+            protocolVersion.getVersion(),
+            protocolVersion.getName(),
+            Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toCollection(LinkedHashSet::new)),
+            platform.getPlatformName(),
+            platform.getPlatformVersion(),
+            platform.getPluginVersion(),
+            com.viaversion.viaversion.util.VersionInfo.getImplementationVersion(),
+            Via.getManager().getSubPlatforms()
         );
         final Map<String, Object> configuration = ((Config) Via.getConfig()).getValues();
         final DumpTemplate template = new DumpTemplate(version, configuration, platform.getDump(), Via.getManager().getInjector().getDump(), getPlayerSample(playerToSample));

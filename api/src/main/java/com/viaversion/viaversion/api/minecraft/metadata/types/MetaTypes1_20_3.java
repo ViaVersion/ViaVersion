@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.minecraft.metadata.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 

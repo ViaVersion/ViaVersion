@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.packet.ServerboundPackets1_12;
@@ -73,40 +72,40 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
 
 
         protocol.registerServerbound(ServerboundPackets1_12.CONTAINER_CLICK, new PacketHandlers() {
-                    @Override
-                    public void register() {
-                        map(Types.UNSIGNED_BYTE); // 0 - Window ID
-                        map(Types.SHORT); // 1 - Slot
-                        map(Types.BYTE); // 2 - Button
-                        map(Types.SHORT); // 3 - Action number
-                        map(Types.VAR_INT); // 4 - Mode
-                        map(Types.ITEM1_8); // 5 - Clicked Item
+                @Override
+                public void register() {
+                    map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                    map(Types.SHORT); // 1 - Slot
+                    map(Types.BYTE); // 2 - Button
+                    map(Types.SHORT); // 3 - Action number
+                    map(Types.VAR_INT); // 4 - Mode
+                    map(Types.ITEM1_8); // 5 - Clicked Item
 
-                        handler(wrapper -> {
-                            Item item = wrapper.get(Types.ITEM1_8, 0);
-                            if (!Via.getConfig().is1_12QuickMoveActionFix()) {
-                                handleItemToServer(wrapper.user(), item);
-                                return;
+                    handler(wrapper -> {
+                        Item item = wrapper.get(Types.ITEM1_8, 0);
+                        if (!Via.getConfig().is1_12QuickMoveActionFix()) {
+                            handleItemToServer(wrapper.user(), item);
+                            return;
+                        }
+                        byte button = wrapper.get(Types.BYTE, 0);
+                        int mode = wrapper.get(Types.VAR_INT, 0);
+                        // QUICK_MOVE PATCH (Shift + (click/double click))
+                        if (mode == 1 && button == 0 && item == null) {
+                            short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                            short slotId = wrapper.get(Types.SHORT, 0);
+                            short actionId = wrapper.get(Types.SHORT, 1);
+                            InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
+                            boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
+                            if (succeed) {
+                                wrapper.cancel();
                             }
-                            byte button = wrapper.get(Types.BYTE, 0);
-                            int mode = wrapper.get(Types.VAR_INT, 0);
-                            // QUICK_MOVE PATCH (Shift + (click/double click))
-                            if (mode == 1 && button == 0 && item == null) {
-                                short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                                short slotId = wrapper.get(Types.SHORT, 0);
-                                short actionId = wrapper.get(Types.SHORT, 1);
-                                InventoryQuickMoveProvider provider = Via.getManager().getProviders().get(InventoryQuickMoveProvider.class);
-                                boolean succeed = provider.registerQuickMoveAction(windowId, slotId, actionId, wrapper.user());
-                                if (succeed) {
-                                    wrapper.cancel();
-                                }
-                                // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
-                            } else {
-                                handleItemToServer(wrapper.user(), item);
-                            }
-                        });
-                    }
+                            // otherwise just pass through so the server sends the PacketPlayOutTransaction packet.
+                        } else {
+                            handleItemToServer(wrapper.user(), item);
+                        }
+                    });
                 }
+            }
         );
 
         registerCreativeInvAction(ServerboundPackets1_12.SET_CREATIVE_MODE_SLOT);

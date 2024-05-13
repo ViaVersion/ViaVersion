@@ -82,8 +82,8 @@ public final class ChunkPosition {
     @Override
     public String toString() {
         return "ChunkPosition{" +
-                "chunkX=" + chunkX +
-                ", chunkZ=" + chunkZ +
-                '}';
+            "chunkX=" + chunkX +
+            ", chunkZ=" + chunkZ +
+            '}';
     }
 }

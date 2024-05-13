@@ -154,8 +154,8 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         resourcePack1_17PromptMessage = getSerializedComponent("resource-pack-1_17-prompt");
         Map<String, String> worlds = get("map-1_16-world-names", new HashMap<>());
         map1_16WorldNames = new WorldIdentifiers(worlds.getOrDefault("overworld", WorldIdentifiers.OVERWORLD_DEFAULT),
-                worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
-                worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
+            worlds.getOrDefault("nether", WorldIdentifiers.NETHER_DEFAULT),
+            worlds.getOrDefault("end", WorldIdentifiers.END_DEFAULT));
         cache1_17Light = getBoolean("cache-1_17-light", true);
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
         enforceSecureChat = getBoolean("enforce-secure-chat", false);

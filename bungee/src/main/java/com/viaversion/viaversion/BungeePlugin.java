@@ -78,11 +78,11 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
 
         // Init platform
         Via.init(ViaManagerImpl.builder()
-                .platform(this)
-                .injector(new BungeeViaInjector())
-                .loader(new BungeeViaLoader(this))
-                .commandHandler(commandHandler)
-                .build());
+            .platform(this)
+            .injector(new BungeeViaInjector())
+            .loader(new BungeeViaLoader(this))
+            .commandHandler(commandHandler)
+            .build());
 
         config.reload();
     }
@@ -192,11 +192,11 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
         List<PluginInfo> plugins = new ArrayList<>();
         for (Plugin p : ProxyServer.getInstance().getPluginManager().getPlugins())
             plugins.add(new PluginInfo(
-                    true,
-                    p.getDescription().getName(),
-                    p.getDescription().getVersion(),
-                    p.getDescription().getMain(),
-                    Collections.singletonList(p.getDescription().getAuthor())
+                true,
+                p.getDescription().getName(),
+                p.getDescription().getVersion(),
+                p.getDescription().getMain(),
+                Collections.singletonList(p.getDescription().getAuthor())
             ));
 
         platformSpecific.add("plugins", GsonUtil.getGson().toJsonTree(plugins));
@@ -208,10 +208,10 @@ public class BungeePlugin extends Plugin implements ViaServerProxyPlatform<Proxi
     public Collection<UnsupportedSoftware> getUnsupportedSoftwareClasses() {
         final Collection<UnsupportedSoftware> list = new ArrayList<>(ViaServerProxyPlatform.super.getUnsupportedSoftwareClasses());
         list.add(new UnsupportedServerSoftware.Builder()
-                .name("FlameCord")
-                .addClassName("dev._2lstudios.flamecord.FlameCord")
-                .reason(UnsupportedServerSoftware.Reason.BREAKING_PROXY_SOFTWARE)
-                .build());
+            .name("FlameCord")
+            .addClassName("dev._2lstudios.flamecord.FlameCord")
+            .reason(UnsupportedServerSoftware.Reason.BREAKING_PROXY_SOFTWARE)
+            .build());
         return ImmutableList.copyOf(list);
     }
 

@@ -18,12 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

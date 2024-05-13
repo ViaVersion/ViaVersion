@@ -30,12 +30,12 @@ public class RecipeData {
 
     public static void init() {
         InputStream stream = MappingData1_13.class.getClassLoader()
-                .getResourceAsStream("assets/viaversion/data/itemrecipes1_12_2to1_13.json");
+            .getResourceAsStream("assets/viaversion/data/itemrecipes1_12_2to1_13.json");
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             recipes = GsonUtil.getGson().fromJson(
-                    reader,
-                    new TypeToken<Map<String, Recipe>>() {
-                    }.getType()
+                reader,
+                new TypeToken<Map<String, Recipe>>() {
+                }.getType()
             );
         } catch (IOException e) {
             throw new RuntimeException(e);

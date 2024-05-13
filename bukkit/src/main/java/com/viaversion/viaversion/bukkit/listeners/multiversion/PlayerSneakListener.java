@@ -62,7 +62,7 @@ public class PlayerSneakListener extends ViaBukkitListener {
         getHandle = Class.forName(packageName + ".entity.CraftPlayer").getMethod("getHandle");
 
         final Class<?> entityPlayerClass = Class.forName(packageName
-                .replace("org.bukkit.craftbukkit", "net.minecraft.server") + ".EntityPlayer");
+            .replace("org.bukkit.craftbukkit", "net.minecraft.server") + ".EntityPlayer");
         try {
             setSize = entityPlayerClass.getMethod("setSize", Float.TYPE, Float.TYPE);
         } catch (NoSuchMethodException e) {

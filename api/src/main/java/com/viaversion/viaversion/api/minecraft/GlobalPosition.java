@@ -57,10 +57,10 @@ public final class GlobalPosition extends Position {
     @Override
     public String toString() {
         return "GlobalPosition{" +
-                "dimension='" + dimension + '\'' +
-                ", x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
+            "dimension='" + dimension + '\'' +
+            ", x=" + x +
+            ", y=" + y +
+            ", z=" + z +
+            '}';
     }
 }

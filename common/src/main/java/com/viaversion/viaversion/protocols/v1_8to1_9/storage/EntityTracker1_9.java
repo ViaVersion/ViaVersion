@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -30,11 +31,9 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
@@ -60,10 +59,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final IntSet validBlocking = new IntOpenHashSet();
     private final IntSet knownHolograms = new IntOpenHashSet();
     private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .expireAfterAccess(250, TimeUnit.MILLISECONDS)
-            .<Position, Boolean>build()
-            .asMap());
+        .maximumSize(1000)
+        .expireAfterAccess(250, TimeUnit.MILLISECONDS)
+        .<Position, Boolean>build()
+        .asMap());
     private boolean blocking;
     private boolean autoTeam;
     private Position currentlyDigging;
@@ -193,9 +192,9 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 }
                 if (metadata.id() == 12 && Via.getConfig().isLeftHandedHandling()) { // Player model
                     metadataList.add(new Metadata(
-                            13, // Main hand
-                            MetaType1_9.BYTE,
-                            (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
+                        13, // Main hand
+                        MetaType1_9.BYTE,
+                        (byte) (((((byte) metadata.getValue()) & 0x80) != 0) ? 0 : 1)
                     ));
                 }
             }
@@ -207,8 +206,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     Metadata displayName;
                     Metadata displayNameVisible;
                     if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                            && (displayName = getMetaByIndex(metadataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
-                            && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
+                        && (displayName = getMetaByIndex(metadataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
+                        && (displayNameVisible = getMetaByIndex(metadataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
                             // Send movement

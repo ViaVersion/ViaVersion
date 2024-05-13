@@ -41,45 +41,49 @@ import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
 import com.viaversion.viaversion.protocols.base.BaseProtocol;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_16;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
-import com.viaversion.viaversion.protocols.v1_9_3to1_10.Protocol1_9_3To1_10;
-import com.viaversion.viaversion.protocols.v1_11to1_11_1.Protocol1_11To1_11_1;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
-import com.viaversion.viaversion.protocols.v1_12to1_12_1.Protocol1_12To1_12_1;
-import com.viaversion.viaversion.protocols.v1_12_1to1_12_2.Protocol1_12_1To1_12_2;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
-import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
-import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.Protocol1_13_1To1_13_2;
+import com.viaversion.viaversion.protocols.v1_11to1_11_1.Protocol1_11To1_11_1;
+import com.viaversion.viaversion.protocols.v1_12_1to1_12_2.Protocol1_12_1To1_12_2;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
-import com.viaversion.viaversion.protocols.v1_14to1_14_1.Protocol1_14To1_14_1;
+import com.viaversion.viaversion.protocols.v1_12to1_12_1.Protocol1_12To1_12_1;
+import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.Protocol1_13_1To1_13_2;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
+import com.viaversion.viaversion.protocols.v1_13to1_13_1.Protocol1_13To1_13_1;
 import com.viaversion.viaversion.protocols.v1_14_1to1_14_2.Protocol1_14_1To1_14_2;
 import com.viaversion.viaversion.protocols.v1_14_2to1_14_3.Protocol1_14_2To1_14_3;
 import com.viaversion.viaversion.protocols.v1_14_3to1_14_4.Protocol1_14_3To1_14_4;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
-import com.viaversion.viaversion.protocols.v1_15to1_15_1.Protocol1_15To1_15_1;
-import com.viaversion.viaversion.protocols.v1_15_1to1_15_2.Protocol1_15_1To1_15_2;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.Protocol1_14_4To1_15;
-import com.viaversion.viaversion.protocols.v1_16to1_16_1.Protocol1_16To1_16_1;
+import com.viaversion.viaversion.protocols.v1_14to1_14_1.Protocol1_14To1_14_1;
+import com.viaversion.viaversion.protocols.v1_15_1to1_15_2.Protocol1_15_1To1_15_2;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
+import com.viaversion.viaversion.protocols.v1_15to1_15_1.Protocol1_15To1_15_1;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.Protocol1_16_1To1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_2to1_16_3.Protocol1_16_2To1_16_3;
 import com.viaversion.viaversion.protocols.v1_16_3to1_16_4.Protocol1_16_3To1_16_4;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
-import com.viaversion.viaversion.protocols.v1_17to1_17_1.Protocol1_17To1_17_1;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.Protocol1_16_4To1_17;
-import com.viaversion.viaversion.protocols.v1_18to1_18_2.Protocol1_18To1_18_2;
+import com.viaversion.viaversion.protocols.v1_16to1_16_1.Protocol1_16To1_16_1;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
-import com.viaversion.viaversion.protocols.v1_19to1_19_1.Protocol1_19To1_19_1;
+import com.viaversion.viaversion.protocols.v1_17to1_17_1.Protocol1_17To1_17_1;
+import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
+import com.viaversion.viaversion.protocols.v1_18to1_18_2.Protocol1_18To1_18_2;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.Protocol1_19_3To1_19_4;
-import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
+import com.viaversion.viaversion.protocols.v1_19_4to1_20.Protocol1_19_4To1_20;
+import com.viaversion.viaversion.protocols.v1_19to1_19_1.Protocol1_19To1_19_1;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.Protocol1_20_2To1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
-import com.viaversion.viaversion.protocols.v1_19_4to1_20.Protocol1_19_4To1_20;
-import com.viaversion.viaversion.protocols.v1_9to1_9_1.Protocol1_9To1_9_1;
-import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
+import com.viaversion.viaversion.protocols.v1_9_3to1_10.Protocol1_9_3To1_10;
+import com.viaversion.viaversion.protocols.v1_9to1_9_1.Protocol1_9To1_9_1;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -101,10 +105,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.logging.Level;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
@@ -289,10 +289,10 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
     @Override
     public <C extends ClientboundPacketType,
-            S extends ServerboundPacketType
-            > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
-                                                                       @Nullable Class<C> clientboundPacketsClass,
-                                                                       @Nullable Class<S> serverboundPacketsClass) {
+        S extends ServerboundPacketType
+        > VersionedPacketTransformer<C, S> createPacketTransformer(ProtocolVersion inputVersion,
+                                                                   @Nullable Class<C> clientboundPacketsClass,
+                                                                   @Nullable Class<S> serverboundPacketsClass) {
         Preconditions.checkArgument(clientboundPacketsClass != ClientboundPacketType.class && serverboundPacketsClass != ServerboundPacketType.class);
         return new VersionedPacketTransformerImpl<>(inputVersion, clientboundPacketsClass, serverboundPacketsClass);
     }
@@ -475,7 +475,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void addMappingLoaderFuture(Class<? extends Protocol> protocolClass, Class<? extends Protocol> dependsOn, Runnable runnable) {
         CompletableFuture<Void> future = getMappingLoaderFuture(dependsOn)
-                .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
+            .whenCompleteAsync((v, throwable) -> runnable.run(), mappingLoaderExecutor).exceptionally(mappingLoaderThrowable(protocolClass));
 
         mappingLoaderLock.writeLock().lock();
         try {

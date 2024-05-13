@@ -17,8 +17,8 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.viaversion.nbt.tag.Tag;
 import com.google.gson.JsonElement;
+import com.viaversion.nbt.tag.Tag;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;

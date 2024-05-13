@@ -76,10 +76,10 @@ public class BungeeViaLoader implements ViaPlatformLoader {
 
         if (plugin.getConf().getBungeePingInterval() > 0) {
             tasks.add(plugin.getProxy().getScheduler().schedule(
-                    plugin,
-                    () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
-                    0, plugin.getConf().getBungeePingInterval(),
-                    TimeUnit.SECONDS
+                plugin,
+                () -> Via.proxyPlatform().protocolDetectorService().probeAllServers(),
+                0, plugin.getConf().getBungeePingInterval(),
+                TimeUnit.SECONDS
             ));
         }
     }

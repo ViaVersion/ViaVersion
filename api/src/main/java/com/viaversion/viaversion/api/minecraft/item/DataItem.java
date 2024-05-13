@@ -22,8 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft.item;
 
-import com.viaversion.nbt.tag.CompoundTag;
 import com.google.gson.annotations.SerializedName;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;

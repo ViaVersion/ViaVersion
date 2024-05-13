@@ -102,7 +102,7 @@ public class CompressionProvider implements Provider {
             try {
                 this.inflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
                 output.writerIndex(output.writerIndex() + this.inflater.inflate(
-                        output.array(), output.arrayOffset(), outLength));
+                    output.array(), output.arrayOffset(), outLength));
                 out.add(output.retain());
             } finally {
                 output.release();
@@ -151,7 +151,7 @@ public class CompressionProvider implements Provider {
                 while (!deflater.finished()) {
                     output.ensureWritable(4096);
                     output.writerIndex(output.writerIndex() + this.deflater.deflate(output.array(),
-                            output.arrayOffset() + output.writerIndex(), output.writableBytes()));
+                        output.arrayOffset() + output.writerIndex(), output.writableBytes()));
                 }
                 out.writeBytes(output);
             } finally {
