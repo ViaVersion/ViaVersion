@@ -106,12 +106,7 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
                             throw new RuntimeException(e);
                         }
 
-                        List<ProtocolPathEntry> protocols = null;
-                        if (info.protocolVersion().newerThanOrEqualTo(closestServerProtocol)) {
-                            protocols = Via.getManager().getProtocolManager()
-                                .getProtocolPath(info.protocolVersion(), closestServerProtocol);
-                        }
-
+                        List<ProtocolPathEntry> protocols = Via.getManager().getProtocolManager().getProtocolPath(info.protocolVersion(), closestServerProtocol);
                         if (protocols != null) {
                             if (protocolVersion.equalTo(closestServerProtocol) || protocolVersion.getVersion() == 0) { // Fix ServerListPlus
                                 version.addProperty("protocol", info.protocolVersion().getOriginalVersion());
