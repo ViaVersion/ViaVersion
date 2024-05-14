@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-public class EntityTypeRewriter {
+public class EntityIdMappings1_13 {
     private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(83, .99F);
 
     static {

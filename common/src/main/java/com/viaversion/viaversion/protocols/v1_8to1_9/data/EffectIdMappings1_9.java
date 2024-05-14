@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.data;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-public class EffectIds1_8 {
+public class EffectIdMappings1_9 {
 
     private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(19, .99F);
 

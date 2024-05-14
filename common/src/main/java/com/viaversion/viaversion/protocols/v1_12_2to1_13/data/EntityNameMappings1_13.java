@@ -20,30 +20,12 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 import com.viaversion.viaversion.util.Key;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-/*
-    CHANGED ENTITY NAMES IN 1.13
-
-    commandblock_minecart => command_block_minecart
-    ender_crystal => end_crystal
-    evocation_fangs => evoker_fangs
-    evocation_illager => evoker
-    eye_of_ender_signal => eye_of_ender
-    fireworks_rocket => firework_rocket
-    illusion_illager => illusioner
-    snowman => snow_golem
-    villager_golem => iron_golem
-    vindication_illager => vindicator
-    xp_bottle => experience_bottle
-    xp_orb => experience_orb
- */
-public class EntityNameRewriter {
+public class EntityNameMappings1_13 {
     private static final Map<String, String> entityNames = new HashMap<>();
 
     static {
-        /*
-            CHANGED NAMES IN 1.13
-         */
         reg("commandblock_minecart", "command_block_minecart");
         reg("ender_crystal", "end_crystal");
         reg("evocation_fangs", "evoker_fangs");
@@ -58,7 +40,6 @@ public class EntityNameRewriter {
         reg("xp_orb", "experience_orb");
     }
 
-
     private static void reg(String past, String future) {
         entityNames.put(Key.namespaced(past), Key.namespaced(future));
     }
@@ -69,9 +50,6 @@ public class EntityNameRewriter {
             return entityName;
         }
         entityName = entityNames.get(Key.namespaced(entName));
-        if (entityName != null) {
-            return entityName;
-        } else
-            return entName;
+        return Objects.requireNonNullElse(entityName, entName);
     }
 }

@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PotionIds1_8 {
+public class PotionIdMappings1_9 {
 
     public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     public static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();

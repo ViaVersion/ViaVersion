@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.Attributes1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.AttributeMappings1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.data.DimensionRegistries1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
@@ -161,7 +161,7 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
             for (int i = 0; i < size; i++) {
                 // Attributes have been renamed and are now namespaced identifiers
                 String key = wrapper.read(Types.STRING);
-                String attributeIdentifier = Attributes1_16.attributeIdentifierMappings().get(key);
+                String attributeIdentifier = AttributeMappings1_16.attributeIdentifierMappings().get(key);
                 if (attributeIdentifier == null) {
                     attributeIdentifier = Key.namespaced(key);
                     if (!Key.isValid(attributeIdentifier)) {

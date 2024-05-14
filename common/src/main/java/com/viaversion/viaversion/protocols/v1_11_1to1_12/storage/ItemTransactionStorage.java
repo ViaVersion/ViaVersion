@@ -15,21 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_13_2to1_14.data;
+package com.viaversion.viaversion.protocols.v1_11_1to1_12.storage;
 
-import com.google.gson.JsonObject;
-import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ComponentRewriter1_13;
-
-public class ComponentRewriter1_14<C extends ClientboundPacketType> extends ComponentRewriter1_13<C> {
-
-    public ComponentRewriter1_14(Protocol<C, ?, ?, ?> protocol) {
-        super(protocol);
-    }
-
-    @Override
-    protected void handleTranslate(JsonObject object, String translate) {
-        // Nothing
-    }
+public record ItemTransactionStorage(short windowId, short slotId, short actionId) {
 }

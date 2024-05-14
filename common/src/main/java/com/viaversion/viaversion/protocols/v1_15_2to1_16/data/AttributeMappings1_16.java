@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_15_2to1_16.data;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-public final class Attributes1_16 {
+public final class AttributeMappings1_16 {
     private static final BiMap<String, String> ATTRIBUTE_MAPPINGS = HashBiMap.create();
 
     static {

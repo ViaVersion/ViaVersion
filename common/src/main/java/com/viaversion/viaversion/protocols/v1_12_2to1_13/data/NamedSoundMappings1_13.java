@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class NamedSoundRewriter {
+public class NamedSoundMappings1_13 {
     private static final Map<String, String> oldToNew = new HashMap<>();
 
     static {

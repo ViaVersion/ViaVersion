@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 
 import java.util.Optional;
 
-public enum SoundSource {
+public enum SoundSource1_12_2 {
     MASTER("master", 0),
     MUSIC("music", 1),
     RECORD("record", 2),
@@ -34,13 +34,13 @@ public enum SoundSource {
     private final String name;
     private final int id;
 
-    SoundSource(String name, int id) {
+    SoundSource1_12_2(String name, int id) {
         this.name = name;
         this.id = id;
     }
 
-    public static Optional<SoundSource> findBySource(String source) {
-        for (SoundSource item : SoundSource.values())
+    public static Optional<SoundSource1_12_2> findBySource(String source) {
+        for (SoundSource1_12_2 item : SoundSource1_12_2.values())
             if (item.name.equalsIgnoreCase(source))
                 return Optional.of(item);
         return Optional.empty();

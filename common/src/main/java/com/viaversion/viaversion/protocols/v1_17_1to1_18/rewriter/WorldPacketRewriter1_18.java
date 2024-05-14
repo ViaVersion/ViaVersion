@@ -36,7 +36,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_17;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntities1_18;
-import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityIds1_18;
+import com.viaversion.viaversion.protocols.v1_17_1to1_18.data.BlockEntityMappings1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
@@ -55,7 +55,7 @@ public final class WorldPacketRewriter1_18 {
                 map(Types.BLOCK_POSITION1_14);
                 handler(wrapper -> {
                     final short id = wrapper.read(Types.UNSIGNED_BYTE);
-                    final int newId = BlockEntityIds1_18.newId(id);
+                    final int newId = BlockEntityMappings1_18.newId(id);
                     wrapper.write(Types.VAR_INT, newId);
 
                     handleSpawners(newId, wrapper.passthrough(Types.NAMED_COMPOUND_TAG));

@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.ComponentRewriter1_14;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.ComponentRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.MappingData1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;

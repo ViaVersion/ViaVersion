@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.data;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum SoundEffects1_8 {
+public enum SoundEffectMappings1_9 {
 
     MOB_HORSE_ZOMBIE_IDLE("mob.horse.zombie.idle", "entity.zombie_horse.ambient", SoundCategories1_8.NEUTRAL),
     NOTE_SNARE("note.snare", "block.note.snare", SoundCategories1_8.RECORD),
@@ -274,30 +274,30 @@ public enum SoundEffects1_8 {
     private final SoundCategories1_8 category;
     private final boolean breakSound;
 
-    private static final Map<String, SoundEffects1_8> effects;
+    private static final Map<String, SoundEffectMappings1_9> effects;
 
     static {
         effects = new HashMap<>();
-        for (SoundEffects1_8 e : SoundEffects1_8.values()) {
+        for (SoundEffectMappings1_9 e : SoundEffectMappings1_9.values()) {
             effects.put(e.getName(), e);
         }
     }
 
-    SoundEffects1_8(String name, String newName, SoundCategories1_8 category) {
+    SoundEffectMappings1_9(String name, String newName, SoundCategories1_8 category) {
         this.category = category;
         this.newName = newName;
         this.name = name;
         this.breakSound = name.startsWith("dig.");
     }
 
-    SoundEffects1_8(String name, String newName, SoundCategories1_8 category, boolean shouldIgnore) {
+    SoundEffectMappings1_9(String name, String newName, SoundCategories1_8 category, boolean shouldIgnore) {
         this.category = category;
         this.newName = newName;
         this.name = name;
         this.breakSound = name.startsWith("dig.") || shouldIgnore;
     }
 
-    public static SoundEffects1_8 getByName(String name) {
+    public static SoundEffectMappings1_9 getByName(String name) {
         return effects.get(name);
     }
 
