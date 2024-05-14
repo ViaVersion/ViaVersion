@@ -19,7 +19,7 @@ package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.Types.Types;
+import com.viaversion.viaversion.api.type.Types;
 
 public class AttributeRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.protocol1_21to1_20_5;
+package com.viaversion.viaversion.protocols.v1_20_5to1_21;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -23,20 +23,19 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundConfigurationPackets1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPacket1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ClientboundPackets1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundConfigurationPackets1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPacket1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_20_5to1_20_3.packet.ServerboundPackets1_20_5;
-import com.viaversion.viaversion.protocols.protocol1_21to1_20_5.data.MappingData;
-import com.viaversion.viaversion.protocols.protocol1_21to1_20_5.rewriter.BlockItemPacketRewriter1_21;
-import com.viaversion.viaversion.protocols.protocol1_21to1_20_5.rewriter.EntityPacketRewriter1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.MappingData;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacketRewriter1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -44,14 +43,14 @@ import com.viaversion.viaversion.rewriter.TagRewriter;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_21To1_20_5 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
+public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityPacketRewriter1_21 entityRewriter = new EntityPacketRewriter1_21(this);
     private final BlockItemPacketRewriter1_21 itemRewriter = new BlockItemPacketRewriter1_21(this);
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
 
-    public Protocol1_21To1_20_5() {
+    public Protocol1_20_5To1_21() {
         super(ClientboundPacket1_20_5.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_5.class, ServerboundPacket1_20_5.class);
     }
 
@@ -59,23 +58,23 @@ public final class Protocol1_21To1_20_5 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         super.registerPackets();
 
-        tagRewriter.registerGeneric(ClientboundPackets1_20_5.TAGS);
+        tagRewriter.registerGeneric(ClientboundPackets1_20_5.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_5.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_5> soundRewriter = new SoundRewriter<>(this);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.SOUND);
-        soundRewriter.register1_19_3Sound(ClientboundPackets1_20_5.ENTITY_SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND);
+        soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND_ENTITY);
 
-        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.STATISTICS);
-        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.ENTITY_PROPERTIES);
+        new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
+        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES);
 
         registerClientbound(ClientboundPackets1_20_5.PROJECTILE_POWER, wrapper -> {
-            wrapper.passthrough(Type.VAR_INT); // Id
-            final double xPower = wrapper.read(Type.DOUBLE);
-            final double yPower = wrapper.read(Type.DOUBLE);
-            final double zPower = wrapper.read(Type.DOUBLE);
+            wrapper.passthrough(Types.VAR_INT); // Id
+            final double xPower = wrapper.read(Types.DOUBLE);
+            final double yPower = wrapper.read(Types.DOUBLE);
+            final double zPower = wrapper.read(Types.DOUBLE);
             final double accelerationPower = Math.sqrt(xPower * xPower + yPower * yPower + zPower * zPower);
-            wrapper.write(Type.DOUBLE, accelerationPower);
+            wrapper.write(Types.DOUBLE, accelerationPower);
         });
     }
 
