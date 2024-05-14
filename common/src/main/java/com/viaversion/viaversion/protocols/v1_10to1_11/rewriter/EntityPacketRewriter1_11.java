@@ -254,13 +254,11 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
     }
 
     public EntityType rewriteEntityType(int numType, List<Metadata> metadata) {
-        Optional<EntityType> optType = EntityType.findById(numType);
-        if (optType.isEmpty()) {
+        EntityType type = EntityType.findById(numType);
+        if (type == null) {
             Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with metadata: " + metadata);
             return null;
         }
-
-        EntityType type = optType.get();
 
         try {
             if (type.is(EntityType.GUARDIAN)) {

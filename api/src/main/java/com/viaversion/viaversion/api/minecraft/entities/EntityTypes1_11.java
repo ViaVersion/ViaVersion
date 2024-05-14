@@ -25,23 +25,22 @@ package com.viaversion.viaversion.api.minecraft.entities;
 import com.viaversion.viaversion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class EntityTypes1_11 {
 
     public static EntityType getTypeFromId(final int typeId, final boolean object) {
-        Optional<EntityType> type;
+        EntityType type;
 
         if (object) {
             type = ObjectType.getEntityType(typeId);
         } else {
             type = EntityType.findById(typeId);
         }
-        if (type.isEmpty()) {
+        if (type == null) {
             Via.getPlatform().getLogger().severe("Could not find 1.11 type id " + typeId + " objectType=" + object);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
-        return type.get();
+        return type;
     }
 
     public enum EntityType implements com.viaversion.viaversion.api.minecraft.entities.EntityType {
@@ -227,9 +226,11 @@ public class EntityTypes1_11 {
             }
         }
 
-        public static Optional<EntityType> findById(final int id) {
-            if (id == -1) return Optional.empty();
-            return Optional.ofNullable(TYPES.get(id));
+        public static EntityType findById(final int id) {
+            if (id == -1) {
+                return null;
+            }
+            return TYPES.get(id);
         }
     }
 
@@ -288,14 +289,16 @@ public class EntityTypes1_11 {
             return type;
         }
 
-        public static Optional<ObjectType> findById(final int id) {
-            if (id == -1) return Optional.empty();
-            return Optional.ofNullable(TYPES.get(id));
+        public static ObjectType findById(final int id) {
+            if (id == -1) {
+                return null;
+            }
+            return TYPES.get(id);
         }
 
-        public static Optional<EntityType> getEntityType(final int id) {
-            Optional<ObjectType> output = findById(id);
-            return output.map(objectType -> objectType.type);
+        public static EntityType getEntityType(final int id) {
+            final ObjectType objectType = findById(id);
+            return objectType != null ? objectType.type : null;
         }
     }
 }
