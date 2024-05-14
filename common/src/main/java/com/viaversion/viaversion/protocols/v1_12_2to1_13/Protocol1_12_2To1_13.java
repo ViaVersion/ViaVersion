@@ -151,19 +151,19 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 for (Map.Entry<String, int[]> tag : MAPPINGS.getBlockTags().entrySet()) {
                     wrapper.write(Types.STRING, tag.getKey());
                     // Needs copy as other protocols may modify it
-                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue().clone());
                 }
                 wrapper.write(Types.VAR_INT, MAPPINGS.getItemTags().size()); // item tags
                 for (Map.Entry<String, int[]> tag : MAPPINGS.getItemTags().entrySet()) {
                     wrapper.write(Types.STRING, tag.getKey());
                     // Needs copy as other protocols may modify it
-                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue().clone());
                 }
                 wrapper.write(Types.VAR_INT, MAPPINGS.getFluidTags().size()); // fluid tags
                 for (Map.Entry<String, int[]> tag : MAPPINGS.getFluidTags().entrySet()) {
                     wrapper.write(Types.STRING, tag.getKey());
                     // Needs copy as other protocols may modify it
-                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue());
+                    wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue().clone());
                 }
             }).scheduleSend(Protocol1_12_2To1_13.class);
         };
