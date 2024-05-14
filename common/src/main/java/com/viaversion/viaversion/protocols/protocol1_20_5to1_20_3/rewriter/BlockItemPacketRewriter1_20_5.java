@@ -26,15 +26,22 @@ import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.github.steveice10.opennbt.tag.builtin.NumberTag;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.GlobalPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -100,6 +107,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -137,10 +145,41 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_3.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, (user, blockEntity) -> updateBlockEntityTag(user, null, blockEntity.tag()));
+        protocol.registerClientbound(ClientboundPackets1_20_3.CHUNK_DATA, wrapper -> {
+            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
+            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
+            final Type<Chunk> chunkType = new ChunkType1_20_2(tracker.currentWorldSectionHeight(),
+                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+                MathUtil.ceilLog2(tracker.biomesSent()));
+            final Chunk chunk = wrapper.passthrough(chunkType);
+            for (final ChunkSection section : chunk.getSections()) {
+                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+                for (int i = 0; i < blockPalette.size(); i++) {
+                    final int id = blockPalette.idByIndex(i);
+                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+                }
+            }
+
+            List<BlockEntity> blockEntities = chunk.blockEntities();
+            for (int i = 0; i < blockEntities.size(); i++) {
+                final BlockEntity blockEntity = blockEntities.get(i);
+                if (blockEntity.tag() != null) {
+                    updateBlockEntityTag(wrapper.user(), null, blockEntity.tag());
+                }
+                if (isUnknownBlockEntityType(blockEntity.typeId())) {
+                    blockEntities.remove(i);
+                    i--;
+                }
+            }
+        });
         protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.VAR_INT); // Block entity type
+            final int type = wrapper.passthrough(Type.VAR_INT);
+            if (isUnknownBlockEntityType(type)) {
+                wrapper.cancel();
+                return;
+            }
 
             CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
             if (tag != null) {
@@ -323,6 +362,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 recipeRewriter.handleRecipeType(wrapper, Key.stripMinecraftNamespace(type));
             }
         });
+    }
+
+    private boolean isUnknownBlockEntityType(final int id) {
+        // Unknown block entity types are no longer silently ignored
+        return id < 0 || id > 42;
     }
 
     public Item handleNonNullItemToClient(final UserConnection connection, @Nullable Item item) {
