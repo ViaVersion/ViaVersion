@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityTypes1_10 {
+public class EntityTypes1_9 {
 
     public static EntityType getTypeFromId(final int typeId, final boolean object) {
         EntityType type;
@@ -37,7 +37,7 @@ public class EntityTypes1_10 {
             type = EntityType.findById(typeId);
         }
         if (type == null) {
-            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeId + " objectType=" + object);
+            Via.getPlatform().getLogger().severe("Could not find 1.9 type id " + typeId + " objectType=" + object);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type;
@@ -99,7 +99,7 @@ public class EntityTypes1_10 {
 
         LIVING_ENTITY_BASE(ENTITY),
         ARMOR_STAND(30, LIVING_ENTITY_BASE),
-        PLAYER(LIVING_ENTITY_BASE), // Needed for entity (un)tracking
+        PLAYER(ENTITY), // Needed for entity (un)tracking
 
         // Living entities as a larger subclass
         LIVING_ENTITY(48, LIVING_ENTITY_BASE),
@@ -132,7 +132,6 @@ public class EntityTypes1_10 {
         COW(92, ABSTRACT_ANIMAL),
         MOOSHROOM(96, COW),
         PIG(90, ABSTRACT_ANIMAL),
-        POLAR_BEAR(102, ABSTRACT_ANIMAL),
         RABBIT(101, ABSTRACT_ANIMAL),
         SHEEP(91, ABSTRACT_ANIMAL),
         HORSE(100, ABSTRACT_ANIMAL),

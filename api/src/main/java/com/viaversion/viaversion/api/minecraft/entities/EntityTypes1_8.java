@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityTypes1_10 {
+public class EntityTypes1_8 {
 
     public static EntityType getTypeFromId(final int typeId, final boolean object) {
         EntityType type;
@@ -37,7 +37,7 @@ public class EntityTypes1_10 {
             type = EntityType.findById(typeId);
         }
         if (type == null) {
-            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeId + " objectType=" + object);
+            Via.getPlatform().getLogger().severe("Could not find 1.8 type id " + typeId + " objectType=" + object);
             return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type;
@@ -47,7 +47,6 @@ public class EntityTypes1_10 {
 
         ENTITY,
 
-        AREA_EFFECT_CLOUD(3, ENTITY),
         END_CRYSTAL(200, ENTITY),
         EXPERIENCE_ORB(2, ENTITY),
         EYE_OF_ENDER(15, ENTITY),
@@ -65,20 +64,15 @@ public class EntityTypes1_10 {
         // Projectiles
         PROJECTILE(ENTITY),
         FIREWORK_ROCKET(22, ENTITY),
-        SHULKER_BULLET(25, ENTITY),
         SNOWBALL(11, PROJECTILE),
         ENDER_PEARL(14, PROJECTILE),
         EGG(7, PROJECTILE),
         EXPERIENCE_BOTTLE(17, PROJECTILE),
         POTION(16, PROJECTILE),
         FISHING_HOOK(ENTITY),
-
-        ABSTRACT_ARROW(ENTITY),
-        ARROW(10, ABSTRACT_ARROW),
-        SPECTRAL_ARROW(24, ABSTRACT_ARROW),
+        ARROW(10, ENTITY),
 
         HURTING_PROJECTILE(ENTITY),
-        DRAGON_FIREBALL(26, HURTING_PROJECTILE),
         FIREBALL(12, HURTING_PROJECTILE),
         SMALL_FIREBALL(13, HURTING_PROJECTILE),
         WITHER_SKULL(19, HURTING_PROJECTILE),
@@ -99,7 +93,7 @@ public class EntityTypes1_10 {
 
         LIVING_ENTITY_BASE(ENTITY),
         ARMOR_STAND(30, LIVING_ENTITY_BASE),
-        PLAYER(LIVING_ENTITY_BASE), // Needed for entity (un)tracking
+        PLAYER(LIVING_ENTITY_BASE), // Needed for entity (un)tracking and metadata indexing
 
         // Living entities as a larger subclass
         LIVING_ENTITY(48, LIVING_ENTITY_BASE),
@@ -118,7 +112,6 @@ public class EntityTypes1_10 {
         ABSTRACT_GOLEM(ABSTRACT_CREATURE),
         SNOW_GOLEM(97, ABSTRACT_GOLEM),
         IRON_GOLEM(99, ABSTRACT_GOLEM),
-        SHULKER(69, ABSTRACT_GOLEM),
 
         WATER_ANIMAL(LIVING_ENTITY),
         SQUID(94, WATER_ANIMAL),
@@ -132,7 +125,6 @@ public class EntityTypes1_10 {
         COW(92, ABSTRACT_ANIMAL),
         MOOSHROOM(96, COW),
         PIG(90, ABSTRACT_ANIMAL),
-        POLAR_BEAR(102, ABSTRACT_ANIMAL),
         RABBIT(101, ABSTRACT_ANIMAL),
         SHEEP(91, ABSTRACT_ANIMAL),
         HORSE(100, ABSTRACT_ANIMAL),
@@ -216,7 +208,6 @@ public class EntityTypes1_10 {
     public enum ObjectType implements com.viaversion.viaversion.api.minecraft.entities.ObjectType {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.ITEM),
-        AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
         MINECART(10, EntityType.MINECART), // There are multiple types, but we don't need them
         TNT_PRIMED(50, EntityType.TNT),
         ENDER_CRYSTAL(51, EntityType.END_CRYSTAL),
@@ -227,7 +218,6 @@ public class EntityTypes1_10 {
         SMALL_FIREBALL(64, EntityType.SMALL_FIREBALL),
         ENDER_PEARL(65, EntityType.ENDER_PEARL),
         WITHER_SKULL(66, EntityType.WITHER_SKULL),
-        SHULKER_BULLET(67, EntityType.SHULKER_BULLET),
         FALLING_BLOCK(70, EntityType.FALLING_BLOCK),
         ITEM_FRAME(71, EntityType.ITEM_FRAME),
         EYE_OF_ENDER(72, EntityType.EYE_OF_ENDER),
@@ -236,9 +226,7 @@ public class EntityTypes1_10 {
         FIREWORK_ROCKET(76, EntityType.FIREWORK_ROCKET),
         LEASH(77, EntityType.LEASH_KNOT),
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
-        FISHIHNG_HOOK(90, EntityType.FISHING_HOOK),
-        SPECTRAL_ARROW(91, EntityType.SPECTRAL_ARROW),
-        DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL);
+        FISHIHNG_HOOK(90, EntityType.FISHING_HOOK);
 
         private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 

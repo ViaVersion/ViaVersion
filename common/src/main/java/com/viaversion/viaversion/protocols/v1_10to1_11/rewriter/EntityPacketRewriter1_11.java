@@ -260,8 +260,6 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             return null;
         }
 
-        EntityType type = optType.get();
-
         try {
             if (type.is(EntityType.GUARDIAN)) {
                 // ElderGuardian - 4

@@ -81,7 +81,7 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        filter().type(EntityTypes1_12.EntityType.EVOCATION_ILLAGER).index(12).toIndex(13); // Aggressive
+        filter().type(EntityTypes1_12.EntityType.ABSTRACT_ILLAGER).addIndex(12); // Aggressive
     }
 
     @Override

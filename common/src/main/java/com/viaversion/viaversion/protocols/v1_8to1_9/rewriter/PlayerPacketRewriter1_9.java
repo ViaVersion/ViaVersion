@@ -25,7 +25,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameMode;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -185,7 +185,7 @@ public class PlayerPacketRewriter1_9 {
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.addEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
+                    tracker.addEntity(entityId, EntityTypes1_9.EntityType.PLAYER);
                     tracker.setClientEntityId(entityId);
                 });
                 map(Types.UNSIGNED_BYTE); // 1 - Player Gamemode
