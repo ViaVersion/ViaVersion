@@ -32,6 +32,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -186,28 +187,18 @@ public class BlockRewriter<C extends ClientboundPacketType> {
 
     public PacketHandler chunkDataHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         return wrapper -> {
-            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
-            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
-            final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
-                    MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                    MathUtil.ceilLog2(tracker.biomesSent()));
-            final Chunk chunk = wrapper.passthrough(chunkType);
-            for (final ChunkSection section : chunk.getSections()) {
-                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < blockPalette.size(); i++) {
-                    final int id = blockPalette.idByIndex(i);
-                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-                }
-            }
-
+            final Chunk chunk = handleChunk1_19(wrapper, chunkTypeSupplier);
             final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
             if (blockEntityMappings != null || blockEntityHandler != null) {
-                List<BlockEntity> blockEntities = chunk.blockEntities();
+                final List<BlockEntity> blockEntities = chunk.blockEntities();
                 for (int i = 0; i < blockEntities.size(); i++) {
                     final BlockEntity blockEntity = blockEntities.get(i);
                     if (blockEntityMappings != null) {
-                        blockEntities.set(i, blockEntity.withTypeId(blockEntityMappings.getNewIdOrDefault(blockEntity.typeId(), blockEntity.typeId())));
+                        final int id = blockEntity.typeId();
+                        final int mappedId = blockEntityMappings.getNewIdOrDefault(id, id);
+                        if (id != mappedId) {
+                            blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                        }
                     }
 
                     if (blockEntityHandler != null && blockEntity.tag() != null) {
@@ -216,6 +207,24 @@ public class BlockRewriter<C extends ClientboundPacketType> {
                 }
             }
         };
+    }
+
+    public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) throws Exception {
+        final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
+        Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
+        Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
+        final Type<Chunk> chunkType = chunkTypeSupplier.supply(tracker.currentWorldSectionHeight(),
+            MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
+            MathUtil.ceilLog2(tracker.biomesSent()));
+        final Chunk chunk = wrapper.passthrough(chunkType);
+        for (final ChunkSection section : chunk.getSections()) {
+            final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
+            for (int i = 0; i < blockPalette.size(); i++) {
+                final int id = blockPalette.idByIndex(i);
+                blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
+            }
+        }
+        return chunk;
     }
 
     public void registerBlockEntityData(C packetType) {

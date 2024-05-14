@@ -35,6 +35,8 @@ import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -137,10 +139,27 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         blockRewriter.registerBlockChange(ClientboundPackets1_20_3.BLOCK_CHANGE);
         blockRewriter.registerVarLongMultiBlockChange1_20(ClientboundPackets1_20_3.MULTI_BLOCK_CHANGE);
         blockRewriter.registerEffect(ClientboundPackets1_20_3.EFFECT, 1010, 2001);
-        blockRewriter.registerChunkData1_19(ClientboundPackets1_20_3.CHUNK_DATA, ChunkType1_20_2::new, (user, blockEntity) -> updateBlockEntityTag(user, null, blockEntity.tag()));
+        protocol.registerClientbound(ClientboundPackets1_20_3.CHUNK_DATA, wrapper -> {
+            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_20_2::new);
+            for (int i = 0; i < chunk.blockEntities().size(); i++) {
+                final BlockEntity blockEntity = chunk.blockEntities().get(i);
+                if (isUnknownBlockEntity(blockEntity.typeId())) {
+                    // The client no longer ignores unknown block entities
+                    chunk.blockEntities().remove(i--);
+                    continue;
+                }
+
+                updateBlockEntityTag(wrapper.user(), null, blockEntity.tag());
+            }
+        });
         protocol.registerClientbound(ClientboundPackets1_20_3.BLOCK_ENTITY_DATA, wrapper -> {
             wrapper.passthrough(Type.POSITION1_14); // Position
-            wrapper.passthrough(Type.VAR_INT); // Block entity type
+
+            final int typeId = wrapper.passthrough(Type.VAR_INT);
+            if (isUnknownBlockEntity(typeId)) {
+                wrapper.cancel();
+                return;
+            }
 
             CompoundTag tag = wrapper.read(Type.COMPOUND_TAG);
             if (tag != null) {
@@ -1344,6 +1363,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (!tag.contains("id")) {
             tag.putString("id", id);
         }
+    }
+
+    private boolean isUnknownBlockEntity(final int id) {
+        return id < 0 || id > 42;
     }
 
     private void updateBlockEntityTag(final UserConnection connection, @Nullable final StructuredDataContainer data, final CompoundTag tag) {
