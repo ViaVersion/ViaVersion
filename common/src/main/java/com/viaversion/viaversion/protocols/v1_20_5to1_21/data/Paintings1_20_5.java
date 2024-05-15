@@ -17,62 +17,40 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.data;
 
+import com.viaversion.viaversion.api.minecraft.PaintingVariant;
+
 public final class Paintings1_20_5 {
 
     public static final PaintingVariant[] PAINTINGS = {
-        new PaintingVariant("kebab", 1, 1),
-        new PaintingVariant("aztec", 1, 1),
-        new PaintingVariant("alban", 1, 1),
-        new PaintingVariant("aztec2", 1, 1),
-        new PaintingVariant("bomb", 1, 1),
-        new PaintingVariant("plant", 1, 1),
-        new PaintingVariant("wasteland", 1, 1),
-        new PaintingVariant("pool", 2, 1),
-        new PaintingVariant("courbet", 2, 1),
-        new PaintingVariant("sea", 2, 1),
-        new PaintingVariant("sunset", 2, 1),
-        new PaintingVariant("creebet", 2, 1),
-        new PaintingVariant("wanderer", 1, 2),
-        new PaintingVariant("graham", 1, 2),
-        new PaintingVariant("match", 2, 2),
-        new PaintingVariant("bust", 2, 2),
-        new PaintingVariant("stage", 2, 2),
-        new PaintingVariant("void", 2, 2),
-        new PaintingVariant("skull_and_roses", 2, 2),
-        new PaintingVariant("wither", 2, 2),
-        new PaintingVariant("fighters", 4, 2),
-        new PaintingVariant("pointer", 4, 4),
-        new PaintingVariant("pigscene", 4, 4),
-        new PaintingVariant("burning_skull", 4, 4),
-        new PaintingVariant("skeleton", 4, 3),
-        new PaintingVariant("earth", 2, 2),
-        new PaintingVariant("wind", 2, 2),
-        new PaintingVariant("water", 2, 2),
-        new PaintingVariant("fire", 2, 2),
-        new PaintingVariant("donkey_kong", 4, 3)
+        new PaintingVariant(1, 1, "kebab"),
+        new PaintingVariant(1, 1, "aztec"),
+        new PaintingVariant(1, 1, "alban"),
+        new PaintingVariant(1, 1, "aztec2"),
+        new PaintingVariant(1, 1, "bomb"),
+        new PaintingVariant(1, 1, "plant"),
+        new PaintingVariant(1, 1, "wasteland"),
+        new PaintingVariant(2, 1, "pool"),
+        new PaintingVariant(2, 1, "courbet"),
+        new PaintingVariant(2, 1, "sea"),
+        new PaintingVariant(2, 1, "sunset"),
+        new PaintingVariant(2, 1, "creebet"),
+        new PaintingVariant(1, 2, "wanderer"),
+        new PaintingVariant(1, 2, "graham"),
+        new PaintingVariant(2, 2, "match"),
+        new PaintingVariant(2, 2, "bust"),
+        new PaintingVariant(2, 2, "stage"),
+        new PaintingVariant(2, 2, "void"),
+        new PaintingVariant(2, 2, "skull_and_roses"),
+        new PaintingVariant(2, 2, "wither"),
+        new PaintingVariant(4, 2, "fighters"),
+        new PaintingVariant(4, 4, "pointer"),
+        new PaintingVariant(4, 4, "pigscene"),
+        new PaintingVariant(4, 4, "burning_skull"),
+        new PaintingVariant(4, 3, "skeleton"),
+        new PaintingVariant(2, 2, "earth"),
+        new PaintingVariant(2, 2, "wind"),
+        new PaintingVariant(2, 2, "water"),
+        new PaintingVariant(2, 2, "fire"),
+        new PaintingVariant(4, 3, "donkey_kong")
     };
-
-    public static final class PaintingVariant {
-        private final String key;
-        private final int width;
-        private final int height;
-
-        public PaintingVariant(final String key, final int width, final int height) {
-            this.key = key;
-            this.width = width;
-            this.height = height;
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public int width() {
-            return width;
-        }
-
-        public int height() {
-            return height;
-        }
-    }
 }

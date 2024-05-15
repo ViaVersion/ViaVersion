@@ -18,20 +18,23 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 
@@ -68,12 +71,12 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             paintingRegistryPacket.write(Types.STRING, "minecraft:painting_variant");
             final RegistryEntry[] paintingsRegistry = new RegistryEntry[Paintings1_20_5.PAINTINGS.length];
             for (int i = 0; i < Paintings1_20_5.PAINTINGS.length; i++) {
-                final Paintings1_20_5.PaintingVariant painting = Paintings1_20_5.PAINTINGS[i];
+                final PaintingVariant painting = Paintings1_20_5.PAINTINGS[i];
                 final CompoundTag tag = new CompoundTag();
                 tag.putInt("width", painting.width());
                 tag.putInt("height", painting.height());
-                tag.putString("asset_id", painting.key());
-                paintingsRegistry[i] = new RegistryEntry(painting.key(), tag);
+                tag.putString("asset_id", painting.assetId());
+                paintingsRegistry[i] = new RegistryEntry(painting.assetId(), tag);
             }
             paintingRegistryPacket.write(Types.REGISTRY_ENTRY_ARRAY, paintingsRegistry);
             paintingRegistryPacket.send(Protocol1_20_5To1_21.class);
@@ -118,8 +121,18 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(Types1_21.ENTITY_DATA_TYPES::byId);
-
+        filter().handler((event, data) -> {
+            final EntityDataType type = data.dataType();
+            if (type == Types1_20_5.ENTITY_DATA_TYPES.wolfVariantType) {
+                final int variant = data.value();
+                data.setTypeAndValue(Types1_21.ENTITY_DATA_TYPES.wolfVariantType, Holder.of(variant));
+            } else if (type == Types1_20_5.ENTITY_DATA_TYPES.paintingVariantType) {
+                final int variant = data.value();
+                data.setTypeAndValue(Types1_21.ENTITY_DATA_TYPES.paintingVariantType, Holder.of(variant));
+            } else {
+                data.setDataType(Types1_21.ENTITY_DATA_TYPES.byId(type.typeId()));
+            }
+        });
         registerEntityDataTypeHandler(
             Types1_21.ENTITY_DATA_TYPES.itemType,
             Types1_21.ENTITY_DATA_TYPES.blockStateType,
