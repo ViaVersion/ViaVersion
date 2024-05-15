@@ -173,6 +173,37 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         });
     }
 
+    public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType) {
+        registerLevelChunk(packetType, chunkType, newChunkType, null);
+    }
+
+    public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType, @Nullable BiConsumer<UserConnection, Chunk> chunkRewriter) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            Chunk chunk = wrapper.read(chunkType);
+            wrapper.write(newChunkType, chunk);
+
+            handleChunk(chunk);
+            if (chunkRewriter != null) {
+                chunkRewriter.accept(wrapper.user(), chunk);
+            }
+        });
+    }
+
+    public void handleChunk(Chunk chunk) {
+        for (int s = 0; s < chunk.getSections().length; s++) {
+            ChunkSection section = chunk.getSections()[s];
+            if (section == null) {
+                continue;
+            }
+
+            DataPalette palette = section.palette(PaletteType.BLOCKS);
+            for (int i = 0; i < palette.size(); i++) {
+                int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
+                palette.setIdByIndex(i, mappedBlockStateId);
+            }
+        }
+    }
+
     public void registerLevelChunk1_19(C packetType, ChunkTypeSupplier chunkTypeSupplier) {
         registerLevelChunk1_19(packetType, chunkTypeSupplier, null);
     }

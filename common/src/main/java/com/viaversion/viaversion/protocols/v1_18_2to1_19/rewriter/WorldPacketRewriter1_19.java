@@ -17,19 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_18_2to1_19.rewriter;
 
-import com.google.common.base.Preconditions;
-import com.viaversion.viaversion.api.data.entity.EntityTracker;
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.packet.ClientboundPackets1_18;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.Protocol1_18_2To1_19;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.packet.ServerboundPackets1_19;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
-import com.viaversion.viaversion.util.MathUtil;
 
 public final class WorldPacketRewriter1_19 {
 
@@ -39,25 +32,9 @@ public final class WorldPacketRewriter1_19 {
         blockRewriter.registerBlockUpdate(ClientboundPackets1_18.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate(ClientboundPackets1_18.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent(ClientboundPackets1_18.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_18::new);
 
         protocol.cancelClientbound(ClientboundPackets1_18.BLOCK_BREAK_ACK);
-
-        protocol.registerClientbound(ClientboundPackets1_18.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
-            final EntityTracker tracker = protocol.getEntityRewriter().tracker(wrapper.user());
-            Preconditions.checkArgument(tracker.biomesSent() != -1, "Biome count not set");
-            Preconditions.checkArgument(tracker.currentWorldSectionHeight() != -1, "Section height not set");
-            final ChunkType1_18 chunkType = new ChunkType1_18(tracker.currentWorldSectionHeight(),
-                MathUtil.ceilLog2(protocol.getMappingData().getBlockStateMappings().mappedSize()),
-                MathUtil.ceilLog2(tracker.biomesSent()));
-            final Chunk chunk = wrapper.passthrough(chunkType);
-            for (final ChunkSection section : chunk.getSections()) {
-                final DataPalette blockPalette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < blockPalette.size(); i++) {
-                    final int id = blockPalette.idByIndex(i);
-                    blockPalette.setIdByIndex(i, protocol.getMappingData().getNewBlockStateId(id));
-                }
-            }
-        });
 
         protocol.registerServerbound(ServerboundPackets1_19.SET_BEACON, wrapper -> {
             // Primary effect

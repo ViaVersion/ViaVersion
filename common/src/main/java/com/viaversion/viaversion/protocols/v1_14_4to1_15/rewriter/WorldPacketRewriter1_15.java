@@ -17,10 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_14;
@@ -38,11 +34,7 @@ public final class WorldPacketRewriter1_15 {
         blockRewriter.registerBlockUpdate(ClientboundPackets1_14_4.BLOCK_UPDATE);
         blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_14_4.CHUNK_BLOCKS_UPDATE);
         blockRewriter.registerBlockBreakAck(ClientboundPackets1_14_4.BLOCK_BREAK_ACK);
-
-        protocol.registerClientbound(ClientboundPackets1_14_4.LEVEL_CHUNK, wrapper -> {
-            Chunk chunk = wrapper.read(ChunkType1_14.TYPE);
-            wrapper.write(ChunkType1_15.TYPE, chunk);
-
+        blockRewriter.registerLevelChunk(ClientboundPackets1_14_4.LEVEL_CHUNK, ChunkType1_14.TYPE, ChunkType1_15.TYPE, (connection, chunk) -> {
             if (chunk.isFullChunk()) {
                 int[] biomeData = chunk.getBiomeData();
                 int[] newBiomeData = new int[1024];
@@ -63,19 +55,6 @@ public final class WorldPacketRewriter1_15 {
                 }
 
                 chunk.setBiomeData(newBiomeData);
-            }
-
-            for (int s = 0; s < chunk.getSections().length; s++) {
-                ChunkSection section = chunk.getSections()[s];
-                if (section == null) {
-                    continue;
-                }
-
-                DataPalette palette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < palette.size(); i++) {
-                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                    palette.setIdByIndex(i, mappedBlockStateId);
-                }
             }
         });
 

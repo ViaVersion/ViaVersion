@@ -38,17 +38,7 @@ public class WorldPacketRewriter1_13_1 {
             ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
             Chunk chunk = wrapper.passthrough(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
 
-            for (ChunkSection section : chunk.getSections()) {
-                if (section == null) {
-                    continue;
-                }
-
-                DataPalette palette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < palette.size(); i++) {
-                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                    palette.setIdByIndex(i, mappedBlockStateId);
-                }
-            }
+            blockRewriter.handleChunk(chunk);
         });
 
         blockRewriter.registerBlockEvent(ClientboundPackets1_13.BLOCK_EVENT);
