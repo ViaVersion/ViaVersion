@@ -67,12 +67,10 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     protected void onMappingDataLoaded() {
         EntityTypes1_15.initialize(this);
 
-        int[] shulkerBoxes = new int[17];
-        int shulkerBoxOffset = 501;
-        for (int i = 0; i < 17; i++) {
-            shulkerBoxes[i] = shulkerBoxOffset + i;
-        }
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:shulker_boxes", shulkerBoxes);
+        tagRewriter.removeTag(RegistryType.BLOCK, "minecraft:dirt_like");
+        tagRewriter.addEmptyTag(RegistryType.ITEM, "minecraft:lectern_books");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:bee_growables", "minecraft:beehives");
+        tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:beehive_inhabitors");
 
         super.onMappingDataLoaded();
     }

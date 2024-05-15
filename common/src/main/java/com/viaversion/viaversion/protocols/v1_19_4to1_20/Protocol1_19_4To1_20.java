@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_19_4to1_20;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.type.Types;
@@ -79,6 +80,10 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
             .reader("vibration", ParticleType.Readers.VIBRATION1_19)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK);
+
+        tagRewriter.removeTag(RegistryType.BLOCK, "minecraft:replaceable_plants");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:decorated_pot_ingredients", "minecraft:decorated_pot_sherds");
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:trail_ruins_replaceable");
 
         super.onMappingDataLoaded();
     }

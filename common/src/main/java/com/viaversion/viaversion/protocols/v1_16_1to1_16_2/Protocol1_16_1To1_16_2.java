@@ -26,9 +26,9 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.data.MappingData1_16_2;
-import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.EntityPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ClientboundPackets1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPackets1_16_2;
+import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.EntityPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.ItemPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.WorldPacketRewriter1_16_2;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -86,19 +86,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
     protected void onMappingDataLoaded() {
         EntityTypes1_16_2.initialize(this);
 
-        tagRewriter.addTag(RegistryType.ITEM, "minecraft:stone_crafting_materials", 14, 962);
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:mushroom_grow_block");
-
-        // The client now wants ALL (previous) tags to be sent, sooooo :>
-        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:soul_fire_base_blocks", "minecraft:furnace_materials", "minecraft:crimson_stems",
-            "minecraft:gold_ores", "minecraft:piglin_loved", "minecraft:piglin_repellents", "minecraft:creeper_drop_music_discs",
-            "minecraft:logs_that_burn", "minecraft:stone_tool_materials", "minecraft:warped_stems");
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:infiniburn_nether", "minecraft:crimson_stems",
-            "minecraft:wither_summon_base_blocks", "minecraft:infiniburn_overworld", "minecraft:piglin_repellents",
-            "minecraft:hoglin_repellents", "minecraft:prevent_mob_spawning_inside", "minecraft:wart_blocks",
-            "minecraft:stone_pressure_plates", "minecraft:nylium", "minecraft:gold_ores", "minecraft:pressure_plates",
-            "minecraft:logs_that_burn", "minecraft:strider_warm_blocks", "minecraft:warped_stems", "minecraft:infiniburn_end",
-            "minecraft:base_stone_nether", "minecraft:base_stone_overworld");
+        tagRewriter.removeTag(RegistryType.ITEM, "minecraft:furnace_materials");
 
         super.onMappingDataLoaded();
     }

@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_18_2to1_19;
 
 import com.google.gson.JsonElement;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -301,6 +302,18 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK);
         EntityTypes1_19.initialize(this);
+
+        tagRewriter.removeTag(RegistryType.ITEM, "minecraft:occludes_vibration_signals");
+        tagRewriter.renameTag(RegistryType.ITEM, "minecraft:carpets", "minecraft:wool_carpets");
+        tagRewriter.renameTag(RegistryType.BLOCK, "minecraft:carpets", "minecraft:wool_carpets");
+        tagRewriter.renameTag(RegistryType.BLOCK, "minecraft:polar_bears_spawnable_on_in_frozen_ocean", "minecraft:polar_bears_spawnable_on_alternate");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:chest_boats", "minecraft:dampens_vibrations", "minecraft:mangrove_logs", "minecraft:overworld_natural_logs");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:ancient_city_replaceable", "minecraft:convertable_to_mud", "minecraft:dampens_vibrations",
+            "minecraft:frog_prefer_jump_to", "minecraft:frogs_spawnable_on", "minecraft:mangrove_logs", "minecraft:mangrove_logs_can_grow_through",
+            "minecraft:mangrove_roots_can_grow_through", "minecraft:nether_carver_replaceables", "minecraft:overworld_carver_replaceables",
+            "minecraft:overworld_natural_logs", "minecraft:sculk_replaceable", "minecraft:sculk_replaceable_world_gen", "minecraft:snaps_goat_horn");
+        tagRewriter.addEmptyTag(RegistryType.ENTITY, "minecraft:frog_food");
+        tagRewriter.addEmptyTags(RegistryType.GAME_EVENT, "minecraft:allay_can_listen", "minecraft:shrieker_can_listen", "minecraft:warden_can_listen");
 
         super.onMappingDataLoaded();
     }

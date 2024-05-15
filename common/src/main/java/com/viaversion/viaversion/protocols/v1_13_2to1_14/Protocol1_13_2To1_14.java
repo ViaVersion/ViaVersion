@@ -19,9 +19,10 @@ package com.viaversion.viaversion.protocols.v1_13_2to1_14;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.RegistryType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
@@ -40,6 +41,7 @@ import com.viaversion.viaversion.rewriter.CommandRewriter;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
+import com.viaversion.viaversion.rewriter.TagRewriter;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_13, ClientboundPackets1_14, ServerboundPackets1_13, ServerboundPackets1_14> {
@@ -47,6 +49,7 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData1_14 MAPPINGS = new MappingData1_14();
     private final EntityPacketRewriter1_14 entityRewriter = new EntityPacketRewriter1_14(this);
     private final ItemPacketRewriter1_14 itemRewriter = new ItemPacketRewriter1_14(this);
+    private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_13_2To1_14() {
         super(ClientboundPackets1_13.class, ClientboundPackets1_14.class, ServerboundPackets1_13.class, ServerboundPackets1_14.class);
@@ -76,59 +79,12 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         };
         commandRewriter.registerDeclareCommands(ClientboundPackets1_13.COMMANDS);
 
-        registerClientbound(ClientboundPackets1_13.UPDATE_TAGS, wrapper -> {
-            int blockTagsSize = wrapper.read(Types.VAR_INT);
-            wrapper.write(Types.VAR_INT, blockTagsSize + 6); // block tags
-            for (int i = 0; i < blockTagsSize; i++) {
-                wrapper.passthrough(Types.STRING);
-                int[] blockIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-                for (int j = 0; j < blockIds.length; j++) {
-                    blockIds[j] = MAPPINGS.getNewBlockId(blockIds[j]);
-                }
+        registerClientbound(ClientboundPackets1_13.UPDATE_TAGS, new PacketHandlers() {
+            @Override
+            protected void register() {
+                handler(tagRewriter.getHandler(RegistryType.FLUID));
+                handler(wrapper -> tagRewriter.appendNewTags(wrapper, RegistryType.ENTITY));
             }
-            // Minecraft crashes if we not send signs tags
-            wrapper.write(Types.STRING, "minecraft:signs");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                MAPPINGS.getNewBlockId(150), MAPPINGS.getNewBlockId(155)
-            });
-            wrapper.write(Types.STRING, "minecraft:wall_signs");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                MAPPINGS.getNewBlockId(155)
-            });
-            wrapper.write(Types.STRING, "minecraft:standing_signs");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                MAPPINGS.getNewBlockId(150)
-            });
-            // Fences and walls tags - used for block connections
-            wrapper.write(Types.STRING, "minecraft:fences");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 248, 472, 473, 474, 475});
-            wrapper.write(Types.STRING, "minecraft:walls");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{271, 272});
-            wrapper.write(Types.STRING, "minecraft:wooden_fences");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{189, 472, 473, 474, 475});
-            int itemTagsSize = wrapper.read(Types.VAR_INT);
-            wrapper.write(Types.VAR_INT, itemTagsSize + 2); // item tags
-            for (int i = 0; i < itemTagsSize; i++) {
-                wrapper.passthrough(Types.STRING);
-                int[] itemIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-                for (int j = 0; j < itemIds.length; j++) {
-                    itemIds[j] = MAPPINGS.getNewItemId(itemIds[j]);
-                }
-            }
-            // Should fix fuel shift clicking
-            wrapper.write(Types.STRING, "minecraft:signs");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{
-                MAPPINGS.getNewItemId(541)
-            });
-            // Arrows tag (used by bow)
-            wrapper.write(Types.STRING, "minecraft:arrows");
-            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{526, 825, 826});
-            int fluidTagsSize = wrapper.passthrough(Types.VAR_INT); // fluid tags
-            for (int i = 0; i < fluidTagsSize; i++) {
-                wrapper.passthrough(Types.STRING);
-                wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-            }
-            wrapper.write(Types.VAR_INT, 0);  // new entity tags - do we need to send this?
         });
 
         // Set Difficulty packet added in 19w11a
@@ -157,6 +113,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("item", ParticleType.Readers.ITEM1_13_2);
 
+        tagRewriter.addEmptyTag(RegistryType.BLOCK, "bamboo_plantable_on");
+
         super.onMappingDataLoaded();
     }
 
@@ -181,5 +139,10 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_14 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public TagRewriter<ClientboundPackets1_13> getTagRewriter() {
+        return tagRewriter;
     }
 }
