@@ -177,12 +177,10 @@ public class BlockRewriter<C extends ClientboundPacketType> {
         registerLevelChunk(packetType, chunkType, newChunkType, null);
     }
 
-    public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType, BiConsumer<UserConnection, Chunk> chunkRewriter) {
+    public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType, @Nullable BiConsumer<UserConnection, Chunk> chunkRewriter) {
         protocol.registerClientbound(packetType, wrapper -> {
-            Chunk chunk = newChunkType != null ? wrapper.read(chunkType) : wrapper.passthrough(chunkType);
-            if (newChunkType != null) {
-                wrapper.write(newChunkType, chunk);
-            }
+            Chunk chunk = wrapper.read(chunkType);
+            wrapper.write(newChunkType, chunk);
 
             handleChunk(chunk);
             if (chunkRewriter != null) {
