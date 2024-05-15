@@ -24,10 +24,6 @@ import com.viaversion.nbt.tag.LongArrayTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_15;
@@ -50,34 +46,8 @@ public class WorldPacketRewriter1_16 {
         blockRewriter.registerBlockUpdate(ClientboundPackets1_15.BLOCK_UPDATE);
         blockRewriter.registerChunkBlocksUpdate(ClientboundPackets1_15.CHUNK_BLOCKS_UPDATE);
         blockRewriter.registerBlockBreakAck(ClientboundPackets1_15.BLOCK_BREAK_ACK);
-
-        protocol.registerClientbound(ClientboundPackets1_15.LIGHT_UPDATE, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // x
-                map(Types.VAR_INT); // y
-                handler(wrapper -> wrapper.write(Types.BOOLEAN, true)); // Take neighbour's light into account as well
-            }
-        });
-
-        protocol.registerClientbound(ClientboundPackets1_15.LEVEL_CHUNK, wrapper -> {
-            Chunk chunk = wrapper.read(ChunkType1_15.TYPE);
-            wrapper.write(ChunkType1_16.TYPE, chunk);
-
+        blockRewriter.registerLevelChunk(ClientboundPackets1_15.LEVEL_CHUNK, ChunkType1_15.TYPE, ChunkType1_16.TYPE, (connection, chunk) -> {
             chunk.setIgnoreOldLightData(chunk.isFullChunk());
-
-            for (int s = 0; s < chunk.getSections().length; s++) {
-                ChunkSection section = chunk.getSections()[s];
-                if (section == null) {
-                    continue;
-                }
-
-                DataPalette palette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < palette.size(); i++) {
-                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                    palette.setIdByIndex(i, mappedBlockStateId);
-                }
-            }
 
             CompoundTag heightMaps = chunk.getHeightMap();
             for (Tag heightMapTag : heightMaps.values()) {
@@ -89,7 +59,16 @@ public class WorldPacketRewriter1_16 {
 
             if (chunk.getBlockEntities() == null) return;
             for (CompoundTag blockEntity : chunk.getBlockEntities()) {
-                handleBlockEntity(protocol, wrapper.user(), blockEntity);
+                handleBlockEntity(protocol, connection, blockEntity);
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_15.LIGHT_UPDATE, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.VAR_INT); // x
+                map(Types.VAR_INT); // y
+                handler(wrapper -> wrapper.write(Types.BOOLEAN, true)); // Take neighbour's light into account as well
             }
         });
 

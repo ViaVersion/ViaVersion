@@ -125,18 +125,8 @@ public final class WorldPacketRewriter1_17 {
             // 1.17 uses a bitset for the mask
             chunk.setChunkMask(BitSet.valueOf(new long[]{chunk.getBitmask()}));
 
-            for (int s = 0; s < chunk.getSections().length; s++) {
-                ChunkSection section = chunk.getSections()[s];
-                if (section == null) {
-                    continue;
-                }
-
-                DataPalette palette = section.palette(PaletteType.BLOCKS);
-                for (int i = 0; i < palette.size(); i++) {
-                    int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(palette.idByIndex(i));
-                    palette.setIdByIndex(i, mappedBlockStateId);
-                }
-            }
+            // Rewrite block state ids
+            blockRewriter.handleChunk(chunk);
         });
 
         blockRewriter.registerLevelEvent(ClientboundPackets1_16_2.LEVEL_EVENT, 1010, 2001);
