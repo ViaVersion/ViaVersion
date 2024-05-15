@@ -30,8 +30,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityNames1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityNames1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityMappings1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityMappings1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
@@ -144,13 +144,13 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 1) {
-                        EntityNames1_11.toClientSpawner(tag);
+                        EntityMappings1_11.toClientSpawner(tag);
                     }
 
                     StringTag idTag = tag.getStringTag("id");
                     if (idTag != null) {
                         // Handle new identifier
-                        idTag.setValue(BlockEntityNames1_11.toNewIdentifier(idTag.getValue()));
+                        idTag.setValue(BlockEntityMappings1_11.toNewIdentifier(idTag.getValue()));
                     }
                 });
             }
@@ -162,7 +162,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         filter().handler((event, meta) -> {
             if (meta.getValue() instanceof DataItem) {
                 // Apply rewrite
-                EntityNames1_11.toClientItem(meta.value());
+                EntityMappings1_11.toClientItem(meta.value());
             }
         });
 

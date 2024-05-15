@@ -46,11 +46,11 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.Connec
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ComponentRewriter1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ComponentRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.RecipeData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticData;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticMappings;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
@@ -212,7 +212,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 if (split.length == 2) {
                     // Custom types
                     categoryId = 8;
-                    Integer newIdRaw = StatisticMappings.CUSTOM_STATS.get(name);
+                    Integer newIdRaw = StatisticMappings1_13.CUSTOM_STATS.get(name);
                     if (newIdRaw != null) {
                         newId = newIdRaw;
                     } else {

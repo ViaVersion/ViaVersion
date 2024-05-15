@@ -21,7 +21,7 @@ import com.viaversion.viaversion.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class PotionColors1_11 {
+public class PotionColorMappings1_11 {
 
     //<oldData> to <newData, isInstant> mapping
     private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(37, 0.99F);

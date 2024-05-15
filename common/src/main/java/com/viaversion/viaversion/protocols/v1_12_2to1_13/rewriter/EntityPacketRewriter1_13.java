@@ -28,8 +28,8 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.EntityTypeRewriter;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleRewriter;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.EntityIdMappings1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -210,7 +210,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 int parameter1 = parameter1Meta != null ? parameter1Meta.value() : 0;
                 int parameter2 = parameter2Meta != null ? parameter2Meta.value() : 0;
 
-                Particle particle = ParticleRewriter.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
+                Particle particle = ParticleIdMappings1_13.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.id() != -1) {
                     event.createExtraData(new EntityData(9, Types1_13.ENTITY_DATA_TYPES.particleType, particle));
                 }
@@ -223,7 +223,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public int newEntityId(final int id) {
-        return EntityTypeRewriter.getNewId(id);
+        return EntityIdMappings1_13.getNewId(id);
     }
 
     @Override

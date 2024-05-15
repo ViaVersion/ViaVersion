@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.data;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StatisticMappings {
+public class StatisticMappings1_13 {
 
     public static final Map<String, Integer> CUSTOM_STATS = new HashMap<>();
 

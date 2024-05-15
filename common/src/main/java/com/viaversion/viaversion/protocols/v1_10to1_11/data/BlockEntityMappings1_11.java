@@ -21,7 +21,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.util.Key;
 
-public class BlockEntityNames1_11 {
+public class BlockEntityMappings1_11 {
     private static final BiMap<String, String> OLD_TO_NEW_NAMES = HashBiMap.create();
 
     // Source: https://www.minecraftforum.net/forums/minecraft-java-edition/redstone-discussion-and/commands-command-blocks-and/2724507-1-11-nbt-changes-and-additions#AllTiles

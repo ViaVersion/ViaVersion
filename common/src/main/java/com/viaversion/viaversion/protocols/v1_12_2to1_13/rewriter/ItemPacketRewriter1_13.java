@@ -33,8 +33,8 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SoundSource;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SpawnEggRewriter;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SoundSource1_12_2;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.SpawnEggMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
@@ -117,12 +117,12 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         wrapper.write(Types.BYTE, flags); // Placeholder
                         if (!originalSource.isEmpty()) {
                             flags |= 1;
-                            Optional<SoundSource> finalSource = SoundSource.findBySource(originalSource);
+                            Optional<SoundSource1_12_2> finalSource = SoundSource1_12_2.findBySource(originalSource);
                             if (finalSource.isEmpty()) {
                                 if (!Via.getConfig().isSuppressConversionWarnings()) {
                                     Protocol1_12_2To1_13.LOGGER.warning("Could not handle unknown sound source " + originalSource + " falling back to default: master");
                                 }
-                                finalSource = Optional.of(SoundSource.MASTER);
+                                finalSource = Optional.of(SoundSource1_12_2.MASTER);
                             }
 
                             wrapper.write(Types.VAR_INT, finalSource.get().getId());
@@ -430,7 +430,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                 if (entityTag != null) {
                     StringTag idTag = entityTag.getStringTag("id");
                     if (idTag != null) {
-                        rawId = SpawnEggRewriter.getSpawnEggId(idTag.getValue());
+                        rawId = SpawnEggMappings1_13.getSpawnEggId(idTag.getValue());
                         if (rawId == -1) {
                             rawId = 25100288; // Bat fallback
                         } else {
@@ -528,7 +528,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
             int oldId = Protocol1_12_2To1_13.MAPPINGS.getItemMappings().inverse().getNewId(item.identifier());
             if (oldId != -1) {
                 // Handle spawn eggs
-                Optional<String> eggEntityId = SpawnEggRewriter.getEntityId(oldId);
+                Optional<String> eggEntityId = SpawnEggMappings1_13.getEntityId(oldId);
                 if (eggEntityId.isPresent()) {
                     rawId = 383 << 16;
                     if (tag == null)

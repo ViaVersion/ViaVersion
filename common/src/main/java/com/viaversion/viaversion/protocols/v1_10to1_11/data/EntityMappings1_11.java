@@ -24,7 +24,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.util.Key;
 
-public class EntityNames1_11 {
+public class EntityMappings1_11 {
     private static final BiMap<String, String> oldToNewNames = HashBiMap.create();
 
     static {

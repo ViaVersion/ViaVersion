@@ -34,7 +34,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.MetaIndex1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
@@ -393,7 +393,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
     private void handleMetadata(EntityDataHandlerEvent event, EntityData metadata) {
         EntityType type = event.entityType();
-        MetaIndex1_8 metaIndex = MetaIndex1_8.searchIndex(type, metadata.id());
+        EntityDataIndex1_9 metaIndex = EntityDataIndex1_9.searchIndex(type, metadata.id());
         if (metaIndex == null) {
             // Almost certainly bad data, remove it
             event.cancel();
@@ -419,13 +419,13 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     metadata.setValue(((Integer) value).byteValue());
                 }
                 // After writing the last one
-                if (metaIndex == MetaIndex1_8.ENTITY_STATUS && type == EntityTypes1_9.EntityType.PLAYER) {
+                if (metaIndex == EntityDataIndex1_9.ENTITY_STATUS && type == EntityTypes1_9.EntityType.PLAYER) {
                     byte val = 0;
                     if ((((Byte) value) & 0x10) == 0x10) { // Player eating/aiming/drinking
                         val = 1;
                     }
-                    int newIndex = MetaIndex1_8.PLAYER_HAND.getNewIndex();
-                    EntityDataType metaType = MetaIndex1_8.PLAYER_HAND.getNewType();
+                    int newIndex = EntityDataIndex1_9.PLAYER_HAND.getNewIndex();
+                    EntityDataType metaType = EntityDataIndex1_9.PLAYER_HAND.getNewType();
                     event.createExtraData(new EntityData(newIndex, metaType, val));
                 }
                 break;
@@ -456,7 +456,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 metadata.setValue(value);
                 break;
             case BOOLEAN:
-                if (metaIndex == MetaIndex1_8.ABSTRACT_AGEABLE_AGE)
+                if (metaIndex == EntityDataIndex1_9.ABSTRACT_AGEABLE_AGE)
                     metadata.setValue((Byte) value < 0);
                 else
                     metadata.setValue((Byte) value != 0);

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ParticleRewriter {
+public class ParticleIdMappings1_13 {
     private static final List<NewParticle> particles = new ArrayList<>();
 
     static {

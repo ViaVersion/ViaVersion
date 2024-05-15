@@ -42,7 +42,7 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.RecipeRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.util.PotionEffects1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.data.PotionEffects1_20_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.MathUtil;

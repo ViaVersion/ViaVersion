@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
 
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
-import com.viaversion.viaversion.protocols.v1_11_1to1_12.storage.ItemTransaction;
+import com.viaversion.viaversion.protocols.v1_11_1to1_12.storage.ItemTransactionStorage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +30,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
 
     private final BukkitInventoryQuickMoveProvider provider;
     private final UUID uuid;
-    private final List<ItemTransaction> items;
+    private final List<ItemTransactionStorage> items;
 
     public BukkitInventoryUpdateTask(BukkitInventoryQuickMoveProvider provider, UUID uuid) {
         this.provider = provider;
@@ -39,7 +39,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
     }
 
     public void addItem(short windowId, short slotId, short actionId) {
-        ItemTransaction storage = new ItemTransaction(windowId, slotId, actionId);
+        ItemTransactionStorage storage = new ItemTransactionStorage(windowId, slotId, actionId);
         items.add(storage);
     }
 
@@ -52,7 +52,7 @@ public class BukkitInventoryUpdateTask implements Runnable {
         }
         try {
             synchronized (items) {
-                for (ItemTransaction storage : items) {
+                for (ItemTransactionStorage storage : items) {
                     Object packet = provider.buildWindowClickPacket(p, storage);
                     boolean result = provider.sendPacketToServer(p, packet);
                     if (!result) {

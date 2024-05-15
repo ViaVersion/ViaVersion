@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_17_1to1_18.data;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.Protocol1_17_1To1_18;
 import java.util.Arrays;
 
-public final class BlockEntityIds1_18 {
+public final class BlockEntityMappings1_18 {
 
     private static final int[] IDS = new int[14];
 

@@ -28,7 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType.*;
 
-public enum MetaIndex1_8 {
+public enum EntityDataIndex1_9 {
 
     // Entity
     ENTITY_STATUS(ENTITY, 0, EntityDataTypes1_8.BYTE, EntityDataTypes1_9.BYTE),
@@ -189,10 +189,10 @@ public enum MetaIndex1_8 {
     // Ender dragon
     ENDER_DRAGON_PHASE(ENDER_DRAGON, 11, EntityDataTypes1_9.VAR_INT);
 
-    private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, MetaIndex1_8> metadataRewrites = new HashMap<>();
+    private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, EntityDataIndex1_9> metadataRewrites = new HashMap<>();
 
     static {
-        for (MetaIndex1_8 index : MetaIndex1_8.values()) {
+        for (EntityDataIndex1_9 index : EntityDataIndex1_9.values()) {
             metadataRewrites.put(new Pair<>(index.clazz, index.index), index);
         }
     }
@@ -203,7 +203,7 @@ public enum MetaIndex1_8 {
     private final EntityDataTypes1_8 oldType;
     private final int index;
 
-    MetaIndex1_8(EntityTypes1_9.EntityType type, int index, EntityDataTypes1_8 oldType, @Nullable EntityDataTypes1_9 newType) {
+    EntityDataIndex1_9(EntityTypes1_9.EntityType type, int index, EntityDataTypes1_8 oldType, @Nullable EntityDataTypes1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.newIndex = index;
@@ -211,7 +211,7 @@ public enum MetaIndex1_8 {
         this.newType = newType;
     }
 
-    MetaIndex1_8(EntityTypes1_9.EntityType type, int newIndex, @Nullable EntityDataTypes1_9 newType) {
+    EntityDataIndex1_9(EntityTypes1_9.EntityType type, int newIndex, @Nullable EntityDataTypes1_9 newType) {
         this.clazz = type;
         this.index = -1;
         this.oldType = null;
@@ -219,7 +219,7 @@ public enum MetaIndex1_8 {
         this.newType = newType;
     }
 
-    MetaIndex1_8(EntityTypes1_9.EntityType type, int index, EntityDataTypes1_8 oldType, int newIndex, @Nullable EntityDataTypes1_9 newType) {
+    EntityDataIndex1_9(EntityTypes1_9.EntityType type, int index, EntityDataTypes1_8 oldType, int newIndex, @Nullable EntityDataTypes1_9 newType) {
         this.clazz = type;
         this.index = index;
         this.oldType = oldType;
@@ -247,15 +247,15 @@ public enum MetaIndex1_8 {
         return index;
     }
 
-    private static Optional<MetaIndex1_8> getIndex(EntityType type, int index) {
+    private static Optional<EntityDataIndex1_9> getIndex(EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
         return Optional.ofNullable(metadataRewrites.get(pair));
     }
 
-    public static MetaIndex1_8 searchIndex(EntityType type, int index) {
+    public static EntityDataIndex1_9 searchIndex(EntityType type, int index) {
         EntityType currentType = type;
         do {
-            Optional<MetaIndex1_8> optMeta = getIndex(currentType, index);
+            Optional<EntityDataIndex1_9> optMeta = getIndex(currentType, index);
 
             if (optMeta.isPresent()) {
                 return optMeta.get();

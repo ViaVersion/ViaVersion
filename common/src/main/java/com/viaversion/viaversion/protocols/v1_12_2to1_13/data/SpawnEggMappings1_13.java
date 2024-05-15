@@ -22,7 +22,7 @@ import com.google.common.collect.HashBiMap;
 import com.viaversion.viaversion.util.Key;
 import java.util.Optional;
 
-public class SpawnEggRewriter {
+public class SpawnEggMappings1_13 {
     private static final BiMap<String, Integer> spawnEggs = HashBiMap.create();
 
     static {

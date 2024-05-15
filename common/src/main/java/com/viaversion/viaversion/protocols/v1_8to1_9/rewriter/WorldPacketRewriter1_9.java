@@ -36,9 +36,9 @@ import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.EffectIds1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.SoundEffects1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EffectIdMappings1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.SoundEffectMappings1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
@@ -77,7 +77,7 @@ public class WorldPacketRewriter1_9 {
                 handler(wrapper -> {
                     int id = wrapper.get(Types.INT, 0);
 
-                    id = EffectIds1_8.getNewId(id);
+                    id = EffectIdMappings1_9.getNewId(id);
                     wrapper.set(Types.INT, 0, id);
                 });
                 // Rewrite potion effect as it changed to use a dynamic registry
@@ -85,7 +85,7 @@ public class WorldPacketRewriter1_9 {
                     int id = wrapper.get(Types.INT, 0);
                     if (id == 2002) {
                         int data = wrapper.get(Types.INT, 1);
-                        int newData = PotionIds1_8.getNewPotionID(data);
+                        int newData = PotionIdMappings1_9.getNewPotionID(data);
                         wrapper.set(Types.INT, 1, newData);
                     }
                 });
@@ -102,7 +102,7 @@ public class WorldPacketRewriter1_9 {
                 handler(wrapper -> {
                     String name = Key.stripMinecraftNamespace(wrapper.get(Types.STRING, 0));
 
-                    SoundEffects1_8 effect = SoundEffects1_8.getByName(name);
+                    SoundEffectMappings1_9 effect = SoundEffectMappings1_9.getByName(name);
                     int catid = 0;
                     String newname = name;
                     if (effect != null) {

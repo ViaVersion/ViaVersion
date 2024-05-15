@@ -29,9 +29,9 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityNames1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityNames1_11;
-import com.viaversion.viaversion.protocols.v1_10to1_11.data.PotionColors1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.BlockEntityMappings1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityMappings1_11;
+import com.viaversion.viaversion.protocols.v1_10to1_11.data.PotionColorMappings1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.EntityPacketRewriter1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.rewriter.ItemPacketRewriter1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
@@ -112,11 +112,11 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
                 String identifier = idTag.getValue();
                 if (identifier.equals("MobSpawner")) {
-                    EntityNames1_11.toClientSpawner(tag);
+                    EntityMappings1_11.toClientSpawner(tag);
                 }
 
                 // Handle new identifier
-                idTag.setValue(BlockEntityNames1_11.toNewIdentifier(identifier));
+                idTag.setValue(BlockEntityMappings1_11.toNewIdentifier(identifier));
             }
         });
 
@@ -157,7 +157,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                     if (effectID == 2002) {
                         int data = packetWrapper.get(Types.INT, 1);
                         boolean isInstant = false;
-                        Pair<Integer, Boolean> newData = PotionColors1_11.getNewData(data);
+                        Pair<Integer, Boolean> newData = PotionColorMappings1_11.getNewData(data);
                         if (newData == null) {
                             getLogger().warning("Received unknown potion data: " + data);
                             data = 0;

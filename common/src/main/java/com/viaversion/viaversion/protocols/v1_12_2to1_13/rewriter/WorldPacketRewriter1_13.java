@@ -37,8 +37,8 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_3;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionHandler;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.NamedSoundRewriter;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleRewriter;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.NamedSoundMappings1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
@@ -318,7 +318,7 @@ public class WorldPacketRewriter1_13 {
                 map(Types.STRING);
                 handler(wrapper -> {
                     String sound = Key.stripMinecraftNamespace(wrapper.get(Types.STRING, 0));
-                    String newSoundId = NamedSoundRewriter.getNewId(sound);
+                    String newSoundId = NamedSoundMappings1_13.getNewId(sound);
                     wrapper.set(Types.STRING, 0, newSoundId);
                 });
             }
@@ -496,7 +496,7 @@ public class WorldPacketRewriter1_13 {
                     for (int i = 0; i < data.length; i++)
                         data[i] = wrapper.read(Types.VAR_INT);
 
-                    Particle particle = ParticleRewriter.rewriteParticle(particleId, data);
+                    Particle particle = ParticleIdMappings1_13.rewriteParticle(particleId, data);
 
                     // Cancel if null or completely removed
                     if (particle == null || particle.id() == -1) {
