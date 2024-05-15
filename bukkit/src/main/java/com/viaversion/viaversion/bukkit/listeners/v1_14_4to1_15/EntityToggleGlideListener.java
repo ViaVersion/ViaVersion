@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.listeners.protocol1_15to1_14_4;
+package com.viaversion.viaversion.bukkit.listeners.v1_14_4to1_15;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;

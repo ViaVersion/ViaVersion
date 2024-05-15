@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.listeners.protocol1_19_4To1_19_3;
+package com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
