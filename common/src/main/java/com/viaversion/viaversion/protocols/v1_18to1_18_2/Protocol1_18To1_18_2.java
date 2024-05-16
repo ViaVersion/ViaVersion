@@ -39,7 +39,7 @@ public final class Protocol1_18To1_18_2 extends AbstractProtocol<ClientboundPack
     @Override
     protected void registerPackets() {
         final TagRewriter<ClientboundPackets1_18> tagRewriter = new TagRewriter<>(this);
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:fall_damage_resetting");
+        tagRewriter.addTagRaw(RegistryType.BLOCK, "minecraft:fall_damage_resetting", 169, 257, 680, 713, 714, 715, 716, 859, 860, 696, 100);
         tagRewriter.registerGeneric(ClientboundPackets1_18.UPDATE_TAGS);
 
         registerClientbound(ClientboundPackets1_18.UPDATE_MOB_EFFECT, new PacketHandlers() {

@@ -107,6 +107,7 @@ public class MappingDataBase implements MappingData {
             this.tags = new EnumMap<>(RegistryType.class);
             loadTags(RegistryType.ITEM, tagsTag);
             loadTags(RegistryType.BLOCK, tagsTag);
+            loadTags(RegistryType.ENTITY, tagsTag);
         }
 
         loadExtras(data);

@@ -32,7 +32,9 @@ public interface TagRewriter extends MappingDataListener {
 
     void removeTags(String registryKey);
 
-    void renameTag(RegistryType type, String registryKey, String renameTo);
+    void removeTag(RegistryType type, String tagId);
+
+    void renameTag(RegistryType type, String tagId, String renameTo);
 
     /**
      * Adds an empty tag (since the client crashes if a checked tag is not registered).

@@ -213,55 +213,18 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
 
     @Override
     protected void onMappingDataLoaded() {
-        int[] wallPostOverrideTag = new int[47];
-        int arrayIndex = 0;
-        wallPostOverrideTag[arrayIndex++] = 140;
-        wallPostOverrideTag[arrayIndex++] = 179;
-        wallPostOverrideTag[arrayIndex++] = 264;
-        for (int i = 153; i <= 158; i++) {
-            wallPostOverrideTag[arrayIndex++] = i;
-        }
-        for (int i = 163; i <= 168; i++) {
-            wallPostOverrideTag[arrayIndex++] = i;
-        }
-        for (int i = 408; i <= 439; i++) {
-            wallPostOverrideTag[arrayIndex++] = i;
-        }
-
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:wall_post_override", wallPostOverrideTag);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:beacon_base_blocks", 133, 134, 148, 265);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:climbable", 160, 241, 658);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:fire", 142);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:campfires", 679);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:fence_gates", 242, 467, 468, 469, 470, 471);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:unstable_bottom_center", 242, 467, 468, 469, 470, 471);
-        tagRewriter.addTag(RegistryType.BLOCK, "minecraft:wooden_trapdoors", 193, 194, 195, 196, 197, 198);
-        tagRewriter.addTag(RegistryType.ITEM, "minecraft:wooden_trapdoors", 215, 216, 217, 218, 219, 220);
-        tagRewriter.addTag(RegistryType.ITEM, "minecraft:beacon_payment_items", 529, 530, 531, 760);
-        tagRewriter.addTag(RegistryType.ENTITY, "minecraft:impact_projectiles", 2, 72, 71, 37, 69, 79, 83, 15, 93);
-
-        // The client crashes if we don't send all tags it may use
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:guarded_by_piglins");
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:soul_speed_blocks");
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:soul_fire_base_blocks");
-        tagRewriter.addEmptyTag(RegistryType.BLOCK, "minecraft:non_flammable_wood");
-        tagRewriter.addEmptyTag(RegistryType.ITEM, "minecraft:non_flammable_wood");
-
-        // The rest of not accessed tags added in older versions; #1830
-        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:bamboo_plantable_on", "minecraft:beds", "minecraft:bee_growables",
-            "minecraft:beehives", "minecraft:coral_plants", "minecraft:crops", "minecraft:dragon_immune", "minecraft:flowers",
-            "minecraft:portals", "minecraft:shulker_boxes", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors",
-            "minecraft:underwater_bonemeals", "minecraft:wither_immune", "minecraft:wooden_fences", "minecraft:wooden_trapdoors");
-        tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:arrows", "minecraft:beehive_inhabitors", "minecraft:raiders", "minecraft:skeletons");
-        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:beds", "minecraft:coals", "minecraft:fences", "minecraft:flowers",
-            "minecraft:lectern_books", "minecraft:music_discs", "minecraft:small_flowers", "minecraft:tall_flowers", "minecraft:trapdoors", "minecraft:walls", "minecraft:wooden_fences");
-
         EntityTypes1_16.initialize(this);
         Types1_16.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("dust", ParticleType.Readers.DUST)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("item", ParticleType.Readers.ITEM1_13_2);
+
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:crimson_stems", "minecraft:non_flammable_wood", "minecraft:piglin_loved",
+            "minecraft:piglin_repellents", "minecraft:soul_fire_base_blocks", "minecraft:warped_stems");
+        tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:crimson_stems", "minecraft:guarded_by_piglins", "minecraft:hoglin_repellents",
+            "minecraft:non_flammable_wood", "minecraft:nylium", "minecraft:piglin_repellents", "minecraft:soul_fire_base_blocks", "minecraft:soul_speed_blocks",
+            "minecraft:strider_warm_blocks", "minecraft:warped_stems");
 
         super.onMappingDataLoaded();
     }
