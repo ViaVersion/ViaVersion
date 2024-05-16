@@ -265,33 +265,24 @@ public class PacketWrapperImpl implements PacketWrapper {
 
         final UserConnection connection = user();
         if (currentThread) {
-            try {
-                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
-                connection.sendRawPacket(output);
-            } catch (InformativeException e) {
-                throw e;
-            } catch (CancelException ignored) {
-            } catch (Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw new InformativeException(e);
-                }
-            }
-            return;
+            sendNow(protocol, skipCurrentPipeline);
+        } else {
+            connection.getChannel().eventLoop().submit(() -> sendNow(protocol, skipCurrentPipeline));
         }
+    }
 
-        connection.getChannel().eventLoop().submit(() -> {
-            try {
-                final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
-                connection.sendRawPacket(output);
-            } catch (InformativeException e) {
-                throw e;
-            } catch (CancelException ignored) {
-            } catch (Exception e) {
-                if (!PipelineUtil.containsCause(e, CancelException.class)) {
-                    throw new InformativeException(e);
-                }
+    private void sendNow(final Class<? extends Protocol> protocol, final boolean skipCurrentPipeline) throws InformativeException {
+        try {
+            final ByteBuf output = constructPacket(protocol, skipCurrentPipeline, Direction.CLIENTBOUND);
+            user().sendRawPacket(output);
+        } catch (InformativeException e) {
+            throw e;
+        } catch (CancelException ignored) {
+        } catch (Exception e) {
+            if (!PipelineUtil.containsCause(e, CancelException.class)) {
+                throw new InformativeException(e);
             }
-        });
+        }
     }
 
     /**

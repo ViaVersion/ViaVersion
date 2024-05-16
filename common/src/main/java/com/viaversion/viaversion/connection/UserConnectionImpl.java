@@ -23,12 +23,12 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
@@ -39,6 +39,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.CodecException;
 import java.util.Collection;
 import java.util.Collections;
@@ -162,24 +163,27 @@ public class UserConnectionImpl implements UserConnection {
         sendRawPacket(packet, false);
     }
 
-    private void sendRawPacket(final ByteBuf packet, boolean currentThread) {
-        Runnable act;
-        if (clientSide) {
-            // We'll just assume that Via decoder isn't wrapping the original decoder
-            act = () -> getChannel().pipeline()
-                .context(Via.getManager().getInjector().getDecoderName()).fireChannelRead(packet);
-        } else {
-            act = () -> channel.pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
-        }
+    private void sendRawPacket(final ByteBuf packet, final boolean currentThread) {
         if (currentThread) {
-            act.run();
+            sendRawPacketNow(packet);
         } else {
             try {
-                channel.eventLoop().submit(act);
+                channel.eventLoop().submit(() -> sendRawPacketNow(packet));
             } catch (Throwable e) {
                 packet.release(); // Couldn't schedule
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void sendRawPacketNow(final ByteBuf buf) {
+        final ChannelPipeline pipeline = getChannel().pipeline();
+        final ViaInjector injector = Via.getManager().getInjector();
+        if (clientSide) {
+            // We'll just assume that Via decoder isn't wrapping the original decoder
+            pipeline.context(injector.getDecoderName()).fireChannelRead(buf);
+        } else {
+            pipeline.context(injector.getEncoderName()).writeAndFlush(buf);
         }
     }
 
@@ -229,7 +233,7 @@ public class UserConnectionImpl implements UserConnection {
         }
     }
 
-    private void sendRawPacketToServerServerSide(final ByteBuf packet, boolean currentThread) {
+    private void sendRawPacketToServerServerSide(final ByteBuf packet, final boolean currentThread) {
         final ByteBuf buf = packet.alloc().buffer();
         try {
             // We'll use passing through because there are some encoder wrappers
@@ -243,18 +247,11 @@ public class UserConnectionImpl implements UserConnection {
             }
 
             buf.writeBytes(packet);
-            Runnable act = () -> {
-                if (context != null) {
-                    context.fireChannelRead(buf);
-                } else {
-                    channel.pipeline().fireChannelRead(buf);
-                }
-            };
             if (currentThread) {
-                act.run();
+                fireChannelRead(context, buf);
             } else {
                 try {
-                    channel.eventLoop().submit(act);
+                    channel.eventLoop().submit(() -> fireChannelRead(context, buf));
                 } catch (Throwable t) {
                     // Couldn't schedule
                     buf.release();
@@ -266,19 +263,29 @@ public class UserConnectionImpl implements UserConnection {
         }
     }
 
-    private void sendRawPacketToServerClientSide(final ByteBuf packet, boolean currentThread) {
-        Runnable act = () -> getChannel().pipeline()
-            .context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(packet);
+    private void fireChannelRead(@Nullable final ChannelHandlerContext context, final ByteBuf buf) {
+        if (context != null) {
+            context.fireChannelRead(buf);
+        } else {
+            channel.pipeline().fireChannelRead(buf);
+        }
+    }
+
+    private void sendRawPacketToServerClientSide(final ByteBuf packet, final boolean currentThread) {
         if (currentThread) {
-            act.run();
+            writeAndFlush(packet);
         } else {
             try {
-                getChannel().eventLoop().submit(act);
+                getChannel().eventLoop().submit(() -> writeAndFlush(packet));
             } catch (Throwable e) {
                 e.printStackTrace();
                 packet.release(); // Couldn't schedule
             }
         }
+    }
+
+    private void writeAndFlush(final ByteBuf buf) {
+        getChannel().pipeline().context(Via.getManager().getInjector().getEncoderName()).writeAndFlush(buf);
     }
 
     @Override
