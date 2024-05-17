@@ -499,9 +499,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
         if (fireworksTag != null) {
             final ListTag<CompoundTag> explosionsTag = fireworksTag.getListTag("Explosions", CompoundTag.class);
-            if (explosionsTag != null) {
-                updateFireworks(data, fireworksTag, explosionsTag);
-            }
+            updateFireworks(data, fireworksTag, explosionsTag);
         }
 
         if (old.identifier() == 1085) {
@@ -1022,10 +1020,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateFireworks(final StructuredDataContainer data, final CompoundTag fireworksTag, final ListTag<CompoundTag> explosionsTag) {
-        final int flightDuration = fireworksTag.getInt("Flight");
+        final int flightDuration = fireworksTag.getByte("Flight");
         final Fireworks fireworks = new Fireworks(
             flightDuration,
-            explosionsTag.stream().limit(256).map(this::readExplosion).toArray(FireworkExplosion[]::new)
+            explosionsTag != null ? explosionsTag.stream().limit(256).
+                map(this::readExplosion).toArray(FireworkExplosion[]::new) : new FireworkExplosion[0]
         );
         data.set(StructuredDataKey.FIREWORKS, fireworks);
     }
