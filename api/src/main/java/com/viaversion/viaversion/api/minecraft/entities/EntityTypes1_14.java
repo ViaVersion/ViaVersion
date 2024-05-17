@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.EntityTypeUtil;
 import java.util.Locale;
+import com.viaversion.viaversion.util.Key;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum EntityTypes1_14 implements EntityType {
@@ -211,7 +212,7 @@ public enum EntityTypes1_14 implements EntityType {
 
     EntityTypes1_14(final EntityType parent) {
         this.parent = parent;
-        this.identifier = "minecraft:" + name().toLowerCase(Locale.ROOT);
+        this.identifier =  Key.namespaced(name().toLowerCase(Locale.ROOT));
     }
 
     EntityTypes1_14(final EntityType parent, @Nullable final String identifier) {
