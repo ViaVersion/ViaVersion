@@ -130,7 +130,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         entityTracker.syncShieldWithSword();
                     }
 
-                    handleItemToServer(wrapper.user(), stack);
+                    handleItemToClient(wrapper.user(), stack);
                 });
                 // Brewing patch
                 handler(wrapper -> {
