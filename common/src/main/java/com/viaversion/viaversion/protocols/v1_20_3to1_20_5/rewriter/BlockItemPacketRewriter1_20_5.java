@@ -1202,7 +1202,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             if (Key.stripMinecraftNamespace(id).equals("sweeping")) {
                 // Renamed
-                id = "minecraft:sweeping_edge";
+                id = Key.namespaced("sweeping_edge");
             }
 
             final int intId = Enchantments1_20_5.keyToId(id);
