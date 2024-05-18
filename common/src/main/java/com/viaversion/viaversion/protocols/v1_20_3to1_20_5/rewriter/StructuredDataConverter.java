@@ -220,13 +220,15 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.CHARGED_PROJECTILES, (connection, data, tag) -> convertItemList(connection, data, tag, "ChargedProjectiles"));
         register(StructuredDataKey.BUNDLE_CONTENTS, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.LODESTONE_TRACKER, (data, tag) -> {
-            final CompoundTag positionTag = new CompoundTag();
-            tag.put("LodestonePos", positionTag);
             tag.putBoolean("LodestoneTracked", data.tracked());
-            tag.putString("LodestoneDimension", data.position().dimension());
-            positionTag.putInt("X", data.position().x());
-            positionTag.putInt("Y", data.position().y());
-            positionTag.putInt("Z", data.position().z());
+            if (data.position() != null) {
+                final CompoundTag positionTag = new CompoundTag();
+                positionTag.putInt("X", data.position().x());
+                positionTag.putInt("Y", data.position().y());
+                positionTag.putInt("Z", data.position().z());
+                tag.put("LodestonePos", positionTag);
+                tag.putString("LodestoneDimension", data.position().dimension());
+            }
         });
         register(StructuredDataKey.FIREWORKS, (data, tag) -> {
             final CompoundTag fireworksTag = new CompoundTag();

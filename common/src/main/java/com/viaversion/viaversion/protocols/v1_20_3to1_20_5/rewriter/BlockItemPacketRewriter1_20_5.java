@@ -469,10 +469,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             data.set(StructuredDataKey.RECIPES, recipesTag);
         }
 
-        final CompoundTag lodestonePosTag = tag.getCompoundTag("LodestonePos");
-        final String lodestoneDimension = tag.getString("LodestoneDimension");
-        if (lodestonePosTag != null && lodestoneDimension != null) {
-            updateLodestoneTracker(tag, lodestonePosTag, lodestoneDimension, data);
+        final NumberTag trackedTag = tag.getNumberTag("LodestoneTracked");
+        if (trackedTag != null) {
+            final CompoundTag lodestonePosTag = tag.getCompoundTag("LodestonePos");
+            final String lodestoneDimension = tag.getString("LodestoneDimension");
+            updateLodestoneTracker(trackedTag.asBoolean(), lodestonePosTag, lodestoneDimension, data);
         }
 
         final ListTag<CompoundTag> effectsTag = tag.getListTag("effects", CompoundTag.class);
@@ -1048,12 +1049,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, suspiciousStewEffects);
     }
 
-    private void updateLodestoneTracker(final CompoundTag tag, final CompoundTag lodestonePosTag, final String lodestoneDimensionTag, final StructuredDataContainer data) {
-        final boolean tracked = tag.getBoolean("LodestoneTracked");
-        final int x = lodestonePosTag.getInt("X");
-        final int y = lodestonePosTag.getInt("Y");
-        final int z = lodestonePosTag.getInt("Z");
-        final GlobalPosition position = new GlobalPosition(lodestoneDimensionTag, x, y, z);
+    private void updateLodestoneTracker(final boolean tracked, final CompoundTag lodestonePosTag, final String lodestoneDimensionTag, final StructuredDataContainer data) {
+        GlobalPosition position = null;
+        if (lodestonePosTag != null && lodestoneDimensionTag != null) {
+            final int x = lodestonePosTag.getInt("X");
+            final int y = lodestonePosTag.getInt("Y");
+            final int z = lodestonePosTag.getInt("Z");
+            position = new GlobalPosition(lodestoneDimensionTag, x, y, z);
+        }
         data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, tracked));
     }
 
