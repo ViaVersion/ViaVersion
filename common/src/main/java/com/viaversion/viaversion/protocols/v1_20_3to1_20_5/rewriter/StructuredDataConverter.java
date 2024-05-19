@@ -873,6 +873,10 @@ public final class StructuredDataConverter {
         rewriters.put(key, c);
     }
 
+    public boolean isBackupInconvertibleData() {
+        return backupInconvertibleData;
+    }
+
     @FunctionalInterface
     interface SimpleDataConverter<T> {
 
