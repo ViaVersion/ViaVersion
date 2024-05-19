@@ -228,6 +228,8 @@ public final class StructuredDataConverter {
                 positionTag.putInt("Z", data.position().z());
                 tag.put("LodestonePos", positionTag);
                 tag.putString("LodestoneDimension", data.position().dimension());
+            } else {
+                tag.putString("LodestoneDimension", "viaversion:viaversion");
             }
         });
         register(StructuredDataKey.FIREWORKS, (data, tag) -> {
