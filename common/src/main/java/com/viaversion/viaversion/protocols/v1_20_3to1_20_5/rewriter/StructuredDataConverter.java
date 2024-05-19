@@ -234,14 +234,16 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.FIREWORKS, (data, tag) -> {
             final CompoundTag fireworksTag = new CompoundTag();
-            fireworksTag.putInt("Flight", data.flightDuration());
+            fireworksTag.putByte("Flight", (byte) data.flightDuration());
             tag.put("Fireworks", fireworksTag);
 
-            final ListTag<CompoundTag> explosionsTag = new ListTag<>(CompoundTag.class);
-            for (final FireworkExplosion explosion : data.explosions()) {
-                explosionsTag.add(convertExplosion(explosion));
+            if (data.explosions().length > 0) {
+                final ListTag<CompoundTag> explosionsTag = new ListTag<>(CompoundTag.class);
+                for (final FireworkExplosion explosion : data.explosions()) {
+                    explosionsTag.add(convertExplosion(explosion));
+                }
+                fireworksTag.put("Explosions", explosionsTag);
             }
-            fireworksTag.put("Explosions", explosionsTag);
         });
         register(StructuredDataKey.FIREWORK_EXPLOSION, (data, tag) -> tag.put("Explosion", convertExplosion(data)));
         register(StructuredDataKey.PROFILE, (data, tag) -> {
