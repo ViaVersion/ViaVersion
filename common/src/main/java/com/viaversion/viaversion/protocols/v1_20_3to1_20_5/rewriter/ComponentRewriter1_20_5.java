@@ -234,9 +234,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
 
             if (structuredItem.identifier() != 0) {
-                final String itemName = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().mappedIdentifier(structuredItem.identifier());
-                if (itemName != null) {
-                    contentsTag.putString("id", itemName);
+                final String identifier = mappedIdentifier(structuredItem.identifier());
+                if (identifier != null) {
+                    contentsTag.putString("id", identifier);
                 }
             } else {
                 // Cannot be air
@@ -332,6 +332,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final TagConverter<T> converter = tagConverter(key);
         Preconditions.checkNotNull(converter, "No converter found for: %s", key);
         return StructuredData.of(key, converter.convert(tag), id);
+    }
+
+    private String mappedIdentifier(final int id) {
+        return Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().mappedIdentifier(id);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -849,11 +853,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     protected ListTag<StringTag> convertPotDecorations(final PotDecorations value) {
         final ListTag<StringTag> tag = new ListTag<>(StringTag.class);
         for (final int decoration : value.itemIds()) {
-            final String item = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().identifier(decoration);
-            if (item == null) {
+            final String identifier = mappedIdentifier(decoration);
+            if (identifier == null) {
                 throw new IllegalArgumentException("Unknown item: " + decoration);
             }
-            tag.add(new StringTag(item));
+            tag.add(new StringTag(identifier));
         }
         return tag;
     }
@@ -957,11 +961,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     protected void convertItem(final CompoundTag tag, final Item item) {
-        final String name = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().identifier(item.identifier());
-        if (name == null) {
+        final String identifier = mappedIdentifier(item.identifier());
+        if (identifier == null) {
             throw new IllegalArgumentException("Unknown item: " + item.identifier());
         }
-        tag.putString("id", name);
+        tag.putString("id", identifier);
         try {
             tag.put("count", convertPositiveInt(item.amount()));
         } catch (IllegalArgumentException ignored) { // Fallback value
