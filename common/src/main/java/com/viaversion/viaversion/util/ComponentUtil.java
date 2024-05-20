@@ -151,8 +151,8 @@ public final class ComponentUtil {
 
     public static String legacyToJsonString(final String message, final boolean itemData) {
         final ATextComponent component = LegacyStringDeserializer.parse(message, true);
-        if (itemData) {
-            component.setParentStyle(new Style().setItalic(true));
+        if (itemData && !component.getStyle().isEmpty()) {
+            component.setParentStyle(new Style().setItalic(false));
         }
         return SerializerVersion.V1_12.toString(component);
     }
