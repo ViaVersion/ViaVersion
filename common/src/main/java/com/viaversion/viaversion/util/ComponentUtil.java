@@ -30,6 +30,7 @@ import net.lenni0451.mcstructs.text.events.hover.AHoverEvent;
 import net.lenni0451.mcstructs.text.events.hover.impl.TextHoverEvent;
 import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import net.lenni0451.mcstructs.text.utils.TextUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -151,10 +152,16 @@ public final class ComponentUtil {
 
     public static String legacyToJsonString(final String message, final boolean itemData) {
         final ATextComponent component = LegacyStringDeserializer.parse(message, true);
-        if (itemData && !component.getStyle().isEmpty()) {
+        if (itemData && hasStyle(component)) {
             component.setParentStyle(new Style().setItalic(false));
         }
         return SerializerVersion.V1_12.toString(component);
+    }
+
+    public static boolean hasStyle(final ATextComponent component) {
+        final boolean[] hasStyle = {false};
+        TextUtils.iterateAll(component, c -> hasStyle[0] |= !c.getStyle().isEmpty());
+        return hasStyle[0];
     }
 
     public static String jsonToLegacy(final String value) {
