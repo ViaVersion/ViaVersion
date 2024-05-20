@@ -387,7 +387,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return dataItem;
         }
 
-        if (dataConverter.isBackupInconvertibleData()) {
+        if (dataConverter.backupInconvertibleData()) {
             // In 1.20.6, some items have default values which are not written into the components
             if (item.identifier() == 1105 && !data.contains(StructuredDataKey.FIREWORKS)) {
                 data.set(StructuredDataKey.FIREWORKS, new Fireworks(1, new FireworkExplosion[0]));

@@ -873,7 +873,7 @@ public final class StructuredDataConverter {
         rewriters.put(key, c);
     }
 
-    public boolean isBackupInconvertibleData() {
+    public boolean backupInconvertibleData() {
         return backupInconvertibleData;
     }
 
