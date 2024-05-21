@@ -416,7 +416,7 @@ public class PlayerPacketRewriter1_9 {
             @Override
             public void register() {
                 map(Types.STRING); // 0 - Channel Name
-                handlerSoftFail(wrapper -> {
+                handler(wrapper -> {
                     String name = wrapper.get(Types.STRING, 0);
                     if (name.equals("MC|BSign")) {
                         Item item = wrapper.passthrough(Types.ITEM1_8);

@@ -224,7 +224,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
             @Override
             public void register() {
                 map(Types.STRING); // Channel
-                handlerSoftFail(wrapper -> {
+                handler(wrapper -> {
                     String channel = wrapper.get(Types.STRING, 0);
                     String old = channel;
                     channel = getOldPluginChannelId(channel);

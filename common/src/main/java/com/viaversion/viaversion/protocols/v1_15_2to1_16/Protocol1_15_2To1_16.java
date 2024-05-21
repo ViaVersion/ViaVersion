@@ -165,7 +165,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                 @Override
                 public void register() {
                     map(Types.STRING); // Channel
-                    handlerSoftFail(wrapper -> {
+                    handler(wrapper -> {
                         final String channel = wrapper.get(Types.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {

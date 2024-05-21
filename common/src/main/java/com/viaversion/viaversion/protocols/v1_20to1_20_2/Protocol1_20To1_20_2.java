@@ -78,21 +78,13 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
 
-        final PacketHandlers sanitizeCustomPayload = new PacketHandlers() {
+        registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             protected void register() {
-                map(Types.STRING); // Channel
-                handlerSoftFail(wrapper -> {
-                    final String channel = Key.namespaced(wrapper.get(Types.STRING, 0));
-                    if (channel.equals("minecraft:brand")) {
-                        wrapper.passthrough(Types.STRING);
-                        wrapper.clearInputBuffer();
-                    }
-                });
+                handlerSoftFail(Protocol1_20To1_20_2::sanitizeCustomPayload);
             }
-        };
-        registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, sanitizeCustomPayload);
-        registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, sanitizeCustomPayload);
+        });
+        registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, Protocol1_20To1_20_2::sanitizeCustomPayload);
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Types.STRING);
@@ -210,6 +202,14 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             responsePacket.write(Types.LONG, time);
             responsePacket.sendFuture(Protocol1_20To1_20_2.class);
         });
+    }
+
+    private static void sanitizeCustomPayload(final PacketWrapper wrapper) {
+        final String channel = Key.namespaced(wrapper.passthrough(Types.STRING));
+        if (channel.equals("minecraft:brand")) {
+            wrapper.passthrough(Types.STRING);
+            wrapper.clearInputBuffer();
+        }
     }
 
     @Override
