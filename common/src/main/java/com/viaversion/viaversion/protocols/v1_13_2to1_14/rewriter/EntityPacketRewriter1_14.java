@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
@@ -241,7 +241,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     tracker.setSleeping(entityId, true);
 
-                    Position position = wrapper.read(Types.BLOCK_POSITION1_8);
+                    BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_8);
                     List<EntityData> metadataList = new LinkedList<>();
                     metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, position));
                     if (tracker.clientEntityId() != entityId) {

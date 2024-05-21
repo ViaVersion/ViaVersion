@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -37,10 +37,10 @@ class VineConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         if (isAttachedToBlock(user, position)) return blockState;
 
-        Position upperPos = position.getRelative(BlockFace.TOP);
+        BlockPosition upperPos = position.getRelative(BlockFace.TOP);
         int upperBlock = getBlockData(user, upperPos);
         if (VINES.contains(upperBlock) && isAttachedToBlock(user, upperPos)) return blockState;
 
@@ -48,14 +48,14 @@ class VineConnectionHandler implements ConnectionHandler {
         return 0;
     }
 
-    private boolean isAttachedToBlock(UserConnection user, Position position) {
+    private boolean isAttachedToBlock(UserConnection user, BlockPosition position) {
         return isAttachedToBlock(user, position, BlockFace.EAST)
             || isAttachedToBlock(user, position, BlockFace.WEST)
             || isAttachedToBlock(user, position, BlockFace.NORTH)
             || isAttachedToBlock(user, position, BlockFace.SOUTH);
     }
 
-    private boolean isAttachedToBlock(UserConnection user, Position position, BlockFace blockFace) {
+    private boolean isAttachedToBlock(UserConnection user, BlockPosition position, BlockFace blockFace) {
         return ConnectionData.OCCLUDING_STATES.contains(getBlockData(user, position.getRelative(blockFace)));
     }
 }

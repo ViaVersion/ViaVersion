@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
 import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntityImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -45,10 +45,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BlockRewriter<C extends ClientboundPacketType> {
     private final Protocol<C, ?, ?, ?> protocol;
-    private final Type<Position> positionType;
+    private final Type<BlockPosition> positionType;
     private final Type<CompoundTag> compoundTagType;
 
-    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<Position> positionType, Type<CompoundTag> compoundTagType) {
+    public BlockRewriter(Protocol<C, ?, ?, ?> protocol, Type<BlockPosition> positionType, Type<CompoundTag> compoundTagType) {
         this.protocol = protocol;
         this.positionType = positionType;
         this.compoundTagType = compoundTagType;
@@ -260,7 +260,7 @@ public class BlockRewriter<C extends ClientboundPacketType> {
 
     public void registerBlockEntityData(C packetType, @Nullable Consumer<BlockEntity> blockEntityHandler) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final Position position = wrapper.passthrough(positionType);
+            final BlockPosition position = wrapper.passthrough(positionType);
 
             final int blockEntityId = wrapper.read(Types.VAR_INT);
             final Mappings mappings = protocol.getMappingData().getBlockEntityMappings();

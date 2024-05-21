@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
@@ -38,7 +38,7 @@ public class BlockListener extends ViaBukkitListener {
         if (isOnPipe(e.getPlayer())) {
             Block b = e.getBlockPlaced();
             EntityTracker1_9 tracker = getUserConnection(e.getPlayer()).getEntityTracker(Protocol1_8To1_9.class);
-            tracker.addBlockInteraction(new Position(b.getX(), b.getY(), b.getZ()));
+            tracker.addBlockInteraction(new BlockPosition(b.getX(), b.getY(), b.getZ()));
         }
     }
 }

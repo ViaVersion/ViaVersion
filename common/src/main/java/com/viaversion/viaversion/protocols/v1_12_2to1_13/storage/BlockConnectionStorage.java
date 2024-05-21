@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 import com.google.common.collect.EvictingQueue;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class BlockConnectionStorage implements StorableObject {
 
     private final Map<Long, SectionData> blockStorage = createLongObjectMap();
     @SuppressWarnings("UnstableApiUsage")
-    private final Queue<Position> modified = EvictingQueue.create(5);
+    private final Queue<BlockPosition> modified = EvictingQueue.create(5);
 
     // Cache to retrieve section quicker
     private long lastIndex = -1;
@@ -93,15 +93,15 @@ public class BlockConnectionStorage implements StorableObject {
         }
     }
 
-    public void markModified(Position pos) {
+    public void markModified(BlockPosition pos) {
         // Avoid saving the same pos twice
         if (!modified.contains(pos)) {
             this.modified.add(pos);
         }
     }
 
-    public boolean recentlyModified(Position pos) {
-        for (Position p : modified) {
+    public boolean recentlyModified(BlockPosition pos) {
+        for (BlockPosition p : modified) {
             if (Math.abs(pos.x() - p.x()) + Math.abs(pos.y() - p.y()) + Math.abs(pos.z() - p.z()) <= 2) {
                 return true;
             }

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,7 +44,7 @@ public class PacketBlockConnectionProvider extends BlockConnectionProvider {
         connection.get(BlockConnectionStorage.class).clear();
     }
 
-    public void modifiedBlock(UserConnection connection, Position position) {
+    public void modifiedBlock(UserConnection connection, BlockPosition position) {
         connection.get(BlockConnectionStorage.class).markModified(position);
     }
 
@@ -59,7 +59,7 @@ public class PacketBlockConnectionProvider extends BlockConnectionProvider {
     }
 
     @Override
-    public boolean storesBlocks(UserConnection connection, @Nullable Position pos) {
+    public boolean storesBlocks(UserConnection connection, @Nullable BlockPosition pos) {
         if (pos == null || connection == null) return true;
 
         return !connection.get(BlockConnectionStorage.class).recentlyModified(pos);

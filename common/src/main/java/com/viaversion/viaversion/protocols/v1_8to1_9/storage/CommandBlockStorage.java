@@ -20,14 +20,14 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.util.Pair;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage implements StorableObject {
-    private final Map<Pair<Integer, Integer>, Map<Position, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
+    private final Map<Pair<Integer, Integer>, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
     private boolean permissions;
 
     public void unloadChunk(int x, int z) {
@@ -35,14 +35,14 @@ public class CommandBlockStorage implements StorableObject {
         storedCommandBlocks.remove(chunkPos);
     }
 
-    public void addOrUpdateBlock(Position position, CompoundTag tag) {
+    public void addOrUpdateBlock(BlockPosition position, CompoundTag tag) {
         Pair<Integer, Integer> chunkPos = getChunkCoords(position);
 
         if (!storedCommandBlocks.containsKey(chunkPos)) {
             storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
         }
 
-        Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
+        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
 
         if (blocks.containsKey(position) && blocks.get(position).equals(tag)) {
             return;
@@ -51,17 +51,17 @@ public class CommandBlockStorage implements StorableObject {
         blocks.put(position, tag);
     }
 
-    private Pair<Integer, Integer> getChunkCoords(Position position) {
+    private Pair<Integer, Integer> getChunkCoords(BlockPosition position) {
         int chunkX = Math.floorDiv(position.x(), 16);
         int chunkZ = Math.floorDiv(position.z(), 16);
 
         return new Pair<>(chunkX, chunkZ);
     }
 
-    public Optional<CompoundTag> getCommandBlock(Position position) {
+    public Optional<CompoundTag> getCommandBlock(BlockPosition position) {
         Pair<Integer, Integer> chunkCoords = getChunkCoords(position);
 
-        Map<Position, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
+        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
         if (blocks == null)
             return Optional.empty();
 

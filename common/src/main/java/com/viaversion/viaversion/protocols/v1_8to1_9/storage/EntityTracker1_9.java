@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import com.viaversion.viaversion.api.minecraft.GameMode;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -58,14 +58,14 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2ObjectMap<BossBar> bossBarMap = new Int2ObjectOpenHashMap<>();
     private final IntSet validBlocking = new IntOpenHashSet();
     private final IntSet knownHolograms = new IntOpenHashSet();
-    private final Set<Position> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
+    private final Set<BlockPosition> blockInteractions = Collections.newSetFromMap(CacheBuilder.newBuilder()
         .maximumSize(1000)
         .expireAfterAccess(250, TimeUnit.MILLISECONDS)
-        .<Position, Boolean>build()
+        .<BlockPosition, Boolean>build()
         .asMap());
     private boolean blocking;
     private boolean autoTeam;
-    private Position currentlyDigging;
+    private BlockPosition currentlyDigging;
     private boolean teamExists;
     private GameMode gameMode;
     private String currentTeam;
@@ -144,10 +144,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     public boolean interactedBlockRecently(int x, int y, int z) {
-        return blockInteractions.contains(new Position(x, y, z));
+        return blockInteractions.contains(new BlockPosition(x, y, z));
     }
 
-    public void addBlockInteraction(Position p) {
+    public void addBlockInteraction(BlockPosition p) {
         blockInteractions.add(p);
     }
 
@@ -327,7 +327,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         return knownHolograms;
     }
 
-    public Set<Position> getBlockInteractions() {
+    public Set<BlockPosition> getBlockInteractions() {
         return blockInteractions;
     }
 
@@ -347,11 +347,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         this.autoTeam = autoTeam;
     }
 
-    public Position getCurrentlyDigging() {
+    public BlockPosition getCurrentlyDigging() {
         return currentlyDigging;
     }
 
-    public void setCurrentlyDigging(Position currentlyDigging) {
+    public void setCurrentlyDigging(BlockPosition currentlyDigging) {
         this.currentlyDigging = currentlyDigging;
     }
 

@@ -22,7 +22,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -290,7 +290,7 @@ public class WorldPacketRewriter1_9 {
             // Wipe the input buffer
             wrapper.clearInputBuffer();
             wrapper.setPacketType(ServerboundPackets1_8.USE_ITEM_ON);
-            wrapper.write(Types.BLOCK_POSITION1_8, new Position(-1, (short) -1, -1));
+            wrapper.write(Types.BLOCK_POSITION1_8, new BlockPosition(-1, -1, -1));
             wrapper.write(Types.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
             Item item = Protocol1_8To1_9.getHandItem(wrapper.user());
@@ -362,7 +362,7 @@ public class WorldPacketRewriter1_9 {
                     int face = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (face == 255)
                         return;
-                    Position p = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    BlockPosition p = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     int x = p.x();
                     int y = p.y();
                     int z = p.z();
@@ -375,14 +375,14 @@ public class WorldPacketRewriter1_9 {
                         case 5 -> x++;
                     }
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.addBlockInteraction(new Position(x, y, z));
+                    tracker.addBlockInteraction(new BlockPosition(x, y, z));
                 });
 
                 // Handle CommandBlocks
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
 
-                    Position pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
                     // Send the Update Block Entity packet if present
                     if (tag.isPresent()) {

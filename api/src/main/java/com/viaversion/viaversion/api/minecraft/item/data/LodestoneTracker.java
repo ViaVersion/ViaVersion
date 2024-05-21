@@ -22,18 +22,18 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record LodestoneTracker(@Nullable GlobalPosition position, boolean tracked) {
+public record LodestoneTracker(@Nullable GlobalBlockPosition position, boolean tracked) {
 
     public static final Type<LodestoneTracker> TYPE = new Type<>(LodestoneTracker.class) {
         @Override
         public LodestoneTracker read(final ByteBuf buffer) {
-            final GlobalPosition position = Types.OPTIONAL_GLOBAL_POSITION.read(buffer);
+            final GlobalBlockPosition position = Types.OPTIONAL_GLOBAL_POSITION.read(buffer);
             final boolean tracked = buffer.readBoolean();
             return new LodestoneTracker(position, tracked);
         }

@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -43,7 +43,7 @@ public abstract class BlockConnectionProvider implements Provider {
     public void clearStorage(UserConnection connection) {
     }
 
-    public void modifiedBlock(UserConnection connection, Position position) {
+    public void modifiedBlock(UserConnection connection, BlockPosition position) {
 
     }
 
@@ -61,7 +61,7 @@ public abstract class BlockConnectionProvider implements Provider {
      * @param position The position at which block reliability should be checked, null for general-purpose
      * @return true if the block and its neighbors are known to be correct
      */
-    public boolean storesBlocks(UserConnection user, @Nullable Position position) {
+    public boolean storesBlocks(UserConnection user, @Nullable BlockPosition position) {
         return false;
     }
 

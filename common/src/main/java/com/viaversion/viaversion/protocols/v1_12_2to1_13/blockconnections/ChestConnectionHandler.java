@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -62,7 +62,7 @@ class ChestConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         BlockFace facing = CHEST_FACINGS.get(blockState);
         byte states = 0;
         states |= (facing.ordinal() << 2);

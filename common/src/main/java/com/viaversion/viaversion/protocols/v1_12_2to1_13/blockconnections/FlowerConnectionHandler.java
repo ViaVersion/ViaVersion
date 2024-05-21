@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import java.util.HashSet;
@@ -52,7 +52,7 @@ public class FlowerConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         int blockBelowId = getBlockData(user, position.getRelative(BlockFace.BOTTOM));
         int connectBelow = FLOWERS.get(blockBelowId);
         if (connectBelow != 0) {

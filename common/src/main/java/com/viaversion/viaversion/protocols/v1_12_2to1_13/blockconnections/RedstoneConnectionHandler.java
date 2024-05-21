@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -65,7 +65,7 @@ public class RedstoneConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         short b = 0;
         b |= connects(user, position, BlockFace.EAST);
         b |= connects(user, position, BlockFace.NORTH) << 2;
@@ -75,8 +75,8 @@ public class RedstoneConnectionHandler implements ConnectionHandler {
         return CONNECTED_BLOCK_STATES.getOrDefault(b, blockState);
     }
 
-    private int connects(UserConnection user, Position position, BlockFace side) {
-        final Position relative = position.getRelative(side);
+    private int connects(UserConnection user, BlockPosition position, BlockFace side) {
+        final BlockPosition relative = position.getRelative(side);
         int blockState = getBlockData(user, relative);
         if (connects(side, blockState)) {
             return 1; //side

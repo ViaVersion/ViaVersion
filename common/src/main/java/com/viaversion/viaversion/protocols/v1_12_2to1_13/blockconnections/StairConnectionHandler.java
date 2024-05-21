@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.HashMap;
@@ -103,7 +103,7 @@ public class StairConnectionHandler implements ConnectionHandler {
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         StairData stairData = STAIR_DATA_MAP.get(blockState);
         if (stairData == null) return blockState;
 
@@ -117,7 +117,7 @@ public class StairConnectionHandler implements ConnectionHandler {
         return newBlockState == null ? blockState : newBlockState;
     }
 
-    private int getShape(UserConnection user, Position position, StairData stair) {
+    private int getShape(UserConnection user, BlockPosition position, StairData stair) {
         BlockFace facing = stair.facing();
 
         StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(facing)));
@@ -139,7 +139,7 @@ public class StairConnectionHandler implements ConnectionHandler {
         return 0; // straight
     }
 
-    private boolean checkOpposite(UserConnection user, StairData stair, Position position, BlockFace face) {
+    private boolean checkOpposite(UserConnection user, StairData stair, BlockPosition position, BlockFace face) {
         StairData relativeStair = STAIR_DATA_MAP.get(getBlockData(user, position.getRelative(face)));
         return relativeStair == null || relativeStair.facing() != stair.facing() || relativeStair.bottom() != stair.bottom();
     }

@@ -22,31 +22,31 @@
  */
 package com.viaversion.viaversion.api.type.types.math;
 
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public class GlobalPositionType extends Type<GlobalPosition> {
+public class GlobalBlockPositionType extends Type<GlobalBlockPosition> {
 
-    public GlobalPositionType() {
-        super(GlobalPosition.class);
+    public GlobalBlockPositionType() {
+        super(GlobalBlockPosition.class);
     }
 
     @Override
-    public GlobalPosition read(ByteBuf buffer) {
+    public GlobalBlockPosition read(ByteBuf buffer) {
         final String dimension = Types.STRING.read(buffer);
         return Types.BLOCK_POSITION1_14.read(buffer).withDimension(dimension);
     }
 
     @Override
-    public void write(ByteBuf buffer, GlobalPosition object) {
+    public void write(ByteBuf buffer, GlobalBlockPosition object) {
         Types.STRING.write(buffer, object.dimension());
         Types.BLOCK_POSITION1_14.write(buffer, object);
     }
 
-    public static final class OptionalGlobalPositionType extends OptionalType<GlobalPosition> {
+    public static final class OptionalGlobalPositionType extends OptionalType<GlobalBlockPosition> {
 
         public OptionalGlobalPositionType() {
             super(Types.GLOBAL_POSITION);

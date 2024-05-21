@@ -20,7 +20,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
@@ -38,7 +38,7 @@ public class TabCompleteTracker implements StorableObject {
         PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.COMMAND_SUGGESTION, null, connection);
         wrapper.write(Types.STRING, lastTabComplete);
         wrapper.write(Types.BOOLEAN, false);
-        final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
+        final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
         wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
         wrapper.scheduleSendToServer(Protocol1_12_2To1_13.class);
         lastTabComplete = null;

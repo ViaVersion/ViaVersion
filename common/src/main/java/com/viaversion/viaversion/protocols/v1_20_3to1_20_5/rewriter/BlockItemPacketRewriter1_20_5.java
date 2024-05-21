@@ -30,7 +30,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -1056,12 +1056,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateLodestoneTracker(final boolean tracked, final CompoundTag lodestonePosTag, final String lodestoneDimensionTag, final StructuredDataContainer data) {
-        GlobalPosition position = null;
+        GlobalBlockPosition position = null;
         if (lodestonePosTag != null && lodestoneDimensionTag != null) {
             final int x = lodestonePosTag.getInt("X");
             final int y = lodestonePosTag.getInt("Y");
             final int z = lodestonePosTag.getInt("Z");
-            position = new GlobalPosition(lodestoneDimensionTag, x, y, z);
+            position = new GlobalBlockPosition(lodestoneDimensionTag, x, y, z);
         }
         data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, tracked));
     }

@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.EnumMap;
@@ -55,7 +55,7 @@ public abstract class AbstractStempConnectionHandler implements ConnectionHandle
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         if (blockState != baseStateId) {
             return blockState;
         }

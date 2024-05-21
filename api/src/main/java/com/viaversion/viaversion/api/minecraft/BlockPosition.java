@@ -22,24 +22,19 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-public class Position {
+public class BlockPosition {
     protected final int x;
     protected final int y;
     protected final int z;
 
-    public Position(int x, int y, int z) {
+    public BlockPosition(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    // @Deprecated/*(forRemoval=true)*/ Just leave this unchecked
-    public Position(int x, short y, int z) {
-        this(x, (int) y, z);
-    }
-
-    public Position getRelative(BlockFace face) {
-        return new Position(x + face.modX(), (short) (y + face.modY()), z + face.modZ());
+    public BlockPosition getRelative(BlockFace face) {
+        return new BlockPosition(x + face.modX(), y + face.modY(), z + face.modZ());
     }
 
     public int x() {
@@ -54,15 +49,15 @@ public class Position {
         return z;
     }
 
-    public GlobalPosition withDimension(String dimension) {
-        return new GlobalPosition(dimension, x, y, z);
+    public GlobalBlockPosition withDimension(String dimension) {
+        return new GlobalBlockPosition(dimension, x, y, z);
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Position position = (Position) o;
+        BlockPosition position = (BlockPosition) o;
         if (x != position.x) return false;
         if (y != position.y) return false;
         return z == position.z;
@@ -78,7 +73,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "Position{" +
+        return "BlockPosition{" +
             "x=" + x +
             ", y=" + y +
             ", z=" + z +

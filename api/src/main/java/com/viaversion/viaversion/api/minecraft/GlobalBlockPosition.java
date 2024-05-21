@@ -20,41 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.math;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.type.OptionalType;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.Types;
-import io.netty.buffer.ByteBuf;
+public final class GlobalBlockPosition extends BlockPosition {
+    private final String dimension;
 
-public class PositionType1_14 extends Type<Position> {
-    public PositionType1_14() {
-        super(Position.class);
+    public GlobalBlockPosition(final String dimension, final int x, final int y, final int z) {
+        super(x, y, z);
+        this.dimension = dimension;
+    }
+
+    public String dimension() {
+        return dimension;
     }
 
     @Override
-    public Position read(ByteBuf buffer) {
-        long val = buffer.readLong();
-
-        long x = (val >> 38);
-        long y = val << 52 >> 52;
-        long z = val << 26 >> 38;
-
-        return new Position((int) x, (int) y, (int) z);
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final GlobalBlockPosition position = (GlobalBlockPosition) o;
+        if (x != position.x) return false;
+        if (y != position.y) return false;
+        if (z != position.z) return false;
+        return dimension.equals(position.dimension);
     }
 
     @Override
-    public void write(ByteBuf buffer, Position object) {
-        buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
-            | (object.y() & 0xfff)
-            | ((((long) object.z()) & 0x3ffffff) << 12));
+    public int hashCode() {
+        int result = dimension.hashCode();
+        result = 31 * result + x;
+        result = 31 * result + y;
+        result = 31 * result + z;
+        return result;
     }
 
-    public static final class OptionalPosition1_14Type extends OptionalType<Position> {
-
-        public OptionalPosition1_14Type() {
-            super(Types.BLOCK_POSITION1_14);
-        }
+    @Override
+    public String toString() {
+        return "GlobalBlockPosition{" +
+            "dimension='" + dimension + '\'' +
+            ", x=" + x +
+            ", y=" + y +
+            ", z=" + z +
+            '}';
     }
 }

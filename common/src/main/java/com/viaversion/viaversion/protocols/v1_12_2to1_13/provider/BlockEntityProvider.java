@@ -21,7 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -57,7 +57,7 @@ public class BlockEntityProvider implements Provider {
      * @param sendUpdate send a block change update
      * @return new block id
      */
-    public int transform(UserConnection user, Position position, CompoundTag tag, boolean sendUpdate) {
+    public int transform(UserConnection user, BlockPosition position, CompoundTag tag, boolean sendUpdate) {
         StringTag idTag = tag.getStringTag("id");
         if (idTag == null) return -1;
 
@@ -78,7 +78,7 @@ public class BlockEntityProvider implements Provider {
         return newBlock;
     }
 
-    private void sendBlockChange(UserConnection user, Position position, int blockId) {
+    private void sendBlockChange(UserConnection user, BlockPosition position, int blockId) {
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_13.BLOCK_UPDATE, null, user);
         wrapper.write(Types.BLOCK_POSITION1_8, position);
         wrapper.write(Types.VAR_INT, blockId);

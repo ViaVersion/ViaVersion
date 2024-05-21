@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
     }
 
     @Override
-    protected byte getStates(UserConnection user, Position position) {
+    protected byte getStates(UserConnection user, BlockPosition position) {
         byte states = super.getStates(user, position);
         if (up(user, position)) states |= 16;
         return states;
@@ -58,7 +58,7 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return 32;
     }
 
-    public boolean up(UserConnection user, Position position) {
+    public boolean up(UserConnection user, BlockPosition position) {
         if (isWall(getBlockData(user, position.getRelative(BlockFace.BOTTOM))) || isWall(getBlockData(user, position.getRelative(BlockFace.TOP))))
             return true;
         int blockFaces = getBlockFaces(user, position);
@@ -69,7 +69,7 @@ public class WallConnectionHandler extends AbstractFenceConnectionHandler {
         return false;
     }
 
-    private int getBlockFaces(UserConnection user, Position position) {
+    private int getBlockFaces(UserConnection user, BlockPosition position) {
         int blockFaces = 0;
         for (int i = 0; i < BLOCK_FACES.length; i++) {
             if (isWall(getBlockData(user, position.getRelative(BLOCK_FACES[i])))) {

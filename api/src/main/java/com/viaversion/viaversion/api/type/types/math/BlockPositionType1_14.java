@@ -22,37 +22,39 @@
  */
 package com.viaversion.viaversion.api.type.types.math;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public class PositionType1_8 extends Type<Position> {
-
-    public PositionType1_8() {
-        super(Position.class);
+public class BlockPositionType1_14 extends Type<BlockPosition> {
+    public BlockPositionType1_14() {
+        super(BlockPosition.class);
     }
 
     @Override
-    public Position read(ByteBuf buffer) {
-        final long val = buffer.readLong();
-        final long x = (val >> 38);
-        final long y = (val << 26) >> 52;
-        final long z = (val << 38) >> 38;
+    public BlockPosition read(ByteBuf buffer) {
+        long val = buffer.readLong();
 
-        return new Position((int) x, (short) y, (int) z);
+        long x = (val >> 38);
+        long y = val << 52 >> 52;
+        long z = val << 26 >> 38;
+
+        return new BlockPosition((int) x, (int) y, (int) z);
     }
 
     @Override
-    public void write(ByteBuf buffer, Position object) {
-        buffer.writeLong((object.x() & 0X3FFFFFFL) << 38 | (object.y() & 0XFFFL) << 26 | (object.z() & 0X3FFFFFFL));
+    public void write(ByteBuf buffer, BlockPosition object) {
+        buffer.writeLong((((long) object.x() & 0x3ffffff) << 38)
+            | (object.y() & 0xfff)
+            | ((((long) object.z()) & 0x3ffffff) << 12));
     }
 
-    public static final class OptionalPositionType extends OptionalType<Position> {
+    public static final class OptionalBlockPositionType extends OptionalType<BlockPosition> {
 
-        public OptionalPositionType() {
-            super(Types.BLOCK_POSITION1_8);
+        public OptionalBlockPositionType() {
+            super(Types.BLOCK_POSITION1_14);
         }
     }
 }

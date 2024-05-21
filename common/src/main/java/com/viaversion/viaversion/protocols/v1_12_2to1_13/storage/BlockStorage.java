@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.Map;
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
     private static final IntSet WHITELIST = new IntOpenHashSet(46, .99F);
-    private final Map<Position, ReplacementData> blocks = new HashMap<>();
+    private final Map<BlockPosition, ReplacementData> blocks = new HashMap<>();
 
     static {
         // Flower pots
@@ -54,11 +54,11 @@ public class BlockStorage implements StorableObject {
         }
     }
 
-    public void store(Position position, int block) {
+    public void store(BlockPosition position, int block) {
         store(position, block, -1);
     }
 
-    public void store(Position position, int block, int replacementId) {
+    public void store(BlockPosition position, int block, int replacementId) {
         if (!WHITELIST.contains(block))
             return;
 
@@ -69,15 +69,15 @@ public class BlockStorage implements StorableObject {
         return WHITELIST.contains(block);
     }
 
-    public boolean contains(Position position) {
+    public boolean contains(BlockPosition position) {
         return blocks.containsKey(position);
     }
 
-    public ReplacementData get(Position position) {
+    public ReplacementData get(BlockPosition position) {
         return blocks.get(position);
     }
 
-    public ReplacementData remove(Position position) {
+    public ReplacementData remove(BlockPosition position) {
         return blocks.remove(position);
     }
 

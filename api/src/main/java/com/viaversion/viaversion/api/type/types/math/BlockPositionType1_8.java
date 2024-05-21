@@ -20,47 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft;
+package com.viaversion.viaversion.api.type.types.math;
 
-public final class GlobalPosition extends Position {
-    private final String dimension;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.type.OptionalType;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
+import io.netty.buffer.ByteBuf;
 
-    public GlobalPosition(final String dimension, final int x, final int y, final int z) {
-        super(x, y, z);
-        this.dimension = dimension;
-    }
+public class BlockPositionType1_8 extends Type<BlockPosition> {
 
-    public String dimension() {
-        return dimension;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        final GlobalPosition position = (GlobalPosition) o;
-        if (x != position.x) return false;
-        if (y != position.y) return false;
-        if (z != position.z) return false;
-        return dimension.equals(position.dimension);
+    public BlockPositionType1_8() {
+        super(BlockPosition.class);
     }
 
     @Override
-    public int hashCode() {
-        int result = dimension.hashCode();
-        result = 31 * result + x;
-        result = 31 * result + y;
-        result = 31 * result + z;
-        return result;
+    public BlockPosition read(ByteBuf buffer) {
+        final long val = buffer.readLong();
+        final long x = (val >> 38);
+        final long y = (val << 26) >> 52;
+        final long z = (val << 38) >> 38;
+
+        return new BlockPosition((int) x, (short) y, (int) z);
     }
 
     @Override
-    public String toString() {
-        return "GlobalPosition{" +
-            "dimension='" + dimension + '\'' +
-            ", x=" + x +
-            ", y=" + y +
-            ", z=" + z +
-            '}';
+    public void write(ByteBuf buffer, BlockPosition object) {
+        buffer.writeLong((object.x() & 0X3FFFFFFL) << 38 | (object.y() & 0XFFFL) << 26 | (object.z() & 0X3FFFFFFL));
+    }
+
+    public static final class OptionalBlockPositionType extends OptionalType<BlockPosition> {
+
+        public OptionalBlockPositionType() {
+            super(Types.BLOCK_POSITION1_8);
+        }
     }
 }

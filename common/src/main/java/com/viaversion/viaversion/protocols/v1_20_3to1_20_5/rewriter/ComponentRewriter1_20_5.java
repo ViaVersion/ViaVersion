@@ -30,7 +30,7 @@ import com.google.common.primitives.UnsignedBytes;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
@@ -989,7 +989,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         }
     }
 
-    protected void convertGlobalPos(final CompoundTag tag, final GlobalPosition position) {
+    protected void convertGlobalPos(final CompoundTag tag, final GlobalBlockPosition position) {
         final CompoundTag posTag = new CompoundTag();
         posTag.putString("dimension", position.dimension());
         posTag.put("pos", new IntArrayTag(new int[]{position.x(), position.y(), position.z()}));

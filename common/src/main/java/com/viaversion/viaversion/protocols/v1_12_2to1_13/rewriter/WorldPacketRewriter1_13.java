@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -104,7 +104,7 @@ public class WorldPacketRewriter1_13 {
                 map(Types.NAMED_COMPOUND_TAG); // 2 - NBT data
 
                 handler(wrapper -> {
-                    Position position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     short action = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
 
@@ -134,7 +134,7 @@ public class WorldPacketRewriter1_13 {
                 map(Types.UNSIGNED_BYTE); // Action param
                 map(Types.VAR_INT); // Block Id - /!\ NOT BLOCK STATE ID
                 handler(wrapper -> {
-                    Position pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     short action = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     short param = wrapper.get(Types.UNSIGNED_BYTE, 1);
                     int blockId = wrapper.get(Types.VAR_INT, 0);
@@ -177,7 +177,7 @@ public class WorldPacketRewriter1_13 {
                 map(Types.BLOCK_POSITION1_8);
                 map(Types.VAR_INT);
                 handler(wrapper -> {
-                    Position position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     int newId = toNewId(wrapper.get(Types.VAR_INT, 0));
 
                     UserConnection userConnection = wrapper.user();
@@ -212,7 +212,7 @@ public class WorldPacketRewriter1_13 {
                     // Convert ids
                     for (BlockChangeRecord record : records) {
                         int newBlock = toNewId(record.getBlockId());
-                        Position position = new Position(
+                        BlockPosition position = new BlockPosition(
                             record.getSectionX() + (chunkX << 4),
                             record.getY(),
                             record.getSectionZ() + (chunkZ << 4));
@@ -227,7 +227,7 @@ public class WorldPacketRewriter1_13 {
                         for (BlockChangeRecord record : records) {
                             int blockState = record.getBlockId();
 
-                            Position position = new Position(
+                            BlockPosition position = new BlockPosition(
                                 record.getSectionX() + (chunkX * 16),
                                 record.getY(),
                                 record.getSectionZ() + (chunkZ * 16));
@@ -245,7 +245,7 @@ public class WorldPacketRewriter1_13 {
                         wrapper.cancel();
 
                         for (BlockChangeRecord record : records) {
-                            Position position = new Position(
+                            BlockPosition position = new BlockPosition(
                                 record.getSectionX() + (chunkX * 16),
                                 record.getY(),
                                 record.getSectionZ() + (chunkZ * 16));
@@ -275,10 +275,10 @@ public class WorldPacketRewriter1_13 {
                     int y = (int) Math.floor(wrapper.get(Types.FLOAT, 1));
                     int z = (int) Math.floor(wrapper.get(Types.FLOAT, 2));
                     int recordCount = wrapper.get(Types.INT, 0);
-                    Position[] records = new Position[recordCount];
+                    BlockPosition[] records = new BlockPosition[recordCount];
 
                     for (int i = 0; i < recordCount; i++) {
-                        Position position = new Position(
+                        BlockPosition position = new BlockPosition(
                             x + wrapper.passthrough(Types.BYTE),
                             (short) (y + wrapper.passthrough(Types.BYTE)),
                             z + wrapper.passthrough(Types.BYTE));
@@ -358,7 +358,7 @@ public class WorldPacketRewriter1_13 {
                     }
                     for (int idx = 0; idx < ChunkSection.SIZE; idx++) {
                         int id = blocks.idAt(idx);
-                        Position position = new Position(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4));
+                        BlockPosition position = new BlockPosition(ChunkSection.xFromIndex(idx) + (chunk.getX() << 4), ChunkSection.yFromIndex(idx) + (s << 4), ChunkSection.zFromIndex(idx) + (chunk.getZ() << 4));
                         if (storage.isWelcome(id)) {
                             storage.store(position, id);
                         } else if (!chunk.isFullChunk()) { // Update
@@ -426,10 +426,10 @@ public class WorldPacketRewriter1_13 {
                 int newId = provider.transform(wrapper.user(), null, tag, false);
                 if (newId != -1) {
                     int x = tag.getNumberTag("x").asInt();
-                    int y = tag.getNumberTag("y").asInt();
+                    short y = tag.getNumberTag("y").asShort();
                     int z = tag.getNumberTag("z").asInt();
 
-                    Position position = new Position(x, (short) y, z);
+                    BlockPosition position = new BlockPosition(x, y, z);
                     // Store the replacement blocks for blockupdates
                     BlockStorage.ReplacementData replacementData = storage.get(position);
                     if (replacementData != null) {
@@ -536,7 +536,7 @@ public class WorldPacketRewriter1_13 {
 
         // Incoming Packets
         protocol.registerServerbound(ServerboundPackets1_13.USE_ITEM_ON, wrapper -> {
-            Position pos = wrapper.passthrough(Types.BLOCK_POSITION1_8);
+            BlockPosition pos = wrapper.passthrough(Types.BLOCK_POSITION1_8);
             wrapper.passthrough(Types.VAR_INT); // block face
             wrapper.passthrough(Types.VAR_INT); // hand
             wrapper.passthrough(Types.FLOAT); // cursor x
@@ -549,7 +549,7 @@ public class WorldPacketRewriter1_13 {
         });
         protocol.registerServerbound(ServerboundPackets1_13.PLAYER_ACTION, wrapper -> {
             int status = wrapper.passthrough(Types.VAR_INT); // Status
-            Position pos = wrapper.passthrough(Types.BLOCK_POSITION1_8); // Location
+            BlockPosition pos = wrapper.passthrough(Types.BLOCK_POSITION1_8); // Location
             wrapper.passthrough(Types.UNSIGNED_BYTE); // block face
 
             // 0 = Started digging: if in creative this causes the block to break directly
@@ -583,7 +583,7 @@ public class WorldPacketRewriter1_13 {
         return 0;
     }
 
-    private static int checkStorage(UserConnection user, Position position, int newId) {
+    private static int checkStorage(UserConnection user, BlockPosition position, int newId) {
         BlockStorage storage = user.get(BlockStorage.class);
         if (storage.contains(position)) {
             BlockStorage.ReplacementData data = storage.get(position);

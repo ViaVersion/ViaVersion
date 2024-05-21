@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +61,7 @@ public class ChorusPlantConnectionHandler extends AbstractFenceConnectionHandler
     }
 
     @Override
-    protected byte getStates(UserConnection user, Position position) {
+    protected byte getStates(UserConnection user, BlockPosition position) {
         byte states = super.getStates(user, position);
         if (connects(BlockFace.TOP, getBlockData(user, position.getRelative(BlockFace.TOP)), false)) states |= 16;
         if (connects(BlockFace.BOTTOM, getBlockData(user, position.getRelative(BlockFace.BOTTOM)), false)) states |= 32;

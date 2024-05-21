@@ -22,7 +22,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
@@ -38,7 +38,7 @@ public class BannerHandler implements BlockEntityProvider.BlockEntityHandler {
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
         BlockStorage storage = user.get(BlockStorage.class);
-        Position position = new Position(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
+        BlockPosition position = new BlockPosition(tag.getNumberTag("x").asInt(), tag.getNumberTag("y").asShort(), tag.getNumberTag("z").asInt());
 
         if (!storage.contains(position)) {
             Protocol1_12_2To1_13.LOGGER.warning("Received an banner color update packet, but there is no banner! O_o " + tag);

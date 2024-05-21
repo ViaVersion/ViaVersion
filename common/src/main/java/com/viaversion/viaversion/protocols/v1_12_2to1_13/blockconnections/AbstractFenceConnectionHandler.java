@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -61,7 +61,7 @@ public abstract class AbstractFenceConnectionHandler implements ConnectionHandle
         return states;
     }
 
-    protected byte getStates(UserConnection user, Position position) {
+    protected byte getStates(UserConnection user, BlockPosition position) {
         byte states = 0;
         boolean pre1_12 = user.getProtocolInfo().serverProtocolVersion().olderThan(ProtocolVersion.v1_12);
         if (connects(BlockFace.EAST, getBlockData(user, position.getRelative(BlockFace.EAST)), pre1_12)) states |= 1;
@@ -76,12 +76,12 @@ public abstract class AbstractFenceConnectionHandler implements ConnectionHandle
     }
 
     @Override
-    public int getBlockData(UserConnection user, Position position) {
+    public int getBlockData(UserConnection user, BlockPosition position) {
         return STAIR_CONNECTION_HANDLER.connect(user, position, ConnectionHandler.super.getBlockData(user, position));
     }
 
     @Override
-    public int connect(UserConnection user, Position position, int blockState) {
+    public int connect(UserConnection user, BlockPosition position, int blockState) {
         final int newBlockState = connectedBlockStates[getStates(user, position)];
         return newBlockState == -1 ? blockState : newBlockState;
     }

@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.minecraft.BlockFace;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -64,11 +64,11 @@ public final class ConnectionData {
         KEY_TO_ID.defaultReturnValue(-1);
     }
 
-    public static void update(UserConnection user, Position position) {
+    public static void update(UserConnection user, BlockPosition position) {
         Boolean inSync = null;
 
         for (BlockFace face : BlockFace.values()) {
-            Position pos = position.getRelative(face);
+            BlockPosition pos = position.getRelative(face);
             int blockState = blockConnectionProvider.getBlockData(user, pos.x(), pos.y(), pos.z());
             ConnectionHandler handler = connectionHandlerMap.get(blockState);
             if (handler == null) {
@@ -109,7 +109,7 @@ public final class ConnectionData {
         blockConnectionProvider.clearStorage(connection);
     }
 
-    public static void markModified(UserConnection connection, Position pos) {
+    public static void markModified(UserConnection connection, BlockPosition pos) {
         if (!needStoreBlocks()) return;
         blockConnectionProvider.modifiedBlock(connection, pos);
     }
@@ -151,7 +151,7 @@ public final class ConnectionData {
                     continue;
                 }
 
-                Position position = new Position(xOff + ChunkSection.xFromIndex(idx), yOff + ChunkSection.yFromIndex(idx), zOff + ChunkSection.zFromIndex(idx));
+                BlockPosition position = new BlockPosition(xOff + ChunkSection.xFromIndex(idx), yOff + ChunkSection.yFromIndex(idx), zOff + ChunkSection.zFromIndex(idx));
                 int connectedId = handler.connect(user, position, id);
                 if (connectedId != id) {
                     blocks.setIdAt(idx, connectedId);
@@ -257,7 +257,7 @@ public final class ConnectionData {
         return connectionHandlerMap.containsKey(blockState);
     }
 
-    public static int connect(UserConnection user, Position position, int blockState) {
+    public static int connect(UserConnection user, BlockPosition position, int blockState) {
         ConnectionHandler handler = connectionHandlerMap.get(blockState);
         return handler != null ? handler.connect(user, position, blockState) : blockState;
     }
@@ -357,7 +357,7 @@ public final class ConnectionData {
                 return;
             }
 
-            Position pos = new Position(x, y, z);
+            BlockPosition pos = new BlockPosition(x, y, z);
             int newBlockState = handler.connect(user, pos, blockState);
             if (blockState != newBlockState || !blockConnectionProvider.storesBlocks(user, null)) {
                 records.add(new BlockChangeRecord1_8(x & 0xF, y, z & 0xF, newBlockState));

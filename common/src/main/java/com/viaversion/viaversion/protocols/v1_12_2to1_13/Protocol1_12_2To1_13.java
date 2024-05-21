@@ -24,7 +24,7 @@ import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -118,7 +118,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     public static final PacketHandler POS_TO_3_INT = wrapper -> {
-        Position position = wrapper.read(Types.BLOCK_POSITION1_8);
+        BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_8);
         wrapper.write(Types.INT, position.x());
         wrapper.write(Types.INT, position.y());
         wrapper.write(Types.INT, position.z());
@@ -571,7 +571,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                 // Fake the end of the packet
                 handler(wrapper -> {
                     wrapper.write(Types.BOOLEAN, false);
-                    final Position playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
+                    final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(wrapper.user());
                     wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
                     if (!wrapper.isCancelled() && Via.getConfig().get1_13TabCompleteDelay() > 0) {
                         TabCompleteTracker tracker = wrapper.user().get(TabCompleteTracker.class);

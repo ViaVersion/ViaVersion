@@ -28,10 +28,10 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
-import com.viaversion.viaversion.api.minecraft.GlobalPosition;
+import com.viaversion.viaversion.api.minecraft.GlobalBlockPosition;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.PlayerMessageSignature;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ProfileKey;
 import com.viaversion.viaversion.api.minecraft.Quaternion;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -81,9 +81,9 @@ import com.viaversion.viaversion.api.type.types.item.ItemType1_20_2;
 import com.viaversion.viaversion.api.type.types.item.ItemType1_8;
 import com.viaversion.viaversion.api.type.types.math.ChunkPositionType;
 import com.viaversion.viaversion.api.type.types.math.EulerAngleType;
-import com.viaversion.viaversion.api.type.types.math.GlobalPositionType;
-import com.viaversion.viaversion.api.type.types.math.PositionType1_14;
-import com.viaversion.viaversion.api.type.types.math.PositionType1_8;
+import com.viaversion.viaversion.api.type.types.math.GlobalBlockPositionType;
+import com.viaversion.viaversion.api.type.types.math.BlockPositionType1_14;
+import com.viaversion.viaversion.api.type.types.math.BlockPositionType1_8;
 import com.viaversion.viaversion.api.type.types.math.QuaternionType;
 import com.viaversion.viaversion.api.type.types.math.Vector3fType;
 import com.viaversion.viaversion.api.type.types.math.VectorType;
@@ -149,10 +149,10 @@ public final class Types {
     public static final VarLongType VAR_LONG = new VarLongType();
 
     /* MC Types */
-    public static final Type<Position> BLOCK_POSITION1_8 = new PositionType1_8();
-    public static final Type<Position> OPTIONAL_POSITION1_8 = new PositionType1_8.OptionalPositionType();
-    public static final Type<Position> BLOCK_POSITION1_14 = new PositionType1_14();
-    public static final Type<Position> OPTIONAL_POSITION_1_14 = new PositionType1_14.OptionalPosition1_14Type();
+    public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();
+    public static final Type<BlockPosition> OPTIONAL_POSITION1_8 = new BlockPositionType1_8.OptionalBlockPositionType();
+    public static final Type<BlockPosition> BLOCK_POSITION1_14 = new BlockPositionType1_14();
+    public static final Type<BlockPosition> OPTIONAL_POSITION_1_14 = new BlockPositionType1_14.OptionalBlockPositionType();
     public static final Type<EulerAngle> ROTATIONS = new EulerAngleType();
     public static final Type<Vector> VECTOR = new VectorType();
     public static final Type<Vector3f> VECTOR3F = new Vector3fType();
@@ -167,8 +167,8 @@ public final class Types {
     public static final Type<Tag[]> TAG_ARRAY = new ArrayType<>(TAG);
     public static final Type<Tag> OPTIONAL_TAG = new TagType.OptionalTagType();
 
-    public static final Type<GlobalPosition> GLOBAL_POSITION = new GlobalPositionType();
-    public static final Type<GlobalPosition> OPTIONAL_GLOBAL_POSITION = new GlobalPositionType.OptionalGlobalPositionType();
+    public static final Type<GlobalBlockPosition> GLOBAL_POSITION = new GlobalBlockPositionType();
+    public static final Type<GlobalBlockPosition> OPTIONAL_GLOBAL_POSITION = new GlobalBlockPositionType.OptionalGlobalPositionType();
     public static final Type<ChunkPosition> CHUNK_POSITION = new ChunkPositionType();
 
     public static final Type<BlockEntity> BLOCK_ENTITY1_18 = new BlockEntityType1_18();

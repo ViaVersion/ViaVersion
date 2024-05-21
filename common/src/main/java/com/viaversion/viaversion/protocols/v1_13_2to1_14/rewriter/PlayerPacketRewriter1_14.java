@@ -21,7 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -127,7 +127,7 @@ public class PlayerPacketRewriter1_14 {
 
         protocol.registerServerbound(ServerboundPackets1_14.USE_ITEM_ON, wrapper -> {
             int hand = wrapper.read(Types.VAR_INT);
-            Position position = wrapper.read(Types.BLOCK_POSITION1_14);
+            BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_14);
             int face = wrapper.read(Types.VAR_INT);
             float x = wrapper.read(Types.FLOAT);
             float y = wrapper.read(Types.FLOAT);

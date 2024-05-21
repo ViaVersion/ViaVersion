@@ -23,7 +23,7 @@ import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -60,7 +60,7 @@ public class Protocol1_9_1To1_9_3 extends AbstractProtocol<ClientboundPackets1_9
         // Sign update packet
         registerClientbound(ClientboundPackets1_9.UPDATE_SIGN, null, wrapper -> {
             //read data
-            Position position = wrapper.read(Types.BLOCK_POSITION1_8);
+            BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_8);
             JsonElement[] lines = new JsonElement[4];
             for (int i = 0; i < 4; i++) {
                 lines[i] = wrapper.read(Types.COMPONENT);

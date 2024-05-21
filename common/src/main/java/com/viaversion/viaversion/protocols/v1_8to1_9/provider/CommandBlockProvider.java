@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.provider;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -31,12 +31,12 @@ import java.util.Optional;
 
 public class CommandBlockProvider implements Provider {
 
-    public void addOrUpdateBlock(UserConnection user, Position position, CompoundTag tag) {
+    public void addOrUpdateBlock(UserConnection user, BlockPosition position, CompoundTag tag) {
         checkPermission(user);
         getStorage(user).addOrUpdateBlock(position, tag);
     }
 
-    public Optional<CompoundTag> get(UserConnection user, Position position) {
+    public Optional<CompoundTag> get(UserConnection user, BlockPosition position) {
         checkPermission(user);
         return getStorage(user).getCommandBlock(position);
     }

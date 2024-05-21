@@ -27,7 +27,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -99,7 +99,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                     wrapper.write(Types.VAR_INT, EntityTypes1_19.PAINTING.getId());
 
                     final int motive = wrapper.read(Types.VAR_INT);
-                    final Position blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
+                    final BlockPosition blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
                     final byte direction = wrapper.read(Types.BYTE);
                     wrapper.write(Types.DOUBLE, blockPosition.x() + 0.5d);
                     wrapper.write(Types.DOUBLE, blockPosition.y() + 0.5d);

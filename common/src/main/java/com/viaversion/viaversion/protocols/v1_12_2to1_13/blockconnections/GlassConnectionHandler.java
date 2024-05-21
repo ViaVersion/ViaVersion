@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class GlassConnectionHandler extends AbstractFenceConnectionHandler {
     }
 
     @Override
-    protected byte getStates(UserConnection user, Position position) {
+    protected byte getStates(UserConnection user, BlockPosition position) {
         byte states = super.getStates(user, position);
         if (states != 0) return states;
 
