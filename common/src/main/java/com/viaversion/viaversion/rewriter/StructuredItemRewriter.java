@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -50,16 +51,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final MappingData mappingData = protocol.getMappingData();
+        final StructuredDataContainer dataContainer = item.dataContainer();
         if (mappingData != null) {
             if (mappingData.getItemMappings() != null) {
                 item.setIdentifier(mappingData.getNewItemId(item.identifier()));
             }
-            if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.dataContainer().setIdLookup(protocol, true);
+
+            final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
+            if (dataComponentMappings != null) {
+                dataContainer.setIdLookup(protocol, true);
+                dataContainer.updateIds(protocol, dataComponentMappings::getNewId);
             }
         }
 
-        updateItemComponents(connection, item.dataContainer(), this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null);
+        updateItemComponents(connection, dataContainer, this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null);
         return item;
     }
 
@@ -70,16 +75,20 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final MappingData mappingData = protocol.getMappingData();
+        final StructuredDataContainer dataContainer = item.dataContainer();
         if (mappingData != null) {
             if (mappingData.getItemMappings() != null) {
                 item.setIdentifier(mappingData.getOldItemId(item.identifier()));
             }
-            if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.dataContainer().setIdLookup(protocol, false);
+
+            final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
+            if (dataComponentMappings != null) {
+                dataContainer.setIdLookup(protocol, false);
+                dataContainer.updateIds(protocol, id -> dataComponentMappings.inverse().getNewId(id));
             }
         }
 
-        updateItemComponents(connection, item.dataContainer(), this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null);
+        updateItemComponents(connection, dataContainer, this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null);
         return item;
     }
 

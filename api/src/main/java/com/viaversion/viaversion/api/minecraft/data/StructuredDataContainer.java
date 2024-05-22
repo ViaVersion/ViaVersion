@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.Unit;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -158,6 +159,18 @@ public final class StructuredDataContainer {
         this.lookup = protocol.getMappingData().getDataComponentSerializerMappings();
         Preconditions.checkNotNull(this.lookup, "Data component serializer mappings are null");
         this.mappedNames = mappedNames;
+    }
+
+    public void updateIds(final Protocol<?, ?, ?, ?> protocol, final Int2IntFunction rewriter) {
+        for (final StructuredData<?> data : data.values()) {
+            final int mappedId = rewriter.applyAsInt(data.id());
+            if (mappedId == -1) {
+                protocol.getLogger().warning("Could not find item data serializer for id " + data.id());
+                continue;
+            }
+
+            data.setId(mappedId);
+        }
     }
 
     public StructuredDataContainer copy() {
