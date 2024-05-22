@@ -81,10 +81,14 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             protected void register() {
+                map(Types.STRING); // Channel
                 handlerSoftFail(Protocol1_20To1_20_2::sanitizeCustomPayload);
             }
         });
-        registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, Protocol1_20To1_20_2::sanitizeCustomPayload);
+        registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Channel
+            sanitizeCustomPayload(wrapper);
+        });
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
             final String url = wrapper.passthrough(Types.STRING);
@@ -205,7 +209,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     }
 
     private static void sanitizeCustomPayload(final PacketWrapper wrapper) {
-        final String channel = Key.namespaced(wrapper.passthrough(Types.STRING));
+        final String channel = Key.namespaced(wrapper.get(Types.STRING, 0));
         if (channel.equals("minecraft:brand")) {
             wrapper.passthrough(Types.STRING);
             wrapper.clearInputBuffer();
