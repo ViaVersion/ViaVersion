@@ -47,8 +47,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
-import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
-import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
@@ -64,7 +65,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
-import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
@@ -515,7 +515,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (attributeModifiersTag != null) {
             updateAttributes(data, attributeModifiersTag, showAttributes);
         } else if (!showAttributes) {
-            data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(new AttributeModifier[0], false));
+            data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, new AttributeModifiers1_20_5(new AttributeModifier[0], false));
         }
 
         final CompoundTag fireworksTag = tag.getCompoundTag("Fireworks");
@@ -874,7 +874,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 slotTypeId
             ));
         }
-        data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS, new AttributeModifiers(modifiers.toArray(new AttributeModifier[0]), showInTooltip));
+        data.set(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, new AttributeModifiers1_20_5(modifiers.toArray(new AttributeModifier[0]), showInTooltip));
     }
 
     private PotionEffectData readPotionEffectData(final CompoundTag tag) {

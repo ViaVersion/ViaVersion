@@ -18,20 +18,25 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import java.util.Arrays;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_20_5To1_21> {
@@ -79,8 +84,21 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         }
 
         super.handleItemToClient(connection, item);
-        item.structuredData().replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
+        updateItemData(item);
         return item;
+    }
+
+    public static void updateItemData(final Item item) {
+        final StructuredDataContainer dataContainer = item.structuredData();
+        dataContainer.replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
+        dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> {
+            final AttributeModifiers1_21.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
+                final AttributeModifiers1_20_5.ModifierData modData = modifier.modifier();
+                final AttributeModifiers1_21.ModifierData updatedModData = new AttributeModifiers1_21.ModifierData(Protocol1_20_5To1_21.mapAttributeUUID(modData.uuid(), modData.name()), modData.amount(), modData.operation());
+                return new AttributeModifiers1_21.AttributeModifier(modifier.attribute(), updatedModData, modifier.slotType());
+            }).toArray(AttributeModifiers1_21.AttributeModifier[]::new);
+            return new AttributeModifiers1_21(modifiers, attributeModifiers.showInTooltip());
+        });
     }
 
     @Override
@@ -90,7 +108,27 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         }
 
         super.handleItemToServer(connection, item);
-        item.structuredData().replaceKey(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_20_5);
+        downgradeItemData(item);
         return item;
+    }
+
+    public static void downgradeItemData(final Item item) {
+        final StructuredDataContainer dataContainer = item.structuredData();
+        dataContainer.replaceKey(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_20_5);
+        dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE);
+        dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, attributeModifiers -> {
+            final AttributeModifiers1_20_5.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
+                final AttributeModifiers1_21.ModifierData modData = modifier.modifier();
+                final String name = AttributeModifierMappings1_21.idToName(modData.id());
+                final AttributeModifiers1_20_5.ModifierData updatedModData = new AttributeModifiers1_20_5.ModifierData(
+                    Protocol1_20_5To1_21.mapAttributeId(modData.id()),
+                    name != null ? name : modData.id(),
+                    modData.amount(),
+                    modData.operation()
+                );
+                return new AttributeModifiers1_20_5.AttributeModifier(modifier.attribute(), updatedModData, modifier.slotType());
+            }).toArray(AttributeModifiers1_20_5.AttributeModifier[]::new);
+            return new AttributeModifiers1_20_5(modifiers, attributeModifiers.showInTooltip());
+        });
     }
 }

@@ -41,8 +41,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
-import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
-import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
@@ -58,7 +59,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
-import com.viaversion.viaversion.api.minecraft.item.data.ModifierData;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
@@ -126,7 +126,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.ENCHANTMENTS, this::convertEnchantments);
         register(StructuredDataKey.CAN_PLACE_ON, this::convertCanPlaceOn);
         register(StructuredDataKey.CAN_BREAK, this::convertCanBreak);
-        register(StructuredDataKey.ATTRIBUTE_MODIFIERS, this::convertAttributeModifiers);
+        register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, this::convertAttributeModifiers);
         register(StructuredDataKey.CUSTOM_MODEL_DATA, this::convertCustomModelData);
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, this::convertHideAdditionalTooltip);
         register(StructuredDataKey.HIDE_TOOLTIP, this::convertHideTooltip);
@@ -446,7 +446,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return convertCanPlaceOn(value);
     }
 
-    protected CompoundTag convertAttributeModifiers(final AttributeModifiers value) {
+    protected CompoundTag convertAttributeModifiers(final AttributeModifiers1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         final ListTag<CompoundTag> modifiers = new ListTag<>(CompoundTag.class);
         for (final AttributeModifier modifier : value.modifiers()) {

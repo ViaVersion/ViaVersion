@@ -31,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record StatePropertyMatcher(String name, Either<String, RangedMatcher> matcher) {
 
-    // TODO Abstract Either reading
     public static final Type<StatePropertyMatcher> TYPE = new Type<>(StatePropertyMatcher.class) {
         @Override
         public StatePropertyMatcher read(final ByteBuf buffer) {

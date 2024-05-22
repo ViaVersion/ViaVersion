@@ -28,7 +28,7 @@ public class AttributeRewriter<C extends ClientboundPacketType> {
         this.protocol = protocol;
     }
 
-    public void register1_20_5(C packetType) {
+    public void register1_21(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
 
@@ -43,7 +43,7 @@ public class AttributeRewriter<C extends ClientboundPacketType> {
                     wrapper.read(Types.DOUBLE); // Base
                     final int modifierSize = wrapper.read(Types.VAR_INT);
                     for (int j = 0; j < modifierSize; j++) {
-                        wrapper.read(Types.UUID); // ID
+                        wrapper.read(Types.STRING); // ID
                         wrapper.read(Types.DOUBLE); // Amount
                         wrapper.read(Types.BYTE); // Operation
                     }
@@ -54,7 +54,7 @@ public class AttributeRewriter<C extends ClientboundPacketType> {
                 wrapper.passthrough(Types.DOUBLE); // Base
                 final int modifierSize = wrapper.passthrough(Types.VAR_INT);
                 for (int j = 0; j < modifierSize; j++) {
-                    wrapper.passthrough(Types.UUID); // ID
+                    wrapper.passthrough(Types.STRING); // ID
                     wrapper.passthrough(Types.DOUBLE); // Amount
                     wrapper.passthrough(Types.BYTE); // Operation
                 }

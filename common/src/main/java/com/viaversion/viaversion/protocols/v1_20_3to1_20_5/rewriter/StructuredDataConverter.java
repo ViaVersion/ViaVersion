@@ -35,7 +35,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimMaterial;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrimPattern;
-import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifier;
+import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5.AttributeModifier;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPattern;
 import com.viaversion.viaversion.api.minecraft.item.data.BannerPatternLayer;
 import com.viaversion.viaversion.api.minecraft.item.data.Bee;
@@ -128,7 +128,7 @@ public final class StructuredDataConverter {
         });
         register(StructuredDataKey.ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, false));
         register(StructuredDataKey.STORED_ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, true));
-        register(StructuredDataKey.ATTRIBUTE_MODIFIERS, (data, tag) -> {
+        register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, (data, tag) -> {
             final ListTag<CompoundTag> modifiers = new ListTag<>(CompoundTag.class);
             for (int i = 0; i < data.modifiers().length; i++) {
                 final AttributeModifier modifier = data.modifiers()[i];

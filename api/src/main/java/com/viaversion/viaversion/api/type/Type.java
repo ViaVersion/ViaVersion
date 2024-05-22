@@ -22,6 +22,9 @@
  */
 package com.viaversion.viaversion.api.type;
 
+import com.viaversion.viaversion.util.Either;
+import io.netty.buffer.ByteBuf;
+
 /**
  * Type for buffer reading and writing.
  *
@@ -74,5 +77,23 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
     @Override
     public String toString() {
         return getTypeName();
+    }
+
+    public static <X, Y> Either<X, Y> readEither(final ByteBuf buf, final Type<X> leftType, final Type<Y> rightType) {
+        if (buf.readBoolean()) {
+            return Either.left(leftType.read(buf));
+        } else {
+            return Either.right(rightType.read(buf));
+        }
+    }
+
+    public static <X, Y> void writeEither(final ByteBuf buf, final Either<X, Y> value, final Type<X> leftType, final Type<Y> rightType) {
+        if (value.isLeft()) {
+            buf.writeBoolean(true);
+            leftType.write(buf, value.left());
+        } else {
+            buf.writeBoolean(false);
+            rightType.write(buf, value.right());
+        }
     }
 }

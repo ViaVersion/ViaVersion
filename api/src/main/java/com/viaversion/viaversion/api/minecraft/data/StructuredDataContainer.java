@@ -106,9 +106,19 @@ public final class StructuredDataContainer {
     }
 
     public <T> void replaceKey(final StructuredDataKey<T> key, final StructuredDataKey<T> toKey) {
+        replace(key, toKey, Function.identity());
+    }
+
+    public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, V> valueMapper) {
         final StructuredData<T> data = remove(key);
-        if (data != null) {
-            set(toKey, data.value());
+        if (data == null) {
+            return;
+        }
+
+        if (data.isPresent()) {
+            set(toKey, valueMapper.apply(data.value()));
+        } else {
+            addEmpty(toKey);
         }
     }
 

@@ -27,23 +27,28 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.MappingData;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacketRewriter1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
-import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.MappingData;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacketRewriter1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import java.util.Locale;
+import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
+public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_21, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingData();
     private final EntityPacketRewriter1_21 entityRewriter = new EntityPacketRewriter1_21(this);
@@ -51,7 +56,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_20_5To1_21() {
-        super(ClientboundPacket1_20_5.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_5.class, ServerboundPacket1_20_5.class);
+        super(ClientboundPacket1_20_5.class, ClientboundPacket1_21.class, ServerboundPacket1_20_5.class, ServerboundPacket1_20_5.class);
     }
 
     @Override
@@ -66,7 +71,24 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND_ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
-        new AttributeRewriter<>(this).register1_20_5(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES);
+
+        registerClientbound(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < size; i++) {
+                final int attributeId = wrapper.read(Types.VAR_INT);
+                wrapper.write(Types.VAR_INT, MAPPINGS.getNewAttributeId(attributeId));
+                wrapper.passthrough(Types.DOUBLE); // Base
+                final int modifierSize = wrapper.passthrough(Types.VAR_INT);
+                for (int j = 0; j < modifierSize; j++) {
+                    final UUID uuid = wrapper.read(Types.UUID);
+                    wrapper.write(Types.STRING, mapAttributeUUID(uuid, null));
+                    wrapper.passthrough(Types.DOUBLE); // Amount
+                    wrapper.passthrough(Types.BYTE); // Operation
+                }
+            }
+        });
 
         registerClientbound(ClientboundPackets1_20_5.PROJECTILE_POWER, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Id
@@ -76,6 +98,22 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
             final double accelerationPower = Math.sqrt(xPower * xPower + yPower * yPower + zPower * zPower);
             wrapper.write(Types.DOUBLE, accelerationPower);
         });
+    }
+
+    public static String mapAttributeUUID(final UUID uuid, final String name) {
+        String id = AttributeModifierMappings1_21.uuidToId(uuid);
+        if (id != null) {
+            return id;
+        }
+        if (name != null) {
+            id = AttributeModifierMappings1_21.nameToId(name);
+        }
+        return id != null ? id : uuid.toString().toLowerCase(Locale.ROOT);
+    }
+
+    public static UUID mapAttributeId(final String id) {
+        final UUID uuid = AttributeModifierMappings1_21.idToUuid(id);
+        return uuid != null ? uuid : UUID.randomUUID();
     }
 
     @Override
@@ -97,9 +135,9 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         Types1_21.STRUCTURED_DATA.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
             .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE).add(StructuredDataKey.RARITY)
-            .add(StructuredDataKey.HIDE_TOOLTIP).add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.FIRE_RESISTANT)
+            .add(StructuredDataKey.HIDE_TOOLTIP).add(StructuredDataKey.FIRE_RESISTANT)
             .add(StructuredDataKey.CUSTOM_NAME).add(StructuredDataKey.LORE).add(StructuredDataKey.ENCHANTMENTS)
-            .add(StructuredDataKey.CAN_PLACE_ON).add(StructuredDataKey.CAN_BREAK).add(StructuredDataKey.ATTRIBUTE_MODIFIERS)
+            .add(StructuredDataKey.CAN_PLACE_ON).add(StructuredDataKey.CAN_BREAK)
             .add(StructuredDataKey.CUSTOM_MODEL_DATA).add(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP).add(StructuredDataKey.REPAIR_COST)
             .add(StructuredDataKey.CREATIVE_SLOT_LOCK).add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE).add(StructuredDataKey.INTANGIBLE_PROJECTILE)
             .add(StructuredDataKey.STORED_ENCHANTMENTS).add(StructuredDataKey.DYED_COLOR).add(StructuredDataKey.MAP_COLOR)
@@ -113,7 +151,8 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
             .add(StructuredDataKey.BANNER_PATTERNS).add(StructuredDataKey.BASE_COLOR).add(StructuredDataKey.POT_DECORATIONS)
             .add(StructuredDataKey.CONTAINER).add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
             .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL)
-            .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER);
+            .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER)
+            .add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.JUKEBOX_PLAYABLE).add(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21);
     }
 
     @Override
@@ -142,10 +181,10 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    protected PacketTypesProvider<ClientboundPacket1_20_5, ClientboundPacket1_20_5, ServerboundPacket1_20_5, ServerboundPacket1_20_5> createPacketTypesProvider() {
+    protected PacketTypesProvider<ClientboundPacket1_20_5, ClientboundPacket1_21, ServerboundPacket1_20_5, ServerboundPacket1_20_5> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_20_5.class, ClientboundConfigurationPackets1_20_5.class),
-            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_20_5.class, ClientboundConfigurationPackets1_20_5.class),
+            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_21.class, ClientboundConfigurationPackets1_21.class),
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_20_5.class, ServerboundConfigurationPackets1_20_5.class),
             packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_20_5.class, ServerboundConfigurationPackets1_20_5.class)
         );
