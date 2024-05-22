@@ -439,9 +439,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updateBlockState(data, blockState);
         }
 
-        final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+        CompoundTag entityTag = tag.getCompoundTag("EntityTag");
         if (entityTag != null) {
-            data.set(StructuredDataKey.ENTITY_DATA, entityTag.copy());
+            entityTag = entityTag.copy();
+            if (entityTag.contains("variant")) {
+                entityTag.putString("id", "minecraft:painting");
+            }
+            data.set(StructuredDataKey.ENTITY_DATA, entityTag);
         }
 
         final CompoundTag blockEntityTag = tag.getCompoundTag("BlockEntityTag");
