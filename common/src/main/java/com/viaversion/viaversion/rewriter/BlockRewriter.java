@@ -20,6 +20,7 @@ package com.viaversion.viaversion.rewriter;
 import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -154,23 +155,24 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerLevelEvent(C packetType, int playRecordId, int blockBreakId) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // Effect Id
-                map(positionType); // Location
-                map(Types.INT); // Data
-                handler(wrapper -> {
-                    int id = wrapper.get(Types.INT, 0);
-                    int data = wrapper.get(Types.INT, 1);
-                    if (id == playRecordId && protocol.getMappingData().getItemMappings() != null) {
-                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewItemId(data));
-                    } else if (id == blockBreakId && protocol.getMappingData().getBlockStateMappings() != null) {
-                        wrapper.set(Types.INT, 1, protocol.getMappingData().getNewBlockStateId(data));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            final int id = wrapper.passthrough(Types.INT);
+            wrapper.passthrough(positionType);
+
+            final int data = wrapper.read(Types.INT);
+            final MappingData mappingData = protocol.getMappingData();
+            if (playRecordId != -1 && id == playRecordId && mappingData.getItemMappings() != null) {
+                wrapper.write(Types.INT, mappingData.getNewItemId(data));
+            } else if (id == blockBreakId && mappingData.getBlockStateMappings() != null) {
+                wrapper.write(Types.INT, mappingData.getNewBlockStateId(data));
+            } else {
+                wrapper.write(Types.INT, data);
             }
         });
+    }
+
+    public void registerLevelEvent1_21(C packetType, int blockBreakId) {
+        registerLevelEvent(packetType, -1, blockBreakId);
     }
 
     public void registerLevelChunk(C packetType, Type<Chunk> chunkType, Type<Chunk> newChunkType) {

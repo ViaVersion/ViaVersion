@@ -37,9 +37,12 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierM
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_20_5To1_21> {
+
+    private static final List<String> DISCS = List.of("11", "13", "5", "blocks", "cat", "chirp", "far", "mall", "mellohi", "otherside", "pigstep", "relic", "stal", "strad", "wait", "ward");
 
     public BlockItemPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY);
@@ -51,7 +54,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         blockRewriter.registerBlockEvent(ClientboundPackets1_20_5.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_20_5.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent(ClientboundPackets1_20_5.LEVEL_EVENT, 1010, 2001);
         blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_5.BLOCK_ENTITY_DATA);
 
@@ -66,6 +68,26 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerContainerSetData(ClientboundPackets1_20_5.CONTAINER_SET_DATA);
         registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_21.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_21.PARTICLE); // Rewrites the included sound and particles
+
+        protocol.registerClientbound(ClientboundPackets1_20_5.LEVEL_EVENT, wrapper -> {
+            final int id = wrapper.passthrough(Types.INT);
+            wrapper.passthrough(Types.BLOCK_POSITION1_14);
+
+            final int data = wrapper.read(Types.INT);
+            if (id == 1010) {
+                final int jukeboxSong = itemToJubeboxSong(data);
+                if (jukeboxSong == -1) {
+                    wrapper.cancel();
+                    return;
+                }
+
+                wrapper.write(Types.INT, jukeboxSong);
+            } else if (id == 2001) {
+                wrapper.write(Types.INT, protocol.getMappingData().getNewBlockStateId(data));
+            } else {
+                wrapper.write(Types.INT, data);
+            }
+        });
 
         protocol.registerServerbound(ServerboundPackets1_20_5.USE_ITEM, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Hand
@@ -130,5 +152,15 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             }).toArray(AttributeModifiers1_20_5.AttributeModifier[]::new);
             return new AttributeModifiers1_20_5(modifiers, attributeModifiers.showInTooltip());
         });
+    }
+
+    private int itemToJubeboxSong(final int id) {
+        String identifier = Protocol1_20_5To1_21.MAPPINGS.getFullItemMappings().identifier(id);
+        if (!identifier.contains("music_disc_")) {
+            return -1;
+        }
+
+        identifier = identifier.substring("minecraft:music_disc_".length());
+        return DISCS.indexOf(identifier);
     }
 }

@@ -46,7 +46,7 @@ public final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Cl
         blockRewriter.registerBlockEvent(ClientboundPackets1_20_5.BLOCK_EVENT);
         blockRewriter.registerBlockUpdate(ClientboundPackets1_20_5.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_20_5.SECTION_BLOCKS_UPDATE);
-        blockRewriter.registerLevelEvent(ClientboundPackets1_20_5.LEVEL_EVENT, 1010, 2001);
+        blockRewriter.registerLevelEvent1_21(ClientboundPackets1_20_5.LEVEL_EVENT, 2001);
         blockRewriter.registerLevelChunk1_19(ClientboundPackets1_20_5.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_20_5.BLOCK_ENTITY_DATA);
 

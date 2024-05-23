@@ -47,7 +47,7 @@ public final class Key {
     }
 
     public static boolean equals(final String firstIdentifier, final String secondIdentifier) {
-        return stripNamespace(firstIdentifier).equals(stripNamespace(secondIdentifier));
+        return stripMinecraftNamespace(firstIdentifier).equals(stripMinecraftNamespace(secondIdentifier));
     }
 
     public static String namespaced(final String identifier) {

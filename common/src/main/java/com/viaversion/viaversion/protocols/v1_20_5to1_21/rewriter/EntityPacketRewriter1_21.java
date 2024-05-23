@@ -91,6 +91,11 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             }
             enchantmentRegistryPacket.write(Types.REGISTRY_ENTRY_ARRAY, enchantmentRegistry);
             enchantmentRegistryPacket.send(Protocol1_20_5To1_21.class);
+
+            final PacketWrapper jukeboxSongsPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
+            jukeboxSongsPacket.write(Types.STRING, "minecraft:jukebox_song");
+            jukeboxSongsPacket.write(Types.REGISTRY_ENTRY_ARRAY, protocol.getMappingData().jukeboxSongs());
+            jukeboxSongsPacket.send(Protocol1_20_5To1_21.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_5.LOGIN, new PacketHandlers() {

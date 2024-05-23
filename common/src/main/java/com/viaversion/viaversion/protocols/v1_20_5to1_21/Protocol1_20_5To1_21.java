@@ -34,7 +34,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.MappingData;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.MappingData1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
@@ -43,6 +43,8 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRe
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.UUIDUtil;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -50,7 +52,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPacket1_20_5, ClientboundPacket1_21, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
 
-    public static final MappingData MAPPINGS = new MappingData();
+    public static final MappingData1_21 MAPPINGS = new MappingData1_21();
     private final EntityPacketRewriter1_21 entityRewriter = new EntityPacketRewriter1_21(this);
     private final BlockItemPacketRewriter1_21 itemRewriter = new BlockItemPacketRewriter1_21(this);
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
@@ -112,7 +114,12 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     }
 
     public static UUID mapAttributeId(final String id) {
-        final UUID uuid = AttributeModifierMappings1_21.idToUuid(id);
+        UUID uuid = AttributeModifierMappings1_21.idToUuid(id);
+        if (uuid != null) {
+            return uuid;
+        }
+
+        uuid = UUIDUtil.parseUUID(Key.stripNamespace(id).toUpperCase(Locale.ROOT));
         return uuid != null ? uuid : UUID.randomUUID();
     }
 
@@ -161,7 +168,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public MappingData getMappingData() {
+    public MappingData1_21 getMappingData() {
         return MAPPINGS;
     }
 

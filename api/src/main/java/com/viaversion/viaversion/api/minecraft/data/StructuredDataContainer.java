@@ -165,7 +165,6 @@ public final class StructuredDataContainer {
         for (final StructuredData<?> data : data.values()) {
             final int mappedId = rewriter.applyAsInt(data.id());
             if (mappedId == -1) {
-                protocol.getLogger().warning("Could not find item data serializer for id " + data.id());
                 continue;
             }
 

@@ -33,6 +33,14 @@ import io.netty.buffer.ByteBuf;
 
 public record JukeboxPlayable(Either<Holder<JukeboxSong>, String> song, boolean showInTooltip) {
 
+    public JukeboxPlayable(final Holder<JukeboxSong> song, final boolean showInTooltip) {
+        this(Either.left(song), showInTooltip);
+    }
+
+    public JukeboxPlayable(final String resourceKey, final boolean showInTooltip) {
+        this(Either.right(resourceKey), showInTooltip);
+    }
+
     public static final Type<JukeboxPlayable> TYPE = new Type<>(JukeboxPlayable.class) {
         @Override
         public JukeboxPlayable read(final ByteBuf buffer) {
