@@ -6,7 +6,7 @@ description: ${description}
 api-version: 1.13
 folia-supported: true
 loadbefore: [ ProtocolLib, ProxyPipe, SpigotLib, SkinRestorer ]
-softdepend: [ ProtocolSupport, PacketListenerApi ]
+softdepend: [ PacketListenerApi ]
 commands:
   viaversion:
     permission: viaversion.command # The permission is also referenced here to filter root suggestions (/via<tab>)
