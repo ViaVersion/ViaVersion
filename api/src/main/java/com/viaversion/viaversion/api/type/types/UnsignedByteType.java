@@ -27,6 +27,8 @@ import com.viaversion.viaversion.api.type.TypeConverter;
 import io.netty.buffer.ByteBuf;
 
 public class UnsignedByteType extends Type<Short> implements TypeConverter<Short> {
+    public static final int MAX_VALUE = 255;
+
     public UnsignedByteType() {
         super("Unsigned Byte", Short.class);
     }

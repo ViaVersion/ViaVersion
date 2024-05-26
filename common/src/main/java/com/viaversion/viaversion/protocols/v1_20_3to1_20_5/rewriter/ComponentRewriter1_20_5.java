@@ -26,7 +26,6 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.UnsignedBytes;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
@@ -72,6 +71,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.type.types.UnsignedByteType;
 import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.ArmorMaterials1_20_5;
@@ -1050,7 +1050,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     protected ByteTag convertUnsignedByte(final byte value) {
-        if (value > UnsignedBytes.MAX_VALUE) {
+        if (value > UnsignedByteType.MAX_VALUE) {
             throw new IllegalArgumentException("Value out of range: " + value);
         }
         return new ByteTag(value);
