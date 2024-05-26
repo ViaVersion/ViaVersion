@@ -75,6 +75,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -329,6 +330,17 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     return new StructuredItem(1, 1);
                 }
                 return item;
+            }
+
+            @Override
+            protected void handleIngredient(final PacketWrapper wrapper) {
+                // Needed to map between DataItem and StructuredItem types
+                final Item[] items = wrapper.read(itemArrayType());
+                final StructuredItem[] mappedItems = new StructuredItem[items.length];
+                for (int i = 0; i < items.length; i++) {
+                    mappedItems[i] = (StructuredItem) rewrite(wrapper.user(), items[i]);
+                }
+                wrapper.write(mappedItemArrayType(), mappedItems);
             }
         };
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_RECIPES, wrapper -> {

@@ -82,7 +82,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         protocol.registerClientbound(packetType, wrapper -> {
             int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Types.STRING);// Recipe Identifier
+                wrapper.passthrough(Types.STRING); // Recipe Identifier
 
                 final int typeId = wrapper.passthrough(Types.VAR_INT);
                 final String type = protocol.getMappingData().getRecipeSerializerMappings().identifier(typeId);
