@@ -774,49 +774,52 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     private void writeDeclareRecipes(PacketWrapper recipesPacket) {
         recipesPacket.write(Types.VAR_INT, RecipeData.recipes.size());
         for (Map.Entry<String, RecipeData.Recipe> entry : RecipeData.recipes.entrySet()) {
+            RecipeData.Recipe recipe = entry.getValue();
             recipesPacket.write(Types.STRING, entry.getKey()); // Id
-            recipesPacket.write(Types.STRING, entry.getValue().getType());
-            switch (entry.getValue().getType()) {
+            recipesPacket.write(Types.STRING, recipe.type());
+
+            // Clone item arrays because array and item are mutable, also make sure the array type is the interface
+            switch (recipe.type()) {
                 case "crafting_shapeless": {
-                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
-                    recipesPacket.write(Types.VAR_INT, entry.getValue().getIngredients().length);
-                    for (Item[] ingredient : entry.getValue().getIngredients()) {
-                        Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                        for (int i = 0; i < clone.length; i++) {
+                    recipesPacket.write(Types.STRING, recipe.group());
+                    recipesPacket.write(Types.VAR_INT, recipe.ingredients().length);
+                    for (Item[] ingredient : recipe.ingredients()) {
+                        Item[] clone = new Item[ingredient.length];
+                        for (int i = 0; i < ingredient.length; i++) {
                             if (clone[i] == null) continue;
-                            clone[i] = new DataItem(clone[i]);
+                            clone[i] = new DataItem(ingredient[i]);
                         }
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
                     break;
                 }
                 case "crafting_shaped": {
-                    recipesPacket.write(Types.VAR_INT, entry.getValue().getWidth());
-                    recipesPacket.write(Types.VAR_INT, entry.getValue().getHeight());
-                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
-                    for (Item[] ingredient : entry.getValue().getIngredients()) {
-                        Item[] clone = ingredient.clone(); // Clone because array and item is mutable
-                        for (int i = 0; i < clone.length; i++) {
+                    recipesPacket.write(Types.VAR_INT, recipe.width());
+                    recipesPacket.write(Types.VAR_INT, recipe.height());
+                    recipesPacket.write(Types.STRING, recipe.group());
+                    for (Item[] ingredient : recipe.ingredients()) {
+                        Item[] clone = new Item[ingredient.length];
+                        for (int i = 0; i < ingredient.length; i++) {
                             if (clone[i] == null) continue;
-                            clone[i] = new DataItem(clone[i]);
+                            clone[i] = new DataItem(ingredient[i]);
                         }
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
                     break;
                 }
                 case "smelting": {
-                    recipesPacket.write(Types.STRING, entry.getValue().getGroup());
-                    Item[] clone = entry.getValue().getIngredient().clone(); // Clone because array and item is mutable
-                    for (int i = 0; i < clone.length; i++) {
-                        if (clone[i] == null) continue;
-                        clone[i] = new DataItem(clone[i]);
+                    recipesPacket.write(Types.STRING, recipe.group());
+                    Item[] ingredient = new Item[recipe.ingredient().length];
+                    for (int i = 0; i < ingredient.length; i++) {
+                        if (recipe.ingredient()[i] == null) continue;
+                        ingredient[i] = new DataItem(recipe.ingredient()[i]);
                     }
-                    recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(entry.getValue().getResult()));
-                    recipesPacket.write(Types.FLOAT, entry.getValue().getExperience());
-                    recipesPacket.write(Types.VAR_INT, entry.getValue().getCookingTime());
+                    recipesPacket.write(Types.ITEM1_13_ARRAY, ingredient);
+                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
+                    recipesPacket.write(Types.FLOAT, recipe.experience());
+                    recipesPacket.write(Types.VAR_INT, recipe.cookingTime());
                     break;
                 }
             }

@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-public class RecipeData {
+public final class RecipeData {
     public static Map<String, Recipe> recipes;
 
     public static void init() {
@@ -43,87 +43,7 @@ public class RecipeData {
         // Ignored
     }
 
-    public static class Recipe {
-        private String type;
-        private String group;
-        private int width;
-        private int height;
-        private float experience;
-        private int cookingTime;
-        private DataItem[] ingredient;
-        private DataItem[][] ingredients;
-        private DataItem result;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getGroup() {
-            return group;
-        }
-
-        public void setGroup(String group) {
-            this.group = group;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
-        public float getExperience() {
-            return experience;
-        }
-
-        public void setExperience(float experience) {
-            this.experience = experience;
-        }
-
-        public int getCookingTime() {
-            return cookingTime;
-        }
-
-        public void setCookingTime(int cookingTime) {
-            this.cookingTime = cookingTime;
-        }
-
-        public DataItem[] getIngredient() {
-            return ingredient;
-        }
-
-        public void setIngredient(DataItem[] ingredient) {
-            this.ingredient = ingredient;
-        }
-
-        public DataItem[][] getIngredients() {
-            return ingredients;
-        }
-
-        public void setIngredients(DataItem[][] ingredients) {
-            this.ingredients = ingredients;
-        }
-
-        public DataItem getResult() {
-            return result;
-        }
-
-        public void setResult(DataItem result) {
-            this.result = result;
-        }
+    public record Recipe(String type, String group, int width, int height, float experience, int cookingTime,
+                         DataItem[] ingredient, DataItem[][] ingredients, DataItem result) {
     }
 }
