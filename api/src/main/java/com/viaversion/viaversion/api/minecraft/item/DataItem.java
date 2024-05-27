@@ -45,10 +45,6 @@ public class DataItem implements Item {
         this.tag = tag;
     }
 
-    public DataItem(Item toCopy) {
-        this(toCopy.identifier(), (byte) toCopy.amount(), toCopy.data(), toCopy.tag());
-    }
-
     @Override
     public int identifier() {
         return identifier;
@@ -98,8 +94,8 @@ public class DataItem implements Item {
     }
 
     @Override
-    public Item copy() {
-        return new DataItem(identifier, amount, data, tag);
+    public DataItem copy() {
+        return new DataItem(identifier, amount, data, tag != null ? tag.copy() : null);
     }
 
     @Override
