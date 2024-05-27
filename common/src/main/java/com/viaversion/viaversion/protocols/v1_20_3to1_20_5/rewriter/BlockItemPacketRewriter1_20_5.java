@@ -301,7 +301,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Types.VAR_INT); // Container id
             final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final Item input = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                Item input = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM_COST, input);
 
                 final Item output = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
