@@ -23,10 +23,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -46,7 +45,6 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.Connec
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.PacketBlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.BlockIdData;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ComponentRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.MappingData1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.RecipeData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.StatisticData;
@@ -56,6 +54,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ComponentRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
@@ -787,11 +786,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         Item[] clone = new Item[ingredient.length];
                         for (int i = 0; i < ingredient.length; i++) {
                             if (clone[i] == null) continue;
-                            clone[i] = new DataItem(ingredient[i]);
+                            clone[i] = ingredient[i].copy();
                         }
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
+                    recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
                     break;
                 }
                 case "crafting_shaped": {
@@ -802,11 +801,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         Item[] clone = new Item[ingredient.length];
                         for (int i = 0; i < ingredient.length; i++) {
                             if (clone[i] == null) continue;
-                            clone[i] = new DataItem(ingredient[i]);
+                            clone[i] = ingredient[i].copy();
                         }
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
+                    recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
                     break;
                 }
                 case "smelting": {
@@ -814,10 +813,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     Item[] ingredient = new Item[recipe.ingredient().length];
                     for (int i = 0; i < ingredient.length; i++) {
                         if (recipe.ingredient()[i] == null) continue;
-                        ingredient[i] = new DataItem(recipe.ingredient()[i]);
+                        ingredient[i] = recipe.ingredient()[i].copy();
                     }
                     recipesPacket.write(Types.ITEM1_13_ARRAY, ingredient);
-                    recipesPacket.write(Types.ITEM1_13, new DataItem(recipe.result()));
+                    recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
                     recipesPacket.write(Types.FLOAT, recipe.experience());
                     recipesPacket.write(Types.VAR_INT, recipe.cookingTime());
                     break;
