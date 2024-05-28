@@ -38,6 +38,10 @@ public class DataItem implements Item {
     public DataItem() {
     }
 
+    public DataItem(int identifier, byte amount, @Nullable CompoundTag tag) {
+        this(identifier, amount, (short) 0, tag);
+    }
+
     public DataItem(int identifier, byte amount, short data, @Nullable CompoundTag tag) {
         this.identifier = identifier;
         this.amount = amount;
