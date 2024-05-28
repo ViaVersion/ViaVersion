@@ -364,6 +364,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final Item structuredItem = toStructuredItem(connection, item);
+
+        // Server can send amounts which are higher than vanilla's default, and 1.20.4 will still accept them,
+        // let's use the new added data key to emulate this behavior
+        structuredItem.structuredData().set(StructuredDataKey.MAX_STACK_SIZE, structuredItem.amount());
         return super.handleItemToClient(connection, structuredItem);
     }
 
