@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import net.lenni0451.mcstructs.text.ATextComponent;
 import net.lenni0451.mcstructs.text.Style;
@@ -37,6 +38,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Component conversion utility, trying to divert most calls to the component library to this class instead for easy replacement.
  */
 public final class ComponentUtil {
+
+    private static final int MAX_UNSIGNED_SHORT = 65535;
 
     public static JsonObject emptyJsonComponent() {
         return plainToJson("");
@@ -83,10 +86,10 @@ public final class ComponentUtil {
             return null;
         }
         return TagUtil.handleDeep(input, (key, tag) -> {
-            if (tag instanceof StringTag) {
-                final String value = ((StringTag) tag).getValue();
-                if (value.length() > Short.MAX_VALUE) {
-                    ((StringTag) tag).setValue("{}");
+            if (tag instanceof StringTag stringTag) {
+                final byte[] value = stringTag.getValue().getBytes(StandardCharsets.UTF_8);
+                if (value.length > MAX_UNSIGNED_SHORT) {
+                    stringTag.setValue("{}");
                 }
             }
             return tag;
