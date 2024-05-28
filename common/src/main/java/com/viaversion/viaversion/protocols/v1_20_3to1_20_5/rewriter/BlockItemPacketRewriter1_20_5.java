@@ -372,6 +372,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (item == null) return null;
 
         super.handleItemToServer(connection, item);
+
+        // In 1.20.6, some items have default values which are not written into the components
+        final StructuredDataContainer data = item.structuredData();
+        if (item.identifier() == 1105 && !data.contains(StructuredDataKey.FIREWORKS)) {
+            data.set(StructuredDataKey.FIREWORKS, new Fireworks(1, new FireworkExplosion[0]));
+        }
         return toOldItem(connection, item, DATA_CONVERTER);
     }
 
@@ -385,13 +391,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
         if (customData != null && tag.remove(nbtTagName()) != null) {
             return dataItem;
-        }
-
-        if (dataConverter.backupInconvertibleData()) {
-            // In 1.20.6, some items have default values which are not written into the components
-            if (item.identifier() == 1105 && !data.contains(StructuredDataKey.FIREWORKS)) {
-                data.set(StructuredDataKey.FIREWORKS, new Fireworks(1, new FireworkExplosion[0]));
-            }
         }
 
         for (final StructuredData<?> structuredData : data.data().values()) {
