@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.Types1_21;
 
 public final class EntityDataTypes1_21 extends AbstractEntityDataTypes {
 
@@ -40,7 +40,7 @@ public final class EntityDataTypes1_21 extends AbstractEntityDataTypes {
     public final EntityDataType stringType = add(4, Types.STRING);
     public final EntityDataType componentType = add(5, Types.TAG);
     public final EntityDataType optionalComponentType = add(6, Types.OPTIONAL_TAG);
-    public final EntityDataType itemType = add(7, Types1_20_5.ITEM);
+    public final EntityDataType itemType = add(7, Types1_21.ITEM);
     public final EntityDataType booleanType = add(8, Types.BOOLEAN);
     public final EntityDataType rotationsType = add(9, Types.ROTATIONS);
     public final EntityDataType blockPositionType = add(10, Types.BLOCK_POSITION1_14);
