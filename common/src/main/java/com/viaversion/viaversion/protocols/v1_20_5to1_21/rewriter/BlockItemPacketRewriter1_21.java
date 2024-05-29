@@ -69,6 +69,14 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_21.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_21.PARTICLE); // Rewrites the included sound and particles
 
+        protocol.registerClientbound(ClientboundPackets1_20_5.HORSE_SCREEN_OPEN, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+
+            // Now written as columns
+            final int size = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT, Math.max(1, (size - 1) / 3));
+        });
+
         protocol.registerClientbound(ClientboundPackets1_20_5.LEVEL_EVENT, wrapper -> {
             final int id = wrapper.passthrough(Types.INT);
             wrapper.passthrough(Types.BLOCK_POSITION1_14);

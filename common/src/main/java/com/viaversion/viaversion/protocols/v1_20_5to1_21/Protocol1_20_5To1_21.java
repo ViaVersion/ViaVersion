@@ -18,8 +18,10 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.ChatType;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
@@ -73,6 +75,40 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound1_19_3(ClientboundPackets1_20_5.SOUND_ENTITY);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
+
+        registerClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
+            wrapper.passthrough(Types.TAG); // Message
+
+            // Holder time
+            final int chatType = wrapper.read(Types.VAR_INT);
+            wrapper.write(ChatType.TYPE, Holder.of(chatType));
+        });
+        registerClientbound(ClientboundPackets1_20_5.PLAYER_CHAT, wrapper -> {
+            wrapper.passthrough(Types.UUID); // Sender
+            wrapper.passthrough(Types.VAR_INT); // Index
+            wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES); // Signature
+            wrapper.passthrough(Types.STRING); // Plain content
+            wrapper.passthrough(Types.LONG); // Timestamp
+            wrapper.passthrough(Types.LONG); // Salt
+
+            final int lastSeen = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < lastSeen; i++) {
+                final int index = wrapper.passthrough(Types.VAR_INT);
+                if (index == 0) {
+                    wrapper.passthrough(Types.SIGNATURE_BYTES);
+                }
+            }
+
+            wrapper.passthrough(Types.OPTIONAL_TAG); // Unsigned content
+
+            final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
+            if (filterMaskType == 2) {
+                wrapper.passthrough(Types.LONG_ARRAY_PRIMITIVE); // Mask
+            }
+
+            final int chatType = wrapper.read(Types.VAR_INT);
+            wrapper.write(ChatType.TYPE, Holder.of(chatType));
+        });
 
         registerClientbound(ClientboundPackets1_20_5.UPDATE_ATTRIBUTES, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
