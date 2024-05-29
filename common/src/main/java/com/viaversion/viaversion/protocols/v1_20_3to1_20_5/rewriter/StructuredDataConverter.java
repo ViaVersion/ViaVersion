@@ -216,7 +216,7 @@ public final class StructuredDataConverter {
                 tag.putString("filtered_title", data.title().filtered());
             }
         });
-        register(StructuredDataKey.BASE_COLOR, (data, tag) -> tag.putInt("Base", data));
+        register(StructuredDataKey.BASE_COLOR, (data, tag) -> getBlockEntityTag(tag).putInt("Base", data));
         register(StructuredDataKey.CHARGED_PROJECTILES, (connection, data, tag) -> convertItemList(connection, data, tag, "ChargedProjectiles"));
         register(StructuredDataKey.BUNDLE_CONTENTS, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.LODESTONE_TRACKER, (data, tag) -> {
@@ -361,11 +361,11 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.CONTAINER_LOOT, (data, tag) -> {
             final Tag lootTable = data.get("loot_table");
             if (lootTable != null) {
-                tag.put("LootTable", lootTable);
+                getBlockEntityTag(tag).put("LootTable", lootTable);
             }
             final Tag lootTableSeed = data.get("loot_table_seed");
             if (lootTableSeed != null) {
-                tag.put("LootTableSeed", lootTableSeed);
+                getBlockEntityTag(tag).put("LootTableSeed", lootTableSeed);
             }
         });
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, (data, tag) -> {
@@ -493,7 +493,7 @@ public final class StructuredDataConverter {
             }
             getBlockEntityTag(tag, "banner").put("Patterns", patternsTag);
         });
-        register(StructuredDataKey.CONTAINER, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
+        register(StructuredDataKey.CONTAINER, (connection, data, tag) -> convertItemList(connection, data, getBlockEntityTag(tag), "Items"));
         register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
         register(StructuredDataKey.CAN_BREAK, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
         register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
