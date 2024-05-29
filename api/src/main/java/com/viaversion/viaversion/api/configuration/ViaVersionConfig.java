@@ -457,4 +457,11 @@ public interface ViaVersionConfig extends Config {
      * @return the value sent to 1.19+ clients on join
      */
     boolean enforceSecureChat();
+
+    /**
+     * Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
+     *
+     * @return true if enabled
+     */
+    boolean handleInvalidItemCount();
 }
