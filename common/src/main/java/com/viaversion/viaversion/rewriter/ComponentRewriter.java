@@ -36,13 +36,15 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.util.ComponentUtil;
+import com.viaversion.viaversion.util.SerializerVersion;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles json and tag components, containing methods to override certain parts of the handling.
  * Also contains methods to register a few of the packets using components.
  */
-public class ComponentRewriter<C extends ClientboundPacketType> {
+public class ComponentRewriter<C extends ClientboundPacketType> implements com.viaversion.viaversion.api.rewriter.ComponentRewriter {
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final ReadType type;
 
@@ -249,6 +251,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
     // -----------------------------------------------------------------------
     // Tag methods
 
+    @Override
     public void processTag(final UserConnection connection, @Nullable final Tag tag) {
         if (tag == null) {
             return;
@@ -309,6 +312,48 @@ public class ComponentRewriter<C extends ClientboundPacketType> {
             if (contents != null) {
                 processTag(connection, contents.get("name"));
             }
+        } else if (action.equals("show_item")) {
+            convertLegacyContents(hoverEventTag);
+
+            final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");
+            if (contentsTag == null) {
+                return;
+            }
+
+            final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
+            if (componentsTag != null) {
+                handleShowItem(connection, componentsTag);
+            }
+        }
+    }
+
+    protected void handleShowItem(final UserConnection connection, final CompoundTag componentsTag) {
+        // To override if needed
+    }
+
+    protected SerializerVersion inputSerializerVersion() {
+        return null;
+    }
+
+    protected SerializerVersion outputSerializerVersion() {
+        return null;
+    }
+
+    private void convertLegacyContents(final CompoundTag hoverEvent) {
+        if (inputSerializerVersion() == null || outputSerializerVersion() == null) {
+            return;
+        }
+
+        final Tag valueTag = hoverEvent.remove("value");
+        if (valueTag != null) {
+            final CompoundTag tag = ComponentUtil.deserializeShowItem(valueTag, inputSerializerVersion());
+            final CompoundTag contentsTag = new CompoundTag();
+            contentsTag.put("id", tag.getStringTag("id"));
+            contentsTag.put("count", tag.getIntTag("count"));
+            if (tag.get("tag") instanceof CompoundTag) {
+                contentsTag.putString("tag", outputSerializerVersion().toSNBT(tag.getCompoundTag("tag")));
+            }
+            hoverEvent.put("contents", contentsTag);
         }
     }
 

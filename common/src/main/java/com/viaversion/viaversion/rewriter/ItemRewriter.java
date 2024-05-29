@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
@@ -28,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -381,15 +383,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerAdvancements1_20_2(C packetType) {
-        registerAdvancements1_20_2(packetType, Types.COMPONENT);
-    }
-
     public void registerAdvancements1_20_3(C packetType) {
-        registerAdvancements1_20_2(packetType, Types.TAG);
-    }
-
-    private void registerAdvancements1_20_2(C packetType, Type<?> componentType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.BOOLEAN); // Reset/clear
             int size = wrapper.passthrough(Types.VAR_INT); // Mapping size
@@ -399,8 +393,14 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    wrapper.passthrough(componentType); // Title
-                    wrapper.passthrough(componentType); // Description
+                    final Tag title = wrapper.passthrough(Types.TAG);
+                    final Tag description = wrapper.passthrough(Types.TAG);
+                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+                    if (componentRewriter != null) {
+                        componentRewriter.processTag(wrapper.user(), title);
+                        componentRewriter.processTag(wrapper.user(), description);
+                    }
+
                     handleClientboundItem(wrapper); // Icon
                     wrapper.passthrough(Types.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Types.INT); // Flags

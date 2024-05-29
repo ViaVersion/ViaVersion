@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
@@ -379,6 +380,10 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @return tag rewriter
      */
     default @Nullable TagRewriter getTagRewriter() {
+        return null;
+    }
+
+    default @Nullable ComponentRewriter getComponentRewriter() {
         return null;
     }
 
