@@ -183,7 +183,7 @@ translate-ocelot-to-cat: false
 enforce-secure-chat: false
 #
 # Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
-handle-invalid-item-count: true
+handle-invalid-item-count: false
 #
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
