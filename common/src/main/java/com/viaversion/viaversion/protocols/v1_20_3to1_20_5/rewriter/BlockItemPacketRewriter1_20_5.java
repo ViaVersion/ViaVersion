@@ -88,6 +88,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DyeColors;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.EquipmentSlots1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MaxStackSize1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MapDecorations1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
@@ -364,6 +365,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final Item structuredItem = toStructuredItem(connection, item);
+
+        if (Via.getConfig().handleInvalidItemCount()) {
+            // Server can send amounts which are higher than vanilla's default, and 1.20.4 will still accept them,
+            // let's use the new added data key to emulate this behavior
+            if (structuredItem.amount() > MaxStackSize1_20_3.getMaxStackSize(structuredItem.identifier())) {
+                structuredItem.structuredData().set(StructuredDataKey.MAX_STACK_SIZE, structuredItem.amount());
+            }
+        }
         return super.handleItemToClient(connection, structuredItem);
     }
 

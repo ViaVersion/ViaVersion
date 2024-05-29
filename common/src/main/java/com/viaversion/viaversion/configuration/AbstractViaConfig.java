@@ -90,6 +90,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean cache1_17Light;
     private boolean translateOcelotToCat;
     private boolean enforceSecureChat;
+    private boolean handleInvalidItemCount;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -159,6 +160,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         cache1_17Light = getBoolean("cache-1_17-light", true);
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
         enforceSecureChat = getBoolean("enforce-secure-chat", false);
+        handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -534,5 +536,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean enforceSecureChat() {
         return enforceSecureChat;
+    }
+
+    @Override
+    public boolean handleInvalidItemCount() {
+        return handleInvalidItemCount;
     }
 }

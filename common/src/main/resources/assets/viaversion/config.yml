@@ -182,6 +182,9 @@ translate-ocelot-to-cat: false
 # It is not recommended to fake this value if your server is running 1.19 or later, as 1.20.5 have stricter chat handling and may get kicked otherwise.
 enforce-secure-chat: false
 #
+# Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
+handle-invalid-item-count: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#
