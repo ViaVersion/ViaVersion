@@ -382,7 +382,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
-        final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), (short) 0, tag);
+        final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), tag);
         if (customData != null && tag.remove(nbtTagName()) != null) {
             return dataItem;
         }
@@ -1195,7 +1195,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final byte count = item.getByte("Count", (byte) 1);
         final CompoundTag tag = item.getCompoundTag("tag");
-        return handleItemToClient(connection, new DataItem(itemId, count, (short) 0, tag));
+        return handleItemToClient(connection, new DataItem(itemId, count, tag));
     }
 
     private void updateEnchantments(final StructuredDataContainer data, final CompoundTag tag, final String key,
