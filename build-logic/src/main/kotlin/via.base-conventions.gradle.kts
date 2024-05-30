@@ -7,7 +7,7 @@ tasks {
     // Variable replacements
     processResources {
         filesMatching(listOf("plugin.yml", "fabric.mod.json")) {
-            expand("version" to project.version, "description" to project.description)
+            expand("version" to project.version, "description" to project.description, "url" to "https://viaversion.com")
         }
     }
     javadoc {
