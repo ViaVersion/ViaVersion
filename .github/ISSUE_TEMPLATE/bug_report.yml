@@ -71,9 +71,9 @@ body:
     attributes:
       label: Additional Server Info
       description: |
-        Do you use a proxy (e.g. BungeeCord)? What software do you use and what plugins?
+        Do you use a proxy (e.g. Velocity)? What software do you use and what plugins?
       placeholder: |
-        Example: "I also use BungeeCord with the following plugins: x, y, z"
+        Example: "I also use Velocity with the following plugins: x, y, z"
     validations:
       required: false
 
@@ -82,7 +82,7 @@ body:
       label: Checklist
       description: Make sure you have followed each of the steps outlined here.
       options:
-        - label: Via plugins are only running on **EITHER** the backend servers (e.g. Paper) **OR** the proxy (e.g. BungeeCord), **not on both**.
+        - label: Via plugins are only running on **EITHER** the backend servers (e.g. Paper) **OR** the proxy (e.g. Velocity), **not on both**.
           required: true
         - label: I have included a ViaVersion dump.
           required: true
