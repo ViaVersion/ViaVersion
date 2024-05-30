@@ -61,8 +61,6 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         loaders.add("paper")
         loaders.add("folia")
         loaders.add("velocity")
-        loaders.add("bungeecord")
-        loaders.add("sponge")
         autoAddDependsOn.set(false)
         detectLoaders.set(false)
         dependencies {
@@ -86,10 +84,6 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                 velocity {
                     jar.set(tasks.shadowJar.flatMap { it.archiveFile })
                     platformVersions.set(listOf(property("velocityVersion") as String))
-                }
-                waterfall {
-                    jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                    platformVersions.set(listOf(property("waterfallVersion") as String))
                 }
             }
         }
