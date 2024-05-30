@@ -320,11 +320,11 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             int armorType = meta.value();
             Item armorItem = null;
             if (armorType == 1) {  //iron armor
-                armorItem = new DataItem(protocol.getMappingData().getNewItemId(727), (byte) 1, (short) 0, null);
+                armorItem = new DataItem(protocol.getMappingData().getNewItemId(727), (byte) 1, null);
             } else if (armorType == 2) {  //gold armor
-                armorItem = new DataItem(protocol.getMappingData().getNewItemId(728), (byte) 1, (short) 0, null);
+                armorItem = new DataItem(protocol.getMappingData().getNewItemId(728), (byte) 1, null);
             } else if (armorType == 3) {  //diamond armor
-                armorItem = new DataItem(protocol.getMappingData().getNewItemId(729), (byte) 1, (short) 0, null);
+                armorItem = new DataItem(protocol.getMappingData().getNewItemId(729), (byte) 1, null);
             }
 
             PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_14.SET_EQUIPPED_ITEM, null, event.user());

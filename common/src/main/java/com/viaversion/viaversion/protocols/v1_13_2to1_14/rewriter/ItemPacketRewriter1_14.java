@@ -222,7 +222,7 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
             resyncPacket.write(Types.VAR_INT, 5); // 4 - Mode - Drag
             CompoundTag tag = new CompoundTag();
             tag.put("force_resync", new DoubleTag(Double.NaN)); // Tags with NaN are not equal
-            resyncPacket.write(Types.ITEM1_13_2, new DataItem(1, (byte) 1, (short) 0, tag)); // 5 - Clicked Item
+            resyncPacket.write(Types.ITEM1_13_2, new DataItem(1, (byte) 1, tag)); // 5 - Clicked Item
             resyncPacket.scheduleSendToServer(Protocol1_13_2To1_14.class);
         });
 

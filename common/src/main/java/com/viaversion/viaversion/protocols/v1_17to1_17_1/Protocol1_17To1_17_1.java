@@ -80,7 +80,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
 
         registerServerbound(ServerboundPackets1_17.EDIT_BOOK, wrapper -> {
             CompoundTag tag = new CompoundTag();
-            Item item = new DataItem(942, (byte) 1, (short) 0, tag); // Magic value for writable books
+            Item item = new DataItem(942, (byte) 1, tag); // Magic value for writable books
 
             // Write the item, edit the tag down the line
             wrapper.write(Types.ITEM1_13_2, item);
