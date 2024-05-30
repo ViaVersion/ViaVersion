@@ -155,16 +155,14 @@ public final class ComponentUtil {
 
     public static String legacyToJsonString(final String message, final boolean itemData) {
         final ATextComponent component = LegacyStringDeserializer.parse(message, true);
-        if (itemData && hasStyle(component)) {
-            component.setParentStyle(new Style().setItalic(false));
+        if (itemData) {
+            TextUtils.iterateAll(component, c -> {
+                if (!c.getStyle().isEmpty()) {
+                    c.setParentStyle(new Style().setItalic(false));
+                }
+            });
         }
         return SerializerVersion.V1_12.toString(component);
-    }
-
-    public static boolean hasStyle(final ATextComponent component) {
-        final boolean[] hasStyle = {false};
-        TextUtils.iterateAll(component, c -> hasStyle[0] |= !c.getStyle().isEmpty());
-        return hasStyle[0];
     }
 
     public static String jsonToLegacy(final String value) {
