@@ -45,13 +45,13 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
@@ -100,9 +100,6 @@ public class SpongePlugin implements ViaPlatform<Player> {
 
     @Listener
     public void onServerStart(StartingEngineEvent<Server> event) {
-        // Can't use the command register event for raw commands...
-        Sponge.server().commandManager().registrar(Command.Raw.class).get().register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
-
         final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
         manager.init();
     }
@@ -111,6 +108,11 @@ public class SpongePlugin implements ViaPlatform<Player> {
     public void onServerStarted(StartedEngineEvent<Server> event) {
         final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
         manager.onServerLoaded();
+    }
+
+    @Listener
+    public void onCommandRegister(RegisterCommandEvent<Command.Raw> event) {
+        event.register(container, (Command.Raw) Via.getManager().getCommandHandler(), "viaversion", "viaver", "vvsponge");
     }
 
     @Listener
