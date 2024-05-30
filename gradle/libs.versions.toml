@@ -19,8 +19,6 @@ checkerQual = "3.43.0"
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
-bungee = "1.20-R0.3-SNAPSHOT"
-sponge = "8.0.0"
 velocity = "3.1.1"
 
 
@@ -43,8 +41,6 @@ checkerQual = { group = "org.checkerframework", name = "checker-qual", version.r
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
-bungee = { group = "net.md-5", name = "bungeecord-api", version.ref = "bungee" }
-sponge = { group = "org.spongepowered", name = "spongeapi", version.ref = "sponge" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 

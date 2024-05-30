@@ -6,10 +6,8 @@ plugins {
 dependencies {
     api(projects.viaversionCommon)
     api(projects.viaversionBukkit)
-    api(projects.viaversionBungee)
-    api(projects.viaversionFabric)
-    api(projects.viaversionSponge)
     api(projects.viaversionVelocity)
+    api(projects.viaversionFabric)
 }
 
 tasks {

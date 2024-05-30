@@ -14,10 +14,8 @@ val main = setOf(
     projects.viaversionCommon,
     projects.viaversionApi,
     projects.viaversionBukkit,
-    projects.viaversionBungee,
-    projects.viaversionFabric,
-    projects.viaversionSponge,
-    projects.viaversionVelocity
+    projects.viaversionVelocity,
+    projects.viaversionFabric
 ).map { it.dependencyProject }
 
 // val special = setOf().map { it.dependencyProject }

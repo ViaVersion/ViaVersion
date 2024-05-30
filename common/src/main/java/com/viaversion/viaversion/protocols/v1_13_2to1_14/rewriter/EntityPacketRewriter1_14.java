@@ -37,7 +37,7 @@ import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1_13, Protocol1_13_2To1_14> {
@@ -184,7 +184,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
                         PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
                         metadataPacket.write(Types.VAR_INT, entityId);
-                        List<EntityData> metadataList = new LinkedList<>();
+                        List<EntityData> metadataList = new ArrayList<>();
                         if (tracker.clientEntityId() != entityId) {
                             metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
                         }
@@ -242,7 +242,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     tracker.setSleeping(entityId, true);
 
                     BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_8);
-                    List<EntityData> metadataList = new LinkedList<>();
+                    List<EntityData> metadataList = new ArrayList<>();
                     metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, position));
                     if (tracker.clientEntityId() != entityId) {
                         metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
