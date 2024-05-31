@@ -60,4 +60,12 @@ final class HolderImpl<T> implements Holder<T> {
     public int id() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "HolderImpl{" +
+            "value=" + value +
+            ", id=" + id +
+            '}';
+    }
 }

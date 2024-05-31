@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -24,7 +25,6 @@ import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
@@ -61,6 +61,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MapDecorations1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPatternStorage;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -549,7 +550,7 @@ public final class StructuredDataConverter {
                 patternTag.putBoolean("decal", pattern.decal());
                 trimTag.put("pattern", patternTag);
             } else {
-                final String oldKey = TrimMaterials1_20_3.idToKey(data.pattern().id());
+                final String oldKey = TrimPatterns1_20_3.idToKey(data.pattern().id());
                 if (oldKey != null) {
                     trimTag.putString("pattern", oldKey);
                 }
