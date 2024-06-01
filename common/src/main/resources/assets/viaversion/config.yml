@@ -9,7 +9,7 @@
 #----------------------------------------------------------#
 #
 # Should ViaVersion check for updates?
-checkforupdates: true
+check-for-updates: true
 # Send the supported versions with the Status (Ping) response packet
 send-supported-versions: false
 # Easier to configure alternative to 'block-protocols'. Uses readable version strings with possible '<' and '>' prefixes.
@@ -23,7 +23,7 @@ block-protocols: []
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
 # If you use ProtocolLib, we can't reload without kicking the players.
 # (We don't suggest using reload either, use a plugin manager)
-# You can customise the message we kick people with if you use ProtocolLib here.
+# You can customize the message we kick people with if you use ProtocolLib here.
 reload-disconnect-msg: "Server reload, please rejoin!"
 # We warn when there's an error converting item and block data over versions, should we suppress these? (Only suggested if spamming)
 suppress-conversion-warnings: false
@@ -68,11 +68,12 @@ max-pps-kick-msg: "You are sending too many packets!"
 # Period to track (in seconds)
 # Use -1 to disable.
 tracking-period: 6
-# How many packets per second counts as a warning
+# How many packets per second count as a warning?
 tracking-warning-pps: 120
 # How many warnings over the interval can we have
-# This can never be higher than "tracking-period"
+# This can never be higher than "tracking-period"?
 tracking-max-warnings: 4
+# The kick message sent if the user hits the max packets per second.
 tracking-max-kick-msg: "You are sending too many packets, :("
 #
 #----------------------------------------------------------#
@@ -83,24 +84,24 @@ tracking-max-kick-msg: "You are sending too many packets, :("
 # You may disable this for faster startup/join time if you are 100% sure no plugin requires this.
 register-userconnections-on-join: true
 # Should we enable our hologram patch?
-# If they're in the wrong place enable this
+# If they're in the wrong place, enable this
 hologram-patch: false
 # This is the offset, should work as default when enabled.
 hologram-y: -0.96
 # Should we disable piston animation for 1.11/1.11.1 clients?
-# In some cases when firing lots of pistons it crashes them.
+# In some cases, when firing lots of pistons, it crashes them.
 piston-animation-patch: false
 # Should we fix nbt for 1.12 and above clients in chat messages (causes invalid item)
 chat-nbt-fix: true
 # Experimental - Should we fix shift quick move action for 1.12 clients (causes shift + double click not to work when moving items) (only works on 1.8-1.11.2 bukkit based servers)
 quick-move-action-fix: false
-# Should we use prefix for team colour on 1.13 and above clients
+# Should we use prefix for team color on 1.13 and above clients?
 team-colour-fix: true
 # 1.13 introduced new auto complete which can trigger "Kicked for spamming" for servers older than 1.13, the following option will disable it completely.
 disable-1_13-auto-complete: false
 # The following option will delay the tab complete request in x ticks if greater than 0, if other tab-complete is received, the previous is cancelled
 1_13-tab-complete-delay: 0
-# For 1.13 clients the smallest (1 layer) snow doesn't have collision, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
+# For 1.13 clients the smallest (1 layer) snow doesn't have collisions, this will send these as 2 snowlayers for 1.13+ clients to prevent them bugging through them
 fix-low-snow-collision: false
 # Infested blocks are instantly breakable for 1.13+ clients, resulting in them being unable to break them on sub 1.13 servers. This remaps them to their normal stone variants
 fix-infested-block-breaking: true
@@ -140,7 +141,7 @@ forced-use-1_17-resource-pack: false
 # The message to be displayed at the prompt when the 1.17+ client receives the server resource pack.
 resource-pack-1_17-prompt: ''
 #
-# Caches light until chunks are unloaded to allow subsequent chunk update packets as opposed to instantly uncaching when the first chunk data is sent.
+# Caches light until chunks are unloaded to allow later chunk update packets as opposed to instantly uncaching when the first chunk data is sent.
 # Only disable this if you know what you are doing.
 cache-1_17-light: true
 #
@@ -172,12 +173,12 @@ handle-invalid-item-count: false
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
-# When enabled if certain metadata can't be read we won't tell you about it
+# When enabled if certain metadata can't be read, we won't tell you about it
 suppress-metadata-errors: false
-# When enabled 1.9+ will be able to block by using shields
+# When enabled, 1.9+ will be able to block by using shields
 shield-blocking: true
 # If this setting is active, the main hand is used instead of the off-hand to trigger the blocking of the player.
-# With the main hand the blocking starts way faster.
+# With the main hand, the blocking starts way faster.
 # (Requires "show-shield-when-sword-in-hand" to be disabled)
 no-delay-shield-blocking: false
 # If this setting is active, the shield will appear immediately for 1.9+ when you hold a sword in your main hand.
@@ -196,9 +197,9 @@ bossbar-anti-flicker: false
 use-new-effect-indicator: true
 # Show the new death messages for 1.9+ on the death screen
 use-new-deathmessages: true
-# Should we cache our items, this will prevent server from being lagged out, however the cost is a constant task caching items
+# Should we cache our items, this will prevent the server from being lagged out, however, the cost is a constant task caching items
 item-cache: true
-# Should we replace extended pistons to fix 1.10.1 (Only on chunk load)
+# Should we replace extended pistons to fix 1.10.1 (Only on chunk loading)?
 replace-pistons: false
 # What id should we replace with, default is air. (careful of players getting stuck standing on them)
 replacement-piston-id: 0
