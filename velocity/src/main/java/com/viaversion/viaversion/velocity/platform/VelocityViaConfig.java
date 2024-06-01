@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class VelocityViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "bungee-ping-interval", "bungee-ping-save", "bungee-servers", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
+    private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
     private int velocityPingInterval;
     private boolean velocityPingSave;
     private Map<String, Integer> velocityServerProtocols;
