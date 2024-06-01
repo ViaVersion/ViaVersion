@@ -29,28 +29,6 @@ reload-disconnect-msg: "Server reload, please rejoin!"
 suppress-conversion-warnings: false
 #
 #----------------------------------------------------------#
-#                     BUNGEE OPTIONS                       #
-#----------------------------------------------------------#
-#
-# BungeeCord allows you to have different server versions inside.
-# Instead of you entering all the versions of these servers, we can ping them.
-#
-# What interval would you like us to ping at? (in seconds)
-# Use -1 to disable.
-bungee-ping-interval: 60
-# If the above is enabled, should we save the info to the config (in the section below)
-bungee-ping-save: true
-# To get a server's protocol, ViaVersion will do the following:
-# Look for the server in the following section, then look for the last ping if bungee-ping is enabled
-# otherwise use default.
-#
-# The format for the following is:
-#  servername: protocolversion
-# You can find protocol ids on https://wiki.vg/Protocol_version_numbers
-# It will use the default option if none found.
-bungee-servers: {}
-#
-#----------------------------------------------------------#
 #                    VELOCITY OPTIONS                      #
 #----------------------------------------------------------#
 #
