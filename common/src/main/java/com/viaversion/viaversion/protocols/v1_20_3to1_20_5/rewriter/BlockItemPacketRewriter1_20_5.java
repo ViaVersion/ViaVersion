@@ -120,7 +120,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.viaversion.viaversion.util.MathUtil.clamp;
 
-// 1.20.3 nbt -> 1.20.5 data component conversion
 public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<ClientboundPacket1_20_3, ServerboundPacket1_20_5, Protocol1_20_3To1_20_5> {
 
     public static final String[] MOB_TAGS = {"NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag"};
@@ -394,13 +393,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), tag);
         if (customData != null && tag.remove(nbtTagName()) != null) {
             return dataItem;
-        }
-
-        if (dataConverter.backupInconvertibleData()) {
-            // In 1.20.6, some items have default values which are not written into the components
-            if (item.identifier() == 1105 && !data.contains(StructuredDataKey.FIREWORKS)) {
-                data.set(StructuredDataKey.FIREWORKS, new Fireworks(1, new FireworkExplosion[0]));
-            }
         }
 
         for (final StructuredData<?> structuredData : data.data().values()) {
