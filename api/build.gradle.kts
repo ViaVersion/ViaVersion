@@ -34,5 +34,3 @@ dependencies {
 java {
     withJavadocJar()
 }
-
-publishShadowJar()
