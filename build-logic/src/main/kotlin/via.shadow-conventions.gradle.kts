@@ -27,6 +27,9 @@ publishing {
         groupId = rootProject.group as String
         artifactId = project.name
         version = rootProject.version as String
+
+        artifact(tasks["shadowJar"])
+        artifact(tasks["sourcesJar"])
     }
     repositories.maven {
         name = "Via"

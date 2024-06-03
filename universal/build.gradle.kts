@@ -30,8 +30,6 @@ tasks {
     }
 }
 
-publishShadowJar()
-
 val branch = rootProject.branchName()
 val baseVersion = project.version as String
 val isRelease = !baseVersion.contains('-')

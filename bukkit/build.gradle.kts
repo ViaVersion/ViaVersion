@@ -7,5 +7,3 @@ dependencies {
         exclude("javax.persistence", "persistence-api")
     }
 }
-
-publishShadowJar()

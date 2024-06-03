@@ -20,5 +20,3 @@ java {
 tasks.named<Jar>("sourcesJar") {
     from(project(":viaversion-api").sourceSets.main.get().allSource)
 }
-
-publishShadowJar()
