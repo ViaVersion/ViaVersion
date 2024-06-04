@@ -103,7 +103,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     protected void loadFields() {
-        checkForUpdates = getBoolean("checkforupdates", true);
+        checkForUpdates = getBoolean("check-for-updates", true);
         preventCollision = getBoolean("prevent-collision", true);
         useNewEffectIndicator = getBoolean("use-new-effect-indicator", true);
         useNewDeathmessages = getBoolean("use-new-deathmessages", true);
