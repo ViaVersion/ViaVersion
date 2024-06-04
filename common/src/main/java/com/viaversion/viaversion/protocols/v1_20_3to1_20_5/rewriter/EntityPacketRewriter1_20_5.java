@@ -413,6 +413,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             Types1_20_5.ENTITY_DATA_TYPES.particleType,
             null
         );
+        registerMinecartBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART);
+
         filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
         filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
 
@@ -478,11 +480,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             if (color != -1) {
                 meta.setValue(withAlpha(color));
             }
-        });
-
-        filter().type(EntityTypes1_20_5.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
-            final int blockState = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
         });
     }
 

@@ -260,6 +260,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
     protected void registerRewrites() {
         filter().mapDataType(Types1_14.ENTITY_DATA_TYPES::byId);
         registerEntityDataTypeHandler(Types1_14.ENTITY_DATA_TYPES.itemType, Types1_14.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_14.ENTITY_DATA_TYPES.particleType);
+        registerMinecartBlockStateHandler(EntityTypes1_14.ABSTRACT_MINECART, 10);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
         filter().type(EntityTypes1_14.LIVING_ENTITY).addIndex(12);
@@ -307,11 +308,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             } else if (meta.id() > 16) {
                 meta.setId(meta.id() - 1);
             }
-        });
-
-        filter().type(EntityTypes1_14.ABSTRACT_MINECART).index(10).handler((event, meta) -> {
-            int data = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
         });
 
         filter().type(EntityTypes1_14.HORSE).index(18).handler((event, meta) -> {

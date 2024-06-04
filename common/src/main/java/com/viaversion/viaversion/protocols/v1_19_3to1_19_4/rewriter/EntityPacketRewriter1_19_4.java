@@ -221,11 +221,7 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapDataType(typeId -> Types1_19_4.ENTITY_DATA_TYPES.byId(typeId >= 14 ? typeId + 1 : typeId)); // Optional block state (and map block state=14 to optional block state)
         registerEntityDataTypeHandler(Types1_19_4.ENTITY_DATA_TYPES.itemType, Types1_19_4.ENTITY_DATA_TYPES.blockStateType, Types1_19_4.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_4.ENTITY_DATA_TYPES.particleType, null);
-
-        filter().type(EntityTypes1_19_4.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
-            final int blockState = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
-        });
+        registerMinecartBlockStateHandler(EntityTypes1_19_4.ABSTRACT_MINECART);
 
         filter().type(EntityTypes1_19_4.BOAT).index(11).handler((event, meta) -> {
             final int boatType = meta.value();

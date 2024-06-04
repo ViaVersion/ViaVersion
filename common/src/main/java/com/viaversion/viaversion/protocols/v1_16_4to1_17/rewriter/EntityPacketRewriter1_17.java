@@ -144,15 +144,10 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
             }
         });
         registerEntityDataTypeHandler(Types1_17.ENTITY_DATA_TYPES.itemType, Types1_17.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_17.ENTITY_DATA_TYPES.particleType);
+        registerMinecartBlockStateHandler(EntityTypes1_17.ABSTRACT_MINECART);
 
         // Ticks frozen added with id 7
         filter().type(EntityTypes1_17.ENTITY).addIndex(7);
-
-        filter().type(EntityTypes1_17.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
-            // Convert to new block id
-            int data = (int) meta.getValue();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        });
 
         // Attachment position removed
         filter().type(EntityTypes1_17.SHULKER).removeIndex(17);

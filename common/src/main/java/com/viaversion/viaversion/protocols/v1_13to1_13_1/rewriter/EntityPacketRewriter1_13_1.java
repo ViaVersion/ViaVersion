@@ -109,10 +109,8 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
     @Override
     protected void registerRewrites() {
         registerEntityDataTypeHandler(Types1_13.ENTITY_DATA_TYPES.itemType, Types1_13.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_13.ENTITY_DATA_TYPES.particleType);
-        filter().type(EntityTypes1_13.EntityType.ABSTRACT_MINECART).index(9).handler((event, meta) -> {
-            int data = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        });
+        registerMinecartBlockStateHandler(EntityTypes1_13.EntityType.ABSTRACT_MINECART, 9);
+
         filter().type(EntityTypes1_13.EntityType.ABSTRACT_ARROW).addIndex(7); // Shooter UUID
     }
 
