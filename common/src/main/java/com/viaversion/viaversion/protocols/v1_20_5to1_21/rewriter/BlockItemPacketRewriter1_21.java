@@ -119,7 +119,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     }
 
     public static void updateItemData(final Item item) {
-        final StructuredDataContainer dataContainer = item.structuredData();
+        final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> {
             final AttributeModifiers1_21.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
@@ -143,7 +143,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     }
 
     public static void downgradeItemData(final Item item) {
-        final StructuredDataContainer dataContainer = item.structuredData();
+        final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_20_5);
         dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, attributeModifiers -> {

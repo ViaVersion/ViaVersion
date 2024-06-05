@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
@@ -153,7 +154,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected void restoreTextComponents(final Item item) {
-        final StructuredDataContainer data = item.structuredData();
+        final StructuredDataContainer data = item.dataContainer();
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             return;
@@ -171,7 +172,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected CompoundTag createCustomTag(final Item item) {
-        final StructuredDataContainer data = item.structuredData();
+        final StructuredDataContainer data = item.dataContainer();
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         if (customData != null) {
             return customData.value();
@@ -196,7 +197,6 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     @FunctionalInterface
     public interface ItemHandler {
 
-        @Nullable
-        Item rewrite(UserConnection connection, @Nullable Item item);
+        Item rewrite(UserConnection connection, Item item);
     }
 }
