@@ -115,7 +115,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
     @Override
     protected void registerRewrites() {
         registerEntityDataTypeHandler(Types1_14.ENTITY_DATA_TYPES.itemType, Types1_14.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_14.ENTITY_DATA_TYPES.particleType);
-        registerMinecartBlockStateHandler(EntityTypes1_15.ABSTRACT_MINECART, 10);
+        registerBlockStateHandler(EntityTypes1_15.ABSTRACT_MINECART, 10);
 
         filter().type(EntityTypes1_15.LIVING_ENTITY).addIndex(12);
         filter().type(EntityTypes1_15.WOLF).removeIndex(18);

@@ -174,7 +174,7 @@ public final class EntityPacketRewriter1_20_2 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapDataType(Types1_20_2.ENTITY_DATA_TYPES::byId);
         registerEntityDataTypeHandler(Types1_20_2.ENTITY_DATA_TYPES.itemType, Types1_20_2.ENTITY_DATA_TYPES.blockStateType, Types1_20_2.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_20_2.ENTITY_DATA_TYPES.particleType, null);
-        registerMinecartBlockStateHandler(EntityTypes1_19_4.ABSTRACT_MINECART);
+        registerBlockStateHandler(EntityTypes1_19_4.ABSTRACT_MINECART, 11);
 
         filter().type(EntityTypes1_19_4.DISPLAY).addIndex(10);
     }

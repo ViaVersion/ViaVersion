@@ -153,7 +153,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
     protected void registerRewrites() {
         filter().mapDataType(typeId -> Types1_19_3.ENTITY_DATA_TYPES.byId(typeId >= 2 ? typeId + 1 : typeId)); // Long added
         registerEntityDataTypeHandler(Types1_19_3.ENTITY_DATA_TYPES.itemType, Types1_19_3.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_3.ENTITY_DATA_TYPES.particleType);
-        registerMinecartBlockStateHandler(EntityTypes1_19_3.ABSTRACT_MINECART);
+        registerBlockStateHandler(EntityTypes1_19_3.ABSTRACT_MINECART, 11);
 
         filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, meta) -> {
             // Sitting pose added

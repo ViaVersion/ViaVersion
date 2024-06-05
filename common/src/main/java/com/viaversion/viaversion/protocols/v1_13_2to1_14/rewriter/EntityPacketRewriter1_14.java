@@ -260,7 +260,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
     protected void registerRewrites() {
         filter().mapDataType(Types1_14.ENTITY_DATA_TYPES::byId);
         registerEntityDataTypeHandler(Types1_14.ENTITY_DATA_TYPES.itemType, Types1_14.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_14.ENTITY_DATA_TYPES.particleType);
-        registerMinecartBlockStateHandler(EntityTypes1_14.ABSTRACT_MINECART, 10);
+        registerBlockStateHandler(EntityTypes1_14.ABSTRACT_MINECART, 10);
 
         filter().type(EntityTypes1_14.ENTITY).addIndex(6);
         filter().type(EntityTypes1_14.LIVING_ENTITY).addIndex(12);

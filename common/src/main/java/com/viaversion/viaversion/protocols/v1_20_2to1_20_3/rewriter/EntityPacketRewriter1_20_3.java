@@ -135,7 +135,7 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
             Types1_20_3.ENTITY_DATA_TYPES.optionalBlockStateType,
             Types1_20_3.ENTITY_DATA_TYPES.particleType,
             null);
-        registerMinecartBlockStateHandler(EntityTypes1_20_3.ABSTRACT_MINECART);
+        registerBlockStateHandler(EntityTypes1_20_3.ABSTRACT_MINECART, 11);
     }
 
     @Override
