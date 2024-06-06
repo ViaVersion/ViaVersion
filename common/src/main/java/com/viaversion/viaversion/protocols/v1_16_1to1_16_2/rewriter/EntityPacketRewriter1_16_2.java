@@ -78,10 +78,8 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
     @Override
     protected void registerRewrites() {
         registerEntityDataTypeHandler(Types1_16.ENTITY_DATA_TYPES.itemType, Types1_16.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_16.ENTITY_DATA_TYPES.particleType);
-        filter().type(EntityTypes1_16_2.ABSTRACT_MINECART).index(10).handler((metadatas, meta) -> {
-            int data = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        });
+        registerBlockStateHandler(EntityTypes1_16_2.ABSTRACT_MINECART, 10);
+
         filter().type(EntityTypes1_16_2.ABSTRACT_PIGLIN).handler((metadatas, meta) -> {
             if (meta.id() == 15) {
                 meta.setId(16);

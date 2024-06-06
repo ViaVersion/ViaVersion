@@ -223,6 +223,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         });
     }
 
+    public void registerBlockStateHandler(final EntityType entityType, final int index) {
+        filter().type(entityType).index(index).handler((event, meta) -> {
+            final int data = (int) meta.getValue();
+            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        });
+    }
+
     public void registerTracker(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override

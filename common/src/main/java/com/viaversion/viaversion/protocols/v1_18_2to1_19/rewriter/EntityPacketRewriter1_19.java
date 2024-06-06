@@ -335,12 +335,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
         });
 
         registerEntityDataTypeHandler(Types1_19.ENTITY_DATA_TYPES.itemType, Types1_19.ENTITY_DATA_TYPES.optionalBlockStateType, null);
-
-        filter().type(EntityTypes1_19.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
-            // Convert to new block id
-            final int data = (int) meta.getValue();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
-        });
+        registerBlockStateHandler(EntityTypes1_19.ABSTRACT_MINECART, 11);
 
         filter().type(EntityTypes1_19.CAT).index(19).mapDataType(typeId -> Types1_19.ENTITY_DATA_TYPES.catVariantType);
     }
