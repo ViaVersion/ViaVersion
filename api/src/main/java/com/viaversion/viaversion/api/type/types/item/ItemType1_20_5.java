@@ -82,7 +82,7 @@ public class ItemType1_20_5 extends Type<Item> {
 
     @Override
     public void write(final ByteBuf buffer, @Nullable final Item object) {
-        if (object == null) {
+        if (object == null || object.identifier() == 0 || object.amount() <= 0) {
             Types.VAR_INT.writePrimitive(buffer, 0);
             return;
         }
