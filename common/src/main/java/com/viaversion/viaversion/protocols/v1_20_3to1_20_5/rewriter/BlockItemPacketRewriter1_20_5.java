@@ -307,7 +307,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final Item output = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, output);
 
-                final Item secondInput = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                Item secondInput = wrapper.read(Types.ITEM1_20_2);
+                if (secondInput != null) {
+                    secondInput = handleItemToClient(wrapper.user(), secondInput);
+                    if (secondInput.isEmpty()) {
+                        secondInput = null;
+                    }
+                }
                 wrapper.write(Types1_20_5.OPTIONAL_ITEM_COST, secondInput);
 
                 wrapper.passthrough(Types.BOOLEAN); // Out of stock
