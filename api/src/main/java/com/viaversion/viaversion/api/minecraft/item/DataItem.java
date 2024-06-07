@@ -93,7 +93,7 @@ public class DataItem implements Item {
     }
 
     @Override
-    public StructuredDataContainer structuredData() {
+    public StructuredDataContainer dataContainer() {
         throw new UnsupportedOperationException();
     }
 

@@ -54,7 +54,7 @@ public final class ItemCostType1_20_5 extends Type<Item> {
     public void write(final ByteBuf buffer, final Item object) {
         Types.VAR_INT.writePrimitive(buffer, object.identifier());
         Types.VAR_INT.writePrimitive(buffer, object.amount());
-        dataArrayType.write(buffer, object.structuredData().data().values().toArray(EMPTY_DATA_ARRAY));
+        dataArrayType.write(buffer, object.dataContainer().data().values().toArray(EMPTY_DATA_ARRAY));
     }
 
     public static final class OptionalItemCostType extends OptionalType<Item> {

@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
@@ -38,9 +37,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     @Override
-    public @Nullable Item handleItemToClient(UserConnection connection, @Nullable Item item) {
-        if (item == null) {
-            return null;
+    public Item handleItemToClient(UserConnection connection, Item item) {
+        if (item.isEmpty()) {
+            return item;
         }
 
         final MappingData mappingData = protocol.getMappingData();
@@ -49,16 +48,16 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.setIdentifier(mappingData.getNewItemId(item.identifier()));
             }
             if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.structuredData().setIdLookup(protocol, true);
+                item.dataContainer().setIdLookup(protocol, true);
             }
         }
         return item;
     }
 
     @Override
-    public @Nullable Item handleItemToServer(UserConnection connection, @Nullable Item item) {
-        if (item == null) {
-            return null;
+    public Item handleItemToServer(UserConnection connection, Item item) {
+        if (item.isEmpty()) {
+            return item;
         }
 
         final MappingData mappingData = protocol.getMappingData();
@@ -67,7 +66,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
                 item.setIdentifier(mappingData.getOldItemId(item.identifier()));
             }
             if (mappingData.getDataComponentSerializerMappings() != null) {
-                item.structuredData().setIdLookup(protocol, false);
+                item.dataContainer().setIdLookup(protocol, false);
             }
         }
         return item;

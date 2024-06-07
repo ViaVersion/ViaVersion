@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemType1_20_5 extends Type<Item> {
 
@@ -45,10 +44,10 @@ public class ItemType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public @Nullable Item read(final ByteBuf buffer) {
+    public Item read(final ByteBuf buffer) {
         final int amount = Types.VAR_INT.readPrimitive(buffer);
         if (amount <= 0) {
-            return null;
+            return StructuredItem.empty();
         }
 
         final int id = Types.VAR_INT.readPrimitive(buffer);
@@ -81,8 +80,8 @@ public class ItemType1_20_5 extends Type<Item> {
     }
 
     @Override
-    public void write(final ByteBuf buffer, @Nullable final Item object) {
-        if (object == null || object.isEmpty()) {
+    public void write(final ByteBuf buffer, final Item object) {
+        if (object.isEmpty()) {
             Types.VAR_INT.writePrimitive(buffer, 0);
             return;
         }
@@ -90,7 +89,7 @@ public class ItemType1_20_5 extends Type<Item> {
         Types.VAR_INT.writePrimitive(buffer, object.amount());
         Types.VAR_INT.writePrimitive(buffer, object.identifier());
 
-        final Map<StructuredDataKey<?>, StructuredData<?>> data = object.structuredData().data();
+        final Map<StructuredDataKey<?>, StructuredData<?>> data = object.dataContainer().data();
         int valuesSize = 0;
         int markersSize = 0;
         for (final StructuredData<?> value : data.values()) {

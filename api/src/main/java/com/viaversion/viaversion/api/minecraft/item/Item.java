@@ -90,7 +90,12 @@ public interface Item {
      */
     void setTag(@Nullable CompoundTag tag);
 
-    StructuredDataContainer structuredData();
+    /**
+     * Returns the data container for item data components.
+     *
+     * @return the data container
+     */
+    StructuredDataContainer dataContainer();
 
     /**
      * Returns a copy of the item.

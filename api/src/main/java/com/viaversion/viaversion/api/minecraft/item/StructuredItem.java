@@ -41,6 +41,11 @@ public class StructuredItem implements Item {
         this.data = data;
     }
 
+    public static StructuredItem empty() {
+        // Data is mutable, create a new item
+        return new StructuredItem(0, 0);
+    }
+
     @Override
     public int identifier() {
         return identifier;
@@ -72,7 +77,7 @@ public class StructuredItem implements Item {
     }
 
     @Override
-    public StructuredDataContainer structuredData() {
+    public StructuredDataContainer dataContainer() {
         return data;
     }
 

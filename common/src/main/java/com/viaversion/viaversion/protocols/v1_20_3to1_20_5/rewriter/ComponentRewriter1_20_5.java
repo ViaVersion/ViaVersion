@@ -243,7 +243,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 contentsTag.putString("id", "minecraft:stone");
             }
 
-            final Map<StructuredDataKey<?>, StructuredData<?>> data = structuredItem.structuredData().data();
+            final Map<StructuredDataKey<?>, StructuredData<?>> data = structuredItem.dataContainer().data();
             if (!data.isEmpty()) {
                 final CompoundTag components;
                 try {
@@ -971,7 +971,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         } catch (IllegalArgumentException ignored) { // Fallback value
             tag.putInt("count", 1);
         }
-        final Map<StructuredDataKey<?>, StructuredData<?>> components = item.structuredData().data();
+        final Map<StructuredDataKey<?>, StructuredData<?>> components = item.dataContainer().data();
         tag.put("components", toTag(components, true));
     }
 

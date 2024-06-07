@@ -88,9 +88,9 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DyeColors;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.EquipmentSlots1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MaxStackSize1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MapDecorations1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MaxStackSize1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
@@ -197,7 +197,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     wrapper.passthrough(Types.TAG); // Title
                     wrapper.passthrough(Types.TAG); // Description
 
-                    Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(itemType()));
+                    Item item = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(itemType()));
                     wrapper.write(mappedItemType(), item);
 
                     wrapper.passthrough(Types.VAR_INT); // Frame type
@@ -247,7 +247,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 final int blockStateId = wrapper.read(Types.VAR_INT);
                 particle.add(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockStateId));
             } else if (mappings.isItemParticle(particleId)) {
-                final Item item = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                final Item item = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 particle.add(Types1_20_5.ITEM, item);
             } else if (particleId == mappings.id("dust")) {
                 // R, g, b, scale
@@ -301,10 +301,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Types.VAR_INT); // Container id
             final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                Item input = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                Item input = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM_COST, input);
 
-                final Item output = handleNonNullItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                final Item output = handleNonEmptyItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, output);
 
                 final Item secondInput = handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
@@ -323,12 +323,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol) {
             @Override
             protected Item rewrite(final UserConnection connection, @Nullable Item item) {
-                item = super.rewrite(connection, item);
-                if (item == null || item.isEmpty()) {
-                    // Does not allow empty items
-                    return new StructuredItem(1, 1);
-                }
-                return item;
+                return handleNonEmptyItemToClient(connection, item);
             }
         };
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_RECIPES, wrapper -> {
@@ -344,18 +339,21 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         });
     }
 
-    public Item handleNonNullItemToClient(final UserConnection connection, @Nullable Item item) {
+    public Item handleNonEmptyItemToClient(final UserConnection connection, @Nullable Item item) {
         item = handleItemToClient(connection, item);
         // Items are no longer nullable in a few places
-        if (item == null || item.isEmpty()) {
+        if (item.isEmpty()) {
             return new StructuredItem(1, 1);
         }
         return item;
     }
 
     @Override
-    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
-        if (item == null) return null;
+    public Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
+        if (item == null) {
+            // We no longer want null items, always unify them to empty
+            return StructuredItem.empty();
+        }
 
         // Add the original as custom data, to be re-used for creative clients as well
         final CompoundTag tag = item.tag();
@@ -369,15 +367,18 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             // Server can send amounts which are higher than vanilla's default, and 1.20.4 will still accept them,
             // let's use the new added data key to emulate this behavior
             if (structuredItem.amount() > MaxStackSize1_20_3.getMaxStackSize(structuredItem.identifier())) {
-                structuredItem.structuredData().set(StructuredDataKey.MAX_STACK_SIZE, structuredItem.amount());
+                structuredItem.dataContainer().set(StructuredDataKey.MAX_STACK_SIZE, structuredItem.amount());
             }
         }
         return super.handleItemToClient(connection, structuredItem);
     }
 
     @Override
-    public @Nullable Item handleItemToServer(UserConnection connection, @Nullable final Item item) {
-        if (item == null) return null;
+    public @Nullable Item handleItemToServer(UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            // Empty to null for the old protocols
+            return null;
+        }
 
         super.handleItemToServer(connection, item);
         return toOldItem(connection, item, DATA_CONVERTER);
@@ -385,7 +386,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
     public Item toOldItem(final UserConnection connection, final Item item, final StructuredDataConverter dataConverter) {
         // Start out with custom data and add the rest on top, or short-curcuit with the original item
-        final StructuredDataContainer data = item.structuredData();
+        final StructuredDataContainer data = item.dataContainer();
         data.setIdLookup(protocol, true);
 
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
@@ -405,7 +406,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     public Item toStructuredItem(final UserConnection connection, final Item old) {
         final CompoundTag tag = old.tag();
         final StructuredItem item = new StructuredItem(old.identifier(), (byte) old.amount(), new StructuredDataContainer());
-        final StructuredDataContainer data = item.structuredData();
+        final StructuredDataContainer data = item.dataContainer();
         data.setIdLookup(protocol, true);
 
         if (tag == null) {
@@ -453,7 +454,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (blockEntityTag != null) {
             final CompoundTag clonedTag = blockEntityTag.copy();
             updateBlockEntityTag(connection, data, clonedTag);
-            item.structuredData().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
+            item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
         }
 
         final CompoundTag debugProperty = tag.getCompoundTag("DebugProperty");
@@ -1176,14 +1177,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final Item[] items = itemsTag.stream()
                 .limit(256)
                 .map(item -> itemFromTag(connection, item))
-                .filter(Objects::nonNull)
                 .filter(item -> allowEmpty || !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
         }
     }
 
-    private @Nullable Item itemFromTag(final UserConnection connection, final CompoundTag item) {
+    private Item itemFromTag(final UserConnection connection, final CompoundTag item) {
         final String id = item.getString("id");
         if (id == null) {
             return null;

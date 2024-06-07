@@ -709,16 +709,12 @@ public final class StructuredDataConverter {
 
     // Check if item name could be mapped, if not, locate original/backup item id and use it
     static int removeItemBackupTag(final CompoundTag tag, final int unmappedId) {
-        if (unmappedId != -1) {
-            return unmappedId;
-        }
-
         final IntTag itemBackupTag = tag.getIntTag(ITEM_BACKUP_TAG_KEY);
         if (itemBackupTag != null) {
             tag.remove(ITEM_BACKUP_TAG_KEY);
             return itemBackupTag.asInt();
         }
-        return -1;
+        return unmappedId;
     }
 
     private void convertBlockPredicates(final CompoundTag tag, final AdventureModePredicate data, final String key, final int hideFlag) {
@@ -808,7 +804,7 @@ public final class StructuredDataConverter {
                 savedItem.putByte("Count", (byte) item.amount());
 
                 final CompoundTag itemTag = new CompoundTag();
-                for (final StructuredData<?> data : item.structuredData().data().values()) {
+                for (final StructuredData<?> data : item.dataContainer().data().values()) {
                     writeToTag(connection, data, itemTag);
                 }
                 savedItem.put("tag", itemTag);
