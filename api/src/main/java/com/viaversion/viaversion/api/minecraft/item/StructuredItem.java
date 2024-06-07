@@ -46,6 +46,14 @@ public class StructuredItem implements Item {
         return new StructuredItem(0, 0);
     }
 
+    public static StructuredItem[] emptyArray(final int size) {
+        final StructuredItem[] items = new StructuredItem[size];
+        for (int i = 0; i < items.length; i++) {
+            items[i] = empty();
+        }
+        return items;
+    }
+
     @Override
     public int identifier() {
         return identifier;
