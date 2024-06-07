@@ -28,8 +28,8 @@ import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -46,6 +46,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -481,6 +482,18 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 meta.setValue(withAlpha(color));
             }
         });
+
+        final EntityDataHandler emptyItemHandler = (event, data) -> {
+            final Item item = data.value();
+            if (item == null || item.isEmpty()) {
+                // The item is used for particles or projectile display and can no longer be empty
+                event.cancel();
+            }
+        };
+        filter().type(EntityTypes1_20_5.EGG).index(8).handler(emptyItemHandler);
+        filter().type(EntityTypes1_20_5.SNOWBALL).index(8).handler(emptyItemHandler);
+        filter().type(EntityTypes1_20_5.ENDER_PEARL).index(8).handler(emptyItemHandler);
+        filter().type(EntityTypes1_20_5.EXPERIENCE_BOTTLE).index(8).handler(emptyItemHandler);
     }
 
     private void addColor(@Nullable final EntityData particleMeta, final int color) {
