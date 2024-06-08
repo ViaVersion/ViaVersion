@@ -143,7 +143,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             Types1_21.ENTITY_DATA_TYPES.blockStateType,
             Types1_21.ENTITY_DATA_TYPES.optionalBlockStateType,
             Types1_21.ENTITY_DATA_TYPES.particleType,
-            Types1_21.ENTITY_DATA_TYPES.particlesType
+            Types1_21.ENTITY_DATA_TYPES.particlesType,
+            Types1_21.ENTITY_DATA_TYPES.componentType,
+            Types1_21.ENTITY_DATA_TYPES.optionalComponentType
         );
 
         filter().type(EntityTypes1_20_5.ABSTRACT_MINECART).index(11).handler((event, meta) -> {

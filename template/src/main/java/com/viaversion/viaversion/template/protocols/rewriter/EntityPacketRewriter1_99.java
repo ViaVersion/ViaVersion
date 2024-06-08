@@ -95,7 +95,9 @@ public final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPa
             Types1_20_5.ENTITY_DATA_TYPES.blockStateType,
             Types1_20_5.ENTITY_DATA_TYPES.optionalBlockStateType,
             Types1_20_5.ENTITY_DATA_TYPES.particleType,
-            Types1_20_5.ENTITY_DATA_TYPES.particlesType
+            Types1_20_5.ENTITY_DATA_TYPES.particlesType,
+            Types1_20_5.ENTITY_DATA_TYPES.componentType,
+            Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType
         );
         // Minecarts are special
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);

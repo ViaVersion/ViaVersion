@@ -412,12 +412,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             Types1_20_5.ENTITY_DATA_TYPES.blockStateType,
             Types1_20_5.ENTITY_DATA_TYPES.optionalBlockStateType,
             Types1_20_5.ENTITY_DATA_TYPES.particleType,
-            null
+            null,
+            Types1_20_5.ENTITY_DATA_TYPES.componentType,
+            Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
-
-        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
-        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
 
         filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();

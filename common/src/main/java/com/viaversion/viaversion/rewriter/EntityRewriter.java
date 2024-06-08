@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Int2IntMapMappings;
@@ -32,9 +33,9 @@ import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -191,6 +192,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerEntityDataTypeHandler(itemType, null, blockStateType, particleType, null);
     }
 
+    public void registerEntityDataTypeHandler(@Nullable EntityDataType itemType, @Nullable EntityDataType blockStateType, @Nullable EntityDataType optionalBlockStateType, @Nullable EntityDataType particleType, @Nullable EntityDataType particlesType) {
+        registerEntityDataTypeHandler(itemType, blockStateType, optionalBlockStateType, particleType, particlesType, null, null);
+    }
+
     /**
      * Registers an entity data handler to rewrite, item, block, and particle ids stored in entity data.
      *
@@ -199,8 +204,12 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
      * @param optionalBlockStateType optional block state data type if needed
      * @param particleType           particle data type if needed
      * @param particlesType          particles data type if needed
+     * @param componentType          component data type if needed
+     * @param optionalComponentType  optional component data type if needed
      */
-    public void registerEntityDataTypeHandler(@Nullable EntityDataType itemType, @Nullable EntityDataType blockStateType, @Nullable EntityDataType optionalBlockStateType, @Nullable EntityDataType particleType, @Nullable EntityDataType particlesType) {
+    public void registerEntityDataTypeHandler(@Nullable EntityDataType itemType, @Nullable EntityDataType blockStateType, @Nullable EntityDataType optionalBlockStateType,
+                                              @Nullable EntityDataType particleType, @Nullable EntityDataType particlesType,
+                                              @Nullable EntityDataType componentType, @Nullable EntityDataType optionalComponentType) {
         filter().handler((event, data) -> {
             final EntityDataType type = data.dataType();
             if (type == itemType) {
@@ -220,6 +229,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 for (final Particle particle : particles) {
                     rewriteParticle(event.user(), particle);
                 }
+            } else if (type == componentType || type == optionalComponentType) {
+                final Tag component = data.value();
+                protocol.getComponentRewriter().processTag(event.user(), component);
             }
         });
     }

@@ -38,7 +38,6 @@ import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_20_5To1_21> {
 
@@ -108,9 +107,9 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     }
 
     @Override
-    public @Nullable Item handleItemToClient(final UserConnection connection, @Nullable final Item item) {
-        if (item == null) {
-            return null;
+    public Item handleItemToClient(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
         }
 
         super.handleItemToClient(connection, item);
@@ -132,9 +131,9 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     }
 
     @Override
-    public @Nullable Item handleItemToServer(final UserConnection connection, @Nullable final Item item) {
-        if (item == null) {
-            return null;
+    public Item handleItemToServer(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
         }
 
         super.handleItemToServer(connection, item);
