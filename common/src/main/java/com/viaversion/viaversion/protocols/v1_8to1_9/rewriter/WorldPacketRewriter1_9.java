@@ -44,6 +44,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.HandItemProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -293,7 +294,7 @@ public class WorldPacketRewriter1_9 {
             wrapper.write(Types.BLOCK_POSITION1_8, new BlockPosition(-1, -1, -1));
             wrapper.write(Types.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
-            Item item = Protocol1_8To1_9.getHandItem(wrapper.user());
+            Item item = Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(wrapper.user());
             // Blocking patch
             if (Via.getConfig().isShieldBlocking()) {
                 EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
@@ -350,7 +351,7 @@ public class WorldPacketRewriter1_9 {
                     if (hand != 0) wrapper.cancel();
                 });
                 handler(wrapper -> {
-                    Item item = Protocol1_8To1_9.getHandItem(wrapper.user());
+                    Item item = Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(wrapper.user());
                     wrapper.write(Types.ITEM1_8, item); // 3 - Item
                 });
                 map(Types.UNSIGNED_BYTE); // 4 - X
