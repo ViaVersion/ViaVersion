@@ -419,14 +419,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.componentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
         filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.optionalComponentType).handler((event, meta) -> protocol.getComponentRewriter().processTag(event.user(), meta.value()));
 
-        filter().dataType(Types1_20_5.ENTITY_DATA_TYPES.itemType).handler((event, meta) -> {
-            final Item item = meta.value();
-            if (item != null && item.amount() <= 0) {
-                // No longer accepted by the client, needs to be properly empty
-                meta.setValue(null);
-            }
-        });
-
         filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, meta) -> {
             final int effectColor = meta.value();
             if (effectColor == 0) {
