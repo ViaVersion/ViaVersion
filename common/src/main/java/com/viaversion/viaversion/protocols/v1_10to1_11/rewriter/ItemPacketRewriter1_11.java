@@ -17,6 +17,8 @@
  */
 package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
 
+import com.viaversion.nbt.tag.ByteTag;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -74,14 +76,30 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
 
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
+        if (item != null && item.amount() <= 0) {
+            CompoundTag tag = item.tag();
+            if (tag == null) {
+                item.setTag(tag = new CompoundTag());
+            }
+            tag.putByte(nbtTagName(), (byte) item.amount());
+            item.setAmount(1);
+        }
         EntityMappings1_11.toClientItem(item);
         return item;
     }
 
     @Override
     public Item handleItemToServer(UserConnection connection, Item item) {
+        if (item == null) {
+            return null;
+        }
+        if (item.tag() != null && item.tag().contains(nbtTagName())) {
+            item.setAmount(item.tag().<ByteTag>removeUnchecked(nbtTagName()).asByte());
+            if (item.tag().isEmpty()) {
+                item.setTag(null);
+            }
+        }
         EntityMappings1_11.toServerItem(item);
-        if (item == null) return null;
         boolean newItem = item.identifier() >= 218 && item.identifier() <= 234;
         newItem |= item.identifier() == 449 || item.identifier() == 450;
         if (newItem) { // Replace server-side unknown items
