@@ -18,12 +18,13 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.provider;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.Provider;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class HandItemProvider implements Provider {
-    public Item getHandItem(final UserConnection info) {
-        return new DataItem(0, (byte) 0, (short) 0, null);
+
+    public @Nullable Item getHandItem(final UserConnection connection) {
+        return null;
     }
 }
