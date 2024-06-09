@@ -144,7 +144,6 @@ public class EntityMappings1_11 {
         if (hasEntityTag(item)) {
             toClient(item.tag().getCompoundTag("EntityTag"), backwards);
         }
-        if (item != null && item.amount() <= 0) item.setAmount(1);
     }
 
     public static void toServerItem(Item item) {
