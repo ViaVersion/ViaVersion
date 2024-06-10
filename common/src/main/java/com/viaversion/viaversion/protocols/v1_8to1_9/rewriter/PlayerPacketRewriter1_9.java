@@ -271,43 +271,6 @@ public class PlayerPacketRewriter1_9 {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.CUSTOM_PAYLOAD, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.STRING); // 0 - Channel Name
-                handlerSoftFail(wrapper -> {
-                    String name = wrapper.get(Types.STRING, 0);
-                    if (name.equals("MC|BOpen")) {
-                        wrapper.write(Types.VAR_INT, 0);
-                    } else if (name.equals("MC|TrList")) {
-                        wrapper.passthrough(Types.INT); // ID
-
-                        Short size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-
-                        for (int i = 0; i < size; ++i) {
-                            Item item1 = wrapper.passthrough(Types.ITEM1_8);
-                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item1);
-
-                            Item item2 = wrapper.passthrough(Types.ITEM1_8);
-                            protocol.getItemRewriter().handleItemToClient(wrapper.user(), item2);
-
-                            boolean present = wrapper.passthrough(Types.BOOLEAN);
-
-                            if (present) {
-                                Item item3 = wrapper.passthrough(Types.ITEM1_8);
-                                protocol.getItemRewriter().handleItemToClient(wrapper.user(), item3);
-                            }
-
-                            wrapper.passthrough(Types.BOOLEAN);
-
-                            wrapper.passthrough(Types.INT);
-                            wrapper.passthrough(Types.INT);
-                        }
-                    }
-                });
-            }
-        });
-
         protocol.registerClientbound(ClientboundPackets1_8.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {

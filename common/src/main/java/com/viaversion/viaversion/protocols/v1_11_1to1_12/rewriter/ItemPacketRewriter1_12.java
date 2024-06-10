@@ -40,36 +40,7 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
         registerSetSlot(ClientboundPackets1_9_3.CONTAINER_SET_SLOT);
         registerSetContent(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
         registerSetEquippedItem(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
-
-        // Plugin message -> Trading
-        protocol.registerClientbound(ClientboundPackets1_9_3.CUSTOM_PAYLOAD, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.STRING); // 0 - Channel
-
-                handlerSoftFail(wrapper -> {
-                    if (wrapper.get(Types.STRING, 0).equals("MC|TrList")) {
-                        wrapper.passthrough(Types.INT); // Passthrough Window ID
-
-                        int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-                        for (int i = 0; i < size; i++) {
-                            handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Input Item
-                            handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Output Item
-
-                            boolean secondItem = wrapper.passthrough(Types.BOOLEAN); // Has second item
-                            if (secondItem) {
-                                handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_8)); // Second Item
-                            }
-
-                            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
-                            wrapper.passthrough(Types.INT); // Number of tools uses
-                            wrapper.passthrough(Types.INT); // Maximum number of trade uses
-                        }
-                    }
-                });
-            }
-        });
-
+        registerMerchantOffers(ClientboundPackets1_9_3.CUSTOM_PAYLOAD);
 
         protocol.registerServerbound(ServerboundPackets1_12.CONTAINER_CLICK, new PacketHandlers() {
                 @Override
