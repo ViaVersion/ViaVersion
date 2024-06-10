@@ -240,17 +240,18 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             @Override
             protected void register() {
                 map(Types.STRING); // 0 - Channel
-                handlerSoftFail(merchantOffersRewriter());
+                handlerSoftFail(wrapper -> {
+                    final String channel = wrapper.get(Types.STRING, 0);
+                    if (channel.equals("MC|TrList")) {
+                        merchantOffersRewriter().handle(wrapper);
+                    }
+                });
             }
         });
     }
 
     public PacketHandler merchantOffersRewriter() {
         return wrapper -> {
-            final String channel = wrapper.get(Types.STRING, 0);
-            if (!channel.equals("MC|TrList")) {
-                return;
-            }
             wrapper.passthrough(Types.INT); // Window ID
 
             final int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
