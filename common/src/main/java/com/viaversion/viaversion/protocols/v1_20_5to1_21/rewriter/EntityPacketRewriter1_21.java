@@ -147,11 +147,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             Types1_21.ENTITY_DATA_TYPES.componentType,
             Types1_21.ENTITY_DATA_TYPES.optionalComponentType
         );
-
-        filter().type(EntityTypes1_20_5.ABSTRACT_MINECART).index(11).handler((event, meta) -> {
-            final int blockState = meta.value();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(blockState));
-        });
+        registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
     }
 
     @Override
