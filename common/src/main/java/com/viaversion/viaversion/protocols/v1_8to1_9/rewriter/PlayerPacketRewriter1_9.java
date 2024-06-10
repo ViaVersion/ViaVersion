@@ -271,6 +271,21 @@ public class PlayerPacketRewriter1_9 {
             }
         });
 
+        protocol.registerClientbound(ClientboundPackets1_8.CUSTOM_PAYLOAD, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.STRING); // 0 - Channel Name
+                handlerSoftFail(wrapper -> {
+                    final String name = wrapper.get(Types.STRING, 0);
+                    if (name.equals("MC|BOpen")) {
+                        wrapper.write(Types.VAR_INT, 0);
+                    } else if (name.equals("MC|TrList")) {
+                        protocol.getItemRewriter().merchantOffersRewriter().handle(wrapper);
+                    }
+                });
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_8.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {

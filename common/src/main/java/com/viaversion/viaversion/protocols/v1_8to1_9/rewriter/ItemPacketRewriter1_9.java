@@ -48,8 +48,6 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
     @Override
     protected void registerPackets() {
-        registerMerchantOffers(ClientboundPackets1_8.CUSTOM_PAYLOAD);
-
         protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_DATA, new PacketHandlers() {
 
             @Override
