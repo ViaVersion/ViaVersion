@@ -51,7 +51,7 @@ import java.util.Optional;
 public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_12_2To1_13> {
 
     public ItemPacketRewriter1_13(Protocol1_12_2To1_13 protocol) {
-        super(protocol, null, null);
+        super(protocol, Types.ITEM1_8, null, Types.ITEM1_13, null);
     }
 
     @Override
@@ -136,31 +136,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         return;
                     } else if (channel.equals("MC|TrList")) {
                         channel = "minecraft:trader_list";
-                        wrapper.passthrough(Types.INT); // Passthrough Window ID
-
-                        int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-                        for (int i = 0; i < size; i++) {
-                            // Input Item
-                            Item input = wrapper.read(Types.ITEM1_8);
-                            handleItemToClient(wrapper.user(), input);
-                            wrapper.write(Types.ITEM1_13, input);
-                            // Output Item
-                            Item output = wrapper.read(Types.ITEM1_8);
-                            handleItemToClient(wrapper.user(), output);
-                            wrapper.write(Types.ITEM1_13, output);
-
-                            boolean secondItem = wrapper.passthrough(Types.BOOLEAN); // Has second item
-                            if (secondItem) {
-                                // Second Item
-                                Item second = wrapper.read(Types.ITEM1_8);
-                                handleItemToClient(wrapper.user(), second);
-                                wrapper.write(Types.ITEM1_13, second);
-                            }
-
-                            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
-                            wrapper.passthrough(Types.INT); // Number of tools uses
-                            wrapper.passthrough(Types.INT); // Maximum number of trade uses
-                        }
+                        handleTradeList(wrapper);
                     } else {
                         String old = channel;
                         channel = getNewPluginChannelId(channel);

@@ -43,7 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, ServerboundPackets1_9, Protocol1_8To1_9> {
 
     public ItemPacketRewriter1_9(final Protocol1_8To1_9 protocol) {
-        super(protocol, null, null);
+        super(protocol, Types.ITEM1_8, null);
     }
 
     @Override
