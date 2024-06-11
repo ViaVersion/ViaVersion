@@ -34,7 +34,7 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
     public void registerPackets() {
         registerCooldown(ClientboundPackets1_16.COOLDOWN);
         registerSetContent(ClientboundPackets1_16.CONTAINER_SET_CONTENT);
-        registerMerchantOffers1_15(ClientboundPackets1_16.MERCHANT_OFFERS);
+        registerMerchantOffers(ClientboundPackets1_16.MERCHANT_OFFERS);
         registerSetSlot(ClientboundPackets1_16.CONTAINER_SET_SLOT);
         registerSetEquipment(ClientboundPackets1_16.SET_EQUIPMENT);
         registerAdvancements(ClientboundPackets1_16.UPDATE_ADVANCEMENTS);

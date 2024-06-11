@@ -270,7 +270,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
 
     // 1.14.4+
-    public void registerMerchantOffers1_15(C packetType) {
+    public void registerMerchantOffers(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT);
             int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
