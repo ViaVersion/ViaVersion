@@ -40,7 +40,7 @@ public class ItemPacketRewriter1_12 extends ItemRewriter<ClientboundPackets1_9_3
         registerSetSlot(ClientboundPackets1_9_3.CONTAINER_SET_SLOT);
         registerSetContent(ClientboundPackets1_9_3.CONTAINER_SET_CONTENT);
         registerSetEquippedItem(ClientboundPackets1_9_3.SET_EQUIPPED_ITEM);
-        registerMerchantOffers(ClientboundPackets1_9_3.CUSTOM_PAYLOAD);
+        registerCustomPayloadTradeList(ClientboundPackets1_9_3.CUSTOM_PAYLOAD);
 
         protocol.registerServerbound(ServerboundPackets1_12.CONTAINER_CLICK, new PacketHandlers() {
                 @Override

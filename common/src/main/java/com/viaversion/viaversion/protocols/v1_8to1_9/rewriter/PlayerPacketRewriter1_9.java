@@ -280,7 +280,7 @@ public class PlayerPacketRewriter1_9 {
                     if (name.equals("MC|BOpen")) {
                         wrapper.write(Types.VAR_INT, 0);
                     } else if (name.equals("MC|TrList")) {
-                        protocol.getItemRewriter().merchantOffersRewriter().handle(wrapper);
+                        protocol.getItemRewriter().handleMerchantOffers(wrapper);
                     }
                 });
             }

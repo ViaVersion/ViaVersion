@@ -136,7 +136,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         return;
                     } else if (channel.equals("MC|TrList")) {
                         channel = "minecraft:trader_list";
-                        merchantOffersRewriter().handle(wrapper);
+                        handleMerchantOffers(wrapper);
                     } else {
                         String old = channel;
                         channel = getNewPluginChannelId(channel);

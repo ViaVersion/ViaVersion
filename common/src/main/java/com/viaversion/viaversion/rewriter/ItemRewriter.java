@@ -235,7 +235,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
 
-    public void registerMerchantOffers(C packetType) {
+    public void registerCustomPayloadTradeList(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             protected void register() {
@@ -243,31 +243,29 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 handlerSoftFail(wrapper -> {
                     final String channel = wrapper.get(Types.STRING, 0);
                     if (channel.equals("MC|TrList")) {
-                        merchantOffersRewriter().handle(wrapper);
+                        handleMerchantOffers(wrapper);
                     }
                 });
             }
         });
     }
 
-    public PacketHandler merchantOffersRewriter() {
-        return wrapper -> {
-            wrapper.passthrough(Types.INT); // Window ID
+    public void handleMerchantOffers(final PacketWrapper wrapper) {
+        wrapper.passthrough(Types.INT); // Window ID
 
-            final int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-            for (int i = 0; i < size; i++) {
-                handleClientboundItem(wrapper); // Input Item
-                handleClientboundItem(wrapper); // Output Item
+        final int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
+        for (int i = 0; i < size; i++) {
+            handleClientboundItem(wrapper); // Input Item
+            handleClientboundItem(wrapper); // Output Item
 
-                if (wrapper.passthrough(Types.BOOLEAN)) {
-                    handleClientboundItem(wrapper); // Second Item
-                }
-
-                wrapper.passthrough(Types.BOOLEAN); // Trade disabled
-                wrapper.passthrough(Types.INT); // Number of tools uses
-                wrapper.passthrough(Types.INT); // Maximum number of trade uses
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                handleClientboundItem(wrapper); // Second Item
             }
-        };
+
+            wrapper.passthrough(Types.BOOLEAN); // Trade disabled
+            wrapper.passthrough(Types.INT); // Number of tools uses
+            wrapper.passthrough(Types.INT); // Maximum number of trade uses
+        }
     }
 
 
