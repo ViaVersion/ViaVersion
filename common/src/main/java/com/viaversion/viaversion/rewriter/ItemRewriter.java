@@ -243,14 +243,14 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 handlerSoftFail(wrapper -> {
                     final String channel = wrapper.get(Types.STRING, 0);
                     if (channel.equals("MC|TrList")) {
-                        handleMerchantOffers(wrapper);
+                        handleTradeList(wrapper);
                     }
                 });
             }
         });
     }
 
-    public void handleMerchantOffers(final PacketWrapper wrapper) {
+    public void handleTradeList(final PacketWrapper wrapper) {
         wrapper.passthrough(Types.INT); // Window ID
 
         final int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
