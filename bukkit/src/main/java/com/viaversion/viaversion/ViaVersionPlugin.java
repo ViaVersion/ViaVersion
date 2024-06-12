@@ -180,16 +180,6 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
     }
 
     @Override
-    public ViaCommandSender[] getOnlinePlayers() {
-        ViaCommandSender[] array = new ViaCommandSender[Bukkit.getOnlinePlayers().size()];
-        int i = 0;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            array[i++] = new BukkitCommandSender(player);
-        }
-        return array;
-    }
-
-    @Override
     public void sendMessage(UUID uuid, String message) {
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {

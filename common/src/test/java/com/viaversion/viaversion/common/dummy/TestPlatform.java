@@ -81,11 +81,6 @@ public final class TestPlatform implements ViaPlatform {
     }
 
     @Override
-    public ViaCommandSender[] getOnlinePlayers() {
-        return new ViaCommandSender[0];
-    }
-
-    @Override
     public void sendMessage(UUID uuid, String message) {
     }
 

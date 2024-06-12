@@ -121,13 +121,6 @@ public interface ViaPlatform<T> {
     PlatformTask runRepeatingSync(Runnable runnable, long period);
 
     /**
-     * Get the online players
-     *
-     * @return Array of ViaCommandSender
-     */
-    ViaCommandSender[] getOnlinePlayers();
-
-    /**
      * Send a message to a player
      *
      * @param uuid    The player's UUID
