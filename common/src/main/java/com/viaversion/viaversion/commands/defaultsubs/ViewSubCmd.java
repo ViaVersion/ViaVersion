@@ -20,6 +20,8 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class ViewSubCmd implements ViaSubCommand {
 
     @Override
     public String usage() {
-        return "view <player>";
+        return "view <player|*>";
     }
 
     @Override
@@ -45,13 +47,13 @@ public class ViewSubCmd implements ViaSubCommand {
         if (args.length == 0) {
             return false;
         }
-        for (final ViaCommandSender player : Via.getPlatform().getOnlinePlayers()) {
-            if (player.getName().equalsIgnoreCase(args[0])) {
-                final ProtocolVersion version = ProtocolVersion.getProtocol(Via.getAPI().getPlayerVersion(player.getUUID()));
-                sendMessage(sender, "&6Player &2%s &6is connected via &2%s", player.getName(), version);
-                sendMessage(sender, "&6Their UUID is &2%s", player.getUUID());
-                return true;
+        for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+            final ProtocolInfo info = connection.getProtocolInfo();
+            if (args[0].equalsIgnoreCase(info.getUsername()) || args[0].equals("*")) {
+                sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &5" + info.getUuid() +
+                    " &7Client-Protocol: &5" + info.protocolVersion().getName() + " &7Server-Protocol: &5" + info.serverProtocolVersion().getName());
             }
+            return true;
         }
         return false;
     }
@@ -60,10 +62,14 @@ public class ViewSubCmd implements ViaSubCommand {
     public List<String> onTabComplete(final ViaCommandSender sender, final String[] args) {
         if (args.length == 1) {
             final List<String> matches = new ArrayList<>();
-            for (final ViaCommandSender player : Via.getPlatform().getOnlinePlayers()) {
-                if (player.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
-                    matches.add(player.getName());
+            for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+                final String name = connection.getProtocolInfo().getUsername();
+                if (name.toLowerCase().startsWith(args[0].toLowerCase())) {
+                    matches.add(name);
                 }
+            }
+            if (matches.isEmpty()) {
+                matches.add("*");
             }
             return matches;
         }
