@@ -34,7 +34,7 @@ public class ViewSubCmd implements ViaSubCommand {
 
     @Override
     public String description() {
-        return "Shows statistics about a specific player.";
+        return "Shows connection information about one or all players";
     }
 
     @Override
@@ -50,10 +50,9 @@ public class ViewSubCmd implements ViaSubCommand {
         for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
             final ProtocolInfo info = connection.getProtocolInfo();
             if (args[0].equalsIgnoreCase(info.getUsername()) || args[0].equals("*")) {
-                sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &5" + info.getUuid() +
-                    " &7Client-Protocol: &5" + info.protocolVersion().getName() + " &7Server-Protocol: &5" + info.serverProtocolVersion().getName());
+                sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &2" + info.getUuid() + " &7Client-Protocol: &2" + info.protocolVersion().getName() + " &7Server-Protocol: &2" + info.serverProtocolVersion().getName());
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -61,16 +60,16 @@ public class ViewSubCmd implements ViaSubCommand {
     @Override
     public List<String> onTabComplete(final ViaCommandSender sender, final String[] args) {
         if (args.length == 1) {
+            final String input = args[0].toLowerCase();
+
             final List<String> matches = new ArrayList<>();
             for (final UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
                 final String name = connection.getProtocolInfo().getUsername();
-                if (name.toLowerCase().startsWith(args[0].toLowerCase())) {
+                if (input.isEmpty() || name.toLowerCase().startsWith(input)) {
                     matches.add(name);
                 }
             }
-            if (matches.isEmpty()) {
-                matches.add("*");
-            }
+            matches.add("*");
             return matches;
         }
         return ViaSubCommand.super.onTabComplete(sender, args);
