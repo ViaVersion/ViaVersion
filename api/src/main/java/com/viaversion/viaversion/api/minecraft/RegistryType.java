@@ -32,7 +32,8 @@ public enum RegistryType {
     ITEM("item"),
     FLUID("fluid"),
     ENTITY("entity_type"),
-    GAME_EVENT("game_event");
+    GAME_EVENT("game_event"),
+    ENCHANTMENT("enchantment");
 
     private static final Map<String, RegistryType> MAP = new HashMap<>();
     private static final RegistryType[] VALUES = values();

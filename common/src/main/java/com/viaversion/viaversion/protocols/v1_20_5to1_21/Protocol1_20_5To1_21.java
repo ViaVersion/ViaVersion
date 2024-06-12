@@ -214,6 +214,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:blocks_wind_charge_explosions");
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:can_turn_in_boats", "minecraft:deflects_projectiles", "minecraft:immune_to_infested",
             "minecraft:immune_to_oozing", "minecraft:no_anger_from_wind_charge");
+        tagRewriter.addTag(RegistryType.ENCHANTMENT, "minecraft:curse", 10, 41); // Binding and vanishing curse
     }
 
     @Override

@@ -40,11 +40,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TagRewriter<C extends ClientboundPacketType> implements com.viaversion.viaversion.api.rewriter.TagRewriter {
     private static final int[] EMPTY_ARRAY = {};
-    private final Protocol<C, ?, ?, ?> protocol;
-    private final Map<RegistryType, List<TagData>> newTags = new EnumMap<>(RegistryType.class);
+    private final Map<RegistryType, List<TagData>> toAdd = new EnumMap<>(RegistryType.class);
     private final Map<RegistryType, Map<String, String>> toRename = new EnumMap<>(RegistryType.class);
     private final Map<RegistryType, Set<String>> toRemove = new EnumMap<>(RegistryType.class);
     private final Set<String> toRemoveRegistries = new HashSet<>();
+    private final Protocol<C, ?, ?, ?> protocol;
 
     public TagRewriter(final Protocol<C, ?, ?, ?> protocol) {
         this.protocol = protocol;
@@ -56,6 +56,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             return;
         }
 
+        // TODO Tags for player synchronized registries
         for (RegistryType type : RegistryType.getValues()) {
             List<TagData> tags = protocol.getMappingData().getTags(type);
             if (tags != null) {
@@ -235,12 +236,12 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
     @Override
     public @Nullable List<TagData> getNewTags(RegistryType tagType) {
-        return newTags.get(tagType);
+        return toAdd.get(tagType);
     }
 
     @Override
     public List<TagData> getOrComputeNewTags(RegistryType tagType) {
-        return newTags.computeIfAbsent(tagType, type -> new ArrayList<>());
+        return toAdd.computeIfAbsent(tagType, type -> new ArrayList<>());
     }
 
     public @Nullable IdRewriteFunction getRewriter(RegistryType tagType) {
@@ -249,6 +250,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             case BLOCK -> mappingData != null && mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
             case ITEM -> mappingData != null && mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
             case ENTITY -> protocol.getEntityRewriter() != null ? id -> protocol.getEntityRewriter().newEntityId(id) : null;
+            case ENCHANTMENT -> mappingData != null && mappingData.getEnchantmentMappings() != null ? id -> mappingData.getEnchantmentMappings().getNewId(id) : null;
             case FLUID, GAME_EVENT -> null;
         };
     }
