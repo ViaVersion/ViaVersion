@@ -34,7 +34,7 @@ public class ViewSubCmd implements ViaSubCommand {
 
     @Override
     public String description() {
-        return "Shows connection information about one or all players";
+        return "Shows connection information about one or all players.";
     }
 
     @Override
@@ -51,10 +51,9 @@ public class ViewSubCmd implements ViaSubCommand {
             final ProtocolInfo info = connection.getProtocolInfo();
             if (args[0].equalsIgnoreCase(info.getUsername()) || args[0].equals("*")) {
                 sendMessage(sender, "&7[&6" + info.getUsername() + "&7] UUID: &2" + info.getUuid() + " &7Client-Protocol: &2" + info.protocolVersion().getName() + " &7Server-Protocol: &2" + info.serverProtocolVersion().getName());
-                return true;
             }
         }
-        return false;
+        return true;
     }
 
     @Override
