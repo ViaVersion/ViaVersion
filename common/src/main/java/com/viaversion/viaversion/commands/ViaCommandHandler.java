@@ -30,6 +30,7 @@ import com.viaversion.viaversion.commands.defaultsubs.DumpSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ListSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.PPSSubCmd;
 import com.viaversion.viaversion.commands.defaultsubs.ReloadSubCmd;
+import com.viaversion.viaversion.commands.defaultsubs.ViewSubCmd;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -194,5 +195,6 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
         registerSubCommand(new DontBugMeSubCmd());
         registerSubCommand(new AutoTeamSubCmd());
         registerSubCommand(new ReloadSubCmd());
+        registerSubCommand(new ViewSubCmd());
     }
 }
