@@ -51,7 +51,7 @@ import java.util.Optional;
 public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_1, ServerboundPackets1_13, Protocol1_12_2To1_13> {
 
     public ItemPacketRewriter1_13(Protocol1_12_2To1_13 protocol) {
-        super(protocol, Types.ITEM1_8, null, Types.ITEM1_13, null);
+        super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY, Types.ITEM1_13, Types.ITEM1_13_SHORT_ARRAY);
     }
 
     @Override
