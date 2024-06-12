@@ -452,6 +452,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             entityTag = entityTag.copy();
             if (entityTag.contains("variant")) {
                 entityTag.putString("id", "minecraft:painting");
+            } else if (entityTag.contains("ShowArms")) {
+                entityTag.putString("id", "minecraft:armor_stand");
             }
             data.set(StructuredDataKey.ENTITY_DATA, entityTag);
         }
