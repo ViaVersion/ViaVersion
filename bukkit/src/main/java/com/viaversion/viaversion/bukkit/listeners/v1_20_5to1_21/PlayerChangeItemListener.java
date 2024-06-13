@@ -33,6 +33,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * For some reason, mining efficiency is not calculated by the client anymore, but by the server,
@@ -60,16 +61,16 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
     public void onPlayerItemHeld(final PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        sendAttributeUpdate(player, item != null ? item : ItemStack.empty());
+        sendAttributeUpdate(player, item);
     }
 
-    private void sendAttributeUpdate(final Player player, final ItemStack item) {
+    private void sendAttributeUpdate(final Player player, @Nullable final ItemStack item) {
         final UserConnection connection = Via.getAPI().getConnection(player.getUniqueId());
         if (connection == null || !isOnPipe(player)) {
             return;
         }
 
-        final int efficiencyLevel = item.getEnchantmentLevel(efficiency);
+        final int efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
         final PacketWrapper attributesPacket = PacketWrapper.create(ClientboundPackets1_21.UPDATE_ATTRIBUTES, connection);
         attributesPacket.write(Types.VAR_INT, player.getEntityId());
 
