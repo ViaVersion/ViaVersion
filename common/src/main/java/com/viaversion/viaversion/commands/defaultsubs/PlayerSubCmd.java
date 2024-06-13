@@ -22,14 +22,13 @@ import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewSubCmd implements ViaSubCommand {
+public class PlayerSubCmd implements ViaSubCommand {
     @Override
     public String name() {
-        return "view";
+        return "player";
     }
 
     @Override
@@ -39,7 +38,7 @@ public class ViewSubCmd implements ViaSubCommand {
 
     @Override
     public String usage() {
-        return "view <player|*>";
+        return "player <name|*>";
     }
 
     @Override
