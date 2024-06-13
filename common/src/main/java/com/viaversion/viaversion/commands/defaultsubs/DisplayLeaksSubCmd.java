@@ -27,12 +27,17 @@ import java.util.stream.Collectors;
 public class DisplayLeaksSubCmd implements ViaSubCommand {
     @Override
     public String name() {
-        return "displayleaks <level>";
+        return "displayleaks";
     }
 
     @Override
     public String description() {
         return "Try to hunt memory leaks!";
+    }
+
+    @Override
+    public String usage() {
+        return "displayleaks <level>";
     }
 
     @Override
