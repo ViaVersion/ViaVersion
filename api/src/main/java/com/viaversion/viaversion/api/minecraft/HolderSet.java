@@ -22,6 +22,8 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+
 /**
  * Set of ids that either holds a string tag key or an array of ids.
  */
@@ -76,4 +78,12 @@ public interface HolderSet {
      * @return true if this holder set has direct ids, false if it has a tag key
      */
     boolean hasIds();
+
+    /**
+     * Returns a new holder set with the ids rewritten.
+     *
+     * @param idRewriter the id rewriter
+     * @return a new holder set with the ids rewritten, or self if it has a tag key
+     */
+    HolderSet rewrite(Int2IntFunction idRewriter);
 }

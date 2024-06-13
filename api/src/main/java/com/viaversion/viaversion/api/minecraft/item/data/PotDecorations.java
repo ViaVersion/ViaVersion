@@ -76,9 +76,10 @@ public final class PotDecorations {
     }
 
     public PotDecorations rewrite(final Int2IntFunction idRewriteFunction) {
+        final int[] newItems = new int[itemIds.length];
         for (int i = 0; i < itemIds.length; i++) {
-            itemIds[i] = idRewriteFunction.apply(itemIds[i]);
+            newItems[i] = idRewriteFunction.applyAsInt(itemIds[i]);
         }
-        return this;
+        return new PotDecorations(newItems);
     }
 }

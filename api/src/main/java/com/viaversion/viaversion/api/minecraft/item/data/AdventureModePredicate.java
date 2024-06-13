@@ -44,9 +44,10 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
     };
 
     public AdventureModePredicate rewrite(final Int2IntFunction blockIdRewriter) {
+        final BlockPredicate[] predicates = new BlockPredicate[this.predicates.length];
         for (int i = 0; i < predicates.length; i++) {
-            predicates[i] = predicates[i].rewrite(blockIdRewriter);
+            predicates[i] = this.predicates[i].rewrite(blockIdRewriter);
         }
-        return this;
+        return new AdventureModePredicate(predicates, showInTooltip);
     }
 }

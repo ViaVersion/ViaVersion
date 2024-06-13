@@ -51,14 +51,6 @@ public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolea
     public static final Type<ToolRule[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
     public ToolRule rewrite(final Int2IntFunction blockIdRewriter) {
-        if (blocks.hasTagKey()) {
-            return this;
-        }
-
-        final int[] ids = blocks.ids();
-        for (int i = 0; i < ids.length; i++) {
-            ids[i] = blockIdRewriter.apply(ids[i]);
-        }
-        return this;
+        return blocks.hasIds() ? new ToolRule(blocks.rewrite(blockIdRewriter), speed, correctForDrops) : this;
     }
 }

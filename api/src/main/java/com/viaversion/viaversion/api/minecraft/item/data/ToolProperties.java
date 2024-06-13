@@ -47,9 +47,10 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
     };
 
     public ToolProperties rewrite(final Int2IntFunction blockIdRewriter) {
+        final ToolRule[] rules = new ToolRule[this.rules.length];
         for (int i = 0; i < rules.length; i++) {
-            rules[i] = rules[i].rewrite(blockIdRewriter);
+            rules[i] = this.rules[i].rewrite(blockIdRewriter);
         }
-        return this;
+        return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock);
     }
 }

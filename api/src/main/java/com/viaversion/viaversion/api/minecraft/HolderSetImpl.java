@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.util.EitherImpl;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 final class HolderSetImpl extends EitherImpl<String, int[]> implements HolderSet {
 
@@ -52,5 +53,19 @@ final class HolderSetImpl extends EitherImpl<String, int[]> implements HolderSet
     @Override
     public boolean hasIds() {
         return isRight();
+    }
+
+    @Override
+    public HolderSet rewrite(final Int2IntFunction idRewriter) {
+        if (hasTagKey()) {
+            return this;
+        }
+
+        final int[] ids = ids();
+        final int[] mappedIds = new int[ids.length];
+        for (int i = 0; i < mappedIds.length; i++) {
+            mappedIds[i] = idRewriter.apply(ids[i]);
+        }
+        return new HolderSetImpl(mappedIds);
     }
 }

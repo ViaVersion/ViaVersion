@@ -62,10 +62,7 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
             return this;
         }
 
-        final int[] ids = holderSet.ids();
-        for (int i = 0; i < ids.length; i++) {
-            ids[i] = blockIdRewriter.apply(ids[i]);
-        }
-        return this;
+        final HolderSet updatedHolders = holderSet.rewrite(blockIdRewriter);
+        return new BlockPredicate(updatedHolders, propertyMatchers, tag);
     }
 }
