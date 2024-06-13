@@ -143,8 +143,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.MAP_ID, this::convertMapId);
         register(StructuredDataKey.MAP_DECORATIONS, this::convertMapDecorations);
         register(StructuredDataKey.MAP_POST_PROCESSING, null);
-        register(StructuredDataKey.CHARGED_PROJECTILES, this::convertChargedProjectiles);
-        register(StructuredDataKey.BUNDLE_CONTENTS, this::convertBundleContents);
+        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::convertChargedProjectiles);
+        register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::convertBundleContents);
         register(StructuredDataKey.POTION_CONTENTS, this::convertPotionContents);
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::convertSuspiciousStewEffects);
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::convertWritableBookContent);
@@ -165,7 +165,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.BANNER_PATTERNS, this::convertBannerPatterns);
         register(StructuredDataKey.BASE_COLOR, this::convertBaseColor);
         register(StructuredDataKey.POT_DECORATIONS, this::convertPotDecorations);
-        register(StructuredDataKey.CONTAINER, this::convertContainer);
+        register(StructuredDataKey.CONTAINER1_20_5, this::convertContainer);
         register(StructuredDataKey.BLOCK_STATE, this::convertBlockState);
         register(StructuredDataKey.BEES, this::convertBees);
         register(StructuredDataKey.LOCK, this::convertLock);

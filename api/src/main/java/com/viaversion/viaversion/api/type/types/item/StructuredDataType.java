@@ -83,6 +83,7 @@ public class StructuredDataType extends Type<StructuredData<?>> {
         public DataFiller add(final StructuredDataKey<?> key) {
             final int id = mappings.mappedId(key.identifier());
             Preconditions.checkArgument(id != -1, "No mapped id found for %s", key.identifier());
+            Preconditions.checkArgument(types[id] == null, "Data component serializer already exists for id %s", id);
             types[id] = key;
             return this;
         }

@@ -536,9 +536,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES, false);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5, false);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS, false);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5, false);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1443,7 +1443,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, baseColorIntTag.asInt());
             }
 
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER, true);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER1_20_5, true);
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");

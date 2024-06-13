@@ -52,6 +52,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.util.Unit;
 
 public record StructuredDataKey<T>(String identifier, Type<T> type) {
@@ -87,8 +88,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> MAP_ID = new StructuredDataKey<>("map_id", Types.VAR_INT);
     public static final StructuredDataKey<CompoundTag> MAP_DECORATIONS = new StructuredDataKey<>("map_decorations", Types.COMPOUND_TAG);
     public static final StructuredDataKey<Integer> MAP_POST_PROCESSING = new StructuredDataKey<>("map_post_processing", Types.VAR_INT);
-    public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES = new StructuredDataKey<>("charged_projectiles", Types1_20_5.ITEM_ARRAY);
-    public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS = new StructuredDataKey<>("bundle_contents", Types1_20_5.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_20_5 = new StructuredDataKey<>("charged_projectiles", Types1_20_5.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_21 = new StructuredDataKey<>("charged_projectiles", Types1_21.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_20_5 = new StructuredDataKey<>("bundle_contents", Types1_20_5.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_21 = new StructuredDataKey<>("bundle_contents", Types1_21.ITEM_ARRAY);
     public static final StructuredDataKey<PotionContents> POTION_CONTENTS = new StructuredDataKey<>("potion_contents", PotionContents.TYPE);
     public static final StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", SuspiciousStewEffect.ARRAY_TYPE);
     public static final StructuredDataKey<FilterableString[]> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", FilterableString.ARRAY_TYPE);
@@ -110,7 +113,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<BannerPatternLayer[]> BANNER_PATTERNS = new StructuredDataKey<>("banner_patterns", BannerPatternLayer.ARRAY_TYPE);
     public static final StructuredDataKey<Integer> BASE_COLOR = new StructuredDataKey<>("base_color", Types.VAR_INT);
     public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);
-    public static final StructuredDataKey<Item[]> CONTAINER = new StructuredDataKey<>("container", Types1_20_5.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CONTAINER1_20_5 = new StructuredDataKey<>("container", Types1_20_5.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CONTAINER1_21 = new StructuredDataKey<>("container", Types1_21.ITEM_ARRAY);
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);
