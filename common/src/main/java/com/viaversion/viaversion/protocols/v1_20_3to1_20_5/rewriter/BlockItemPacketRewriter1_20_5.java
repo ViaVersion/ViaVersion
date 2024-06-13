@@ -294,7 +294,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Small explosion particle
             protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Large explosion particle
 
-            wrapper.write(Types.VAR_INT, 0); // "Empty" registry id to instead use the resource location that follows after
+            final String sound = wrapper.read(Types.STRING);
+            final Float range = wrapper.read(Types.OPTIONAL_FLOAT);
+            wrapper.write(Types.SOUND_EVENT, Holder.of(new SoundEvent(sound, range)));
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_3.MERCHANT_OFFERS, wrapper -> {

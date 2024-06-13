@@ -504,7 +504,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerExplosion(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
-        final SoundRewriter<C> cSoundRewriter = new SoundRewriter<>(protocol);
+        final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
@@ -528,7 +528,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             rewriteParticle(wrapper.user(), smallExplosionParticle);
             rewriteParticle(wrapper.user(), largeExplosionParticle);
 
-            cSoundRewriter.soundHolderHandler().handle(wrapper);
+            soundRewriter.soundHolderHandler().handle(wrapper);
         });
     }
 
