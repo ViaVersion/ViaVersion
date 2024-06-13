@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolean correctForDrops) {
@@ -49,4 +50,15 @@ public record ToolRule(HolderSet blocks, @Nullable Float speed, @Nullable Boolea
     };
     public static final Type<ToolRule[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
+    public ToolRule rewrite(final Int2IntFunction blockIdRewriter) {
+        if (blocks.hasTagKey()) {
+            return this;
+        }
+
+        final int[] ids = blocks.ids();
+        for (int i = 0; i < ids.length; i++) {
+            ids[i] = blockIdRewriter.apply(ids[i]);
+        }
+        return this;
+    }
 }

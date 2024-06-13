@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher @Nullable [] propertyMatchers,
@@ -56,4 +57,15 @@ public record BlockPredicate(@Nullable HolderSet holderSet, StatePropertyMatcher
     };
     public static final Type<BlockPredicate[]> ARRAY_TYPE = new ArrayType<>(TYPE);
 
+    public BlockPredicate rewrite(final Int2IntFunction blockIdRewriter) {
+        if (holderSet == null || holderSet.hasTagKey()) {
+            return this;
+        }
+
+        final int[] ids = holderSet.ids();
+        for (int i = 0; i < ids.length; i++) {
+            ids[i] = blockIdRewriter.apply(ids[i]);
+        }
+        return this;
+    }
 }

@@ -99,6 +99,24 @@ public final class StructuredDataContainer {
         return empty;
     }
 
+    /**
+     * Updates and returns the structured data by id if not empty.
+     *
+     * @param key             serializer id
+     * @param mappingFunction function to update existing data
+     * @param <T>             data type
+     * @return updated structured data if not empty
+     */
+    public <T> @Nullable StructuredData<T> updateIfPresent(final StructuredDataKey<T> key, final Function<T, T> mappingFunction) {
+        final StructuredData<T> data = this.getNonEmpty(key);
+        if (data == null) {
+            return null;
+        }
+
+        data.setValue(mappingFunction.apply(data.value()));
+        return data;
+    }
+
     public <T> void set(final StructuredDataKey<T> key, final T value) {
         final int id = serializerId(key);
         if (id != -1) {

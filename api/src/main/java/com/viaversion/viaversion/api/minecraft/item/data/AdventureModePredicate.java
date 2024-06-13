@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) {
 
@@ -42,4 +43,10 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
         }
     };
 
+    public AdventureModePredicate rewrite(final Int2IntFunction blockIdRewriter) {
+        for (int i = 0; i < predicates.length; i++) {
+            predicates[i] = predicates[i].rewrite(blockIdRewriter);
+        }
+        return this;
+    }
 }

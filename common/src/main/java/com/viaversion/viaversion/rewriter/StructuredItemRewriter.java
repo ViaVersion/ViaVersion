@@ -26,8 +26,6 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
-import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -88,7 +86,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
-        updateItemComponents(connection, dataContainer, this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null);
+        updateItemComponents(connection, dataContainer, this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null, mappingData != null ? mappingData::getNewBlockId : null);
         return item;
     }
 
@@ -113,20 +111,25 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         restoreTextComponents(item);
-        updateItemComponents(connection, dataContainer, this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null);
+        updateItemComponents(connection, dataContainer, this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null, mappingData != null ? mappingData::getOldBlockId : null);
         return item;
     }
 
+    // Temporary
     protected void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter) {
-        // Specific types that need deep handling
-        final StructuredData<ArmorTrim> trimData = container.getNonEmpty(StructuredDataKey.TRIM);
-        if (trimData != null && idRewriter != null) {
-            trimData.setValue(trimData.value().rewrite(idRewriter));
-        }
+        updateItemComponents(connection, container, itemHandler, idRewriter, null);
+    }
 
-        final StructuredData<PotDecorations> potDecorationsData = container.getNonEmpty(StructuredDataKey.POT_DECORATIONS);
-        if (potDecorationsData != null && idRewriter != null) {
-            potDecorationsData.setValue(potDecorationsData.value().rewrite(idRewriter));
+    protected void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter, @Nullable Int2IntFunction blockIdRewriter) {
+        // Specific types that need deep handling
+        if (idRewriter != null) {
+            container.updateIfPresent(StructuredDataKey.TRIM, value -> value.rewrite(idRewriter));
+            container.updateIfPresent(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(idRewriter));
+        }
+        if (blockIdRewriter != null) {
+            container.updateIfPresent(StructuredDataKey.TOOL, value -> value.rewrite(blockIdRewriter));
+            container.updateIfPresent(StructuredDataKey.CAN_PLACE_ON, value -> value.rewrite(blockIdRewriter));
+            container.updateIfPresent(StructuredDataKey.CAN_BREAK, value -> value.rewrite(blockIdRewriter));
         }
 
         // Look for item types

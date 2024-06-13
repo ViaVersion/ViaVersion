@@ -39,13 +39,13 @@ public class MappingDataBase implements MappingData {
 
     protected final String unmappedVersion;
     protected final String mappedVersion;
-    protected BiMappings itemMappings;
     protected FullMappings argumentTypeMappings;
     protected FullMappings entityMappings;
     protected FullMappings recipeSerializerMappings;
     protected FullMappings itemDataSerializerMappings;
     protected ParticleMappings particleMappings;
-    protected Mappings blockMappings;
+    protected BiMappings itemMappings;
+    protected BiMappings blockMappings;
     protected Mappings blockStateMappings;
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
@@ -68,7 +68,7 @@ public class MappingDataBase implements MappingData {
         }
 
         final CompoundTag data = readMappingsFile("mappings-" + unmappedVersion + "to" + mappedVersion + ".nbt");
-        blockMappings = loadMappings(data, "blocks");
+        blockMappings = loadBiMappings(data, "blocks");
         blockStateMappings = loadMappings(data, "blockstates");
         blockEntityMappings = loadMappings(data, "blockentities");
         soundMappings = loadMappings(data, "sounds");
@@ -176,6 +176,11 @@ public class MappingDataBase implements MappingData {
     @Override
     public int getNewBlockId(final int id) {
         return checkValidity(id, blockMappings.getNewId(id), "block");
+    }
+
+    @Override
+    public int getOldBlockId(final int id) {
+        return blockMappings.getNewIdOrDefault(id, 1);
     }
 
     @Override

@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.minecraft.item.data;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock) {
 
@@ -45,4 +46,10 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
         }
     };
 
+    public ToolProperties rewrite(final Int2IntFunction blockIdRewriter) {
+        for (int i = 0; i < rules.length; i++) {
+            rules[i] = rules[i].rewrite(blockIdRewriter);
+        }
+        return this;
+    }
 }

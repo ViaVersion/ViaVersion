@@ -52,6 +52,8 @@ public interface MappingData {
      */
     int getNewBlockId(int id);
 
+    int getOldBlockId(int id);
+
     /**
      * Returns the mapped item id, or -1 if unmapped.
      *
