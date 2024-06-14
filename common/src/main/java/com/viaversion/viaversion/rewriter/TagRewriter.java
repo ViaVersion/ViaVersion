@@ -175,8 +175,9 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
     }
 
     public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename, @Nullable Set<String> tagsToRemove) {
-        int tagsSize = wrapper.read(Types.VAR_INT);
+        final int tagsSize = wrapper.read(Types.VAR_INT);
         final List<TagData> tags = new ArrayList<>(newTags != null ? tagsSize + newTags.size() : tagsSize);
+        final Set<String> currentTags = new HashSet<>(tagsSize);
 
         for (int i = 0; i < tagsSize; i++) {
             String key = wrapper.read(Types.STRING);
@@ -202,6 +203,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             }
 
             tags.add(new TagData(key, ids));
+            currentTags.add(Key.stripMinecraftNamespace(key));
         }
 
         if (tagsToRemove != null) {
@@ -210,7 +212,11 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
         // Add new tags if present
         if (newTags != null) {
-            tags.addAll(newTags);
+            for (final TagData tag : newTags) {
+                if (!currentTags.contains(Key.stripMinecraftNamespace(tag.identifier()))) {
+                    tags.add(tag);
+                }
+            }
         }
 
         // Write the tags
