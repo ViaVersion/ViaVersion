@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 import com.viaversion.viaversion.util.ComponentUtil;
-import com.viaversion.viaversion.util.SerializerVersion;
 
 public class PlayerPacketRewriter1_9 {
     public static void register(Protocol1_8To1_9 protocol) {
@@ -410,7 +409,7 @@ public class PlayerPacketRewriter1_9 {
                                 final StringTag pageTag = pages.get(i);
                                 final String value = pageTag.getValue();
 
-                                pageTag.setValue(ComponentUtil.convertJson(value, SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
+                                pageTag.setValue(ComponentUtil.plainToJson(value).toString());
                             }
                         }
                     }
