@@ -169,6 +169,13 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
+    public ViaCommandSender[] getOnlinePlayers() {
+        return PROXY.getAllPlayers().stream()
+            .map(VelocityCommandSender::new)
+            .toArray(ViaCommandSender[]::new);
+    }
+
+    @Override
     public void sendMessage(UUID uuid, String message) {
         PROXY.getPlayer(uuid).ifPresent(player -> player.sendMessage(COMPONENT_SERIALIZER.deserialize(message)));
     }
