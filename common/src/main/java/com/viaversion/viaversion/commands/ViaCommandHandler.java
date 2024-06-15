@@ -58,8 +58,8 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
     }
 
     @Override
-    public void removeSubCommand(final Class<? extends ViaSubCommand> commandClass) {
-        commandMap.values().removeIf(commandClass::isInstance);
+    public void removeSubCommand(final String name) {
+        commandMap.remove(name.toLowerCase(Locale.ROOT));
     }
 
     @Override

@@ -35,11 +35,11 @@ public interface ViaVersionCommand {
     void registerSubCommand(ViaSubCommand command);
 
     /**
-     * Removes a subcommand by class, can be used to unload default subcommands which are not supported
+     * Removes a subcommand by name, can be used to unload default subcommands which are not supported
      * on the platform.
-     * @param commandClass Subcommand class
+     * @param name Subcommand name
      */
-    void removeSubCommand(Class<? extends ViaSubCommand> commandClass);
+    void removeSubCommand(String name);
 
     /**
      * Check if a subcommand is registered.
