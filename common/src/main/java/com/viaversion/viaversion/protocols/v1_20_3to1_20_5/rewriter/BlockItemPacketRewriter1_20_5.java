@@ -1196,7 +1196,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private Item itemFromTag(final UserConnection connection, final CompoundTag item) {
         final String id = item.getString("id");
         if (id == null) {
-            return null;
+            return StructuredItem.empty();
         }
 
         final int itemId = StructuredDataConverter.removeItemBackupTag(item, unmappedItemId(id));
