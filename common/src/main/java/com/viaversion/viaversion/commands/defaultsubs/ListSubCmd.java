@@ -20,6 +20,7 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,10 +47,9 @@ public class ListSubCmd implements ViaSubCommand {
     public boolean execute(ViaCommandSender sender, String[] args) {
         Map<ProtocolVersion, Set<String>> playerVersions = new TreeMap<>(ProtocolVersion::compareTo);
 
-        for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
-            int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
-            ProtocolVersion key = ProtocolVersion.getProtocol(playerVersion);
-            playerVersions.computeIfAbsent(key, s -> new HashSet<>()).add(p.getName());
+        for (UserConnection p : Via.getManager().getConnectionManager().getConnections()) {
+            ProtocolVersion version = p.getProtocolInfo().protocolVersion();
+            playerVersions.computeIfAbsent(version, s -> new HashSet<>()).add(p.getProtocolInfo().getUsername());
         }
 
         for (Map.Entry<ProtocolVersion, Set<String>> entry : playerVersions.entrySet()) {

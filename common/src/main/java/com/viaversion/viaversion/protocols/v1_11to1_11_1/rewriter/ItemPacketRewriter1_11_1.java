@@ -28,7 +28,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 public class ItemPacketRewriter1_11_1 extends ItemRewriter<ClientboundPackets1_9_3, ServerboundPackets1_9_3, Protocol1_11To1_11_1> {
 
     public ItemPacketRewriter1_11_1(Protocol1_11To1_11_1 protocol) {
-        super(protocol, Types.ITEM1_8, null);
+        super(protocol, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY);
     }
 
     @Override

@@ -20,6 +20,9 @@ package com.viaversion.viaversion.commands.defaultsubs;
 import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.command.ViaSubCommand;
 import io.netty.util.ResourceLeakDetector;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DisplayLeaksSubCmd implements ViaSubCommand {
     @Override
@@ -33,13 +36,34 @@ public class DisplayLeaksSubCmd implements ViaSubCommand {
     }
 
     @Override
-    public boolean execute(ViaCommandSender sender, String[] args) {
-        if (ResourceLeakDetector.getLevel() != ResourceLeakDetector.Level.PARANOID)
-            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
-        else
-            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
+    public String usage() {
+        return "displayleaks <level>";
+    }
 
-        sendMessage(sender, "&6Leak detector is now %s", (ResourceLeakDetector.getLevel() == ResourceLeakDetector.Level.PARANOID ? "&aenabled" : "&cdisabled"));
+    @Override
+    public boolean execute(ViaCommandSender sender, String[] args) {
+        if (args.length == 1) {
+            try {
+                ResourceLeakDetector.Level level = ResourceLeakDetector.Level.valueOf(args[0]);
+                ResourceLeakDetector.setLevel(level);
+                sendMessage(sender, "&6Set leak detector level to &2" + level);
+            } catch (IllegalArgumentException e) {
+                sendMessage(sender, "&cInvalid level (" + Arrays.toString(ResourceLeakDetector.Level.values()) + ")");
+            }
+        } else {
+            sendMessage(sender, "&6Current leak detection level is &2" + ResourceLeakDetector.getLevel());
+        }
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(ViaCommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return Arrays.stream(ResourceLeakDetector.Level.values())
+                .map(Enum::name)
+                .filter(it -> it.startsWith(args[0]))
+                .collect(Collectors.toList());
+        }
+        return ViaSubCommand.super.onTabComplete(sender, args);
     }
 }
