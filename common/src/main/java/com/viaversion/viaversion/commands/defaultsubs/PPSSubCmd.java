@@ -46,26 +46,25 @@ public class PPSSubCmd implements ViaSubCommand {
 
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
-        Map<Integer, Set<String>> playerVersions = new HashMap<>();
+        Map<ProtocolVersion, Set<String>> playerVersions = new TreeMap<>(ProtocolVersion::compareTo);
         int totalPackets = 0;
         int clients = 0;
         long max = 0;
 
-        for (ViaCommandSender p : Via.getPlatform().getOnlinePlayers()) {
-            int playerVersion = Via.getAPI().getPlayerVersion(p.getUUID());
-            if (!playerVersions.containsKey(playerVersion))
+        for (UserConnection p : Via.getManager().getConnectionManager().getConnections()) {
+            ProtocolVersion playerVersion = p.getProtocolInfo().protocolVersion();
+            if (!playerVersions.containsKey(playerVersion)) {
                 playerVersions.put(playerVersion, new HashSet<>());
-            UserConnection uc = Via.getManager().getConnectionManager().getConnectedClient(p.getUUID());
-            if (uc != null && uc.getPacketTracker().getPacketsPerSecond() > -1) {
-                playerVersions.get(playerVersion).add(p.getName() + " (" + uc.getPacketTracker().getPacketsPerSecond() + " PPS)");
-                totalPackets += uc.getPacketTracker().getPacketsPerSecond();
-                if (uc.getPacketTracker().getPacketsPerSecond() > max) {
-                    max = uc.getPacketTracker().getPacketsPerSecond();
+            }
+            if (p.getPacketTracker().getPacketsPerSecond() > -1) {
+                playerVersions.get(playerVersion).add(p.getProtocolInfo().getUsername() + " (" + p.getPacketTracker().getPacketsPerSecond() + " PPS)");
+                totalPackets += p.getPacketTracker().getPacketsPerSecond();
+                if (p.getPacketTracker().getPacketsPerSecond() > max) {
+                    max = p.getPacketTracker().getPacketsPerSecond();
                 }
                 clients++;
             }
         }
-        Map<Integer, Set<String>> sorted = new TreeMap<>(playerVersions);
         sendMessage(sender, "&4Live Packets Per Second");
         if (clients > 1) {
             sendMessage(sender, "&cAverage: &f" + (totalPackets / clients));
@@ -74,9 +73,10 @@ public class PPSSubCmd implements ViaSubCommand {
         if (clients == 0) {
             sendMessage(sender, "&cNo clients to display.");
         }
-        for (Map.Entry<Integer, Set<String>> entry : sorted.entrySet())
-            sendMessage(sender, "&8[&6%s&8]: &b%s", ProtocolVersion.getProtocol(entry.getKey()).getName(), entry.getValue());
-        sorted.clear();
+        for (Map.Entry<ProtocolVersion, Set<String>> entry : playerVersions.entrySet()) {
+            sendMessage(sender, "&8[&6%s&8]: &b%s", entry.getKey().getName(), entry.getValue());
+        }
+        playerVersions.clear();
         return true;
     }
 }
