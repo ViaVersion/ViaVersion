@@ -196,7 +196,9 @@ public class PlayerPacketRewriter1_9 {
 
                 handler(wrapper -> {
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.setGameMode(GameMode.getById(wrapper.get(Types.UNSIGNED_BYTE, 0))); //Set player gamemode
+                    short gamemodeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    gamemodeId &= -9; // remove the hardcore mode flag
+                    tracker.setGameMode(GameMode.getById(gamemodeId)); //Set player gamemode
                 });
 
                 // Track player's dimension
