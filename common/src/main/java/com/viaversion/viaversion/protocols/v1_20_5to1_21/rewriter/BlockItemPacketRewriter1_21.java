@@ -120,7 +120,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replaceKey(StructuredDataKey.FOOD1_20_5, StructuredDataKey.FOOD1_21);
-        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_20_5, StructuredDataKey.CONTAINER1_20_5);
+        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_20_5, StructuredDataKey.CONTAINER1_21);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_20_5, StructuredDataKey.CHARGED_PROJECTILES1_21);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_20_5, StructuredDataKey.BUNDLE_CONTENTS1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> {
