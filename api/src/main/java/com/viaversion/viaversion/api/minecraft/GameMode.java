@@ -40,8 +40,6 @@ public enum GameMode {
     }
 
     public static GameMode getById(int id) {
-        id &= -9; // remove the hardcore mode flag
-
         return switch (id) {
             case 0 -> SURVIVAL;
             case 1 -> CREATIVE;
