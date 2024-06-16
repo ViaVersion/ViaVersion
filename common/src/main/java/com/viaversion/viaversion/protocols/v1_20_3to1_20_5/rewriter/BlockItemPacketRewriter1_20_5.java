@@ -1201,7 +1201,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final int itemId = StructuredDataConverter.removeItemBackupTag(item, unmappedItemId(id));
         if (itemId == -1) {
-            return null;
+            return StructuredItem.empty();
         }
 
         final byte count = item.getByte("Count", (byte) 1);
