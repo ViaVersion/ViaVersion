@@ -218,7 +218,12 @@ public final class StructuredDataConverter {
             }
         });
         register(StructuredDataKey.BASE_COLOR, (data, tag) -> getBlockEntityTag(tag).putInt("Base", data));
-        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, (connection, data, tag) -> convertItemList(connection, data, tag, "ChargedProjectiles"));
+        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, (connection, data, tag) -> {
+            convertItemList(connection, data, tag, "ChargedProjectiles");
+            if (data.length != 0) {
+                tag.putBoolean("Charged", true);
+            }
+        });
         register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, (connection, data, tag) -> convertItemList(connection, data, tag, "Items"));
         register(StructuredDataKey.LODESTONE_TRACKER, (data, tag) -> {
             tag.putBoolean("LodestoneTracked", data.tracked());
