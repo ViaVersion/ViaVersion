@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 
@@ -114,6 +115,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey1_20_5(3));
                 handler(playerTrackerHandler());
+                handler(wrapper -> wrapper.user().get(EfficiencyAttributeStorage.class).onLoginSent(wrapper.user()));
             }
         });
 

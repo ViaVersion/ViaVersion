@@ -20,11 +20,9 @@ package com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -41,7 +39,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class PlayerChangeItemListener extends ViaBukkitListener {
 
-    private static final int MINING_EFFICIENCY_ID = 19;
     private final Enchantment efficiency = Enchantment.getByKey(NamespacedKey.minecraft("efficiency"));
 
     public PlayerChangeItemListener(final ViaVersionPlugin plugin) {
@@ -70,24 +67,12 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
             return;
         }
 
-        final int efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
-        final PacketWrapper attributesPacket = PacketWrapper.create(ClientboundPackets1_21.UPDATE_ATTRIBUTES, connection);
-        attributesPacket.write(Types.VAR_INT, player.getEntityId());
-
-        attributesPacket.write(Types.VAR_INT, 1); // Size
-        attributesPacket.write(Types.VAR_INT, MINING_EFFICIENCY_ID); // Attribute ID
-        attributesPacket.write(Types.DOUBLE, 0D); // Base
-
-        if (efficiencyLevel > 0) {
-            final double modifierAmount = (efficiencyLevel * efficiencyLevel) + 1D;
-            attributesPacket.write(Types.VAR_INT, 1); // Modifiers
-            attributesPacket.write(Types.STRING, "minecraft:enchantment.efficiency/mainhand"); // Id
-            attributesPacket.write(Types.DOUBLE, modifierAmount);
-            attributesPacket.write(Types.BYTE, (byte) 0); // 'Add' operation
-        } else {
-            attributesPacket.write(Types.VAR_INT, 0); // Modifiers
+        final EfficiencyAttributeStorage storage = connection.get(EfficiencyAttributeStorage.class);
+        if (storage == null) {
+            return;
         }
 
-        attributesPacket.scheduleSend(Protocol1_20_5To1_21.class);
+        final int efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
+        storage.setEfficiencyLevel(new EfficiencyAttributeStorage.StoredEfficiency(player.getEntityId(), efficiencyLevel), connection);
     }
 }
