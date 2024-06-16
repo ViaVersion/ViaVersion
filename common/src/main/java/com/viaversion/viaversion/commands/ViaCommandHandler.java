@@ -58,6 +58,11 @@ public abstract class ViaCommandHandler implements ViaVersionCommand {
     }
 
     @Override
+    public void removeSubCommand(final String name) {
+        commandMap.remove(name.toLowerCase(Locale.ROOT));
+    }
+
+    @Override
     public boolean hasSubCommand(String name) {
         return commandMap.containsKey(name.toLowerCase(Locale.ROOT));
     }
