@@ -86,7 +86,13 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
-        updateItemComponents(connection, dataContainer, this::handleItemToClient, mappingData != null ? mappingData::getNewItemId : null, mappingData != null ? mappingData::getNewBlockId : null);
+        Int2IntFunction itemIdRewriter = null;
+        Int2IntFunction blockIdRewriter = null;
+        if (mappingData != null) {
+            itemIdRewriter = mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
+            blockIdRewriter = mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
+        }
+        updateItemComponents(connection, dataContainer, this::handleItemToClient, itemIdRewriter, blockIdRewriter);
         return item;
     }
 
@@ -111,13 +117,15 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         restoreTextComponents(item);
-        updateItemComponents(connection, dataContainer, this::handleItemToServer, mappingData != null ? mappingData::getOldItemId : null, mappingData != null ? mappingData::getOldBlockId : null);
-        return item;
-    }
 
-    // Temporary
-    protected void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter) {
-        updateItemComponents(connection, container, itemHandler, idRewriter, null);
+        Int2IntFunction itemIdRewriter = null;
+        Int2IntFunction blockIdRewriter = null;
+        if (mappingData != null) {
+            itemIdRewriter = mappingData.getItemMappings() != null ? mappingData::getOldItemId : null;
+            blockIdRewriter = mappingData.getBlockMappings() != null ? mappingData::getOldBlockId : null;
+        }
+        updateItemComponents(connection, dataContainer, this::handleItemToServer, itemIdRewriter, blockIdRewriter);
+        return item;
     }
 
     protected void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter, @Nullable Int2IntFunction blockIdRewriter) {
