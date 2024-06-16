@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.minecraft;
 
 public enum GameMode {
 
+    NOT_SET(""),
     SURVIVAL("Survival Mode"),
     CREATIVE("Creative Mode"),
     ADVENTURE("Adventure Mode"),
@@ -41,11 +42,11 @@ public enum GameMode {
 
     public static GameMode getById(int id) {
         return switch (id) {
-            case 0 -> SURVIVAL;
+            case -1 -> NOT_SET;
             case 1 -> CREATIVE;
             case 2 -> ADVENTURE;
             case 3 -> SPECTATOR;
-            default -> throw new IllegalArgumentException("Unknown gamemode id: " + id);
+            default /*0*/ -> SURVIVAL;
         };
     }
 }
