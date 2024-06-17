@@ -112,18 +112,20 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             @Override
             public void register() {
                 map(Types.VAR_INT); // Container id
-                handler(wrapper -> {
-                    final int windowType = wrapper.read(Types.VAR_INT);
-                    final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
-                    if (mappedId == -1) {
-                        wrapper.cancel();
-                        return;
-                    }
-
-                    wrapper.write(Types.VAR_INT, mappedId);
-                });
+                handler(wrapper -> handleMenuType(wrapper));
             }
         });
+    }
+
+    public void handleMenuType(final PacketWrapper wrapper) {
+        final int windowType = wrapper.read(Types.VAR_INT);
+        final int mappedId = protocol.getMappingData().getMenuMappings().getNewId(windowType);
+        if (mappedId == -1) {
+            wrapper.cancel();
+            return;
+        }
+
+        wrapper.write(Types.VAR_INT, mappedId);
     }
 
     public void registerSetSlot(C packetType) {
