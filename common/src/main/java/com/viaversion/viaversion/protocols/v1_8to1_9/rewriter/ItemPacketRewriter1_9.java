@@ -418,6 +418,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             }
 
             ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+            tag.put(nbtTagName("pages"), pages == null ? new ListTag<>(StringTag.class) : pages);
+
             if (pages == null) {
                 pages = new ListTag<>(Collections.singletonList(new StringTag(ComponentUtil.emptyJsonComponent().toString())));
                 tag.put("pages", pages);
@@ -480,6 +482,19 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             }
             item.setTag(tag);
             item.setData((short) data);
+        }
+        if (item.identifier() == 387) { // WRITTEN_BOOK
+            CompoundTag tag = item.tag();
+            if (tag != null) {
+                ListTag<StringTag> pages = tag.getListTag(nbtTagName("pages"), StringTag.class);
+                if (pages != null && !pages.isEmpty()) {
+                    tag.put("pages", pages);
+                    tag.remove(nbtTagName("pages"));
+                    if (tag.isEmpty()) {
+                        item.setTag(null);
+                    }
+                }
+            }
         }
 
         boolean newItem = item.identifier() >= 198 && item.identifier() <= 212;
