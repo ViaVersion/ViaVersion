@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Key;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
@@ -60,7 +61,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
                 campfireDamageType.putString("message_id", "inFire");
                 campfireDamageType.putFloat("exhaustion", 0.1F);
-                wrapper.set(Types.REGISTRY_ENTRY_ARRAY, 0, addRegistryEntries(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
+                wrapper.set(Types.REGISTRY_ENTRY_ARRAY, 0, ArrayUtil.add(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
             } else {
                 handleRegistryData1_20_5(wrapper.user(), type, entries);
             }
