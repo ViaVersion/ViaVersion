@@ -69,14 +69,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
         if (componentRewriter != null) {
             // Handle name and lore components
-            final StructuredData<Tag> customNameData = dataContainer.getNonEmpty(StructuredDataKey.CUSTOM_NAME);
-            if (customNameData != null) {
-                final Tag originalName = customNameData.value().copy();
-                componentRewriter.processTag(connection, customNameData.value());
-                if (!customNameData.value().equals(originalName)) {
-                    saveTag(createCustomTag(item), originalName, "Name");
-                }
-            }
+            updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
+            updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
 
             final StructuredData<Tag[]> loreData = dataContainer.getNonEmpty(StructuredDataKey.LORE);
             if (loreData != null) {
@@ -164,6 +158,19 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
+    private void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
+        final StructuredData<Tag> name = item.dataContainer().getNonEmpty(key);
+        if (name == null) {
+            return;
+        }
+
+        final Tag originalName = name.value().copy();
+        protocol.getComponentRewriter().processTag(connection, name.value());
+        if (!name.value().equals(originalName)) {
+            saveTag(createCustomTag(item), originalName, backupKey);
+        }
+    }
+
     protected void restoreTextComponents(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
@@ -172,12 +179,17 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         // Remove custom name
-        if (customData.value().remove(nbtTagName("customName")) != null) {
+        if (customData.value().remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
         } else {
-            final Tag name = removeBackupTag(customData.value(), "Name");
-            if (name != null) {
-                data.set(StructuredDataKey.CUSTOM_NAME, name);
+            final Tag customName = removeBackupTag(customData.value(), "custom_name");
+            if (customName != null) {
+                data.set(StructuredDataKey.CUSTOM_NAME, customName);
+            }
+
+            final Tag itemName = removeBackupTag(customData.value(), "item_name");
+            if (itemName != null) {
+                data.set(StructuredDataKey.ITEM_NAME, itemName);
             }
         }
     }
