@@ -500,9 +500,11 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 } else {
                     // Fallback to normal pages tag
                     ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
-                    for (int i = 0; i < pages.size(); i++) {
-                        final StringTag page = pages.get(i);
-                        page.setValue(ComponentUtil.convertJsonOrEmpty(page.getValue(), SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
+                    if (pages != null) {
+                        for (int i = 0; i < pages.size(); i++) {
+                            final StringTag page = pages.get(i);
+                            page.setValue(ComponentUtil.convertJsonOrEmpty(page.getValue(), SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
+                        }
                     }
                 }
             }
