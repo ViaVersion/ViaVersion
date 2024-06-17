@@ -408,6 +408,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             dataConverter.writeToTag(connection, structuredData, tag);
         }
 
+        if (tag.isEmpty()) {
+            dataItem.setTag(null);
+        }
+
         return dataItem;
     }
 
