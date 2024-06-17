@@ -158,7 +158,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
     }
 
-    private void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
+    protected void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
         final StructuredData<Tag> name = item.dataContainer().getNonEmpty(key);
         if (name == null) {
             return;
