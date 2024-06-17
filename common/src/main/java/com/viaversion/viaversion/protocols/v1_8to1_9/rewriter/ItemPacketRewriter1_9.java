@@ -486,15 +486,23 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
         if (item.identifier() == 387) { // WRITTEN_BOOK
             CompoundTag tag = item.tag();
             if (tag != null) {
-                ListTag<StringTag> pages = tag.removeUnchecked(nbtTagName("pages"));
-                if (pages != null) {
-                    if (!pages.isEmpty()) {
-                        tag.put("pages", pages);
+                // Prefer saved pages since they are more likely to be accurate
+                ListTag<StringTag> backup = tag.removeUnchecked(nbtTagName("pages"));
+                if (backup != null) {
+                    if (!backup.isEmpty()) {
+                        tag.put("pages", backup);
                     } else {
                         tag.remove("pages");
+                        if (tag.isEmpty()) {
+                            item.setTag(null);
+                        }
                     }
-                    if (tag.isEmpty()) {
-                        item.setTag(null);
+                } else {
+                    // Fallback to normal pages tag
+                    ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+                    for (int i = 0; i < pages.size(); i++) {
+                        final StringTag page = pages.get(i);
+                        page.setValue(ComponentUtil.convertJsonOrEmpty(page.getValue(), SerializerVersion.V1_9, SerializerVersion.V1_8).toString());
                     }
                 }
             }
