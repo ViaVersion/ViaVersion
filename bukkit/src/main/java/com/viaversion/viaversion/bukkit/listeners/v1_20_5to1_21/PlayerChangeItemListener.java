@@ -31,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -40,6 +41,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PlayerChangeItemListener extends ViaBukkitListener {
 
     private final Enchantment efficiency = Enchantment.getByKey(NamespacedKey.minecraft("efficiency"));
+    private final Enchantment depthStrider = Enchantment.getByKey(NamespacedKey.minecraft("depth_strider"));
+    private final Enchantment soulSpeed = Enchantment.getByKey(NamespacedKey.minecraft("soul_speed"));
+    private final Enchantment swiftSneak = Enchantment.getByKey(NamespacedKey.minecraft("swift_sneak"));
 
     public PlayerChangeItemListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_20_5To1_21.class);
@@ -49,8 +53,14 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
     public void onPlayerInventorySlotChangedEvent(final PlayerInventorySlotChangeEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = event.getNewItemStack();
-        if (event.getSlot() == player.getInventory().getHeldItemSlot()) {
-            sendAttributeUpdate(player, item);
+        final PlayerInventory inventory = player.getInventory();
+        final int slot = event.getSlot();
+        if (slot == inventory.getHeldItemSlot()) {
+            sendAttributeUpdate(player, item, Slot.HAND);
+        } else if (slot == 36) {
+            sendAttributeUpdate(player, item, Slot.BOOTS);
+        } else if (slot == 37) {
+            sendAttributeUpdate(player, item, Slot.LEGGINGS);
         }
     }
 
@@ -58,10 +68,10 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
     public void onPlayerItemHeld(final PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = player.getInventory().getItem(event.getNewSlot());
-        sendAttributeUpdate(player, item);
+        sendAttributeUpdate(player, item, Slot.HAND);
     }
 
-    private void sendAttributeUpdate(final Player player, @Nullable final ItemStack item) {
+    private void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {
         final UserConnection connection = Via.getAPI().getConnection(player.getUniqueId());
         if (connection == null || !isOnPipe(player)) {
             return;
@@ -72,7 +82,23 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
             return;
         }
 
-        final int efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
-        storage.setEfficiencyLevel(new EfficiencyAttributeStorage.StoredEfficiency(player.getEntityId(), efficiencyLevel), connection);
+        final EfficiencyAttributeStorage.ActiveEnchants activeEnchants = storage.activeEnchants();
+        int efficiencyLevel = activeEnchants.efficiency().level();
+        int soulSpeedLevel = activeEnchants.soulSpeed().level();
+        int swiftSneakLevel = activeEnchants.swiftSneak().level();
+        int depthStriderLevel = activeEnchants.depthStrider().level();
+        switch (slot) {
+            case HAND -> efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
+            case LEGGINGS -> swiftSneakLevel = item != null && swiftSneak != null ? item.getEnchantmentLevel(swiftSneak) : 0;
+            case BOOTS -> {
+                depthStriderLevel = item != null && depthStrider != null ? item.getEnchantmentLevel(depthStrider) : 0;
+                soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
+            }
+        }
+        storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, depthStriderLevel);
+    }
+
+    private enum Slot {
+        HAND, BOOTS, LEGGINGS
     }
 }

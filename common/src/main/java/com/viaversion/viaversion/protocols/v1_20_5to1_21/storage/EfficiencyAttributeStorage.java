@@ -23,57 +23,115 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
+import java.util.List;
 
 public final class EfficiencyAttributeStorage implements StorableObject {
 
-    private static final int MINING_EFFICIENCY_ID = 19;
-    private final Object lock = new Object(); // Slightly sloppy locking, but should be good enough
+    public static final EnchantAttributeModifier EFFICIENCY = new EnchantAttributeModifier("minecraft:enchantment.efficiency/mainhand", 19, 0, level -> (level * level) + 1);
+    public static final EnchantAttributeModifier SOUL_SPEED = new EnchantAttributeModifier("minecraft:enchantment.soul_speed", 21, 0.1, level -> 0.04D + ((level - 1) * 0.01D));
+    public static final EnchantAttributeModifier SWIFT_SNEAK = new EnchantAttributeModifier("minecraft:enchantment.swift_sneak", 25, 0.3, level -> level * 0.15D);
+    public static final EnchantAttributeModifier DEPTH_STRIDER = new EnchantAttributeModifier("minecraft:enchantment.depth_strider", 30, 0, level -> level / 3D);
+    private static final ActiveEnchants DEFAULT = new ActiveEnchants(-1,
+        new ActiveEnchant(EFFICIENCY, 0),
+        new ActiveEnchant(SOUL_SPEED, 0),
+        new ActiveEnchant(SWIFT_SNEAK, 0),
+        new ActiveEnchant(DEPTH_STRIDER, 0)
+    );
+    private final Object lock = new Object();
+    private volatile ActiveEnchants activeEnchants = DEFAULT;
+    private volatile boolean attributesSent = true;
     private volatile boolean loginSent;
-    private volatile StoredEfficiency efficiencyLevel;
 
-    public void setEfficiencyLevel(final StoredEfficiency efficiencyLevel, final UserConnection connection) {
-        this.efficiencyLevel = efficiencyLevel;
+    public void setEnchants(final int entityId, final UserConnection connection, final int efficiency, final int soulSpeed, final int swiftSneak, final int depthStrider) {
+        // Always called from the main thread
+        if (efficiency == activeEnchants.efficiency.level
+            && soulSpeed == activeEnchants.soulSpeed.level
+            && swiftSneak == activeEnchants.swiftSneak.level
+            && depthStrider == activeEnchants.depthStrider.level) {
+            return;
+        }
+
+        synchronized (lock) {
+            this.activeEnchants = new ActiveEnchants(entityId,
+                new ActiveEnchant(EFFICIENCY, efficiency),
+                new ActiveEnchant(SOUL_SPEED, soulSpeed),
+                new ActiveEnchant(SWIFT_SNEAK, swiftSneak),
+                new ActiveEnchant(DEPTH_STRIDER, depthStrider)
+            );
+            this.attributesSent = false;
+        }
         sendAttributesPacket(connection);
     }
 
+    public ActiveEnchants activeEnchants() {
+        return activeEnchants;
+    }
+
     public void onLoginSent(final UserConnection connection) {
+        // Always called from the netty thread
         this.loginSent = true;
         sendAttributesPacket(connection);
     }
 
     private void sendAttributesPacket(final UserConnection connection) {
-        final StoredEfficiency efficiency;
+        final ActiveEnchants enchants;
         synchronized (lock) {
             // Older servers (and often Bungee) will send world state packets before sending the login packet
-            if (!loginSent || efficiencyLevel == null) {
+            if (!loginSent || attributesSent) {
                 return;
             }
 
-            efficiency = efficiencyLevel;
-            efficiencyLevel = null;
+            enchants = this.activeEnchants;
+            attributesSent = true;
         }
 
         final PacketWrapper attributesPacket = PacketWrapper.create(ClientboundPackets1_21.UPDATE_ATTRIBUTES, connection);
-        attributesPacket.write(Types.VAR_INT, efficiency.entityId());
+        attributesPacket.write(Types.VAR_INT, enchants.entityId());
 
-        attributesPacket.write(Types.VAR_INT, 1); // Size
-        attributesPacket.write(Types.VAR_INT, MINING_EFFICIENCY_ID); // Attribute ID
-        attributesPacket.write(Types.DOUBLE, 0D); // Base
+        final List<ActiveEnchant> list = List.of(enchants.efficiency(), enchants.soulSpeed(), enchants.swiftSneak(), enchants.depthStrider());
+        attributesPacket.write(Types.VAR_INT, list.size());
+        for (final ActiveEnchant enchant : list) {
+            final EnchantAttributeModifier modifier = enchant.modifier;
+            attributesPacket.write(Types.VAR_INT, modifier.attributeId);
+            attributesPacket.write(Types.DOUBLE, modifier.baseValue);
 
-        final int level = efficiency.level;
-        if (level > 0) {
-            final double modifierAmount = (level * level) + 1D;
-            attributesPacket.write(Types.VAR_INT, 1); // Modifiers
-            attributesPacket.write(Types.STRING, "minecraft:enchantment.efficiency/mainhand"); // Id
-            attributesPacket.write(Types.DOUBLE, modifierAmount);
-            attributesPacket.write(Types.BYTE, (byte) 0); // 'Add' operation
-        } else {
-            attributesPacket.write(Types.VAR_INT, 0); // Modifiers
+            if (enchant.level > 0) {
+                attributesPacket.write(Types.VAR_INT, 1); // Modifiers
+                attributesPacket.write(Types.STRING, modifier.key);
+                attributesPacket.write(Types.DOUBLE, enchant.modifier.modifierFunction.get(enchant.level));
+                attributesPacket.write(Types.BYTE, (byte) 0); // 'Add' operation
+            } else {
+                attributesPacket.write(Types.VAR_INT, 0); // Modifiers
+            }
         }
 
         attributesPacket.scheduleSend(Protocol1_20_5To1_21.class);
     }
 
-    public record StoredEfficiency(int entityId, int level) {
+    public record ActiveEnchants(int entityId, ActiveEnchant efficiency, ActiveEnchant soulSpeed,
+                                 ActiveEnchant swiftSneak, ActiveEnchant depthStrider) {
+    }
+
+    public record ActiveEnchant(EnchantAttributeModifier modifier, int level) {
+    }
+
+    public static final class EnchantAttributeModifier { // Private constructor, equals by reference
+        private final String key;
+        private final int attributeId;
+        private final double baseValue;
+        private final LevelToModifier modifierFunction;
+
+        private EnchantAttributeModifier(final String key, final int attributeId, final double baseValue, final LevelToModifier modifierFunction) {
+            this.key = key;
+            this.attributeId = attributeId;
+            this.baseValue = baseValue;
+            this.modifierFunction = modifierFunction;
+        }
+    }
+
+    @FunctionalInterface
+    private interface LevelToModifier {
+
+        double get(int level);
     }
 }
