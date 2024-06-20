@@ -25,6 +25,12 @@ package com.viaversion.viaversion.api.minecraft;
 import com.viaversion.nbt.tag.Tag;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Represents an entry in a registry.
+ *
+ * @param key key of the registry entry
+ * @param tag data of the registry entry, or null if the client should use its default
+ */
 public record RegistryEntry(String key, @Nullable Tag tag) {
 
     public RegistryEntry withKey(final String key) {

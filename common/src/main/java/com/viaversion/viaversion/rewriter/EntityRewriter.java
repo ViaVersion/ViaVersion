@@ -527,7 +527,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             final Map<String, DimensionData> dimensionDataMap = new HashMap<>(entries.length);
             for (int i = 0; i < entries.length; i++) {
                 final RegistryEntry entry = entries[i];
-                dimensionDataMap.put(Key.stripMinecraftNamespace(entry.key()), new DimensionDataImpl(i, (CompoundTag) entry.tag()));
+                final String key = Key.stripMinecraftNamespace(entry.key());
+                final DimensionData dimensionData = entry.tag() != null
+                    ? new DimensionDataImpl(i, (CompoundTag) entry.tag())
+                    : DimensionDataImpl.withDefaultsFor(key, i);
+                dimensionDataMap.put(key, dimensionData);
             }
             tracker(connection).setDimensions(dimensionDataMap);
         }

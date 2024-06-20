@@ -48,6 +48,14 @@ public final class DimensionDataImpl implements DimensionData {
         this.minY = minY.asInt();
     }
 
+    public static DimensionData withDefaultsFor(final String key, final int id) {
+        return switch (key) {
+            case "overworld", "overworld_caves" -> new DimensionDataImpl(id, -64, 384);
+            case "the_nether", "the_end" -> new DimensionDataImpl(id, 0, 256);
+            default -> throw new IllegalArgumentException("Missing registry data for unknown dimension: " + key);
+        };
+    }
+
     @Override
     public int id() {
         return id;
