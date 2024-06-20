@@ -27,10 +27,10 @@ import java.util.List;
 
 public final class EfficiencyAttributeStorage implements StorableObject {
 
-    public static final EnchantAttributeModifier EFFICIENCY = new EnchantAttributeModifier("minecraft:enchantment.efficiency/mainhand", 19, 0, level -> (level * level) + 1);
-    public static final EnchantAttributeModifier SOUL_SPEED = new EnchantAttributeModifier("minecraft:enchantment.soul_speed", 21, 0.1, level -> 0.04D + ((level - 1) * 0.01D));
-    public static final EnchantAttributeModifier SWIFT_SNEAK = new EnchantAttributeModifier("minecraft:enchantment.swift_sneak", 25, 0.3, level -> level * 0.15D);
-    public static final EnchantAttributeModifier DEPTH_STRIDER = new EnchantAttributeModifier("minecraft:enchantment.depth_strider", 30, 0, level -> level / 3D);
+    private static final EnchantAttributeModifier EFFICIENCY = new EnchantAttributeModifier("minecraft:enchantment.efficiency/mainhand", 19, 0, level -> (level * level) + 1);
+    private static final EnchantAttributeModifier SOUL_SPEED = new EnchantAttributeModifier("minecraft:enchantment.soul_speed", 21, 0.1, level -> 0.04D + ((level - 1) * 0.01D));
+    private static final EnchantAttributeModifier SWIFT_SNEAK = new EnchantAttributeModifier("minecraft:enchantment.swift_sneak", 25, 0.3, level -> level * 0.15D);
+    private static final EnchantAttributeModifier DEPTH_STRIDER = new EnchantAttributeModifier("minecraft:enchantment.depth_strider", 30, 0, level -> level / 3D);
     private static final ActiveEnchants DEFAULT = new ActiveEnchants(-1,
         new ActiveEnchant(EFFICIENCY, 0),
         new ActiveEnchant(SOUL_SPEED, 0),
@@ -115,18 +115,7 @@ public final class EfficiencyAttributeStorage implements StorableObject {
     public record ActiveEnchant(EnchantAttributeModifier modifier, int level) {
     }
 
-    public static final class EnchantAttributeModifier { // Private constructor, equals by reference
-        private final String key;
-        private final int attributeId;
-        private final double baseValue;
-        private final LevelToModifier modifierFunction;
-
-        private EnchantAttributeModifier(final String key, final int attributeId, final double baseValue, final LevelToModifier modifierFunction) {
-            this.key = key;
-            this.attributeId = attributeId;
-            this.baseValue = baseValue;
-            this.modifierFunction = modifierFunction;
-        }
+    public record EnchantAttributeModifier(String key, int attributeId, double baseValue, LevelToModifier modifierFunction) {
     }
 
     @FunctionalInterface

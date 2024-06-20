@@ -387,7 +387,7 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         }
     }
 
-    private int withAlpha(final int rgb) {
+    static int withAlpha(final int rgb) {
         return 255 << 24 | rgb & 0xffffff;
     }
 

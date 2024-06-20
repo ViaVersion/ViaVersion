@@ -225,18 +225,32 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.FLOAT); // Offset X
-            wrapper.passthrough(Types.FLOAT); // Offset Y
-            wrapper.passthrough(Types.FLOAT); // Offset Z
+            final float offX = wrapper.passthrough(Types.FLOAT);
+            final float offY = wrapper.passthrough(Types.FLOAT);
+            final float offZ = wrapper.passthrough(Types.FLOAT);
             final float data = wrapper.passthrough(Types.FLOAT);
-            wrapper.passthrough(Types.INT); // Particle Count
+            final int count = wrapper.passthrough(Types.INT);
 
             // Read data and add it to Particle
             final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
             final int mappedId = mappings.getNewId(particleId);
             final Particle particle = new Particle(mappedId);
             if (mappedId == mappings.mappedId("entity_effect")) {
-                particle.add(Types.INT, data != 0 ? ThreadLocalRandom.current().nextInt() : 0); // rgb
+                final int color;
+                if (data == 0) {
+                    // Black
+                    color = 0;
+                } else if (count != 0) {
+                    // Randomized color
+                    color = ThreadLocalRandom.current().nextInt();
+                } else {
+                    // From offset
+                    final int red = Math.round(offX * 255);
+                    final int green = Math.round(offY * 255);
+                    final int blue = Math.round(offZ * 255);
+                    color = (red << 16) | (green << 8) | blue;
+                }
+                particle.add(Types.INT, EntityPacketRewriter1_20_5.withAlpha(color));
             } else if (particleId == mappings.id("dust_color_transition")) {
                 for (int i = 0; i < 7; i++) {
                     particle.add(Types.FLOAT, wrapper.read(Types.FLOAT));
