@@ -41,6 +41,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class PlayerChangeItemListener extends ViaBukkitListener {
 
     private final Enchantment efficiency = Enchantment.getByKey(NamespacedKey.minecraft("efficiency"));
+    private final Enchantment aquaAffinity = Enchantment.getByKey(NamespacedKey.minecraft("aqua_affinity"));
     private final Enchantment depthStrider = Enchantment.getByKey(NamespacedKey.minecraft("depth_strider"));
     private final Enchantment soulSpeed = Enchantment.getByKey(NamespacedKey.minecraft("soul_speed"));
     private final Enchantment swiftSneak = Enchantment.getByKey(NamespacedKey.minecraft("swift_sneak"));
@@ -61,6 +62,8 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
             sendAttributeUpdate(player, item, Slot.BOOTS);
         } else if (slot == 37) {
             sendAttributeUpdate(player, item, Slot.LEGGINGS);
+        } else if (slot == 39) {
+            sendAttributeUpdate(player, item, Slot.HELMET);
         }
     }
 
@@ -84,11 +87,13 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
 
         final EfficiencyAttributeStorage.ActiveEnchants activeEnchants = storage.activeEnchants();
         int efficiencyLevel = activeEnchants.efficiency().level();
+        int aquaAffinityLevel = activeEnchants.aquaAffinity().level();
         int soulSpeedLevel = activeEnchants.soulSpeed().level();
         int swiftSneakLevel = activeEnchants.swiftSneak().level();
         int depthStriderLevel = activeEnchants.depthStrider().level();
         switch (slot) {
             case HAND -> efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
+            case HELMET -> aquaAffinityLevel = item != null ? item.getEnchantmentLevel(aquaAffinity) : 0;
             case LEGGINGS -> swiftSneakLevel = item != null && swiftSneak != null ? item.getEnchantmentLevel(swiftSneak) : 0;
             case BOOTS -> {
                 depthStriderLevel = item != null && depthStrider != null ? item.getEnchantmentLevel(depthStrider) : 0;
@@ -97,10 +102,10 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
                 //soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
             }
         }
-        storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, depthStriderLevel);
+        storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, aquaAffinityLevel, depthStriderLevel);
     }
 
     private enum Slot {
-        HAND, BOOTS, LEGGINGS
+        HAND, BOOTS, LEGGINGS, HELMET
     }
 }
