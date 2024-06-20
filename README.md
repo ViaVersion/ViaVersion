@@ -11,6 +11,9 @@ The base ViaVersion jar runs on Paper and Velocity. We also have projects integr
 on Fabric, Forge, Bungee, Sponge, or as a standalone proxy to join from basically any client version on
 any server version from the past decade. **See [HERE](https://github.com/ViaVersion) for an overview of the different Via\* projects.**
 
+Note that ViaVersion will be able to **run best on either Paper servers or Fabric clients** due to having
+direct access to client/server state and more extensive API.
+
 Supported Versions:
 
 ![Table (https://i.imgur.com/sTrVnC2.png)](https://i.imgur.com/sTrVnC2.png)

@@ -93,7 +93,13 @@ public final class EfficiencyAttributeStorage implements StorableObject {
         final PacketWrapper attributesPacket = PacketWrapper.create(ClientboundPackets1_21.UPDATE_ATTRIBUTES, connection);
         attributesPacket.write(Types.VAR_INT, enchants.entityId());
 
-        final List<ActiveEnchant> list = List.of(enchants.efficiency(), enchants.soulSpeed(), enchants.swiftSneak(), enchants.depthStrider());
+        final List<ActiveEnchant> list = List.of(
+            enchants.efficiency(),
+            enchants.soulSpeed(),
+            enchants.swiftSneak(),
+            enchants.aquaAffinity(),
+            enchants.depthStrider()
+        );
         attributesPacket.write(Types.VAR_INT, list.size());
         for (final ActiveEnchant enchant : list) {
             final EnchantAttributeModifier modifier = enchant.modifier;
@@ -113,8 +119,8 @@ public final class EfficiencyAttributeStorage implements StorableObject {
         attributesPacket.scheduleSend(Protocol1_20_5To1_21.class);
     }
 
-    public record ActiveEnchants(int entityId, ActiveEnchant efficiency, ActiveEnchant aquaAffinity,
-                                 ActiveEnchant soulSpeed, ActiveEnchant swiftSneak, ActiveEnchant depthStrider) {
+    public record ActiveEnchants(int entityId, ActiveEnchant efficiency, ActiveEnchant soulSpeed,
+                                 ActiveEnchant swiftSneak, ActiveEnchant aquaAffinity, ActiveEnchant depthStrider) {
     }
 
     public record ActiveEnchant(EnchantAttributeModifier modifier, int level) {
