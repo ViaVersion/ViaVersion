@@ -92,7 +92,9 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
             case LEGGINGS -> swiftSneakLevel = item != null && swiftSneak != null ? item.getEnchantmentLevel(swiftSneak) : 0;
             case BOOTS -> {
                 depthStriderLevel = item != null && depthStrider != null ? item.getEnchantmentLevel(depthStrider) : 0;
-                soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
+                // TODO This needs continuous ticking for the supporting block as a conditional effect
+                //  and is even more prone to desync from high ping than the other attributes
+                //soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
             }
         }
         storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, depthStriderLevel);
