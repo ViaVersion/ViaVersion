@@ -17,23 +17,28 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.viaversion.viaversion.ViaManagerImpl;
-import com.viaversion.viaversion.api.Via;
+import com.google.gson.JsonObject;
+import com.viaversion.viaversion.api.platform.ViaInjector;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 
-public final class DummyInitializer {
+public class TestInjector implements ViaInjector {
 
-    private static boolean initialized;
+    @Override
+    public void inject() {
+    }
 
-    public static void init() {
-        if (initialized) {
-            return;
-        }
+    @Override
+    public void uninject() {
 
-        initialized = true;
-        Via.init(new ViaManagerImpl(new TestPlatform(), new TestInjector(), null, new TestLoader()));
+    }
 
-        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
-        manager.init();
-        manager.onServerLoaded();
+    @Override
+    public ProtocolVersion getServerProtocolVersion() {
+        return ProtocolVersion.v1_15_2;
+    }
+
+    @Override
+    public JsonObject getDump() {
+        return null;
     }
 }

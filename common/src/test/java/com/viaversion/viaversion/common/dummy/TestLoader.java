@@ -17,23 +17,15 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.viaversion.viaversion.ViaManagerImpl;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 
-public final class DummyInitializer {
+public class TestLoader implements ViaPlatformLoader {
 
-    private static boolean initialized;
+    @Override
+    public void load() {
+    }
 
-    public static void init() {
-        if (initialized) {
-            return;
-        }
-
-        initialized = true;
-        Via.init(new ViaManagerImpl(new TestPlatform(), new TestInjector(), null, new TestLoader()));
-
-        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
-        manager.init();
-        manager.onServerLoaded();
+    @Override
+    public void unload() {
     }
 }
