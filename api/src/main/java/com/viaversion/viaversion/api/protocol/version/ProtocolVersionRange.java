@@ -104,7 +104,10 @@ public class ProtocolVersionRange {
      */
     public boolean contains(final ProtocolVersion version) {
         if (this.ranges == null) return true;
-        return this.ranges.stream().anyMatch(range -> range.contains(version));
+        for (Range<ProtocolVersion> range : this.ranges) {
+            if (range.contains(version)) return true;
+        }
+        return false;
     }
 
     @Override
