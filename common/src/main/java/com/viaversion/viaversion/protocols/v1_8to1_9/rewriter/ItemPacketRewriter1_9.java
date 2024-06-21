@@ -418,7 +418,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
             }
 
             ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
-            tag.put(nbtTagName("pages"), pages == null ? new ListTag<>(StringTag.class) : pages);
+            tag.put(nbtTagName("pages"), pages == null ? new ListTag<>(StringTag.class) : pages.copy());
 
             if (pages == null) {
                 pages = new ListTag<>(Collections.singletonList(new StringTag(ComponentUtil.emptyJsonComponent().toString())));
