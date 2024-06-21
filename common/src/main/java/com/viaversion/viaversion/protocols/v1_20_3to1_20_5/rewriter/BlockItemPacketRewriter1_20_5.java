@@ -1089,13 +1089,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         data.set(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, suspiciousStewEffects);
     }
 
-    private void updateLodestoneTracker(final boolean tracked, final CompoundTag lodestonePosTag, final String lodestoneDimensionTag, final StructuredDataContainer data) {
+    private void updateLodestoneTracker(final boolean tracked, final CompoundTag lodestonePosTag, final String lodestoneDimension, final StructuredDataContainer data) {
         GlobalBlockPosition position = null;
-        if (lodestonePosTag != null && lodestoneDimensionTag != null) {
+        if (lodestonePosTag != null && lodestoneDimension != null) {
             final int x = lodestonePosTag.getInt("X");
             final int y = lodestonePosTag.getInt("Y");
             final int z = lodestonePosTag.getInt("Z");
-            position = new GlobalBlockPosition(lodestoneDimensionTag, x, y, z);
+            position = new GlobalBlockPosition(lodestoneDimension, x, y, z);
         }
         data.set(StructuredDataKey.LODESTONE_TRACKER, new LodestoneTracker(position, tracked));
     }
