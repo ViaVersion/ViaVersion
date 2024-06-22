@@ -17,23 +17,8 @@
  */
 package com.viaversion.viaversion.common.dummy;
 
-import com.viaversion.viaversion.ViaManagerImpl;
-import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.commands.ViaCommandHandler;
 
-public final class DummyInitializer {
+public class TestCommandHandler extends ViaCommandHandler {
 
-    private static boolean initialized;
-
-    public static void init() {
-        if (initialized) {
-            return;
-        }
-
-        initialized = true;
-        Via.init(new ViaManagerImpl(new TestPlatform(), new TestInjector(), new TestCommandHandler(), new TestLoader()));
-
-        final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
-        manager.init();
-        manager.onServerLoaded();
-    }
 }
