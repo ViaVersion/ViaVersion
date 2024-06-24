@@ -23,13 +23,13 @@ import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.logging.Level;
 
 public class TranslateRewriter {
 
-    private static final ComponentRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new ComponentRewriter<>(null, ComponentRewriter.ReadType.JSON) {
+    private static final TextRewriter<ClientboundPackets1_9_3> ACHIEVEMENT_TEXT_REWRITER = new TextRewriter<>(null, TextRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             String text = AchievementTranslations1_12.get(translate);

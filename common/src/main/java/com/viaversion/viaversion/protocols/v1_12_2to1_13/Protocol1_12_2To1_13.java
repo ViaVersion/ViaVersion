@@ -54,7 +54,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PaintingProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ComponentRewriter1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.TextRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.EntityPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
@@ -85,7 +85,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     private static final Set<Character> FORMATTING_CODES = Sets.newHashSet('k', 'l', 'm', 'n', 'o', 'r');
     private final EntityPacketRewriter1_13 entityRewriter = new EntityPacketRewriter1_13(this);
     private final ItemPacketRewriter1_13 itemRewriter = new ItemPacketRewriter1_13(this);
-    private final ComponentRewriter1_13<ClientboundPackets1_12_1> componentRewriter = new ComponentRewriter1_13<>(this);
+    private final TextRewriter1_13<ClientboundPackets1_12_1> textRewriter = new TextRewriter1_13<>(this);
 
     static {
         SCOREBOARD_TEAM_NAME_REWRITE.put('0', 'g');
@@ -174,7 +174,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_13.register(this);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
         registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketHandlers() {
@@ -245,8 +245,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         });
 
 
-        componentRewriter.registerBossEvent(ClientboundPackets1_12_1.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
+        textRewriter.registerBossEvent(ClientboundPackets1_12_1.BOSS_EVENT);
+        textRewriter.registerTextPacket(ClientboundPackets1_12_1.CHAT);
 
         registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
             wrapper.write(Types.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
@@ -286,7 +286,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             public void register() {
                 map(Types.UNSIGNED_BYTE); // Id
                 map(Types.STRING); // Window type
-                handler(wrapper -> componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT))); // Title
+                handler(wrapper -> textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT))); // Title
             }
         });
 
@@ -321,7 +321,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.DISCONNECT);
+        textRewriter.registerTextPacket(ClientboundPackets1_12_1.DISCONNECT);
 
         registerClientbound(ClientboundPackets1_12_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
@@ -351,7 +351,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        componentRewriter.registerPlayerCombat(ClientboundPackets1_12_1.PLAYER_COMBAT);
+        textRewriter.registerPlayerCombat(ClientboundPackets1_12_1.PLAYER_COMBAT);
 
         registerClientbound(ClientboundPackets1_12_1.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
@@ -494,15 +494,15 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             wrapper.write(Types.STRING, displayName);
         });
 
-        componentRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
+        textRewriter.registerTitle(ClientboundPackets1_12_1.SET_TITLES);
 
         // New 0x4C - Stop Sound
 
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_12_1.SOUND);
 
         registerClientbound(ClientboundPackets1_12_1.TAB_LIST, wrapper -> {
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-            componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
         registerClientbound(ClientboundPackets1_12_1.UPDATE_ADVANCEMENTS, wrapper -> {
@@ -515,8 +515,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Title
-                    componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Description
+                    textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Title
+                    textRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)); // Description
                     Item icon = wrapper.read(Types.ITEM1_8);
                     itemRewriter.handleItemToClient(wrapper.user(), icon);
                     wrapper.write(Types.ITEM1_13, icon); // Translate item to flat item
@@ -919,7 +919,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         return itemRewriter;
     }
 
-    public ComponentRewriter1_13 getComponentRewriter() {
-        return componentRewriter;
+    @Override
+    public TextRewriter1_13 getTextRewriter() {
+        return textRewriter;
     }
 }

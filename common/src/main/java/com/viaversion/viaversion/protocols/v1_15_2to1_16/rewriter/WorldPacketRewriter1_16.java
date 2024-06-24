@@ -112,7 +112,7 @@ public class WorldPacketRewriter1_16 {
             for (int i = 1; i <= 4; i++) {
                 StringTag line = compoundTag.getStringTag("Text" + i);
                 if (line != null) {
-                    JsonElement text = protocol.getComponentRewriter().processText(connection, line.getValue());
+                    JsonElement text = protocol.getTextRewriter().processText(connection, line.getValue());
                     compoundTag.putString("Text" + i, text.toString());
                 }
             }

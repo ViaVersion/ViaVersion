@@ -47,11 +47,11 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.BlockItemPacketRewriter1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ComponentRewriter1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.TextRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -70,7 +70,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
-    private final ComponentRewriter1_20_5<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5<>(this, Types1_20_5.STRUCTURED_DATA);
+    private final TextRewriter1_20_5<ClientboundPacket1_20_3> textRewriter = new TextRewriter1_20_5<>(this, Types1_20_5.STRUCTURED_DATA);
 
     public Protocol1_20_3To1_20_5() {
         super(ClientboundPacket1_20_3.class, ClientboundPacket1_20_5.class, ServerboundPacket1_20_3.class, ServerboundPacket1_20_5.class);
@@ -89,9 +89,9 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_3.AWARD_STATS);
 
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_3.SYSTEM_CHAT);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
+        textRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Types.STRING); // Server ID
@@ -317,8 +317,9 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         return tagRewriter;
     }
 
-    public ComponentRewriter<ClientboundPacket1_20_3> getComponentRewriter() {
-        return componentRewriter;
+    @Override
+    public TextRewriter<ClientboundPacket1_20_3> getTextRewriter() {
+        return textRewriter;
     }
 
     @Override

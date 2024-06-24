@@ -231,7 +231,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 }
             } else if (type == componentType || type == optionalComponentType) {
                 final Tag component = data.value();
-                protocol.getComponentRewriter().processTag(event.user(), component);
+                protocol.getTextRewriter().processTag(event.user(), component);
             }
         });
     }

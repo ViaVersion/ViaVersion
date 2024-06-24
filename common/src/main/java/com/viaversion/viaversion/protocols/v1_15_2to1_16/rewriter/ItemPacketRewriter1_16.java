@@ -159,7 +159,7 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
             ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
             if (pages != null) {
                 for (StringTag pageTag : pages) {
-                    pageTag.setValue(protocol.getComponentRewriter().processText(connection, pageTag.getValue()).toString());
+                    pageTag.setValue(protocol.getTextRewriter().processText(connection, pageTag.getValue()).toString());
                 }
             }
         }

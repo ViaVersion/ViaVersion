@@ -30,14 +30,14 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import java.util.logging.Level;
 
-public class ComponentRewriter1_13<C extends ClientboundPacketType> extends ComponentRewriter<C> {
+public class TextRewriter1_13<C extends ClientboundPacketType> extends TextRewriter<C> {
 
-    public ComponentRewriter1_13(Protocol<C, ?, ?, ?> protocol) {
+    public TextRewriter1_13(Protocol<C, ?, ?, ?> protocol) {
         super(protocol, ReadType.JSON);
     }
 

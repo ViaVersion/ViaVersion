@@ -27,7 +27,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public interface ComponentRewriter {
+public interface TextRewriter {
 
     void processTag(UserConnection connection, @Nullable Tag tag);
 
