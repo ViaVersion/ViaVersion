@@ -146,25 +146,28 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
 
         final CompoundTag tag = item.tag();
         if (tag != null && item.identifier() == 1047) { // Written book
-            updatePages(tag, "pages");
-            updatePages(tag, "filtered_pages"); // TODO This isn't a list
+            final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+            if (pages != null) {
+                for (final StringTag pageTag : pages) {
+                    updatePageTag(pageTag);
+                }
+            }
+            final CompoundTag filteredPages = tag.getCompoundTag("filtered_pages");
+            if (filteredPages != null) {
+                for (final String string : filteredPages.keySet()) {
+                    updatePageTag(filteredPages.getStringTag(string));
+                }
+            }
         }
         return super.handleItemToClient(connection, item);
     }
 
-    private void updatePages(final CompoundTag tag, final String key) {
-        final ListTag<StringTag> pages = tag.getListTag(key, StringTag.class);
-        if (pages == null) {
-            return;
-        }
-
-        for (final StringTag pageTag : pages) {
-            try {
-                final JsonElement updatedComponent = ComponentUtil.convertJson(pageTag.getValue(), SerializerVersion.V1_19_4, SerializerVersion.V1_20_3);
-                pageTag.setValue(updatedComponent.toString());
-            } catch (final Exception e) {
-                Via.getManager().debugHandler().error("Error during book conversion", e);
-            }
+    private void updatePageTag(final StringTag pageTag) {
+        try {
+            final JsonElement updatedComponent = ComponentUtil.convertJson(pageTag.getValue(), SerializerVersion.V1_19_4, SerializerVersion.V1_20_3);
+            pageTag.setValue(updatedComponent.toString());
+        } catch (final Exception e) {
+            Via.getManager().debugHandler().error("Error during book conversion", e);
         }
     }
 }
