@@ -105,7 +105,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                                 wrapper.set(Types.INT, 0, data - 1);
                             }
                             // send velocity in separate packet, 1.14 is now ignoring the velocity
-                            PacketWrapper velocity = wrapper.create(0x45);
+                            PacketWrapper velocity = wrapper.create(ClientboundPackets1_14.SET_ENTITY_MOTION);
                             velocity.write(Types.VAR_INT, entityId);
                             velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 0));
                             velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 1));

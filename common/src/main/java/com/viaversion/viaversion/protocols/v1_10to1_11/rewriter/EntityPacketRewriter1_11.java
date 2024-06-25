@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -53,8 +54,20 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 map(Types.VAR_INT); // 0 - Entity id
                 map(Types.UUID); // 1 - UUID
                 map(Types.BYTE); // 2 - Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Pitch
+                map(Types.BYTE); // 7 - Yaw
+                map(Types.INT); // 8 - Data
 
                 // Track Entity
+                handler(wrapper -> {
+                    byte type = wrapper.get(Types.BYTE, 0);
+                    if (type == EntityTypes1_10.ObjectType.FISHIHNG_HOOK.getId()) {
+                        tryFixFishingHookVelocity(wrapper);
+                    }
+                });
                 handler(objectTrackerHandler());
             }
         });
@@ -130,6 +143,11 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                     }
                 });
             }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_MOTION, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity id
+            tryFixFishingHookVelocity(wrapper);
         });
 
         registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
@@ -241,6 +259,17 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 }
             }
         });
+    }
+
+    private void tryFixFishingHookVelocity(final PacketWrapper wrapper) {
+        // TODO Fix properly
+        // Velocity handling of this changed on the client, this code still isn't entirely correct
+        final short x = wrapper.read(Types.SHORT);
+        final short y = wrapper.read(Types.SHORT);
+        final short z = wrapper.read(Types.SHORT);
+        wrapper.write(Types.SHORT, (short) (x * 1.33));
+        wrapper.write(Types.SHORT, (short) (y * 1.2));
+        wrapper.write(Types.SHORT, (short) (z * 1.33));
     }
 
     @Override
