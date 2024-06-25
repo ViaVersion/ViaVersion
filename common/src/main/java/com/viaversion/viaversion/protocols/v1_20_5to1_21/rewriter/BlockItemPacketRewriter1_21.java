@@ -73,7 +73,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
 
             // Now written as columns
             final int size = wrapper.read(Types.VAR_INT);
-            wrapper.write(Types.VAR_INT, Math.max(1, (size - 1) / 3));
+            wrapper.write(Types.VAR_INT, Math.max(0, (size - 1) / 3));
         });
 
         protocol.registerClientbound(ClientboundPackets1_20_5.LEVEL_EVENT, wrapper -> {
