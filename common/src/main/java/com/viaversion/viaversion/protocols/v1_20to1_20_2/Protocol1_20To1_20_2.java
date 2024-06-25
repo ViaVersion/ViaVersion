@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_20to1_20_2;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
@@ -88,6 +89,22 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundPackets1_20_2.CUSTOM_PAYLOAD, wrapper -> {
             wrapper.passthrough(Types.STRING); // Channel
             sanitizeCustomPayload(wrapper);
+        });
+
+        registerClientbound(ClientboundPackets1_19_4.SYSTEM_CHAT, wrapper -> {
+            if (wrapper.user().isClientSide() || Via.getPlatform().isProxy()) {
+                return;
+            }
+
+            // Workaround for GH-3438, where chat messages are sent before the login has completed, usually during proxy server switches
+            // The server will unnecessarily send an error text message, thinking a packet ran into an error, when it was just cancelled and re-queued
+            final JsonElement component = wrapper.passthrough(Types.COMPONENT);
+            if (component instanceof JsonObject object && object.has("translate")) {
+                final JsonElement translate = object.get("translate");
+                if (translate != null && translate.getAsString().equals("multiplayer.message_not_delivered")) {
+                    wrapper.cancel();
+                }
+            }
         });
 
         registerClientbound(ClientboundPackets1_19_4.RESOURCE_PACK, wrapper -> {
