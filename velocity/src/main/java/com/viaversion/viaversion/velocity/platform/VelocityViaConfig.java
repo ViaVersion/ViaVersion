@@ -20,7 +20,6 @@ package com.viaversion.viaversion.velocity.platform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class VelocityViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("nms-player-ticking", "item-cache", "quick-move-action-fix", "blockconnection-method", "change-1_9-hitbox", "change-1_14-hitbox");
     private int velocityPingInterval;
     private boolean velocityPingSave;
     private Map<String, Integer> velocityServerProtocols;
@@ -85,7 +83,7 @@ public class VelocityViaConfig extends AbstractViaConfig {
 
     @Override
     public List<String> getUnsupportedOptions() {
-        return UNSUPPORTED;
+        return BUKKIT_ONLY_OPTIONS;
     }
 
     @Override
