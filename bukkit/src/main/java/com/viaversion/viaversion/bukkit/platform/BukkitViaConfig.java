@@ -19,13 +19,11 @@ package com.viaversion.viaversion.bukkit.platform;
 
 import com.viaversion.viaversion.configuration.AbstractViaConfig;
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class BukkitViaConfig extends AbstractViaConfig {
-    private static final List<String> UNSUPPORTED = Arrays.asList("velocity-ping-interval", "velocity-ping-save", "velocity-servers");
     private boolean quickMoveActionFix;
     private boolean hitboxFix1_9;
     private boolean hitboxFix1_14;
@@ -84,6 +82,6 @@ public class BukkitViaConfig extends AbstractViaConfig {
 
     @Override
     public List<String> getUnsupportedOptions() {
-        return UNSUPPORTED;
+        return VELOCITY_ONLY_OPTIONS;
     }
 }
