@@ -44,7 +44,9 @@ public class ComponentType extends Type<JsonElement> {
         try {
             return JsonParser.parseString(s);
         } catch (JsonSyntaxException e) {
-            Via.getPlatform().getLogger().severe("Error when trying to parse json: " + s);
+            if (Via.getManager().isDebug()) {
+                Via.getPlatform().getLogger().severe("Error when trying to parse json: " + s);
+            }
             throw e;
         }
     }
