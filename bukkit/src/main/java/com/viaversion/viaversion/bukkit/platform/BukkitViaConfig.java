@@ -30,6 +30,9 @@ public class BukkitViaConfig extends AbstractViaConfig {
     private String blockConnectionMethod;
     private boolean armorToggleFix;
     private boolean registerUserConnectionOnJoin;
+    private boolean useNewDeathMessages;
+    private boolean itemCache;
+    private boolean nmsPlayerTicking;
 
     public BukkitViaConfig(final File folder, final Logger logger) {
         super(new File(folder, "config.yml"), logger);
@@ -44,6 +47,9 @@ public class BukkitViaConfig extends AbstractViaConfig {
         hitboxFix1_14 = getBoolean("change-1_14-hitbox", false);
         blockConnectionMethod = getString("blockconnection-method", "packet");
         armorToggleFix = getBoolean("armor-toggle-fix", true);
+        useNewDeathMessages = getBoolean("use-new-deathmessages", true);
+        itemCache = getBoolean("item-cache", true);
+        nmsPlayerTicking = getBoolean("nms-player-ticking", true);
     }
 
     @Override
@@ -78,6 +84,21 @@ public class BukkitViaConfig extends AbstractViaConfig {
     @Override
     public boolean isArmorToggleFix() {
         return armorToggleFix;
+    }
+
+    @Override
+    public boolean isShowNewDeathMessages() {
+        return useNewDeathMessages;
+    }
+
+    @Override
+    public boolean isItemCache() {
+        return itemCache;
+    }
+
+    @Override
+    public boolean isNMSPlayerTicking() {
+        return nmsPlayerTicking;
     }
 
     @Override

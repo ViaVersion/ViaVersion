@@ -86,16 +86,6 @@ public class VelocityViaConfig extends AbstractViaConfig {
         return BUKKIT_ONLY_OPTIONS;
     }
 
-    @Override
-    public boolean isItemCache() {
-        return false;
-    }
-
-    @Override
-    public boolean isNMSPlayerTicking() {
-        return false;
-    }
-
     /**
      * What is the interval for checking servers via ping
      * -1 for disabled

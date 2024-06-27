@@ -45,7 +45,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean checkForUpdates;
     private boolean preventCollision;
     private boolean useNewEffectIndicator;
-    private boolean useNewDeathmessages;
     private boolean suppressMetadataErrors;
     private boolean shieldBlocking;
     private boolean noDelayShieldBlocking;
@@ -63,8 +62,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private String maxPPSWarningsKickMessage;
     private boolean sendSupportedVersions;
     private boolean simulatePlayerTick;
-    private boolean itemCache;
-    private boolean nmsPlayerTicking;
     private boolean replacePistons;
     private int pistonReplacementId;
     private boolean chunkBorderFix;
@@ -112,7 +109,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         checkForUpdates = getBoolean("check-for-updates", true);
         preventCollision = getBoolean("prevent-collision", true);
         useNewEffectIndicator = getBoolean("use-new-effect-indicator", true);
-        useNewDeathmessages = getBoolean("use-new-deathmessages", true);
         suppressMetadataErrors = getBoolean("suppress-metadata-errors", false);
         shieldBlocking = getBoolean("shield-blocking", true);
         noDelayShieldBlocking = getBoolean("no-delay-shield-blocking", false);
@@ -130,8 +126,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         maxPPSWarningsKickMessage = getString("tracking-max-kick-msg", "You are sending too many packets, :(");
         sendSupportedVersions = getBoolean("send-supported-versions", false);
         simulatePlayerTick = getBoolean("simulate-pt", true);
-        itemCache = getBoolean("item-cache", true);
-        nmsPlayerTicking = getBoolean("nms-player-ticking", true);
         replacePistons = getBoolean("replace-pistons", false);
         pistonReplacementId = getInt("replacement-piston-id", 0);
         chunkBorderFix = getBoolean("chunk-border-fix", false);
@@ -260,7 +254,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public boolean isShowNewDeathMessages() {
-        return useNewDeathmessages;
+        return false;
     }
 
     @Override
@@ -350,12 +344,12 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public boolean isItemCache() {
-        return itemCache;
+        return false;
     }
 
     @Override
     public boolean isNMSPlayerTicking() {
-        return nmsPlayerTicking;
+        return false;
     }
 
     @Override
