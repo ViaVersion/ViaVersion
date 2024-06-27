@@ -150,7 +150,7 @@ public class ViaManagerImpl implements ViaManager {
                 platform.getLogger().warning("and if you're still unsure, feel free to join our Discord-Server for further assistance.");
             } else if (protocolVersion.highestSupportedProtocolVersion().olderThan(ProtocolVersion.v1_13)) {
                 platform.getLogger().warning("This version of Minecraft is extremely outdated and support for it has reached its end of life. "
-                    + "You will still be able to run Via on this Minecraft version, but we are unlikely to provide any further fixes or help with problems specific to legacy Minecraft versions. "
+                    + "You will still be able to run Via on this Minecraft version, but we will prioritize issues with legacy Minecraft versions lower. "
                     + "Please consider updating to give your players a better experience and to avoid issues that have long been fixed.");
             }
         }
