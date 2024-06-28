@@ -146,8 +146,10 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
         });
 
         protocol.registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_MOTION, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity id
-            tryFixFishingHookVelocity(wrapper);
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            if (tracker(wrapper.user()).entityType(entityId) == EntityTypes1_10.EntityType.FISHING_HOOK) {
+                tryFixFishingHookVelocity(wrapper);
+            }
         });
 
         registerRemoveEntities(ClientboundPackets1_9_3.REMOVE_ENTITIES);
