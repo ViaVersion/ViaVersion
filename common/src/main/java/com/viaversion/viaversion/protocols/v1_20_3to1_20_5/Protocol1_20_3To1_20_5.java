@@ -93,6 +93,16 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISGUISED_CHAT);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
+        // People add item hovers to all sorts of weird places...
+        componentRewriter.registerOpenScreen(ClientboundPackets1_20_3.OPEN_SCREEN);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_ACTION_BAR_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_TITLE_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_SUBTITLE_TEXT);
+        componentRewriter.registerBossEvent(ClientboundPackets1_20_3.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_20_3.TAB_LIST);
+        componentRewriter.registerPing();
+
         registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, wrapper -> {
             wrapper.passthrough(Types.STRING); // Server ID
             wrapper.passthrough(Types.BYTE_ARRAY_PRIMITIVE); // Public key
