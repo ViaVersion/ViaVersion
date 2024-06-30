@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_13_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ClientboundPackets1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPackets1_13;
-import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.ComponentRewriter1_14;
+import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.TextRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.data.MappingData1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
@@ -38,7 +38,7 @@ import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.PlayerPacketRe
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter.WorldPacketRewriter1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -65,8 +65,8 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_13.SOUND);
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
 
-        ComponentRewriter<ClientboundPackets1_13> componentRewriter = new ComponentRewriter1_14<>(this);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT);
+        TextRewriter<ClientboundPackets1_13> textRewriter = new TextRewriter1_14<>(this);
+        textRewriter.registerTextPacket(ClientboundPackets1_13.CHAT);
 
         CommandRewriter<ClientboundPackets1_13> commandRewriter = new CommandRewriter<>(this) {
             @Override

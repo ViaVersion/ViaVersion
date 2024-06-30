@@ -85,7 +85,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_2
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimPatterns1_20_3;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
@@ -101,7 +101,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
+public class TextRewriter1_20_5<C extends ClientboundPacketType> extends TextRewriter<C> {
 
     private final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
     private final StructuredDataType structuredDataType;
@@ -110,7 +110,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
      * @param protocol           protocol
      * @param structuredDataType unmapped structured data type
      */
-    public ComponentRewriter1_20_5(final Protocol<C, ?, ?, ?> protocol, final StructuredDataType structuredDataType) {
+    public TextRewriter1_20_5(final Protocol<C, ?, ?, ?> protocol, final StructuredDataType structuredDataType) {
         super(protocol, ReadType.NBT);
         this.structuredDataType = structuredDataType;
 

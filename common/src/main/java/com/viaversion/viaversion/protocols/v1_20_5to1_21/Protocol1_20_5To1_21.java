@@ -42,10 +42,10 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacketRewriter1_21;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.ComponentRewriter1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.TextRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -62,7 +62,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     private final EntityPacketRewriter1_21 entityRewriter = new EntityPacketRewriter1_21(this);
     private final BlockItemPacketRewriter1_21 itemRewriter = new BlockItemPacketRewriter1_21(this);
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
-    private final ComponentRewriter<ClientboundPacket1_20_5> componentRewriter = new ComponentRewriter1_21(this);
+    private final TextRewriter<ClientboundPacket1_20_5> textRewriter = new TextRewriter1_21(this);
 
     public Protocol1_20_5To1_21() {
         super(ClientboundPacket1_20_5.class, ClientboundPacket1_21.class, ServerboundPacket1_20_5.class, ServerboundPacket1_20_5.class);
@@ -81,18 +81,18 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_20_5.AWARD_STATS);
 
-        componentRewriter.registerOpenScreen(ClientboundPackets1_20_5.OPEN_SCREEN);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_ACTION_BAR_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_TITLE_TEXT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SET_SUBTITLE_TEXT);
-        componentRewriter.registerBossEvent(ClientboundPackets1_20_5.BOSS_EVENT);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.DISCONNECT);
-        componentRewriter.registerTabList(ClientboundPackets1_20_5.TAB_LIST);
-        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_5.PLAYER_COMBAT_KILL);
-        componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SYSTEM_CHAT);
+        textRewriter.registerOpenScreen(ClientboundPackets1_20_5.OPEN_SCREEN);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_5.SET_ACTION_BAR_TEXT);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_5.SET_TITLE_TEXT);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_5.SET_SUBTITLE_TEXT);
+        textRewriter.registerBossEvent(ClientboundPackets1_20_5.BOSS_EVENT);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_5.DISCONNECT);
+        textRewriter.registerTabList(ClientboundPackets1_20_5.TAB_LIST);
+        textRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_5.PLAYER_COMBAT_KILL);
+        textRewriter.registerTextPacket(ClientboundPackets1_20_5.SYSTEM_CHAT);
 
         registerClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Message
+            textRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Message
 
             // Holder time
             final int chatType = wrapper.read(Types.VAR_INT);
@@ -114,7 +114,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
                 }
             }
 
-            componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
+            textRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG)); // Unsigned content
 
             final int filterMaskType = wrapper.passthrough(Types.VAR_INT);
             if (filterMaskType == 2) {
@@ -245,8 +245,8 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public ComponentRewriter<ClientboundPacket1_20_5> getComponentRewriter() {
-        return componentRewriter;
+    public TextRewriter<ClientboundPacket1_20_5> getTextRewriter() {
+        return textRewriter;
     }
 
     @Override

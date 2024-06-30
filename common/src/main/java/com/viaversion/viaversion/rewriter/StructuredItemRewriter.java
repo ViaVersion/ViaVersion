@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.api.rewriter.TextRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.Map;
@@ -66,8 +66,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             }
         }
 
-        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-        if (componentRewriter != null) {
+        final TextRewriter textRewriter = protocol.getTextRewriter();
+        if (textRewriter != null) {
             // Handle name and lore components
             updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
             updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
@@ -75,7 +75,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             final StructuredData<Tag[]> loreData = dataContainer.getNonEmpty(StructuredDataKey.LORE);
             if (loreData != null) {
                 for (final Tag tag : loreData.value()) {
-                    componentRewriter.processTag(connection, tag);
+                    textRewriter.processTag(connection, tag);
                 }
             }
         }
@@ -165,7 +165,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final Tag originalName = name.value().copy();
-        protocol.getComponentRewriter().processTag(connection, name.value());
+        protocol.getTextRewriter().processTag(connection, name.value());
         if (!name.value().equals(originalName)) {
             saveTag(createCustomTag(item), originalName, backupKey);
         }

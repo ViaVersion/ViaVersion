@@ -41,7 +41,7 @@ public class CommandBlockHandler implements BlockEntityProvider.BlockEntityHandl
         StringTag out = tag.getStringTag("LastOutput");
         if (out != null) {
             JsonElement value = JsonParser.parseString(out.getValue());
-            protocol.getComponentRewriter().processText(user, value);
+            protocol.getTextRewriter().processText(user, value);
             out.setValue(value.toString());
         }
         return -1;

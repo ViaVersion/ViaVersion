@@ -29,7 +29,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.api.rewriter.TextRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -397,10 +397,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 if (wrapper.passthrough(Types.BOOLEAN)) {
                     final Tag title = wrapper.passthrough(Types.TAG);
                     final Tag description = wrapper.passthrough(Types.TAG);
-                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-                    if (componentRewriter != null) {
-                        componentRewriter.processTag(wrapper.user(), title);
-                        componentRewriter.processTag(wrapper.user(), description);
+                    final TextRewriter textRewriter = protocol.getTextRewriter();
+                    if (textRewriter != null) {
+                        textRewriter.processTag(wrapper.user(), title);
+                        textRewriter.processTag(wrapper.user(), description);
                     }
 
                     handleClientboundItem(wrapper); // Icon

@@ -23,14 +23,14 @@ import com.google.gson.JsonPrimitive;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPackets1_15;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.Protocol1_15_2To1_16;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.TextRewriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ComponentRewriter1_16 extends ComponentRewriter<ClientboundPackets1_15> {
+public class TextRewriter1_16 extends TextRewriter<ClientboundPackets1_15> {
     private final Map<String, String> mappings = new HashMap<>();
 
-    public ComponentRewriter1_16(Protocol1_15_2To1_16 protocol) {
+    public TextRewriter1_16(Protocol1_15_2To1_16 protocol) {
         super(protocol, ReadType.JSON);
         mappings.put("attribute.name.generic.armorToughness", "attribute.name.generic.armor_toughness");
         mappings.put("attribute.name.generic.attackDamage", "attribute.name.generic.attack_damage");

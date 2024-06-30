@@ -42,7 +42,7 @@ import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ClientboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.packet.ServerboundPackets1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.provider.PlayerAbilitiesProvider;
-import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ComponentRewriter1_16;
+import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.TextRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ItemPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.WorldPacketRewriter1_16;
@@ -63,7 +63,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.15", "1.16");
     private final EntityPacketRewriter1_16 entityRewriter = new EntityPacketRewriter1_16(this);
     private final ItemPacketRewriter1_16 itemRewriter = new ItemPacketRewriter1_16(this);
-    private final ComponentRewriter1_16 componentRewriter = new ComponentRewriter1_16(this);
+    private final TextRewriter1_16 textRewriter = new TextRewriter1_16(this);
     private final TagRewriter<ClientboundPackets1_15> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_15_2To1_16() {
@@ -129,14 +129,14 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                 map(Types.COMPONENT);
                 map(Types.BYTE);
                 handler(wrapper -> {
-                    componentRewriter.processText(wrapper.user(), wrapper.get(Types.COMPONENT, 0));
+                    textRewriter.processText(wrapper.user(), wrapper.get(Types.COMPONENT, 0));
                     wrapper.write(Types.UUID, ZERO_UUID); // Sender uuid - always send as 'system'
                 });
             }
         });
-        componentRewriter.registerBossEvent(ClientboundPackets1_15.BOSS_EVENT);
-        componentRewriter.registerTitle(ClientboundPackets1_15.SET_TITLES);
-        componentRewriter.registerPlayerCombat(ClientboundPackets1_15.PLAYER_COMBAT);
+        textRewriter.registerBossEvent(ClientboundPackets1_15.BOSS_EVENT);
+        textRewriter.registerTitle(ClientboundPackets1_15.SET_TITLES);
+        textRewriter.registerPlayerCombat(ClientboundPackets1_15.PLAYER_COMBAT);
 
         SoundRewriter<ClientboundPackets1_15> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound(ClientboundPackets1_15.SOUND);
@@ -255,8 +255,9 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         return itemRewriter;
     }
 
-    public ComponentRewriter1_16 getComponentRewriter() {
-        return componentRewriter;
+    @Override
+    public TextRewriter1_16 getTextRewriter() {
+        return textRewriter;
     }
 
     @Override

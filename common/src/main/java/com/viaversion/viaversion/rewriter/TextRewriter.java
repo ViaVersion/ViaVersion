@@ -41,25 +41,25 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Handles json and tag components, containing methods to override certain parts of the handling.
- * Also contains methods to register a few of the packets using components.
+ * Handles json and tag text components, containing methods to override certain parts of the handling.
+ * Also contains methods to register a few of the packets using text components.
  */
-public class ComponentRewriter<C extends ClientboundPacketType> implements com.viaversion.viaversion.api.rewriter.ComponentRewriter {
+public class TextRewriter<C extends ClientboundPacketType> implements com.viaversion.viaversion.api.rewriter.TextRewriter {
     protected final Protocol<C, ?, ?, ?> protocol;
     protected final ReadType type;
 
-    public ComponentRewriter(final Protocol<C, ?, ?, ?> protocol, final ReadType type) {
+    public TextRewriter(final Protocol<C, ?, ?, ?> protocol, final ReadType type) {
         this.protocol = protocol;
         this.type = type;
     }
 
     /**
-     * Processes components at the beginning of the packet.
+     * Processes text components at the beginning of the packet.
      * Used for packets that have components as their very first value, so no special pre-reading is necessary.
      *
      * @param packetType clientbound packet type
      */
-    public void registerComponentPacket(final C packetType) {
+    public void registerTextPacket(final C packetType) {
         protocol.registerClientbound(packetType, this::passthroughAndProcess);
     }
 
@@ -80,7 +80,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     /**
-     * Handles sub 1.17 combat event components.
+     * Handles sub 1.17 combat event text components.
      */
     public void registerPlayerCombat(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {

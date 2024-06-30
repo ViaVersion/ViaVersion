@@ -1194,7 +1194,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     private Tag jsonToTag(final UserConnection connection, final StringTag stringTag) {
         // Use the same version for deserializing and serializing, as the only write changes are in hovers, which we handle ourselves
         final Tag tag = ComponentUtil.jsonStringToTag(stringTag.getValue(), SerializerVersion.V1_20_3, SerializerVersion.V1_20_3);
-        protocol.getComponentRewriter().processTag(connection, tag);
+        protocol.getTextRewriter().processTag(connection, tag);
         return tag;
     }
 
