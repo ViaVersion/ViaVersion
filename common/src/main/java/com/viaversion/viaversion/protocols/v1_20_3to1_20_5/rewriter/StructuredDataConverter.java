@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
 import com.google.common.base.Preconditions;
+import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -798,28 +799,37 @@ public final class StructuredDataConverter {
 
     private void convertItemList(final UserConnection connection, final Item[] items, final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> itemsTag = new ListTag<>(CompoundTag.class);
-        for (final Item item : items) {
-            final CompoundTag savedItem = new CompoundTag();
-            if (item != null) {
-                final String name = toMappedItemName(item.identifier());
-                savedItem.putString("id", name);
-                if (backupInconvertibleData && name.isEmpty()) {
-                    savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
-                }
-                savedItem.putByte("Count", (byte) item.amount());
-
-                final CompoundTag itemTag = new CompoundTag();
-                for (final StructuredData<?> data : item.dataContainer().data().values()) {
-                    writeToTag(connection, data, itemTag);
-                }
-                savedItem.put("tag", itemTag);
-            } else {
-                savedItem.putString("id", "air");
+        for (int i = 0; i < items.length; i++) {
+            final Item item = items[i];
+            final CompoundTag savedItem = itemToTag(connection, item);
+            // 1.20.4 clients need the Slot to display the item correctly
+            if (backupInconvertibleData) {
+                savedItem.putByte("Slot", (byte) i);
             }
-
             itemsTag.add(savedItem);
         }
         tag.put(key, itemsTag);
+    }
+
+    private CompoundTag itemToTag(final UserConnection connection, final Item item) {
+        final CompoundTag savedItem = new CompoundTag();
+        if (item != null) {
+            final String name = toMappedItemName(item.identifier());
+            savedItem.putString("id", name);
+            if (backupInconvertibleData && name.isEmpty()) {
+                savedItem.putInt(ITEM_BACKUP_TAG_KEY, item.identifier());
+            }
+            savedItem.putByte("Count", (byte) item.amount());
+
+            final CompoundTag itemTag = new CompoundTag();
+            for (final StructuredData<?> data : item.dataContainer().data().values()) {
+                writeToTag(connection, data, itemTag);
+            }
+            savedItem.put("tag", itemTag);
+        } else {
+            savedItem.putString("id", "air");
+        }
+        return savedItem;
     }
 
     private void convertEnchantments(final Enchantments data, final CompoundTag tag, final boolean storedEnchantments) {
