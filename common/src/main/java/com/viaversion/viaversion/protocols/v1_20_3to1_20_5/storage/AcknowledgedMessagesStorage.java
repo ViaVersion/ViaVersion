@@ -23,46 +23,59 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Tracks the last Secure Chat state that we received from the client. This is important to always have a valid 'last
+ * seen' state that is consistent with future and past updates from the client (which may be signed). This state is
+ * used to construct signed command packets to the outdated server from unsigned ones from the modern client.
+ * <ul>
+ *     <li>If we last forwarded a chat or command packet from the client, we have a known 'last seen' that we can
+ *     reuse.</li>
+ *     <li>If we last forwarded a chat acknowledgement packet, the previous 'last seen' cannot be reused. We
+ *     cannot predict an up-to-date 'last seen', as we do not know which messages the client actually saw.</li>
+ *     <li>Therefore, we need to hold back any acknowledgement packets so that we can continue to reuse the last valid
+ *     'last seen' state.</li>
+ *     <li>However, there is a limit to the number of messages that can remain unacknowledged on the server.</li>
+ *     <li>To address this, we know that if the client has moved its 'last seen' window far enough, we can fill in the
+ *     gap with dummy 'last seen', and it will never be checked.</li>
+ * </ul>
+ */
 public final class AcknowledgedMessagesStorage implements StorableObject {
     private static final int MAX_HISTORY = 20;
-    private final boolean[] trackedMessages = new boolean[MAX_HISTORY];
+    private static final int MINIMUM_DELAYED_ACK_COUNT = MAX_HISTORY;
+    private static final BitSet DUMMY_LAST_SEEN_MESSAGES = new BitSet();
+
     private Boolean secureChatEnforced;
     private ChatSession chatSession;
-    private int offset;
-    private int tail;
-    private byte[] lastMessage;
 
-    public boolean add(final byte[] message) {
-        if (Arrays.equals(message, lastMessage)) {
-            return false;
+    private BitSet lastSeenMessages = new BitSet();
+    private int delayedAckCount;
+
+    public int updateFromMessage(int ackCount, BitSet lastSeenMessages) {
+        // We held back some acknowledged messages, so flush that out now that we have a known 'last seen' state again
+        int delayedAckCount = this.delayedAckCount;
+        this.delayedAckCount = 0;
+        this.lastSeenMessages = lastSeenMessages;
+        return ackCount + delayedAckCount;
+    }
+
+    public int accumulateAckCount(int ackCount) {
+        delayedAckCount += ackCount;
+        int ackCountToForward = delayedAckCount - MINIMUM_DELAYED_ACK_COUNT;
+        if (ackCountToForward >= MAX_HISTORY) {
+            // Because we only forward acknowledgements above the window size, we don't have to shift the previous 'last seen' state
+            lastSeenMessages = DUMMY_LAST_SEEN_MESSAGES;
+            delayedAckCount = MINIMUM_DELAYED_ACK_COUNT;
+            return ackCountToForward;
         }
-        this.lastMessage = message;
-        this.offset++;
-        this.trackedMessages[this.tail] = true;
-        this.tail = (this.tail + 1) % MAX_HISTORY;
-        return true;
+        return 0;
     }
 
-    public BitSet toAck() {
-        final BitSet acks = new BitSet(MAX_HISTORY);
-        for (int i = 0; i < MAX_HISTORY; i++) {
-            final int messageIndex = (this.tail + i) % MAX_HISTORY;
-            acks.set(i, this.trackedMessages[messageIndex]);
-        }
-        return acks;
-    }
-
-    public int offset() {
-        return this.offset;
-    }
-
-    public void clearOffset() {
-        this.offset = 0;
+    public BitSet createSpoofedAck() {
+        return lastSeenMessages;
     }
 
     public void setSecureChatEnforced(final boolean secureChatEnforced) {
@@ -98,10 +111,8 @@ public final class AcknowledgedMessagesStorage implements StorableObject {
     }
 
     public void clear() {
-        this.offset = 0;
-        this.tail = 0;
-        this.lastMessage = null;
-        Arrays.fill(this.trackedMessages, false);
+        lastSeenMessages = new BitSet();
+        delayedAckCount = 0;
     }
 
     @Override

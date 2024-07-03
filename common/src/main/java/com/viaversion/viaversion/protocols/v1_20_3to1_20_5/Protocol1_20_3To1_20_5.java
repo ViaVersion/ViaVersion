@@ -56,6 +56,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ProtocolLogger;
+import java.util.BitSet;
 import java.util.UUID;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
@@ -124,26 +125,6 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             }
         });
 
-        // Big problem with this update: Without access to the client, this cannot 100% predict the
-        // correct offset. This means we have to entirely discard client acknowledgements and fake them.
-        registerClientbound(ClientboundPackets1_20_3.PLAYER_CHAT, wrapper -> {
-            wrapper.passthrough(Types.UUID); // Sender
-            wrapper.passthrough(Types.VAR_INT); // Index
-            final byte[] signature = wrapper.passthrough(Types.OPTIONAL_SIGNATURE_BYTES);
-            if (signature == null) {
-                return;
-            }
-
-            // Mimic client behavior for acknowledgements
-            final AcknowledgedMessagesStorage storage = wrapper.user().get(AcknowledgedMessagesStorage.class);
-            if (storage.add(signature) && storage.offset() > 64) {
-                final PacketWrapper chatAck = wrapper.create(ServerboundPackets1_20_3.CHAT_ACK);
-                chatAck.write(Types.VAR_INT, storage.offset());
-                chatAck.sendToServer(Protocol1_20_3To1_20_5.class);
-
-                storage.clearOffset();
-            }
-        });
         registerServerbound(ServerboundPackets1_20_5.CHAT, wrapper -> {
             wrapper.passthrough(Types.STRING); // Message
             wrapper.passthrough(Types.LONG); // Timestamp
@@ -161,7 +142,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 wrapper.write(Types.OPTIONAL_SIGNATURE_BYTES, null);
             }
 
-            replaceChatAck(wrapper, storage);
+            fixChatAck(wrapper, storage);
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND_SIGNED, ServerboundPackets1_20_3.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Types.STRING); // Command
@@ -188,7 +169,16 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
                 }
             }
 
-            replaceChatAck(wrapper, storage);
+            fixChatAck(wrapper, storage);
+        });
+        registerServerbound(ServerboundPackets1_20_5.CHAT_ACK, wrapper -> {
+            final int offset = wrapper.read(Types.VAR_INT);
+            final int fixedOffset = wrapper.user().get(AcknowledgedMessagesStorage.class).accumulateAckCount(offset);
+            if (fixedOffset > 0) {
+                wrapper.write(Types.VAR_INT, fixedOffset);
+            } else {
+                wrapper.cancel();
+            }
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_COMMAND, wrapper -> {
             wrapper.passthrough(Types.STRING); // Command
@@ -197,7 +187,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
             wrapper.write(Types.LONG, 0L); // Salt
             wrapper.write(Types.VAR_INT, 0); // No signatures
 
-            writeChatAck(wrapper, wrapper.user().get(AcknowledgedMessagesStorage.class));
+            writeSpoofedChatAck(wrapper, wrapper.user().get(AcknowledgedMessagesStorage.class));
         });
         registerServerbound(ServerboundPackets1_20_5.CHAT_SESSION_UPDATE, wrapper -> {
             // Delay this until we know whether the server enforces secure chat
@@ -214,7 +204,6 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
 
             wrapper.cancel();
         });
-        cancelServerbound(ServerboundPackets1_20_5.CHAT_ACK);
 
         registerClientbound(ClientboundPackets1_20_3.START_CONFIGURATION, wrapper -> wrapper.user().put(new AcknowledgedMessagesStorage()));
 
@@ -241,16 +230,19 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_5.DEBUG_SAMPLE_SUBSCRIPTION);
     }
 
-    private void replaceChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
-        wrapper.read(Types.VAR_INT); // Offset
-        wrapper.read(Types.ACKNOWLEDGED_BIT_SET); // Acknowledged
-        writeChatAck(wrapper, storage);
+    private void fixChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
+        final int offset = wrapper.read(Types.VAR_INT);
+        final BitSet acknowledged = wrapper.read(Types.ACKNOWLEDGED_BIT_SET);
+        final int fixedOffset = storage.updateFromMessage(offset, acknowledged);
+        wrapper.write(Types.VAR_INT, fixedOffset);
+        // Never change this, as this message (and future ones) are signed with it
+        wrapper.write(Types.ACKNOWLEDGED_BIT_SET, acknowledged);
     }
 
-    private void writeChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
-        wrapper.write(Types.VAR_INT, storage.offset());
-        wrapper.write(Types.ACKNOWLEDGED_BIT_SET, storage.toAck());
-        storage.clearOffset();
+    private void writeSpoofedChatAck(final PacketWrapper wrapper, final AcknowledgedMessagesStorage storage) {
+        // As we don't have the new state from the client, replay what we last received
+        wrapper.write(Types.VAR_INT, 0); // Offset
+        wrapper.write(Types.ACKNOWLEDGED_BIT_SET, storage.createSpoofedAck()); // Acknowledged
     }
 
     @Override
