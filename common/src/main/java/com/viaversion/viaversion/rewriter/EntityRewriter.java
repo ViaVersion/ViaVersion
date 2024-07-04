@@ -589,6 +589,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             byte type = wrapper.get(Types.BYTE, 0);
 
             EntityType entType = objectTypeFromId(type);
+            if (entType == null) {
+                return;
+            }
             // Register Type ID
             tracker(wrapper.user()).addEntity(entityId, entType);
         };
