@@ -38,7 +38,6 @@ public class EntityTypes1_12 {
         }
         if (type == null) {
             Via.getPlatform().getLogger().severe("Could not find 1.12 type id " + typeId + " objectType=" + object);
-            return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type;
     }

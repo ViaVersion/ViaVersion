@@ -82,6 +82,8 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     int typeId = wrapper.get(Types.VAR_INT, 1);
 
                     EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
+                    if (type1_13 == null) return;
+
                     typeId = newEntityId(type1_13.getId());
                     EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
 
