@@ -245,7 +245,7 @@ public enum EntityTypes1_14 implements EntityType {
     }
 
     public static EntityType getTypeFromId(final int typeId) {
-        return EntityTypeUtil.getTypeFromId(TYPES, typeId, ENTITY);
+        return EntityTypeUtil.getTypeFromId(TYPES, typeId, PIG);
     }
 
     public static void initialize(final Protocol<?, ?, ?, ?> protocol) {
