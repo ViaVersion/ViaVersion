@@ -557,6 +557,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             }
 
             EntityType entType = typeFromId(trackMappedType ? newType : type);
+            if (entType == null) {
+                return;
+            }
             // Register Type ID
             tracker(wrapper.user()).addEntity(entityId, entType);
 
