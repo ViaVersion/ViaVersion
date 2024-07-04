@@ -373,6 +373,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 }
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
+                    if (!tracker(wrapper.user()).hasEntity(entityId)) {
+                        wrapper.cancel();
+                        return;
+                    }
                     List<EntityData> entityData = wrapper.get(mappedDataType, 0);
                     handleEntityData(entityId, entityData, wrapper.user());
                 });
