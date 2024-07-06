@@ -31,15 +31,15 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
     private final TrackedEntity trackedEntity;
     private final int entityId;
     private final List<EntityData> dataList;
-    private final EntityData meta;
+    private final EntityData data;
     private List<EntityData> extraData;
     private boolean cancel;
 
-    public EntityDataHandlerEventImpl(UserConnection connection, @Nullable TrackedEntity trackedEntity, int entityId, EntityData meta, List<EntityData> dataList) {
+    public EntityDataHandlerEventImpl(UserConnection connection, @Nullable TrackedEntity trackedEntity, int entityId, EntityData data, List<EntityData> dataList) {
         this.connection = connection;
         this.trackedEntity = trackedEntity;
         this.entityId = entityId;
-        this.meta = meta;
+        this.data = data;
         this.dataList = dataList;
     }
 
@@ -60,7 +60,7 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
 
     @Override
     public EntityData data() {
-        return meta;
+        return data;
     }
 
     @Override
@@ -75,9 +75,9 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
 
     @Override
     public @Nullable EntityData dataAtIndex(int index) {
-        for (EntityData meta : dataList) {
-            if (index == meta.id()) {
-                return meta;
+        for (EntityData data : dataList) {
+            if (index == data.id()) {
+                return data;
             }
         }
         return null;

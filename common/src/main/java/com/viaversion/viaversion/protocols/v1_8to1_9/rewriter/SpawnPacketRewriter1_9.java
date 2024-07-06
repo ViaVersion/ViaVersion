@@ -203,7 +203,7 @@ public class SpawnPacketRewriter1_9 {
                         entityDataList.clear();
                     }
                 });
-                // Handler for meta data
+                // Handler for entity data
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);

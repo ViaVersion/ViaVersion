@@ -164,7 +164,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
         for (EntityData entityData : new ArrayList<>(entityDataList)) {
             if (type == EntityType.SKELETON) {
-                if ((getMetaByIndex(entityDataList, 12)) == null) {
+                if ((getDataByIndex(entityDataList, 12)) == null) {
                     entityDataList.add(new EntityData(12, EntityDataTypes1_9.BOOLEAN, true));
                 }
             }
@@ -204,15 +204,15 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 }
             }
             if (type == EntityType.ARMOR_STAND && Via.getConfig().isHologramPatch()) {
-                if (entityData.id() == 0 && getMetaByIndex(entityDataList, 10) != null) {
-                    EntityData meta = getMetaByIndex(entityDataList, 10); //Only happens if the armorstand is small
-                    byte data = (byte) entityData.getValue();
+                if (entityData.id() == 0 && getDataByIndex(entityDataList, 10) != null) {
+                    EntityData data = getDataByIndex(entityDataList, 10); //Only happens if the armorstand is small
+                    byte value = (byte) entityData.getValue();
                     // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
                     EntityData displayName;
                     EntityData displayNameVisible;
-                    if ((data & 0x20) == 0x20 && ((byte) meta.getValue() & 0x01) == 0x01
-                        && (displayName = getMetaByIndex(entityDataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
-                        && (displayNameVisible = getMetaByIndex(entityDataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
+                    if ((value & 0x20) == 0x20 && ((byte) data.getValue() & 0x01) == 0x01
+                        && (displayName = getDataByIndex(entityDataList, 2)) != null && !((String) displayName.getValue()).isEmpty()
+                        && (displayNameVisible = getDataByIndex(entityDataList, 3)) != null && (boolean) displayNameVisible.getValue()) {
                         if (!knownHolograms.contains(entityId)) {
                             knownHolograms.add(entityId);
                             // Send movement
@@ -267,10 +267,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         }
     }
 
-    public EntityData getMetaByIndex(List<EntityData> list, int index) {
-        for (EntityData meta : list)
-            if (index == meta.id()) {
-                return meta;
+    public EntityData getDataByIndex(List<EntityData> list, int index) {
+        for (EntityData data : list)
+            if (index == data.id()) {
+                return data;
             }
         return null;
     }

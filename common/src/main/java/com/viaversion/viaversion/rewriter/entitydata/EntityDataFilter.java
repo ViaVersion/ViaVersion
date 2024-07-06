@@ -31,7 +31,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
                                @Nullable EntityDataType dataType, int index, EntityDataHandler handler) {
 
     public EntityDataFilter {
-        Preconditions.checkNotNull(handler, "MetaHandler cannot be null");
+        Preconditions.checkNotNull(handler, "EntityDataHandler cannot be null");
     }
 
     /**
@@ -84,7 +84,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
      *
      * @param type     entity type
      * @param entityData entityData
-     * @return whether the meta should be filtered
+     * @return whether the data should be filtered
      */
     public boolean isFiltered(@Nullable EntityType type, EntityData entityData) {
         // Check if no specific index is filtered or the indexes are equal
@@ -212,10 +212,10 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
         }
 
         public void mapDataType(Int2ObjectFunction<EntityDataType> updateFunction) {
-            handler((event, meta) -> {
-                EntityDataType mappedType = updateFunction.apply(meta.dataType().typeId());
+            handler((event, data) -> {
+                EntityDataType mappedType = updateFunction.apply(data.dataType().typeId());
                 if (mappedType != null) {
-                    meta.setDataType(mappedType);
+                    data.setDataType(mappedType);
                 } else {
                     event.cancel();
                 }
@@ -230,7 +230,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void cancel(int index) {
             this.index = index;
-            handler((event, meta) -> event.cancel());
+            handler((event, data) -> event.cancel());
         }
 
         /**
@@ -242,7 +242,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void toIndex(int newIndex) {
             Preconditions.checkArgument(this.index != -1);
-            handler((event, meta) -> event.setIndex(newIndex));
+            handler((event, data) -> event.setIndex(newIndex));
         }
 
         /**
@@ -254,7 +254,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void addIndex(int index) {
             Preconditions.checkArgument(this.index == -1);
-            handler((event, meta) -> {
+            handler((event, data) -> {
                 if (event.index() >= index) {
                     event.setIndex(event.index() + 1);
                 }
@@ -270,18 +270,18 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void removeIndex(int index) {
             Preconditions.checkArgument(this.index == -1);
-            handler((event, meta) -> {
-                int metaIndex = event.index();
-                if (metaIndex == index) {
+            handler((event, data) -> {
+                int dataIndex = event.index();
+                if (dataIndex == index) {
                     event.cancel();
-                } else if (metaIndex > index) {
-                    event.setIndex(metaIndex - 1);
+                } else if (dataIndex > index) {
+                    event.setIndex(dataIndex - 1);
                 }
             });
         }
 
         /**
-         * Creates and registers the created MetaFilter in the linked {@link EntityRewriter} instance.
+         * Creates and registers the created EntityDataFilter in the linked {@link EntityRewriter} instance.
          */
         public void register() {
             rewriter.registerFilter(build());

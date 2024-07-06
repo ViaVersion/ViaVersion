@@ -113,8 +113,8 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                 data.setDataType(Types1_20_3.ENTITY_DATA_TYPES.byId(type.typeId()));
             }
         });
-        filter().dataType(Types1_20_3.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
-            final Particle particle = meta.value();
+        filter().dataType(Types1_20_3.ENTITY_DATA_TYPES.particleType).handler((event, data) -> {
+            final Particle particle = data.value();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
             if (particle.id() == particleMappings.id("vibration")) {
                 // Change the type of the resource key argument

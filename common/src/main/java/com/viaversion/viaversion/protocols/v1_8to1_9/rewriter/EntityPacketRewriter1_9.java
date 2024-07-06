@@ -222,7 +222,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     }
                 });
 
-                // Handler for meta data
+                // Handler for entity data
                 handler(wrapper -> {
                     List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
@@ -425,8 +425,8 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                         val = 1;
                     }
                     int newIndex = EntityDataIndex1_9.PLAYER_HAND.getNewIndex();
-                    EntityDataType metaType = EntityDataIndex1_9.PLAYER_HAND.getNewType();
-                    event.createExtraData(new EntityData(newIndex, metaType, val));
+                    EntityDataType dataType = EntityDataIndex1_9.PLAYER_HAND.getNewType();
+                    event.createExtraData(new EntityData(newIndex, dataType, val));
                 }
                 break;
             case OPTIONAL_UUID:

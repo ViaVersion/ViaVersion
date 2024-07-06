@@ -136,11 +136,11 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
     @Override
     protected void registerRewrites() {
         filter().mapDataType(Types1_17.ENTITY_DATA_TYPES::byId);
-        filter().dataType(Types1_17.ENTITY_DATA_TYPES.poseType).handler((event, meta) -> {
-            int pose = meta.value();
+        filter().dataType(Types1_17.ENTITY_DATA_TYPES.poseType).handler((event, data) -> {
+            int pose = data.value();
             if (pose > 5) {
                 // Added LONG_JUMP at 6
-                meta.setValue(pose + 1);
+                data.setValue(pose + 1);
             }
         });
         registerEntityDataTypeHandler(Types1_17.ENTITY_DATA_TYPES.itemType, Types1_17.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_17.ENTITY_DATA_TYPES.particleType);

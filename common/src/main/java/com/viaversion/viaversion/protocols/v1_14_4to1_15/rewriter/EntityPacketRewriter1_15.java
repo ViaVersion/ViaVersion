@@ -123,7 +123,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
 
 
     private void sendEntityDataPacket(PacketWrapper wrapper, int entityId) {
-        // Meta is no longer included in the spawn packets, but sent separately
+        // Data is no longer included in the spawn packets, but sent separately
         List<EntityData> entityData = wrapper.read(Types1_14.ENTITY_DATA_LIST);
         if (entityData.isEmpty()) {
             return;
@@ -133,7 +133,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
         wrapper.send(Protocol1_14_4To1_15.class);
         wrapper.cancel();
 
-        // Handle meta
+        // Handle data
         handleEntityData(entityId, entityData, wrapper.user());
 
         PacketWrapper entityDataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());

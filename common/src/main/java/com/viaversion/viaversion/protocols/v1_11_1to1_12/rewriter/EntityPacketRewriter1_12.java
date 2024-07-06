@@ -75,9 +75,9 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> {
-            if (meta.getValue() instanceof Item) {
-                meta.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), meta.value()));
+        filter().handler((event, data) -> {
+            if (data.getValue() instanceof Item) {
+                data.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), data.value()));
             }
         });
 

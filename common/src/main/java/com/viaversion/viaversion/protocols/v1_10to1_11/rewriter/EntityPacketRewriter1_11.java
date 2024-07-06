@@ -230,7 +230,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        filter().type(EntityType.ARMOR_STAND).index(0).handler((event, meta) -> {
+        filter().type(EntityType.ARMOR_STAND).index(0).handler((event, data) -> {
             if (!Via.getConfig().isHologramPatch()) {
                 return;
             }
@@ -242,9 +242,9 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 return;
             }
 
-            byte data = meta.value();
+            byte value = data.value();
             // Check invisible | Check small | Check if custom name is empty | Check if custom name visible is true
-            if ((data & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
+            if ((value & 0x20) == 0x20 && ((byte) flags.getValue() & 0x01) == 0x01
                 && !((String) customName.getValue()).isEmpty() && (boolean) customNameVisible.getValue()) {
                 EntityTracker1_11 tracker = tracker(event.user());
                 int entityId = event.entityId();

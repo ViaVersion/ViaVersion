@@ -317,8 +317,8 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
     @Override
     protected void registerRewrites() {
         filter().mapDataType(Types1_19.ENTITY_DATA_TYPES::byId);
-        filter().dataType(Types1_19.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
-            final Particle particle = (Particle) meta.getValue();
+        filter().dataType(Types1_19.ENTITY_DATA_TYPES.particleType).handler((event, data) -> {
+            final Particle particle = (Particle) data.getValue();
             final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
             if (particle.id() == particleMappings.id("vibration")) {
                 // Remove the position

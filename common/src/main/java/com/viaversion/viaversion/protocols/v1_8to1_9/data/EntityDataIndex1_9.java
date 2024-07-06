@@ -255,10 +255,10 @@ public enum EntityDataIndex1_9 {
     public static EntityDataIndex1_9 searchIndex(EntityType type, int index) {
         EntityType currentType = type;
         do {
-            Optional<EntityDataIndex1_9> optMeta = getIndex(currentType, index);
+            Optional<EntityDataIndex1_9> optData = getIndex(currentType, index);
 
-            if (optMeta.isPresent()) {
-                return optMeta.get();
+            if (optData.isPresent()) {
+                return optData.get();
             }
 
             currentType = currentType.getParent();

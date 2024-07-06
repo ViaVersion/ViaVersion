@@ -211,8 +211,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
         registerBlockStateHandler(EntityTypes1_16.ABSTRACT_MINECART, 10);
 
         filter().type(EntityTypes1_16.ABSTRACT_ARROW).removeIndex(8);
-        filter().type(EntityTypes1_16.WOLF).index(16).handler((event, meta) -> {
-            byte mask = meta.value();
+        filter().type(EntityTypes1_16.WOLF).index(16).handler((event, data) -> {
+            byte mask = data.value();
             int angerTime = (mask & 0x02) != 0 ? Integer.MAX_VALUE : 0;
             event.createExtraData(new EntityData(20, Types1_16.ENTITY_DATA_TYPES.varIntType, angerTime));
         });
