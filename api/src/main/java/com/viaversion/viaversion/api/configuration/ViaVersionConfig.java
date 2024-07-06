@@ -293,11 +293,11 @@ public interface ViaVersionConfig extends Config {
     boolean isDisable1_13AutoComplete();
 
     /**
-     * Tries to minimize cooldown animation.
+     * Hides the cooldown indicator for 1.9+ clients on 1.8 servers when interacting with swords and other tools.
      *
      * @return true if enabled
      */
-    boolean isMinimizeCooldown();
+    boolean isHideCooldownIndicator();
 
     /**
      * Enable the serverside blockconnections for 1.13+ clients

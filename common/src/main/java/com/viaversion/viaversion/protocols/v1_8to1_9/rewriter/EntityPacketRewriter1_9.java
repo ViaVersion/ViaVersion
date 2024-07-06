@@ -278,7 +278,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
             public void register() {
                 map(Types.VAR_INT);
                 handler(wrapper -> {
-                    if (!Via.getConfig().isMinimizeCooldown()) return;
+                    if (!Via.getConfig().isHideCooldownIndicator()) return;
 
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (wrapper.get(Types.VAR_INT, 0) != tracker.getProvidedEntityId()) {
