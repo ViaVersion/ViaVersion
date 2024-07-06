@@ -46,15 +46,15 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             return inputValue / 63.0F;
         }
     };
-    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_METADATA = new ValueTransformer<>(Types1_9.ENTITY_DATA_LIST) {
+    public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_ENTITY_DATA = new ValueTransformer<>(Types1_9.ENTITY_DATA_LIST) {
         @Override
         public List<EntityData> transform(PacketWrapper wrapper, List<EntityData> inputValue) {
-            List<EntityData> metaList = new CopyOnWriteArrayList<>(inputValue);
-            for (EntityData m : metaList) {
-                if (m.id() >= 5)
-                    m.setId(m.id() + 1);
+            List<EntityData> dataList = new CopyOnWriteArrayList<>(inputValue);
+            for (EntityData data : dataList) {
+                if (data.id() >= 5)
+                    data.setId(data.id() + 1);
             }
-            return metaList;
+            return dataList;
         }
     };
     private final ItemPacketRewriter1_10 itemRewriter = new ItemPacketRewriter1_10(this);
@@ -100,12 +100,12 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
             }
         });
 
-        // Metadata packet
+        // Entity data packet
         registerClientbound(ClientboundPackets1_9_3.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 1 - Metadata list
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 1 - Entity data list
             }
         });
 
@@ -125,7 +125,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 12 - Metadata
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 12 - Entity data
             }
         });
 
@@ -140,7 +140,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_METADATA); // 7 - Metadata list
+                map(Types1_9.ENTITY_DATA_LIST, TRANSFORM_ENTITY_DATA); // 7 - Entity data list
             }
         });
 

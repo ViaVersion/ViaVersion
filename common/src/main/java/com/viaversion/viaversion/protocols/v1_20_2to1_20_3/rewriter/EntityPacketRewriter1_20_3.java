@@ -103,14 +103,14 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> {
-            final EntityDataType type = meta.dataType();
+        filter().handler((event, data) -> {
+            final EntityDataType type = data.dataType();
             if (type == Types1_20_2.ENTITY_DATA_TYPES.componentType) {
-                meta.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.componentType, ComponentUtil.jsonToTag(meta.value()));
+                data.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.componentType, ComponentUtil.jsonToTag(data.value()));
             } else if (type == Types1_20_2.ENTITY_DATA_TYPES.optionalComponentType) {
-                meta.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.jsonToTag(meta.value()));
+                data.setTypeAndValue(Types1_20_3.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.jsonToTag(data.value()));
             } else {
-                meta.setDataType(Types1_20_3.ENTITY_DATA_TYPES.byId(type.typeId()));
+                data.setDataType(Types1_20_3.ENTITY_DATA_TYPES.byId(type.typeId()));
             }
         });
         filter().dataType(Types1_20_3.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {

@@ -33,11 +33,11 @@ import java.util.List;
 public final class Types1_8 {
 
     /**
-     * Metadata type for 1.8
+     * Entity data type for 1.8
      */
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType1_8();
     /**
-     * Metadata list type for 1.8
+     * Entity data list type for 1.8
      */
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
 

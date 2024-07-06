@@ -80,11 +80,11 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
         registerEntityDataTypeHandler(Types1_16.ENTITY_DATA_TYPES.itemType, Types1_16.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_16.ENTITY_DATA_TYPES.particleType);
         registerBlockStateHandler(EntityTypes1_16_2.ABSTRACT_MINECART, 10);
 
-        filter().type(EntityTypes1_16_2.ABSTRACT_PIGLIN).handler((metadatas, meta) -> {
-            if (meta.id() == 15) {
-                meta.setId(16);
-            } else if (meta.id() == 16) {
-                meta.setId(15);
+        filter().type(EntityTypes1_16_2.ABSTRACT_PIGLIN).handler((event, data) -> {
+            if (data.id() == 15) {
+                data.setId(16);
+            } else if (data.id() == 16) {
+                data.setId(15);
             }
         });
     }

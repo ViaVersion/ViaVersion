@@ -32,7 +32,7 @@ public abstract class OldEntityDataType extends EntityDataTypeTemplate {
     @Override
     public EntityData read(final ByteBuf buffer) {
         final byte index = buffer.readByte();
-        if (index == END) return null; // End of metadata
+        if (index == END) return null; // End of data
         final EntityDataType type = this.getType((index & 224) >> 5);
         return new EntityData(index & 31, type, type.type().read(buffer));
     }

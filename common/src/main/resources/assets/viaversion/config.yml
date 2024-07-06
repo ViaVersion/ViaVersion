@@ -173,7 +173,7 @@ handle-invalid-item-count: false
 prevent-collision: true
 # If the above is true, should we automatically team players until you do?
 auto-team: true
-# When enabled if certain metadata can't be read, we won't tell you about it
+# When enabled if certain entity data can't be read, we won't tell you about it
 suppress-metadata-errors: false
 # When enabled, 1.9+ will be able to block by using shields
 shield-blocking: true

@@ -418,17 +418,17 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         );
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, meta) -> {
-            final int effectColor = meta.value();
+        filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, data) -> {
+            final int effectColor = data.value();
             if (effectColor == 0) {
                 // No effect
-                meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
+                data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
                 return;
             }
 
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
             particle.add(Types.INT, withAlpha(effectColor));
-            meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
+            data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
         });
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color

@@ -189,11 +189,11 @@ public enum EntityDataIndex1_9 {
     // Ender dragon
     ENDER_DRAGON_PHASE(ENDER_DRAGON, 11, EntityDataTypes1_9.VAR_INT);
 
-    private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, EntityDataIndex1_9> metadataRewrites = new HashMap<>();
+    private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, EntityDataIndex1_9> entityDataRewriters = new HashMap<>();
 
     static {
         for (EntityDataIndex1_9 index : EntityDataIndex1_9.values()) {
-            metadataRewrites.put(new Pair<>(index.clazz, index.index), index);
+            entityDataRewriters.put(new Pair<>(index.clazz, index.index), index);
         }
     }
 
@@ -249,7 +249,7 @@ public enum EntityDataIndex1_9 {
 
     private static Optional<EntityDataIndex1_9> getIndex(EntityType type, int index) {
         Pair pair = new Pair<>(type, index);
-        return Optional.ofNullable(metadataRewrites.get(pair));
+        return Optional.ofNullable(entityDataRewriters.get(pair));
     }
 
     public static EntityDataIndex1_9 searchIndex(EntityType type, int index) {

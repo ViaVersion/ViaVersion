@@ -137,7 +137,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 12 - Metadata
+                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 12 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST));
             }
@@ -165,7 +165,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 7 - Metadata
+                map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST, EntityTypes1_14.PLAYER));
             }
@@ -182,15 +182,15 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                         int entityId = wrapper.get(Types.VAR_INT, 0);
                         tracker.setSleeping(entityId, false);
 
-                        PacketWrapper metadataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
-                        metadataPacket.write(Types.VAR_INT, entityId);
-                        List<EntityData> metadataList = new ArrayList<>();
+                        PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_14.SET_ENTITY_DATA);
+                        entityDataPacket.write(Types.VAR_INT, entityId);
+                        List<EntityData> entityDataList = new ArrayList<>();
                         if (tracker.clientEntityId() != entityId) {
-                            metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
+                            entityDataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
                         }
-                        metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, null));
-                        metadataPacket.write(Types1_14.ENTITY_DATA_LIST, metadataList);
-                        metadataPacket.scheduleSend(Protocol1_13_2To1_14.class);
+                        entityDataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, null));
+                        entityDataPacket.write(Types1_14.ENTITY_DATA_LIST, entityDataList);
+                        entityDataPacket.scheduleSend(Protocol1_13_2To1_14.class);
                     }
                 });
             }
@@ -242,12 +242,12 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     tracker.setSleeping(entityId, true);
 
                     BlockPosition position = wrapper.read(Types.BLOCK_POSITION1_8);
-                    List<EntityData> metadataList = new ArrayList<>();
-                    metadataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, position));
+                    List<EntityData> entityDataList = new ArrayList<>();
+                    entityDataList.add(new EntityData(12, Types1_14.ENTITY_DATA_TYPES.optionalBlockPositionType, position));
                     if (tracker.clientEntityId() != entityId) {
-                        metadataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
+                        entityDataList.add(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, EntityPacketRewriter1_14.recalculatePlayerPose(entityId, tracker)));
                     }
-                    wrapper.write(Types1_14.ENTITY_DATA_LIST, metadataList);
+                    wrapper.write(Types1_14.ENTITY_DATA_LIST, entityDataList);
                 });
             }
         });
@@ -274,26 +274,26 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
             }
         });
 
-        filter().type(EntityTypes1_14.MOB).index(13).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.MOB).index(13).handler((event, data) -> {
             EntityTracker1_14 tracker = tracker(event.user());
             int entityId = event.entityId();
-            tracker.setInsentientData(entityId, (byte) ((((Number) meta.getValue()).byteValue() & ~0x4)
-                | (tracker.getInsentientData(entityId) & 0x4))); // New attacking metadata
-            meta.setValue(tracker.getInsentientData(entityId));
+            tracker.setInsentientData(entityId, (byte) ((((Number) data.getValue()).byteValue() & ~0x4)
+                | (tracker.getInsentientData(entityId) & 0x4))); // New attacking entity data
+            data.setValue(tracker.getInsentientData(entityId));
         });
 
-        filter().type(EntityTypes1_14.PLAYER).handler((event, meta) -> {
+        filter().type(EntityTypes1_14.PLAYER).handler((event, data) -> {
             EntityTracker1_14 tracker = tracker(event.user());
             int entityId = event.entityId();
             if (entityId != tracker.clientEntityId()) {
-                if (meta.id() == 0) {
-                    byte flags = ((Number) meta.getValue()).byteValue();
+                if (data.id() == 0) {
+                    byte flags = ((Number) data.getValue()).byteValue();
                     // Mojang overrides the client-side pose updater, see OtherPlayerEntity#updateSize
                     tracker.setEntityFlags(entityId, flags);
-                } else if (meta.id() == 7) {
-                    tracker.setRiptide(entityId, (((Number) meta.getValue()).byteValue() & 0x4) != 0);
+                } else if (data.id() == 7) {
+                    tracker.setRiptide(entityId, (((Number) data.getValue()).byteValue() & 0x4) != 0);
                 }
-                if (meta.id() == 0 || meta.id() == 7) {
+                if (data.id() == 0 || data.id() == 7) {
                     event.createExtraData(new EntityData(6, Types1_14.ENTITY_DATA_TYPES.poseType, recalculatePlayerPose(entityId, tracker)));
                 }
             }

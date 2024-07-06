@@ -115,13 +115,13 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                     wrapper.send(Protocol1_18_2To1_19.class);
                     wrapper.cancel();
 
-                    // Send motive in metadata
-                    final PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
-                    metaPacket.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0)); // Entity id
-                    final List<EntityData> metadata = new ArrayList<>();
-                    metadata.add(new EntityData(8, Types1_19.ENTITY_DATA_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
-                    metaPacket.write(Types1_19.ENTITY_DATA_LIST, metadata);
-                    metaPacket.send(Protocol1_18_2To1_19.class);
+                    // Send motive in entity data
+                    final PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_19.SET_ENTITY_DATA);
+                    entityDataPacket.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0)); // Entity id
+                    final List<EntityData> entityData = new ArrayList<>();
+                    entityData.add(new EntityData(8, Types1_19.ENTITY_DATA_TYPES.paintingVariantType, protocol.getMappingData().getPaintingMappings().getNewIdOrDefault(motive, 0)));
+                    entityDataPacket.write(Types1_19.ENTITY_DATA_LIST, entityData);
+                    entityDataPacket.send(Protocol1_18_2To1_19.class);
                 });
             }
         });

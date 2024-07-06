@@ -155,11 +155,11 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
         registerEntityDataTypeHandler(Types1_19_3.ENTITY_DATA_TYPES.itemType, Types1_19_3.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_3.ENTITY_DATA_TYPES.particleType);
         registerBlockStateHandler(EntityTypes1_19_3.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, meta) -> {
+        filter().type(EntityTypes1_19_3.ENTITY).index(6).handler((event, data) -> {
             // Sitting pose added
-            final int pose = meta.value();
+            final int pose = data.value();
             if (pose >= 10) {
-                meta.setValue(pose + 1);
+                data.setValue(pose + 1);
             }
         });
     }

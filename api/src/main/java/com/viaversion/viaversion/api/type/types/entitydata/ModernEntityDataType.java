@@ -33,7 +33,7 @@ public abstract class ModernEntityDataType extends EntityDataTypeTemplate {
     @Override
     public EntityData read(final ByteBuf buffer) {
         final short index = buffer.readUnsignedByte();
-        if (index == END) return null; // End of metadata
+        if (index == END) return null; // End of data
         final EntityDataType type = this.getType(Types.VAR_INT.readPrimitive(buffer));
         return new EntityData(index, type, type.type().read(buffer));
     }

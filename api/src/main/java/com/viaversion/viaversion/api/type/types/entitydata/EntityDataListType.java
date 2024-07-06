@@ -40,20 +40,20 @@ public final class EntityDataListType extends EntityDataListTypeTemplate {
     @Override
     public List<EntityData> read(final ByteBuf buffer) {
         final List<EntityData> list = new ArrayList<>();
-        EntityData meta;
+        EntityData data;
         do {
-            meta = this.type.read(buffer);
-            if (meta != null) {
-                list.add(meta);
+            data = this.type.read(buffer);
+            if (data != null) {
+                list.add(data);
             }
-        } while (meta != null);
+        } while (data != null);
         return list;
     }
 
     @Override
     public void write(final ByteBuf buffer, final List<EntityData> object) {
-        for (final EntityData metadata : object) {
-            this.type.write(buffer, metadata);
+        for (final EntityData data : object) {
+            this.type.write(buffer, data);
         }
         this.type.write(buffer, null);
     }

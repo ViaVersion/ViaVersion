@@ -67,9 +67,9 @@ public interface ViaVersionConfig extends Config {
     boolean isShowNewDeathMessages();
 
     /**
-     * Get if metadata errors will be suppressed
+     * Get if entity data errors will be suppressed
      *
-     * @return true if metadata errors suppression is enabled
+     * @return true if entity data errors suppression is enabled
      */
     boolean isSuppressMetadataErrors();
 
