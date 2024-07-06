@@ -303,7 +303,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                         properties.put(key, new Pair<>(value, modifiers));
                     }
                     
-                    properties.put("generic.attackSpeed", new Pair<>(23, ImmutableList.of( // Neutralize modifiers
+                    properties.put("generic.attackSpeed", new Pair<>(23.0, ImmutableList.of( // Neutralize modifiers
                         new Triple<>(UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3"), 0.0, (byte) 0), // Tool and weapon modifier
                         new Triple<>(UUID.fromString("AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3"), 0.0, (byte) 2), // Dig speed
                         new Triple<>(UUID.fromString("55FCED67-E92A-486E-9800-B47F202C4386"), 0.0, (byte) 2) // Dig slow down
