@@ -80,7 +80,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_13.ENTITY_DATA_LIST); // 12 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST); // 12 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST));
             }
@@ -96,7 +96,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_13.ENTITY_DATA_LIST); // 7 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }

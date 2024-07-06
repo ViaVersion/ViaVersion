@@ -31,13 +31,13 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
                                @Nullable EntityDataType dataType, int index, EntityDataHandler handler) {
 
     public EntityDataFilter {
-        Preconditions.checkNotNull(handler, "MetaHandler cannot be null");
+        Preconditions.checkNotNull(handler, "EntityDataHandler cannot be null");
     }
 
     /**
-     * Returns the metadata index to filter, or -1.
+     * Returns the entity data index to filter, or -1.
      *
-     * @return metadata index, or -1 if unset
+     * @return entity data index, or -1 if unset
      */
     public int index() {
         return index;
@@ -62,9 +62,9 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
     }
 
     /**
-     * Returns the metadata handler.
+     * Returns the entity data handler.
      *
-     * @return metadata handler
+     * @return entity data handler
      */
     public EntityDataHandler handler() {
         return handler;
@@ -80,18 +80,18 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
     }
 
     /**
-     * Returns whether if the metadata should be handled by this filter.
+     * Returns whether if the entity data should be handled by this filter.
      *
      * @param type     entity type
-     * @param metadata metadata
-     * @return whether the meta should be filtered
+     * @param entityData entityData
+     * @return whether the data should be filtered
      */
-    public boolean isFiltered(@Nullable EntityType type, EntityData metadata) {
+    public boolean isFiltered(@Nullable EntityType type, EntityData entityData) {
         // Check if no specific index is filtered or the indexes are equal
         // Then check if the filter has no entity type or the type is equal to or part of the filtered parent type
-        return (this.index == -1 || metadata.id() == this.index)
+        return (this.index == -1 || entityData.id() == this.index)
             && (this.type == null || matchesType(type))
-            && (this.dataType == null || metadata.dataType() == this.dataType);
+            && (this.dataType == null || entityData.dataType() == this.dataType);
     }
 
     private boolean matchesType(EntityType type) {
@@ -156,7 +156,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          * Sets the type to filter, including subtypes.
          * <p>
          * You should always register a type when accessing specific indexes,
-         * even if it is the base entity type, to avoid metadata from unregistered
+         * even if it is the base entity type, to avoid entity data from unregistered
          * entities causing issues.
          *
          * @param type entity type to filter
@@ -173,7 +173,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          * Sets the type to filter, not including subtypes.
          * <p>
          * You should always register a type when accessing specific indexes,
-         * even if it is the base entity type, to avoid metadata from unregistered
+         * even if it is the base entity type, to avoid entity data from unregistered
          * entities causing issues.
          *
          * @param type exact entity type to filter
@@ -199,10 +199,10 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
         }
 
         /**
-         * Sets the metadata handler and registers the metadata filter.
+         * Sets the entity data handler and registers the entity data filter.
          * Should always be called last.
          *
-         * @param handler metadata handler
+         * @param handler entity data handler
          * @throws IllegalArgumentException if a handler has already been set
          */
         public void handler(EntityDataHandler handler) {
@@ -212,10 +212,10 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
         }
 
         public void mapDataType(Int2ObjectFunction<EntityDataType> updateFunction) {
-            handler((event, meta) -> {
-                EntityDataType mappedType = updateFunction.apply(meta.dataType().typeId());
+            handler((event, data) -> {
+                EntityDataType mappedType = updateFunction.apply(data.dataType().typeId());
                 if (mappedType != null) {
-                    meta.setDataType(mappedType);
+                    data.setDataType(mappedType);
                 } else {
                     event.cancel();
                 }
@@ -223,14 +223,14 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
         }
 
         /**
-         * Sets a handler to remove metadata at the given index without affecting any other indexes and registers the filter.
+         * Sets a handler to remove entity data at the given index without affecting any other indexes and registers the filter.
          * Should always be called last.
          *
          * @param index index to cancel
          */
         public void cancel(int index) {
             this.index = index;
-            handler((event, meta) -> event.cancel());
+            handler((event, data) -> event.cancel());
         }
 
         /**
@@ -242,7 +242,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void toIndex(int newIndex) {
             Preconditions.checkArgument(this.index != -1);
-            handler((event, meta) -> event.setIndex(newIndex));
+            handler((event, data) -> event.setIndex(newIndex));
         }
 
         /**
@@ -254,7 +254,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void addIndex(int index) {
             Preconditions.checkArgument(this.index == -1);
-            handler((event, meta) -> {
+            handler((event, data) -> {
                 if (event.index() >= index) {
                     event.setIndex(event.index() + 1);
                 }
@@ -262,7 +262,7 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
         }
 
         /**
-         * Sets a handler to remove metadata at the given index, decrementing every index above it and registers the filter.
+         * Sets a handler to remove entity data at the given index, decrementing every index above it and registers the filter.
          * Should always be called last.
          *
          * @param index index to remove
@@ -270,27 +270,27 @@ public record EntityDataFilter(@Nullable EntityType type, boolean filterFamily,
          */
         public void removeIndex(int index) {
             Preconditions.checkArgument(this.index == -1);
-            handler((event, meta) -> {
-                int metaIndex = event.index();
-                if (metaIndex == index) {
+            handler((event, data) -> {
+                int dataIndex = event.index();
+                if (dataIndex == index) {
                     event.cancel();
-                } else if (metaIndex > index) {
-                    event.setIndex(metaIndex - 1);
+                } else if (dataIndex > index) {
+                    event.setIndex(dataIndex - 1);
                 }
             });
         }
 
         /**
-         * Creates and registers the created MetaFilter in the linked {@link EntityRewriter} instance.
+         * Creates and registers the created EntityDataFilter in the linked {@link EntityRewriter} instance.
          */
         public void register() {
             rewriter.registerFilter(build());
         }
 
         /**
-         * Returns a new metadata filter without registering it.
+         * Returns a new entity data filter without registering it.
          *
-         * @return created meta filter
+         * @return created data filter
          */
         public EntityDataFilter build() {
             return new EntityDataFilter(type, filterFamily, dataType, index, handler);

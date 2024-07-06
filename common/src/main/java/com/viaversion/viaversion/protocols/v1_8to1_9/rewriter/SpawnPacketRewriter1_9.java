@@ -100,20 +100,20 @@ public class SpawnPacketRewriter1_9 {
 
                     int typeID = wrapper.get(Types.BYTE, 0);
                     if (EntityTypes1_8.getTypeFromId(typeID, true) == EntityTypes1_8.EntityType.POTION) {
-                        // Convert this to meta data, woo!
-                        PacketWrapper metaPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
+                        // Convert this to entity data, woo!
+                        PacketWrapper entityDataPacket = wrapper.create(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper1 -> {
                             wrapper1.write(Types.VAR_INT, entityID);
-                            List<EntityData> meta = new ArrayList<>();
+                            List<EntityData> entityData = new ArrayList<>();
                             Item item = new DataItem(373, (byte) 1, (short) data, null); // Potion
                             protocol.getItemRewriter().handleItemToClient(wrapper.user(), item); // Rewrite so that it gets the right nbt
                             // TEMP FIX FOR POTIONS UNTIL WE FIGURE OUT HOW TO TRANSFORM SENT PACKETS
                             EntityData potion = new EntityData(5, EntityDataTypes1_9.ITEM, item);
-                            meta.add(potion);
-                            wrapper1.write(Types1_9.ENTITY_DATA_LIST, meta);
+                            entityData.add(potion);
+                            wrapper1.write(Types1_9.ENTITY_DATA_LIST, entityData);
                         });
                         // Fix packet order
                         wrapper.send(Protocol1_8To1_9.class);
-                        metaPacket.send(Protocol1_8To1_9.class);
+                        entityDataPacket.send(Protocol1_8To1_9.class);
                         wrapper.cancel();
                     }
                 });
@@ -193,22 +193,22 @@ public class SpawnPacketRewriter1_9 {
 
                 map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
                 handler(wrapper -> {
-                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.getEntityRewriter().handleEntityData(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleEntityData(entityId, entityDataList, wrapper.user());
                     } else {
-                        protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
-                        metadataList.clear();
+                        protocol.getLogger().warning("Unable to find entity for entity data, entity ID: " + entityId);
+                        entityDataList.clear();
                     }
                 });
-                // Handler for meta data
+                // Handler for entity data
                 handler(wrapper -> {
-                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.handleMetadata(entityID, metadataList);
+                    tracker.handleEntityData(entityID, entityDataList);
                 });
             }
         });
@@ -271,23 +271,23 @@ public class SpawnPacketRewriter1_9 {
                 map(Types1_8.ENTITY_DATA_LIST, Types1_9.ENTITY_DATA_LIST);
 
                 handler(wrapper -> {
-                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     if (tracker.hasEntity(entityId)) {
-                        protocol.getEntityRewriter().handleEntityData(entityId, metadataList, wrapper.user());
+                        protocol.getEntityRewriter().handleEntityData(entityId, entityDataList, wrapper.user());
                     } else {
-                        protocol.getLogger().warning("Unable to find entity for metadata, entity ID: " + entityId);
-                        metadataList.clear();
+                        protocol.getLogger().warning("Unable to find entity for entity data, entity ID: " + entityId);
+                        entityDataList.clear();
                     }
                 });
 
-                // Handler for meta data
+                // Handler for entity data
                 handler(wrapper -> {
-                    List<EntityData> metadataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
+                    List<EntityData> entityDataList = wrapper.get(Types1_9.ENTITY_DATA_LIST, 0);
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.handleMetadata(entityID, metadataList);
+                    tracker.handleEntityData(entityID, entityDataList);
                 });
             }
         });

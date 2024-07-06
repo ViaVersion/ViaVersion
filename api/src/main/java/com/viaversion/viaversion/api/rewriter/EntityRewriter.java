@@ -59,13 +59,13 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
     int newEntityId(int id);
 
     /**
-     * Handles and transforms metadata of an entity.
+     * Handles and transforms entity data of an entity.
      *
      * @param entityId     entity id
-     * @param metadataList full, mutable list of metadata
+     * @param dataList full, mutable list of entity data
      * @param connection   user connection
      */
-    void handleEntityData(int entityId, List<EntityData> metadataList, UserConnection connection);
+    void handleEntityData(int entityId, List<EntityData> dataList, UserConnection connection);
 
     /**
      * Returns the entity tracker for the current protocol.

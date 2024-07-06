@@ -58,7 +58,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 11 - Velocity Z
 
                 handler(trackerHandler());
-                handler(wrapper -> sendMetadataPacket(wrapper, wrapper.get(Types.VAR_INT, 0)));
+                handler(wrapper -> sendEntityDataPacket(wrapper, wrapper.get(Types.VAR_INT, 0)));
             }
         });
 
@@ -77,7 +77,7 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     wrapper.user().getEntityTracker(Protocol1_14_4To1_15.class).addEntity(entityId, EntityTypes1_15.PLAYER);
 
-                    sendMetadataPacket(wrapper, entityId);
+                    sendEntityDataPacket(wrapper, entityId);
                 });
             }
         });
@@ -122,10 +122,10 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
     }
 
 
-    private void sendMetadataPacket(PacketWrapper wrapper, int entityId) {
-        // Meta is no longer included in the spawn packets, but sent separately
-        List<EntityData> metadata = wrapper.read(Types1_14.ENTITY_DATA_LIST);
-        if (metadata.isEmpty()) {
+    private void sendEntityDataPacket(PacketWrapper wrapper, int entityId) {
+        // Data is no longer included in the spawn packets, but sent separately
+        List<EntityData> entityData = wrapper.read(Types1_14.ENTITY_DATA_LIST);
+        if (entityData.isEmpty()) {
             return;
         }
 
@@ -133,13 +133,13 @@ public class EntityPacketRewriter1_15 extends EntityRewriter<ClientboundPackets1
         wrapper.send(Protocol1_14_4To1_15.class);
         wrapper.cancel();
 
-        // Handle meta
-        handleEntityData(entityId, metadata, wrapper.user());
+        // Handle data
+        handleEntityData(entityId, entityData, wrapper.user());
 
-        PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
-        metadataPacket.write(Types.VAR_INT, entityId);
-        metadataPacket.write(Types1_14.ENTITY_DATA_LIST, metadata);
-        metadataPacket.send(Protocol1_14_4To1_15.class);
+        PacketWrapper entityDataPacket = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, wrapper.user());
+        entityDataPacket.write(Types.VAR_INT, entityId);
+        entityDataPacket.write(Types1_14.ENTITY_DATA_LIST, entityData);
+        entityDataPacket.send(Protocol1_14_4To1_15.class);
     }
 
     @Override

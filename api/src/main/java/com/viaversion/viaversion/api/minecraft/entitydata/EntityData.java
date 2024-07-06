@@ -28,21 +28,21 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class EntityData {
     private int id;
-    private EntityDataType metaType;
+    private EntityDataType dataType;
     private Object value;
 
     /**
-     * Creates a new metadata instance.
+     * Creates a new entity data instance.
      *
-     * @param id       metadata index
-     * @param metaType metadata type
+     * @param id       data index
+     * @param dataType data type
      * @param value    value if present
-     * @throws IllegalArgumentException if the value and metaType are incompatible
+     * @throws IllegalArgumentException if the value and dataType are incompatible
      */
-    public EntityData(int id, EntityDataType metaType, @Nullable Object value) {
+    public EntityData(int id, EntityDataType dataType, @Nullable Object value) {
         this.id = id;
-        this.metaType = metaType;
-        this.value = checkValue(metaType, value);
+        this.dataType = dataType;
+        this.value = checkValue(dataType, value);
     }
 
     public int id() {
@@ -54,19 +54,19 @@ public final class EntityData {
     }
 
     public EntityDataType dataType() {
-        return metaType;
+        return dataType;
     }
 
     /**
-     * Sets the metadata type if compatible with the current value.
+     * Sets the entity data type if compatible with the current value.
      *
-     * @param metaType metadata type
-     * @throws IllegalArgumentException if the metadata type and current value are incompatible
+     * @param dataType entity data type
+     * @throws IllegalArgumentException if the entity data type and current value are incompatible
      * @see #setTypeAndValue(EntityDataType, Object)
      */
-    public void setDataType(EntityDataType metaType) {
-        checkValue(metaType, this.value);
-        this.metaType = metaType;
+    public void setDataType(EntityDataType dataType) {
+        checkValue(dataType, this.value);
+        this.dataType = dataType;
     }
 
     public @Nullable <T> T value() {
@@ -78,32 +78,32 @@ public final class EntityData {
     }
 
     /**
-     * Sets the metadata value if compatible with the current meta type.
+     * Sets the entity data value if compatible with the current data type.
      *
      * @param value value
-     * @throws IllegalArgumentException if the value and current metaType are incompatible
+     * @throws IllegalArgumentException if the value and current dataType are incompatible
      * @see #setTypeAndValue(EntityDataType, Object)
      */
     public void setValue(@Nullable Object value) {
-        this.value = checkValue(this.metaType, value);
+        this.value = checkValue(this.dataType, value);
     }
 
     /**
-     * Sets metadata type and value.
+     * Sets entity data type and value.
      *
-     * @param metaType metadata type
+     * @param dataType entity data type
      * @param value    value
-     * @throws IllegalArgumentException if the value and metaType are incompatible
+     * @throws IllegalArgumentException if the value and dataType are incompatible
      */
-    public void setTypeAndValue(EntityDataType metaType, @Nullable Object value) {
-        this.value = checkValue(metaType, value);
-        this.metaType = metaType;
+    public void setTypeAndValue(EntityDataType dataType, @Nullable Object value) {
+        this.value = checkValue(dataType, value);
+        this.dataType = dataType;
     }
 
-    private Object checkValue(EntityDataType metaType, @Nullable Object value) {
-        Preconditions.checkNotNull(metaType);
-        if (value != null && !metaType.type().getOutputClass().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Metadata value and metaType are incompatible. Type=" + metaType
+    private Object checkValue(EntityDataType dataType, @Nullable Object value) {
+        Preconditions.checkNotNull(dataType);
+        if (value != null && !dataType.type().getOutputClass().isAssignableFrom(value.getClass())) {
+            throw new IllegalArgumentException("Entity data value and dataType are incompatible. Type=" + dataType
                 + ", value=" + value + " (" + value.getClass().getSimpleName() + ")");
         }
         return value;
@@ -111,32 +111,32 @@ public final class EntityData {
 
     @Deprecated
     public void setDataTypeUnsafe(EntityDataType type) {
-        this.metaType = type;
+        this.dataType = type;
     }
 
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EntityData metadata = (EntityData) o;
-        if (id != metadata.id) return false;
-        if (metaType != metadata.metaType) return false;
-        return Objects.equals(value, metadata.value);
+        EntityData entityData = (EntityData) o;
+        if (id != entityData.id) return false;
+        if (dataType != entityData.dataType) return false;
+        return Objects.equals(value, entityData.value);
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + metaType.hashCode();
+        result = 31 * result + dataType.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Metadata{" +
+        return "EntityData{" +
             "id=" + id +
-            ", metaType=" + metaType +
+            ", dataType=" + dataType +
             ", value=" + value +
             '}';
     }

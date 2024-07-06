@@ -102,7 +102,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 12 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 12 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST));
             }
@@ -118,7 +118,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 7 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST, Types1_13.ENTITY_DATA_LIST); // 7 - Entity data
 
                 handler(trackerAndRewriterHandler(Types1_13.ENTITY_DATA_LIST, EntityTypes1_13.EntityType.PLAYER));
             }
@@ -167,55 +167,55 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
     @Override
     protected void registerRewrites() {
         filter().mapDataType(typeId -> Types1_13.ENTITY_DATA_TYPES.byId(typeId > 4 ? typeId + 1 : typeId));
-        filter().dataType(Types1_13.ENTITY_DATA_TYPES.itemType).handler(((event, meta) -> protocol.getItemRewriter().handleItemToClient(event.user(), meta.value())));
-        filter().dataType(Types1_13.ENTITY_DATA_TYPES.optionalBlockStateType).handler(((event, meta) -> {
-            final int oldId = meta.value();
+        filter().dataType(Types1_13.ENTITY_DATA_TYPES.itemType).handler(((event, data) -> protocol.getItemRewriter().handleItemToClient(event.user(), data.value())));
+        filter().dataType(Types1_13.ENTITY_DATA_TYPES.optionalBlockStateType).handler(((event, data) -> {
+            final int oldId = data.value();
             if (oldId != 0) {
                 final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
                 final int newId = WorldPacketRewriter1_13.toNewId(combined);
-                meta.setValue(newId);
+                data.setValue(newId);
             }
         }));
 
         // Previously unused, now swimming
-        filter().index(0).handler((event, meta) -> meta.setValue((byte) ((byte) meta.getValue() & ~0x10)));
+        filter().index(0).handler((event, data) -> data.setValue((byte) ((byte) data.getValue() & ~0x10)));
 
-        filter().index(2).handler(((event, meta) -> {
-            if (meta.getValue() != null && !((String) meta.getValue()).isEmpty()) {
-                meta.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) meta.getValue()));
+        filter().index(2).handler(((event, data) -> {
+            if (data.getValue() != null && !((String) data.getValue()).isEmpty()) {
+                data.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, ComponentUtil.legacyToJson((String) data.getValue()));
             } else {
-                meta.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, null);
+                data.setTypeAndValue(Types1_13.ENTITY_DATA_TYPES.optionalComponentType, null);
             }
         }));
 
-        filter().type(EntityTypes1_13.EntityType.WOLF).index(17).handler((event, meta) -> {
+        filter().type(EntityTypes1_13.EntityType.WOLF).index(17).handler((event, data) -> {
             // Handle new colors
-            meta.setValue(15 - (int) meta.getValue());
+            data.setValue(15 - (int) data.getValue());
         });
 
         filter().type(EntityTypes1_13.EntityType.ZOMBIE).addIndex(15); // Shaking
 
-        filter().type(EntityTypes1_13.EntityType.ABSTRACT_MINECART).index(9).handler((event, meta) -> {
-            final int oldId = meta.value();
+        filter().type(EntityTypes1_13.EntityType.ABSTRACT_MINECART).index(9).handler((event, data) -> {
+            final int oldId = data.value();
             final int combined = (((oldId & 4095) << 4) | (oldId >> 12 & 15));
             final int newId = WorldPacketRewriter1_13.toNewId(combined);
-            meta.setValue(newId);
+            data.setValue(newId);
         });
 
-        filter().type(EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD).handler((event, meta) -> {
-            if (meta.id() == 9) {
-                int particleId = meta.value();
-                EntityData parameter1Meta = event.dataAtIndex(10);
-                EntityData parameter2Meta = event.dataAtIndex(11);
-                int parameter1 = parameter1Meta != null ? parameter1Meta.value() : 0;
-                int parameter2 = parameter2Meta != null ? parameter2Meta.value() : 0;
+        filter().type(EntityTypes1_13.EntityType.AREA_EFFECT_CLOUD).handler((event, data) -> {
+            if (data.id() == 9) {
+                int particleId = data.value();
+                EntityData parameter1Data = event.dataAtIndex(10);
+                EntityData parameter2Data = event.dataAtIndex(11);
+                int parameter1 = parameter1Data != null ? parameter1Data.value() : 0;
+                int parameter2 = parameter2Data != null ? parameter2Data.value() : 0;
 
                 Particle particle = ParticleIdMappings1_13.rewriteParticle(particleId, new Integer[]{parameter1, parameter2});
                 if (particle != null && particle.id() != -1) {
                     event.createExtraData(new EntityData(9, Types1_13.ENTITY_DATA_TYPES.particleType, particle));
                 }
             }
-            if (meta.id() >= 9) {
+            if (data.id() >= 9) {
                 event.cancel();
             }
         });

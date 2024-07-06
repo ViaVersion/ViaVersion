@@ -30,17 +30,17 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
     private final UserConnection connection;
     private final TrackedEntity trackedEntity;
     private final int entityId;
-    private final List<EntityData> metadataList;
-    private final EntityData meta;
+    private final List<EntityData> dataList;
+    private final EntityData data;
     private List<EntityData> extraData;
     private boolean cancel;
 
-    public EntityDataHandlerEventImpl(UserConnection connection, @Nullable TrackedEntity trackedEntity, int entityId, EntityData meta, List<EntityData> metadataList) {
+    public EntityDataHandlerEventImpl(UserConnection connection, @Nullable TrackedEntity trackedEntity, int entityId, EntityData data, List<EntityData> dataList) {
         this.connection = connection;
         this.trackedEntity = trackedEntity;
         this.entityId = entityId;
-        this.meta = meta;
-        this.metadataList = metadataList;
+        this.data = data;
+        this.dataList = dataList;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
 
     @Override
     public EntityData data() {
-        return meta;
+        return data;
     }
 
     @Override
@@ -75,9 +75,9 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
 
     @Override
     public @Nullable EntityData dataAtIndex(int index) {
-        for (EntityData meta : metadataList) {
-            if (index == meta.id()) {
-                return meta;
+        for (EntityData data : dataList) {
+            if (index == data.id()) {
+                return data;
             }
         }
         return null;
@@ -85,7 +85,7 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
 
     @Override
     public List<EntityData> dataList() {
-        return Collections.unmodifiableList(metadataList);
+        return Collections.unmodifiableList(dataList);
     }
 
     @Override
@@ -94,11 +94,11 @@ public class EntityDataHandlerEventImpl implements EntityDataHandlerEvent {
     }
 
     @Override
-    public void createExtraData(EntityData metadata) {
+    public void createExtraData(EntityData entityData) {
         if (extraData == null) {
             extraData = new ArrayList<>();
         }
 
-        extraData.add(metadata);
+        extraData.add(entityData);
     }
 }

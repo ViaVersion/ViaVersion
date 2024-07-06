@@ -51,13 +51,13 @@ public class EntityToggleGlideListener extends ViaBukkitListener {
 
         if (!isOnPipe(player)) return;
 
-        // Cancelling can only be done by updating the player's metadata
+        // Cancelling can only be done by updating the player's entity data
         if (event.isGliding() && event.isCancelled()) {
             PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_15.SET_ENTITY_DATA, null, getUserConnection(player));
             packet.write(Types.VAR_INT, player.getEntityId());
 
             byte bitmask = 0;
-            // Collect other metadata for the mitmask
+            // Collect other entity data for the mitmask
             if (player.getFireTicks() > 0) {
                 bitmask |= 0x01;
             }

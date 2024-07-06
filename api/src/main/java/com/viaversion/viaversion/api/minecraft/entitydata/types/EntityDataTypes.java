@@ -27,18 +27,18 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 public interface EntityDataTypes {
 
     /**
-     * Returns the meta type by the given id.
+     * Returns the data type by the given id.
      *
      * @param id type id
-     * @return meta type by id
+     * @return data type by id
      * @throws IndexOutOfBoundsException if id is out of bounds
      */
     EntityDataType byId(int id);
 
     /**
-     * Returns an array of meta types.
+     * Returns an array of data types.
      *
-     * @return array of meta types
+     * @return array of data types
      */
     EntityDataType[] values();
 }

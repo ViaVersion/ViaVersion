@@ -27,7 +27,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public interface EntityDataHandlerEvent {
 
     /**
-     * Returns the user connection the metadata is sent to.
+     * Returns the user connection the entity data is sent to.
      *
      * @return user connection
      */

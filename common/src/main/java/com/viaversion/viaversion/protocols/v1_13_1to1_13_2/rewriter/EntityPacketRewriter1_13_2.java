@@ -29,9 +29,9 @@ import com.viaversion.viaversion.protocols.v1_13_1to1_13_2.Protocol1_13_1To1_13_
 public class EntityPacketRewriter1_13_2 {
 
     public static void register(Protocol1_13_1To1_13_2 protocol) {
-        final PacketHandler metaTypeHandler = wrapper -> {
-            for (EntityData metadata : wrapper.get(Types1_13_2.ENTITY_DATA_LIST, 0)) {
-                metadata.setDataType(Types1_13_2.ENTITY_DATA_TYPES.byId(metadata.dataType().typeId()));
+        final PacketHandler dataTypeHandler = wrapper -> {
+            for (EntityData data : wrapper.get(Types1_13_2.ENTITY_DATA_LIST, 0)) {
+                data.setDataType(Types1_13_2.ENTITY_DATA_TYPES.byId(data.dataType().typeId()));
             }
         };
 
@@ -50,9 +50,9 @@ public class EntityPacketRewriter1_13_2 {
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 12 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 12 - Entity data
 
-                handler(metaTypeHandler);
+                handler(dataTypeHandler);
             }
         });
 
@@ -66,9 +66,9 @@ public class EntityPacketRewriter1_13_2 {
                 map(Types.DOUBLE); // 4 - Z
                 map(Types.BYTE); // 5 - Yaw
                 map(Types.BYTE); // 6 - Pitch
-                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 7 - Metadata
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 7 - Entity data
 
-                handler(metaTypeHandler);
+                handler(dataTypeHandler);
             }
         });
 
@@ -76,9 +76,9 @@ public class EntityPacketRewriter1_13_2 {
             @Override
             public void register() {
                 map(Types.VAR_INT); // 0 - Entity ID
-                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 1 - Metadata list
+                map(Types1_13.ENTITY_DATA_LIST, Types1_13_2.ENTITY_DATA_LIST); // 1 - Entity data list
 
-                handler(metaTypeHandler);
+                handler(dataTypeHandler);
             }
         });
     }

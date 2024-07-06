@@ -35,7 +35,7 @@ public interface EntityDataType {
     Type type();
 
     /**
-     * Get type id from the specific MetaDataType
+     * Get type id from the specific EntityDataType
      *
      * @return Type id as an integer
      */
@@ -77,9 +77,9 @@ public interface EntityDataType {
         public boolean equals(final Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            final EntityDataTypeImpl metaType = (EntityDataTypeImpl) o;
-            if (typeId != metaType.typeId) return false;
-            return type.equals(metaType.type);
+            final EntityDataTypeImpl dataType = (EntityDataTypeImpl) o;
+            if (typeId != dataType.typeId) return false;
+            return type.equals(dataType.type);
         }
 
         @Override

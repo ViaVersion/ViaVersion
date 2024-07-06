@@ -223,10 +223,10 @@ public final class EntityPacketRewriter1_19_4 extends EntityRewriter<Clientbound
         registerEntityDataTypeHandler(Types1_19_4.ENTITY_DATA_TYPES.itemType, Types1_19_4.ENTITY_DATA_TYPES.blockStateType, Types1_19_4.ENTITY_DATA_TYPES.optionalBlockStateType, Types1_19_4.ENTITY_DATA_TYPES.particleType, null);
         registerBlockStateHandler(EntityTypes1_19_4.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_19_4.BOAT).index(11).handler((event, meta) -> {
-            final int boatType = meta.value();
+        filter().type(EntityTypes1_19_4.BOAT).index(11).handler((event, data) -> {
+            final int boatType = data.value();
             if (boatType > 4) { // Cherry added
-                meta.setValue(boatType + 1);
+                data.setValue(boatType + 1);
             }
         });
 

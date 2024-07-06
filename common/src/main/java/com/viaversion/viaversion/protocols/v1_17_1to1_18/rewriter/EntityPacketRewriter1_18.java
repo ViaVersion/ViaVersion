@@ -82,8 +82,8 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
     @Override
     protected void registerRewrites() {
         filter().mapDataType(Types1_18.ENTITY_DATA_TYPES::byId);
-        filter().dataType(Types1_18.ENTITY_DATA_TYPES.particleType).handler((event, meta) -> {
-            final Particle particle = (Particle) meta.getValue();
+        filter().dataType(Types1_18.ENTITY_DATA_TYPES.particleType).handler((event, data) -> {
+            final Particle particle = (Particle) data.getValue();
             if (particle.id() == 2) { // Barrier
                 particle.setId(3); // Block marker
                 particle.add(Types.VAR_INT, 7754); // Barrier state

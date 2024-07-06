@@ -418,27 +418,27 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         );
         registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, meta) -> {
-            final int effectColor = meta.value();
+        filter().type(EntityTypes1_20_5.LIVING_ENTITY).index(10).handler((event, data) -> {
+            final int effectColor = data.value();
             if (effectColor == 0) {
                 // No effect
-                meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
+                data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[0]);
                 return;
             }
 
             final Particle particle = new Particle(protocol.getMappingData().getParticleMappings().mappedId("entity_effect"));
             particle.add(Types.INT, withAlpha(effectColor));
-            meta.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
+            data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
         });
 
         filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
-        filter().type(EntityTypes1_20_5.AREA_EFFECT_CLOUD).handler((event, meta) -> {
+        filter().type(EntityTypes1_20_5.AREA_EFFECT_CLOUD).handler((event, data) -> {
             // Color removed - Now put into the actual particle
-            final int metaIndex = event.index();
-            if (metaIndex == 9) {
+            final int dataIndex = event.index();
+            if (dataIndex == 9) {
                 // If the color is found first
                 final EntityData particleData = event.dataAtIndex(11);
-                final int color = meta.value();
+                final int color = data.value();
                 if (particleData == null) {
                     if (color != 0) {
                         // Add default particle with data
@@ -454,23 +454,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 return;
             }
 
-            if (metaIndex > 9) {
-                event.setIndex(metaIndex - 1);
+            if (dataIndex > 9) {
+                event.setIndex(dataIndex - 1);
             }
 
-            if (metaIndex == 11) {
+            if (dataIndex == 11) {
                 // If the particle is found first
                 final EntityData colorData = event.dataAtIndex(9);
                 if (colorData != null && colorData.dataType() == Types1_20_5.ENTITY_DATA_TYPES.varIntType) {
-                    addColor(meta, colorData.value());
+                    addColor(data, colorData.value());
                 }
             }
         });
 
-        filter().type(EntityTypes1_20_5.ARROW).index(10).handler((event, meta) -> {
-            final int color = meta.value();
+        filter().type(EntityTypes1_20_5.ARROW).index(10).handler((event, data) -> {
+            final int color = data.value();
             if (color != -1) {
-                meta.setValue(withAlpha(color));
+                data.setValue(withAlpha(color));
             }
         });
 

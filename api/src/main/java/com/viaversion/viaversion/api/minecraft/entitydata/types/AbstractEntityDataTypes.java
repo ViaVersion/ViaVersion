@@ -44,8 +44,8 @@ public abstract class AbstractEntityDataTypes implements EntityDataTypes {
     }
 
     protected EntityDataType add(final int typeId, final Type<?> type) {
-        final EntityDataType metaType = EntityDataType.create(typeId, type);
-        values[typeId] = metaType;
-        return metaType;
+        final EntityDataType dataType = EntityDataType.create(typeId, type);
+        values[typeId] = dataType;
+        return dataType;
     }
 }

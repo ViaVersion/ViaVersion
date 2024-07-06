@@ -26,14 +26,14 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes;
 
 public final class EntityDataType extends ModernEntityDataType {
 
-    private final EntityDataTypes metaTypes;
+    private final EntityDataTypes dataTypes;
 
-    public EntityDataType(final EntityDataTypes metaTypes) {
-        this.metaTypes = metaTypes;
+    public EntityDataType(final EntityDataTypes dataTypes) {
+        this.dataTypes = dataTypes;
     }
 
     @Override
     protected com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType getType(final int index) {
-        return metaTypes.byId(index);
+        return dataTypes.byId(index);
     }
 }

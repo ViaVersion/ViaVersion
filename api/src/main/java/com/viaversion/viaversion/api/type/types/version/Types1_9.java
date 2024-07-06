@@ -32,11 +32,11 @@ import java.util.List;
 
 public final class Types1_9 {
     /**
-     * Metadata type for 1.9
+     * Entity data type for 1.9
      */
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType1_9();
     /**
-     * Metadata list type for 1.9
+     * Entity data list type for 1.9
      */
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
 

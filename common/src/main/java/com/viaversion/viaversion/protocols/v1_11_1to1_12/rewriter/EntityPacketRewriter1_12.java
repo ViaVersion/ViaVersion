@@ -62,9 +62,9 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 9 - Velocity X
                 map(Types.SHORT); // 10 - Velocity Y
                 map(Types.SHORT); // 11 - Velocity Z
-                map(Types1_12.ENTITY_DATA_LIST); // 12 - Metadata
+                map(Types1_12.ENTITY_DATA_LIST); // 12 - Entity data
 
-                // Track mob and rewrite metadata
+                // Track mob and rewrite entity data
                 handler(trackerAndRewriterHandler(Types1_12.ENTITY_DATA_LIST));
             }
         });
@@ -75,9 +75,9 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
 
     @Override
     protected void registerRewrites() {
-        filter().handler((event, meta) -> {
-            if (meta.getValue() instanceof Item) {
-                meta.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), meta.value()));
+        filter().handler((event, data) -> {
+            if (data.getValue() instanceof Item) {
+                data.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), data.value()));
             }
         });
 

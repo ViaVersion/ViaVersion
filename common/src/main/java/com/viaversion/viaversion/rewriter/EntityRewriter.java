@@ -108,10 +108,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     @Override
-    public void handleEntityData(final int entityId, final List<EntityData> entityDataList, final UserConnection connection) {
+    public void handleEntityData(final int entityId, final List<EntityData> dataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
-        for (final EntityData entityData : entityDataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
+        for (final EntityData entityData : dataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
             EntityDataHandlerEvent event = null;
             for (final EntityDataFilter filter : entityDataFilters) {
                 if (!filter.isFiltered(type, entityData)) {
@@ -119,27 +119,27 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                 }
                 if (event == null) {
                     // Instantiate lazily and share event instance
-                    event = new EntityDataHandlerEventImpl(connection, entity, entityId, entityData, entityDataList);
+                    event = new EntityDataHandlerEventImpl(connection, entity, entityId, entityData, dataList);
                 }
 
                 try {
                     filter.handler().handle(event, entityData);
                 } catch (final Exception e) {
-                    logException(e, type, entityDataList, entityData);
-                    entityDataList.remove(entityData);
+                    logException(e, type, dataList, entityData);
+                    dataList.remove(entityData);
                     break;
                 }
 
                 if (event.cancelled()) {
                     // Remove entity data, and break current filter loop
-                    entityDataList.remove(entityData);
+                    dataList.remove(entityData);
                     break;
                 }
             }
 
             if (event != null && event.hasExtraData()) {
                 // Finally, add newly created entity data
-                entityDataList.addAll(event.extraData());
+                dataList.addAll(event.extraData());
             }
         }
 
@@ -237,9 +237,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerBlockStateHandler(final EntityType entityType, final int index) {
-        filter().type(entityType).index(index).handler((event, meta) -> {
-            final int data = (int) meta.getValue();
-            meta.setValue(protocol.getMappingData().getNewBlockStateId(data));
+        filter().type(entityType).index(index).handler((event, data) -> {
+            final int state = (int) data.getValue();
+            data.setValue(protocol.getMappingData().getNewBlockStateId(state));
         });
     }
 
