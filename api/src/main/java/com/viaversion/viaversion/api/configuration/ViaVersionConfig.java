@@ -293,13 +293,6 @@ public interface ViaVersionConfig extends Config {
     boolean isDisable1_13AutoComplete();
 
     /**
-     * Tries to minimize cooldown animation.
-     *
-     * @return true if enabled
-     */
-    boolean isMinimizeCooldown();
-
-    /**
      * Enable the serverside blockconnections for 1.13+ clients
      *
      * @return true if enabled
