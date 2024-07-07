@@ -123,7 +123,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             return item;
         }
         if (item.identifier() == 1188 || item.identifier() == 1200) {
-            dataContainer.set(StructuredDataKey.RARITY, 0);
+            dataContainer.addEmpty(StructuredDataKey.RARITY);
             saveTag(createCustomTag(item), new ByteTag(true), "rarity");
         }
         return item;
