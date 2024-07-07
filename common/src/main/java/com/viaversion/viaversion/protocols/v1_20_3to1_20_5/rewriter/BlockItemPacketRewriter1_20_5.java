@@ -27,7 +27,6 @@ import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
@@ -614,14 +613,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
-        final ProtocolInfo protocolInfo = connection.getProtocolInfo();
-        if (protocolInfo.serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
             if (item.identifier() == 1182) { // crossbow
                 // Change crossbow damage to value used in 1.17.1 and lower
                 item.dataContainer().set(StructuredDataKey.MAX_DAMAGE, 326);
             }
         }
-        if (protocolInfo.serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 814 || item.identifier() == 819 || item.identifier() == 824 || item.identifier() == 829 || item.identifier() == 834) { // swords
                 // Make sword "eatable" to enable clientside instant blocking on 1.8. Consume time is set really high, so the eating animation doesn't play
                 item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties(0, 0F, true, 3600, null, new FoodEffect[0]));
