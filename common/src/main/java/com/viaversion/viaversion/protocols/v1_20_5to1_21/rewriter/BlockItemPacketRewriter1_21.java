@@ -122,8 +122,10 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         if (dataContainer.contains(StructuredDataKey.RARITY)) {
             return item;
         }
+
+        // Change rarity of trident and piglin banner pattern
         if (item.identifier() == 1188 || item.identifier() == 1200) {
-            dataContainer.addEmpty(StructuredDataKey.RARITY);
+            dataContainer.set(StructuredDataKey.RARITY, 0); // Common
             saveTag(createCustomTag(item), new ByteTag(true), "rarity");
         }
         return item;
