@@ -75,6 +75,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolRule;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
@@ -384,6 +385,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         final Item structuredItem = toStructuredItem(connection, item);
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, structuredItem);
 
         if (Via.getConfig().handleInvalidItemCount()) {
             // Server can send amounts which are higher than vanilla's default, and 1.20.4 will still accept them,
@@ -407,7 +410,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     public Item toOldItem(final UserConnection connection, final Item item, final StructuredDataConverter dataConverter) {
-        // Start out with custom data and add the rest on top, or short-curcuit with the original item
+        // Start out with custom data and add the rest on top, or short-circuit with the original item
         final StructuredDataContainer data = item.dataContainer();
         data.setIdLookup(protocol, true);
 
@@ -607,6 +610,22 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
+    }
+
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_17_1)) {
+            if (item.identifier() == 1182) { // crossbow
+                // Change crossbow damage to value used in 1.17.1 and lower
+                item.dataContainer().set(StructuredDataKey.MAX_DAMAGE, 326);
+            }
+        }
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            if (item.identifier() == 814 || item.identifier() == 819 || item.identifier() == 824 || item.identifier() == 829 || item.identifier() == 834) { // swords
+                // Make sword "eatable" to enable clientside instant blocking on 1.8. Consume time is set really high, so the eating animation doesn't play
+                item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties(0, 0F, true, 3600, null, new FoodEffect[0]));
+            }
+        }
     }
 
     private int unmappedItemId(final String name) {
