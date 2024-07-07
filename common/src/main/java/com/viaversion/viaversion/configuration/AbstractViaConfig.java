@@ -72,7 +72,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private String reloadDisconnectMessage;
     private boolean suppressConversionWarnings;
     private boolean disable1_13TabComplete;
-    private boolean hideCooldownIndicator;
     private boolean teamColourFix;
     private boolean serversideBlockConnections;
     private boolean reduceBlockStorageMemory;
@@ -134,7 +133,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         blockedProtocolVersions = loadBlockedProtocolVersions();
         blockedDisconnectMessage = getString("block-disconnect-msg", "You are using an unsupported Minecraft version!");
         reloadDisconnectMessage = getString("reload-disconnect-msg", "Server reload, please rejoin!");
-        hideCooldownIndicator = getBoolean("hide-cooldown-indicator", true);
         teamColourFix = getBoolean("team-colour-fix", true);
         suppressConversionWarnings = getBoolean("suppress-conversion-warnings", false);
         disable1_13TabComplete = getBoolean("disable-1_13-auto-complete", false);
@@ -401,11 +399,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public String getReloadDisconnectMsg() {
         return reloadDisconnectMessage;
-    }
-
-    @Override
-    public boolean isHideCooldownIndicator() {
-        return hideCooldownIndicator;
     }
 
     @Override
