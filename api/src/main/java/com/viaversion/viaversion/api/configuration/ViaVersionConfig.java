@@ -457,4 +457,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean handleInvalidItemCount();
+
+    /**
+     * Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
+     *
+     * @return true if enabled
+     */
+    boolean cancelBlockSounds();
 }

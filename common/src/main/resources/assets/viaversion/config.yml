@@ -207,3 +207,5 @@ replacement-piston-id: 0
 chunk-border-fix: false
 # Allows 1.9+ left-handedness (main hand) on 1.8 servers
 left-handed-handling: true
+# Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
+cancel-block-sounds: true

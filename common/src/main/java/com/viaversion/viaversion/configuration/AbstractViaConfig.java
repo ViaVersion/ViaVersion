@@ -93,6 +93,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean translateOcelotToCat;
     private boolean enforceSecureChat;
     private boolean handleInvalidItemCount;
+    private boolean cancelBlockSounds;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -159,6 +160,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         translateOcelotToCat = getBoolean("translate-ocelot-to-cat", true);
         enforceSecureChat = getBoolean("enforce-secure-chat", false);
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
+        cancelBlockSounds = getBoolean("cancel-block-sounds", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -534,5 +536,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean handleInvalidItemCount() {
         return handleInvalidItemCount;
+    }
+
+    @Override
+    public boolean cancelBlockSounds() {
+        return cancelBlockSounds;
     }
 }
