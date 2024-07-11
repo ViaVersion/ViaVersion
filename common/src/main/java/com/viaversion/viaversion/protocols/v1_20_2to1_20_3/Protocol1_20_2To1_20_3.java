@@ -258,7 +258,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         registerClientbound(ClientboundPackets1_20_2.PLAYER_COMBAT_KILL, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.VAR_INT); // Duration
+                map(Types.VAR_INT); // Player ID
                 handler(wrapper -> convertComponent(wrapper));
             }
         });
