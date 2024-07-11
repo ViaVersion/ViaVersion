@@ -87,7 +87,9 @@ public class BukkitViaLoader implements ViaPlatformLoader {
         if (serverProtocolVersion.olderThan(ProtocolVersion.v1_9)) {
             new ArmorListener(plugin).register();
             new DeathListener(plugin).register();
-            new BlockListener(plugin).register();
+            if (plugin.getConf().cancelBlockSounds()) {
+                new BlockListener(plugin).register();
+            }
 
             if (plugin.getConf().isItemCache()) {
                 handItemCache = new HandItemCache();

@@ -112,6 +112,10 @@ public class WorldPacketRewriter1_9 {
                     }
                     wrapper.set(Types.STRING, 0, newname);
                     wrapper.write(Types.VAR_INT, catid); // Write Category ID
+
+                    if (!Via.getConfig().cancelBlockSounds()) {
+                        return;
+                    }
                     if (effect != null && effect.isBreakSound()) {
                         EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                         int x = wrapper.passthrough(Types.INT); //Position X
@@ -358,7 +362,27 @@ public class WorldPacketRewriter1_9 {
                 map(Types.UNSIGNED_BYTE); // 5 - Y
                 map(Types.UNSIGNED_BYTE); // 6 - Z
 
-                //Register block place to fix sounds
+                // Handle CommandBlocks
+                handler(wrapper -> {
+                    CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+
+                    BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
+                    // Send the Update Block Entity packet if present
+                    if (tag.isPresent()) {
+                        PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
+
+                        updateBlockEntity.write(Types.BLOCK_POSITION1_8, pos);
+                        updateBlockEntity.write(Types.UNSIGNED_BYTE, (short) 2);
+                        updateBlockEntity.write(Types.NAMED_COMPOUND_TAG, tag.get());
+
+                        updateBlockEntity.scheduleSend(Protocol1_8To1_9.class);
+                    }
+                });
+
+                if (!Via.getConfig().cancelBlockSounds()) {
+                    return;
+                }
                 handler(wrapper -> {
                     int face = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (face == 255)
@@ -378,25 +402,6 @@ public class WorldPacketRewriter1_9 {
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
                     tracker.addBlockInteraction(new BlockPosition(x, y, z));
                 });
-
-                // Handle CommandBlocks
-                handler(wrapper -> {
-                    CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
-
-                    BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
-                    Optional<CompoundTag> tag = provider.get(wrapper.user(), pos);
-                    // Send the Update Block Entity packet if present
-                    if (tag.isPresent()) {
-                        PacketWrapper updateBlockEntity = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, null, wrapper.user());
-
-                        updateBlockEntity.write(Types.BLOCK_POSITION1_8, pos);
-                        updateBlockEntity.write(Types.UNSIGNED_BYTE, (short) 2);
-                        updateBlockEntity.write(Types.NAMED_COMPOUND_TAG, tag.get());
-
-                        updateBlockEntity.scheduleSend(Protocol1_8To1_9.class);
-                    }
-                });
-
             }
         });
     }
