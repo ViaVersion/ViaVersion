@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_16;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_14;
 import com.viaversion.viaversion.api.type.types.version.Types1_16;
@@ -119,10 +120,13 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     wrapper.write(Types.BYTE, (byte) -1); // Previous gamemode, set to none
 
+                    // <= 1.14.4 didn't keep attributes on respawn and 1.15.x always kept them
+                    final boolean keepAttributes = wrapper.user().getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_15);
+
                     String levelType = wrapper.read(Types.STRING);
                     wrapper.write(Types.BOOLEAN, false); // debug
                     wrapper.write(Types.BOOLEAN, levelType.equals("flat"));
-                    wrapper.write(Types.BOOLEAN, true); // keep all playerdata
+                    wrapper.write(Types.BOOLEAN, keepAttributes); // keep player attributes
                 });
             }
         });

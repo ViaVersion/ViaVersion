@@ -26,8 +26,8 @@ import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -227,7 +227,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                 map(Types.BYTE); // Previous gamemode
                 map(Types.BOOLEAN); // Debug
                 map(Types.BOOLEAN); // Flat
-                map(Types.BOOLEAN); // Keep player data
+                map(Types.BOOLEAN); // Keep player attributes
                 create(Types.OPTIONAL_GLOBAL_POSITION, null); // Last death location
                 handler(worldDataTrackerHandlerByKey());
             }
