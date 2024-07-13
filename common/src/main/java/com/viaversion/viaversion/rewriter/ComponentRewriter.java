@@ -85,8 +85,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     public void registerPlayerCombat(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             if (wrapper.passthrough(Types.VAR_INT) == 2) {
-                wrapper.passthrough(Types.VAR_INT);
-                wrapper.passthrough(Types.INT);
+                wrapper.passthrough(Types.VAR_INT); // Player ID
+                wrapper.passthrough(Types.INT); // Killer ID
                 processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
             }
         });
@@ -142,8 +142,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.VAR_INT);
-                map(Types.INT);
+                map(Types.VAR_INT); // Player ID
+                map(Types.INT); // Killer ID
                 handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
             }
         });
@@ -153,7 +153,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.VAR_INT); // Duration
+                map(Types.VAR_INT); // Player ID
                 handler(wrapper -> passthroughAndProcess(wrapper));
             }
         });

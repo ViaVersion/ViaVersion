@@ -63,7 +63,7 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
             wrapper.read(Types.INT); // Killer ID
         });
         registerClientbound(ClientboundPackets1_19_4.PLAYER_COMBAT_KILL, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Duration
+            wrapper.passthrough(Types.VAR_INT); // Player ID
             wrapper.read(Types.INT); // Killer ID
         });
     }
