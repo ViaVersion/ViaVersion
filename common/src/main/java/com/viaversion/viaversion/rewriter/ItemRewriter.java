@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.rewriter;
 
+import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.Mappings;
@@ -363,8 +364,14 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
                 // Display data
                 if (wrapper.passthrough(Types.BOOLEAN)) {
-                    wrapper.passthrough(Types.COMPONENT); // Title
-                    wrapper.passthrough(Types.COMPONENT); // Description
+                    final JsonElement title = wrapper.passthrough(Types.COMPONENT); // Title
+                    final JsonElement description = wrapper.passthrough(Types.COMPONENT); // Description
+                    final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
+                    if (componentRewriter != null) {
+                        componentRewriter.processText(wrapper.user(), title);
+                        componentRewriter.processText(wrapper.user(), description);
+                    }
+
                     handleClientboundItem(wrapper); // Icon
                     wrapper.passthrough(Types.VAR_INT); // Frame type
                     int flags = wrapper.passthrough(Types.INT); // Flags
