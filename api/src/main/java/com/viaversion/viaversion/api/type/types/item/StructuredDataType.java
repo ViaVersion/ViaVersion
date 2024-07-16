@@ -50,7 +50,7 @@ public class StructuredDataType extends Type<StructuredData<?>> {
     public StructuredData<?> read(final ByteBuf buffer) {
         Preconditions.checkNotNull(types, "StructuredDataType has not been initialized");
         final int id = Types.VAR_INT.readPrimitive(buffer);
-        final StructuredDataKey<?> key = this.types[id];
+        final StructuredDataKey<?> key = key(id);
         if (key == null) {
             throw new IllegalArgumentException("No data component serializer found for id " + id);
         }
