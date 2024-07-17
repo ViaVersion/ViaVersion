@@ -1480,7 +1480,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, baseColorIntTag.asInt());
             }
 
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER1_20_5, true);
+            if (tag.contains("Items")) {
+                updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER1_20_5, true);
+                addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
+            }
         }
 
         final Tag skullOwnerTag = tag.remove("SkullOwner");
