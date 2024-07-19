@@ -739,8 +739,8 @@ public final class StructuredDataConverter {
                 predicatedListTag.add(serializeBlockPredicate(predicate, tagKey));
             } else {
                 for (final int id : holders.ids()) {
-                    final String name = toMappedItemName(id);
-                    if (name.isEmpty()) {
+                    final String name = Protocol1_20_3To1_20_5.MAPPINGS.blockName(id);
+                    if (name == null) {
                         if (backupInconvertibleData) {
                             // TODO Backup
                         }
