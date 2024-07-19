@@ -52,4 +52,7 @@ public class RedirectProtocolVersion extends ProtocolVersion {
         };
     }
 
+    public ProtocolVersion getOrigin() {
+        return origin;
+    }
 }
