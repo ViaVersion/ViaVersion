@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
-import com.viaversion.nbt.stringified.SNBT;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -859,7 +858,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         CompoundTag tag = null;
         if (tagStartIndex != -1 && tagEndIndex != -1) {
             try {
-                tag = SNBT.deserializeCompoundTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
+                tag = (CompoundTag) SerializerVersion.V1_20_3.toTag(rawPredicate.substring(tagStartIndex, tagEndIndex + 1));
             } catch (final Exception e) {
                 if (Via.getManager().isDebug()) {
                     Protocol1_20_3To1_20_5.LOGGER.log(Level.SEVERE, "Failed to parse block predicate tag: " + rawPredicate.substring(tagStartIndex, tagEndIndex + 1), e);
