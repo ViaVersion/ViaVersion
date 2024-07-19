@@ -41,7 +41,6 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DamageTypes1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
@@ -152,14 +151,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                     // Fill in missing damage types with 1.20.3/4 defaults
                     final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(e -> Key.stripMinecraftNamespace(e.key())).collect(Collectors.toSet());
-                    for (final String key : DamageTypes1_20_3.keys()) {
+                    for (final String key : protocol.getMappingData().damageKeys()) {
                         if (registryEntryKeys.contains(key)) {
                             continue;
                         }
 
                         highestId++;
                         registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
-                        registryEntries[highestId] = new RegistryEntry(Key.namespaced(key), DamageTypes1_20_3.get(key));
+                        registryEntries[highestId] = new RegistryEntry(Key.namespaced(key), protocol.getMappingData().damageType(key));
                     }
                 }
 

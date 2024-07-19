@@ -22,10 +22,14 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.util.KeyMappings;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.List;
 
 public class MappingData1_20_5 extends MappingDataBase {
 
+    private final Object2ObjectMap<String, CompoundTag> damageTypes = new Object2ObjectOpenHashMap<>();
     private KeyMappings blocks;
     private KeyMappings sounds;
 
@@ -40,6 +44,11 @@ public class MappingData1_20_5 extends MappingDataBase {
         final CompoundTag extraMappings = MappingDataLoader.INSTANCE.loadNBT("extra-identifiers-1.20.3.nbt");
         blocks = new KeyMappings(extraMappings.getListTag("blocks", StringTag.class));
         sounds = new KeyMappings(extraMappings.getListTag("sounds", StringTag.class));
+
+        final CompoundTag damageTypes = MappingDataLoader.INSTANCE.loadNBT("damage-types-1.20.3.nbt");
+        for (final String key : damageTypes.keySet()) {
+            this.damageTypes.put(key, damageTypes.getCompoundTag(key));
+        }
     }
 
     public int blockId(final String name) {
@@ -56,5 +65,13 @@ public class MappingData1_20_5 extends MappingDataBase {
 
     public @Nullable String soundName(final int id) {
         return sounds.idToKey(id);
+    }
+
+    public CompoundTag damageType(final String key) {
+        return damageTypes.get(key).copy();
+    }
+
+    public List<String> damageKeys() {
+        return damageTypes.keySet().stream().toList();
     }
 }

@@ -84,9 +84,6 @@ public final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1
                 }
             }
         }.registerDeclareCommands1_19(ClientboundPackets1_20_5.DECLARE_COMMANDS);*/
-
-        // TODO Rewrite structured data ids and items within them
-
     }
 
     @Override
