@@ -46,6 +46,7 @@ public class MappingDataBase implements MappingData {
     protected ParticleMappings particleMappings;
     protected BiMappings itemMappings;
     protected BiMappings blockMappings;
+    protected BiMappings attributeMappings;
     protected Mappings blockStateMappings;
     protected Mappings blockEntityMappings;
     protected Mappings soundMappings;
@@ -53,7 +54,6 @@ public class MappingDataBase implements MappingData {
     protected Mappings enchantmentMappings;
     protected Mappings paintingMappings;
     protected Mappings menuMappings;
-    protected Mappings attributeMappings;
     protected Map<RegistryType, List<TagData>> tags;
 
     public MappingDataBase(final String unmappedVersion, final String mappedVersion) {
@@ -76,7 +76,7 @@ public class MappingDataBase implements MappingData {
         menuMappings = loadMappings(data, "menus");
         enchantmentMappings = loadMappings(data, "enchantments");
         paintingMappings = loadMappings(data, "paintings");
-        attributeMappings = loadMappings(data, "attributes");
+        attributeMappings = loadBiMappings(data, "attributes");
 
 
         final CompoundTag unmappedIdentifierData = readUnmappedIdentifiersFile("identifiers-" + unmappedVersion + ".nbt");
