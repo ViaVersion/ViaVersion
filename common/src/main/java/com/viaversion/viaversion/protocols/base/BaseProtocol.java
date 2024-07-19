@@ -61,13 +61,19 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             wrapper.passthrough(Types.UNSIGNED_SHORT); // Server Port
             int state = wrapper.passthrough(Types.VAR_INT);
 
-            ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setProtocolVersion(ProtocolVersion.getProtocol(protocolVersion));
-            // Ensure the server has a version provider
             VersionProvider versionProvider = Via.getManager().getProviders().get(VersionProvider.class);
+            // Ensure the server has a version provider
             if (versionProvider == null) {
                 wrapper.user().setActive(false);
                 return;
+            }
+
+            ProtocolInfo info = wrapper.user().getProtocolInfo();
+            ProtocolVersion clientVersion = versionProvider.getClientProtocol(wrapper.user());
+            if (clientVersion != null) {
+                info.setProtocolVersion(clientVersion);
+            } else {
+                info.setProtocolVersion(ProtocolVersion.getProtocol(protocolVersion));
             }
 
             // Choose the pipe
