@@ -106,7 +106,7 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
         conf.reload();
     }
 
-    @Subscribe(order = PostOrder.LATE)
+    @Subscribe(order = PostOrder.LAST)
     public void onProxyLateInit(ProxyInitializeEvent e) {
         final ViaManagerImpl manager = (ViaManagerImpl) Via.getManager();
         manager.init();

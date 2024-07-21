@@ -21,8 +21,10 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
+import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
@@ -35,12 +37,17 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         Object plugin = VelocityPlugin.PROXY.getPluginManager()
             .getPlugin("viaversion").flatMap(PluginContainer::getInstance).get();
 
+        final ViaProviders providers = Via.getManager().getProviders();
+
         final ProtocolVersion protocolVersion = Via.getAPI().getServerVersion().lowestSupportedProtocolVersion();
         if (protocolVersion.olderThan(ProtocolVersion.v1_9)) {
-            Via.getManager().getProviders().use(BossBarProvider.class, new VelocityBossBarProvider());
+            providers.use(BossBarProvider.class, new VelocityBossBarProvider());
         }
 
-        Via.getManager().getProviders().use(VersionProvider.class, new VelocityVersionProvider());
+        // Allow platforms to override the version provider
+        if (providers.get(VersionProvider.class) instanceof BaseVersionProvider) {
+            providers.use(VersionProvider.class, new VelocityVersionProvider());
+        }
         // We probably don't need a EntityIdProvider because velocity sends a Join packet on server change
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
