@@ -69,11 +69,11 @@ public class BaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseCl
             }
 
             ProtocolInfo info = wrapper.user().getProtocolInfo();
+            info.setProtocolVersion(ProtocolVersion.getProtocol(protocolVersion));
+
             ProtocolVersion clientVersion = versionProvider.getClientProtocol(wrapper.user());
             if (clientVersion != null) {
                 info.setProtocolVersion(clientVersion);
-            } else {
-                info.setProtocolVersion(ProtocolVersion.getProtocol(protocolVersion));
             }
 
             // Choose the pipe
