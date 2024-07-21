@@ -86,8 +86,8 @@ public abstract class Config {
 
     private synchronized Map<String, Object> loadConfig(File location, InputStreamSupplier configSupplier) {
         List<String> unsupported = getUnsupportedOptions();
-        try {
-            commentStore.storeComments(configSupplier.get());
+        try (InputStream inputStream = configSupplier.get()) {
+            commentStore.storeComments(inputStream);
             for (String option : unsupported) {
                 List<String> comments = commentStore.header(option);
                 if (comments != null) {
@@ -95,42 +95,46 @@ public abstract class Config {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load default config comments", e);
         }
+
+        // Load actual file data
         Map<String, Object> config = null;
         if (location.exists()) {
             try (FileInputStream input = new FileInputStream(location)) {
+                //noinspection unchecked
                 config = (Map<String, Object>) YAML.get().load(input);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Failed to load config", e);
+            } catch (Exception e) {
+                logger.severe("Failed to load config, make sure your input is valid");
+                throw new RuntimeException("Failed to load config (malformed input?)", e);
             }
         }
         if (config == null) {
             config = new HashMap<>();
         }
 
-        Map<String, Object> defaults = config;
+        // Load default config and merge with current to make sure we always have an up-to-date/correct config
+        Map<String, Object> mergedConfig;
         try (InputStream stream = configSupplier.get()) {
-            defaults = (Map<String, Object>) YAML.get().load(stream);
-            for (String option : unsupported) {
-                defaults.remove(option);
-            }
-            // Merge with defaultLoader
-            for (Map.Entry<String, Object> entry : config.entrySet()) {
-                // Set option in new conf if exists
-                if (defaults.containsKey(entry.getKey()) && !unsupported.contains(entry.getKey())) {
-                    defaults.put(entry.getKey(), entry.getValue());
-                }
-            }
+            //noinspection unchecked
+            mergedConfig = (Map<String, Object>) YAML.get().load(stream);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load default config", e);
         }
-        // Call Handler
-        handleConfig(defaults);
-        // Save
-        save(location, defaults);
+        for (String option : unsupported) {
+            mergedConfig.remove(option);
+        }
+        for (Map.Entry<String, Object> entry : config.entrySet()) {
+            // Set option in new conf if it exists
+            mergedConfig.computeIfPresent(entry.getKey(), (key, value) -> entry.getValue());
+        }
 
-        return defaults;
+        handleConfig(mergedConfig);
+        save(location, mergedConfig);
+
+        return mergedConfig;
     }
 
     protected abstract void handleConfig(Map<String, Object> config);
