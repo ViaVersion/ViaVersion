@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.dump;
 
-import com.viaversion.viaversion.api.protocol.version.VersionType;
 import java.util.Set;
 
 public record VersionInfo(String javaVersion, String operatingSystem,
