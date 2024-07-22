@@ -34,18 +34,40 @@ public final class ComponentRewriter1_21 extends ComponentRewriter<ClientboundPa
         super(protocol, ReadType.NBT);
     }
 
-    @Override
-    protected void handleShowItem(final UserConnection connection, final CompoundTag componentsTag) {
-        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "minecraft:attribute_modifiers");
-        if (attributeModifiers != null) {
-            final ListTag<CompoundTag> modifiers = attributeModifiers.getListTag("modifiers", CompoundTag.class);
-            for (final CompoundTag modifier : modifiers) {
-                final String name = modifier.getString("name");
-                final UUID uuid = UUIDUtil.fromIntArray(modifier.getIntArrayTag("uuid").getValue());
-                final String id = Protocol1_20_5To1_21.mapAttributeUUID(uuid, name);
-                modifier.putString("id", id);
+    private void convertAttributeModifiersComponent(final CompoundTag tag) {
+        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(tag, "minecraft:attribute_modifiers");
+        if (attributeModifiers == null) {
+            return;
+        }
+        final ListTag<CompoundTag> modifiers = attributeModifiers.getListTag("modifiers", CompoundTag.class);
+        for (final CompoundTag modifier : modifiers) {
+            final String name = modifier.getString("name");
+            final UUID uuid = UUIDUtil.fromIntArray(modifier.getIntArrayTag("uuid").getValue());
+            final String id = Protocol1_20_5To1_21.mapAttributeUUID(uuid, name);
+            modifier.putString("id", id);
+        }
+    }
+
+    private void handleContainerComponent(final CompoundTag tag) {
+        final ListTag<CompoundTag> container = TagUtil.getNamespacedCompoundTagList(tag, "minecraft:container");
+        if (container == null) {
+            return;
+        }
+        for (final CompoundTag entryTag : container) {
+            final CompoundTag itemTag = entryTag.getCompoundTag("item");
+
+            final CompoundTag componentsTag = itemTag.getCompoundTag("components");
+            if (componentsTag != null) {
+                convertAttributeModifiersComponent(componentsTag);
+                handleContainerComponent(componentsTag);
             }
         }
+    }
+
+    @Override
+    protected void handleShowItem(final UserConnection connection, final CompoundTag componentsTag) {
+        convertAttributeModifiersComponent(componentsTag);
+        handleContainerComponent(componentsTag);
     }
 
     @Override
