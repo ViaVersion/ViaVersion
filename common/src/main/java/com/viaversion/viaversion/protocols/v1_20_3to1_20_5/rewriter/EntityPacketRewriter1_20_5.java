@@ -474,17 +474,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             }
         });
 
-        final EntityDataHandler emptyItemHandler = (event, data) -> {
+        filter().type(EntityTypes1_20_5.ITEM_PROJECTILE).index(8).handler((event, data) -> {
             final Item item = data.value();
             if (item == null || item.isEmpty()) {
                 // The item is used for particles or projectile display and can no longer be empty
                 event.cancel();
             }
-        };
-        filter().type(EntityTypes1_20_5.EGG).index(8).handler(emptyItemHandler);
-        filter().type(EntityTypes1_20_5.SNOWBALL).index(8).handler(emptyItemHandler);
-        filter().type(EntityTypes1_20_5.ENDER_PEARL).index(8).handler(emptyItemHandler);
-        filter().type(EntityTypes1_20_5.EXPERIENCE_BOTTLE).index(8).handler(emptyItemHandler);
+        });
     }
 
     private void addColor(@Nullable final EntityData particleMeta, final int color) {
