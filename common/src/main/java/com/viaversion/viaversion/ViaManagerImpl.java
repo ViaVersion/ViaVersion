@@ -67,6 +67,7 @@ public class ViaManagerImpl implements ViaManager {
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
     private List<Runnable> enableListeners = new ArrayList<>();
+    private List<Runnable> postEnableListeners = new ArrayList<>();
     private PlatformTask<?> mappingLoadingTask;
     private boolean initialized;
 
@@ -184,6 +185,11 @@ public class ViaManagerImpl implements ViaManager {
 
         // Refresh Versions
         protocolManager.refreshVersions();
+
+        for (final Runnable listener : postEnableListeners) {
+            listener.run();
+        }
+        postEnableListeners = null;
     }
 
     private void loadServerProtocol() {
@@ -317,23 +323,19 @@ public class ViaManagerImpl implements ViaManager {
         return configurationProvider;
     }
 
-    /**
-     * Returns a mutable set of self-added subplatform version strings.
-     * This set is expanded by the subplatform itself (e.g. ViaBackwards), and may not contain all running ones.
-     *
-     * @return mutable set of subplatform versions
-     */
+    @Override
     public Set<String> getSubPlatforms() {
         return subPlatforms;
     }
 
-    /**
-     * Adds a runnable to be executed when ViaVersion has finished its init before the full server load.
-     *
-     * @param runnable runnable to be executed
-     */
+    @Override
     public void addEnableListener(Runnable runnable) {
         enableListeners.add(runnable);
+    }
+
+    @Override
+    public void addPostEnableListener(final Runnable runnable) {
+        postEnableListeners.add(runnable);
     }
 
     @Override

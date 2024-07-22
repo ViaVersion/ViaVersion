@@ -24,7 +24,6 @@ import com.viaversion.viaversion.api.platform.ViaPlatformLoader;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
-import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
@@ -44,10 +43,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
             providers.use(BossBarProvider.class, new VelocityBossBarProvider());
         }
 
-        // Allow platforms to override the version provider
-        if (providers.get(VersionProvider.class) instanceof BaseVersionProvider) {
-            providers.use(VersionProvider.class, new VelocityVersionProvider());
-        }
+        providers.use(VersionProvider.class, new VelocityVersionProvider());
         // We probably don't need a EntityIdProvider because velocity sends a Join packet on server change
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
