@@ -64,6 +64,11 @@ public final class TagUtil {
         return compoundTag != null ? compoundTag : tag.getCompoundTag(Key.stripMinecraftNamespace(key));
     }
 
+    public static @Nullable ListTag<CompoundTag> getNamespacedCompoundTagList(final CompoundTag tag, final String key) {
+        final ListTag<CompoundTag> listTag = tag.getListTag(Key.namespaced(key), CompoundTag.class);
+        return listTag != null ? listTag : tag.getListTag(Key.stripMinecraftNamespace(key), CompoundTag.class);
+    }
+
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {
         return handleDeep(null, tag, consumer);
     }
