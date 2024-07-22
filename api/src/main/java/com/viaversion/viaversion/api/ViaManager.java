@@ -141,6 +141,13 @@ public interface ViaManager {
     void addEnableListener(Runnable runnable);
 
     /**
+     * Adds a runnable to be executed when ViaVersion has finished its init after the full server load.
+     *
+     * @param runnable runnable to be executed
+     */
+    void addLateEnableListener(Runnable runnable);
+
+    /**
      * Returns whether the manager has been initialized (and protocols have been loaded).
      *
      * @return whether the manager has been initialized

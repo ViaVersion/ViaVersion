@@ -67,6 +67,7 @@ public class ViaManagerImpl implements ViaManager {
     private final ViaPlatformLoader loader;
     private final Set<String> subPlatforms = new HashSet<>();
     private List<Runnable> enableListeners = new ArrayList<>();
+    private List<Runnable> lateEnableListeners = new ArrayList<>();
     private PlatformTask<?> mappingLoadingTask;
     private boolean initialized;
 
@@ -184,6 +185,11 @@ public class ViaManagerImpl implements ViaManager {
 
         // Refresh Versions
         protocolManager.refreshVersions();
+
+        for (final Runnable listener : lateEnableListeners) {
+            listener.run();
+        }
+        lateEnableListeners = null;
     }
 
     private void loadServerProtocol() {
@@ -334,6 +340,11 @@ public class ViaManagerImpl implements ViaManager {
      */
     public void addEnableListener(Runnable runnable) {
         enableListeners.add(runnable);
+    }
+
+    @Override
+    public void addLateEnableListener(final Runnable runnable) {
+        lateEnableListeners.add(runnable);
     }
 
     @Override
