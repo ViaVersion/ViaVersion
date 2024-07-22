@@ -16,7 +16,7 @@ direct access to client/server state and more extensive API.
 
 Supported Versions:
 
-![Table (https://i.imgur.com/sTrVnC2.png)](https://i.imgur.com/sTrVnC2.png)
+![Table (https://i.imgur.com/zrQTcf0.png)](https://i.imgur.com/zrQTcf0.png)
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
