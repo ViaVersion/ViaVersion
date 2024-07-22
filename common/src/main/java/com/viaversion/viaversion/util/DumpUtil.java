@@ -62,7 +62,6 @@ public final class DumpUtil {
         final VersionInfo version = new VersionInfo(
             System.getProperty("java.version"),
             System.getProperty("os.name"),
-            protocolVersion.getVersionType(),
             protocolVersion.getVersion(),
             protocolVersion.getName(),
             Via.getManager().getProtocolManager().getSupportedVersions().stream().map(ProtocolVersion::toString).collect(Collectors.toCollection(LinkedHashSet::new)),
