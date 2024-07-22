@@ -24,8 +24,8 @@ import com.viaversion.viaversion.api.data.MappingDataLoader;
 import com.viaversion.viaversion.util.KeyMappings;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import java.util.List;
 
 public class MappingData1_20_5 extends MappingDataBase {
 
@@ -71,7 +71,7 @@ public class MappingData1_20_5 extends MappingDataBase {
         return damageTypes.get(key).copy();
     }
 
-    public List<String> damageKeys() {
-        return damageTypes.keySet().stream().toList();
+    public ObjectSet<String> damageKeys() {
+        return damageTypes.keySet();
     }
 }
