@@ -145,7 +145,7 @@ public interface ViaManager {
      *
      * @param runnable runnable to be executed
      */
-    void addLateEnableListener(Runnable runnable);
+    void addPostEnableListener(Runnable runnable);
 
     /**
      * Returns whether the manager has been initialized (and protocols have been loaded).
