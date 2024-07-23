@@ -161,12 +161,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
 
     public void passthroughAndProcess(final PacketWrapper wrapper) {
         switch (type) {
-            case JSON:
-                processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
-                break;
-            case NBT:
-                processTag(wrapper.user(), wrapper.passthrough(Types.TAG));
-                break;
+            case JSON -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+            case NBT -> processTag(wrapper.user(), wrapper.passthrough(Types.TAG));
         }
     }
 

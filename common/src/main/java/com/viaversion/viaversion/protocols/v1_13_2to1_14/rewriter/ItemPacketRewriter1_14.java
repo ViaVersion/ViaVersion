@@ -86,42 +86,21 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
 
                 int typeId = -1;
                 switch (type) {
-                    case "minecraft:crafting_table":
-                        typeId = 11;
-                        break;
-                    case "minecraft:furnace":
-                        typeId = 13;
-                        break;
-                    case "minecraft:dropper", "minecraft:dispenser":
-                        typeId = 6;
-                        break;
-                    case "minecraft:enchanting_table":
-                        typeId = 12;
-                        break;
-                    case "minecraft:brewing_stand":
-                        typeId = 10;
-                        break;
-                    case "minecraft:villager":
-                        typeId = 18;
-                        break;
-                    case "minecraft:beacon":
-                        typeId = 8;
-                        break;
-                    case "minecraft:anvil":
-                        typeId = 7;
-                        break;
-                    case "minecraft:hopper":
-                        typeId = 15;
-                        break;
-                    case "minecraft:shulker_box":
-                        typeId = 19;
-                        break;
-                    case "minecraft:container", "minecraft:chest":
-                    default:
+                    case "minecraft:crafting_table" -> typeId = 11;
+                    case "minecraft:furnace" -> typeId = 13;
+                    case "minecraft:dropper", "minecraft:dispenser" -> typeId = 6;
+                    case "minecraft:enchanting_table" -> typeId = 12;
+                    case "minecraft:brewing_stand" -> typeId = 10;
+                    case "minecraft:villager" -> typeId = 18;
+                    case "minecraft:beacon" -> typeId = 8;
+                    case "minecraft:anvil" -> typeId = 7;
+                    case "minecraft:hopper" -> typeId = 15;
+                    case "minecraft:shulker_box" -> typeId = 19;
+                    default -> {
                         if (slots > 0 && slots <= 54) {
                             typeId = slots / 9 - 1;
                         }
-                        break;
+                    }
                 }
 
                 if (typeId == -1) {

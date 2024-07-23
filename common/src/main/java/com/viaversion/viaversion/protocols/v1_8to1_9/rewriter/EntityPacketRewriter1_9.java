@@ -23,10 +23,10 @@ import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
@@ -405,7 +405,7 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
         Object value = data.getValue();
         switch (dataIndex.getNewType()) {
-            case BYTE:
+            case BYTE -> {
                 // convert from int, byte
                 if (dataIndex.getOldType() == EntityDataTypes1_8.BYTE) {
                     data.setValue(value);
@@ -423,8 +423,8 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     EntityDataType dataType = EntityDataIndex1_9.PLAYER_HAND.getNewType();
                     event.createExtraData(new EntityData(newIndex, dataType, val));
                 }
-                break;
-            case OPTIONAL_UUID:
+            }
+            case OPTIONAL_UUID -> {
                 String owner = (String) value;
                 UUID toWrite = null;
                 if (!owner.isEmpty()) {
@@ -434,8 +434,8 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                     }
                 }
                 data.setValue(toWrite);
-                break;
-            case VAR_INT:
+            }
+            case VAR_INT -> {
                 // convert from int, short, byte
                 if (dataIndex.getOldType() == EntityDataTypes1_8.BYTE) {
                     data.setValue(((Byte) value).intValue());
@@ -446,39 +446,33 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
                 if (dataIndex.getOldType() == EntityDataTypes1_8.INT) {
                     data.setValue(value);
                 }
-                break;
-            case FLOAT, STRING:
-                data.setValue(value);
-                break;
-            case BOOLEAN:
+            }
+            case FLOAT, STRING -> data.setValue(value);
+            case BOOLEAN -> {
                 if (dataIndex == EntityDataIndex1_9.ABSTRACT_AGEABLE_AGE)
                     data.setValue((Byte) value < 0);
                 else
                     data.setValue((Byte) value != 0);
-                break;
-            case ITEM:
+            }
+            case ITEM -> {
                 data.setValue(value);
                 protocol.getItemRewriter().handleItemToClient(event.user(), (Item) data.getValue());
-                break;
-            case BLOCK_POSITION:
+            }
+            case BLOCK_POSITION -> {
                 Vector vector = (Vector) value;
                 data.setValue(vector);
-                break;
-            case ROTATIONS:
+            }
+            case ROTATIONS -> {
                 EulerAngle angle = (EulerAngle) value;
                 data.setValue(angle);
-                break;
-            case COMPONENT:
+            }
+            case COMPONENT -> {
                 // Was previously also a component, so just convert it
                 String text = (String) value;
                 data.setValue(ComponentUtil.convertJsonOrEmpty(text, SerializerVersion.V1_8, SerializerVersion.V1_9));
-                break;
-            case OPTIONAL_BLOCK_STATE:
-                // Convert from int, short, byte
-                data.setValue(((Number) value).intValue());
-                break;
-            default:
-                throw new RuntimeException("Unhandled EntityDataType: " + dataIndex.getNewType());
+            }
+            case OPTIONAL_BLOCK_STATE -> data.setValue(((Number) value).intValue()); // Convert from int, short, byte
+            default -> throw new RuntimeException("Unhandled EntityDataType: " + dataIndex.getNewType());
         }
     }
 

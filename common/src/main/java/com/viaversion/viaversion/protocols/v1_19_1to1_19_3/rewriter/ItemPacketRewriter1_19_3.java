@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_19_1to1_19_3.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.Protocol1_19_1To1_19_3;
@@ -66,7 +65,7 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                 final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
                 wrapper.passthrough(Types.STRING); // Recipe Identifier
                 switch (type) {
-                    case "crafting_shapeless": {
+                    case "crafting_shapeless" -> {
                         wrapper.passthrough(Types.STRING); // Group
                         wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                         final int ingredients = wrapper.passthrough(Types.VAR_INT);
@@ -77,9 +76,8 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                             }
                         }
                         handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
-                        break;
                     }
-                    case "crafting_shaped": {
+                    case "crafting_shaped" -> {
                         final int ingredients = wrapper.passthrough(Types.VAR_INT) * wrapper.passthrough(Types.VAR_INT);
                         wrapper.passthrough(Types.STRING); // Group
                         wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
@@ -90,12 +88,8 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                             }
                         }
                         handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
-                        break;
                     }
-                    case "smelting":
-                    case "campfire_cooking":
-                    case "blasting":
-                    case "smoking":
+                    case "smelting", "campfire_cooking", "blasting", "smoking" -> {
                         wrapper.passthrough(Types.STRING); // Group
                         wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
                         final Item[] items = wrapper.passthrough(Types.ITEM1_13_2_ARRAY); // Ingredients
@@ -105,25 +99,12 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
                         handleItemToClient(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)); // Result
                         wrapper.passthrough(Types.FLOAT); // EXP
                         wrapper.passthrough(Types.VAR_INT); // Cooking time
-                        break;
-                    case "crafting_special_armordye":
-                    case "crafting_special_bookcloning":
-                    case "crafting_special_mapcloning":
-                    case "crafting_special_mapextending":
-                    case "crafting_special_firework_rocket":
-                    case "crafting_special_firework_star":
-                    case "crafting_special_firework_star_fade":
-                    case "crafting_special_tippedarrow":
-                    case "crafting_special_bannerduplicate":
-                    case "crafting_special_shielddecoration":
-                    case "crafting_special_shulkerboxcoloring":
-                    case "crafting_special_suspiciousstew":
-                    case "crafting_special_repairitem":
-                        wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
-                        break;
-                    default:
-                        recipeRewriter.handleRecipeType(wrapper, type);
-                        break;
+                    }
+                    case "crafting_special_armordye", "crafting_special_bookcloning", "crafting_special_mapcloning", "crafting_special_mapextending",
+                         "crafting_special_firework_rocket", "crafting_special_firework_star", "crafting_special_firework_star_fade", "crafting_special_tippedarrow",
+                         "crafting_special_bannerduplicate", "crafting_special_shielddecoration", "crafting_special_shulkerboxcoloring", "crafting_special_suspiciousstew",
+                         "crafting_special_repairitem" -> wrapper.write(Types.VAR_INT, MISC_CRAFTING_BOOK_CATEGORY);
+                    default -> recipeRewriter.handleRecipeType(wrapper, type);
                 }
             }
         });

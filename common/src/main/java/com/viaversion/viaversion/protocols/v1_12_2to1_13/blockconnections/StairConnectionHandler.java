@@ -61,23 +61,14 @@ public class StairConnectionHandler implements ConnectionHandler {
 
             byte shape;
             switch (blockData.getValue("shape")) {
-                case "straight":
-                    shape = 0;
-                    break;
-                case "inner_left":
-                    shape = 1;
-                    break;
-                case "inner_right":
-                    shape = 2;
-                    break;
-                case "outer_left":
-                    shape = 3;
-                    break;
-                case "outer_right":
-                    shape = 4;
-                    break;
-                default:
+                case "straight" -> shape = 0;
+                case "inner_left" -> shape = 1;
+                case "inner_right" -> shape = 2;
+                case "outer_left" -> shape = 3;
+                case "outer_right" -> shape = 4;
+                default -> {
                     return;
+                }
             }
 
             StairData stairData = new StairData(
