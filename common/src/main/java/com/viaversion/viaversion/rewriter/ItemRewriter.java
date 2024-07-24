@@ -430,6 +430,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override

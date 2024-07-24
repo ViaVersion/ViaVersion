@@ -61,7 +61,6 @@ public final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Cl
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
         registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerContainerSetData(ClientboundPackets1_20_5.CONTAINER_SET_DATA);
         registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
         registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
 
