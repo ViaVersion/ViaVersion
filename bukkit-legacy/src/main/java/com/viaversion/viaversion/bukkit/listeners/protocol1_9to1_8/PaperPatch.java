@@ -92,18 +92,17 @@ public class PaperPatch extends ViaBukkitListener {
     private boolean isPlacable(Material material) {
         if (!material.isSolid()) return true;
         // signs, pressure plates, doors, and banners
-        switch (material.getId()) {
-            case 63: // SIGN_POST
-            case 68: // WALL_SIGN
-            case 70: // STONE_PLATE
-            case 72: // WOOD_PLATE
-            case 147: // GOLD_PLATE
-            case 148: // IRON_PLATE
-            case 176: // STANDING_BANNER
-            case 177: // WALL_BANNER
-                return true;
-            default:
-                return false;
-        }
+        return switch (material.getId()) {
+            case 63, // SIGN_POST
+                 68, // WALL_SIGN
+                 70, // STONE_PLATE
+                 72, // WOOD_PLATE
+                 147, // GOLD_PLATE
+                 148, // IRON_PLATE
+                 176, // STANDING_BANNER
+                 177 -> // WALL_BANNER
+                true;
+            default -> false;
+        };
     }
 }
