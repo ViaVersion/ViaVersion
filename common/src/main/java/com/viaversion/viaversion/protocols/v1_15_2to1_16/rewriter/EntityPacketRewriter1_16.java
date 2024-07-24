@@ -51,22 +51,23 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
         String dimensionName;
         String outputName;
         switch (dimension) {
-            case -1:
+            case -1 -> {
                 dimensionName = "minecraft:the_nether";
                 outputName = map.nether();
-                break;
-            case 0:
+            }
+            case 0 -> {
                 dimensionName = "minecraft:overworld";
                 outputName = map.overworld();
-                break;
-            case 1:
+            }
+            case 1 -> {
                 dimensionName = "minecraft:the_end";
                 outputName = map.end();
-                break;
-            default:
+            }
+            default -> {
                 protocol.getLogger().warning("Invalid dimension id: " + dimension);
                 dimensionName = "minecraft:overworld";
                 outputName = map.overworld();
+            }
         }
 
         wrapper.write(Types.STRING, dimensionName); // dimension

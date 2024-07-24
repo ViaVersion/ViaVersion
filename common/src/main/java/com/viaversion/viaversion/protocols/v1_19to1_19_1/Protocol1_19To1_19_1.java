@@ -399,19 +399,13 @@ public final class Protocol1_19To1_19_1 extends AbstractProtocol<ClientboundPack
             for (final StringTag element : parameters) {
                 JsonElement argument = null;
                 switch (element.getValue()) {
-                    case "sender":
-                        argument = senderName;
-                        break;
-                    case "content":
-                        argument = message;
-                        break;
-                    case "team_name":
-                    case "target": // So that this method can also be used in VB
+                    case "sender" -> argument = senderName;
+                    case "content" -> argument = message;
+                    case "team_name", "target" /*So that this method can also be used in VB*/ -> {
                         Preconditions.checkNotNull(targetName, "Team name is null");
                         argument = targetName;
-                        break;
-                    default:
-                        LOGGER.warning("Unknown parameter for chat decoration: " + element.getValue());
+                    }
+                    default -> LOGGER.warning("Unknown parameter for chat decoration: " + element.getValue());
                 }
                 if (argument != null) {
                     arguments.add(SerializerVersion.V1_18.toComponent(argument));

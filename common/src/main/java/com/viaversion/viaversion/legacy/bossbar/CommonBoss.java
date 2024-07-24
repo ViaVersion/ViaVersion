@@ -246,7 +246,7 @@ public class CommonBoss implements BossBar {
             wrapper.write(Types.UUID, uuid);
             wrapper.write(Types.VAR_INT, action.getId());
             switch (action) {
-                case ADD:
+                case ADD -> {
                     try {
                         wrapper.write(Types.COMPONENT, JsonParser.parseString(this.title));
                     } catch (Exception e) {
@@ -256,26 +256,22 @@ public class CommonBoss implements BossBar {
                     wrapper.write(Types.VAR_INT, color.getId());
                     wrapper.write(Types.VAR_INT, style.getId());
                     wrapper.write(Types.BYTE, (byte) flagToBytes());
-                    break;
-                case REMOVE:
-                    break;
-                case UPDATE_HEALTH:
-                    wrapper.write(Types.FLOAT, health);
-                    break;
-                case UPDATE_TITLE:
+                }
+                case REMOVE -> {
+                }
+                case UPDATE_HEALTH -> wrapper.write(Types.FLOAT, health);
+                case UPDATE_TITLE -> {
                     try {
                         wrapper.write(Types.COMPONENT, JsonParser.parseString(this.title));
                     } catch (Exception e) {
                         wrapper.write(Types.COMPONENT, ComponentUtil.plainToJson(this.title));
                     }
-                    break;
-                case UPDATE_STYLE:
+                }
+                case UPDATE_STYLE -> {
                     wrapper.write(Types.VAR_INT, color.getId());
                     wrapper.write(Types.VAR_INT, style.getId());
-                    break;
-                case UPDATE_FLAGS:
-                    wrapper.write(Types.BYTE, (byte) flagToBytes());
-                    break;
+                }
+                case UPDATE_FLAGS -> wrapper.write(Types.BYTE, (byte) flagToBytes());
             }
 
             return wrapper;

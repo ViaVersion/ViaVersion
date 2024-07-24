@@ -453,30 +453,22 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
 
     public static String getNewPluginChannelId(String old) {
         // Default channels that should not be modifiable
-        switch (old) {
-            case "MC|TrList":
-                return "minecraft:trader_list";
-            case "MC|Brand":
-                return "minecraft:brand";
-            case "MC|BOpen":
-                return "minecraft:book_open";
-            case "MC|DebugPath":
-                return "minecraft:debug/paths";
-            case "MC|DebugNeighborsUpdate":
-                return "minecraft:debug/neighbors_update";
-            case "REGISTER":
-                return "minecraft:register";
-            case "UNREGISTER":
-                return "minecraft:unregister";
-            case "BungeeCord":
-                return "bungeecord:main";
-            case "bungeecord:main":
-                return null;
-            default:
+        return switch (old) {
+            case "MC|TrList" -> "minecraft:trader_list";
+            case "MC|Brand" -> "minecraft:brand";
+            case "MC|BOpen" -> "minecraft:book_open";
+            case "MC|DebugPath" -> "minecraft:debug/paths";
+            case "MC|DebugNeighborsUpdate" -> "minecraft:debug/neighbors_update";
+            case "REGISTER" -> "minecraft:register";
+            case "UNREGISTER" -> "minecraft:unregister";
+            case "BungeeCord" -> "bungeecord:main";
+            case "bungeecord:main" -> null;
+            default -> {
                 String mappedChannel = Protocol1_12_2To1_13.MAPPINGS.getChannelMappings().get(old);
-                if (mappedChannel != null) return mappedChannel;
-                return MappingData1_13.validateNewChannel(old);
-        }
+                if (mappedChannel != null) yield mappedChannel;
+                yield MappingData1_13.validateNewChannel(old);
+            }
+        };
     }
 
     @Override
@@ -687,28 +679,21 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
         if (newId == null) return null;
 
         // Default channels that should not be modifiable
-        switch (newId) {
-            case "minecraft:trader_list":
-                return "MC|TrList";
-            case "minecraft:book_open":
-                return "MC|BOpen";
-            case "minecraft:debug/paths":
-                return "MC|DebugPath";
-            case "minecraft:debug/neighbors_update":
-                return "MC|DebugNeighborsUpdate";
-            case "minecraft:register":
-                return "REGISTER";
-            case "minecraft:unregister":
-                return "UNREGISTER";
-            case "minecraft:brand":
-                return "MC|Brand";
-            case "bungeecord:main":
-                return "BungeeCord";
-            default:
+        return switch (newId) {
+            case "minecraft:trader_list" -> "MC|TrList";
+            case "minecraft:book_open" -> "MC|BOpen";
+            case "minecraft:debug/paths" -> "MC|DebugPath";
+            case "minecraft:debug/neighbors_update" -> "MC|DebugNeighborsUpdate";
+            case "minecraft:register" -> "REGISTER";
+            case "minecraft:unregister" -> "UNREGISTER";
+            case "minecraft:brand" -> "MC|Brand";
+            case "bungeecord:main" -> "BungeeCord";
+            default -> {
                 String mappedChannel = Protocol1_12_2To1_13.MAPPINGS.getChannelMappings().inverse().get(newId);
-                if (mappedChannel != null) return mappedChannel;
-                return newId.length() > 20 ? newId.substring(0, 20) : newId;
-        }
+                if (mappedChannel != null) yield mappedChannel;
+                yield newId.length() > 20 ? newId.substring(0, 20) : newId;
+            }
+        };
     }
 
     public static boolean isDamageable(int id) {

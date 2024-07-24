@@ -779,7 +779,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
             // Clone item arrays because array and item are mutable, also make sure the array type is the interface
             switch (recipe.type()) {
-                case "crafting_shapeless": {
+                case "crafting_shapeless" -> {
                     recipesPacket.write(Types.STRING, recipe.group());
                     recipesPacket.write(Types.VAR_INT, recipe.ingredients().length);
                     for (Item[] ingredient : recipe.ingredients()) {
@@ -791,9 +791,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
                     recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
-                    break;
                 }
-                case "crafting_shaped": {
+                case "crafting_shaped" -> {
                     recipesPacket.write(Types.VAR_INT, recipe.width());
                     recipesPacket.write(Types.VAR_INT, recipe.height());
                     recipesPacket.write(Types.STRING, recipe.group());
@@ -806,9 +805,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                         recipesPacket.write(Types.ITEM1_13_ARRAY, clone);
                     }
                     recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
-                    break;
                 }
-                case "smelting": {
+                case "smelting" -> {
                     recipesPacket.write(Types.STRING, recipe.group());
                     Item[] ingredient = new Item[recipe.ingredient().length];
                     for (int i = 0; i < ingredient.length; i++) {
@@ -819,7 +817,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     recipesPacket.write(Types.ITEM1_13, recipe.result().copy());
                     recipesPacket.write(Types.FLOAT, recipe.experience());
                     recipesPacket.write(Types.VAR_INT, recipe.cookingTime());
-                    break;
                 }
             }
         }
