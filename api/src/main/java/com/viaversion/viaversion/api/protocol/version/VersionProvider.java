@@ -40,6 +40,20 @@ public interface VersionProvider extends Provider {
     }
 
     /**
+     * Calls {@link #getClosestServerProtocol(UserConnection)} and catches any exceptions by returning null.
+     *
+     * @param connection connection
+     * @return closest server protocol version to the user's protocol version
+     */
+    default ProtocolVersion getServerProtocol(UserConnection connection) {
+        try {
+            return getClosestServerProtocol(connection);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * Returns the closest server protocol version to the user's protocol version.
      * On non-proxy servers, this returns the actual server version.
      *
