@@ -26,10 +26,12 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -45,7 +47,6 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundCon
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -72,6 +73,22 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_20_3.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_20_3.SET_ENTITY_DATA, Types1_20_3.ENTITY_DATA_LIST, Types1_20_5.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_3.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
+            final EntityType type = tracker(wrapper.user()).entityType(entityId);
+
+            byte slot;
+            do {
+                slot = wrapper.read(Types.BYTE);
+                if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && slot == 4) {
+                    slot = 6; // Map chest slot index to body slot index for horses
+                }
+                wrapper.write(Types.BYTE, slot);
+                Item item = protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
+                wrapper.write(Types1_20_5.ITEM, item);
+            } while (slot < 0);
+        });
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
             final PacketWrapper knownPacksPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.SELECT_KNOWN_PACKS);
@@ -430,7 +447,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
         });
 
-        filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
+        filter().type(EntityTypes1_20_5.LLAMA).handler((event, data) -> {
+            // Carpet color removed - now set via the set equipment packet
+            final int dataIndex = event.index();
+            if (dataIndex == 20) {
+                event.cancel();
+                final int color = data.value();
+
+                // Convert dyed color id to carpet item id
+                final PacketWrapper setEquipment = PacketWrapper.create(ClientboundPackets1_20_5.SET_EQUIPMENT, event.user());
+                setEquipment.write(Types.VAR_INT, event.entityId());
+                setEquipment.write(Types.BYTE, (byte) 6);
+                setEquipment.write(Types1_20_5.ITEM, new StructuredItem(color + 446, 1, new StructuredDataContainer()));
+                setEquipment.scheduleSend(Protocol1_20_3To1_20_5.class);
+            } else if (dataIndex > 20) {
+                event.setIndex(dataIndex - 1);
+            }
+        });
         filter().type(EntityTypes1_20_5.AREA_EFFECT_CLOUD).handler((event, data) -> {
             // Color removed - Now put into the actual particle
             final int dataIndex = event.index();

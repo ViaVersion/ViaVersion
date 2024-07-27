@@ -174,10 +174,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         registerCooldown(ClientboundPackets1_20_3.COOLDOWN);
         registerSetContent1_17_1(ClientboundPackets1_20_3.CONTAINER_SET_CONTENT);
         registerSetSlot1_17_1(ClientboundPackets1_20_3.CONTAINER_SET_SLOT);
-        registerSetEquipment(ClientboundPackets1_20_3.SET_EQUIPMENT);
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
         registerContainerSetData(ClientboundPackets1_20_3.CONTAINER_SET_DATA);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
+
         protocol.registerServerbound(ServerboundPackets1_20_5.CONTAINER_BUTTON_CLICK, wrapper -> {
             final byte containerId = wrapper.read(Types.VAR_INT).byteValue();
             final byte buttonId = wrapper.read(Types.VAR_INT).byteValue();
