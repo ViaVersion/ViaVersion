@@ -76,10 +76,11 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
         protocol.registerClientbound(ClientboundPackets1_20_3.SET_EQUIPMENT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
+            final EntityType type = tracker(wrapper.user()).entityType(entityId);
+
             byte slot;
             do {
                 slot = wrapper.read(Types.BYTE);
-                final EntityType type = tracker(wrapper.user()).entityType(entityId);
                 if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && slot == 4) {
                     slot = 6; // Map chest slot index to body slot index for horses
                 }
