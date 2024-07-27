@@ -26,10 +26,12 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -430,7 +432,23 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             data.setTypeAndValue(Types1_20_5.ENTITY_DATA_TYPES.particlesType, new Particle[]{particle});
         });
 
-        filter().type(EntityTypes1_20_5.LLAMA).removeIndex(20); // Carpet color
+        filter().type(EntityTypes1_20_5.LLAMA).handler((event, data) -> {
+            // Carpet color removed - now set via the set equipment packet
+            final int dataIndex = event.index();
+            if (dataIndex == 20) {
+                event.cancel();
+                final int color = data.value();
+
+                // Convert dyed color id to carpet item id
+                final PacketWrapper setEquipment = PacketWrapper.create(ClientboundPackets1_20_5.SET_EQUIPMENT, event.user());
+                setEquipment.write(Types.VAR_INT, event.entityId());
+                setEquipment.write(Types.BYTE, (byte) 6);
+                setEquipment.write(Types1_20_5.ITEM, new StructuredItem(color + 446, 1, new StructuredDataContainer()));
+                setEquipment.scheduleSend(Protocol1_20_3To1_20_5.class);
+            } else if (dataIndex > 20) {
+                event.setIndex(dataIndex - 1);
+            }
+        });
         filter().type(EntityTypes1_20_5.AREA_EFFECT_CLOUD).handler((event, data) -> {
             // Color removed - Now put into the actual particle
             final int dataIndex = event.index();
