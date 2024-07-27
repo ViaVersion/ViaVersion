@@ -46,6 +46,8 @@ public final class ChatItemRewriter {
                 }
             } else if (obj.has("extra")) {
                 toClient(obj.get("extra"));
+            } else if (obj.has("translate") && obj.has("with")) {
+                toClient(obj.get("with"));
             }
         } else if (element instanceof final JsonArray array) {
             for (JsonElement value : array) {
