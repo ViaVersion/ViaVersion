@@ -198,7 +198,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                 handler(wrapper -> {
                     // 100-character limit on older servers
                     String msg = wrapper.get(Types.STRING, 0);
-                    if (msg.length() > 100) {
+                    if (msg.length() > 100 && Via.getConfig().truncate1_11ChatMessages()) {
                         wrapper.set(Types.STRING, 0, msg.substring(0, 100));
                     }
                 });

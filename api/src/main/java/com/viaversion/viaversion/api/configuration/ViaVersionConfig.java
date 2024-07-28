@@ -464,4 +464,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean cancelBlockSounds();
+
+    /**
+     * Truncate chat messages longer than 100 characters from 1.11+ clients on sub 1.11 servers
+     *
+     * @return true if enabled
+     */
+    boolean truncate1_11ChatMessages();
 }
