@@ -23,48 +23,29 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * For some reason, mining efficiency is not calculated by the client anymore, but by the server,
  * then sending the current value to the client every time the item changes. This roughly emulates that behavior.
  */
-public final class PlayerChangeItemListener extends ViaBukkitListener {
+public class PlayerChangeItemListener extends ViaBukkitListener {
 
-    private final Enchantment efficiency = Enchantment.getByKey(NamespacedKey.minecraft("efficiency"));
-    private final Enchantment aquaAffinity = Enchantment.getByKey(NamespacedKey.minecraft("aqua_affinity"));
-    private final Enchantment depthStrider = Enchantment.getByKey(NamespacedKey.minecraft("depth_strider"));
-    private final Enchantment soulSpeed = Enchantment.getByKey(NamespacedKey.minecraft("soul_speed"));
-    private final Enchantment swiftSneak = Enchantment.getByKey(NamespacedKey.minecraft("swift_sneak"));
+    // Use legacy function and names here to support all versions
+    private final Enchantment efficiency = Enchantment.getByName("DIG_SPEED");
+    private final Enchantment aquaAffinity = Enchantment.getByName("WATER_WORKER");
+    private final Enchantment depthStrider = Enchantment.getByName("DEPTH_STRIDER");
+    private final Enchantment soulSpeed = Enchantment.getByName("SOUL_SPEED");
+    private final Enchantment swiftSneak = Enchantment.getByName("SWIFT_SNEAK");
 
     public PlayerChangeItemListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_20_5To1_21.class);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerInventorySlotChangedEvent(final PlayerInventorySlotChangeEvent event) {
-        final Player player = event.getPlayer();
-        final ItemStack item = event.getNewItemStack();
-        final PlayerInventory inventory = player.getInventory();
-        final int slot = event.getSlot();
-        if (slot == inventory.getHeldItemSlot()) {
-            sendAttributeUpdate(player, item, Slot.HAND);
-        } else if (slot == 36) {
-            sendAttributeUpdate(player, item, Slot.BOOTS);
-        } else if (slot == 37) {
-            sendAttributeUpdate(player, item, Slot.LEGGINGS);
-        } else if (slot == 39) {
-            sendAttributeUpdate(player, item, Slot.HELMET);
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -74,7 +55,7 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
         sendAttributeUpdate(player, item, Slot.HAND);
     }
 
-    private void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {
+    void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {
         final UserConnection connection = Via.getAPI().getConnection(player.getUniqueId());
         if (connection == null || !isOnPipe(player)) {
             return;
@@ -105,7 +86,7 @@ public final class PlayerChangeItemListener extends ViaBukkitListener {
         storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, aquaAffinityLevel, depthStriderLevel);
     }
 
-    private enum Slot {
+    enum Slot {
         HAND, BOOTS, LEGGINGS, HELMET
     }
 }
