@@ -38,11 +38,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PlayerChangeItemListener extends ViaBukkitListener {
 
     // Use legacy function and names here to support all versions
-    private final Enchantment efficiency = Enchantment.getByName("DIG_SPEED");
-    private final Enchantment aquaAffinity = Enchantment.getByName("WATER_WORKER");
-    private final Enchantment depthStrider = Enchantment.getByName("DEPTH_STRIDER");
-    private final Enchantment soulSpeed = Enchantment.getByName("SOUL_SPEED");
-    private final Enchantment swiftSneak = Enchantment.getByName("SWIFT_SNEAK");
+    private final Enchantment efficiency = getByName("efficiency", "DIG_SPEED");
+    private final Enchantment aquaAffinity = getByName("aqua_affinity", "WATER_WORKER");
+    private final Enchantment depthStrider = getByName("depth_strider", "DEPTH_STRIDER");
+    private final Enchantment soulSpeed = getByName("soul_speed", "SOUL_SPEED");
+    private final Enchantment swiftSneak = getByName("swift_sneak", "SWIFT_SNEAK");
 
     public PlayerChangeItemListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_20_5To1_21.class);
@@ -88,5 +88,13 @@ public class PlayerChangeItemListener extends ViaBukkitListener {
 
     enum Slot {
         HAND, BOOTS, LEGGINGS, HELMET
+    }
+
+    private Enchantment getByName(final String newName, final String oldName) {
+        final Enchantment enchantment = Enchantment.getByName(newName);
+        if (enchantment == null) {
+            return Enchantment.getByName(oldName);
+        }
+        return enchantment;
     }
 }
