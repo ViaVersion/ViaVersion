@@ -210,8 +210,10 @@ public class ViaManagerImpl implements ViaManager {
     }
 
     public void destroy() {
-        // Uninject
-        platform.getLogger().info("ViaVersion is disabling, if this is a reload and you experience issues consider rebooting.");
+        if (platform.couldBeReloading()) {
+            platform.getLogger().info("ViaVersion is disabling. If this is a reload and you experience issues, please reboot instead.");
+        }
+
         try {
             injector.uninject();
         } catch (Exception e) {
@@ -220,6 +222,8 @@ public class ViaManagerImpl implements ViaManager {
 
         loader.unload();
         scheduler.shutdown();
+
+        platform.getLogger().info("ViaVersion has been disabled; uninjected the platform shut down the scheduler.");
     }
 
     private void checkJavaVersion() { // Stolen from Paper

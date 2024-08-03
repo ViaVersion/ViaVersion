@@ -136,4 +136,9 @@ public final class TestPlatform implements ViaPlatform {
     public boolean hasPlugin(final String name) {
         return false;
     }
+
+    @Override
+    public boolean couldBeReloading() {
+        return false;
+    }
 }

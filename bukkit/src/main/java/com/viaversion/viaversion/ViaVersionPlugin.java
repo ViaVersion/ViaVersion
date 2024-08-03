@@ -268,6 +268,11 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
         return getServer().getPluginManager().getPlugin(name) != null;
     }
 
+    @Override
+    public boolean couldBeReloading() {
+        return !(PaperViaInjector.PAPER_IS_STOPPING_METHOD && Bukkit.isStopping());
+    }
+
     public boolean isLateBind() {
         return lateBind;
     }

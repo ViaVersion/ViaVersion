@@ -215,4 +215,13 @@ public interface ViaPlatform<T> {
      * @return whether the platform has a plugin/mod with the given name
      */
     boolean hasPlugin(String name);
+
+    /**
+     * Returns whether the platform might be reloading.
+     *
+     * @return whether the platform might be reloading
+     */
+    default boolean couldBeReloading() {
+        return true;
+    }
 }

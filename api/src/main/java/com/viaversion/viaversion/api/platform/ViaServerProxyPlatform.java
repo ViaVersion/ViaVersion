@@ -30,4 +30,9 @@ public interface ViaServerProxyPlatform<T> extends ViaPlatform<T> {
      * @return protocol detector service
      */
     ProtocolDetectorService protocolDetectorService();
+
+    @Override
+    default boolean couldBeReloading() {
+        return false;
+    }
 }
