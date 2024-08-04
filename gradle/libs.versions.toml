@@ -18,7 +18,6 @@ checkerQual = "3.43.0"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
-legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 velocity = "3.1.1"
 
 
@@ -40,7 +39,6 @@ jupiterEngine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", ve
 checkerQual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerQual" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 

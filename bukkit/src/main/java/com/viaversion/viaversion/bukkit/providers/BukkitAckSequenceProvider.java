@@ -20,7 +20,7 @@ package com.viaversion.viaversion.bukkit.providers;
 import com.viaversion.viaversion.ViaVersionPlugin;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-import com.viaversion.viaversion.bukkit.tasks.protocol1_19to1_18_2.AckSequenceTask;
+import com.viaversion.viaversion.bukkit.tasks.v1_18_2to1_19.AckSequenceTask;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.storage.SequenceStorage;
 

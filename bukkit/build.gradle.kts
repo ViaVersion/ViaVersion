@@ -1,5 +1,4 @@
 dependencies {
-    implementation(projects.viaversionBukkitLegacy)
     compileOnlyApi(projects.viaversionCommon)
     compileOnly(libs.paper) {
         exclude("junit", "junit")

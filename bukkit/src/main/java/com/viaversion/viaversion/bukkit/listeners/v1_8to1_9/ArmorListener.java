@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.listeners.protocol1_9to1_8;
+package com.viaversion.viaversion.bukkit.listeners.v1_8to1_9;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -55,7 +55,7 @@ public class ArmorListener extends ViaBukkitListener {
 
         int armor = 0;
         for (ItemStack stack : player.getInventory().getArmorContents()) {
-            armor += ArmorTypes1_8.findById(stack.getTypeId()).getArmorPoints();
+            armor += ArmorTypes1_8.findById(stack.getType().getId()).getArmorPoints();
         }
 
         PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.UPDATE_ATTRIBUTES, null, getUserConnection(player));
@@ -74,7 +74,7 @@ public class ArmorListener extends ViaBukkitListener {
     public void onInventoryClick(InventoryClickEvent e) {
         HumanEntity human = e.getWhoClicked();
         if (human instanceof final Player player && e.getInventory() instanceof CraftingInventory) {
-            if ((e.getCurrentItem() != null && ArmorTypes1_8.isArmor(e.getCurrentItem().getTypeId()))
+            if ((e.getCurrentItem() != null && ArmorTypes1_8.isArmor(e.getCurrentItem().getType().getId()))
                 || (e.getRawSlot() >= 5 && e.getRawSlot() <= 8)) {
                 sendDelayedArmorUpdate(player);
             }

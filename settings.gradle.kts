@@ -29,7 +29,6 @@ include("compat", "compat:snakeyaml-compat-common", "compat:snakeyaml2-compat", 
 setupViaSubproject("api")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
-setupViaSubproject("bukkit-legacy")
 setupViaSubproject("velocity")
 setupViaSubproject("fabric")
 setupViaSubproject("template")

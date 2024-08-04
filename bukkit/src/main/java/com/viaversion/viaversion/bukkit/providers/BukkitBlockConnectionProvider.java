@@ -40,7 +40,7 @@ public class BukkitBlockConnectionProvider extends BlockConnectionProvider {
             if (world.isChunkLoaded(x, z)) {
                 Chunk c = getChunk(world, x, z);
                 Block b = c.getBlock(bx, by, bz);
-                return b.getTypeId() << 4 | b.getData();
+                return b.getType().getId() << 4 | b.getData();
             }
         }
         return 0;
