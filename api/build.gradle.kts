@@ -24,8 +24,8 @@ dependencies {
         exclude("com.google.code.gson", "gson")
         exclude("com.viaversion", "nbt")
     }
+    api(libs.snakeYaml)
 
-    compileOnlyApi(libs.snakeYaml)
     compileOnlyApi(libs.netty)
     compileOnlyApi(libs.guava)
     compileOnlyApi(libs.checkerQual)
