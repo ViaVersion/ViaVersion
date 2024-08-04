@@ -212,6 +212,8 @@ public final class StructuredDataContainer {
     public String toString() {
         return "StructuredDataContainer{" +
             "data=" + data +
+            ", lookup=" + lookup +
+            ", mappedNames=" + mappedNames +
             '}';
     }
 }

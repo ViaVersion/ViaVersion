@@ -124,7 +124,7 @@ public class DataItem implements Item {
 
     @Override
     public String toString() {
-        return "Item{" +
+        return "DataItem{" +
             "identifier=" + identifier +
             ", amount=" + amount +
             ", data=" + data +

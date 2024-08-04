@@ -67,7 +67,7 @@ public interface EntityDataType {
 
         @Override
         public String toString() {
-            return "EntityDataType{" +
+            return "EntityDataTypeImpl{" +
                 "typeId=" + typeId +
                 ", type=" + type +
                 '}';
