@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.bukkit.tasks.protocol1_12to1_11_1;
+package com.viaversion.viaversion.bukkit.tasks.v1_11_1to1_12;
 
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.storage.ItemTransactionStorage;
