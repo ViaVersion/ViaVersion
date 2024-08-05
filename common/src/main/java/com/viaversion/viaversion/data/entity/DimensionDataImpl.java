@@ -73,8 +73,9 @@ public final class DimensionDataImpl implements DimensionData {
 
     @Override
     public String toString() {
-        return "DimensionData{" +
-            "minY=" + minY +
+        return "DimensionDataImpl{" +
+            "id=" + id +
+            ", minY=" + minY +
             ", height=" + height +
             '}';
     }

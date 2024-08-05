@@ -209,17 +209,6 @@ public class ConfigurationState implements StorableObject {
         public boolean skipCurrentPipeline() {
             return skipCurrentPipeline;
         }
-
-        @Override
-        public String toString() {
-            return "QueuedPacket{" +
-                "buf=" + buf +
-                ", clientbound=" + clientbound +
-                ", packetType=" + packetType +
-                ", packetId=" + packetId +
-                ", skipCurrentPipeline=" + skipCurrentPipeline +
-                '}';
-        }
     }
 
     public static final class ClientInformation {

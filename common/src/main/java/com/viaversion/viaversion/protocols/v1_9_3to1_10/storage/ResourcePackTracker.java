@@ -29,11 +29,4 @@ public class ResourcePackTracker implements StorableObject {
     public void setLastHash(String lastHash) {
         this.lastHash = lastHash;
     }
-
-    @Override
-    public String toString() {
-        return "ResourcePackTracker{" +
-            "lastHash='" + lastHash + '\'' +
-            '}';
-    }
 }
