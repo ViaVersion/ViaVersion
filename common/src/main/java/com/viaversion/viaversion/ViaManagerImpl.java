@@ -223,7 +223,7 @@ public class ViaManagerImpl implements ViaManager {
         loader.unload();
         scheduler.shutdown();
 
-        platform.getLogger().info("ViaVersion has been disabled, and the platform has shut down the scheduler.");
+        platform.getLogger().info("ViaVersion has been disabled; uninjected the platform and shut down the scheduler.");
     }
 
     private void checkJavaVersion() { // Stolen from Paper
