@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
-import com.viaversion.viaversion.compatibility.YamlCompat;
-import com.viaversion.viaversion.compatibility.unsafe.Yaml1Compat;
-import com.viaversion.viaversion.compatibility.unsafe.Yaml2Compat;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,18 +31,31 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.logging.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 @SuppressWarnings("VulnerableCodeUsages")
 public abstract class Config {
-    private static final YamlCompat YAMP_COMPAT = YamlCompat.isVersion1() ? new Yaml1Compat() : new Yaml2Compat();
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(false);
         options.setIndent(2);
-        return new Yaml(YAMP_COMPAT.createSafeConstructor(), YAMP_COMPAT.createRepresenter(options), options);
+        return new Yaml(new CustomSafeConstructor(), new Representer(options), options);
     });
+
+    private static final class CustomSafeConstructor extends SafeConstructor {
+
+        public CustomSafeConstructor() {
+            super(new LoaderOptions());
+            yamlClassConstructors.put(NodeId.mapping, new ConstructYamlMap());
+            yamlConstructors.put(Tag.OMAP, new ConstructYamlOmap());
+        }
+    }
 
     private final CommentStore commentStore = new CommentStore('.', 2);
     private final File configFile;

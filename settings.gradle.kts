@@ -24,8 +24,6 @@ rootProject.name = "viaversion-parent"
 
 includeBuild("build-logic")
 
-include("compat", "compat:snakeyaml-compat-common", "compat:snakeyaml2-compat", "compat:snakeyaml1-compat")
-
 setupViaSubproject("api")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
