@@ -390,6 +390,9 @@ public final class StructuredDataConverter {
             if (enchantmentsTag == null) {
                 enchantmentsTag = new ListTag<>(CompoundTag.class);
                 tag.put("Enchantments", enchantmentsTag);
+            } else if (!enchantmentsTag.isEmpty()) {
+                // If there already are enchantments, we don't need to add an invalid one
+                return;
             }
 
             final CompoundTag invalidEnchantment = new CompoundTag();
