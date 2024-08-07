@@ -125,8 +125,6 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
                     particle.add(0, Types.VAR_INT, 1);
                 }
             }
-
-            rewriteParticle(event.user(), particle);
         });
 
         registerEntityDataTypeHandler(
@@ -134,7 +132,8 @@ public final class EntityPacketRewriter1_20_3 extends EntityRewriter<Clientbound
             Types1_20_3.ENTITY_DATA_TYPES.blockStateType,
             Types1_20_3.ENTITY_DATA_TYPES.optionalBlockStateType,
             Types1_20_3.ENTITY_DATA_TYPES.particleType,
-            null);
+            null
+        );
         registerBlockStateHandler(EntityTypes1_20_3.ABSTRACT_MINECART, 11);
     }
 

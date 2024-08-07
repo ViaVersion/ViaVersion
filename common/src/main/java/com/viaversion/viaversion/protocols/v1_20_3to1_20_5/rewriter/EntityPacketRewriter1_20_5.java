@@ -504,16 +504,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                 return;
             }
 
-            if (dataIndex > 9) {
-                event.setIndex(dataIndex - 1);
-            }
-
             if (dataIndex == 11) {
                 // If the particle is found first
                 final EntityData colorData = event.dataAtIndex(9);
                 if (colorData != null && colorData.dataType() == Types1_20_5.ENTITY_DATA_TYPES.varIntType) {
                     addColor(data, colorData.value());
                 }
+            }
+
+            if (dataIndex > 9) {
+                event.setIndex(dataIndex - 1);
             }
         });
 
