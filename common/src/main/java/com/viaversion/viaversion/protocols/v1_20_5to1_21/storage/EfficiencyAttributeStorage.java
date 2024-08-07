@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import java.util.List;
+import java.util.stream.Stream;
 
 public final class EfficiencyAttributeStorage implements StorableObject {
 
@@ -33,11 +34,11 @@ public final class EfficiencyAttributeStorage implements StorableObject {
     private static final EnchantAttributeModifier AQUA_AFFINITY = new EnchantAttributeModifier("minecraft:enchantment.aqua_affinity", 28, 0.2, level -> level * 4, (byte) 2);
     private static final EnchantAttributeModifier DEPTH_STRIDER = new EnchantAttributeModifier("minecraft:enchantment.depth_strider", 30, 0, level -> level / 3D);
     private static final ActiveEnchants DEFAULT = new ActiveEnchants(-1,
-        new ActiveEnchant(EFFICIENCY, 0),
-        new ActiveEnchant(SOUL_SPEED, 0),
-        new ActiveEnchant(SWIFT_SNEAK, 0),
-        new ActiveEnchant(AQUA_AFFINITY, 0),
-        new ActiveEnchant(DEPTH_STRIDER, 0)
+        new ActiveEnchant(EFFICIENCY, 0, 0),
+        new ActiveEnchant(SOUL_SPEED, 0, 0),
+        new ActiveEnchant(SWIFT_SNEAK, 0, 0),
+        new ActiveEnchant(AQUA_AFFINITY, 0, 0),
+        new ActiveEnchant(DEPTH_STRIDER, 0, 0)
     );
     private final Object lock = new Object();
     private volatile boolean attributesSent = true;
@@ -57,15 +58,15 @@ public final class EfficiencyAttributeStorage implements StorableObject {
 
         synchronized (lock) {
             this.activeEnchants = new ActiveEnchants(entityId,
-                new ActiveEnchant(EFFICIENCY, efficiency),
-                new ActiveEnchant(SOUL_SPEED, soulSpeed),
-                new ActiveEnchant(SWIFT_SNEAK, swiftSneak),
-                new ActiveEnchant(AQUA_AFFINITY, aquaAffinity),
-                new ActiveEnchant(DEPTH_STRIDER, depthStrider)
+                new ActiveEnchant(activeEnchants.efficiency, efficiency),
+                new ActiveEnchant(activeEnchants.soulSpeed, soulSpeed),
+                new ActiveEnchant(activeEnchants.swiftSneak, swiftSneak),
+                new ActiveEnchant(activeEnchants.aquaAffinity, aquaAffinity),
+                new ActiveEnchant(activeEnchants.depthStrider, depthStrider)
             );
             this.attributesSent = false;
         }
-        sendAttributesPacket(connection);
+        sendAttributesPacket(connection, false);
     }
 
     public ActiveEnchants activeEnchants() {
@@ -75,14 +76,18 @@ public final class EfficiencyAttributeStorage implements StorableObject {
     public void onLoginSent(final UserConnection connection) {
         // Always called from the netty thread
         this.loginSent = true;
-        sendAttributesPacket(connection);
+        sendAttributesPacket(connection, false);
     }
 
-    private void sendAttributesPacket(final UserConnection connection) {
+    public void onRespawn(final UserConnection connection) {
+        sendAttributesPacket(connection, true);
+    }
+
+    private void sendAttributesPacket(final UserConnection connection, final boolean forceSendAll) {
         final ActiveEnchants enchants;
         synchronized (lock) {
             // Older servers (and often Bungee) will send world state packets before sending the login packet
-            if (!loginSent || attributesSent) {
+            if (!forceSendAll && (!loginSent || attributesSent)) {
                 return;
             }
 
@@ -93,13 +98,15 @@ public final class EfficiencyAttributeStorage implements StorableObject {
         final PacketWrapper attributesPacket = PacketWrapper.create(ClientboundPackets1_21.UPDATE_ATTRIBUTES, connection);
         attributesPacket.write(Types.VAR_INT, enchants.entityId());
 
-        final List<ActiveEnchant> list = List.of(
+        // Make sure to update this list with new enchantments
+        // Only send the attribute if it actually changed
+        final List<ActiveEnchant> list = Stream.of(
             enchants.efficiency(),
             enchants.soulSpeed(),
             enchants.swiftSneak(),
             enchants.aquaAffinity(),
             enchants.depthStrider()
-        );
+        ).filter(enchant -> forceSendAll || enchant.previousLevel != enchant.level).toList();
         attributesPacket.write(Types.VAR_INT, list.size());
         for (final ActiveEnchant enchant : list) {
             final EnchantAttributeModifier modifier = enchant.modifier;
@@ -123,7 +130,11 @@ public final class EfficiencyAttributeStorage implements StorableObject {
                                  ActiveEnchant swiftSneak, ActiveEnchant aquaAffinity, ActiveEnchant depthStrider) {
     }
 
-    public record ActiveEnchant(EnchantAttributeModifier modifier, int level) {
+    public record ActiveEnchant(EnchantAttributeModifier modifier, int previousLevel, int level) {
+
+        public ActiveEnchant(final ActiveEnchant from, final int level) {
+            this(from.modifier, from.level, level);
+        }
     }
 
     public record EnchantAttributeModifier(String key, int attributeId, double baseValue, LevelToModifier modifierFunction, byte operation) {

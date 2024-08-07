@@ -124,6 +124,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             final int dimensionId = wrapper.passthrough(Types.VAR_INT);
             final String world = wrapper.passthrough(Types.STRING);
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world); // Tracks world height and name for chunk data and entity (un)tracking
+
+            // Resend attribute modifiers from items
+            wrapper.user().get(EfficiencyAttributeStorage.class).onRespawn(wrapper.user());
         });
     }
 
