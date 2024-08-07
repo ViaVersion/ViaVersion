@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
+import com.viaversion.viaversion.util.TagUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -316,15 +317,46 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 return;
             }
 
+            // Until they're properly parsed
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
+            handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
-                handleShowItem(connection, componentsTag);
+                handleContainerContents(connection, componentsTag);
+                handleItemArrayContents(connection, componentsTag, "bundle_contents");
+                handleItemArrayContents(connection, componentsTag, "charged_projectiles");
             }
         }
     }
 
-    protected void handleShowItem(final UserConnection connection, final CompoundTag componentsTag) {
-        // To override if needed
+    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, @Nullable final CompoundTag componentsTag) {
+        final StringTag idTag = itemTag.getStringTag("id");
+        final String mappedId = protocol.getMappingData().getFullItemMappings().mappedIdentifier(idTag.getValue());
+        if (mappedId != null) {
+            idTag.setValue(mappedId);
+        }
+    }
+
+    protected void handleContainerContents(final UserConnection connection, final CompoundTag tag) {
+        final ListTag<CompoundTag> container = TagUtil.getNamespacedCompoundTagList(tag, "minecraft:container");
+        if (container == null) {
+            return;
+        }
+
+        for (final CompoundTag entryTag : container) {
+            final CompoundTag itemTag = entryTag.getCompoundTag("item");
+            handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+        }
+    }
+
+    protected void handleItemArrayContents(final UserConnection connection, final CompoundTag tag, final String key) {
+        final ListTag<CompoundTag> container = TagUtil.getNamespacedCompoundTagList(tag, key);
+        if (container == null) {
+            return;
+        }
+
+        for (final CompoundTag itemTag : container) {
+            handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+        }
     }
 
     protected SerializerVersion inputSerializerVersion() {
