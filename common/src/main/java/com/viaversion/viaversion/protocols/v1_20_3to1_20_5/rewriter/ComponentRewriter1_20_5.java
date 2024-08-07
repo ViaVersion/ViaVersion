@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
@@ -25,7 +26,6 @@ import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
-import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
@@ -83,8 +83,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.EquipmentSlots1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimPatterns1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
@@ -132,7 +131,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.HIDE_TOOLTIP, this::convertHideTooltip);
         register(StructuredDataKey.REPAIR_COST, this::convertRepairCost);
         register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, this::convertEnchantmentGlintOverride);
-        register(StructuredDataKey.CREATIVE_SLOT_LOCK, null);
+        registerEmpty(StructuredDataKey.CREATIVE_SLOT_LOCK);
         register(StructuredDataKey.INTANGIBLE_PROJECTILE, this::convertIntangibleProjectile);
         register(StructuredDataKey.FOOD1_20_5, this::convertFood);
         register(StructuredDataKey.FIRE_RESISTANT, this::convertFireResistant);
@@ -142,7 +141,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.MAP_COLOR, this::convertMapColor);
         register(StructuredDataKey.MAP_ID, this::convertMapId);
         register(StructuredDataKey.MAP_DECORATIONS, this::convertMapDecorations);
-        register(StructuredDataKey.MAP_POST_PROCESSING, null);
+        registerEmpty(StructuredDataKey.MAP_POST_PROCESSING);
         register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::convertChargedProjectiles);
         register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::convertBundleContents);
         register(StructuredDataKey.POTION_CONTENTS, this::convertPotionContents);
@@ -247,7 +246,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             if (!data.isEmpty()) {
                 final CompoundTag components;
                 try {
-                    components = toTag(data, false);
+                    components = toTag(connection, data, false);
                 } catch (final Exception e) {
                     if (!Via.getConfig().isSuppressConversionWarnings()) {
                         protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
@@ -278,7 +277,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         }
     }
 
-    public CompoundTag toTag(final Map<StructuredDataKey<?>, StructuredData<?>> data, final boolean empty) {
+    public CompoundTag toTag(final UserConnection connection, final Map<StructuredDataKey<?>, StructuredData<?>> data, final boolean empty) {
         final CompoundTag tag = new CompoundTag();
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : data.entrySet()) {
             final StructuredDataKey<?> key = entry.getKey();
@@ -302,7 +301,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
 
             //noinspection unchecked
-            final Tag valueTag = converter.dataConverter.convert(value.value());
+            final Tag valueTag = converter.dataConverter.convert(connection, value.value());
             if (valueTag == null) {
                 continue;
             }
@@ -578,12 +577,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return value; // String<->id conversion is already done by the item rewriter
     }
 
-    protected ListTag<CompoundTag> convertChargedProjectiles(final Item[] value) {
-        return convertItemArray(value);
+    protected ListTag<CompoundTag> convertChargedProjectiles(final UserConnection connection, final Item[] value) {
+        return convertItemArray(connection, value);
     }
 
-    protected ListTag<CompoundTag> convertBundleContents(final Item[] value) {
-        return convertItemArray(value);
+    protected ListTag<CompoundTag> convertBundleContents(final UserConnection connection, final Item[] value) {
+        return convertItemArray(connection, value);
     }
 
     protected CompoundTag convertPotionContents(final PotionContents value) {
@@ -668,11 +667,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertTrim(final ArmorTrim value) {
+    protected CompoundTag convertTrim(final UserConnection connection, final ArmorTrim value) {
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial> material = value.material();
+        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
         if (material.hasId()) {
-            final String trimMaterial = TrimMaterials1_20_3.idToKey(material.id());
+            final String trimMaterial = trimStorage.trimMaterials().idToKey(material.id());
             tag.putString("material", trimMaterial);
         } else {
             final ArmorTrimMaterial armorTrimMaterial = material.value();
@@ -700,7 +700,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
         final Holder<ArmorTrimPattern> pattern = value.pattern();
         if (pattern.hasId()) {
-            tag.putString("pattern", TrimPatterns1_20_3.idToKey(pattern.id()));
+            tag.putString("pattern", trimStorage.trimPatterns().idToKey(pattern.id()));
         } else {
             final ArmorTrimPattern armorTrimPattern = pattern.value();
             final CompoundTag patternTag = new CompoundTag();
@@ -862,9 +862,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected ListTag<CompoundTag> convertContainer(final Item[] value) {
+    protected ListTag<CompoundTag> convertContainer(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
-        final ListTag<CompoundTag> items = convertItemArray(value);
+        final ListTag<CompoundTag> items = convertItemArray(connection, value);
         for (int i = 0; i < items.size(); i++) {
             final CompoundTag itemTag = new CompoundTag();
             itemTag.putInt("slot", i);
@@ -950,17 +950,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         }
     }
 
-    protected ListTag<CompoundTag> convertItemArray(final Item[] value) {
+    protected ListTag<CompoundTag> convertItemArray(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final Item item : value) {
             final CompoundTag itemTag = new CompoundTag();
-            convertItem(itemTag, item);
+            convertItem(connection, itemTag, item);
             tag.add(itemTag);
         }
         return tag;
     }
 
-    protected void convertItem(final CompoundTag tag, final Item item) {
+    protected void convertItem(final UserConnection connection, final CompoundTag tag, final Item item) {
         final String identifier = mappedIdentifier(item.identifier());
         if (identifier == null) {
             throw new IllegalArgumentException("Unknown item: " + item.identifier());
@@ -972,7 +972,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putInt("count", 1);
         }
         final Map<StructuredDataKey<?>, StructuredData<?>> components = item.dataContainer().data();
-        tag.put("components", toTag(components, true));
+        tag.put("components", toTag(connection, components, true));
     }
 
     protected void convertFilterableString(final CompoundTag tag, final FilterableString string, final int max) {
@@ -1126,8 +1126,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     // ---------------------------------------------------------------------------------------
 
+    protected <T> void registerEmpty(final StructuredDataKey<T> key) {
+        converters.put(key, new ConverterPair<>(null, null));
+    }
+
     protected <T> void register(final StructuredDataKey<T> key, final DataConverter<T> dataConverter) { // TODO Remove this method
         converters.put(key, new ConverterPair<>(dataConverter, null));
+    }
+
+    protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter) {
+        final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
+        converters.put(key, new ConverterPair<>(converter, null));
     }
 
     protected <T> void register(final StructuredDataKey<T> key, final DataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
@@ -1151,9 +1160,15 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     @FunctionalInterface
-    protected interface DataConverter<T> {
+    protected interface SimpleDataConverter<T> {
 
         Tag convert(T value);
+    }
+
+    @FunctionalInterface
+    protected interface DataConverter<T> {
+
+        Tag convert(UserConnection connection, T value);
     }
 
     @FunctionalInterface

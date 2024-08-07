@@ -15,13 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data;
+package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage;
 
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.util.KeyMappings;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class TrimPatterns1_20_3 {
+public final class ArmorTrimStorage implements StorableObject {
 
+    // Default 1.20.3 registries
+    private static final KeyMappings MATERIALS = new KeyMappings(
+        "amethyst",
+        "copper",
+        "diamond",
+        "emerald",
+        "gold",
+        "iron",
+        "lapis",
+        "netherite",
+        "quartz",
+        "redstone"
+    );
     private static final KeyMappings PATTERNS = new KeyMappings(
         "coast",
         "dune",
@@ -41,11 +54,22 @@ public final class TrimPatterns1_20_3 {
         "wild"
     );
 
-    public static @Nullable String idToKey(final int id) {
-        return PATTERNS.idToKey(id);
+    private KeyMappings trimPatterns = PATTERNS;
+    private KeyMappings trimMaterials = MATERIALS;
+
+    public KeyMappings trimPatterns() {
+        return trimPatterns;
     }
 
-    public static int keyToId(final String pattern) {
-        return PATTERNS.keyToId(pattern);
+    public KeyMappings trimMaterials() {
+        return trimMaterials;
+    }
+
+    public void setTrimPatterns(final KeyMappings trimPatterns) {
+        this.trimPatterns = trimPatterns;
+    }
+
+    public void setTrimMaterials(final KeyMappings trimMaterials) {
+        this.trimMaterials = trimMaterials;
     }
 }

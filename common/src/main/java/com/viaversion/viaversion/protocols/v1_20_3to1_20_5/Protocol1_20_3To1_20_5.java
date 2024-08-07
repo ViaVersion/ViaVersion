@@ -50,6 +50,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.BlockItemPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ComponentRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -292,6 +293,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
         connection.put(new AcknowledgedMessagesStorage());
+        connection.put(new ArmorTrimStorage());
     }
 
     @Override

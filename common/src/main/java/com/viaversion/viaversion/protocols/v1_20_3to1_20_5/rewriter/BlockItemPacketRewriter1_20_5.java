@@ -93,10 +93,9 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MapDecorations1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MaxStackSize1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimPatterns1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPatternStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
@@ -499,7 +498,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final CompoundTag trimTag = tag.getCompoundTag("Trim");
         if (trimTag != null) {
-            updateArmorTrim(data, trimTag, (hideFlagsValue & StructuredDataConverter.HIDE_ARMOR_TRIM) == 0);
+            updateArmorTrim(connection, data, trimTag, (hideFlagsValue & StructuredDataConverter.HIDE_ARMOR_TRIM) == 0);
         }
 
         final CompoundTag explosionTag = tag.getCompoundTag("Explosion");
@@ -967,12 +966,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
     }
 
-    private void updateArmorTrim(final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
+    private void updateArmorTrim(final UserConnection connection, final StructuredDataContainer data, final CompoundTag trimTag, final boolean showInTooltip) {
         final Tag materialTag = trimTag.get("material");
         final Holder<ArmorTrimMaterial> materialHolder;
+        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
         if (materialTag instanceof StringTag materialStringTag) {
-            // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
-            final int id = TrimMaterials1_20_3.keyToId(materialStringTag.getValue());
+            final int id = trimStorage.trimMaterials().keyToId(materialStringTag.getValue());
             if (id == -1) {
                 return;
             }
@@ -1020,11 +1019,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final Tag patternTag = trimTag.get("pattern");
         final Holder<ArmorTrimPattern> patternHolder;
         if (patternTag instanceof StringTag patternStringTag) {
-            // Would technically have to be stored and retrieved from registry data, but that'd mean a lot of work
-            final int id = TrimPatterns1_20_3.keyToId(patternStringTag.getValue());
+            final int id = trimStorage.trimPatterns().keyToId(patternStringTag.getValue());
             if (id == -1) {
                 return;
             }
+
             patternHolder = Holder.of(id);
         } else if (patternTag instanceof CompoundTag patternCompoundTag) {
             final String assetId = patternCompoundTag.getString("assetId");

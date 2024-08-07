@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
 import com.google.common.base.Preconditions;
-import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntArrayTag;
@@ -61,8 +60,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.MapDecorations1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimMaterials1_20_3;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.TrimPatterns1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPatternStorage;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -516,8 +514,9 @@ public final class StructuredDataConverter {
                 tag.putInt("map_scale_direction", 1);
             }
         });
-        register(StructuredDataKey.TRIM, (data, tag) -> {
+        register(StructuredDataKey.TRIM, (connection, data, tag) -> {
             final CompoundTag trimTag = new CompoundTag();
+            final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
             if (data.material().isDirect()) {
                 final CompoundTag materialTag = new CompoundTag();
                 final ArmorTrimMaterial material = data.material().value();
@@ -540,7 +539,7 @@ public final class StructuredDataConverter {
                 materialTag.put("description", material.description());
                 trimTag.put("material", materialTag);
             } else {
-                final String oldKey = TrimMaterials1_20_3.idToKey(data.material().id());
+                final String oldKey = trimStorage.trimMaterials().idToKey(data.material().id());
                 if (oldKey != null) {
                     trimTag.putString("material", oldKey);
                 }
@@ -559,7 +558,7 @@ public final class StructuredDataConverter {
                 patternTag.putBoolean("decal", pattern.decal());
                 trimTag.put("pattern", patternTag);
             } else {
-                final String oldKey = TrimPatterns1_20_3.idToKey(data.pattern().id());
+                final String oldKey = trimStorage.trimPatterns().idToKey(data.pattern().id());
                 if (oldKey != null) {
                     trimTag.putString("pattern", oldKey);
                 }

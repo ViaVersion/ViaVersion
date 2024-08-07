@@ -46,8 +46,10 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.KeyMappings;
 import com.viaversion.viaversion.util.TagUtil;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -156,7 +158,8 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                     registryEntries[id] = new RegistryEntry(name, tag.get("element"));
                 }
 
-                if (Key.stripMinecraftNamespace(type).equals("damage_type")) {
+                final String strippedKey = Key.stripMinecraftNamespace(type);
+                if (strippedKey.equals("damage_type")) {
                     // Add spit damage type
                     highestId++;
                     registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
@@ -186,6 +189,13 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
                         registryEntries = Arrays.copyOf(registryEntries, finalLength);
                     }
                     replaceNullValues(registryEntries);
+                }
+
+                // Track custom armor trims
+                if (strippedKey.equals("trim_pattern")) {
+                    wrapper.user().get(ArmorTrimStorage.class).setTrimPatterns(toMappings(registryEntries));
+                } else if (strippedKey.equals("trim_material")) {
+                    wrapper.user().get(ArmorTrimStorage.class).setTrimMaterials(toMappings(registryEntries));
                 }
 
                 final PacketWrapper registryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
@@ -326,6 +336,14 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             final float value = wrapper.passthrough(Types.FLOAT);
             sendRangeAttributes(wrapper.user(), value == CREATIVE_MODE_ID);
         });
+    }
+
+    private KeyMappings toMappings(final RegistryEntry[] entries) {
+        final String[] keys = new String[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            keys[i] = Key.stripMinecraftNamespace(entries[i].key());
+        }
+        return new KeyMappings(keys);
     }
 
     private void updateParticleFormat(final CompoundTag options, final String particleType) {
