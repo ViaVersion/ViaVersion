@@ -4,7 +4,7 @@ import org.gradle.jvm.tasks.Jar
 plugins {
     id("via.base-conventions")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 tasks {
