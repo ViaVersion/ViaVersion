@@ -90,7 +90,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         // EntityTypes1_20_5.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
-        /*Types1_20_5.PARTICLE.filler(this)
+        /*Types1_21.PARTICLE.filler(this)
                 .reader("block", ParticleType.Readers.BLOCK)
                 .reader("block_marker", ParticleType.Readers.BLOCK)
                 .reader("dust", ParticleType.Readers.DUST)

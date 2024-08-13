@@ -42,13 +42,34 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item> mappedItemType;
     private final Type<Item[]> itemArrayType;
     private final Type<Item[]> mappedItemArrayType;
+    private final Type<Item> itemCostType;
+    private final Type<Item> mappedItemCostType;
+    private final Type<Item> optionalItemCostType;
+    private final Type<Item> mappedOptionalItemCostType;
+    private final Type<Particle> particleType;
+    private final Type<Particle> mappedParticleType;
 
-    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
+    public ItemRewriter(
+        T protocol,
+        Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
+        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType,
+        Type<Particle> particleType, Type<Particle> mappedParticleType
+    ) {
         super(protocol);
         this.itemType = itemType;
         this.itemArrayType = itemArrayType;
         this.mappedItemType = mappedItemType;
         this.mappedItemArrayType = mappedItemArrayType;
+        this.itemCostType = itemCostType;
+        this.mappedItemCostType = mappedItemCostType;
+        this.optionalItemCostType = optionalItemCostType;
+        this.mappedOptionalItemCostType = mappedOptionalItemCostType;
+        this.particleType = particleType;
+        this.mappedParticleType = mappedParticleType;
+    }
+
+    public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
+        this(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, null, null, null, null, null, null);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
@@ -322,25 +343,21 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     // Hopefully the item cost weirdness is temporary
-    public void registerMerchantOffers1_20_5(
-        final C packetType,
-        final Type<Item> costType, final Type<Item> mappedCostType,
-        final Type<Item> optionalCostType, final Type<Item> mappedOptionalCostType
-    ) {
+    public void registerMerchantOffers1_20_5(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Container id
             int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
-                final Item input = wrapper.read(costType);
-                wrapper.write(mappedCostType, handleItemToClient(wrapper.user(), input));
+                final Item input = wrapper.read(itemCostType);
+                wrapper.write(mappedItemCostType, handleItemToClient(wrapper.user(), input));
 
                 handleClientboundItem(wrapper); // Result
 
-                Item secondInput = wrapper.read(optionalCostType);
+                Item secondInput = wrapper.read(optionalItemCostType);
                 if (secondInput != null) {
                     handleItemToClient(wrapper.user(), secondInput);
                 }
-                wrapper.write(mappedOptionalCostType, secondInput);
+                wrapper.write(mappedOptionalItemCostType, secondInput);
 
                 wrapper.passthrough(Types.BOOLEAN); // Out of stock
                 wrapper.passthrough(Types.INT); // Number of trade uses
@@ -491,7 +508,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerLevelParticles1_20_5(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
+    public void registerLevelParticles1_20_5(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -505,7 +522,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Types.FLOAT); // Particle Data
                 map(Types.INT); // Particle Count
                 handler(wrapper -> {
-                    final Particle particle = wrapper.read(unmappedParticleType);
+                    final Particle particle = wrapper.read(particleType);
                     rewriteParticle(wrapper.user(), particle);
                     wrapper.write(mappedParticleType, particle);
                 });
@@ -513,7 +530,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
-    public void registerExplosion(C packetType, Type<Particle> unmappedParticleType, Type<Particle> mappedParticleType) {
+    public void registerExplosion(C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
@@ -531,8 +548,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Types.FLOAT); // Knockback Z
             wrapper.passthrough(Types.VAR_INT); // Block interaction type
 
-            final Particle smallExplosionParticle = wrapper.read(unmappedParticleType);
-            final Particle largeExplosionParticle = wrapper.read(unmappedParticleType);
+            final Particle smallExplosionParticle = wrapper.read(particleType);
+            final Particle largeExplosionParticle = wrapper.read(particleType);
             wrapper.write(mappedParticleType, smallExplosionParticle);
             wrapper.write(mappedParticleType, largeExplosionParticle);
             rewriteParticle(wrapper.user(), smallExplosionParticle);

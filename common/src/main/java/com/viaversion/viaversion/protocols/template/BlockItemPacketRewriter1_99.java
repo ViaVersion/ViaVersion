@@ -18,7 +18,7 @@
 package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
+import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
@@ -30,10 +30,16 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 // To replace if needed:
 //   ChunkType1_20_2
 //   RecipeRewriter1_20_3
+//   Types1_21, Types1_OLD
 final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21, ServerboundPacket1_20_5, Protocol1_99To_98> {
 
     public BlockItemPacketRewriter1_99(final Protocol1_99To_98 protocol) {
-        super(protocol, /*TypesOLD.ITEM, TypesOLD.ITEM_ARRAY, */Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY);
+        super(protocol, Types1_21.ITEM, Types1_21.ITEM_ARRAY);
+        /*super(protocol,
+            Types1_OLD.ITEM, Types1_OLD.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY,
+            Types1_OLD.ITEM_COST, Types1_OLD.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST,
+            Types1_OLD.PARTICLE, Types1_21.PARTICLE
+        );*/
     }
 
     @Override
@@ -58,10 +64,10 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
-        registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST);
+        registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE);
-        registerExplosion(ClientboundPackets1_21.EXPLODE, Types1_20_5.PARTICLE, Types1_20_5.PARTICLE); // Rewrites the included sound and particles
+        registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
+        registerExplosion(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
         new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_21.UPDATE_RECIPES);
         // OR do this if serialization of recipes changed and override the relevant method

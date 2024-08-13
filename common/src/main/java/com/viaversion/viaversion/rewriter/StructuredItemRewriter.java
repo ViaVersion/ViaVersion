@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
@@ -37,6 +38,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
+
+    public StructuredItemRewriter(
+        T protocol,
+        Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
+        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType,
+        Type<Particle> particleType, Type<Particle> mappedParticleType
+    ) {
+        super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, itemCostType, optionalItemCostType, mappedItemCostType, mappedOptionalItemCostType, particleType, mappedParticleType);
+    }
 
     public StructuredItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
         super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType);

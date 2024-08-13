@@ -48,7 +48,11 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     private static final List<String> DISCS = List.of("11", "13", "5", "blocks", "cat", "chirp", "far", "mall", "mellohi", "otherside", "pigstep", "relic", "stal", "strad", "wait", "ward");
 
     public BlockItemPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
-        super(protocol, Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY);
+        super(protocol,
+            Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY,
+            Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST,
+            Types1_20_5.PARTICLE, Types1_21.PARTICLE
+        );
     }
 
     @Override
@@ -66,10 +70,10 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerAdvancements1_20_3(ClientboundPackets1_20_5.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_20_5.SET_EQUIPMENT);
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
-        registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS, Types1_20_5.ITEM_COST, Types1_21.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.OPTIONAL_ITEM_COST);
+        registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES, Types1_20_5.PARTICLE, Types1_21.PARTICLE);
-        registerExplosion(ClientboundPackets1_20_5.EXPLODE, Types1_20_5.PARTICLE, Types1_21.PARTICLE); // Rewrites the included sound and particles
+        registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES);
+        registerExplosion(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
 
         protocol.registerClientbound(ClientboundPackets1_20_5.HORSE_SCREEN_OPEN, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
