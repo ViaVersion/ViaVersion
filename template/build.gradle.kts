@@ -1,3 +1,0 @@
-dependencies {
-    compileOnly(projects.viaversionCommon)
-}

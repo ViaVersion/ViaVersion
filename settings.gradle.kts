@@ -30,7 +30,6 @@ setupViaSubproject("bukkit")
 setupViaSubproject("bukkit-legacy")
 setupViaSubproject("velocity")
 setupViaSubproject("fabric")
-setupViaSubproject("template")
 
 setupSubproject("viaversion") {
     projectDir = file("universal")
