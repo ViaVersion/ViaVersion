@@ -500,7 +500,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     protected CompoundTag convertFood(final FoodProperties value) {
         final CompoundTag tag = new CompoundTag();
         tag.put("nutrition", convertNonNegativeInt(value.nutrition()));
-        tag.putFloat("saturation_modifier", value.saturationModifier());
+        tag.putFloat("saturation", value.saturationModifier());
         if (value.canAlwaysEat()) {
             tag.putBoolean("can_always_eat", true);
         }
