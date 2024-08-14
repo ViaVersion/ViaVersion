@@ -376,13 +376,15 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             return StructuredItem.empty();
         }
 
-        // Add the original as custom data, to be re-used for creative clients as well
         final CompoundTag tag = item.tag();
+        final Item structuredItem = toStructuredItem(connection, item);
+
+        // Add the original as custom data, to be re-used for creative clients as well
         if (tag != null) {
             tag.putBoolean(nbtTagName(), true);
+            structuredItem.dataContainer().set(StructuredDataKey.CUSTOM_DATA, tag);
         }
 
-        final Item structuredItem = toStructuredItem(connection, item);
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, structuredItem);
 
@@ -415,7 +417,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
         final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
         final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), tag);
-        if (customData != null && tag.remove(nbtTagName()) != null) {
+        if (!dataConverter.backupInconvertibleData() && customData != null && tag.remove(nbtTagName()) != null) {
+            // Skip for VB since it's used for incoming item data
             return dataItem;
         }
 
@@ -605,8 +608,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             // Restore original data components
             restoreFromBackupTag(backupTag, data);
         }
-
-        data.set(StructuredDataKey.CUSTOM_DATA, tag);
         return item;
     }
 
