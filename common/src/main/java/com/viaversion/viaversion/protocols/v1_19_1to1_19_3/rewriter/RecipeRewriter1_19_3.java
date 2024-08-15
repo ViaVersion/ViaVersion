@@ -50,8 +50,7 @@ public class RecipeRewriter1_19_3<C extends ClientboundPacketType> extends Recip
         wrapper.passthrough(Types.STRING); // Group
         wrapper.passthrough(Types.VAR_INT); // Crafting book category
         handleIngredients(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        wrapper.write(mappedItemType(), rewrite(wrapper.user(), wrapper.read(itemType())));
     }
 
     @Override

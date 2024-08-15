@@ -19,11 +19,11 @@ package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
-import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.RecipeRewriter1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
@@ -59,19 +59,19 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         // Other places using item ids are: Entity data, tags, statistics, effect
         // registerOpenWindow(ClientboundPackets1_21.OPEN_WINDOW); - If a new container type was added
         registerCooldown(ClientboundPackets1_21.COOLDOWN);
-        registerSetContent1_17_1(ClientboundPackets1_21.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_21.CONTAINER_SET_SLOT);
+        registerSetContent1_21_2(ClientboundPackets1_21.CONTAINER_SET_CONTENT);
+        registerSetSlot1_21_2(ClientboundPackets1_21.CONTAINER_SET_SLOT);
         registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
-        registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
+        registerContainerClick1_21_2(ServerboundPackets1_20_5.CONTAINER_CLICK);
         registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
         registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
-        registerExplosion(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
+        registerExplosion1_21_2(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
-        new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_21.UPDATE_RECIPES);
+        new RecipeRewriter1_21_2<>(protocol).register1_20_5(ClientboundPackets1_21.UPDATE_RECIPES);
         // OR do this if serialization of recipes changed and override the relevant method
         // Add new serializers to RecipeRewriter, or extend the last one for changes
-        // new RecipeRewriter1_20_3<ClientboundPacket1_21>(this) {}.register1_20_5(ClientboundPackets1_21.DECLARE_RECIPES);
+        // new RecipeRewriter1_21_2<ClientboundPacket1_21>(this) {}.register1_20_5(ClientboundPackets1_21.DECLARE_RECIPES);
     }
 }

@@ -29,19 +29,19 @@ import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record Instrument(Holder<SoundEvent> soundEvent, int useDuration, float range) {
+public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, float range) {
 
-    public static final HolderType<Instrument> TYPE = new HolderType<>() {
+    public static final HolderType<Instrument1_20_5> TYPE = new HolderType<>() {
         @Override
-        public Instrument readDirect(final ByteBuf buffer) {
+        public Instrument1_20_5 readDirect(final ByteBuf buffer) {
             final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
             final int useDuration = Types.VAR_INT.readPrimitive(buffer);
             final float range = buffer.readFloat();
-            return new Instrument(soundEvent, useDuration, range);
+            return new Instrument1_20_5(soundEvent, useDuration, range);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final Instrument value) {
+        public void writeDirect(final ByteBuf buffer, final Instrument1_20_5 value) {
             Types.SOUND_EVENT.write(buffer, value.soundEvent());
             Types.VAR_INT.writePrimitive(buffer, value.useDuration());
             buffer.writeFloat(value.range());

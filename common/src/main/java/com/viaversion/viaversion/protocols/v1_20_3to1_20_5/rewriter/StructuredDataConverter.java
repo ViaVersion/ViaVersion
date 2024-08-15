@@ -45,7 +45,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
 import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
@@ -278,12 +278,12 @@ public final class StructuredDataConverter {
             }
             profileTag.put("Properties", propertiesTag);
         });
-        register(StructuredDataKey.INSTRUMENT, (data, tag) -> {
+        register(StructuredDataKey.INSTRUMENT1_20_5, (data, tag) -> {
             // Can't do anything with direct values
             if (!data.hasId()) {
                 if (backupInconvertibleData) {
                     final CompoundTag backupTag = new CompoundTag();
-                    final Instrument instrument = data.value();
+                    final Instrument1_20_5 instrument = data.value();
                     if (instrument.soundEvent().hasId()) {
                         backupTag.putInt("sound_event", instrument.soundEvent().id());
                     } else {

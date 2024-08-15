@@ -57,7 +57,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
@@ -153,7 +153,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.ENTITY_DATA, this::convertEntityData);
         register(StructuredDataKey.BUCKET_ENTITY_DATA, this::convertBucketEntityData);
         register(StructuredDataKey.BLOCK_ENTITY_DATA, this::convertBlockEntityData);
-        register(StructuredDataKey.INSTRUMENT, this::convertInstrument);
+        register(StructuredDataKey.INSTRUMENT1_20_5, this::convertInstrument);
         register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::convertOminousBottleAmplifier);
         register(StructuredDataKey.RECIPES, this::convertRecipes);
         register(StructuredDataKey.LODESTONE_TRACKER, this::convertLodestoneTracker);
@@ -745,12 +745,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return convertNbtWithId(value);
     }
 
-    protected Tag convertInstrument(final Holder<Instrument> value) {
+    protected Tag convertInstrument(final Holder<Instrument1_20_5> value) {
         if (value.hasId()) {
             return new StringTag(Instruments1_20_3.idToKey(value.id()));
         }
 
-        final Instrument instrument = value.value();
+        final Instrument1_20_5 instrument = value.value();
         final CompoundTag tag = new CompoundTag();
         final Holder<SoundEvent> sound = instrument.soundEvent();
         if (sound.hasId()) {

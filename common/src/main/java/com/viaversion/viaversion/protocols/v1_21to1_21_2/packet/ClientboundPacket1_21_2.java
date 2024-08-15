@@ -15,34 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet;
+package com.viaversion.viaversion.protocols.v1_21to1_21_2.packet;
 
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
-public enum ServerboundConfigurationPackets1_20_5 implements ServerboundPacket1_20_5, ServerboundPacket1_21_2 {
-
-    CLIENT_INFORMATION, // 0x00
-    COOKIE_RESPONSE, // 0x01
-    CUSTOM_PAYLOAD, // 0x02
-    FINISH_CONFIGURATION, // 0x03
-    KEEP_ALIVE, // 0x04
-    PONG, // 0x05
-    RESOURCE_PACK, // 0x06
-    SELECT_KNOWN_PACKS; // 0x07
-
-    @Override
-    public int getId() {
-        return ordinal();
-    }
-
-    @Override
-    public String getName() {
-        return name();
-    }
-
-    @Override
-    public State state() {
-        return State.CONFIGURATION;
-    }
+public interface ClientboundPacket1_21_2 extends ClientboundPacketType {
 }

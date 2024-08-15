@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -80,13 +81,22 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
 
     public void register1_20_5(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Types.VAR_INT);
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            int newSize = size;
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Types.STRING); // Recipe Identifier
+                final String recipeIdentifier = wrapper.read(Types.STRING);
 
-                final int typeId = wrapper.passthrough(Types.VAR_INT);
-                final String type = protocol.getMappingData().getRecipeSerializerMappings().identifier(typeId);
-                handleRecipeType(wrapper, type);
+                final FullMappings recipeSerializerMappings = protocol.getMappingData().getRecipeSerializerMappings();
+                final int typeId = wrapper.read(Types.VAR_INT);
+                final int mappedId = recipeSerializerMappings.getNewId(typeId);
+                if (mappedId != -1) {
+                    wrapper.write(Types.STRING, recipeIdentifier);
+                    wrapper.write(Types.VAR_INT, mappedId);
+                } else {
+                    wrapper.set(Types.VAR_INT, 0, --newSize);
+                }
+
+                handleRecipeType(wrapper, Key.stripMinecraftNamespace(recipeSerializerMappings.identifier(typeId))); // Use the original
             }
         });
     }

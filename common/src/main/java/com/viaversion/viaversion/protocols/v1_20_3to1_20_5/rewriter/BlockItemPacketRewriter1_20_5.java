@@ -62,7 +62,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
@@ -536,7 +536,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (instrument != null) {
             final int id = Instruments1_20_3.keyToId(instrument);
             if (id != -1) {
-                data.set(StructuredDataKey.INSTRUMENT, Holder.of(id));
+                data.set(StructuredDataKey.INSTRUMENT1_20_5, Holder.of(id));
             }
         }
 
@@ -727,7 +727,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             soundEvent = Holder.of(instrument.getInt("sound_event"));
         }
 
-        data.set(StructuredDataKey.INSTRUMENT, Holder.of(new Instrument(soundEvent, useDuration, range)));
+        data.set(StructuredDataKey.INSTRUMENT1_20_5, Holder.of(new Instrument1_20_5(soundEvent, useDuration, range)));
     }
 
     private void restoreFoodFromBackup(final CompoundTag food, final StructuredDataContainer data) {

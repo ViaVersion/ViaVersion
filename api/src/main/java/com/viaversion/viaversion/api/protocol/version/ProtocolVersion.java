@@ -43,7 +43,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     private static final List<ProtocolVersion> VERSION_LIST = new ArrayList<>();
 
     public static final ProtocolVersion v1_7_2 = register(4, "1.7.2-1.7.5", new SubVersionRange("1.7", 2, 5));
-    @Deprecated(forRemoval=true) public static final ProtocolVersion v1_7_1 = v1_7_2;
+    @Deprecated(forRemoval = true)
+    public static final ProtocolVersion v1_7_1 = v1_7_2;
     public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new SubVersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x", new SubVersionRange("1.8", 0, 9));
     public static final ProtocolVersion v1_9 = register(107, "1.9");
@@ -85,6 +86,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_20_3 = register(765, "1.20.3-1.20.4", new SubVersionRange("1.20", 3, 4));
     public static final ProtocolVersion v1_20_5 = register(766, "1.20.5-1.20.6", new SubVersionRange("1.20", 5, 6));
     public static final ProtocolVersion v1_21 = register(767, "1.21-1.21.1", new SubVersionRange("1.21", 0, 1));
+    public static final ProtocolVersion v1_21_2 = register(768, 205, "1.21.2");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
     public static ProtocolVersion register(int version, String name) {
