@@ -65,9 +65,6 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     protected void registerPackets() {
         super.registerPackets();
 
-        // TODO Container ids
-        // TODO Ingredient now holder set???
-
         tagRewriter.registerGeneric(ClientboundPackets1_21.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
 
@@ -77,19 +74,6 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21.UPDATE_ATTRIBUTES);
-
-        // Uncomment if an existing type changed serialization format. Mappings for argument type keys can also be defined in mapping files
-        /*new CommandRewriter1_19_4<>(this) {
-            @Override
-            public void handleArgument(final PacketWrapper wrapper, final String argumentType) {
-                if (argumentType.equals("minecraft:abc")) {
-                    // New argument
-                    wrapper.write(Types.INT, 0);
-                } else {
-                    super.handleArgument(wrapper, argumentType);
-                }
-            }
-        }.registerDeclareCommands1_19(ClientboundPackets1_21.COMMANDS);*/
 
         registerServerbound(ServerboundPackets1_21_2.CLIENT_INFORMATION, this::clientInformation);
         registerServerbound(ServerboundConfigurationPackets1_20_5.CLIENT_INFORMATION, this::clientInformation);
