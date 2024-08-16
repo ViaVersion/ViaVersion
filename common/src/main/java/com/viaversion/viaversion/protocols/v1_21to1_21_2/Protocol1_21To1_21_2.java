@@ -91,7 +91,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         wrapper.passthrough(Types.VAR_INT); // Main hand
         wrapper.passthrough(Types.BOOLEAN); // Text filtering enabled
         wrapper.passthrough(Types.BOOLEAN); // Allow listing
-        wrapper.read(Types.VAR_INT);
+        wrapper.read(Types.VAR_INT); // Particle status
     }
 
     @Override
@@ -102,10 +102,10 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             .reader("dust", ParticleType.Readers.DUST)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-            .reader("item", ParticleType.Readers.item(Types1_21_2.ITEM))
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-            .reader("shriek", ParticleType.Readers.SHRIEK);
+            .reader("shriek", ParticleType.Readers.SHRIEK)
+            .reader("item", ParticleType.Readers.item(Types1_21_2.ITEM));
         Types1_21_2.STRUCTURED_DATA.filler(this)
             .add(StructuredDataKey.CUSTOM_DATA).add(StructuredDataKey.MAX_STACK_SIZE).add(StructuredDataKey.MAX_DAMAGE)
             .add(StructuredDataKey.DAMAGE).add(StructuredDataKey.UNBREAKABLE).add(StructuredDataKey.RARITY)
@@ -116,18 +116,19 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             .add(StructuredDataKey.CREATIVE_SLOT_LOCK).add(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE).add(StructuredDataKey.INTANGIBLE_PROJECTILE)
             .add(StructuredDataKey.STORED_ENCHANTMENTS).add(StructuredDataKey.DYED_COLOR).add(StructuredDataKey.MAP_COLOR)
             .add(StructuredDataKey.MAP_ID).add(StructuredDataKey.MAP_DECORATIONS).add(StructuredDataKey.MAP_POST_PROCESSING)
-            .add(StructuredDataKey.CHARGED_PROJECTILES1_21_2).add(StructuredDataKey.BUNDLE_CONTENTS1_21_2).add(StructuredDataKey.POTION_CONTENTS)
+            .add(StructuredDataKey.POTION_CONTENTS)
             .add(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS).add(StructuredDataKey.WRITABLE_BOOK_CONTENT).add(StructuredDataKey.WRITTEN_BOOK_CONTENT)
             .add(StructuredDataKey.TRIM).add(StructuredDataKey.DEBUG_STICK_STATE).add(StructuredDataKey.ENTITY_DATA)
             .add(StructuredDataKey.BUCKET_ENTITY_DATA).add(StructuredDataKey.BLOCK_ENTITY_DATA).add(StructuredDataKey.INSTRUMENT1_21_2)
             .add(StructuredDataKey.RECIPES).add(StructuredDataKey.LODESTONE_TRACKER).add(StructuredDataKey.FIREWORK_EXPLOSION)
             .add(StructuredDataKey.FIREWORKS).add(StructuredDataKey.PROFILE).add(StructuredDataKey.NOTE_BLOCK_SOUND)
             .add(StructuredDataKey.BANNER_PATTERNS).add(StructuredDataKey.BASE_COLOR).add(StructuredDataKey.POT_DECORATIONS)
-            .add(StructuredDataKey.CONTAINER1_21_2).add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
+            .add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
             .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL)
             .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER)
             .add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.JUKEBOX_PLAYABLE).add(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21)
-            .add(StructuredDataKey.REPAIRABLE).add(StructuredDataKey.ENCHANTABLE);
+            .add(StructuredDataKey.REPAIRABLE).add(StructuredDataKey.ENCHANTABLE)
+            .add(StructuredDataKey.CHARGED_PROJECTILES1_21_2).add(StructuredDataKey.BUNDLE_CONTENTS1_21_2).add(StructuredDataKey.CONTAINER1_21_2);
         super.onMappingDataLoaded();
     }
 

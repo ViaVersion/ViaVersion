@@ -567,12 +567,9 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Types.DOUBLE); // Knockback Y
             wrapper.passthrough(Types.DOUBLE); // Knockback Z
 
-            final Particle smallExplosionParticle = wrapper.read(particleType);
-            final Particle largeExplosionParticle = wrapper.read(particleType);
-            wrapper.write(mappedParticleType, smallExplosionParticle);
-            wrapper.write(mappedParticleType, largeExplosionParticle);
-            rewriteParticle(wrapper.user(), smallExplosionParticle);
-            rewriteParticle(wrapper.user(), largeExplosionParticle);
+            final Particle explosionParticle = wrapper.read(particleType);
+            wrapper.write(mappedParticleType, explosionParticle);
+            rewriteParticle(wrapper.user(), explosionParticle);
 
             soundRewriter.soundHolderHandler().handle(wrapper);
         });

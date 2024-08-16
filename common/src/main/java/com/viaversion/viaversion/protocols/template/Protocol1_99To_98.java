@@ -96,10 +96,10 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
                 .reader("dust", ParticleType.Readers.DUST)
                 .reader("falling_dust", ParticleType.Readers.BLOCK)
                 .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("item", ParticleType.Readers.ITEM1_20_2)
                 .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
                 .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-                .reader("shriek", ParticleType.Readers.SHRIEK);*/
+                .reader("shriek", ParticleType.Readers.SHRIEK)
+                .reader("item", ParticleType.Readers.item(...));*/
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data
     }
