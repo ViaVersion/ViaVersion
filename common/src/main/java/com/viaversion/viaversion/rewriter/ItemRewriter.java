@@ -139,14 +139,14 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public void registerSetSlot(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            wrapper.passthrough(Types.BYTE); // Container id
             wrapper.passthrough(Types.SHORT); // Slot id
             passthroughClientboundItem(wrapper);
         });
     }
 
     public void registerSetSlot1_17_1(C packetType) {
-        registerSetSlot1_17_1(packetType, Types.UNSIGNED_BYTE);
+        registerSetSlot1_17_1(packetType, Types.BYTE);
     }
 
     public void registerSetSlot1_21_2(C packetType) {
@@ -194,7 +194,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public void registerContainerClick(S packetType) {
         protocol.registerServerbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container ID
+            wrapper.passthrough(Types.BYTE); // Container ID
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button
             wrapper.passthrough(Types.SHORT); // Action number
@@ -204,7 +204,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerContainerClick1_17_1(S packetType) {
-        registerContainerClick1_17_1(packetType, Types.UNSIGNED_BYTE);
+        registerContainerClick1_17_1(packetType, Types.BYTE);
     }
 
     public void registerContainerClick1_21_2(S packetType) {

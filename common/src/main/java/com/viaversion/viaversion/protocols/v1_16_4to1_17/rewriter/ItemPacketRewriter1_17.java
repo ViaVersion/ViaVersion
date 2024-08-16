@@ -56,7 +56,7 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
         protocol.registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.UNSIGNED_BYTE); // Window Id
+                map(Types.BYTE); // Window Id
                 map(Types.SHORT); // Slot
                 map(Types.BYTE); // Button
                 handler(wrapper -> wrapper.write(Types.SHORT, (short) 0)); // Action id - doesn't matter, as the sent out confirmation packet will be cancelled
@@ -110,10 +110,10 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
             // Check extra bit for fast dismissal
             if ((id & (1 << 30)) != 0) {
                 // Decode our requested inventory acknowledgement
-                short inventoryId = (short) ((id >> 16) & 0xFF);
+                byte inventoryId = (byte) ((id >> 16) & 0xFF);
                 short confirmationId = (short) (id & 0xFFFF);
                 PacketWrapper packet = wrapper.create(ServerboundPackets1_16_2.CONTAINER_ACK);
-                packet.write(Types.UNSIGNED_BYTE, inventoryId);
+                packet.write(Types.BYTE, inventoryId);
                 packet.write(Types.SHORT, confirmationId);
                 packet.write(Types.BOOLEAN, true); // Accept
                 packet.sendToServer(Protocol1_16_4To1_17.class);

@@ -20,13 +20,15 @@ package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InventoryTracker implements StorableObject {
     private String inventory;
 
-    private final Map<Short, Map<Short, Integer>> windowItemCache = new HashMap<>();
+    private final Int2ObjectMap<Map<Short, Integer>> windowItemCache = new Int2ObjectOpenHashMap<>();
     private int itemIdInCursor;
     private boolean dragging;
 
@@ -38,7 +40,7 @@ public class InventoryTracker implements StorableObject {
         this.inventory = inventory;
     }
 
-    public void resetInventory(short windowId) {
+    public void resetInventory(int windowId) {
         // Reset the cursor state of the inventory
         if (inventory == null) {
             this.itemIdInCursor = 0;
@@ -51,7 +53,7 @@ public class InventoryTracker implements StorableObject {
         }
     }
 
-    public int getItemId(short windowId, short slot) {
+    public int getItemId(int windowId, short slot) {
         Map<Short, Integer> itemMap = this.windowItemCache.get(windowId);
         if (itemMap == null) {
             return 0;
@@ -60,7 +62,7 @@ public class InventoryTracker implements StorableObject {
         return itemMap.getOrDefault(slot, 0);
     }
 
-    public void setItemId(short windowId, short slot, int itemId) {
+    public void setItemId(int windowId, short slot, int itemId) {
         if (windowId == -1 && slot == -1) {
             // Set the cursor item
             this.itemIdInCursor = itemId;
@@ -78,7 +80,7 @@ public class InventoryTracker implements StorableObject {
      * @param hoverSlot The slot number of the current mouse position
      * @param button    The button to use in the click
      */
-    public void handleWindowClick(UserConnection user, short windowId, byte mode, short hoverSlot, byte button) {
+    public void handleWindowClick(UserConnection user, int windowId, byte mode, short hoverSlot, byte button) {
         EntityTracker1_9 entityTracker = user.getEntityTracker(Protocol1_8To1_9.class);
 
         // Skip inventory background clicks

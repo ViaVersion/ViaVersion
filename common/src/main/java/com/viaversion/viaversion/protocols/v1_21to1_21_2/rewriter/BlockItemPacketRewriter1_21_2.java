@@ -112,7 +112,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_CONTENT, wrapper -> {
-            updateContainerId(wrapper);
+            unsignedByteToVarInt(wrapper);
             wrapper.passthrough(Types.VAR_INT); // State id
             final Item[] items = wrapper.read(itemArrayType());
             wrapper.write(mappedItemArrayType(), items);
@@ -122,7 +122,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             passthroughClientboundItem(wrapper);
         });
         protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_SLOT, wrapper -> {
-            updateContainerId(wrapper);
+            byteToVarInt(wrapper);
             final int containerId = wrapper.get(Types.VAR_INT, 0);
             if (containerId == -1) { // cursor item
                 wrapper.setPacketType(ClientboundPackets1_21_2.SET_CURSOR_ITEM);
@@ -142,13 +142,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             passthroughClientboundItem(wrapper);
         });
-        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_CLOSE, this::updateContainerId);
-        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_DATA, this::updateContainerId);
-        protocol.registerClientbound(ClientboundPackets1_21.HORSE_SCREEN_OPEN, this::updateContainerId);
+        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_CLOSE, this::unsignedByteToVarInt);
+        protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_DATA, this::unsignedByteToVarInt);
+        protocol.registerClientbound(ClientboundPackets1_21.HORSE_SCREEN_OPEN, this::unsignedByteToVarInt);
         protocol.registerClientbound(ClientboundPackets1_21.SET_CARRIED_ITEM, ClientboundPackets1_21_2.SET_HELD_SLOT);
-        protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLOSE, this::updateContainerIdServerbound);
+        protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLOSE, this::varIntToByte);
         protocol.registerServerbound(ServerboundPackets1_21_2.CONTAINER_CLICK, wrapper -> {
-            updateContainerIdServerbound(wrapper);
+            varIntToByte(wrapper);
             wrapper.passthrough(Types.VAR_INT); // State id
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button
@@ -161,7 +161,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             passthroughServerboundItem(wrapper);
         });
         protocol.registerClientbound(ClientboundPackets1_21.PLACE_GHOST_RECIPE, wrapper -> {
-            this.updateContainerId(wrapper);
+            this.byteToVarInt(wrapper);
 
             final String recipeKey = wrapper.read(Types.STRING);
             final RecipeRewriter1_21_2.Recipe recipe = wrapper.user().get(RecipeRewriter1_21_2.class).recipe(recipeKey);
@@ -174,7 +174,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             recipe.writeRecipeDisplay(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.PLACE_RECIPE, wrapper -> {
-            this.updateContainerIdServerbound(wrapper);
+            this.varIntToByte(wrapper);
             convertServerboundRecipeDisplayId(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.RECIPE_BOOK_SEEN_RECIPE, this::convertServerboundRecipeDisplayId);
@@ -519,18 +519,19 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         return item;
     }
 
-    private void updateContainerId(final PacketWrapper wrapper) {
-        // Container id handling was always a bit whack with most reading them as unsigned bytes, some as bytes, some already as var ints.
-        // In VV, they're generally read as unsigned bytes to not have to look the type up every time, but we need to make sure they're
-        // properly converted to ints when used
+    private void unsignedByteToVarInt(final PacketWrapper wrapper) {
         final short containerId = wrapper.read(Types.UNSIGNED_BYTE);
-        final int intId = (byte) containerId;
-        wrapper.write(Types.VAR_INT, intId);
+        wrapper.write(Types.VAR_INT, (int) containerId);
     }
 
-    private void updateContainerIdServerbound(final PacketWrapper wrapper) {
+    private void byteToVarInt(final PacketWrapper wrapper) {
+        final byte containerId = wrapper.read(Types.BYTE);
+        wrapper.write(Types.VAR_INT, (int) containerId);
+    }
+
+    private void varIntToByte(final PacketWrapper wrapper) {
         final int containerId = wrapper.read(Types.VAR_INT);
-        wrapper.write(Types.UNSIGNED_BYTE, (short) containerId);
+        wrapper.write(Types.BYTE, (byte) containerId);
     }
 
     public static void updateItemData(final Item item) {

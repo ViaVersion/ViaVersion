@@ -50,7 +50,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_17.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
+                map(Types.BYTE); // Container id
                 create(Types.VAR_INT, 0); // Add arbitrary state id
             }
         });
@@ -73,7 +73,7 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
         registerServerbound(ServerboundPackets1_17.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
+                map(Types.BYTE); // Container id
                 read(Types.VAR_INT); // Remove state id
             }
         });

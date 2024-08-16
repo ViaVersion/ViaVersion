@@ -78,9 +78,9 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerCooldown(ClientboundPackets1_20_5.COOLDOWN);
         registerSetContent1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
         protocol.registerClientbound(ClientboundPackets1_20_5.CONTAINER_SET_SLOT, wrapper -> {
-            final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            final byte containerId = wrapper.passthrough(Types.BYTE);
             wrapper.passthrough(Types.VAR_INT); // State id
-            final short slotId = wrapper.passthrough(Types.SHORT); // Slot id
+            final short slotId = wrapper.passthrough(Types.SHORT);
             final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType()));
             wrapper.write(mappedItemType(), item);
 

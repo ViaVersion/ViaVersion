@@ -128,7 +128,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
         // Get item in new selected slot
         int inventorySlot = this.heldItemSlot + 36; // Hotbar slot index to inventory slot
-        int itemIdentifier = inventoryTracker.getItemId((short) 0, (short) inventorySlot);
+        int itemIdentifier = inventoryTracker.getItemId(0, (short) inventorySlot);
 
         return Protocol1_8To1_9.isSword(itemIdentifier);
     }

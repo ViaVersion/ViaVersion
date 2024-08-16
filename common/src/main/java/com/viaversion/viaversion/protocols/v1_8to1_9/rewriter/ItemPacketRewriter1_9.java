@@ -106,7 +106,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
         protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.BYTE); // 0 - Window ID
                 map(Types.SHORT); // 1 - Slot ID
                 map(Types.ITEM1_8); // 2 - Slot Value
                 handler(wrapper -> {
@@ -121,7 +121,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 
                         short slotID = wrapper.get(Types.SHORT, 0);
-                        byte windowId = wrapper.get(Types.UNSIGNED_BYTE, 0).byteValue();
+                        byte windowId = wrapper.get(Types.BYTE, 0);
 
                         // Store item in slot
                         inventoryTracker.setItemId(windowId, slotID, stack == null ? 0 : stack.identifier());
@@ -154,7 +154,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
                 handler(wrapper -> {
                     Item[] stacks = wrapper.get(Types.ITEM1_8_SHORT_ARRAY, 0);
-                    Short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     EntityTracker1_9 entityTracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
@@ -207,7 +207,8 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 handler(wrapper -> {
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                     inventoryTracker.setInventory(null);
-                    inventoryTracker.resetInventory(wrapper.get(Types.UNSIGNED_BYTE, 0));
+                    short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    inventoryTracker.resetInventory(windowId);
                 });
             }
         });
@@ -245,7 +246,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                         short slotID = wrapper.get(Types.SHORT, 0);
 
                         // Update item in slot
-                        inventoryTracker.setItemId((short) 0, slotID, stack == null ? 0 : stack.identifier());
+                        inventoryTracker.setItemId(0, slotID, stack == null ? 0 : stack.identifier());
 
                         // Sync shield item in offhand with main hand
                         entityTracker.syncShieldWithSword();
@@ -260,7 +261,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     if (throwItem) {
                         // Send a packet wiping the slot
                         wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
-                            w.write(Types.UNSIGNED_BYTE, (short) 0);
+                            w.write(Types.BYTE, (byte) 0);
                             w.write(Types.SHORT, slot);
                             w.write(Types.ITEM1_8, null);
                         }).send(Protocol1_8To1_9.class);
@@ -275,7 +276,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
             @Override
             public void register() {
-                map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                map(Types.BYTE); // 0 - Window ID
                 map(Types.SHORT); // 1 - Slot ID
                 map(Types.BYTE); // 2 - Button
                 map(Types.SHORT); // 3 - Action
@@ -285,10 +286,10 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     Item stack = wrapper.get(Types.ITEM1_8, 0);
 
                     if (Via.getConfig().isShowShieldWhenSwordInHand()) {
-                        Short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                        byte mode = wrapper.get(Types.BYTE, 1);
+                        byte windowId = wrapper.get(Types.BYTE, 0);
+                        byte mode = wrapper.get(Types.BYTE, 2);
                         short hoverSlot = wrapper.get(Types.SHORT, 0);
-                        byte button = wrapper.get(Types.BYTE, 0);
+                        byte button = wrapper.get(Types.BYTE, 1);
 
                         // Move items in inventory to track the sword location
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
@@ -299,7 +300,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                 });
                 // Brewing patch and elytra throw patch
                 handler(wrapper -> {
-                    final short windowID = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    final byte windowID = wrapper.get(Types.BYTE, 0);
                     final short slot = wrapper.get(Types.SHORT, 0);
                     boolean throwItem = (slot == 45 && windowID == 0);
                     InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
@@ -315,7 +316,7 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
                     if (throwItem) {
                         // Send a packet wiping the slot
                         wrapper.create(ClientboundPackets1_9.CONTAINER_SET_SLOT, w -> {
-                            w.write(Types.UNSIGNED_BYTE, windowID);
+                            w.write(Types.BYTE, windowID);
                             w.write(Types.SHORT, slot);
                             w.write(Types.ITEM1_8, null);
                         }).scheduleSend(Protocol1_8To1_9.class);
@@ -334,13 +335,13 @@ public class ItemPacketRewriter1_9 extends ItemRewriter<ClientboundPackets1_8, S
 
                 @Override
                 public void register() {
-                    map(Types.UNSIGNED_BYTE); // 0 - Window ID
+                    map(Types.BYTE); // 0 - Window ID
 
                     // Inventory tracking
                     handler(wrapper -> {
                         InventoryTracker inventoryTracker = wrapper.user().get(InventoryTracker.class);
                         inventoryTracker.setInventory(null);
-                        inventoryTracker.resetInventory(wrapper.get(Types.UNSIGNED_BYTE, 0));
+                        inventoryTracker.resetInventory(wrapper.get(Types.BYTE, 0));
                     });
                 }
             });
