@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
@@ -37,8 +38,6 @@ import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
 
@@ -56,17 +55,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
             RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
             if (registryKey.equals("enchantment")) {
-                for (final RegistryEntry entry : entries) {
-                    if (entry.tag() == null) {
-                        continue;
-                    }
-
-                    final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
-                    if (effects != null) {
-                        updateLocationChangedAttributes(effects);
-                        updateAttributesFields(effects);
-                    }
-                }
+                updateEnchantmentAttributes(entries, protocol.getMappingData().getAttributeMappings());
             } else if (registryKey.equals("damage_type")) {
                 // Add new damage types
                 final int length = entries.length;
@@ -153,18 +142,32 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         protocol.appendServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
     }
 
-    private void updateAttributesFields(final CompoundTag effects) {
+    public static void updateEnchantmentAttributes(final RegistryEntry[] entries, final FullMappings mappings) {
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
+            if (effects != null) {
+                updateLocationChangedAttributes(effects, mappings);
+                updateAttributesFields(effects, mappings);
+            }
+        }
+    }
+
+    private static void updateAttributesFields(final CompoundTag effects, final FullMappings mappings) {
         final ListTag<CompoundTag> attributesList = TagUtil.getNamespacedCompoundTagList(effects, "attributes");
         if (attributesList == null) {
             return;
         }
 
         for (final CompoundTag attributeData : attributesList) {
-            updateAttributeField(attributeData);
+            updateAttributeField(attributeData, mappings);
         }
     }
 
-    private void updateLocationChangedAttributes(final CompoundTag effects) {
+    private static void updateLocationChangedAttributes(final CompoundTag effects, final FullMappings mappings) {
         final ListTag<CompoundTag> locationChanged = TagUtil.getNamespacedCompoundTagList(effects, "location_changed");
         if (locationChanged == null) {
             return;
@@ -173,28 +176,23 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         for (final CompoundTag data : locationChanged) {
             final CompoundTag effect = data.getCompoundTag("effect");
             if (effect != null) {
-                updateAttributeField(effect);
+                updateAttributeField(effect, mappings);
             }
         }
     }
 
-    private void updateAttributeField(final CompoundTag attributeData) {
+    private static void updateAttributeField(final CompoundTag attributeData, final FullMappings mappings) {
         final StringTag attributeTag = attributeData.getStringTag("attribute");
         if (attributeTag == null) {
             return;
         }
 
         final String attribute = Key.stripMinecraftNamespace(attributeTag.getValue());
-        final int firstSeparator = attribute.indexOf('.');
-        if (firstSeparator == -1) {
-            return;
+        String mappedAttribute = mappings.mappedIdentifier(attribute);
+        if (mappedAttribute == null) {
+            mappedAttribute = mappings.mappedIdentifier(0); // Dummy
         }
-
-        // Remove prefix from attributes
-        final String prefix = attribute.substring(0, firstSeparator);
-        if (prefix.equals("generic") || prefix.equals("player") || prefix.equals("zombie")) {
-            attributeTag.setValue(attribute.substring(firstSeparator + 1));
-        }
+        attributeTag.setValue(mappedAttribute);
     }
 
     private void readOnGround(final PacketWrapper wrapper) {
@@ -215,9 +213,9 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             Types1_21_2.ENTITY_DATA_TYPES.componentType,
             Types1_21_2.ENTITY_DATA_TYPES.optionalComponentType
         );
-        registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11); // Data type
+        registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_20_5.SALMON).addIndex(17);
+        filter().type(EntityTypes1_20_5.SALMON).addIndex(17); // Data type
     }
 
     @Override

@@ -126,9 +126,9 @@ public interface MappingData {
 
     @Nullable Mappings getEnchantmentMappings();
 
-    @Nullable Mappings getAttributeMappings();
-
     @Nullable Mappings getPaintingMappings();
+
+    @Nullable FullMappings getAttributeMappings();
 
     @Nullable FullMappings getEntityMappings();
 
