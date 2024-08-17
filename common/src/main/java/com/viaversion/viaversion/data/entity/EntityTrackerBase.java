@@ -34,7 +34,7 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
-    private final Int2ObjectMap<TrackedEntity> entities = new Int2ObjectOpenHashMap<>();
+    protected final Int2ObjectMap<TrackedEntity> entities = new Int2ObjectOpenHashMap<>();
     private final UserConnection connection;
     private final EntityType playerType;
     private int clientEntityId = -1;
