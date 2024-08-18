@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.base;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -40,25 +39,22 @@ import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
-import com.viaversion.viaversion.util.ChatColorUtil;
-import com.viaversion.viaversion.util.ComponentUtil;
-import io.netty.channel.ChannelFuture;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Initial base protocol which is kept always in the pipeline. Assuming we will never support 1.6 and older clients
- * to join 1.7+ servers.
+ * Initial base protocol which is kept always in the pipeline.
  * <p>
  * State tracking for configuration state is done via {@link AbstractProtocol#registerConfigurationChangeHandlers()}
  */
-public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
+public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
     private static final int STATUS_INTENT = 1;
     private static final int LOGIN_INTENT = 2;
     private static final int TRANSFER_INTENT = 3;
 
-    public ServerboundBaseProtocol1_7() {
+    public InitialBaseProtocol() {
         super(BaseClientboundPacket.class, BaseClientboundPacket.class, BaseServerboundPacket.class, BaseServerboundPacket.class);
     }
 
@@ -144,33 +140,6 @@ public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
                 if (serverProtocol.olderThan(ProtocolVersion.v1_20_5)) {
                     wrapper.set(Types.VAR_INT, 1, LOGIN_INTENT);
                 }
-            }
-        });
-
-        // State tracking
-        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
-            final ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.CONFIGURATION);
-        });
-
-        // Handle blocked version disconnect
-        registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
-            final UserConnection user = wrapper.user();
-            final ProtocolVersion protocol = user.getProtocolInfo().protocolVersion();
-            if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
-                if (!user.getChannel().isOpen() || !user.shouldApplyBlockProtocol()) {
-                    return;
-                }
-
-                wrapper.cancel(); // cancel current
-
-                final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
-                final PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, user);
-                disconnectPacket.write(Types.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
-
-                // Send and close
-                final ChannelFuture future = disconnectPacket.sendFuture(null);
-                future.addListener(f -> user.getChannel().close());
             }
         });
     }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.base;
+package com.viaversion.viaversion.protocols.base.v1_7;
 
 import com.google.common.base.Joiner;
 import com.google.gson.JsonElement;
@@ -34,6 +34,8 @@ import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
@@ -42,10 +44,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-/**
- * Protocol dynamically kept for 1.7+ clients to allow <a href="https://github.com/ViaVersion/ViaLegacy">ViaLegacy</a> having their own
- * base protocol code for 1.6 and older servers.
- */
 public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
     public ClientboundBaseProtocol1_7() {
