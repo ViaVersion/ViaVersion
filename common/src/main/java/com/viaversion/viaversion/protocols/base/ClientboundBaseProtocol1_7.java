@@ -133,7 +133,7 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
 
-            if (info.protocolVersion().olderThan(ProtocolVersion.v1_16)) {
+            if (info.serverProtocolVersion().olderThan(ProtocolVersion.v1_16)) {
                 String uuidString = wrapper.passthrough(Types.STRING);
                 if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
                     // Trimmed
@@ -141,9 +141,12 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
                 }
                 info.setUuid(UUID.fromString(uuidString));
             } else {
-                info.setUuid(wrapper.passthrough(Types.UUID));
+                final UUID uuid = wrapper.passthrough(Types.UUID);
+                info.setUuid(uuid);
             }
-            info.setUsername(wrapper.passthrough(Types.STRING));
+
+            final String username = wrapper.passthrough(Types.STRING);
+            info.setUsername(username);
 
             // Setup connection
             onLoginSuccess(wrapper.user());
