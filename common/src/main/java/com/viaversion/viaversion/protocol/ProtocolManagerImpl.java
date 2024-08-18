@@ -38,9 +38,8 @@ import com.viaversion.viaversion.api.protocol.version.ServerProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
-import com.viaversion.viaversion.protocols.base.BaseProtocol;
-import com.viaversion.viaversion.protocols.base.BaseProtocol1_16;
-import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
+import com.viaversion.viaversion.protocols.base.ServerboundBaseProtocol1_7;
+import com.viaversion.viaversion.protocols.base.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
@@ -109,7 +108,7 @@ import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ProtocolManagerImpl implements ProtocolManager {
-    private static final Protocol BASE_PROTOCOL = new BaseProtocol();
+    private static final Protocol BASE_PROTOCOL = new ServerboundBaseProtocol1_7();
 
     // Input Version -> Output Version & Protocol (Allows fast lookup)
     private final Object2ObjectMap<ProtocolVersion, Object2ObjectMap<ProtocolVersion, Protocol>> registryMap = new Object2ObjectOpenHashMap<>(32);
@@ -137,8 +136,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         // Base Protocol
         BASE_PROTOCOL.initialize();
         BASE_PROTOCOL.register(Via.getManager().getProviders());
-        registerBaseProtocol(new BaseProtocol1_7(), Range.closedOpen(ProtocolVersion.v1_7_2, ProtocolVersion.v1_16));
-        registerBaseProtocol(new BaseProtocol1_16(), Range.atLeast(ProtocolVersion.v1_16));
+        registerBaseProtocol(new ClientboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
 
         registerProtocol(new Protocol1_8To1_9(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
         registerProtocol(new Protocol1_9To1_9_1(), Arrays.asList(ProtocolVersion.v1_9_1, ProtocolVersion.v1_9_2), ProtocolVersion.v1_9);

@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -38,22 +37,24 @@ import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
-import com.viaversion.viaversion.util.ChatColorUtil;
-import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.GsonUtil;
-import io.netty.channel.ChannelFuture;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
+/**
+ * Protocol dynamically kept for 1.7+ clients to allow <a href="https://github.com/ViaVersion/ViaLegacy">ViaLegacy</a> having their own
+ * base protocol code for 1.6 and older servers.
+ */
+public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, BaseClientboundPacket, BaseServerboundPacket, BaseServerboundPacket> {
 
-    public BaseProtocol1_7() {
+    public ClientboundBaseProtocol1_7() {
         super(BaseClientboundPacket.class, BaseClientboundPacket.class, BaseServerboundPacket.class, BaseServerboundPacket.class);
     }
 
     @Override
     protected void registerPackets() {
+        // Handle server pinging sent by the client
         registerClientbound(ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
             @Override
             public void register() {
@@ -128,60 +129,24 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
             }
         });
 
-        // Login Success Packet
+        // Track player name/uuid and setup connection + track state
         registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
-            ProtocolInfo info = wrapper.user().getProtocolInfo();
-            if (info.protocolVersion().olderThan(ProtocolVersion.v1_20_2)) { // On 1.20.2+, wait for the login ack
-                info.setState(State.PLAY);
-            }
-
-            UUID uuid = passthroughLoginUUID(wrapper);
-            info.setUuid(uuid);
-
-            String username = wrapper.passthrough(Types.STRING);
-            info.setUsername(username);
-            // Add to ported clients
-            Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
-
-            if (!info.getPipeline().hasNonBaseProtocols()) { // Only base protocol
-                wrapper.user().setActive(false);
-            }
-
-            if (Via.getManager().isDebug()) {
-                // Print out the route to console
-                Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
-                    new Object[]{
-                        username,
-                        info.protocolVersion().getName(),
-                        Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
-                    });
-            }
-        });
-
-        // Login Start Packet
-        registerServerbound(ServerboundLoginPackets.HELLO, wrapper -> {
-            final UserConnection user = wrapper.user();
-            final ProtocolVersion protocol = user.getProtocolInfo().protocolVersion();
-            if (Via.getConfig().blockedProtocolVersions().contains(protocol)) {
-                if (!user.getChannel().isOpen() || !user.shouldApplyBlockProtocol()) {
-                    return;
-                }
-
-                wrapper.cancel(); // cancel current
-
-                final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
-                final PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, user);
-                disconnectPacket.write(Types.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
-
-                // Send and close
-                final ChannelFuture future = disconnectPacket.sendFuture(null);
-                future.addListener(f -> user.getChannel().close());
-            }
-        });
-
-        registerServerbound(ServerboundLoginPackets.LOGIN_ACKNOWLEDGED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.CONFIGURATION);
+
+            if (info.protocolVersion().olderThan(ProtocolVersion.v1_16)) {
+                String uuidString = wrapper.passthrough(Types.STRING);
+                if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
+                    // Trimmed
+                    uuidString = addDashes(uuidString);
+                }
+                info.setUuid(UUID.fromString(uuidString));
+            } else {
+                info.setUuid(wrapper.passthrough(Types.UUID));
+            }
+            info.setUsername(wrapper.passthrough(Types.STRING));
+
+            // Setup connection
+            onLoginSuccess(wrapper.user());
         });
     }
 
@@ -199,13 +164,28 @@ public class BaseProtocol1_7 extends AbstractProtocol<BaseClientboundPacket, Bas
         return idBuff.toString();
     }
 
-    protected UUID passthroughLoginUUID(PacketWrapper wrapper) {
-        String uuidString = wrapper.passthrough(Types.STRING);
-        if (uuidString.length() == 32) { // Trimmed UUIDs are 32 characters
-            // Trimmed
-            uuidString = addDashes(uuidString);
+    public static void onLoginSuccess(final UserConnection connection) {
+        final ProtocolInfo info = connection.getProtocolInfo();
+        if (info.protocolVersion().olderThan(ProtocolVersion.v1_20_2)) { // On 1.20.2+, wait for the login ack
+            info.setState(State.PLAY);
         }
-        return UUID.fromString(uuidString);
+
+        // Add to ported clients
+        Via.getManager().getConnectionManager().onLoginSuccess(connection);
+
+        if (!info.getPipeline().hasNonBaseProtocols()) { // Only base protocol
+            connection.setActive(false);
+        }
+
+        if (Via.getManager().isDebug()) {
+            // Print out the route to console
+            Via.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}",
+                new Object[]{
+                    info.getUsername(),
+                    info.protocolVersion().getName(),
+                    Joiner.on(", ").join(info.getPipeline().pipes(), ", ")
+                });
+        }
     }
 
     @Override
