@@ -365,13 +365,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public @Nullable Protocol getBaseProtocol(ProtocolVersion serverVersion) {
+    public List<Protocol> getBaseProtocols(ProtocolVersion serverVersion) {
+        final List<Protocol> list = new ArrayList<>();
         for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
             if (rangeProtocol.key().contains(serverVersion)) {
-                return rangeProtocol.value();
+                list.add(rangeProtocol.value());
             }
         }
-        return null;
+        return list;
     }
 
     @Override

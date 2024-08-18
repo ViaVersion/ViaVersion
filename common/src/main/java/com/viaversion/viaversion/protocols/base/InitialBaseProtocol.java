@@ -98,12 +98,11 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             // Add Base Protocol
             ProtocolPipeline pipeline = info.getPipeline();
 
-            // Special versions might compare equal to normal versions and would break this getter
+            // Special versions might compare equal to normal versions and would break this getter,
+            // platforms need to add the base protocols manually in this case
             if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
-                final Protocol baseProtocol = protocolManager.getBaseProtocol(serverProtocol);
-                // Platforms might add their base protocol manually (e.g. SPECIAL versions)
-                if (baseProtocol != null) {
-                    pipeline.add(baseProtocol);
+                for (final Protocol protocol : protocolManager.getBaseProtocols(serverProtocol)) {
+                    pipeline.add(protocol);
                 }
             }
 
