@@ -99,14 +99,16 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             // Add Base Protocol
             ProtocolPipeline pipeline = info.getPipeline();
 
-            // Special versions might compare equal to normal versions and would break this getter,
-            // platforms either need to use the RedirectProtocolVersion API or add the base protocols manually
+            // Special versions might compare equal to normal versions and would the normal lookup,
+            // platforms can use the RedirectProtocolVersion API or need to manually handle their base protocols.
+            ProtocolVersion baseProtocolVersion = null;
             if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
-                for (final Protocol protocol : protocolManager.getBaseProtocols(serverProtocol)) {
-                    pipeline.add(protocol);
-                }
+                baseProtocolVersion = serverProtocol;
             } else if (serverProtocol instanceof RedirectProtocolVersion version) {
-                for (final Protocol protocol : protocolManager.getBaseProtocols(version.getOrigin())) {
+                baseProtocolVersion = version.getBaseProtocolVersion();
+            }
+            if (baseProtocolVersion != null) {
+                for (final Protocol protocol : protocolManager.getBaseProtocols(baseProtocolVersion)) {
                     pipeline.add(protocol);
                 }
             }

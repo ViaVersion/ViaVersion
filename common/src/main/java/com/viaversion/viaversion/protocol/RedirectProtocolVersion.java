@@ -24,9 +24,10 @@ import java.util.Comparator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * A {@link ProtocolVersion} with the version type {@link VersionType#SPECIAL} that compares equal to the given
- * origin version. The origin version will also be used in {@link com.viaversion.viaversion.protocols.base.InitialBaseProtocol}
- * to determine the correct base protocol.
+ * Intended API class for protocol versions with the version type {@link VersionType#SPECIAL}.
+ * <p>
+ * Compares equal to the given origin version and allows base protocol determination via {@link #getBaseProtocolVersion()}
+ * which can be null for special cases where there is no base protocol.
  */
 public class RedirectProtocolVersion extends ProtocolVersion {
 
@@ -54,6 +55,13 @@ public class RedirectProtocolVersion extends ProtocolVersion {
     }
 
     public ProtocolVersion getOrigin() {
+        return origin;
+    }
+
+    /**
+     * @return the protocol version used to determine the base protocol, null in case there is no base protocol.
+     */
+    public @Nullable ProtocolVersion getBaseProtocolVersion() {
         return origin;
     }
 }
