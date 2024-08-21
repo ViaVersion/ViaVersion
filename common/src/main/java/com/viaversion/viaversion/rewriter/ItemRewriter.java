@@ -20,6 +20,7 @@ package com.viaversion.viaversion.rewriter;
 import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -261,6 +262,15 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerCooldown1_21_2(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            String itemIdentifier = wrapper.read(Types.OPTIONAL_STRING);
+            if (itemIdentifier != null) {
+                itemIdentifier = mappedIdentifier(protocol.getMappingData().getFullItemMappings(), itemIdentifier);
+            }
+            wrapper.write(Types.OPTIONAL_STRING, itemIdentifier);
+        });
+    }
 
     public void registerCustomPayloadTradeList(C packetType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
@@ -629,6 +639,21 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
+    }
+
+    protected @Nullable String mappedIdentifier(final FullMappings mappings, final String identifier) {
+        // Check if the original exists before mapping
+        if (mappings.id(identifier) == -1) {
+            return identifier;
+        }
+        return mappings.mappedIdentifier(identifier);
+    }
+
+    protected @Nullable String unmappedIdentifier(final FullMappings mappings, final String mappedIdentifier) {
+        if (mappings.mappedId(mappedIdentifier) == -1) {
+            return mappedIdentifier;
+        }
+        return mappings.identifier(mappedIdentifier);
     }
 
     @Override

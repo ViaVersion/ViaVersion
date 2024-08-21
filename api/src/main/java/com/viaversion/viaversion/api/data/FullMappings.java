@@ -54,6 +54,14 @@ public interface FullMappings extends BiMappings {
     @Nullable String identifier(int id);
 
     /**
+     * Returns the unmapped string identifier for the given mapped identifier.
+     *
+     * @param mappedIdentifier mapped identifier
+     * @return unmapped string identifier, or null if not found
+     */
+    @Nullable String identifier(String mappedIdentifier);
+
+    /**
      * Returns the mapped string identifier for the given mapped id.
      *
      * @param mappedId mapped id

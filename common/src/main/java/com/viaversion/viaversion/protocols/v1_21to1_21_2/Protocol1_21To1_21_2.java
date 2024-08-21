@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvide
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
@@ -126,8 +125,9 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             .add(StructuredDataKey.BLOCK_STATE).add(StructuredDataKey.BEES)
             .add(StructuredDataKey.LOCK).add(StructuredDataKey.CONTAINER_LOOT).add(StructuredDataKey.TOOL)
             .add(StructuredDataKey.ITEM_NAME).add(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER)
-            .add(StructuredDataKey.FOOD1_21).add(StructuredDataKey.JUKEBOX_PLAYABLE).add(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21)
-            .add(StructuredDataKey.REPAIRABLE).add(StructuredDataKey.ENCHANTABLE)
+            .add(StructuredDataKey.FOOD1_21_2).add(StructuredDataKey.JUKEBOX_PLAYABLE).add(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21)
+            .add(StructuredDataKey.REPAIRABLE).add(StructuredDataKey.ENCHANTABLE).add(StructuredDataKey.CONSUMABLE1_21_2)
+            .add(StructuredDataKey.USE_REMAINDER).add(StructuredDataKey.USE_COOLDOWN)
             .add(StructuredDataKey.CHARGED_PROJECTILES1_21_2).add(StructuredDataKey.BUNDLE_CONTENTS1_21_2).add(StructuredDataKey.CONTAINER1_21_2);
         super.onMappingDataLoaded();
     }

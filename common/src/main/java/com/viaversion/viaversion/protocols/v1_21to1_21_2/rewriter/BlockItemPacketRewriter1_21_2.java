@@ -18,12 +18,17 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -62,12 +67,18 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21.BLOCK_ENTITY_DATA);
 
-        registerCooldown(ClientboundPackets1_21.COOLDOWN);
         registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT);
         registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
+
+        protocol.registerClientbound(ClientboundPackets1_21.COOLDOWN, wrapper -> {
+            final MappingData mappingData = protocol.getMappingData();
+            final int itemId = wrapper.read(Types.VAR_INT);
+            final int mappedItemId = mappingData.getNewItemId(itemId);
+            wrapper.write(Types.STRING, mappingData.getFullItemMappings().mappedIdentifier(mappedItemId));
+        });
 
         protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_CONTENT, wrapper -> {
             updateContainerId(wrapper);
@@ -104,6 +115,17 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 passthroughServerboundItem(wrapper);
             }
             passthroughServerboundItem(wrapper);
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_21_2.USE_ITEM_ON, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Hand
+            wrapper.passthrough(Types.BLOCK_POSITION1_14); // Block position
+            wrapper.passthrough(Types.VAR_INT); // Direction
+            wrapper.passthrough(Types.FLOAT); // X
+            wrapper.passthrough(Types.FLOAT); // Y
+            wrapper.passthrough(Types.FLOAT); // Z
+            wrapper.passthrough(Types.BOOLEAN); // Inside
+            wrapper.read(Types.BOOLEAN); // World border hit
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.EXPLODE, wrapper -> {
@@ -248,6 +270,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final Instrument1_20_5 value = instrument.value();
             return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration(), value.range(), null));
         });
+        dataContainer.replace(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_21_2, food -> {
+            // Just assume the item type default for CONSUMABLE; add USE_REMAINDER from old food properties
+            if (food.usingConvertsTo() != null) {
+                dataContainer.set(StructuredDataKey.USE_REMAINDER, food.usingConvertsTo());
+            }
+            return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
+        });
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21, StructuredDataKey.CONTAINER1_21_2);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21, StructuredDataKey.CHARGED_PROJECTILES1_21_2);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
@@ -262,10 +291,20 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final Instrument1_21_2 value = instrument.value();
             return Holder.of(new Instrument1_20_5(value.soundEvent(), (int) value.useDuration(), value.range()));
         });
+        dataContainer.replace(StructuredDataKey.FOOD1_21_2, StructuredDataKey.FOOD1_21, food -> {
+            final StructuredData<Consumable1_21_2> consumableData = dataContainer.getNonEmpty(StructuredDataKey.CONSUMABLE1_21_2);
+            final StructuredData<Item> useRemainderData = dataContainer.getNonEmpty(StructuredDataKey.USE_REMAINDER);
+            final Item usingConvertsTo = useRemainderData != null ? useRemainderData.value() : null;
+            final float eatSeconds = consumableData != null ? consumableData.value().consumeSeconds() : 1.6F;
+            return new FoodProperties1_20_5(food.nutrition(), food.saturationModifier(), food.canAlwaysEat(), eatSeconds, usingConvertsTo, new FoodProperties1_20_5.FoodEffect[0]);
+        });
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21);
         dataContainer.remove(StructuredDataKey.REPAIRABLE);
         dataContainer.remove(StructuredDataKey.ENCHANTABLE);
+        dataContainer.remove(StructuredDataKey.CONSUMABLE1_21_2);
+        dataContainer.remove(StructuredDataKey.USE_REMAINDER);
+        dataContainer.remove(StructuredDataKey.USE_COOLDOWN);
     }
 }

@@ -23,25 +23,25 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.ArrayType;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public record FoodEffect(PotionEffect effect, float probability) {
+public record FoodProperties1_21_2(int nutrition, float saturationModifier, boolean canAlwaysEat) {
 
-    public static final Type<FoodEffect> TYPE = new Type<>(FoodEffect.class) {
+    public static final Type<FoodProperties1_21_2> TYPE = new Type<>(FoodProperties1_21_2.class) {
         @Override
-        public FoodEffect read(final ByteBuf buffer) {
-            final PotionEffect effect = PotionEffect.TYPE.read(buffer);
-            final float probability = buffer.readFloat();
-            return new FoodEffect(effect, probability);
+        public FoodProperties1_21_2 read(final ByteBuf buffer) {
+            final int nutrition = Types.VAR_INT.readPrimitive(buffer);
+            final float saturationModifier = buffer.readFloat();
+            final boolean canAlwaysEat = buffer.readBoolean();
+            return new FoodProperties1_21_2(nutrition, saturationModifier, canAlwaysEat);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final FoodEffect value) {
-            PotionEffect.TYPE.write(buffer, value.effect);
-            buffer.writeFloat(value.probability);
+        public void write(final ByteBuf buffer, final FoodProperties1_21_2 value) {
+            Types.VAR_INT.writePrimitive(buffer, value.nutrition);
+            buffer.writeFloat(value.saturationModifier);
+            buffer.writeBoolean(value.canAlwaysEat);
         }
     };
-    public static final Type<FoodEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
-
 }

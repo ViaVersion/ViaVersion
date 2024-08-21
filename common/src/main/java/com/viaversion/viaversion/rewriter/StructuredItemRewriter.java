@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.Map;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
@@ -119,6 +120,10 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             container.replace(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
             container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
             container.replace(StructuredDataKey.REPAIRABLE, value -> value.rewrite(itemIdRewriter));
+        }
+        if (mappingData.getFullItemMappings() != null) {
+            final Function<String, String> itemIdRewriter = clientbound ? id -> mappedIdentifier(mappingData.getFullItemMappings(), id) : id -> unmappedIdentifier(mappingData.getFullItemMappings(), id);
+            container.updateIfPresent(StructuredDataKey.USE_COOLDOWN, value -> value.rewrite(itemIdRewriter));
         }
         if (mappingData.getBlockMappings() != null) {
             final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;

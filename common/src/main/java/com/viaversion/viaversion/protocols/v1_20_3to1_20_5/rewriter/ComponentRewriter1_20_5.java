@@ -55,8 +55,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
@@ -502,7 +502,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return convertUnit();
     }
 
-    protected CompoundTag convertFood(final FoodProperties value) {
+    protected CompoundTag convertFood(final FoodProperties1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         tag.put("nutrition", convertNonNegativeInt(value.nutrition()));
         tag.putFloat("saturation", value.saturationModifier());

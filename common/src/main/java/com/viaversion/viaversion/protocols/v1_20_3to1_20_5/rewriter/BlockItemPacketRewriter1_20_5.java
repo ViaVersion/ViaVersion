@@ -60,8 +60,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
@@ -628,7 +628,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 814 || item.identifier() == 819 || item.identifier() == 824 || item.identifier() == 829 || item.identifier() == 834) { // swords
                 // Make sword "eatable" to enable clientside instant blocking on 1.8. Consume time is set really high, so the eating animation doesn't play
-                item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties(0, 0F, true, 3600, null, new FoodEffect[0]));
+                item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties1_20_5(0, 0F, true, 3600, null, new FoodEffect[0]));
             }
         }
     }
@@ -756,7 +756,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 effect.getFloat("probability")
             ));
         }
-        data.set(StructuredDataKey.FOOD1_20_5, new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, null, possibleEffects.toArray(new FoodEffect[0])));
+        data.set(StructuredDataKey.FOOD1_20_5, new FoodProperties1_20_5(nutrition, saturation, canAlwaysEat, eatSeconds, null, possibleEffects.toArray(new FoodEffect[0])));
     }
 
     private void restoreToolFromBackup(final CompoundTag tool, final StructuredDataContainer data) {
