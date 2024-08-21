@@ -129,8 +129,7 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 protocols.remove(this);
                 wrapper.apply(Direction.SERVERBOUND, State.HANDSHAKE, protocols);
             } catch (CancelException e) {
-                wrapper.user().setActive(false);
-                return;
+                throw new RuntimeException("Cancelling the client intention packet is not allowed", e);
             }
 
             if (Via.getManager().isDebug()) {
