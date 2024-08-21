@@ -123,6 +123,16 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 wrapper.set(Types.VAR_INT, 0, serverProtocol.getOriginalVersion());
             }
 
+            // Send client intention into the pipeline in case protocols down the line need to transform it
+            try {
+                final List<Protocol> protocols = new ArrayList<>(pipeline.pipes());
+                protocols.remove(this);
+                wrapper.apply(Direction.SERVERBOUND, State.HANDSHAKE, protocols);
+            } catch (CancelException e) {
+                wrapper.user().setActive(false);
+                return;
+            }
+
             if (Via.getManager().isDebug()) {
                 Via.getPlatform().getLogger().info("User connected with protocol: " + info.protocolVersion() + " and serverProtocol: " + info.serverProtocolVersion());
                 Via.getPlatform().getLogger().info("Protocol pipeline: " + pipeline.pipes());
