@@ -48,9 +48,5 @@ public class NBTTagTest {
         Assertions.assertEquals("2147483649", deserializeCompoundTag("{id:9000b,thisisastring:2147483649}").get("thisisastring").getValue());
         Assertions.assertEquals((byte) 1, deserializeCompoundTag("{thisisabyte:true}").get("thisisabyte").getValue());
         Assertions.assertEquals((byte) 0, deserializeCompoundTag("{thisisabyte:false}").get("thisisabyte").getValue());
-
-        //TODO fix legacy < 1.12
-        // deserialize("{id:minecraft:stone}");
-        // deserialize("{id:[1,2, 3, 4,5]}");
     }
 }
