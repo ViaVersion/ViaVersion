@@ -24,8 +24,9 @@ import java.util.Comparator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Special protocol version that compares to another version. This can be used for e.g. April Fool versions which are depending
- * on vanilla game versions.
+ * A {@link ProtocolVersion} with the version type {@link VersionType#SPECIAL} that compares equal to the given
+ * origin version. The origin version will also be used in {@link com.viaversion.viaversion.protocols.base.InitialBaseProtocol}
+ * to determine the correct base protocol.
  */
 public class RedirectProtocolVersion extends ProtocolVersion {
 

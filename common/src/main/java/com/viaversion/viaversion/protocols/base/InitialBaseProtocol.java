@@ -35,6 +35,7 @@ import com.viaversion.viaversion.api.protocol.version.VersionType;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.protocol.RedirectProtocolVersion;
 import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
@@ -99,9 +100,13 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             ProtocolPipeline pipeline = info.getPipeline();
 
             // Special versions might compare equal to normal versions and would break this getter,
-            // platforms need to add the base protocols manually in this case
+            // platforms either need to use the RedirectProtocolVersion API or add the base protocols manually
             if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
                 for (final Protocol protocol : protocolManager.getBaseProtocols(serverProtocol)) {
+                    pipeline.add(protocol);
+                }
+            } else if (serverProtocol instanceof RedirectProtocolVersion version) {
+                for (final Protocol protocol : protocolManager.getBaseProtocols(version.getOrigin())) {
                     pipeline.add(protocol);
                 }
             }
