@@ -73,13 +73,13 @@ public interface ProtocolManager {
     Protocol getBaseProtocol();
 
     /**
-     * Returns the base protocol for a specific server protocol version.
+     * Returns the base protocols for a specific server protocol version.
      * The standard base protocols deal with status and login packets for userconnection initialization.
      *
      * @param serverVersion server protocol version
-     * @return base protocol for the given server protocol version if present, else null
+     * @return base protocols for the given server protocol version if present, else null
      */
-    @Nullable Protocol getBaseProtocol(ProtocolVersion serverVersion);
+    List<Protocol> getBaseProtocols(ProtocolVersion serverVersion);
 
     /**
      * Returns an immutable collection of registered protocols.
