@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,17 +102,15 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
 
             // Special versions might compare equal to normal versions and would the normal lookup,
             // platforms can use the RedirectProtocolVersion API or need to manually handle their base protocols.
-            ProtocolVersion baseProtocolVersion = null;
+            ProtocolVersion clientboundBaseProtocolVersion = null;
             if (serverProtocol.getVersionType() != VersionType.SPECIAL) {
-                baseProtocolVersion = serverProtocol;
+                clientboundBaseProtocolVersion = serverProtocol;
             } else if (serverProtocol instanceof RedirectProtocolVersion version) {
-                baseProtocolVersion = version.getBaseProtocolVersion();
+                clientboundBaseProtocolVersion = version.getBaseProtocolVersion();
             }
-            if (baseProtocolVersion != null) {
-                // Add base protocols
-                for (final Protocol protocol : protocolManager.getBaseProtocols(baseProtocolVersion)) {
-                    pipeline.add(protocol);
-                }
+            // Add base protocols
+            for (final Protocol protocol : protocolManager.getBaseProtocols(info.protocolVersion(), clientboundBaseProtocolVersion)) {
+                pipeline.add(protocol);
             }
 
             // Add other protocols

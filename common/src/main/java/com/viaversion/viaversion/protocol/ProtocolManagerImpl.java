@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.ProtocolPathEntry;
 import com.viaversion.viaversion.api.protocol.ProtocolPathKey;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -41,7 +42,6 @@ import com.viaversion.viaversion.protocol.packet.VersionedPacketTransformerImpl;
 import com.viaversion.viaversion.protocols.base.InitialBaseProtocol;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.v1_7.ServerboundBaseProtocol1_7;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_10to1_11.Protocol1_10To1_11;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.Protocol1_11_1To1_12;
 import com.viaversion.viaversion.protocols.v1_11to1_11_1.Protocol1_11To1_11_1;
@@ -74,6 +74,7 @@ import com.viaversion.viaversion.protocols.v1_19_4to1_20.Protocol1_19_4To1_20;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.Protocol1_19To1_19_1;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.Protocol1_20_2To1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.Protocol1_9_1To1_9_3;
@@ -116,7 +117,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
     private final Map<Class<? extends Protocol>, Protocol<?, ?, ?, ?>> protocols = new HashMap<>(64);
     private final Map<ProtocolPathKey, List<ProtocolPathEntry>> pathCache = new ConcurrentHashMap<>();
     private final Set<ProtocolVersion> supportedVersions = new HashSet<>();
-    private final List<Pair<Range<ProtocolVersion>, Protocol>> baseProtocols = Lists.newCopyOnWriteArrayList();
+    private final List<Pair<Range<ProtocolVersion>, Protocol>> serverboundBaseProtocols = Lists.newCopyOnWriteArrayList();
+    private final List<Pair<Range<ProtocolVersion>, Protocol>> clientboundBaseProtocols = Lists.newCopyOnWriteArrayList();
 
     private final ReadWriteLock mappingLoaderLock = new ReentrantReadWriteLock();
     private Map<Class<? extends Protocol>, CompletableFuture<Void>> mappingLoaderFutures = new HashMap<>();
@@ -137,8 +139,8 @@ public class ProtocolManagerImpl implements ProtocolManager {
         // Base Protocol
         BASE_PROTOCOL.initialize();
         BASE_PROTOCOL.register(Via.getManager().getProviders());
-        registerBaseProtocol(new ClientboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
-        registerBaseProtocol(new ServerboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
+        registerBaseProtocol(Direction.CLIENTBOUND, new ClientboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
+        registerBaseProtocol(Direction.SERVERBOUND, new ServerboundBaseProtocol1_7(), Range.atLeast(ProtocolVersion.v1_7_2));
 
         registerProtocol(new Protocol1_8To1_9(), ProtocolVersion.v1_9, ProtocolVersion.v1_8);
         registerProtocol(new Protocol1_9To1_9_1(), Arrays.asList(ProtocolVersion.v1_9_1, ProtocolVersion.v1_9_2), ProtocolVersion.v1_9);
@@ -234,7 +236,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public void registerBaseProtocol(Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols) {
+    public void registerBaseProtocol(Direction direction, Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols) {
         Preconditions.checkArgument(baseProtocol.isBaseProtocol(), "Protocol is not a base protocol");
         final ProtocolVersion lower = supportedProtocols.hasLowerBound() ? supportedProtocols.lowerEndpoint() : null;
         final ProtocolVersion upper = supportedProtocols.hasUpperBound() ? supportedProtocols.upperEndpoint() : null;
@@ -243,7 +245,11 @@ public class ProtocolManagerImpl implements ProtocolManager {
 
         baseProtocol.initialize();
 
-        baseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
+        if (direction == Direction.SERVERBOUND) {
+            serverboundBaseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
+        } else {
+            clientboundBaseProtocols.add(new Pair<>(supportedProtocols, baseProtocol));
+        }
         baseProtocol.register(Via.getManager().getProviders());
         if (Via.getManager().isInitialized()) {
             refreshVersions();
@@ -365,11 +371,20 @@ public class ProtocolManagerImpl implements ProtocolManager {
     }
 
     @Override
-    public List<Protocol> getBaseProtocols(ProtocolVersion serverVersion) {
+    public List<Protocol> getBaseProtocols(@Nullable ProtocolVersion clientVersion, @Nullable ProtocolVersion serverVersion) {
         final List<Protocol> list = new ArrayList<>();
-        for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(baseProtocols)) {
-            if (rangeProtocol.key().contains(serverVersion)) {
-                list.add(rangeProtocol.value());
+        if (clientVersion != null) {
+            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(serverboundBaseProtocols)) {
+                if (rangeProtocol.key().contains(clientVersion)) {
+                    list.add(rangeProtocol.value());
+                }
+            }
+        }
+        if (serverVersion != null) {
+            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(clientboundBaseProtocols)) {
+                if (rangeProtocol.key().contains(serverVersion)) {
+                    list.add(rangeProtocol.value());
+                }
             }
         }
         return list;
