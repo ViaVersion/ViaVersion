@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocol.version.BaseVersionProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,6 +136,7 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             try {
                 final List<Protocol> protocols = new ArrayList<>(pipeline.pipes());
                 protocols.removeAll(alreadyAdded); // Skip all manually added protocols to prevent double handling
+                wrapper.resetReader();
                 wrapper.apply(Direction.SERVERBOUND, State.HANDSHAKE, protocols);
             } catch (CancelException e) {
                 wrapper.cancel();
