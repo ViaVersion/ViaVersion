@@ -96,8 +96,10 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             ProtocolManager protocolManager = Via.getManager().getProtocolManager();
             List<ProtocolPathEntry> protocolPath = protocolManager.getProtocolPath(info.protocolVersion(), serverProtocol);
 
-            // Add Base Protocol
             ProtocolPipeline pipeline = info.getPipeline();
+
+            // Save manually added protocols for later
+            List<Protocol> alreadyAdded = new ArrayList<>(pipeline.pipes());
 
             // Special versions might compare equal to normal versions and would the normal lookup,
             // platforms can use the RedirectProtocolVersion API or need to manually handle their base protocols.
@@ -108,6 +110,7 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 baseProtocolVersion = version.getBaseProtocolVersion();
             }
             if (baseProtocolVersion != null) {
+                // Add base protocols
                 for (final Protocol protocol : protocolManager.getBaseProtocols(baseProtocolVersion)) {
                     pipeline.add(protocol);
                 }
@@ -133,7 +136,7 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             // Send client intention into the pipeline in case protocols down the line need to transform it
             try {
                 final List<Protocol> protocols = new ArrayList<>(pipeline.pipes());
-                protocols.remove(this);
+                protocols.removeAll(alreadyAdded); // Skip all manually added protocols to prevent double handling
                 wrapper.apply(Direction.SERVERBOUND, State.HANDSHAKE, protocols);
             } catch (CancelException e) {
                 throw new RuntimeException("Cancelling the client intention packet is not allowed", e);
