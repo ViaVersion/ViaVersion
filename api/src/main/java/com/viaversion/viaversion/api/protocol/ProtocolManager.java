@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.protocol;
 import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -73,13 +74,14 @@ public interface ProtocolManager {
     Protocol getBaseProtocol();
 
     /**
-     * Returns the base protocols for a specific server protocol version.
+     * Returns the base protocols for a specific server and client protocol version.
      * The standard base protocols deal with status and login packets for userconnection initialization.
      *
+     * @param clientVersion client protocol version
      * @param serverVersion server protocol version
-     * @return base protocols for the given server protocol version if present, else null
+     * @return base protocols for the given server and client protocol version
      */
-    List<Protocol> getBaseProtocols(ProtocolVersion serverVersion);
+    List<Protocol> getBaseProtocols(@Nullable ProtocolVersion clientVersion, @Nullable ProtocolVersion serverVersion);
 
     /**
      * Returns an immutable collection of registered protocols.
@@ -120,11 +122,12 @@ public interface ProtocolManager {
      * Registers and initializes a base protocol. Base Protocols registered later have higher priority.
      * Only base protocol will always be added to pipeline.
      *
+     * @param direction          direction of the base protocol
      * @param baseProtocol       base protocol to register
      * @param supportedProtocols protocol versions supported by the base protocol
      * @throws IllegalArgumentException if the protocol is not a base protocol as given by {@link Protocol#isBaseProtocol()}
      */
-    void registerBaseProtocol(Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols);
+    void registerBaseProtocol(Direction direction, Protocol baseProtocol, Range<ProtocolVersion> supportedProtocols);
 
     /**
      * Calculates and returns the protocol path from a client protocol version to server protocol version.
