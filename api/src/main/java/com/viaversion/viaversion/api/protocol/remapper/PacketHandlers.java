@@ -54,7 +54,7 @@ public abstract class PacketHandlers implements PacketHandler {
      * @param type type to map
      */
     public <T> void map(Type<T> type) {
-        handler(wrapper -> wrapper.write(type, wrapper.read(type)));
+        handler(wrapper -> wrapper.passthrough(type));
     }
 
     /**

@@ -334,11 +334,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerTracker(packetType, entityType, Types.VAR_INT);
     }
 
-    /**
-     * Sub 1.17 method for entity remove packets.
-     *
-     * @param packetType remove entities packet type
-     */
     public void registerRemoveEntities(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int[] entityIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
@@ -349,34 +344,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         });
     }
 
-    /**
-     * 1.17+ method for entity remove packets.
-     *
-     * @param packetType remove entities packet type
-     */
-    public void registerRemoveEntity(C packetType) {
+    public void registerSetEntityData(C packetType, @Nullable Type<List<EntityData>> dataType, Type<List<EntityData>> mappedDataType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int entityId = wrapper.passthrough(Types.VAR_INT);
-            tracker(wrapper.user()).removeEntity(entityId);
-        });
-    }
-
-    public void registerSetEntityData(C packetType, @Nullable Type<List<EntityData>> dataType, Type<List<EntityData>> mappedDataType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                if (dataType != null) {
-                    map(dataType, mappedDataType);
-                } else {
-                    map(mappedDataType);
-                }
-                handler(wrapper -> {
-                    int entityId = wrapper.get(Types.VAR_INT, 0);
-                    List<EntityData> entityData = wrapper.get(mappedDataType, 0);
-                    handleEntityData(entityId, entityData, wrapper.user());
-                });
+            List<EntityData> entityData;
+            if (dataType != null) {
+                entityData = wrapper.read(dataType);
+                wrapper.write(mappedDataType, entityData);
+            } else {
+                entityData = wrapper.passthrough(mappedDataType);
             }
+            handleEntityData(entityId, entityData, wrapper.user());
         });
     }
 

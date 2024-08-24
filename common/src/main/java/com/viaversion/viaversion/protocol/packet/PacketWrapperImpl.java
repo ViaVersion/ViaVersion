@@ -133,23 +133,26 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T read(Type<T> type) {
-        if (readableObjects.isEmpty()) {
-            Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
-            // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
-            try {
-                return type.read(inputBuffer);
-            } catch (Exception e) {
-                throw createInformativeException(e, type, packetValues.size() + 1);
-            }
-        }
+        return readableObjects.isEmpty() ? readFromBuffer(type) : pollReadableObject(type).value;
+    }
 
-        PacketValue readValue = readableObjects.poll();
+    private <T> T readFromBuffer(Type<T> type) {
+        Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
+        try {
+            return type.read(inputBuffer);
+        } catch (Exception e) {
+            throw createInformativeException(e, type, packetValues.size() + 1);
+        }
+    }
+
+    private <T> PacketValue<T> pollReadableObject(Type<T> type) {
+        PacketValue<?> readValue = readableObjects.poll();
         Type<?> readType = readValue.type();
         if (readType == type
             || (type.getBaseClass() == readType.getBaseClass()
             && type.getOutputClass() == readType.getOutputClass())) {
             //noinspection unchecked
-            return (T) readValue.value();
+            return (PacketValue<T>) readValue;
         } else {
             throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + readValue.type().getTypeName()), type, readableObjects.size());
         }
@@ -182,9 +185,15 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T passthrough(Type<T> type) throws InformativeException {
-        T value = read(type);
-        write(type, value);
-        return value;
+        if (readableObjects.isEmpty()) {
+            T value = readFromBuffer(type);
+            packetValues.add(new PacketValue<>(type, value));
+            return value;
+        } else {
+            PacketValue<T> value = pollReadableObject(type);
+            packetValues.add(value);
+            return value.value;
+        }
     }
 
     @Override
