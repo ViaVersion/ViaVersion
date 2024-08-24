@@ -108,7 +108,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             final byte action = wrapper.passthrough(Types.BYTE); // Method
             if (action == 0 || action == 2) {
                 convertComponent(wrapper); // Display Name
-                int render = wrapper.passthrough(Types.VAR_INT); // Render type
+                final int render = wrapper.passthrough(Types.VAR_INT); // Render type
                 if (render == 0 && Via.getConfig().hideScoreboardNumbers()) { // 0 = "integer", 1 = "hearts"
                     wrapper.write(Types.BOOLEAN, true); // has number format
                     wrapper.write(Types.VAR_INT, 0); // Blank format
