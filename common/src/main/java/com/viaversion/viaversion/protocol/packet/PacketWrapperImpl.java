@@ -123,7 +123,7 @@ public class PacketWrapperImpl implements PacketWrapper {
                 continue;
             }
             if (currentIndex == index) {
-                packetValue.setValue(attemptTransform(type, value));
+                packetValue.setValue(value);
                 return;
             }
             currentIndex++;
@@ -160,7 +160,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        packetValues.add(new PacketValue<>(type, attemptTransform(type, value)));
+        packetValues.add(new PacketValue<>(type, value));
     }
 
     /**
@@ -170,7 +170,7 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @param value        value
      * @return value if already matching, else the converted value or possibly unmatched value
      */
-    private <T> @Nullable T attemptTransform(Type<T> expectedType, @Nullable T value) {
+    private <T> @Nullable T attemptTransform(Type<T> expectedType, @Nullable Object value) {
         if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
             // Attempt conversion
             if (expectedType instanceof TypeConverter<?>) {
@@ -180,7 +180,8 @@ public class PacketWrapperImpl implements PacketWrapper {
 
             Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());
         }
-        return value;
+        //noinspection unchecked
+        return (T) value;
     }
 
     @Override
@@ -194,6 +195,14 @@ public class PacketWrapperImpl implements PacketWrapper {
             packetValues.add(value);
             return value.value;
         }
+    }
+
+    @Override
+    public <T> T passthroughAndMap(Type<?> type, Type<T> mappedType) throws InformativeException {
+        final Object value = read(type);
+        final T mappedValue = attemptTransform(mappedType, value);
+        write(mappedType, mappedValue);
+        return mappedValue;
     }
 
     @Override

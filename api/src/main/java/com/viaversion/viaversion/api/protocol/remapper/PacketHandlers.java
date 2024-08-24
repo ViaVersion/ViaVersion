@@ -63,8 +63,8 @@ public abstract class PacketHandlers implements PacketHandler {
      * @param oldType old type
      * @param newType new type
      */
-    public void map(Type oldType, Type newType) {
-        handler(wrapper -> wrapper.write(newType, wrapper.read(oldType)));
+    public void map(Type<?> oldType, Type<?> newType) {
+        handler(wrapper -> wrapper.passthroughAndMap(oldType, newType));
     }
 
     /**
