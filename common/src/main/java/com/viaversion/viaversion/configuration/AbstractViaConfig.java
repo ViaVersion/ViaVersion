@@ -94,6 +94,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean enforceSecureChat;
     private boolean handleInvalidItemCount;
     private boolean cancelBlockSounds;
+    private boolean hideScoreboardNumbers;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -161,6 +162,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         enforceSecureChat = getBoolean("enforce-secure-chat", false);
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
         cancelBlockSounds = getBoolean("cancel-block-sounds", true);
+        hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -541,5 +543,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean cancelBlockSounds() {
         return cancelBlockSounds;
+    }
+
+    @Override
+    public boolean hideScoreboardNumbers() {
+        return hideScoreboardNumbers;
     }
 }
