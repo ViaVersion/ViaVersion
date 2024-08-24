@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_2to1_20_3;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -107,8 +108,13 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             final byte action = wrapper.passthrough(Types.BYTE); // Method
             if (action == 0 || action == 2) {
                 convertComponent(wrapper); // Display Name
-                wrapper.passthrough(Types.VAR_INT); // Render type
-                wrapper.write(Types.BOOLEAN, false); // Null number format
+                int render = wrapper.passthrough(Types.VAR_INT); // Render type
+                if (render == 0 && Via.getConfig().hideScoreboardNumbers()) { // 0 = "integer", 1 = "hearts"
+                    wrapper.write(Types.BOOLEAN, true); // has number format
+                    wrapper.write(Types.VAR_INT, 0); // Blank format
+                } else {
+                    wrapper.write(Types.BOOLEAN, false); // has number format
+                }
             }
         });
 
