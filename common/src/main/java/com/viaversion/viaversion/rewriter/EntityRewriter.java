@@ -110,7 +110,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     public void handleEntityData(final int entityId, final List<EntityData> dataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
-        for (final EntityData entityData : dataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
+
+        // Iterate over indexed list to allow for removal and addition of elements, decrease current index and size if an element is removed
+        int size = dataList.size();
+        for (int i = 0; i < size; i++) {
+            final EntityData entityData = dataList.get(i);
             EntityDataHandlerEvent event = null;
             for (final EntityDataFilter filter : entityDataFilters) {
                 if (!filter.isFiltered(type, entityData)) {
@@ -125,13 +129,15 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     filter.handler().handle(event, entityData);
                 } catch (final Exception e) {
                     logException(e, type, dataList, entityData);
-                    dataList.remove(entityData);
+                    dataList.remove(i--);
+                    size--;
                     break;
                 }
 
                 if (event.cancelled()) {
                     // Remove entity data, and break current filter loop
-                    dataList.remove(entityData);
+                    dataList.remove(i--);
+                    size--;
                     break;
                 }
             }
