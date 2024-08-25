@@ -83,7 +83,7 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> {
             if (wrapper.isReadable(Types.COMPONENT, 0)) {
                 // Already written as component in the base protocol
                 return;

@@ -232,7 +232,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         cancelServerbound(ServerboundPackets1_19.CHAT_PREVIEW);
 
         // Login changes
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.UUID); // UUID
@@ -241,7 +241,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING); // Server id
@@ -253,7 +253,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING); // Name
@@ -261,7 +261,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
+        registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.BYTE_ARRAY_PRIMITIVE); // Keys

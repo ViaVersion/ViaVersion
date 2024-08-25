@@ -81,14 +81,14 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.AWARD_STATS);
 
         // Login Success
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
             // Transform string to a uuid
             UUID uuid = UUID.fromString(wrapper.read(Types.STRING));
             wrapper.write(Types.UUID, uuid);
         });
 
         // Motd Status - line breaks are no longer allowed for player samples
-        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), wrapper -> {
+        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE, wrapper -> {
             String original = wrapper.passthrough(Types.STRING);
             JsonObject object = GsonUtil.getGson().fromJson(original, JsonObject.class);
             JsonObject players = object.getAsJsonObject("players");
