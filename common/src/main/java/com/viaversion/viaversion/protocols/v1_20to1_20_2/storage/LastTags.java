@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_20to1_20_2.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.TagData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.Protocol1_20To1_20_2;
@@ -34,15 +35,14 @@ public class LastTags implements StorableObject {
     public LastTags(final PacketWrapper wrapper) {
         final int length = wrapper.passthrough(Types.VAR_INT);
         for (int i = 0; i < length; i++) {
-            final List<Tag> tags = new ArrayList<>();
+            final List<TagData> tags = new ArrayList<>();
             final String registryKey = wrapper.passthrough(Types.STRING);
             final int tagsSize = wrapper.passthrough(Types.VAR_INT);
             for (int j = 0; j < tagsSize; j++) {
                 final String key = wrapper.passthrough(Types.STRING);
                 final int[] ids = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
-                tags.add(new Tag(key, ids));
+                tags.add(new TagData(key, ids));
             }
-
             this.registryTags.add(new RegistryTags(registryKey, tags));
         }
     }
@@ -57,17 +57,14 @@ public class LastTags implements StorableObject {
         for (final RegistryTags registryTag : registryTags) {
             packet.write(Types.STRING, registryTag.registryKey);
             packet.write(Types.VAR_INT, registryTag.tags.size());
-            for (final Tag tag : registryTag.tags) {
-                packet.write(Types.STRING, tag.key);
-                packet.write(Types.VAR_INT_ARRAY_PRIMITIVE, Arrays.copyOf(tag.ids, tag.ids.length));
+            for (final TagData tag : registryTag.tags) {
+                packet.write(Types.STRING, tag.identifier());
+                packet.write(Types.VAR_INT_ARRAY_PRIMITIVE, Arrays.copyOf(tag.entries(), tag.entries().length));
             }
         }
         packet.send(Protocol1_20To1_20_2.class);
     }
 
-    private record RegistryTags(String registryKey, List<Tag> tags) {
-    }
-
-    private record Tag(String key, int[] ids) {
+    private record RegistryTags(String registryKey, List<TagData> tags) {
     }
 }

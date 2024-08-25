@@ -199,6 +199,10 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T passthroughAndMap(Type<?> type, Type<T> mappedType) throws InformativeException {
+        if (type == mappedType) {
+            return passthrough(mappedType);
+        }
+
         final Object value = read(type);
         final T mappedValue = attemptTransform(mappedType, value);
         write(mappedType, mappedValue);

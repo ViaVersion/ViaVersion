@@ -95,17 +95,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerSetContent(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Window id
-                handler(wrapper -> {
-                    Item[] items = wrapper.read(itemArrayType);
-                    wrapper.write(mappedItemArrayType, items);
-                    for (int i = 0; i < items.length; i++) {
-                        items[i] = handleItemToClient(wrapper.user(), items[i]);
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            Item[] items = wrapper.passthroughAndMap(itemArrayType, mappedItemArrayType);
+            for (int i = 0; i < items.length; i++) {
+                items[i] = handleItemToClient(wrapper.user(), items[i]);
             }
         });
     }
@@ -117,8 +111,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Types.UNSIGNED_BYTE); // Window id
                 map(Types.VAR_INT); // State id
                 handler(wrapper -> {
-                    Item[] items = wrapper.read(itemArrayType);
-                    wrapper.write(mappedItemArrayType, items);
+                    Item[] items = wrapper.passthroughAndMap(itemArrayType, mappedItemArrayType);
                     for (int i = 0; i < items.length; i++) {
                         items[i] = handleItemToClient(wrapper.user(), items[i]);
                     }
@@ -522,9 +515,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                 map(Types.FLOAT); // Particle Data
                 map(Types.INT); // Particle Count
                 handler(wrapper -> {
-                    final Particle particle = wrapper.read(particleType);
+                    final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
                     rewriteParticle(wrapper.user(), particle);
-                    wrapper.write(mappedParticleType, particle);
                 });
             }
         });
@@ -548,10 +540,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
             wrapper.passthrough(Types.FLOAT); // Knockback Z
             wrapper.passthrough(Types.VAR_INT); // Block interaction type
 
-            final Particle smallExplosionParticle = wrapper.read(particleType);
-            final Particle largeExplosionParticle = wrapper.read(particleType);
-            wrapper.write(mappedParticleType, smallExplosionParticle);
-            wrapper.write(mappedParticleType, largeExplosionParticle);
+            final Particle smallExplosionParticle = wrapper.passthroughAndMap(particleType, mappedParticleType);
+            final Particle largeExplosionParticle = wrapper.passthroughAndMap(particleType, mappedParticleType);
             rewriteParticle(wrapper.user(), smallExplosionParticle);
             rewriteParticle(wrapper.user(), largeExplosionParticle);
 
