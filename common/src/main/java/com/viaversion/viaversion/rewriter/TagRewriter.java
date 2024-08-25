@@ -125,13 +125,13 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
     }
 
     public void registerGeneric(C packetType) {
-        protocol.registerClientbound(packetType, getGenericHandler());
+        protocol.registerClientbound(packetType, this::handleGeneric);
     }
 
     public PacketHandler getHandler(@Nullable RegistryType readUntilType) {
         return wrapper -> {
             for (RegistryType type : RegistryType.getValues()) {
-                handle(wrapper, getRewriter(type), getNewTags(type), toRename.get(type), toRemove.get(type));
+                handle(wrapper, type);
 
                 // Stop iterating
                 if (type == readUntilType) {
@@ -141,40 +141,46 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
         };
     }
 
-    public PacketHandler getGenericHandler() {
-        return wrapper -> {
-            final int length = wrapper.passthrough(Types.VAR_INT);
-            int editedLength = length;
-            for (int i = 0; i < length; i++) {
-                String registryKey = wrapper.read(Types.STRING);
-                if (toRemoveRegistries.contains(Key.stripMinecraftNamespace(registryKey))) {
-                    wrapper.set(Types.VAR_INT, 0, --editedLength);
-                    int tagsSize = wrapper.read(Types.VAR_INT);
-                    for (int j = 0; j < tagsSize; j++) {
-                        wrapper.read(Types.STRING);
-                        wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
-                    }
-                    continue;
+    public void handleGeneric(final PacketWrapper wrapper) {
+        final int length = wrapper.passthrough(Types.VAR_INT);
+        int editedLength = length;
+        for (int i = 0; i < length; i++) {
+            final String registryKey = wrapper.read(Types.STRING);
+            if (toRemoveRegistries.contains(Key.stripMinecraftNamespace(registryKey))) {
+                wrapper.set(Types.VAR_INT, 0, --editedLength);
+                final int tagsSize = wrapper.read(Types.VAR_INT);
+                for (int j = 0; j < tagsSize; j++) {
+                    wrapper.read(Types.STRING);
+                    wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
                 }
-
-                wrapper.write(Types.STRING, registryKey);
-                registryKey = Key.stripMinecraftNamespace(registryKey);
-
-                RegistryType type = RegistryType.getByKey(registryKey);
-                if (type != null) {
-                    handle(wrapper, getRewriter(type), getNewTags(type), toRename.get(type), toRemove.get(type));
-                } else {
-                    handle(wrapper, null, null, null, null);
-                }
+                continue;
             }
-        };
+
+            wrapper.write(Types.STRING, registryKey);
+            handle(wrapper, Key.stripMinecraftNamespace(registryKey));
+        }
     }
 
-    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags) {
-        handle(wrapper, rewriteFunction, newTags, null, null);
+    public void handle(final PacketWrapper wrapper, final String registryKey) {
+        final RegistryType type = RegistryType.getByKey(registryKey);
+        if (type != null) {
+            handle(wrapper, type);
+        } else {
+            handle(wrapper, null, null, null, null);
+        }
     }
 
-    public void handle(PacketWrapper wrapper, @Nullable IdRewriteFunction rewriteFunction, @Nullable List<TagData> newTags, @Nullable Map<String, String> tagsToRename, @Nullable Set<String> tagsToRemove) {
+    public void handle(PacketWrapper wrapper, RegistryType registryType) {
+        handle(wrapper, getRewriter(registryType), getNewTags(registryType), toRename.get(registryType), toRemove.get(registryType));
+    }
+
+    protected void handle(
+        PacketWrapper wrapper,
+        @Nullable IdRewriteFunction rewriteFunction,
+        @Nullable List<TagData> newTags,
+        @Nullable Map<String, String> tagsToRename,
+        @Nullable Set<String> tagsToRemove
+    ) {
         final int tagsSize = wrapper.read(Types.VAR_INT);
         final List<TagData> tags = new ArrayList<>(newTags != null ? tagsSize + newTags.size() : tagsSize);
         final Set<String> currentTags = new HashSet<>(tagsSize);

@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_2to1_20_3;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -28,18 +29,11 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvide
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.CommandRewriter1_19_4;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundConfigurationPackets1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacket1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPackets1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
-import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundConfigurationPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
@@ -47,6 +41,12 @@ import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ServerboundPackets1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.BlockItemPacketRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.EntityPacketRewriter1_20_3;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacket1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPackets1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
+import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -107,8 +107,13 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             final byte action = wrapper.passthrough(Types.BYTE); // Method
             if (action == 0 || action == 2) {
                 convertComponent(wrapper); // Display Name
-                wrapper.passthrough(Types.VAR_INT); // Render type
-                wrapper.write(Types.BOOLEAN, false); // Null number format
+                final int render = wrapper.passthrough(Types.VAR_INT); // Render type
+                if (render == 0 && Via.getConfig().hideScoreboardNumbers()) { // 0 = "integer", 1 = "hearts"
+                    wrapper.write(Types.BOOLEAN, true); // has number format
+                    wrapper.write(Types.VAR_INT, 0); // Blank format
+                } else {
+                    wrapper.write(Types.BOOLEAN, false); // has number format
+                }
             }
         });
 
@@ -300,7 +305,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
         registerServerbound(ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, resourcePackStatusHandler());
         registerClientbound(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH, resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
-        registerClientbound(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, tagRewriter.getGenericHandler());
+        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
     }
 
     private PacketHandler resourcePackStatusHandler() {

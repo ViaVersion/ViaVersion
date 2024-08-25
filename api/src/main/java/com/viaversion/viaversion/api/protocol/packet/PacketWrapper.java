@@ -146,6 +146,18 @@ public interface PacketWrapper {
     <T> T passthrough(Type<T> type) throws InformativeException;
 
     /**
+     * Take a value from the input and write to the output, mapping the output type.
+     * This only works for types implementing {@link com.viaversion.viaversion.api.type.TypeConverter}, which is generally only the primitive wrapper types.
+     *
+     * @param type       The type to read.
+     * @param mappedType The type to write.
+     * @param <T>        The return type of the type you wish to pass through.
+     * @return The type which was read/written.
+     * @throws InformativeException If it failed to read or write
+     */
+    <T> T passthroughAndMap(Type<?> type, Type<T> mappedType) throws InformativeException;
+
+    /**
      * Take all the inputs and write them to the output.
      *
      * @throws InformativeException If it failed to read or write

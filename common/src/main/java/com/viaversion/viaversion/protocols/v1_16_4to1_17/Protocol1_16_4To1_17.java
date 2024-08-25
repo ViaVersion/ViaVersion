@@ -68,7 +68,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
                 wrapper.write(Types.STRING, type.resourceLocation());
 
                 // Id conversion
-                tagRewriter.handle(wrapper, tagRewriter.getRewriter(type), tagRewriter.getNewTags(type));
+                tagRewriter.handle(wrapper, type);
 
                 // Stop iterating after entity types
                 if (type == RegistryType.ENTITY) {

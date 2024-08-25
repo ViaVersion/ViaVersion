@@ -158,8 +158,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleIngredient(final PacketWrapper wrapper) {
-        final Item[] items = wrapper.read(itemArrayType());
-        wrapper.write(mappedItemArrayType(), items);
+        final Item[] items = wrapper.passthroughAndMap(itemArrayType(), mappedItemArrayType());
         for (int i = 0; i < items.length; i++) {
             Item item = items[i];
             items[i] = rewrite(wrapper.user(), item);

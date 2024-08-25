@@ -164,6 +164,9 @@ enforce-secure-chat: false
 # Handles items with invalid count values (higher than max stack size) on 1.20.3 servers.
 handle-invalid-item-count: false
 #
+# Hides scoreboard numbers for 1.20.3+ clients on older server versions.
+hide-scoreboard-numbers: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

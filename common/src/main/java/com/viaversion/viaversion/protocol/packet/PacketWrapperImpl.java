@@ -123,7 +123,7 @@ public class PacketWrapperImpl implements PacketWrapper {
                 continue;
             }
             if (currentIndex == index) {
-                packetValue.setValue(attemptTransform(type, value));
+                packetValue.setValue(value);
                 return;
             }
             currentIndex++;
@@ -133,23 +133,26 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> T read(Type<T> type) {
-        if (readableObjects.isEmpty()) {
-            Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
-            // We could in the future log input read values, but honestly for things like bulk maps, mem waste D:
-            try {
-                return type.read(inputBuffer);
-            } catch (Exception e) {
-                throw createInformativeException(e, type, packetValues.size() + 1);
-            }
-        }
+        return readableObjects.isEmpty() ? readFromBuffer(type) : pollReadableObject(type).value;
+    }
 
-        PacketValue readValue = readableObjects.poll();
+    private <T> T readFromBuffer(Type<T> type) {
+        Preconditions.checkNotNull(inputBuffer, "This packet does not have an input buffer.");
+        try {
+            return type.read(inputBuffer);
+        } catch (Exception e) {
+            throw createInformativeException(e, type, packetValues.size() + 1);
+        }
+    }
+
+    private <T> PacketValue<T> pollReadableObject(Type<T> type) {
+        PacketValue<?> readValue = readableObjects.poll();
         Type<?> readType = readValue.type();
         if (readType == type
             || (type.getBaseClass() == readType.getBaseClass()
             && type.getOutputClass() == readType.getOutputClass())) {
             //noinspection unchecked
-            return (T) readValue.value();
+            return (PacketValue<T>) readValue;
         } else {
             throw createInformativeException(new IOException("Unable to read type " + type.getTypeName() + ", found " + readValue.type().getTypeName()), type, readableObjects.size());
         }
@@ -157,7 +160,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        packetValues.add(new PacketValue<>(type, attemptTransform(type, value)));
+        packetValues.add(new PacketValue<>(type, value));
     }
 
     /**
@@ -167,7 +170,7 @@ public class PacketWrapperImpl implements PacketWrapper {
      * @param value        value
      * @return value if already matching, else the converted value or possibly unmatched value
      */
-    private <T> @Nullable T attemptTransform(Type<T> expectedType, @Nullable T value) {
+    private <T> @Nullable T attemptTransform(Type<T> expectedType, @Nullable Object value) {
         if (value != null && !expectedType.getOutputClass().isAssignableFrom(value.getClass())) {
             // Attempt conversion
             if (expectedType instanceof TypeConverter<?>) {
@@ -177,14 +180,33 @@ public class PacketWrapperImpl implements PacketWrapper {
 
             Via.getPlatform().getLogger().warning("Possible type mismatch: " + value.getClass().getName() + " -> " + expectedType.getOutputClass());
         }
-        return value;
+        //noinspection unchecked
+        return (T) value;
     }
 
     @Override
     public <T> T passthrough(Type<T> type) throws InformativeException {
-        T value = read(type);
-        write(type, value);
-        return value;
+        if (readableObjects.isEmpty()) {
+            T value = readFromBuffer(type);
+            packetValues.add(new PacketValue<>(type, value));
+            return value;
+        } else {
+            PacketValue<T> value = pollReadableObject(type);
+            packetValues.add(value);
+            return value.value;
+        }
+    }
+
+    @Override
+    public <T> T passthroughAndMap(Type<?> type, Type<T> mappedType) throws InformativeException {
+        if (type == mappedType) {
+            return passthrough(mappedType);
+        }
+
+        final Object value = read(type);
+        final T mappedValue = attemptTransform(mappedType, value);
+        write(mappedType, mappedValue);
+        return mappedValue;
     }
 
     @Override

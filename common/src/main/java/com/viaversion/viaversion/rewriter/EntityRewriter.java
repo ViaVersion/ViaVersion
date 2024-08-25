@@ -38,7 +38,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
@@ -111,7 +110,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     public void handleEntityData(final int entityId, final List<EntityData> dataList, final UserConnection connection) {
         final TrackedEntity entity = tracker(connection).entity(entityId);
         final EntityType type = entity != null ? entity.entityType() : null;
-        for (final EntityData entityData : dataList.toArray(EMPTY_ARRAY)) { // Copy the list to allow mutation
+
+        // Iterate over indexed list to allow for removal and addition of elements, decrease current index and size if an element is removed
+        int size = dataList.size();
+        for (int i = 0; i < size; i++) {
+            final EntityData entityData = dataList.get(i);
             EntityDataHandlerEvent event = null;
             for (final EntityDataFilter filter : entityDataFilters) {
                 if (!filter.isFiltered(type, entityData)) {
@@ -126,13 +129,15 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     filter.handler().handle(event, entityData);
                 } catch (final Exception e) {
                     logException(e, type, dataList, entityData);
-                    dataList.remove(entityData);
+                    dataList.remove(i--);
+                    size--;
                     break;
                 }
 
                 if (event.cancelled()) {
                     // Remove entity data, and break current filter loop
-                    dataList.remove(entityData);
+                    dataList.remove(i--);
+                    size--;
                     break;
                 }
             }
@@ -334,11 +339,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerTracker(packetType, entityType, Types.VAR_INT);
     }
 
-    /**
-     * Sub 1.17 method for entity remove packets.
-     *
-     * @param packetType remove entities packet type
-     */
     public void registerRemoveEntities(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int[] entityIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
@@ -349,34 +349,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         });
     }
 
-    /**
-     * 1.17+ method for entity remove packets.
-     *
-     * @param packetType remove entities packet type
-     */
-    public void registerRemoveEntity(C packetType) {
+    public void registerSetEntityData(C packetType, @Nullable Type<List<EntityData>> dataType, Type<List<EntityData>> mappedDataType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int entityId = wrapper.passthrough(Types.VAR_INT);
-            tracker(wrapper.user()).removeEntity(entityId);
-        });
-    }
-
-    public void registerSetEntityData(C packetType, @Nullable Type<List<EntityData>> dataType, Type<List<EntityData>> mappedDataType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                if (dataType != null) {
-                    map(dataType, mappedDataType);
-                } else {
-                    map(mappedDataType);
-                }
-                handler(wrapper -> {
-                    int entityId = wrapper.get(Types.VAR_INT, 0);
-                    List<EntityData> entityData = wrapper.get(mappedDataType, 0);
-                    handleEntityData(entityId, entityData, wrapper.user());
-                });
+            List<EntityData> entityData;
+            if (dataType != null) {
+                entityData = wrapper.read(dataType);
+                wrapper.write(mappedDataType, entityData);
+            } else {
+                entityData = wrapper.passthrough(mappedDataType);
             }
+            handleEntityData(entityId, entityData, wrapper.user());
         });
     }
 
@@ -622,12 +605,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
-    }
-
-    public void rewriteParticle(PacketWrapper wrapper, Type<Particle> from, Type<Particle> to) {
-        final Particle particle = wrapper.read(from);
-        rewriteParticle(wrapper.user(), particle);
-        wrapper.write(to, particle);
     }
 
     private void logException(Exception e, @Nullable EntityType type, List<EntityData> entityDataList, EntityData entityData) {

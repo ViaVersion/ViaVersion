@@ -29,6 +29,11 @@ public abstract class StoredObject implements StorableObject {
         this.user = user;
     }
 
+    public UserConnection user() {
+        return this.user;
+    }
+
+    @Deprecated
     public UserConnection getUser() {
         return user;
     }

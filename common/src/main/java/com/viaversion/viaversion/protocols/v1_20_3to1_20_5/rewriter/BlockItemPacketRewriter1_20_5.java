@@ -304,8 +304,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             wrapper.passthrough(Types.FLOAT); // Knockback Z
             wrapper.passthrough(Types.VAR_INT); // Block interaction type
 
-            protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Small explosion particle
-            protocol.getEntityRewriter().rewriteParticle(wrapper, Types1_20_3.PARTICLE, Types1_20_5.PARTICLE); // Large explosion particle
+            final Particle smallExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
+            final Particle largeExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
+            rewriteParticle(wrapper.user(), smallExplosionParticle);
+            rewriteParticle(wrapper.user(), largeExplosionParticle);
 
             final String sound = wrapper.read(Types.STRING);
             final Float range = wrapper.read(Types.OPTIONAL_FLOAT);
