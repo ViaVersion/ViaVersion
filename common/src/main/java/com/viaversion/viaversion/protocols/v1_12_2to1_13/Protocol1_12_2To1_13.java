@@ -173,11 +173,11 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
 
         WorldPacketRewriter1_13.register(this);
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> {
             componentRewriter.processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
 
-        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketHandlers() {
+        registerClientbound(State.STATUS, ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING);
