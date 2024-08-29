@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.base.v1_7;
 
+import com.google.gson.JsonObject;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.packet.BaseClientboundPacket;
 import com.viaversion.viaversion.protocols.base.packet.BasePacketTypesProvider;
 import com.viaversion.viaversion.protocols.base.packet.BaseServerboundPacket;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.ComponentUtil;
 import io.netty.channel.ChannelFuture;
@@ -62,10 +64,16 @@ public class ServerboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
 
                 final String disconnectMessage = ChatColorUtil.translateAlternateColorCodes(Via.getConfig().getBlockedDisconnectMsg());
                 final PacketWrapper disconnectPacket = PacketWrapper.create(ClientboundLoginPackets.LOGIN_DISCONNECT, user);
-                disconnectPacket.write(Types.COMPONENT, ComponentUtil.plainToJson(disconnectMessage));
+
+                final JsonObject object = ComponentUtil.plainToJson(disconnectMessage);
+                if (protocol.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                    disconnectPacket.write(Types.STRING, object.toString());
+                } else {
+                    disconnectPacket.write(Types.COMPONENT, object);
+                }
 
                 // Send and close
-                final ChannelFuture future = disconnectPacket.sendFuture(null);
+                final ChannelFuture future = disconnectPacket.sendFutureRaw();
                 future.addListener(f -> user.getChannel().close());
             }
         });
