@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdHolder;
@@ -118,7 +119,11 @@ public final class Particle implements IdHolder {
         }
 
         public ParticleData<T> copy() {
-            return new ParticleData<>(type, value);
+            if (value instanceof Item item) {
+                return new ParticleData<>(type, (T) item.copy());
+            } else {
+                return new ParticleData<>(type, value);
+            }
         }
 
         @Override
