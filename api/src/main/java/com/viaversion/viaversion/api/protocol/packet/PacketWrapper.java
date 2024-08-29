@@ -238,6 +238,14 @@ public interface PacketWrapper {
 
     /**
      * Sends this packet to the associated user, submitted to netty's event loop.
+     * <b>Unlike {@link #sendFuture(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
+     *
+     * @throws InformativeException if it fails to write
+     */
+    ChannelFuture sendFutureRaw() throws InformativeException;
+
+    /**
+     * Sends this packet to the associated user, submitted to netty's event loop.
      * <b>Unlike {@link #send(Class)}, this method does not handle the pipeline with packet id and data changes.</b>
      *
      * @throws InformativeException if it fails to write

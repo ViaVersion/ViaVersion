@@ -83,14 +83,7 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
     protected void registerPackets() {
         super.registerPackets();
 
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> {
-            if (wrapper.isReadable(Types.COMPONENT, 0)) {
-                // Already written as component in the base protocol
-                return;
-            }
-
-            STRING_TO_JSON.write(wrapper, wrapper.read(Types.STRING));
-        });
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_DISCONNECT, wrapper -> STRING_TO_JSON.write(wrapper, wrapper.read(Types.STRING)));
 
         // Other Handlers
         SpawnPacketRewriter1_9.register(this);

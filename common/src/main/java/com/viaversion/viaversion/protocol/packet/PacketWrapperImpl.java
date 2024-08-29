@@ -340,12 +340,27 @@ public class PacketWrapperImpl implements PacketWrapper {
             }
             return user().sendRawPacketFuture(output);
         }
-        return user().getChannel().newFailedFuture(new RuntimeException("Tried to send cancelled packet"));
+        return cancelledFuture();
     }
 
     @Override
     public void sendRaw() throws InformativeException {
         sendRaw(true);
+    }
+
+    @Override
+    public ChannelFuture sendFutureRaw() throws InformativeException {
+        if (isCancelled()) {
+            return cancelledFuture();
+        }
+
+        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        try {
+            writeToBuffer(output);
+            return user().sendRawPacketFuture(output.retain());
+        } finally {
+            output.release();
+        }
     }
 
     @Override
@@ -369,6 +384,10 @@ public class PacketWrapperImpl implements PacketWrapper {
         } finally {
             output.release();
         }
+    }
+
+    private ChannelFuture cancelledFuture() {
+        return user().getChannel().newFailedFuture(new RuntimeException("Tried to send cancelled packet"));
     }
 
     @Override
