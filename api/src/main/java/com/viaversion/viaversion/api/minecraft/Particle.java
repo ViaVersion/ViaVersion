@@ -72,6 +72,14 @@ public final class Particle implements IdHolder {
         arguments.set(index, new ParticleData<>(type, value));
     }
 
+    public Particle copy() {
+        final Particle particle = new Particle(id);
+        for (ParticleData<?> argument : arguments) {
+            particle.arguments.add(argument.copy());
+        }
+        return particle;
+    }
+
     @Override
     public String toString() {
         return "Particle{" +
@@ -107,6 +115,10 @@ public final class Particle implements IdHolder {
 
         public void write(final PacketWrapper wrapper) {
             wrapper.write(type, value);
+        }
+
+        public ParticleData<T> copy() {
+            return new ParticleData<>(type, value);
         }
 
         @Override
