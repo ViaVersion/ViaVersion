@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) {
 
@@ -43,6 +44,15 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
             buffer.writeBoolean(value.showInTooltip());
         }
     };
+
+    public AttributeModifiers1_21 rewrite(final Int2IntFunction rewriteFunction) {
+        final AttributeModifier[] modifiers = new AttributeModifier[this.modifiers.length];
+        for (int i = 0; i < this.modifiers.length; i++) {
+            final AttributeModifier modifier = this.modifiers[i];
+            modifiers[i] = new AttributeModifier(rewriteFunction.applyAsInt(modifier.attribute()), modifier.modifier(), modifier.slotType());
+        }
+        return new AttributeModifiers1_21(modifiers, showInTooltip);
+    }
 
     public record AttributeModifier(int attribute, ModifierData modifier, int slotType) {
 

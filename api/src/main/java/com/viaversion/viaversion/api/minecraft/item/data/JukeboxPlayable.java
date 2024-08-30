@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import com.viaversion.viaversion.util.Either;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record JukeboxPlayable(Either<Holder<JukeboxSong>, String> song, boolean showInTooltip) {
 
@@ -56,6 +57,20 @@ public record JukeboxPlayable(Either<Holder<JukeboxSong>, String> song, boolean 
         }
     };
 
+    public JukeboxPlayable rewrite(final Int2IntFunction soundIdRewriteFunction) {
+        if (song.isRight()) {
+            return this;
+        }
+
+        final Holder<JukeboxSong> songHolder = this.song.left();
+        if (songHolder.hasId()) {
+            return this;
+        }
+
+        final JukeboxSong rewrittenSong = songHolder.value().rewrite(soundIdRewriteFunction);
+        return rewrittenSong == songHolder.value() ? this : new JukeboxPlayable(Holder.of(rewrittenSong), showInTooltip);
+    }
+
     public record JukeboxSong(Holder<SoundEvent> soundEvent, Tag description,
                               float lengthInSeconds, int comparatorOutput) {
 
@@ -77,5 +92,10 @@ public record JukeboxPlayable(Either<Holder<JukeboxSong>, String> song, boolean 
                 Types.VAR_INT.writePrimitive(buffer, value.comparatorOutput);
             }
         };
+
+        public JukeboxSong rewrite(final Int2IntFunction soundIdRewriteFunction) {
+            final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+            return soundEvent == this.soundEvent ? this : new JukeboxSong(soundEvent, description, lengthInSeconds, comparatorOutput);
+        }
     }
 }

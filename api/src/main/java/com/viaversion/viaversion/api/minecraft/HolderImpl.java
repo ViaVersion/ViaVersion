@@ -23,6 +23,7 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 final class HolderImpl<T> implements Holder<T> {
 
@@ -59,6 +60,22 @@ final class HolderImpl<T> implements Holder<T> {
     @Override
     public int id() {
         return id;
+    }
+
+    @Override
+    public Holder<T> updateId(final Int2IntFunction rewriteFunction) {
+        if (isDirect()) {
+            return this;
+        }
+
+        final int rewrittenId = rewriteFunction.applyAsInt(id);
+        if (rewrittenId == id) {
+            return this;
+        }
+        if (rewrittenId == -1) {
+            throw new IllegalArgumentException("Received invalid id in updateId");
+        }
+        return Holder.of(rewrittenId);
     }
 
     @Override
