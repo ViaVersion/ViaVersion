@@ -48,8 +48,8 @@ public record Instrument1_20_5(Holder<SoundEvent> soundEvent, int useDuration, f
         }
     };
 
-    public Instrument rewrite(final Int2IntFunction soundIdRewriteFunction) {
+    public Instrument1_20_5 rewrite(final Int2IntFunction soundIdRewriteFunction) {
         final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
-        return soundEvent == this.soundEvent ? this : new Instrument(soundEvent, useDuration, range);
+        return soundEvent == this.soundEvent ? this : new Instrument1_20_5(soundEvent, useDuration, range);
     }
 }

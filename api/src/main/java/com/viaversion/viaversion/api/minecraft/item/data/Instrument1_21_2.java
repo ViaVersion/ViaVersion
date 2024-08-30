@@ -28,9 +28,9 @@ import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration, float range, @Nullable Tag description) {
+public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration, float range, Tag description) {
 
     public static final HolderType<Instrument1_21_2> TYPE = new HolderType<>() {
         @Override
@@ -51,4 +51,8 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
         }
     };
 
+    public Instrument1_21_2 rewrite(final Int2IntFunction soundIdRewriteFunction) {
+        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+        return soundEvent == this.soundEvent ? this : new Instrument1_21_2(soundEvent, useDuration, range, description);
+    }
 }

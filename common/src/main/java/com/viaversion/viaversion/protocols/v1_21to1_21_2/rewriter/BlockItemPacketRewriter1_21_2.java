@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
@@ -268,7 +269,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 return Holder.of(instrument.id());
             }
             final Instrument1_20_5 value = instrument.value();
-            return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration(), value.range(), null));
+            return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration(), value.range(), new StringTag("")));
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_21_2, food -> {
             // Just assume the item type default for CONSUMABLE; add USE_REMAINDER from old food properties

@@ -36,7 +36,6 @@ import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.rewriter.ItemPacketRewriter1_10;
 import com.viaversion.viaversion.protocols.v1_9_3to1_10.storage.ResourcePackTracker;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_3, ClientboundPackets1_9_3, ServerboundPackets1_9_3, ServerboundPackets1_9_3> {
 
@@ -49,12 +48,12 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
     public static final ValueTransformer<List<EntityData>, List<EntityData>> TRANSFORM_ENTITY_DATA = new ValueTransformer<>(Types1_9.ENTITY_DATA_LIST) {
         @Override
         public List<EntityData> transform(PacketWrapper wrapper, List<EntityData> inputValue) {
-            List<EntityData> dataList = new CopyOnWriteArrayList<>(inputValue);
-            for (EntityData data : dataList) {
-                if (data.id() >= 5)
+            for (EntityData data : inputValue) {
+                if (data.id() >= 5) {
                     data.setId(data.id() + 1);
+                }
             }
-            return dataList;
+            return inputValue;
         }
     };
     private final ItemPacketRewriter1_10 itemRewriter = new ItemPacketRewriter1_10(this);

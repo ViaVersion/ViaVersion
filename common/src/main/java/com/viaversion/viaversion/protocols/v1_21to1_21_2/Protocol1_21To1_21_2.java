@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
@@ -41,6 +42,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.BlockItemPacketRewriter1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ComponentRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRewriter1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -55,6 +57,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     private final EntityPacketRewriter1_21_2 entityRewriter = new EntityPacketRewriter1_21_2(this);
     private final BlockItemPacketRewriter1_21_2 itemRewriter = new BlockItemPacketRewriter1_21_2(this);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
+    private final ComponentRewriter1_21_2 componentRewriter = new ComponentRewriter1_21_2(this);
 
     public Protocol1_21To1_21_2() {
         super(ClientboundPacket1_21.class, ClientboundPacket1_21_2.class, ServerboundPacket1_20_5.class, ServerboundPacket1_21_2.class);
@@ -155,6 +158,11 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     public TagRewriter<ClientboundPacket1_21> getTagRewriter() {
         return tagRewriter;
+    }
+
+    @Override
+    public ComponentRewriter getComponentRewriter() {
+        return componentRewriter;
     }
 
     @Override

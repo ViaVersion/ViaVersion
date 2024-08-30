@@ -134,6 +134,7 @@ public enum EntityTypes1_20_5 implements EntityType {
 
     // Water mobs
     WATER_ANIMAL(PATHFINDER_MOB, null),
+    // The following three are ageable water mobs in 1.21.2, but not important enough to create a new enum for it // TODO Change in next enum
     DOLPHIN(WATER_ANIMAL),
 
     SQUID(WATER_ANIMAL),

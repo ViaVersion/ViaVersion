@@ -359,6 +359,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
+                final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
+                if (useRemainder != null) {
+                    handleShowItem(connection, useRemainder);
+                }
                 handleContainerContents(connection, componentsTag);
                 if (inputSerializerVersion() != null) {
                     handleWrittenBookContents(connection, componentsTag);
@@ -368,6 +372,10 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 handleItemArrayContents(connection, componentsTag, "charged_projectiles");
             }
         }
+    }
+
+    protected final void handleShowItem(final UserConnection connection, final CompoundTag itemTag) {
+        handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
     }
 
     protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, @Nullable final CompoundTag componentsTag) {
@@ -385,8 +393,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         }
 
         for (final CompoundTag entryTag : container) {
-            final CompoundTag itemTag = entryTag.getCompoundTag("item");
-            handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+            handleShowItem(connection, entryTag.getCompoundTag("item"));
         }
     }
 
