@@ -279,12 +279,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
         ProtocolPathKey protocolKey = new ProtocolPathKeyImpl(clientVersion, serverVersion);
         List<ProtocolPathEntry> protocolList = pathCache.get(protocolKey);
         if (protocolList != null) {
-            return protocolList;
+            return protocolList.isEmpty() ? null : protocolList;
         }
 
         // Calculate path
         Object2ObjectSortedMap<ProtocolVersion, Protocol> outputPath = getProtocolPath(new Object2ObjectLinkedOpenHashMap<>(), clientVersion, serverVersion);
         if (outputPath == null) {
+            // Also cache that there is no path
+            pathCache.put(protocolKey, List.of());
             return null;
         }
 
@@ -374,14 +376,14 @@ public class ProtocolManagerImpl implements ProtocolManager {
     public List<Protocol> getBaseProtocols(@Nullable ProtocolVersion clientVersion, @Nullable ProtocolVersion serverVersion) {
         final List<Protocol> list = new ArrayList<>();
         if (clientVersion != null) {
-            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(serverboundBaseProtocols)) {
+            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : serverboundBaseProtocols) {
                 if (rangeProtocol.key().contains(clientVersion)) {
                     list.add(rangeProtocol.value());
                 }
             }
         }
         if (serverVersion != null) {
-            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : Lists.reverse(clientboundBaseProtocols)) {
+            for (Pair<Range<ProtocolVersion>, Protocol> rangeProtocol : clientboundBaseProtocols) {
                 if (rangeProtocol.key().contains(serverVersion)) {
                     list.add(rangeProtocol.value());
                 }
@@ -534,7 +536,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
         Preconditions.checkArgument(!mappingsLoaded);
 
         // If this log message is missing, something is wrong
-        Via.getPlatform().getLogger().info("Finished mapping loading, shutting down loader executor!");
+        Via.getPlatform().getLogger().info("Finished mapping loading, shutting down loader executor.");
         mappingsLoaded = true;
         mappingLoaderExecutor.shutdown();
         mappingLoaderExecutor = null;
