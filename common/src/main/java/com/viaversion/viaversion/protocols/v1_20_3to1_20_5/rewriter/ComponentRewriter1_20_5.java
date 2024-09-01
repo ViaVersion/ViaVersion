@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.FloatTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
@@ -92,6 +93,7 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
@@ -113,62 +115,62 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         super(protocol, ReadType.NBT);
         this.structuredDataType = structuredDataType;
 
-        register(StructuredDataKey.CUSTOM_DATA, this::convertCustomData);
-        register(StructuredDataKey.MAX_STACK_SIZE, this::convertMaxStackSize);
-        register(StructuredDataKey.MAX_DAMAGE, this::convertMaxDamage);
-        register(StructuredDataKey.DAMAGE, this::convertDamage);
-        register(StructuredDataKey.UNBREAKABLE, this::convertUnbreakable);
-        register(StructuredDataKey.CUSTOM_NAME, this::convertCustomName);
-        register(StructuredDataKey.ITEM_NAME, this::convertItemName);
-        register(StructuredDataKey.LORE, this::convertLore);
-        register(StructuredDataKey.RARITY, this::convertRarity);
-        register(StructuredDataKey.ENCHANTMENTS, this::convertEnchantments);
-        register(StructuredDataKey.CAN_PLACE_ON, this::convertCanPlaceOn);
-        register(StructuredDataKey.CAN_BREAK, this::convertCanBreak);
-        register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, this::convertAttributeModifiers);
-        register(StructuredDataKey.CUSTOM_MODEL_DATA, this::convertCustomModelData);
-        register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, this::convertHideAdditionalTooltip);
-        register(StructuredDataKey.HIDE_TOOLTIP, this::convertHideTooltip);
-        register(StructuredDataKey.REPAIR_COST, this::convertRepairCost);
-        register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, this::convertEnchantmentGlintOverride);
+        register(StructuredDataKey.CUSTOM_DATA, this::customDataToTag, this::customDataFromTag);
+        register(StructuredDataKey.MAX_STACK_SIZE, this::maxStackSizeToTag, this::maxStackSizeFromTag);
+        register(StructuredDataKey.MAX_DAMAGE, this::maxDamageToTag, this::maxDamageFromTag);
+        register(StructuredDataKey.DAMAGE, this::damageToTag, this::damageFromTag);
+        register(StructuredDataKey.UNBREAKABLE, this::unbreakableToTag, this::unbreakableFromTag);
+        register(StructuredDataKey.CUSTOM_NAME, this::customNameToTag, this::customNameFromTag);
+        register(StructuredDataKey.ITEM_NAME, this::itemNameToTag, this::itemNameFromTag);
+        register(StructuredDataKey.LORE, this::loreToTag, this::loreFromTag);
+        register(StructuredDataKey.RARITY, this::rarityToTag, this::rarityFromTag);
+        register(StructuredDataKey.ENCHANTMENTS, this::enchantmentsToTag, this::enchantmentsFromTag);
+        register(StructuredDataKey.CAN_PLACE_ON, this::canPlaceOnToTag);
+        register(StructuredDataKey.CAN_BREAK, this::canBreakToTag);
+        register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, this::attributeModifiersToTag);
+        register(StructuredDataKey.CUSTOM_MODEL_DATA, this::customModelDataToTag);
+        register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, this::hideAdditionalTooltipToTag);
+        register(StructuredDataKey.HIDE_TOOLTIP, this::hideTooltipToTag);
+        register(StructuredDataKey.REPAIR_COST, this::repairCostToTag);
+        register(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, this::enchantmentGlintOverrideToTag);
         registerEmpty(StructuredDataKey.CREATIVE_SLOT_LOCK);
-        register(StructuredDataKey.INTANGIBLE_PROJECTILE, this::convertIntangibleProjectile);
-        register(StructuredDataKey.FOOD1_20_5, this::convertFood);
-        register(StructuredDataKey.FIRE_RESISTANT, this::convertFireResistant);
-        register(StructuredDataKey.TOOL, this::convertTool);
-        register(StructuredDataKey.STORED_ENCHANTMENTS, this::convertStoredEnchantments);
-        register(StructuredDataKey.DYED_COLOR, this::convertDyedColor);
-        register(StructuredDataKey.MAP_COLOR, this::convertMapColor);
-        register(StructuredDataKey.MAP_ID, this::convertMapId);
-        register(StructuredDataKey.MAP_DECORATIONS, this::convertMapDecorations);
+        register(StructuredDataKey.INTANGIBLE_PROJECTILE, this::intangibleProjectileToTag);
+        register(StructuredDataKey.FOOD1_20_5, this::foodToTag);
+        register(StructuredDataKey.FIRE_RESISTANT, this::fireResistantToTag);
+        register(StructuredDataKey.TOOL, this::toolToTag);
+        register(StructuredDataKey.STORED_ENCHANTMENTS, this::storedEnchantmentsToTag);
+        register(StructuredDataKey.DYED_COLOR, this::dyedColorToTag);
+        register(StructuredDataKey.MAP_COLOR, this::mapColorToTag);
+        register(StructuredDataKey.MAP_ID, this::mapIdToTag);
+        register(StructuredDataKey.MAP_DECORATIONS, this::mapDecorationsToTag);
         registerEmpty(StructuredDataKey.MAP_POST_PROCESSING);
-        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::convertChargedProjectiles);
-        register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::convertBundleContents);
-        register(StructuredDataKey.POTION_CONTENTS, this::convertPotionContents);
-        register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::convertSuspiciousStewEffects);
-        register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::convertWritableBookContent);
-        register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::convertWrittenBookContent);
-        register(StructuredDataKey.TRIM, this::convertTrim);
-        register(StructuredDataKey.DEBUG_STICK_STATE, this::convertDebugStickRate);
-        register(StructuredDataKey.ENTITY_DATA, this::convertEntityData);
-        register(StructuredDataKey.BUCKET_ENTITY_DATA, this::convertBucketEntityData);
-        register(StructuredDataKey.BLOCK_ENTITY_DATA, this::convertBlockEntityData);
-        register(StructuredDataKey.INSTRUMENT, this::convertInstrument);
-        register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::convertOminousBottleAmplifier);
-        register(StructuredDataKey.RECIPES, this::convertRecipes);
-        register(StructuredDataKey.LODESTONE_TRACKER, this::convertLodestoneTracker);
-        register(StructuredDataKey.FIREWORK_EXPLOSION, this::convertFireworkExplosion);
-        register(StructuredDataKey.FIREWORKS, this::convertFireworks);
-        register(StructuredDataKey.PROFILE, this::convertProfile);
-        register(StructuredDataKey.NOTE_BLOCK_SOUND, this::convertNoteBlockSound);
-        register(StructuredDataKey.BANNER_PATTERNS, this::convertBannerPatterns);
-        register(StructuredDataKey.BASE_COLOR, this::convertBaseColor);
-        register(StructuredDataKey.POT_DECORATIONS, this::convertPotDecorations);
-        register(StructuredDataKey.CONTAINER1_20_5, this::convertContainer);
-        register(StructuredDataKey.BLOCK_STATE, this::convertBlockState);
-        register(StructuredDataKey.BEES, this::convertBees);
-        register(StructuredDataKey.LOCK, this::convertLock);
-        register(StructuredDataKey.CONTAINER_LOOT, this::convertContainerLoot);
+        register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::chargedProjectilesToTag);
+        register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::bundleContentsToTag);
+        register(StructuredDataKey.POTION_CONTENTS, this::potionContentsToTag);
+        register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::suspiciousStewEffectsToTag);
+        register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag);
+        register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag);
+        register(StructuredDataKey.TRIM, this::trimToTag);
+        register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag);
+        register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag);
+        register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag);
+        register(StructuredDataKey.BLOCK_ENTITY_DATA, this::blockEntityDataToTag);
+        register(StructuredDataKey.INSTRUMENT, this::instrumentToTag);
+        register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::ominousBottleAmplifierToTag);
+        register(StructuredDataKey.RECIPES, this::recipesToTag);
+        register(StructuredDataKey.LODESTONE_TRACKER, this::lodestoneTrackerToTag);
+        register(StructuredDataKey.FIREWORK_EXPLOSION, this::fireworkExplosionToTag);
+        register(StructuredDataKey.FIREWORKS, this::fireworksToTag);
+        register(StructuredDataKey.PROFILE, this::profileToTag);
+        register(StructuredDataKey.NOTE_BLOCK_SOUND, this::noteBlockSoundToTag);
+        register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag);
+        register(StructuredDataKey.BASE_COLOR, this::baseColorToTag);
+        register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag);
+        register(StructuredDataKey.CONTAINER1_20_5, this::containerToTag);
+        register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag);
+        register(StructuredDataKey.BEES, this::beesToTag);
+        register(StructuredDataKey.LOCK, this::lockToTag);
+        register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag);
     }
 
     @Override
@@ -340,23 +342,39 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     // ---------------------------------------------------------------------------------------
     // Conversion methods, can be overridden in future protocols to handle new changes
 
-    protected CompoundTag convertCustomData(final CompoundTag value) {
+    protected CompoundTag customDataToTag(final CompoundTag value) {
         return value;
     }
 
-    protected IntTag convertMaxStackSize(final Integer value) {
-        return convertIntRange(value, 1, 99);
+    protected CompoundTag customDataFromTag(final Tag value) {
+        return (CompoundTag) value;
     }
 
-    protected IntTag convertMaxDamage(final Integer value) {
-        return convertPositiveInt(value);
+    protected IntTag maxStackSizeToTag(final Integer value) {
+        return intRangeToTag(value, 1, 99);
     }
 
-    protected IntTag convertDamage(final Integer value) {
-        return convertNonNegativeInt(value);
+    protected Integer maxStackSizeFromTag(final Tag value) {
+        return checkIntRange(1, 99, asInt(value));
     }
 
-    protected CompoundTag convertUnbreakable(final Unbreakable value) {
+    protected IntTag maxDamageToTag(final Integer value) {
+        return positiveIntToTag(value);
+    }
+
+    protected Integer maxDamageFromTag(final Tag value) {
+        return checkPositiveInt(asInt(value));
+    }
+
+    protected IntTag damageToTag(final Integer value) {
+        return nonNegativeIntToTag(value);
+    }
+
+    protected Integer damageFromTag(final Tag value) {
+        return checkNonNegativeInt(asInt(value));
+    }
+
+    protected CompoundTag unbreakableToTag(final Unbreakable value) {
         final CompoundTag tag = new CompoundTag();
         if (!value.showInTooltip()) {
             tag.putBoolean("show_in_tooltip", false);
@@ -364,23 +382,51 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected StringTag convertCustomName(final Tag value) {
-        return convertComponent(value);
+    protected Unbreakable unbreakableFromTag(final Tag tag) {
+        if (tag instanceof CompoundTag compoundTag) {
+            return new Unbreakable(compoundTag.getBoolean("show_in_tooltip", true));
+        } else {
+            return null;
+        }
     }
 
-    protected StringTag convertItemName(final Tag value) {
-        return convertComponent(value);
+    protected StringTag customNameToTag(final Tag value) {
+        return componentToTag(value);
     }
 
-    protected ListTag<StringTag> convertLore(final Tag[] value) {
-        return convertComponents(value, 256);
+    protected Tag customNameFromTag(final Tag value) {
+        return componentFromTag(value);
     }
 
-    protected StringTag convertRarity(final Integer value) {
-        return convertEnumEntry(value, "common", "uncommon", "rare", "epic");
+    protected StringTag itemNameToTag(final Tag value) {
+        return componentToTag(value);
     }
 
-    protected CompoundTag convertEnchantments(final Enchantments value) {
+    protected Tag itemNameFromTag(final Tag value) {
+        return componentFromTag(value);
+    }
+
+    protected ListTag<StringTag> loreToTag(final Tag[] value) {
+        return componentsToTag(value, 256);
+    }
+
+    protected Tag[] loreFromTag(final Tag value) {
+        return componentsFromTag(value, 256);
+    }
+
+    protected StringTag rarityToTag(final Integer value) {
+        return enumEntryToTag(value, "common", "uncommon", "rare", "epic");
+    }
+
+    protected Integer rarityFromTag(final Tag value) {
+        if (value instanceof StringTag stringTag) {
+            return enumEntryFromTag(stringTag, "common", "uncommon", "rare", "epic");
+        } else {
+            return null;
+        }
+    }
+
+    protected CompoundTag enchantmentsToTag(final Enchantments value) {
         final CompoundTag tag = new CompoundTag();
 
         final CompoundTag levels = new CompoundTag();
@@ -395,16 +441,33 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertCanPlaceOn(final AdventureModePredicate value) {
+    protected Enchantments enchantmentsFromTag(final Tag tag) {
+        final CompoundTag compoundTag = (CompoundTag) tag;
+
+        final Int2IntMap enchantments = new Int2IntOpenHashMap();
+        final CompoundTag levels = compoundTag.getCompoundTag("levels");
+        if (levels == null) {
+            return null;
+        }
+        for (final Map.Entry<String, Tag> level : levels) {
+            final int id = Enchantments1_20_5.keyToId(level.getKey());
+            if (id != -1) {
+                enchantments.put(id, checkIntRange(0, 255, asInt(level.getValue())));
+            }
+        }
+        return new Enchantments(enchantments, compoundTag.getBoolean("show_in_tooltip", true));
+    }
+
+    protected CompoundTag canPlaceOnToTag(final AdventureModePredicate value) {
         final CompoundTag tag = new CompoundTag();
         final ListTag<CompoundTag> predicates = new ListTag<>(CompoundTag.class);
         for (final BlockPredicate predicate : value.predicates()) {
             final CompoundTag predicateTag = new CompoundTag();
             if (predicate.holderSet() != null) {
-                convertHolderSet(predicateTag, "blocks", predicate.holderSet());
+                holderSetToTag(predicateTag, "blocks", predicate.holderSet());
             }
             if (predicate.propertyMatchers() != null) {
-                final CompoundTag state = convertPredicate(predicate);
+                final CompoundTag state = predicateToTag(predicate);
                 predicateTag.put("state", state);
             }
             if (predicate.tag() != null) {
@@ -420,7 +483,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertPredicate(final BlockPredicate predicate) {
+    protected CompoundTag predicateToTag(final BlockPredicate predicate) {
         final CompoundTag state = new CompoundTag();
         for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
             final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
@@ -441,11 +504,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return state;
     }
 
-    protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
-        return convertCanPlaceOn(value);
+    protected CompoundTag canBreakToTag(final AdventureModePredicate value) {
+        return canPlaceOnToTag(value);
     }
 
-    protected CompoundTag convertAttributeModifiers(final AttributeModifiers1_20_5 value) {
+    protected CompoundTag attributeModifiersToTag(final AttributeModifiers1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         final ListTag<CompoundTag> modifiers = new ListTag<>(CompoundTag.class);
         for (final AttributeModifier modifier : value.modifiers()) {
@@ -456,7 +519,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
 
             modifierTag.putString("type", type);
-            convertModifierData(modifierTag, modifier.modifier());
+            modifierDataToTag(modifierTag, modifier.modifier());
             if (modifier.slotType() != 0) {
                 final String slotType = EquipmentSlots1_20_5.idToKey(modifier.slotType());
                 Preconditions.checkNotNull(slotType, "Unknown slot type %s", modifier.slotType());
@@ -473,46 +536,46 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected IntTag convertCustomModelData(final Integer value) {
+    protected IntTag customModelDataToTag(final Integer value) {
         return new IntTag(value);
     }
 
-    protected CompoundTag convertHideAdditionalTooltip(final Unit value) {
-        return convertUnit();
+    protected CompoundTag hideAdditionalTooltipToTag(final Unit value) {
+        return unitToTag();
     }
 
-    protected CompoundTag convertHideTooltip(final Unit value) {
-        return convertUnit();
+    protected CompoundTag hideTooltipToTag(final Unit value) {
+        return unitToTag();
     }
 
-    protected IntTag convertRepairCost(final Integer value) {
-        return convertIntRange(value, 0, Integer.MAX_VALUE);
+    protected IntTag repairCostToTag(final Integer value) {
+        return intRangeToTag(value, 0, Integer.MAX_VALUE);
     }
 
-    protected ByteTag convertEnchantmentGlintOverride(final Boolean value) {
+    protected ByteTag enchantmentGlintOverrideToTag(final Boolean value) {
         return new ByteTag(value);
     }
 
-    protected CompoundTag convertIntangibleProjectile(final Tag value) {
-        return convertUnit();
+    protected CompoundTag intangibleProjectileToTag(final Tag value) {
+        return unitToTag();
     }
 
-    protected CompoundTag convertFood(final FoodProperties value) {
+    protected CompoundTag foodToTag(final FoodProperties value) {
         final CompoundTag tag = new CompoundTag();
-        tag.put("nutrition", convertNonNegativeInt(value.nutrition()));
+        tag.put("nutrition", nonNegativeIntToTag(value.nutrition()));
         tag.putFloat("saturation", value.saturationModifier());
         if (value.canAlwaysEat()) {
             tag.putBoolean("can_always_eat", true);
         }
         if (value.eatSeconds() != 1.6F) {
-            tag.put("eat_seconds", convertPositiveFloat(value.eatSeconds()));
+            tag.put("eat_seconds", positiveFloatToTag(value.eatSeconds()));
         }
         if (value.possibleEffects().length > 0) {
             final ListTag<CompoundTag> effects = new ListTag<>(CompoundTag.class);
             for (final FoodEffect foodEffect : value.possibleEffects()) {
                 final CompoundTag effectTag = new CompoundTag();
                 final CompoundTag potionEffectTag = new CompoundTag();
-                convertPotionEffect(potionEffectTag, foodEffect.effect());
+                potionEffectToTag(potionEffectTag, foodEffect.effect());
                 effectTag.put("effect", potionEffectTag);
                 if (foodEffect.probability() != 1.0F) {
                     effectTag.putFloat("probability", foodEffect.probability());
@@ -523,17 +586,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertFireResistant(final Unit value) {
-        return convertUnit();
+    protected CompoundTag fireResistantToTag(final Unit value) {
+        return unitToTag();
     }
 
-    protected CompoundTag convertTool(final ToolProperties value) {
+    protected CompoundTag toolToTag(final ToolProperties value) {
         final CompoundTag tag = new CompoundTag();
 
         final ListTag<CompoundTag> rules = new ListTag<>(CompoundTag.class);
         for (final ToolRule rule : value.rules()) {
             final CompoundTag ruleTag = new CompoundTag();
-            convertHolderSet(ruleTag, "blocks", rule.blocks());
+            holderSetToTag(ruleTag, "blocks", rule.blocks());
             if (rule.speed() != null) {
                 ruleTag.putFloat("speed", rule.speed());
             }
@@ -547,16 +610,16 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putFloat("default_mining_speed", value.defaultMiningSpeed());
         }
         if (value.damagePerBlock() != 1) {
-            tag.put("damage_per_block", convertNonNegativeInt(value.damagePerBlock()));
+            tag.put("damage_per_block", nonNegativeIntToTag(value.damagePerBlock()));
         }
         return tag;
     }
 
-    protected CompoundTag convertStoredEnchantments(final Enchantments value) {
-        return convertEnchantments(value);
+    protected CompoundTag storedEnchantmentsToTag(final Enchantments value) {
+        return enchantmentsToTag(value);
     }
 
-    protected CompoundTag convertDyedColor(final DyedColor value) {
+    protected CompoundTag dyedColorToTag(final DyedColor value) {
         final CompoundTag tag = new CompoundTag();
         tag.putInt("rgb", value.rgb());
         if (!value.showInTooltip()) {
@@ -565,27 +628,27 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected IntTag convertMapColor(final Integer value) {
+    protected IntTag mapColorToTag(final Integer value) {
         return new IntTag(value);
     }
 
-    protected IntTag convertMapId(final Integer value) {
+    protected IntTag mapIdToTag(final Integer value) {
         return new IntTag(value);
     }
 
-    protected CompoundTag convertMapDecorations(final CompoundTag value) {
+    protected CompoundTag mapDecorationsToTag(final CompoundTag value) {
         return value; // String<->id conversion is already done by the item rewriter
     }
 
-    protected ListTag<CompoundTag> convertChargedProjectiles(final UserConnection connection, final Item[] value) {
-        return convertItemArray(connection, value);
+    protected ListTag<CompoundTag> chargedProjectilesToTag(final UserConnection connection, final Item[] value) {
+        return itemArrayToTag(connection, value);
     }
 
-    protected ListTag<CompoundTag> convertBundleContents(final UserConnection connection, final Item[] value) {
-        return convertItemArray(connection, value);
+    protected ListTag<CompoundTag> bundleContentsToTag(final UserConnection connection, final Item[] value) {
+        return itemArrayToTag(connection, value);
     }
 
-    protected CompoundTag convertPotionContents(final PotionContents value) {
+    protected CompoundTag potionContentsToTag(final PotionContents value) {
         final CompoundTag tag = new CompoundTag();
         if (value.potion() != null) {
             final String potion = Potions1_20_5.idToKey(value.potion());
@@ -597,12 +660,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putInt("custom_color", value.customColor());
         }
         for (final PotionEffect effect : value.customEffects()) {
-            convertPotionEffect(tag, effect);
+            potionEffectToTag(tag, effect);
         }
         return tag;
     }
 
-    protected ListTag<CompoundTag> convertSuspiciousStewEffects(final SuspiciousStewEffect[] value) {
+    protected ListTag<CompoundTag> suspiciousStewEffectsToTag(final SuspiciousStewEffect[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final SuspiciousStewEffect effect : value) {
             final CompoundTag effectTag = new CompoundTag();
@@ -618,7 +681,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertWritableBookContent(final FilterableString[] value) {
+    protected CompoundTag writableBookContentToTag(final FilterableString[] value) {
         final CompoundTag tag = new CompoundTag();
         if (value == null) {
             return tag;
@@ -631,29 +694,29 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final ListTag<CompoundTag> pagesTag = new ListTag<>(CompoundTag.class);
         for (final FilterableString page : value) {
             final CompoundTag pageTag = new CompoundTag();
-            convertFilterableString(pageTag, page, 1024);
+            filterableStringToTag(pageTag, page, 1024);
             pagesTag.add(pageTag);
         }
         tag.put("pages", pagesTag);
         return tag;
     }
 
-    protected CompoundTag convertWrittenBookContent(final WrittenBook value) {
+    protected CompoundTag writtenBookContentToTag(final WrittenBook value) {
         final CompoundTag tag = new CompoundTag();
-        convertFilterableString(tag, value.title(), 32);
+        filterableStringToTag(tag, value.title(), 32);
         tag.putString("author", value.author());
         if (value.generation() != 0) {
-            tag.put("generation", convertIntRange(value.generation(), 0, 3));
+            tag.put("generation", intRangeToTag(value.generation(), 0, 3));
         }
 
         final CompoundTag title = new CompoundTag();
-        convertFilterableString(title, value.title(), 32);
+        filterableStringToTag(title, value.title(), 32);
         tag.put("title", title);
 
         final ListTag<CompoundTag> pagesTag = new ListTag<>(CompoundTag.class);
         for (final FilterableComponent page : value.pages()) {
             final CompoundTag pageTag = new CompoundTag();
-            convertFilterableComponent(pageTag, page);
+            filterableComponentToTag(pageTag, page);
             pagesTag.add(pageTag);
         }
 
@@ -667,7 +730,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertTrim(final UserConnection connection, final ArmorTrim value) {
+    protected CompoundTag trimToTag(final UserConnection connection, final ArmorTrim value) {
         final CompoundTag tag = new CompoundTag();
         final Holder<ArmorTrimMaterial> material = value.material();
         final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
@@ -709,7 +772,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 throw new IllegalArgumentException("Unknown item: " + armorTrimPattern.itemId());
             }
 
-            patternTag.put("asset_id", convertIdentifier(armorTrimPattern.assetName()));
+            patternTag.put("asset_id", identifierToTag(armorTrimPattern.assetName()));
             patternTag.putString("template_item", templateItem);
             patternTag.put("description", armorTrimPattern.description());
             if (armorTrimPattern.decal()) {
@@ -724,23 +787,23 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertDebugStickRate(final CompoundTag value) {
+    protected CompoundTag debugStickRateToTag(final CompoundTag value) {
         return value;
     }
 
-    protected CompoundTag convertEntityData(final CompoundTag value) {
-        return convertNbtWithId(value);
+    protected CompoundTag entityDataToTag(final CompoundTag value) {
+        return nbtWithIdToTag(value);
     }
 
-    protected CompoundTag convertBucketEntityData(final CompoundTag value) {
-        return convertNbt(value);
+    protected CompoundTag bucketEntityDataToTag(final CompoundTag value) {
+        return nbtToTag(value);
     }
 
-    protected CompoundTag convertBlockEntityData(final CompoundTag value) {
-        return convertNbtWithId(value);
+    protected CompoundTag blockEntityDataToTag(final CompoundTag value) {
+        return nbtWithIdToTag(value);
     }
 
-    protected Tag convertInstrument(final Holder<Instrument> value) {
+    protected Tag instrumentToTag(final Holder<Instrument> value) {
         if (value.hasId()) {
             return new StringTag(Instruments1_20_3.idToKey(value.id()));
         }
@@ -753,29 +816,29 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         } else {
             final SoundEvent soundEvent = sound.value();
             final CompoundTag soundEventTag = new CompoundTag();
-            soundEventTag.put("sound_id", convertIdentifier(soundEvent.identifier()));
+            soundEventTag.put("sound_id", identifierToTag(soundEvent.identifier()));
             if (soundEvent.fixedRange() != null) {
                 soundEventTag.putFloat("range", soundEvent.fixedRange());
             }
         }
 
-        tag.put("use_duration", convertPositiveInt(instrument.useDuration()));
-        tag.put("range", convertPositiveFloat(instrument.range()));
+        tag.put("use_duration", positiveIntToTag(instrument.useDuration()));
+        tag.put("range", positiveFloatToTag(instrument.range()));
         return tag;
     }
 
-    protected IntTag convertOminousBottleAmplifier(final Integer value) {
-        return convertIntRange(value, 0, 4);
+    protected IntTag ominousBottleAmplifierToTag(final Integer value) {
+        return intRangeToTag(value, 0, 4);
     }
 
-    protected Tag convertRecipes(final Tag value) {
+    protected Tag recipesToTag(final Tag value) {
         return value; // Item rewriter takes care of validation
     }
 
-    protected CompoundTag convertLodestoneTracker(final LodestoneTracker value) {
+    protected CompoundTag lodestoneTrackerToTag(final LodestoneTracker value) {
         final CompoundTag tag = new CompoundTag();
         if (value.position() != null) {
-            convertGlobalPos(tag, value.position());
+            globalPosToTag(tag, value.position());
         }
         if (!value.tracked()) {
             tag.putBoolean("tracked", false);
@@ -783,9 +846,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertFireworkExplosion(final FireworkExplosion value) {
+    protected CompoundTag fireworkExplosionToTag(final FireworkExplosion value) {
         final CompoundTag tag = new CompoundTag();
-        tag.put("shape", convertEnumEntry(value.shape(), "small_ball", "large_ball", "star", "creeper", "burst"));
+        tag.put("shape", enumEntryToTag(value.shape(), "small_ball", "large_ball", "star", "creeper", "burst"));
         if (value.colors().length > 0) {
             tag.put("colors", new IntArrayTag(value.colors()));
         }
@@ -801,23 +864,23 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertFireworks(final Fireworks value) {
+    protected CompoundTag fireworksToTag(final Fireworks value) {
         final CompoundTag tag = new CompoundTag();
         if (value.flightDuration() != 0) {
-            tag.put("flight_duration", convertUnsignedByte((byte) value.flightDuration()));
+            tag.put("flight_duration", unsignedByteToTag((byte) value.flightDuration()));
         }
         final ListTag<CompoundTag> explosions = new ListTag<>(CompoundTag.class);
         if (value.explosions().length > 256) {
             throw new IllegalArgumentException("Too many explosions: " + value.explosions().length);
         }
         for (final FireworkExplosion explosion : value.explosions()) {
-            explosions.add(convertFireworkExplosion(explosion));
+            explosions.add(fireworkExplosionToTag(explosion));
         }
         tag.put("explosions", explosions);
         return tag;
     }
 
-    protected CompoundTag convertProfile(final GameProfile value) {
+    protected CompoundTag profileToTag(final GameProfile value) {
         final CompoundTag tag = new CompoundTag();
         if (value.name() != null) {
             tag.putString("name", value.name());
@@ -826,31 +889,31 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.put("id", new IntArrayTag(UUIDUtil.toIntArray(value.id())));
         }
         if (value.properties().length > 0) {
-            convertProperties(tag, value.properties());
+            propertiesToTag(tag, value.properties());
         }
         return tag;
     }
 
-    protected StringTag convertNoteBlockSound(final String value) {
-        return convertIdentifier(value);
+    protected StringTag noteBlockSoundToTag(final String value) {
+        return identifierToTag(value);
     }
 
-    protected ListTag<CompoundTag> convertBannerPatterns(final BannerPatternLayer[] value) {
+    protected ListTag<CompoundTag> bannerPatternsToTag(final BannerPatternLayer[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final BannerPatternLayer layer : value) {
             final CompoundTag layerTag = new CompoundTag();
-            convertBannerPattern(layerTag, layer.pattern());
-            layerTag.put("color", convertDyeColor(layer.dyeColor()));
+            bannerPatternToTag(layerTag, layer.pattern());
+            layerTag.put("color", dyeColorToTag(layer.dyeColor()));
             tag.add(layerTag);
         }
         return tag;
     }
 
-    protected StringTag convertBaseColor(final Integer value) {
-        return convertDyeColor(value);
+    protected StringTag baseColorToTag(final Integer value) {
+        return dyeColorToTag(value);
     }
 
-    protected ListTag<StringTag> convertPotDecorations(final PotDecorations value) {
+    protected ListTag<StringTag> potDecorationsToTag(final PotDecorations value) {
         final ListTag<StringTag> tag = new ListTag<>(StringTag.class);
         for (final int decoration : value.itemIds()) {
             final String identifier = mappedIdentifier(decoration);
@@ -862,9 +925,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected ListTag<CompoundTag> convertContainer(final UserConnection connection, final Item[] value) {
+    protected ListTag<CompoundTag> containerToTag(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
-        final ListTag<CompoundTag> items = convertItemArray(connection, value);
+        final ListTag<CompoundTag> items = itemArrayToTag(connection, value);
         for (int i = 0; i < items.size(); i++) {
             final CompoundTag itemTag = new CompoundTag();
             itemTag.putInt("slot", i);
@@ -874,7 +937,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertBlockState(final BlockStateProperties value) {
+    protected CompoundTag blockStateToTag(final BlockStateProperties value) {
         final CompoundTag tag = new CompoundTag();
         for (final Map.Entry<String, String> entry : value.properties().entrySet()) {
             tag.putString(entry.getKey(), entry.getValue());
@@ -882,12 +945,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected ListTag<CompoundTag> convertBees(final Bee[] value) {
+    protected ListTag<CompoundTag> beesToTag(final Bee[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final Bee bee : value) {
             final CompoundTag beeTag = new CompoundTag();
             if (!bee.entityData().isEmpty()) {
-                beeTag.put("entity_data", convertNbt(bee.entityData()));
+                beeTag.put("entity_data", nbtToTag(bee.entityData()));
             }
             beeTag.putInt("ticks_in_hive", bee.ticksInHive());
             beeTag.putInt("min_ticks_in_hive", bee.minTicksInHive());
@@ -895,33 +958,33 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected StringTag convertLock(final Tag value) {
+    protected StringTag lockToTag(final Tag value) {
         return (StringTag) value;
     }
 
-    protected CompoundTag convertContainerLoot(final CompoundTag value) {
+    protected CompoundTag containerLootToTag(final CompoundTag value) {
         return value; // Handled by the item rewriter
     }
 
     // ---------------------------------------------------------------------------------------
 
-    protected void convertModifierData(final CompoundTag tag, final ModifierData data) {
+    protected void modifierDataToTag(final CompoundTag tag, final ModifierData data) {
         tag.put("uuid", new IntArrayTag(UUIDUtil.toIntArray(data.uuid())));
         tag.putString("name", data.name());
         tag.putDouble("amount", data.amount());
         tag.putString("operation", BlockItemPacketRewriter1_20_5.ATTRIBUTE_OPERATIONS[data.operation()]);
     }
 
-    protected void convertPotionEffect(final CompoundTag tag, final PotionEffect effect) {
+    protected void potionEffectToTag(final CompoundTag tag, final PotionEffect effect) {
         final String id = PotionEffects1_20_5.idToKey(effect.effect());
         if (id == null) {
             throw new IllegalArgumentException("Unknown potion effect: " + effect.effect());
         }
         tag.putString("id", id);
-        convertPotionEffectData(tag, effect.effectData());
+        potionEffectDataToTag(tag, effect.effectData());
     }
 
-    protected void convertPotionEffectData(final CompoundTag tag, final PotionEffectData data) {
+    protected void potionEffectDataToTag(final CompoundTag tag, final PotionEffectData data) {
         if (data.amplifier() != 0) {
             tag.putInt("amplifier", data.amplifier());
         }
@@ -937,12 +1000,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.putBoolean("show_icon", data.showIcon());
         if (data.hiddenEffect() != null) {
             final CompoundTag hiddenEffect = new CompoundTag();
-            convertPotionEffectData(hiddenEffect, data.hiddenEffect());
+            potionEffectDataToTag(hiddenEffect, data.hiddenEffect());
             tag.put("hidden_effect", hiddenEffect);
         }
     }
 
-    protected void convertHolderSet(final CompoundTag tag, final String name, final HolderSet set) {
+    protected void holderSetToTag(final CompoundTag tag, final String name, final HolderSet set) {
         if (set.hasTagKey()) {
             tag.putString(name, set.tagKey());
         } else {
@@ -950,24 +1013,24 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         }
     }
 
-    protected ListTag<CompoundTag> convertItemArray(final UserConnection connection, final Item[] value) {
+    protected ListTag<CompoundTag> itemArrayToTag(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         for (final Item item : value) {
             final CompoundTag itemTag = new CompoundTag();
-            convertItem(connection, itemTag, item);
+            itemToTag(connection, itemTag, item);
             tag.add(itemTag);
         }
         return tag;
     }
 
-    protected void convertItem(final UserConnection connection, final CompoundTag tag, final Item item) {
+    protected void itemToTag(final UserConnection connection, final CompoundTag tag, final Item item) {
         final String identifier = mappedIdentifier(item.identifier());
         if (identifier == null) {
             throw new IllegalArgumentException("Unknown item: " + item.identifier());
         }
         tag.putString("id", identifier);
         try {
-            tag.put("count", convertPositiveInt(item.amount()));
+            tag.put("count", positiveIntToTag(item.amount()));
         } catch (IllegalArgumentException ignored) { // Fallback value
             tag.putInt("count", 1);
         }
@@ -975,28 +1038,28 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("components", toTag(connection, components, true));
     }
 
-    protected void convertFilterableString(final CompoundTag tag, final FilterableString string, final int max) {
-        tag.put("raw", convertString(string.raw(), 0, max));
+    protected void filterableStringToTag(final CompoundTag tag, final FilterableString string, final int max) {
+        tag.put("raw", stringToTag(string.raw(), 0, max));
         if (string.filtered() != null) {
-            tag.put("filtered", convertString(string.filtered(), 0, max));
+            tag.put("filtered", stringToTag(string.filtered(), 0, max));
         }
     }
 
-    protected void convertFilterableComponent(final CompoundTag tag, final FilterableComponent component) {
-        tag.put("raw", convertComponent(component.raw()));
+    protected void filterableComponentToTag(final CompoundTag tag, final FilterableComponent component) {
+        tag.put("raw", componentToTag(component.raw()));
         if (component.filtered() != null) {
-            tag.put("filtered", convertComponent(component.filtered()));
+            tag.put("filtered", componentToTag(component.filtered()));
         }
     }
 
-    protected void convertGlobalPos(final CompoundTag tag, final GlobalBlockPosition position) {
+    protected void globalPosToTag(final CompoundTag tag, final GlobalBlockPosition position) {
         final CompoundTag posTag = new CompoundTag();
         posTag.putString("dimension", position.dimension());
         posTag.put("pos", new IntArrayTag(new int[]{position.x(), position.y(), position.z()}));
         tag.put("target", posTag);
     }
 
-    protected void convertProperties(final CompoundTag tag, final GameProfile.Property[] properties) {
+    protected void propertiesToTag(final CompoundTag tag, final GameProfile.Property[] properties) {
         final ListTag<CompoundTag> propertiesTag = new ListTag<>(CompoundTag.class);
         for (final GameProfile.Property property : properties) {
             final CompoundTag propertyTag = new CompoundTag();
@@ -1010,7 +1073,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("properties", propertiesTag);
     }
 
-    protected void convertBannerPattern(final CompoundTag tag, final Holder<BannerPattern> pattern) {
+    protected void bannerPatternToTag(final CompoundTag tag, final Holder<BannerPattern> pattern) {
         if (pattern.hasId()) {
             tag.putString("pattern", BannerPatterns1_20_5.idToKey(pattern.id()));
             return;
@@ -1018,54 +1081,78 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
         final BannerPattern bannerPattern = pattern.value();
         final CompoundTag patternTag = new CompoundTag();
-        patternTag.put("asset_id", convertIdentifier(bannerPattern.assetId()));
+        patternTag.put("asset_id", identifierToTag(bannerPattern.assetId()));
         patternTag.putString("translation_key", bannerPattern.translationKey());
         tag.put("pattern", patternTag);
     }
 
     // ---------------------------------------------------------------------------------------
 
-    protected IntTag convertPositiveInt(final Integer value) {
-        return convertIntRange(value, 1, Integer.MAX_VALUE);
+    protected Integer asInt(final Tag tag) {
+        return ((NumberTag) tag).asInt();
     }
 
-    protected IntTag convertNonNegativeInt(final Integer value) {
-        return convertIntRange(value, 0, Integer.MAX_VALUE);
+    protected IntTag positiveIntToTag(final Integer value) {
+        return intRangeToTag(value, 1, Integer.MAX_VALUE);
     }
 
-    protected IntTag convertIntRange(final Integer value, final int min, final int max) {
+    protected Integer checkPositiveInt(final Integer value) {
+        return checkIntRange(1, Integer.MAX_VALUE, value);
+    }
+
+    protected IntTag nonNegativeIntToTag(final Integer value) {
+        return intRangeToTag(value, 0, Integer.MAX_VALUE);
+    }
+
+    protected Integer checkNonNegativeInt(final Integer value) {
+        return checkIntRange(0, Integer.MAX_VALUE, value);
+    }
+
+    protected IntTag intRangeToTag(final Integer value, final int min, final int max) {
         return new IntTag(checkIntRange(min, max, value));
     }
 
-    protected FloatTag convertPositiveFloat(final Float value) {
-        return convertFloatRange(value, 0, Float.MAX_VALUE);
+    protected FloatTag positiveFloatToTag(final Float value) {
+        return floatRangeToTag(value, 0, Float.MAX_VALUE);
     }
 
-    protected FloatTag convertFloatRange(final Float value, final float min, final float max) {
+    protected FloatTag floatRangeToTag(final Float value, final float min, final float max) {
         return new FloatTag(checkFloatRange(min, max, value));
     }
 
-    protected StringTag convertString(final String value, final int min, final int max) {
+    protected StringTag stringToTag(final String value, final int min, final int max) {
         return new StringTag(checkStringRange(min, max, value));
     }
 
-    protected ByteTag convertUnsignedByte(final byte value) {
+    protected ByteTag unsignedByteToTag(final byte value) {
         if (value > UnsignedByteType.MAX_VALUE) {
             throw new IllegalArgumentException("Value out of range: " + value);
         }
         return new ByteTag(value);
     }
 
-    protected StringTag convertComponent(final Tag value) {
-        return convertComponent(value, Integer.MAX_VALUE);
+    protected StringTag componentToTag(final Tag value) {
+        return componentToTag(value, Integer.MAX_VALUE);
     }
 
-    protected StringTag convertComponent(final Tag value, final int max) {
+    protected Tag componentFromTag(final Tag value) {
+        return componentFromTag(value, Integer.MAX_VALUE);
+    }
+
+    protected StringTag componentToTag(final Tag value, final int max) {
         final String json = serializerVersion().toString(serializerVersion().toComponent(value));
         return new StringTag(checkStringRange(0, max, json));
     }
 
-    protected ListTag<StringTag> convertComponents(final Tag[] value, final int maxLength) {
+    protected Tag componentFromTag(final Tag value, final int max) {
+        if (value instanceof StringTag stringTag) {
+            return serializerVersion().toTag(checkStringRange(0, max, stringTag.getValue()));
+        } else {
+            return null;
+        }
+    }
+
+    protected ListTag<StringTag> componentsToTag(final Tag[] value, final int maxLength) {
         checkIntRange(0, maxLength, value.length);
         final ListTag<StringTag> listTag = new ListTag<>(StringTag.class);
         for (final Tag tag : value) {
@@ -1075,34 +1162,55 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return listTag;
     }
 
-    protected StringTag convertEnumEntry(Integer value, final String... values) {
+    protected Tag[] componentsFromTag(final Tag value, final int maxLength) { // TODO verify
+        final ListTag<StringTag> listTag = (ListTag<StringTag>) value;
+        checkIntRange(0, maxLength, listTag.size());
+
+        final Tag[] components = new Tag[listTag.size()];
+        for (int i = 0; i < listTag.size(); i++) {
+            components[i] = serializerVersion().toTag(listTag.get(i).getValue());
+        }
+        return components;
+    }
+
+    protected StringTag enumEntryToTag(Integer value, final String... values) {
         Preconditions.checkArgument(value >= 0 && value < values.length, "Enum value out of range: " + value);
         return new StringTag(values[value]);
     }
 
-    protected CompoundTag convertUnit() {
+    protected Integer enumEntryFromTag(final StringTag value, final String... values) {
+        final String string = value.getValue();
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(string)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Unknown enum value: " + string);
+    }
+
+    protected CompoundTag unitToTag() {
         return new CompoundTag();
     }
 
-    protected CompoundTag convertNbt(final CompoundTag tag) {
+    protected CompoundTag nbtToTag(final CompoundTag tag) {
         return tag;
     }
 
-    protected CompoundTag convertNbtWithId(final CompoundTag tag) {
+    protected CompoundTag nbtWithIdToTag(final CompoundTag tag) {
         if (tag.getStringTag("id") == null) {
             throw new IllegalArgumentException("Missing id tag in nbt: " + tag);
         }
         return tag;
     }
 
-    protected StringTag convertIdentifier(final String value) {
+    protected StringTag identifierToTag(final String value) {
         if (!Key.isValid(value)) {
             throw new IllegalArgumentException("Invalid identifier: " + value);
         }
         return new StringTag(value);
     }
 
-    protected StringTag convertDyeColor(final Integer value) {
+    protected StringTag dyeColorToTag(final Integer value) {
         return new StringTag(DyeColors.colorById(value));
     }
 
@@ -1137,6 +1245,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter) {
         final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
         converters.put(key, new ConverterPair<>(converter, null));
+    }
+
+    protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
+        final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
+        converters.put(key, new ConverterPair<>(converter, tagConverter));
     }
 
     protected <T> void register(final StructuredDataKey<T> key, final DataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
