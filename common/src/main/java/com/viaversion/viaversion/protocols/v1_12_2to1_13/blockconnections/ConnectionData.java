@@ -54,8 +54,8 @@ import java.util.Map.Entry;
 
 public final class ConnectionData {
     public static BlockConnectionProvider blockConnectionProvider;
-    static final Object2IntMap<String> KEY_TO_ID = new Object2IntOpenHashMap<>(8582, .99F);
-    static final IntSet OCCLUDING_STATES = new IntOpenHashSet(377, .99F);
+    static final Object2IntMap<String> KEY_TO_ID = new Object2IntOpenHashMap<>(8582);
+    static final IntSet OCCLUDING_STATES = new IntOpenHashSet(377);
     static Int2ObjectMap<ConnectionHandler> connectionHandlerMap = new Int2ObjectOpenHashMap<>();
     static Int2ObjectMap<BlockData> blockConnectionData = new Int2ObjectOpenHashMap<>();
     private static final BlockChangeRecord1_8[] EMPTY_RECORDS = new BlockChangeRecord1_8[0];
@@ -173,7 +173,7 @@ public final class ConnectionData {
             KEY_TO_ID.put(key, id);
         }
 
-        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650, .99F);
+        connectionHandlerMap = new Int2ObjectOpenHashMap<>(3650);
 
         if (!Via.getConfig().isReduceBlockStorageMemory()) {
             blockConnectionData = new Int2ObjectOpenHashMap<>(2048);

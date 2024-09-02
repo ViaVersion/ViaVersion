@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EffectIdMappings1_9 {
 
-    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(19, .99F);
+    private static final Int2IntMap EFFECTS = new Int2IntOpenHashMap(19);
 
     static {
         addRewrite(1005, 1010); //Play music disc

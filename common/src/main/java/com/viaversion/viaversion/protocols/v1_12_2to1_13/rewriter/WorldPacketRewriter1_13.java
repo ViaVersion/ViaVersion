@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class WorldPacketRewriter1_13 {
-    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70, .99F);
+    private static final IntSet VALID_BIOMES = new IntOpenHashSet(70);
 
     static {
         // Client will crash if it receives an invalid biome id

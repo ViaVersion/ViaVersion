@@ -24,7 +24,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 public class PotionColorMappings1_11 {
 
     //<oldData> to <newData, isInstant> mapping
-    private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(37, 0.99F);
+    private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(37);
 
     static {
         addRewrite(0, 3694022, false);

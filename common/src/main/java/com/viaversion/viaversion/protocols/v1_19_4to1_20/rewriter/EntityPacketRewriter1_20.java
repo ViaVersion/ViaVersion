@@ -79,8 +79,8 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
                     final ListTag<CompoundTag> damageTypes = TagUtil.getRegistryEntries(registry, "damage_type");
                     int highestId = -1;
                     for (final CompoundTag damageType : damageTypes) {
-                        final IntTag id = damageType.getUnchecked("id");
-                        highestId = Math.max(highestId, id.asInt());
+                        final int id = damageType.getInt("id");
+                        highestId = Math.max(highestId, id);
                     }
 
                     // AaaaAAAaa

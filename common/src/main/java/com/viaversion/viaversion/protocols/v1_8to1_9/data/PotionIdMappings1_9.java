@@ -27,7 +27,7 @@ public class PotionIdMappings1_9 {
     public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
     public static final Map<Integer, String> POTION_ID_TO_NAME = new HashMap<>();
 
-    public static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36, .99F);
+    public static final Int2IntMap POTION_INDEX = new Int2IntOpenHashMap(36);
 
     static {
         register(-1, "empty");

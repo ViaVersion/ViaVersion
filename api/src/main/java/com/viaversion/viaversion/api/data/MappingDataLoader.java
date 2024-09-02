@@ -30,7 +30,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.viaversion.nbt.io.NBTIO;
 import com.viaversion.nbt.io.TagReader;
-import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.IntTag;
@@ -211,68 +210,64 @@ public class MappingDataLoader {
             return null;
         }
 
-        final ByteTag serializationStragetyTag = tag.getUnchecked("id");
-        final IntTag mappedSizeTag = tag.getUnchecked("mappedSize");
-        final byte strategy = serializationStragetyTag.asByte();
+        final int mappedSize = tag.getIntTag("mappedSize").asInt();
+        final byte strategy = tag.getByteTag("id").asByte();
         final V mappings;
         if (strategy == DIRECT_ID) {
             final IntArrayTag valuesTag = tag.getIntArrayTag("val");
-            return IntArrayMappings.of(valuesTag.getValue(), mappedSizeTag.asInt());
+            return IntArrayMappings.of(valuesTag.getValue(), mappedSize);
         } else if (strategy == SHIFTS_ID) {
-            final IntArrayTag shiftsAtTag = tag.getIntArrayTag("at");
-            final IntArrayTag shiftsTag = tag.getIntArrayTag("to");
-            final IntTag sizeTag = tag.getUnchecked("size");
-            final int[] shiftsAt = shiftsAtTag.getValue();
-            final int[] shiftsTo = shiftsTag.getValue();
-            final int size = sizeTag.asInt();
+            final int[] shiftsAt = tag.getIntArrayTag("at").getValue();
+            final int[] shiftsTo = tag.getIntArrayTag("to").getValue();
+            final int size = tag.getIntTag("size").asInt();
             mappings = holderSupplier.get(size);
 
-            // Handle values until first shift
             if (shiftsAt[0] != 0) {
+                // Add identity values before the first shift
                 final int to = shiftsAt[0];
                 for (int id = 0; id < to; id++) {
                     addConsumer.addTo(mappings, id, id);
                 }
             }
 
-            // Handle shifts
+            // Read shifts
             for (int i = 0; i < shiftsAt.length; i++) {
+                final boolean isLast = i == shiftsAt.length - 1;
                 final int from = shiftsAt[i];
-                final int to = i == shiftsAt.length - 1 ? size : shiftsAt[i + 1];
+                final int to = isLast ? size : shiftsAt[i + 1];
                 int mappedId = shiftsTo[i];
                 for (int id = from; id < to; id++) {
                     addConsumer.addTo(mappings, id, mappedId++);
                 }
             }
         } else if (strategy == CHANGES_ID) {
-            final IntArrayTag changesAtTag = tag.getIntArrayTag("at");
-            final IntArrayTag valuesTag = tag.getIntArrayTag("val");
-            final IntTag sizeTag = tag.getUnchecked("size");
+            final int[] changesAt = tag.getIntArrayTag("at").getValue();
+            final int[] values = tag.getIntArrayTag("val").getValue();
+            final int size = tag.getIntTag("size").asInt();
             final boolean fillBetween = tag.get("nofill") == null;
-            final int[] changesAt = changesAtTag.getValue();
-            final int[] values = valuesTag.getValue();
-            mappings = holderSupplier.get(sizeTag.asInt());
+            mappings = holderSupplier.get(size);
 
+            int previousChangedId = 0;
             for (int i = 0; i < changesAt.length; i++) {
-                final int id = changesAt[i];
+                final int changedId = changesAt[i];
                 if (fillBetween) {
                     // Fill from after the last change to before this change with unchanged ids
-                    final int previousId = i != 0 ? changesAt[i - 1] + 1 : 0;
-                    for (int identity = previousId; identity < id; identity++) {
-                        addConsumer.addTo(mappings, identity, identity);
+                    for (int id = previousChangedId + 1; id < changedId; id++) {
+                        addConsumer.addTo(mappings, id, id);
                     }
+                    previousChangedId = changedId;
                 }
 
                 // Assign the changed value
-                addConsumer.addTo(mappings, id, values[i]);
+                addConsumer.addTo(mappings, changedId, values[i]);
             }
         } else if (strategy == IDENTITY_ID) {
-            final IntTag sizeTag = tag.getUnchecked("size");
-            return new IdentityMappings(sizeTag.asInt(), mappedSizeTag.asInt());
+            final IntTag sizeTag = tag.getIntTag("size");
+            return new IdentityMappings(sizeTag.asInt(), mappedSize);
         } else {
             throw new IllegalArgumentException("Unknown serialization strategy: " + strategy);
         }
-        return mappingsSupplier.create(mappings, mappedSizeTag.asInt());
+        return mappingsSupplier.create(mappings, mappedSize);
     }
 
     public @Nullable List<String> identifiersFromGlobalIds(final CompoundTag mappingsTag, final String key) {
@@ -295,7 +290,7 @@ public class MappingDataLoader {
      * @return map with indexes hashed by their id value
      */
     public Object2IntMap<String> indexedObjectToMap(final JsonObject object) {
-        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size(), .99F);
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(object.size());
         map.defaultReturnValue(-1);
         for (final Map.Entry<String, JsonElement> entry : object.entrySet()) {
             map.put(entry.getValue().getAsString(), Integer.parseInt(entry.getKey()));
@@ -310,7 +305,7 @@ public class MappingDataLoader {
      * @return map with indexes hashed by their id value
      */
     public Object2IntMap<String> arrayToMap(final JsonArray array) {
-        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size(), .99F);
+        final Object2IntMap<String> map = new Object2IntOpenHashMap<>(array.size());
         map.defaultReturnValue(-1);
         for (int i = 0; i < array.size(); i++) {
             map.put(array.get(i).getAsString(), i);
