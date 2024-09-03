@@ -112,7 +112,10 @@ public class JoinListener implements Listener {
             return;
         }
         // The connection has already closed, that was a quick leave
-        if (!channel.isOpen()) return;
+        // Channel may be null if a plugin is manually calling the event for a non-player...
+        if (channel == null || !channel.isOpen()) {
+            return;
+        }
 
         UserConnection user = getUserConnection(channel);
         if (user == null) {
