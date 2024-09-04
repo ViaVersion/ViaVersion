@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.BlockStateProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.DyedColor;
 import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
+import com.viaversion.viaversion.api.minecraft.item.data.Equippable;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
@@ -70,6 +71,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Unbreakable> UNBREAKABLE = new StructuredDataKey<>("unbreakable", Unbreakable.TYPE);
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TAG);
     public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TAG);
+    public static final StructuredDataKey<String> ITEM_MODEL = new StructuredDataKey<>("item_model", Types.STRING);
     public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", Types.TAG_ARRAY);
     public static final StructuredDataKey<Integer> RARITY = new StructuredDataKey<>("rarity", Types.VAR_INT);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS = new StructuredDataKey<>("enchantments", Enchantments.TYPE);
@@ -93,7 +95,10 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Types.EMPTY);
     public static final StructuredDataKey<ToolProperties> TOOL = new StructuredDataKey<>("tool", ToolProperties.TYPE);
     public static final StructuredDataKey<Integer> ENCHANTABLE = new StructuredDataKey<>("enchantable", Types.VAR_INT);
+    public static final StructuredDataKey<Equippable> EQUIPPABLE = new StructuredDataKey<>("equippable", Equippable.TYPE);
     public static final StructuredDataKey<HolderSet> REPAIRABLE = new StructuredDataKey<>("repairable", Types.HOLDER_SET);
+    public static final StructuredDataKey<Unit> GLIDER = new StructuredDataKey<>("glider", Types.EMPTY);
+    public static final StructuredDataKey<String> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.STRING);
     public static final StructuredDataKey<Enchantments> STORED_ENCHANTMENTS = new StructuredDataKey<>("stored_enchantments", Enchantments.TYPE);
     public static final StructuredDataKey<DyedColor> DYED_COLOR = new StructuredDataKey<>("dyed_color", DyedColor.TYPE);
     public static final StructuredDataKey<Integer> MAP_COLOR = new StructuredDataKey<>("map_color", Types.INT);

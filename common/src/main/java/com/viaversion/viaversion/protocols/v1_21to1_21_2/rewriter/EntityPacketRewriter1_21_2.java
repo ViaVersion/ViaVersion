@@ -120,13 +120,62 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
         });
 
-        protocol.appendServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS, wrapper -> {
+        protocol.registerClientbound(ClientboundPackets1_21.PLAYER_POSITION, wrapper -> {
+            wrapper.write(Types.VAR_INT, 0); // Teleport id, set at the end
+
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement X
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement Y
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement Z
+
+            // Pack y and x rot
+            final float yaw = wrapper.read(Types.FLOAT);
+            final float pitch = wrapper.read(Types.FLOAT);
+            wrapper.write(Types.BYTE, (byte) Math.floor(yaw * 256F / 360F));
+            wrapper.write(Types.BYTE, (byte) Math.floor(pitch * 256F / 360F));
+
+            // Add new delta movement flags so their current veloticy is kept
+            int relativeArguments = wrapper.read(Types.BYTE);
+            relativeArguments |= 1 << 5;
+            relativeArguments |= 1 << 6;
+            relativeArguments |= 1 << 7;
+            wrapper.write(Types.INT, relativeArguments);
+
+            final int teleportId = wrapper.read(Types.VAR_INT);
+            wrapper.set(Types.VAR_INT, 0, teleportId);
+        });
+
+        // Previously only used while in a vehicle, now always sent.
+        // The server will ignore it if not in a vehicle, so we can always pass it through
+        protocol.registerServerbound(ServerboundPackets1_21_2.PLAYER_INPUT, wrapper -> {
+            final byte flags = wrapper.read(Types.BYTE);
+            final boolean left = (flags & 4) != 0;
+            final boolean right = (flags & 8) != 0;
+            wrapper.write(Types.FLOAT, left ? 1F : (right ? -1F : 0F));
+
+            final boolean forward = (flags & 1) != 0;
+            final boolean backward = (flags & 2) != 0;
+            wrapper.write(Types.FLOAT, forward ? 1F : (backward ? -1F : 0F));
+
+            byte updatedFlags = 0;
+            if ((flags & 1) != 0) {
+                updatedFlags |= 1;
+            } else if ((flags & 2) != 0) {
+                updatedFlags |= 2;
+            }
+            wrapper.write(Types.BYTE, updatedFlags);
+        });
+
+        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
             readOnGround(wrapper);
         });
-        protocol.appendServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS_ROT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS_ROT, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
@@ -134,12 +183,12 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.FLOAT); // Pitch
             readOnGround(wrapper);
         });
-        protocol.appendServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_ROT, wrapper -> {
+        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_ROT, wrapper -> {
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
             readOnGround(wrapper);
         });
-        protocol.appendServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
+        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
     }
 
     public static void updateEnchantmentAttributes(final RegistryEntry[] entries, final FullMappings mappings) {
