@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
@@ -120,6 +121,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             wrapper.write(Types.VAR_INT, 64); // Sea level
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
+
+            wrapper.user().get(ClientVehicleStorage.class).clear();
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.PLAYER_POSITION, wrapper -> {
@@ -150,22 +153,53 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.set(Types.VAR_INT, 0, teleportId);
         });
 
-        // Previously only used while in a vehicle, now always sent.
-        // The server will ignore it if not in a vehicle, so we can always pass it through
+        protocol.registerClientbound(ClientboundPackets1_21.SET_PASSENGERS, wrapper -> {
+            final int vehicleId = wrapper.passthrough(Types.VAR_INT);
+            final int[] passengerIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
+            final ClientVehicleStorage storage = wrapper.user().get(ClientVehicleStorage.class);
+            if (vehicleId == storage.vehicleId()) {
+                storage.clear();
+            }
+
+            final int clientEntityId = tracker(wrapper.user()).clientEntityId();
+            for (final int passenger : passengerIds) {
+                if (passenger == clientEntityId) {
+                    storage.setVehicleId(vehicleId);
+                    break;
+                }
+            }
+        });
+        protocol.appendClientbound(ClientboundPackets1_21.REMOVE_ENTITIES, wrapper -> {
+            final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            final int[] entityIds = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
+            for (final int entityId : entityIds) {
+                if (entityId == vehicleStorage.vehicleId()) {
+                    vehicleStorage.clear();
+                }
+            }
+        });
         protocol.registerServerbound(ServerboundPackets1_21_2.PLAYER_INPUT, wrapper -> {
+            // Previously only used while in a vehicle, now always sent
+            // Filter them appropriately
+            if (wrapper.user().get(ClientVehicleStorage.class).vehicleId() == -1) {
+                wrapper.cancel();
+                return;
+            }
+
             final byte flags = wrapper.read(Types.BYTE);
-            final boolean left = (flags & 4) != 0;
-            final boolean right = (flags & 8) != 0;
+            final boolean left = (flags & 1 << 2) != 0;
+            final boolean right = (flags & 1 << 3) != 0;
             wrapper.write(Types.FLOAT, left ? IMPULSE : (right ? -IMPULSE : 0F));
 
-            final boolean forward = (flags & 1) != 0;
-            final boolean backward = (flags & 2) != 0;
+            final boolean forward = (flags & 1 << 0) != 0;
+            final boolean backward = (flags & 1 << 1) != 0;
             wrapper.write(Types.FLOAT, forward ? IMPULSE : (backward ? -IMPULSE : 0F));
 
             byte updatedFlags = 0;
-            if ((flags & 1) != 0) {
+            if ((flags & 1 << 4) != 0) {
                 updatedFlags |= 1;
-            } else if ((flags & 2) != 0) {
+            }
+            if ((flags & 1 << 5) != 0) {
                 updatedFlags |= 2;
             }
             wrapper.write(Types.BYTE, updatedFlags);
