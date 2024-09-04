@@ -41,6 +41,8 @@ import java.util.Arrays;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
 
+    private static final float IMPULSE = 0.98F;
+
     public EntityPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol);
     }
@@ -154,11 +156,11 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final byte flags = wrapper.read(Types.BYTE);
             final boolean left = (flags & 4) != 0;
             final boolean right = (flags & 8) != 0;
-            wrapper.write(Types.FLOAT, left ? 1F : (right ? -1F : 0F));
+            wrapper.write(Types.FLOAT, left ? IMPULSE : (right ? -IMPULSE : 0F));
 
             final boolean forward = (flags & 1) != 0;
             final boolean backward = (flags & 2) != 0;
-            wrapper.write(Types.FLOAT, forward ? 1F : (backward ? -1F : 0F));
+            wrapper.write(Types.FLOAT, forward ? IMPULSE : (backward ? -IMPULSE : 0F));
 
             byte updatedFlags = 0;
             if ((flags & 1) != 0) {
@@ -224,8 +226,17 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
         for (final CompoundTag data : locationChanged) {
             final CompoundTag effect = data.getCompoundTag("effect");
-            if (effect != null) {
-                updateAttributeField(effect, mappings);
+            if (effect == null) {
+                continue;
+            }
+
+            updateAttributeField(effect, mappings);
+
+            final ListTag<CompoundTag> innerEffects = effect.getListTag("effects", CompoundTag.class);
+            if (innerEffects != null) {
+                for (final CompoundTag innerEffect : innerEffects) {
+                    updateAttributeField(innerEffect, mappings);
+                }
             }
         }
     }
