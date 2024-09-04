@@ -307,5 +307,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.CONSUMABLE1_21_2);
         dataContainer.remove(StructuredDataKey.USE_REMAINDER);
         dataContainer.remove(StructuredDataKey.USE_COOLDOWN);
+        dataContainer.remove(StructuredDataKey.ITEM_MODEL);
+        dataContainer.remove(StructuredDataKey.EQUIPPABLE);
+        dataContainer.remove(StructuredDataKey.GLIDER);
+        dataContainer.remove(StructuredDataKey.TOOLTIP_STYLE);
     }
 }
