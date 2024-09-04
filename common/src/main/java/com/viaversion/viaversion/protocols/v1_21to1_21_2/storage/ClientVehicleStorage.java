@@ -19,19 +19,5 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class ClientVehicleStorage implements StorableObject {
-
-    private int vehicleId = -1;
-
-    public int vehicleId() {
-        return this.vehicleId;
-    }
-
-    public void setVehicleId(final int vehicleId) {
-        this.vehicleId = vehicleId;
-    }
-
-    public void clear() {
-        this.vehicleId = -1;
-    }
+public record ClientVehicleStorage(int vehicleId) implements StorableObject {
 }

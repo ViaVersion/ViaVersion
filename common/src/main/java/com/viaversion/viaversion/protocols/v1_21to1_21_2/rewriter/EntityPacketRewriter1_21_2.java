@@ -122,7 +122,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.VAR_INT, 64); // Sea level
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
 
-            wrapper.user().get(ClientVehicleStorage.class).clear();
+            wrapper.user().remove(ClientVehicleStorage.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.PLAYER_POSITION, wrapper -> {
@@ -157,31 +157,36 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final int vehicleId = wrapper.passthrough(Types.VAR_INT);
             final int[] passengerIds = wrapper.passthrough(Types.VAR_INT_ARRAY_PRIMITIVE);
             final ClientVehicleStorage storage = wrapper.user().get(ClientVehicleStorage.class);
-            if (vehicleId == storage.vehicleId()) {
-                storage.clear();
+            if (storage != null && vehicleId == storage.vehicleId()) {
+                wrapper.user().remove(ClientVehicleStorage.class);
             }
 
             final int clientEntityId = tracker(wrapper.user()).clientEntityId();
             for (final int passenger : passengerIds) {
                 if (passenger == clientEntityId) {
-                    storage.setVehicleId(vehicleId);
+                    wrapper.user().put(new ClientVehicleStorage(vehicleId));
                     break;
                 }
             }
         });
         protocol.appendClientbound(ClientboundPackets1_21.REMOVE_ENTITIES, wrapper -> {
             final ClientVehicleStorage vehicleStorage = wrapper.user().get(ClientVehicleStorage.class);
+            if (vehicleStorage == null) {
+                return;
+            }
+
             final int[] entityIds = wrapper.get(Types.VAR_INT_ARRAY_PRIMITIVE, 0);
             for (final int entityId : entityIds) {
                 if (entityId == vehicleStorage.vehicleId()) {
-                    vehicleStorage.clear();
+                    wrapper.user().remove(ClientVehicleStorage.class);
+                    break;
                 }
             }
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.PLAYER_INPUT, wrapper -> {
             // Previously only used while in a vehicle, now always sent
             // Filter them appropriately
-            if (wrapper.user().get(ClientVehicleStorage.class).vehicleId() == -1) {
+            if (!wrapper.user().has(ClientVehicleStorage.class)) {
                 wrapper.cancel();
                 return;
             }
