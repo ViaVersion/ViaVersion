@@ -143,6 +143,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     public void registerPlayerInfoUpdate1_20_3(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            if (!actions.get(5)) { // Update display name
+                return;
+            }
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID);
@@ -169,9 +172,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 if (actions.get(4)) {
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
-                if (actions.get(5)) { // Update display name
-                    processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
-                }
+                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
             }
         });
     }
