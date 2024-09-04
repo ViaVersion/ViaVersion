@@ -40,6 +40,7 @@ import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.BitSet;
 
 /**
  * Handles json and tag components, containing methods to override certain parts of the handling.
@@ -136,6 +137,42 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         protocol.registerClientbound(packetType, wrapper -> {
             passthroughAndProcess(wrapper);
             passthroughAndProcess(wrapper);
+        });
+    }
+
+    public void registerPlayerInfoUpdate1_20_3(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final int entries = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Types.UUID);
+                if (actions.get(0)) {
+                    wrapper.passthrough(Types.STRING); // Player Name
+
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
+                    }
+                }
+                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.UUID); // Session UUID
+                    wrapper.passthrough(Types.PROFILE_KEY);
+                }
+                if (actions.get(2)) {
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                }
+                if (actions.get(3)) {
+                    wrapper.passthrough(Types.BOOLEAN); // Listed
+                }
+                if (actions.get(4)) {
+                    wrapper.passthrough(Types.VAR_INT); // Latency
+                }
+                if (actions.get(5)) { // Update display name
+                    processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+                }
+            }
         });
     }
 
