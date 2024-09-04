@@ -25,49 +25,29 @@ package com.viaversion.viaversion.api.minecraft;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-final class HolderImpl<T> implements Holder<T> {
+record IdHolder<T>(int id) implements Holder<T> {
 
-    private final T value;
-    private final int id;
-
-    HolderImpl(final int id) {
+    IdHolder {
         Preconditions.checkArgument(id >= 0, "id cannot be negative");
-        this.value = null;
-        this.id = id;
-    }
-
-    HolderImpl(final T value) {
-        this.value = value;
-        this.id = -1;
     }
 
     @Override
     public boolean isDirect() {
-        return id == -1;
+        return false;
     }
 
     @Override
     public boolean hasId() {
-        return id != -1;
+        return true;
     }
 
     @Override
     public T value() {
-        Preconditions.checkArgument(isDirect(), "Holder is not direct");
-        return value;
-    }
-
-    @Override
-    public int id() {
-        return id;
+        throw new IllegalArgumentException("Holder is not direct");
     }
 
     @Override
     public Holder<T> updateId(final Int2IntFunction rewriteFunction) {
-        if (isDirect()) {
-            return this;
-        }
-
         final int rewrittenId = rewriteFunction.applyAsInt(id);
         if (rewrittenId == id) {
             return this;
@@ -76,13 +56,5 @@ final class HolderImpl<T> implements Holder<T> {
             throw new IllegalArgumentException("Received invalid id in updateId");
         }
         return Holder.of(rewrittenId);
-    }
-
-    @Override
-    public String toString() {
-        return "HolderImpl{" +
-            "value=" + value +
-            ", id=" + id +
-            '}';
     }
 }
