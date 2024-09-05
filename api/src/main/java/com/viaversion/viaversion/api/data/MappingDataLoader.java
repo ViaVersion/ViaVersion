@@ -247,15 +247,15 @@ public class MappingDataLoader {
             final boolean fillBetween = tag.get("nofill") == null;
             mappings = holderSupplier.get(size);
 
-            int previousChangedId = 0;
+            int nextUnhandledId = 0;
             for (int i = 0; i < changesAt.length; i++) {
                 final int changedId = changesAt[i];
                 if (fillBetween) {
                     // Fill from after the last change to before this change with unchanged ids
-                    for (int id = previousChangedId + 1; id < changedId; id++) {
+                    for (int id = nextUnhandledId; id < changedId; id++) {
                         addConsumer.addTo(mappings, id, id);
                     }
-                    previousChangedId = changedId;
+                    nextUnhandledId = changedId + 1;
                 }
 
                 // Assign the changed value
