@@ -1170,7 +1170,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         boolean valid = author != null && title != null && title.length() <= 32 && pagesTag != null;
         if (valid) {
             for (final StringTag page : pagesTag) {
-                if (page.getValue().length() > 32767) {
+                if (page.getValue().length() > Short.MAX_VALUE) {
                     valid = false;
                     break;
                 }
