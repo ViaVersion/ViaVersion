@@ -1163,47 +1163,63 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateWrittenBookPages(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag) {
+        final String title = tag.getString("title");
+        final String author = tag.getString("author");
         final ListTag<StringTag> pagesTag = tag.getListTag("pages", StringTag.class);
-        final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
-        if (pagesTag == null) {
-            return;
+
+        boolean valid = author != null && title != null && title.length() <= 32 && pagesTag != null;
+        if (valid) {
+            for (final StringTag page : pagesTag) {
+                if (page.getValue().length() > Short.MAX_VALUE) {
+                    valid = false;
+                    break;
+                }
+            }
         }
 
         final List<FilterableComponent> pages = new ArrayList<>();
-        for (int i = 0; i < pagesTag.size(); i++) {
-            final StringTag page = pagesTag.get(i);
-            Tag filtered = null;
-            if (filteredPagesTag != null) {
-                final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
-                if (filteredPage != null) {
-                    try {
-                        filtered = jsonToTag(connection, filteredPage);
-                    } catch (final Exception e) {
-                        // A 1.20.4 client would display the broken json raw, but a 1.20.5 client would die
-                        continue;
+        if (valid) {
+            final CompoundTag filteredPagesTag = tag.getCompoundTag("filtered_pages");
+
+            for (int i = 0; i < pagesTag.size(); i++) {
+                final StringTag page = pagesTag.get(i);
+                Tag filtered = null;
+                if (filteredPagesTag != null) {
+                    final StringTag filteredPage = filteredPagesTag.getStringTag(String.valueOf(i));
+                    if (filteredPage != null) {
+                        try {
+                            filtered = jsonToTag(connection, filteredPage);
+                        } catch (final Exception e) {
+                            // A 1.20.4 client would display the broken json raw, but a 1.20.5 client would die
+                            continue;
+                        }
                     }
                 }
-            }
 
-            final Tag parsedPage;
-            try {
-                parsedPage = jsonToTag(connection, page);
-            } catch (final Exception e) {
-                // Same as above
-                continue;
-            }
+                final Tag parsedPage;
+                try {
+                    parsedPage = jsonToTag(connection, page);
+                } catch (final Exception e) {
+                    // Same as above
+                    continue;
+                }
 
-            pages.add(new FilterableComponent(parsedPage, filtered));
+                pages.add(new FilterableComponent(parsedPage, filtered));
+            }
+        } else {
+            final CompoundTag invalidPage = new CompoundTag();
+            invalidPage.putString("text", "* Invalid book tag *");
+            invalidPage.putString("color", "#AA0000"); // dark red
+
+            pages.add(new FilterableComponent(invalidPage, null));
         }
 
-        final String title = tag.getString("title", "");
         final String filteredTitle = tag.getString("filtered_title"); // Nullable
-        final String author = tag.getString("author", "");
         final int generation = tag.getInt("generation");
         final boolean resolved = tag.getBoolean("resolved");
         final WrittenBook writtenBook = new WrittenBook(
-            new FilterableString(limit(title, 32), limit(filteredTitle, 32)),
-            author,
+            new FilterableString(limit(title == null ? "" : title, 32), limit(filteredTitle, 32)),
+            author == null ? "" : author,
             clamp(generation, 0, 3),
             pages.toArray(new FilterableComponent[0]),
             resolved
