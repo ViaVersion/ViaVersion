@@ -447,7 +447,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     protected SerializerVersion outputSerializerVersion() {
-        return null;
+        return inputSerializerVersion(); // Only matters if the nbt serializer changed
     }
 
     private void convertLegacyContents(final CompoundTag hoverEvent) {

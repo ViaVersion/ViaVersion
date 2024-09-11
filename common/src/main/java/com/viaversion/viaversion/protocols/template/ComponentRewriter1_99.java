@@ -15,45 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
+package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
-import com.viaversion.viaversion.util.TagUtil;
-import com.viaversion.viaversion.util.UUIDUtil;
-import java.util.UUID;
 
-public final class ComponentRewriter1_21 extends ComponentRewriter<ClientboundPacket1_20_5> {
+public final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_21> {
 
-    public ComponentRewriter1_21(final Protocol1_20_5To1_21 protocol) {
+    public ComponentRewriter1_99(final Protocol1_99To_98 protocol) {
         super(protocol, ReadType.NBT);
-    }
-
-    private void convertAttributeModifiersComponent(final CompoundTag tag) {
-        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(tag, "minecraft:attribute_modifiers");
-        if (attributeModifiers == null) {
-            return;
-        }
-        final ListTag<CompoundTag> modifiers = attributeModifiers.getListTag("modifiers", CompoundTag.class);
-        for (final CompoundTag modifier : modifiers) {
-            final String name = modifier.getString("name");
-            final UUID uuid = UUIDUtil.fromIntArray(modifier.getIntArrayTag("uuid").getValue());
-            final String id = Protocol1_20_5To1_21.mapAttributeUUID(uuid, name);
-            modifier.putString("id", id);
-        }
     }
 
     @Override
     protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final CompoundTag componentsTag) {
         super.handleShowItem(connection, itemTag, componentsTag);
-        if (componentsTag != null) {
-            convertAttributeModifiersComponent(componentsTag);
+        if (componentsTag == null) {
+            return;
         }
+
+        // Remove or update data from componentsTag
     }
 
     @Override

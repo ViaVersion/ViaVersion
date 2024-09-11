@@ -62,8 +62,5 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
         return SerializerVersion.V1_20_5;
     }
 
-    @Override
-    protected SerializerVersion outputSerializerVersion() {
-        return SerializerVersion.V1_20_5;
-    }
+    // Only cosmetic changes in the 1.21.2 serializer
 }

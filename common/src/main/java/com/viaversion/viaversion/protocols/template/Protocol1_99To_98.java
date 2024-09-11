@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
@@ -50,6 +51,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
+    private final ComponentRewriter1_99 componentRewriter = new ComponentRewriter1_99(this);
 
     public Protocol1_99To_98() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
@@ -62,6 +64,19 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
 
         tagRewriter.registerGeneric(ClientboundPackets1_21.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
+
+        // If needed for item or component changes
+        componentRewriter.registerOpenScreen(ClientboundPackets1_21.OPEN_SCREEN);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_ACTION_BAR_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_TITLE_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_SUBTITLE_TEXT);
+        componentRewriter.registerBossEvent(ClientboundPackets1_21.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_21.TAB_LIST);
+        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
+        componentRewriter.registerPing();
 
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
@@ -130,6 +145,11 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
     @Override
     public TagRewriter<ClientboundPacket1_21> getTagRewriter() {
         return tagRewriter;
+    }
+
+    @Override
+    public ComponentRewriter getComponentRewriter() {
+        return componentRewriter;
     }
 
     @Override

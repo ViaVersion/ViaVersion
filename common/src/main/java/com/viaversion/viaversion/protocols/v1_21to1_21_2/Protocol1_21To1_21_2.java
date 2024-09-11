@@ -70,6 +70,18 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         tagRewriter.registerGeneric(ClientboundPackets1_21.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
 
+        componentRewriter.registerOpenScreen(ClientboundPackets1_21.OPEN_SCREEN);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_ACTION_BAR_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_TITLE_TEXT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_SUBTITLE_TEXT);
+        componentRewriter.registerBossEvent(ClientboundPackets1_21.BOSS_EVENT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISCONNECT);
+        componentRewriter.registerTabList(ClientboundPackets1_21.TAB_LIST);
+        componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
+        componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
+        componentRewriter.registerPing();
+
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND_ENTITY);
