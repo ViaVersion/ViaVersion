@@ -398,7 +398,7 @@ public final class StructuredDataConverter {
 
             enchantmentsTag.add(invalidEnchantment);
         });
-        register(StructuredDataKey.POTION_CONTENTS, (data, tag) -> {
+        register(StructuredDataKey.POTION_CONTENTS1_20_5, (data, tag) -> {
             if (data.potion() != null) {
                 final String potion = Potions1_20_5.idToKey(data.potion()); // Include 1.20.5 names
                 if (potion != null) {

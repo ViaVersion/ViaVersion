@@ -53,6 +53,8 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
             food.remove("eat_seconds");
             food.remove("effects");
         }
+
+        TagUtil.removeNamespaced(componentsTag, "fire_resistant");
     }
 
     @Override

@@ -32,7 +32,8 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Nullable String model,
-                         @Nullable HolderSet allowedEntities, boolean dispensable) {
+                         @Nullable HolderSet allowedEntities, boolean dispensable, boolean swappable,
+                         boolean damageOnHurt) {
 
     public static final Type<Equippable> TYPE = new Type<>(Equippable.class) {
         @Override
@@ -42,7 +43,9 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             final String model = Types.STRING.read(buffer);
             final HolderSet allowedEntities = Types.HOLDER_SET.read(buffer);
             final boolean dispensable = buffer.readBoolean();
-            return new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable);
+            final boolean swappable = buffer.readBoolean();
+            final boolean damageOnHurt = buffer.readBoolean();
+            return new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable, swappable, damageOnHurt);
         }
 
         @Override
@@ -52,11 +55,13 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             Types.STRING.write(buffer, value.model());
             Types.HOLDER_SET.write(buffer, value.allowedEntities());
             buffer.writeBoolean(value.dispensable());
+            buffer.writeBoolean(value.swappable());
+            buffer.writeBoolean(value.damageOnHurt());
         }
     };
 
     public Equippable rewrite(final Int2IntFunction soundIdRewriter) {
         final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriter);
-        return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable);
+        return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable, swappable, damageOnHurt);
     }
 }

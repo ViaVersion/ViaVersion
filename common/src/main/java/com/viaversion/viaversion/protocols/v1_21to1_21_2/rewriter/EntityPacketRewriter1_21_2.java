@@ -136,11 +136,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.DOUBLE, 0D); // Delta movement Y
             wrapper.write(Types.DOUBLE, 0D); // Delta movement Z
 
-            // Pack y and x rot
-            final float yaw = wrapper.read(Types.FLOAT);
-            final float pitch = wrapper.read(Types.FLOAT);
-            wrapper.write(Types.BYTE, (byte) Math.floor(yaw * 256F / 360F));
-            wrapper.write(Types.BYTE, (byte) Math.floor(pitch * 256F / 360F));
+            wrapper.passthrough(Types.FLOAT); // Y rot
+            wrapper.passthrough(Types.FLOAT); // X rot
 
             // Add new delta movement flags so their current veloticy is kept
             int relativeArguments = wrapper.read(Types.BYTE);

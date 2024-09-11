@@ -965,7 +965,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         if (potionId != null || customPotionColorTag != null || potionEffects != null) {
-            data.set(StructuredDataKey.POTION_CONTENTS, new PotionContents(
+            data.set(StructuredDataKey.POTION_CONTENTS1_20_5, new PotionContents(
                 potionId,
                 customPotionColorTag != null ? customPotionColorTag.asInt() : null,
                 potionEffects != null ? potionEffects : new PotionEffect[0]

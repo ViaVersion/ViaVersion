@@ -144,7 +144,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         registerEmpty(StructuredDataKey.MAP_POST_PROCESSING);
         register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::convertChargedProjectiles);
         register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::convertBundleContents);
-        register(StructuredDataKey.POTION_CONTENTS, this::convertPotionContents);
+        register(StructuredDataKey.POTION_CONTENTS1_20_5, this::convertPotionContents);
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::convertSuspiciousStewEffects);
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::convertWritableBookContent);
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::convertWrittenBookContent);
