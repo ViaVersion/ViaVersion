@@ -95,7 +95,10 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public void clearEntities() {
-        entities.clear();
+        // Call wrapper function in case protocols need to do additional removals
+        for (final int id : entities.keySet().toIntArray()) {
+            removeEntity(id);
+        }
     }
 
     @Override
