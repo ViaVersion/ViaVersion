@@ -30,9 +30,7 @@ import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
