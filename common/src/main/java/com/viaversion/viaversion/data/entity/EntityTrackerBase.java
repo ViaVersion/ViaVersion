@@ -30,7 +30,9 @@ import com.viaversion.viaversion.util.Key;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeListener {
@@ -95,7 +97,10 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public void clearEntities() {
-        entities.clear();
+        // Call wrapper function in case protocols need to do additional removals
+        for (final int id : entities.keySet().toIntArray()) {
+            removeEntity(id);
+        }
     }
 
     @Override
