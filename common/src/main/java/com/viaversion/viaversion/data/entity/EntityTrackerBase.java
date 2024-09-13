@@ -102,8 +102,13 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public Integer clientEntityId() {
-        return clientEntityId;
+    public boolean hasClientEntityId() {
+        return clientEntityId != null;
+    }
+
+    @Override
+    public int clientEntityId() {
+        return clientEntityId != null ? clientEntityId : -1;
     }
 
     @Override
