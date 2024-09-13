@@ -109,11 +109,12 @@ public interface EntityTracker {
     boolean hasClientEntityId();
 
     /**
-     * Returns the client entity id or -1 if unset. Should be wrapped around {@link #hasClientEntityId()}.
+     * Returns the client entity id. Should be wrapped around {@link #hasClientEntityId()}.
      *
-     * @return client entity id or -1 if unset
+     * @return client entity id
+     * @throws IllegalStateException if the client entity id has not been set
      */
-    int clientEntityId();
+    int clientEntityId() throws IllegalStateException;
 
     /**
      * Sets the client entity id.

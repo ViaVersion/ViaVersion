@@ -107,8 +107,11 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public int clientEntityId() {
-        return clientEntityId != null ? clientEntityId : -1;
+    public int clientEntityId() throws IllegalStateException {
+        if (clientEntityId == null) {
+            throw new IllegalStateException("Client entity id not set");
+        }
+        return clientEntityId;
     }
 
     @Override
