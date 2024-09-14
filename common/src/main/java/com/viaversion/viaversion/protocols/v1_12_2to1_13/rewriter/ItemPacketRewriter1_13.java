@@ -304,23 +304,15 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
             if (ench != null) {
                 ListTag<CompoundTag> enchantments = new ListTag<>(CompoundTag.class);
                 for (CompoundTag enchEntry : ench) {
-                    NumberTag idTag = enchEntry.getNumberTag("id");
-                    if (idTag == null) {
-                        continue;
-                    }
+                    short oldId = enchEntry.getShort("id", (short) 0);
 
                     CompoundTag enchantmentEntry = new CompoundTag();
-                    short oldId = idTag.asShort();
                     String newId = Protocol1_12_2To1_13.MAPPINGS.getOldEnchantmentsIds().get(oldId);
                     if (newId == null) {
                         newId = "viaversion:legacy/" + oldId;
                     }
                     enchantmentEntry.putString("id", newId);
-
-                    NumberTag levelTag = enchEntry.getNumberTag("lvl");
-                    if (levelTag != null) {
-                        enchantmentEntry.putShort("lvl", levelTag.asShort());
-                    }
+                    enchantmentEntry.putShort("lvl", enchEntry.getShort("lvl", (short) 0));
 
                     enchantments.add(enchantmentEntry);
                 }
@@ -589,10 +581,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     }
                     if (oldId != null) {
                         enchEntry.putShort("id", oldId);
-                        NumberTag levelTag = enchantmentEntry.getNumberTag("lvl");
-                        if (levelTag != null) {
-                            enchEntry.putShort("lvl", levelTag.asShort());
-                        }
+                        enchEntry.putShort("lvl", enchantmentEntry.getShort("lvl", (short) 0));
                         ench.add(enchEntry);
                     }
                 }
