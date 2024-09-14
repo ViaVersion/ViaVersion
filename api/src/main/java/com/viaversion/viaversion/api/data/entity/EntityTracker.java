@@ -102,11 +102,19 @@ public interface EntityTracker {
     @Nullable StoredEntityData entityDataIfPresent(int id);
 
     /**
-     * Returns the client entity id or -1 if unset.
+     * Returns whether the client entity id has been set.
      *
-     * @return client entity id or -1 if unset
+     * @return whether the client entity id has been set
      */
-    int clientEntityId();
+    boolean hasClientEntityId();
+
+    /**
+     * Returns the client entity id. Should be wrapped around {@link #hasClientEntityId()}.
+     *
+     * @return client entity id
+     * @throws IllegalStateException if the client entity id has not been set
+     */
+    int clientEntityId() throws IllegalStateException;
 
     /**
      * Sets the client entity id.

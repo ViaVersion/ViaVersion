@@ -37,7 +37,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     protected final Int2ObjectMap<TrackedEntity> entities = new Int2ObjectOpenHashMap<>();
     private final UserConnection connection;
     private final EntityType playerType;
-    private int clientEntityId = -1;
+    private Integer clientEntityId;
     private int currentWorldSectionHeight = -1;
     private int currentMinY;
     private String currentWorld;
@@ -102,7 +102,15 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     }
 
     @Override
-    public int clientEntityId() {
+    public boolean hasClientEntityId() {
+        return clientEntityId != null;
+    }
+
+    @Override
+    public int clientEntityId() throws IllegalStateException {
+        if (clientEntityId == null) {
+            throw new IllegalStateException("Client entity id not set");
+        }
         return clientEntityId;
     }
 
@@ -110,7 +118,7 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
     public void setClientEntityId(int clientEntityId) {
         Preconditions.checkNotNull(playerType);
         final TrackedEntity oldEntity;
-        if (this.clientEntityId != -1 && (oldEntity = entities.remove(this.clientEntityId)) != null) {
+        if (this.clientEntityId != null && (oldEntity = entities.remove(this.clientEntityId.intValue())) != null) {
             entities.put(clientEntityId, oldEntity);
         } else {
             entities.put(clientEntityId, new TrackedEntityImpl(playerType));
@@ -121,8 +129,8 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
 
     @Override
     public boolean trackClientEntity() {
-        if (clientEntityId != -1) {
-            entities.put(clientEntityId, new TrackedEntityImpl(playerType));
+        if (clientEntityId != null) {
+            entities.put(clientEntityId.intValue(), new TrackedEntityImpl(playerType));
             return true;
         }
         return false;
