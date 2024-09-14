@@ -116,6 +116,8 @@ public final class EntityPacketRewriter1_17 extends EntityRewriter<ClientboundPa
         protocol.registerClientbound(ClientboundPackets1_16_2.RESPAWN, wrapper -> {
             CompoundTag dimensionData = wrapper.passthrough(Types.NAMED_COMPOUND_TAG);
             addNewDimensionData(dimensionData);
+
+            onDimensionChange(wrapper.user());
         });
 
         protocol.registerClientbound(ClientboundPackets1_16_2.UPDATE_ATTRIBUTES, new PacketHandlers() {

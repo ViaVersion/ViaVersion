@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -97,6 +98,32 @@ public interface UserConnection {
      * @param tracker       entity tracker
      */
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
+
+    /**
+     * Returns a collection of client worlds currently registered.
+     *
+     * @return collection of client worlds currently registered
+     */
+    Collection<ClientWorld> getClientWorlds();
+
+    /**
+     * Returns the client world by the given protocol class if present.
+     *
+     * @param protocolClass protocol class
+     * @param <T>           client world type
+     * @return client world if present
+     */
+    @Nullable
+    <T extends ClientWorld> T getClientWorld(Class<? extends Protocol> protocolClass);
+
+    /**
+     * Adds a client world to the user connection.
+     * Does not override existing client worlds.
+     *
+     * @param protocolClass protocol class
+     * @param clientWorld   client world
+     */
+    void addClientWorld(Class<? extends Protocol> protocolClass, ClientWorld clientWorld);
 
     /**
      * Clear stored objects and entity trackers.

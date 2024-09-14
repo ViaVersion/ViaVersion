@@ -72,6 +72,8 @@ public class EntityPacketRewriter1_16_2 extends EntityRewriter<ClientboundPacket
         protocol.registerClientbound(ClientboundPackets1_16.RESPAWN, wrapper -> {
             String dimensionType = wrapper.read(Types.STRING);
             wrapper.write(Types.NAMED_COMPOUND_TAG, getDimensionData(dimensionType));
+
+            onDimensionChange(wrapper.user());
         });
     }
 

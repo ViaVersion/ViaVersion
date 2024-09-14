@@ -204,7 +204,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 2 - Dimension
                 handler(wrapper -> {
                     // Store the player
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientChunks = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });

@@ -99,7 +99,7 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
         });
 
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_10To1_11.class);
 
             Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
@@ -117,31 +117,6 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
                 // Handle new identifier
                 idTag.setValue(BlockEntityMappings1_11.toNewIdentifier(identifier));
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // 0 - Entity ID
-                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
-                map(Types.INT); // 2 - Dimension
-                handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 1);
-                    clientChunks.setEnvironment(dimensionId);
-                });
-            }
-        });
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT);
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-                });
             }
         });
 
@@ -238,11 +213,8 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
 
     @Override
     public void init(UserConnection userConnection) {
-        // Entity tracker
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_11(userConnection));
-
-        if (!userConnection.has(ClientWorld.class))
-            userConnection.put(new ClientWorld());
+        userConnection.addClientWorld(this.getClass(), new ClientWorld());
     }
 
     @Override

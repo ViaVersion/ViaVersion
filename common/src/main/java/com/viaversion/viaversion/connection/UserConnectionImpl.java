@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.ViaInjector;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
@@ -58,6 +59,7 @@ public class UserConnectionImpl implements UserConnection {
     private final long id = IDS.incrementAndGet();
     private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
     private final Map<Class<? extends Protocol>, EntityTracker> entityTrackers = new HashMap<>();
+    private final Map<Class<? extends Protocol>, ClientWorld> clientWorlds = new HashMap<>();
     private final PacketTracker packetTracker = new PacketTracker(this);
     private final Set<UUID> passthroughTokens = Collections.newSetFromMap(CacheBuilder.newBuilder()
         .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -127,6 +129,23 @@ public class UserConnectionImpl implements UserConnection {
     public void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker) {
         if (!entityTrackers.containsKey(protocolClass)) {
             entityTrackers.put(protocolClass, tracker);
+        }
+    }
+
+    @Override
+    public Collection<ClientWorld> getClientWorlds() {
+        return clientWorlds.values();
+    }
+
+    @Override
+    public @Nullable <T extends ClientWorld> T getClientWorld(final Class<? extends Protocol> protocolClass) {
+        return (T) clientWorlds.get(protocolClass);
+    }
+
+    @Override
+    public void addClientWorld(final Class<? extends Protocol> protocolClass, final ClientWorld clientWorld) {
+        if (!clientWorlds.containsKey(protocolClass)) {
+            clientWorlds.put(protocolClass, clientWorld);
         }
     }
 

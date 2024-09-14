@@ -125,7 +125,7 @@ public class WorldPacketRewriter1_14 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_13.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
             Chunk chunk = wrapper.read(ChunkType1_13.forEnvironment(clientWorld.getEnvironment()));
             wrapper.write(ChunkType1_14.TYPE, chunk);
 
@@ -282,21 +282,23 @@ public class WorldPacketRewriter1_14 {
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
                     int dimensionId = wrapper.get(Types.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
+                    if (!clientWorld.setEnvironment(dimensionId)) {
+                        return;
+                    }
+                    protocol.getEntityRewriter().onDimensionChange(wrapper.user());
+
                     EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
                     // The client may reset the center chunk if dimension is changed
                     entityTracker.setForceSendCenterChunk(true);
-                });
-                handler(wrapper -> {
+
                     short difficulty = wrapper.read(Types.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
                     PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.CHANGE_DIFFICULTY);
                     difficultyPacket.write(Types.UNSIGNED_BYTE, difficulty);
                     difficultyPacket.write(Types.BOOLEAN, false); // Unknown value added in 19w11a
                     difficultyPacket.scheduleSend(protocol.getClass());
-                });
-                handler(wrapper -> {
+
                     // Manually send the packet and update the viewdistance after
                     wrapper.send(Protocol1_13_2To1_14.class);
                     wrapper.cancel();
