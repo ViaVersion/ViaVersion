@@ -169,6 +169,7 @@ public class UserConnectionImpl implements UserConnection {
             }
             storedObjects.clear();
             entityTrackers.clear();
+            clientWorlds.clear();
         }
     }
 

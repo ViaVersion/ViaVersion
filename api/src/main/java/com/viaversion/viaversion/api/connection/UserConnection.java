@@ -126,14 +126,14 @@ public interface UserConnection {
     void addClientWorld(Class<? extends Protocol> protocolClass, ClientWorld clientWorld);
 
     /**
-     * Clear stored objects and entity trackers.
+     * Clear stored objects, entity trackers and client worlds.
      */
     default void clearStoredObjects() {
         clearStoredObjects(false);
     }
 
     /**
-     * Clear stored objects and entity trackers.
+     * Clear stored objects, entity trackers and client worlds.
      * If cleared for a proxy server switch, some stored objects and tracker data will be retained.
      *
      * @param isServerSwitch whether the clear is due to a server switch
