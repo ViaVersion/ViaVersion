@@ -131,11 +131,6 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     @Override
-    public Collection<ClientWorld> getClientWorlds() {
-        return clientWorlds.values();
-    }
-
-    @Override
     public @Nullable <T extends ClientWorld> T getClientWorld(final Class<? extends Protocol> protocolClass) {
         return (T) clientWorlds.get(protocolClass);
     }

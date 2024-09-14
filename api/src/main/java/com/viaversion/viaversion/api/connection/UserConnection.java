@@ -100,13 +100,6 @@ public interface UserConnection {
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
 
     /**
-     * Returns a collection of client worlds currently registered.
-     *
-     * @return collection of client worlds currently registered
-     */
-    Collection<ClientWorld> getClientWorlds();
-
-    /**
      * Returns the client world by the given protocol class if present.
      *
      * @param protocolClass protocol class
