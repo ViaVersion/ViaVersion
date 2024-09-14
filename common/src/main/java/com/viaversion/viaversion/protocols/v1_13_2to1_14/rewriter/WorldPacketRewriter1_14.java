@@ -282,8 +282,11 @@ public class WorldPacketRewriter1_14 {
             public void register() {
                 map(Types.INT); // 0 - Dimension ID
                 handler(wrapper -> {
+                    short difficulty = wrapper.read(Types.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
+
                     ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13_2To1_14.class);
                     int dimensionId = wrapper.get(Types.INT, 0);
+
                     if (!clientWorld.setEnvironment(dimensionId)) {
                         return;
                     }
@@ -293,7 +296,6 @@ public class WorldPacketRewriter1_14 {
                     // The client may reset the center chunk if dimension is changed
                     entityTracker.setForceSendCenterChunk(true);
 
-                    short difficulty = wrapper.read(Types.UNSIGNED_BYTE); // 19w11a removed difficulty from respawn
                     PacketWrapper difficultyPacket = wrapper.create(ClientboundPackets1_14.CHANGE_DIFFICULTY);
                     difficultyPacket.write(Types.UNSIGNED_BYTE, difficulty);
                     difficultyPacket.write(Types.BOOLEAN, false); // Unknown value added in 19w11a
