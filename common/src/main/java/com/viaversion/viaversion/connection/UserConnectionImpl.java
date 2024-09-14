@@ -127,9 +127,7 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker) {
-        if (!entityTrackers.containsKey(protocolClass)) {
-            entityTrackers.put(protocolClass, tracker);
-        }
+        entityTrackers.putIfAbsent(protocolClass, tracker);
     }
 
     @Override
@@ -144,9 +142,7 @@ public class UserConnectionImpl implements UserConnection {
 
     @Override
     public void addClientWorld(final Class<? extends Protocol> protocolClass, final ClientWorld clientWorld) {
-        if (!clientWorlds.containsKey(protocolClass)) {
-            clientWorlds.put(protocolClass, clientWorld);
-        }
+        clientWorlds.putIfAbsent(protocolClass, clientWorld);
     }
 
     @Override
