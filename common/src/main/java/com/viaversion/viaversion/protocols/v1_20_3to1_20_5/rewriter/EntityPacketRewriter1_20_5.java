@@ -83,13 +83,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
             byte slot;
             do {
                 slot = wrapper.read(Types.BYTE);
-                if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && slot == 4) {
-                    slot = 6; // Map chest slot index to body slot index for horses
+
+                final int rawSlot = slot & 0x7F;
+                if (type != null && type.isOrHasParent(EntityTypes1_20_5.ABSTRACT_HORSE) && rawSlot == 4) {
+                    final boolean lastSlot = (slot & 0xFFFFFF80) == 0;
+                    slot = (byte) (lastSlot ? 6 : 6 | 0xFFFFFF80); // Map chest slot index to body slot index for horses
                 }
                 wrapper.write(Types.BYTE, slot);
                 Item item = protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_20_2));
                 wrapper.write(Types1_20_5.ITEM, item);
-            } while (slot < 0);
+            } while ((slot & 0xFFFFFF80) != 0);
         });
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_20_3.REGISTRY_DATA, wrapper -> {
