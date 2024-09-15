@@ -118,8 +118,9 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 handler(DIMENSION_HANDLER);
                 map(Types.LONG); // Seed
                 map(Types.UNSIGNED_BYTE); // Gamemode
-                handler(dimensionChangeHandler());
                 handler(wrapper -> {
+                    tracker(wrapper.user()).clearEntities();
+
                     wrapper.write(Types.BYTE, (byte) -1); // Previous gamemode, set to none
 
                     // <= 1.14.4 didn't keep attributes on respawn and 1.15.x always kept them

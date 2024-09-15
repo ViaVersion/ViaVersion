@@ -59,7 +59,7 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
                     ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
                     int dimensionId = wrapper.get(Types.INT, 0);
                     if (clientWorld.setEnvironment(dimensionId)) {
-                        onDimensionChange(wrapper.user());
+                        tracker(wrapper.user()).clearEntities();
                     }
                 });
             }

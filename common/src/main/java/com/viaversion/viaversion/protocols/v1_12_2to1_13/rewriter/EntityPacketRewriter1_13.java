@@ -153,7 +153,7 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                         if (Via.getConfig().isServersideBlockConnections()) {
                             ConnectionData.clearBlockStorage(wrapper.user());
                         }
-                        onDimensionChange(wrapper.user());
+                        tracker(wrapper.user()).clearEntities();
                     }
                 });
                 handler(Protocol1_12_2To1_13.SEND_DECLARE_COMMANDS_AND_TAGS);

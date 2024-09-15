@@ -290,9 +290,10 @@ public class WorldPacketRewriter1_14 {
                     if (!clientWorld.setEnvironment(dimensionId)) {
                         return;
                     }
-                    protocol.getEntityRewriter().onDimensionChange(wrapper.user());
 
                     EntityTracker1_14 entityTracker = wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class);
+                    entityTracker.clearEntities();
+
                     // The client may reset the center chunk if dimension is changed
                     entityTracker.setForceSendCenterChunk(true);
 

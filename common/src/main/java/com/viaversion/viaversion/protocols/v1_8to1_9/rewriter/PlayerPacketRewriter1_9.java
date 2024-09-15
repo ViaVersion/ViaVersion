@@ -309,7 +309,7 @@ public class PlayerPacketRewriter1_9 {
 
                     // Track player's dimension
                     if (clientWorld.setEnvironment(dimensionId)) {
-                        protocol.getEntityRewriter().onDimensionChange(wrapper.user());
+                        tracker.clearEntities();
 
                         clientWorld.getLoadedChunks().clear();
                         provider.unloadChunks(wrapper.user());

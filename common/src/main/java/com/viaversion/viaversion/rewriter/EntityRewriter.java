@@ -367,10 +367,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerSetEntityData(packetType, null, dataType);
     }
 
-    public void onDimensionChange(final UserConnection connection) {
+    public void clearEntities(final UserConnection connection) {
         final EntityTracker tracker = tracker(connection);
         tracker.clearEntities();
-        tracker.trackClientEntity();
     }
 
     public PacketHandler trackerHandler() {
@@ -384,10 +383,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             tracker.setClientEntityId(entityId);
             tracker.addEntity(entityId, tracker.playerType());
         };
-    }
-
-    public PacketHandler dimensionChangeHandler() {
-        return wrapper -> onDimensionChange(wrapper.user());
     }
 
     /**
@@ -419,7 +414,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
             String world = wrapper.get(Types.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                onDimensionChange(wrapper.user());
+                tracker.clearEntities();
             }
             tracker.setCurrentWorld(world);
         };
@@ -441,7 +436,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
             String world = wrapper.get(Types.STRING, 1);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-                onDimensionChange(wrapper.user());
+                tracker.clearEntities();
             }
             tracker.setCurrentWorld(world);
         };
@@ -469,7 +464,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
 
         // Clear entities if the world changes
         if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
-            onDimensionChange(connection);
+            tracker.clearEntities();
         }
         tracker.setCurrentWorld(world);
     }

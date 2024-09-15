@@ -152,7 +152,6 @@ public class UserConnectionImpl implements UserConnection {
             });
             for (EntityTracker tracker : entityTrackers.values()) {
                 tracker.clearEntities();
-                tracker.trackClientEntity();
             }
         } else {
             for (StorableObject object : storedObjects.values()) {

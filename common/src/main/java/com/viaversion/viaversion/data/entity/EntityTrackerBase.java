@@ -87,7 +87,6 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         return entity != null && entity.hasData() ? entity.data() : null;
     }
 
-    //TODO Soft memory leak: Remove entities on respawn in protocols prior to 1.18 (1.16+ only when the worldname is different)
     @Override
     public void removeEntity(int id) {
         entities.remove(id);
@@ -98,6 +97,11 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         // Call wrapper function in case protocols need to do additional removals
         for (final int id : entities.keySet().toIntArray()) {
             removeEntity(id);
+        }
+
+        // Re-add the client entity. Keep the call above to untrack attached data if necessary
+        if (clientEntityId != null) {
+            entities.put(clientEntityId.intValue(), new TrackedEntityImpl(playerType));
         }
     }
 
@@ -125,15 +129,6 @@ public class EntityTrackerBase implements EntityTracker, ClientEntityIdChangeLis
         }
 
         this.clientEntityId = clientEntityId;
-    }
-
-    @Override
-    public boolean trackClientEntity() {
-        if (clientEntityId != null) {
-            entities.put(clientEntityId.intValue(), new TrackedEntityImpl(playerType));
-            return true;
-        }
-        return false;
     }
 
     @Override
