@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -34,6 +35,36 @@ public class EntityPacketRewriter1_13_1 extends EntityRewriter<ClientboundPacket
 
     @Override
     protected void registerPackets() {
+        protocol.registerClientbound(ClientboundPackets1_13.LOGIN, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.INT); // 0 - Entity ID
+                map(Types.UNSIGNED_BYTE); // 1 - Gamemode
+                map(Types.INT); // 2 - Dimension
+
+                handler(wrapper -> {
+                    // Store the player
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    int dimensionId = wrapper.get(Types.INT, 1);
+                    clientWorld.setEnvironment(dimensionId);
+                });
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_13.RESPAWN, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.INT); // 0 - Dimension ID
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_13To1_13_1.class);
+                    int dimensionId = wrapper.get(Types.INT, 0);
+                    if (clientWorld.setEnvironment(dimensionId)) {
+                        tracker(wrapper.user()).clearEntities();
+                    }
+                });
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_13.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {

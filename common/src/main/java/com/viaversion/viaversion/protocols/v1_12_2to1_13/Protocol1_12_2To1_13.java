@@ -401,23 +401,6 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        registerClientbound(ClientboundPackets1_12_1.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // 0 - Dimension ID
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-
-                    if (Via.getConfig().isServersideBlockConnections()) {
-                        ConnectionData.clearBlockStorage(wrapper.user());
-                    }
-                });
-                handler(SEND_DECLARE_COMMANDS_AND_TAGS);
-            }
-        });
-
         registerClientbound(ClientboundPackets1_12_1.SET_OBJECTIVE, new PacketHandlers() {
             @Override
             public void register() {
@@ -844,9 +827,9 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
+        userConnection.addClientWorld(this.getClass(), new ClientWorld());
+
         userConnection.put(new TabCompleteTracker());
-        if (!userConnection.has(ClientWorld.class))
-            userConnection.put(new ClientWorld());
         userConnection.put(new BlockStorage());
         if (Via.getConfig().isServersideBlockConnections()) {
             if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {

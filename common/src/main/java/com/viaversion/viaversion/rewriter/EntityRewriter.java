@@ -367,6 +367,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         registerSetEntityData(packetType, null, dataType);
     }
 
+    public void clearEntities(final UserConnection connection) {
+        final EntityTracker tracker = tracker(connection);
+        tracker.clearEntities();
+    }
+
     public PacketHandler trackerHandler() {
         return trackerAndRewriterHandler(null);
     }
@@ -410,7 +415,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             String world = wrapper.get(Types.STRING, 0);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
-                tracker.trackClientEntity();
             }
             tracker.setCurrentWorld(world);
         };
@@ -433,7 +437,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             String world = wrapper.get(Types.STRING, 1);
             if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
                 tracker.clearEntities();
-                tracker.trackClientEntity();
             }
             tracker.setCurrentWorld(world);
         };
@@ -462,7 +465,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         // Clear entities if the world changes
         if (tracker.currentWorld() != null && !tracker.currentWorld().equals(world)) {
             tracker.clearEntities();
-            tracker.trackClientEntity();
         }
         tracker.setCurrentWorld(world);
     }

@@ -45,7 +45,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.HandItemProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
@@ -130,11 +130,10 @@ public class WorldPacketRewriter1_9 {
         });
 
         protocol.registerClientbound(ClientboundPackets1_8.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+            ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
             Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(clientWorld.getEnvironment()));
 
-            long chunkHash = ClientChunks.toLong(chunk.getX(), chunk.getZ());
+            long chunkHash = ClientWorld1_9.toLong(chunk.getX(), chunk.getZ());
 
             // Check if the chunk should be handled as an unload packet
             if (chunk.isFullChunk() && chunk.getBitmask() == 0) {
@@ -146,14 +145,14 @@ public class WorldPacketRewriter1_9 {
                 CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
                 provider.unloadChunk(wrapper.user(), chunk.getX(), chunk.getZ());
 
-                clientChunks.getLoadedChunks().remove(chunkHash);
+                clientWorld.getLoadedChunks().remove(chunkHash);
 
                 // Unload the empty chunks
                 if (Via.getConfig().isChunkBorderFix()) {
                     for (BlockFace face : BlockFace.HORIZONTAL) {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
-                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                        if (!clientWorld.getLoadedChunks().contains(ClientWorld1_9.toLong(chunkX, chunkZ))) {
                             PacketWrapper unloadChunk = wrapper.create(ClientboundPackets1_9.FORGET_LEVEL_CHUNK);
                             unloadChunk.write(Types.INT, chunkX);
                             unloadChunk.write(Types.INT, chunkZ);
@@ -165,14 +164,14 @@ public class WorldPacketRewriter1_9 {
                 Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
                 wrapper.write(chunkType, chunk);
 
-                clientChunks.getLoadedChunks().add(chunkHash);
+                clientWorld.getLoadedChunks().add(chunkHash);
 
                 // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                 if (Via.getConfig().isChunkBorderFix()) {
                     for (BlockFace face : BlockFace.HORIZONTAL) {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
-                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                        if (!clientWorld.getLoadedChunks().contains(ClientWorld1_9.toLong(chunkX, chunkZ))) {
                             PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                             Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
                             emptyChunk.write(chunkType, c);
@@ -185,8 +184,7 @@ public class WorldPacketRewriter1_9 {
 
         protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, null, wrapper -> {
             wrapper.cancel(); // Cancel the packet from being sent
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-            ClientChunks clientChunks = wrapper.user().get(ClientChunks.class);
+            ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
             Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 
             Type<Chunk> chunkType = ChunkType1_9_1.forEnvironment(clientWorld.getEnvironment());
@@ -196,14 +194,14 @@ public class WorldPacketRewriter1_9 {
                 chunkData.write(chunkType, chunk);
                 chunkData.send(Protocol1_8To1_9.class);
 
-                clientChunks.getLoadedChunks().add(ClientChunks.toLong(chunk.getX(), chunk.getZ()));
+                clientWorld.getLoadedChunks().add(ClientWorld1_9.toLong(chunk.getX(), chunk.getZ()));
 
                 // Send empty chunks surrounding the loaded chunk to force 1.9+ clients to render the new chunk
                 if (Via.getConfig().isChunkBorderFix()) {
                     for (BlockFace face : BlockFace.HORIZONTAL) {
                         int chunkX = chunk.getX() + face.modX();
                         int chunkZ = chunk.getZ() + face.modZ();
-                        if (!clientChunks.getLoadedChunks().contains(ClientChunks.toLong(chunkX, chunkZ))) {
+                        if (!clientWorld.getLoadedChunks().contains(ClientWorld1_9.toLong(chunkX, chunkZ))) {
                             PacketWrapper emptyChunk = wrapper.create(ClientboundPackets1_9.LEVEL_CHUNK);
                             Chunk c = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], new int[256], new ArrayList<>());
                             emptyChunk.write(chunkType, c);

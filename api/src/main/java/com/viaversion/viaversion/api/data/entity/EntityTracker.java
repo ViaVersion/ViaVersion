@@ -78,7 +78,7 @@ public interface EntityTracker {
     void removeEntity(int id);
 
     /**
-     * Clears stored entity types and data.
+     * Clears stored entity types and data, only leaving behind the client entity.
      */
     void clearEntities();
 
@@ -177,12 +177,4 @@ public interface EntityTracker {
     @Nullable DimensionData dimensionData(int dimensionId);
 
     void setDimensions(Map<String, DimensionData> dimensions);
-
-    /**
-     * Adds the client player entity to the tracker.
-     * If the client entity has not been set yet, this will return false.
-     *
-     * @return whether the client has been tracked
-     */
-    boolean trackClientEntity();
 }
