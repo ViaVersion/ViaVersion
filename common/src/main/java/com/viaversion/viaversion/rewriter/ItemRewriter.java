@@ -189,7 +189,7 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
                     byte slot;
                     do {
                         slot = wrapper.passthrough(Types.BYTE);
-                        // & 127 into an extra variable if slot is needed
+                        // & 0x7F into an extra variable if slot is needed
                         handleClientboundItem(wrapper);
                     } while (slot < 0);
                 });
