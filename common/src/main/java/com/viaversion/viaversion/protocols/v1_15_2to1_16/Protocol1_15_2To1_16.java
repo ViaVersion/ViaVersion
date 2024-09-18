@@ -81,7 +81,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.AWARD_STATS);
 
         // Login Success
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             // Transform string to a uuid
             UUID uuid = UUID.fromString(wrapper.read(Types.STRING));
             wrapper.write(Types.UUID, uuid);

@@ -144,7 +144,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // We need to wait for it send the login ack before actually sending the play login,
         // hence packets are added to a queue. With the data from the login packet, we sent what is needed
         // during the configuration phase before finally transitioning to the play state with the client as well.
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
             wrapper.user().getProtocolInfo().setServerState(State.PLAY);
         });

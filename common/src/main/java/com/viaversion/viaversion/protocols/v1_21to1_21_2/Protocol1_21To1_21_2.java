@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
@@ -94,6 +96,20 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
         cancelServerbound(ServerboundPackets1_21_2.BUNDLE_ITEM_SELECTED);
         cancelServerbound(ServerboundPackets1_21_2.CLIENT_TICK_END);
+
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
+            wrapper.passthrough(Types.UUID); // UUID
+            wrapper.passthrough(Types.STRING); // Name
+
+            final int properties = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < properties; i++) {
+                wrapper.passthrough(Types.STRING); // Name
+                wrapper.passthrough(Types.STRING); // Value
+                wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
+            }
+
+            wrapper.read(Types.BOOLEAN); // Strict error handling
+        });
     }
 
     private void clientInformation(final PacketWrapper wrapper) {

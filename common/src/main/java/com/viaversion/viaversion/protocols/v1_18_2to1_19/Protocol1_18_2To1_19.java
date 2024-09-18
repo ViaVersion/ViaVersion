@@ -232,7 +232,7 @@ public final class Protocol1_18_2To1_19 extends AbstractProtocol<ClientboundPack
         cancelServerbound(ServerboundPackets1_19.CHAT_PREVIEW);
 
         // Login changes
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.UUID); // UUID

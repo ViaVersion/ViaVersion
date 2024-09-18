@@ -228,7 +228,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             @Override
             public void handleRecipeType(final PacketWrapper wrapper, final String type) {
-                if (type.equals("crafting_special_suspiciousstew")) {
+                if (type.equals("crafting_special_suspiciousstew") || type.equals("crafting_special_shulkerboxcoloring")) {
                     wrapper.read(Types.VAR_INT); // Crafting book category
                 } else {
                     super.handleRecipeType(wrapper, type);

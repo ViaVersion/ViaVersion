@@ -54,6 +54,9 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         recipeHandlers.put("smithing_transform", this::handleSmithingTransform);
         recipeHandlers.put("smithing_trim", this::handleSmithingTrim);
         recipeHandlers.put("crafting_decorated_pot", this::handleSimpleRecipe);
+
+        // Added in 1.21.2
+        recipeHandlers.put("crafting_transmute", this::handleTransmute);
     }
 
     public void handleRecipeType(PacketWrapper wrapper, String type) {
@@ -158,6 +161,22 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Template
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
+    }
+
+    private void handleTransmute(final PacketWrapper wrapper) {
+        wrapper.passthrough(Types.STRING); // Group
+        wrapper.passthrough(Types.VAR_INT); // Crafting book category
+        handleIngredient(wrapper); // Input
+        handleIngredient(wrapper); // Material
+        final int resultItemId = wrapper.read(Types.VAR_INT);
+        wrapper.write(Types.VAR_INT, rewrite(resultItemId));
+    }
+
+    protected int rewrite(final int itemId) {
+        if (protocol.getMappingData() != null && protocol.getItemRewriter() != null) {
+            return protocol.getMappingData().getNewItemId(itemId);
+        }
+        return itemId;
     }
 
     protected @Nullable Item rewrite(UserConnection connection, @Nullable Item item) {
