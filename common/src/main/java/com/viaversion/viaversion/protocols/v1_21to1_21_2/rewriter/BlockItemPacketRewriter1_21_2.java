@@ -272,7 +272,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 return Holder.of(instrument.id());
             }
             final Instrument1_20_5 value = instrument.value();
-            return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration(), value.range(), new StringTag("")));
+            return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration() / 20F, value.range(), new StringTag("")));
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_21_2, food -> {
             // Just assume the item type default for CONSUMABLE; add USE_REMAINDER from old food properties
@@ -295,7 +295,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 return Holder.of(instrument.id());
             }
             final Instrument1_21_2 value = instrument.value();
-            return Holder.of(new Instrument1_20_5(value.soundEvent(), (int) value.useDuration(), value.range()));
+            return Holder.of(new Instrument1_20_5(value.soundEvent(), (int) (value.useDuration() * 20), value.range()));
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21_2, StructuredDataKey.FOOD1_21, food -> {
             final StructuredData<Consumable1_21_2> consumableData = dataContainer.getNonEmpty(StructuredDataKey.CONSUMABLE1_21_2);

@@ -42,6 +42,16 @@ import java.util.Arrays;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
 
+    private static final String[] GOAT_HORN_INSTRUMENTS = {
+        "ponder_goat_horn",
+        "sing_goat_horn",
+        "seek_goat_horn",
+        "feel_goat_horn",
+        "admire_goat_horn",
+        "call_goat_horn",
+        "yearn_goat_horn",
+        "dream_goat_horn"
+    };
     private static final float IMPULSE = 0.98F;
 
     public EntityPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
@@ -53,6 +63,22 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, Types1_21.ENTITY_DATA_LIST, Types1_21_2.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
+
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+            final PacketWrapper instrumentsPacket = wrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA);
+            instrumentsPacket.write(Types.STRING, "minecraft:instrument");
+            final RegistryEntry[] entries = new RegistryEntry[GOAT_HORN_INSTRUMENTS.length];
+            for (int i = 0; i < GOAT_HORN_INSTRUMENTS.length; i++) {
+                final CompoundTag tag = new CompoundTag();
+                tag.putString("sound_event", "item.goat_horn.sound." + i);
+                tag.putFloat("use_duration", 7);
+                tag.putInt("range", 256);
+                tag.putString("description", "");
+                entries[i] = new RegistryEntry(GOAT_HORN_INSTRUMENTS[i], tag);
+            }
+            instrumentsPacket.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+            instrumentsPacket.send(Protocol1_21To1_21_2.class);
+        });
 
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper -> {
             final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));

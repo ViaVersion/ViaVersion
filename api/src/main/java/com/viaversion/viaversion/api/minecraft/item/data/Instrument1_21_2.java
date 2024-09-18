@@ -37,7 +37,7 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
         public Instrument1_21_2 readDirect(final ByteBuf buffer) {
             final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
             final float useDuration = Types.FLOAT.readPrimitive(buffer);
-            final float range = buffer.readFloat();
+            final float range = Types.FLOAT.readPrimitive(buffer);
             final Tag description = Types.TAG.read(buffer);
             return new Instrument1_21_2(soundEvent, useDuration, range, description);
         }
@@ -46,7 +46,7 @@ public record Instrument1_21_2(Holder<SoundEvent> soundEvent, float useDuration,
         public void writeDirect(final ByteBuf buffer, final Instrument1_21_2 value) {
             Types.SOUND_EVENT.write(buffer, value.soundEvent());
             Types.FLOAT.writePrimitive(buffer, value.useDuration());
-            buffer.writeFloat(value.range());
+            Types.FLOAT.writePrimitive(buffer, value.range());
             Types.TAG.write(buffer, value.description());
         }
     };
