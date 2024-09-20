@@ -101,7 +101,7 @@ public class EntityTypes1_12 {
 
         LIVING_ENTITY_BASE(ENTITY),
         ARMOR_STAND(30, LIVING_ENTITY_BASE),
-        PLAYER(ENTITY), // Needed for entity (un)tracking
+        PLAYER(LIVING_ENTITY_BASE), // Needed for entity (un)tracking
 
         // Living entities as a larger subclass
         LIVING_ENTITY(LIVING_ENTITY_BASE),
