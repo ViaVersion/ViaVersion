@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_10to1_11.rewriter;
 
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
@@ -55,6 +56,22 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
             item.setAmount(1);
         }
         EntityMappings1_11.toClientItem(item);
+
+        if (item == null || item.tag() == null) {
+            return item;
+        }
+        CompoundTag tag = item.tag();
+
+        // 1.10 will display item glint if the list tag is present, 1.11+ only if at least one element is present
+        ListTag enchTag = tag.getListTag("ench");
+        if (enchTag != null && enchTag.isEmpty()) {
+            tag.putBoolean(nbtTagName("clearEnch"), true);
+
+            CompoundTag dummyTag = new CompoundTag();
+            dummyTag.putShort("id", Short.MAX_VALUE);
+
+            enchTag.add(dummyTag);
+        }
         return item;
     }
 
@@ -63,10 +80,15 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
         if (item == null) {
             return null;
         }
-        if (item.tag() != null && item.tag().contains(nbtTagName())) {
-            item.setAmount(item.tag().<ByteTag>removeUnchecked(nbtTagName()).asByte());
-            if (item.tag().isEmpty()) {
-                item.setTag(null);
+        CompoundTag tag = item.tag();
+        if (tag != null) {
+            if (tag.contains(nbtTagName())) {
+                item.setAmount(tag.<ByteTag>removeUnchecked(nbtTagName()).asByte());
+                if (tag.isEmpty()) {
+                    item.setTag(null);
+                }
+            } else if (tag.remove(nbtTagName("clearEnch")) != null) {
+                tag.put("ench", new ListTag());
             }
         }
         EntityMappings1_11.toServerItem(item);
