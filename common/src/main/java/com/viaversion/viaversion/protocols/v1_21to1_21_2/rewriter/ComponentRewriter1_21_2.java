@@ -18,12 +18,16 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
+import java.util.Iterator;
 
 public final class ComponentRewriter1_21_2 extends ComponentRewriter<ClientboundPacket1_21> {
 
@@ -37,6 +41,8 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
         if (componentsTag == null) {
             return;
         }
+
+        convertAttributes(componentsTag, protocol.getMappingData().getAttributeMappings());
 
         final CompoundTag instrument = TagUtil.getNamespacedCompoundTag(componentsTag, "instrument");
         if (instrument != null) {
@@ -55,6 +61,26 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
         }
 
         TagUtil.removeNamespaced(componentsTag, "fire_resistant");
+    }
+
+    public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {
+        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
+        if (attributeModifiers == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> modifiers = attributeModifiers.getListTag("modifiers", CompoundTag.class);
+        final Iterator<CompoundTag> iterator = modifiers.iterator();
+        while (iterator.hasNext()) {
+            final CompoundTag modifier = iterator.next();
+            final StringTag attribute = modifier.getStringTag("type");
+            final String mappedAttribute = mappings.mappedIdentifier(attribute.getValue());
+            if (mappedAttribute != null) {
+                attribute.setValue(mappedAttribute);
+            } else {
+                iterator.remove();
+            }
+        }
     }
 
     @Override
