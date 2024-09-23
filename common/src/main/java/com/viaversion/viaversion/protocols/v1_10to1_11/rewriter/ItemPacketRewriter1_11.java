@@ -87,7 +87,8 @@ public class ItemPacketRewriter1_11 extends ItemRewriter<ClientboundPackets1_9_3
                 if (tag.isEmpty()) {
                     item.setTag(null);
                 }
-            } else if (tag.remove(nbtTagName("clearEnch")) != null) {
+            }
+            if (tag.remove(nbtTagName("clearEnch")) != null) {
                 tag.put("ench", new ListTag());
             }
         }
