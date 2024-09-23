@@ -43,6 +43,7 @@ import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.logging.Level;
 
 public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<ClientboundPacket1_20_2, ServerboundPacket1_20_3, Protocol1_20_2To1_20_3> {
 
@@ -167,7 +168,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
             final JsonElement updatedComponent = ComponentUtil.convertJson(pageTag.getValue(), SerializerVersion.V1_19_4, SerializerVersion.V1_20_3);
             pageTag.setValue(updatedComponent.toString());
         } catch (final Exception e) {
-            Via.getManager().debugHandler().error("Error during book conversion", e);
+            Via.getPlatform().getLogger().log(Level.SEVERE, "Error during book conversion: " + pageTag.getValue(), e);
         }
     }
 }
