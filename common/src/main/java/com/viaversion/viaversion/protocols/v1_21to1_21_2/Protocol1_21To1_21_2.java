@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -110,6 +110,12 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
             wrapper.read(Types.BOOLEAN); // Strict error handling
         });
+
+        registerClientbound(ClientboundPackets1_21.SET_TIME, wrapper -> {
+            wrapper.passthrough(Types.LONG); // Game time
+            final long dayTime = wrapper.passthrough(Types.LONG);
+            wrapper.write(Types.BOOLEAN, dayTime < 0); // Do daylight cycle
+        });
     }
 
     private void clientInformation(final PacketWrapper wrapper) {
@@ -126,6 +132,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void onMappingDataLoaded() {
+        EntityTypes1_21_2.initialize(this);
         Types1_21_2.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
@@ -161,7 +168,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
+        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_2.PLAYER));
     }
 
     @Override

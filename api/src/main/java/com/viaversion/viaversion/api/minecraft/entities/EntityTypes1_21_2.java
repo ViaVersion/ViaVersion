@@ -25,11 +25,11 @@ package com.viaversion.viaversion.api.minecraft.entities;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.EntityTypeUtil;
-import java.util.Locale;
 import com.viaversion.viaversion.util.Key;
+import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public enum EntityTypes1_20_5 implements EntityType {
+public enum EntityTypes1_21_2 implements EntityType {
 
     ENTITY(null, null),
 
@@ -88,7 +88,6 @@ public enum EntityTypes1_20_5 implements EntityType {
 
     // Vehicles
     VEHICLE(ENTITY, null),
-    BOAT(VEHICLE),
 
     ABSTRACT_MINECART(VEHICLE, null),
     MINECART(ABSTRACT_MINECART),
@@ -96,11 +95,31 @@ public enum EntityTypes1_20_5 implements EntityType {
     COMMAND_BLOCK_MINECART(ABSTRACT_MINECART),
     TNT_MINECART(ABSTRACT_MINECART),
     SPAWNER_MINECART(ABSTRACT_MINECART),
-    CHEST_BOAT(BOAT),
 
     ABSTRACT_MINECART_CONTAINER(ABSTRACT_MINECART, null),
     CHEST_MINECART(ABSTRACT_MINECART_CONTAINER),
     HOPPER_MINECART(ABSTRACT_MINECART_CONTAINER),
+
+    ABSTRACT_BOAT(VEHICLE, null),
+    ABSTRACT_CHEST_BOAT(ABSTRACT_BOAT, null),
+    ACACIA_BOAT(ABSTRACT_BOAT),
+    ACACIA_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    BAMBOO_CHEST_RAFT(ABSTRACT_CHEST_BOAT),
+    BAMBOO_RAFT(ABSTRACT_BOAT),
+    BIRCH_BOAT(ABSTRACT_BOAT),
+    BIRCH_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    CHERRY_BOAT(ABSTRACT_BOAT),
+    CHERRY_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    DARK_OAK_BOAT(ABSTRACT_BOAT),
+    DARK_OAK_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    JUNGLE_BOAT(ABSTRACT_BOAT),
+    JUNGLE_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    MANGROVE_BOAT(ABSTRACT_BOAT),
+    MANGROVE_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    OAK_BOAT(ABSTRACT_BOAT),
+    OAK_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
+    SPRUCE_BOAT(ABSTRACT_BOAT),
+    SPRUCE_CHEST_BOAT(ABSTRACT_CHEST_BOAT),
 
     // Living entities as a larger subclass
     LIVING_ENTITY(ENTITY, null),
@@ -131,22 +150,6 @@ public enum EntityTypes1_20_5 implements EntityType {
     SNOW_GOLEM(ABSTRACT_GOLEM),
     IRON_GOLEM(ABSTRACT_GOLEM),
     SHULKER(ABSTRACT_GOLEM),
-
-    // Water mobs
-    WATER_ANIMAL(PATHFINDER_MOB, null),
-    DOLPHIN(WATER_ANIMAL),
-
-    SQUID(WATER_ANIMAL),
-    GLOW_SQUID(SQUID),
-
-    ABSTRACT_FISH(WATER_ANIMAL, null),
-    PUFFERFISH(ABSTRACT_FISH),
-    TADPOLE(ABSTRACT_FISH),
-
-    ABSTRACT_SCHOOLING_FISH(ABSTRACT_FISH, null),
-    COD(ABSTRACT_SCHOOLING_FISH),
-    SALMON(ABSTRACT_SCHOOLING_FISH),
-    TROPICAL_FISH(ABSTRACT_SCHOOLING_FISH),
 
     // Ageable mobs and (tamable) animals
     ABSTRACT_AGEABLE(PATHFINDER_MOB, null),
@@ -229,6 +232,23 @@ public enum EntityTypes1_20_5 implements EntityType {
     PIGLIN(ABSTRACT_PIGLIN),
     PIGLIN_BRUTE(ABSTRACT_PIGLIN),
 
+    // Water mobs
+    AGEABLE_WATER_CREATURE(ABSTRACT_AGEABLE, null),
+    DOLPHIN(AGEABLE_WATER_CREATURE),
+
+    SQUID(AGEABLE_WATER_CREATURE),
+    GLOW_SQUID(SQUID),
+
+    WATER_ANIMAL(PATHFINDER_MOB, null),
+    ABSTRACT_FISH(WATER_ANIMAL, null),
+    PUFFERFISH(ABSTRACT_FISH),
+    TADPOLE(ABSTRACT_FISH),
+
+    ABSTRACT_SCHOOLING_FISH(ABSTRACT_FISH, null),
+    COD(ABSTRACT_SCHOOLING_FISH),
+    SALMON(ABSTRACT_SCHOOLING_FISH),
+    TROPICAL_FISH(ABSTRACT_SCHOOLING_FISH),
+
     // Raiders
     ABSTRACT_RAIDER(ABSTRACT_MONSTER, null),
     WITCH(ABSTRACT_RAIDER),
@@ -246,12 +266,12 @@ public enum EntityTypes1_20_5 implements EntityType {
     private final String identifier;
     private int id = -1;
 
-    EntityTypes1_20_5(final EntityType parent) {
+    EntityTypes1_21_2(final EntityType parent) {
         this.parent = parent;
         this.identifier =  Key.namespaced(name().toLowerCase(Locale.ROOT));
     }
 
-    EntityTypes1_20_5(final EntityType parent, @Nullable final String identifier) {
+    EntityTypes1_21_2(final EntityType parent, @Nullable final String identifier) {
         this.parent = parent;
         this.identifier = identifier;
     }

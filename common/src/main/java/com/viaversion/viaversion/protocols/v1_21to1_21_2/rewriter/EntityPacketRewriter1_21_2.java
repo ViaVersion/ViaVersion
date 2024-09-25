@@ -23,7 +23,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -60,7 +60,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_20_5.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_21_2.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, Types1_21.ENTITY_DATA_LIST, Types1_21_2.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
 
@@ -335,16 +335,23 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             Types1_21_2.ENTITY_DATA_TYPES.componentType,
             Types1_21_2.ENTITY_DATA_TYPES.optionalComponentType
         );
-        registerBlockStateHandler(EntityTypes1_20_5.ABSTRACT_MINECART, 11);
+        registerBlockStateHandler(EntityTypes1_21_2.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_20_5.SALMON).addIndex(17); // Data type
-        filter().type(EntityTypes1_20_5.DOLPHIN).addIndex(16); // Baby
-        filter().type(EntityTypes1_20_5.GLOW_SQUID).addIndex(16); // Baby
-        filter().type(EntityTypes1_20_5.SQUID).addIndex(16); // Baby
+        filter().type(EntityTypes1_21_2.ABSTRACT_BOAT).removeIndex(11); // Goodbye boat type
+
+        filter().type(EntityTypes1_21_2.SALMON).addIndex(17); // Data type
+        filter().type(EntityTypes1_21_2.DOLPHIN).addIndex(16); // Baby
+        filter().type(EntityTypes1_21_2.GLOW_SQUID).addIndex(16); // Baby
+        filter().type(EntityTypes1_21_2.SQUID).addIndex(16); // Baby
     }
 
     @Override
     public EntityType typeFromId(final int type) {
-        return EntityTypes1_20_5.getTypeFromId(type);
+        return EntityTypes1_21_2.getTypeFromId(type);
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
     }
 }
