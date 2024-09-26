@@ -113,8 +113,14 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
         registerClientbound(ClientboundPackets1_21.SET_TIME, wrapper -> {
             wrapper.passthrough(Types.LONG); // Game time
-            final long dayTime = wrapper.passthrough(Types.LONG);
-            wrapper.write(Types.BOOLEAN, dayTime < 0); // Do daylight cycle
+            long dayTime = wrapper.read(Types.LONG);
+            boolean doDaylightCycle = true;
+            if (dayTime < 0) {
+                dayTime = -dayTime;
+                doDaylightCycle = false;
+            }
+            wrapper.write(Types.LONG, dayTime);
+            wrapper.write(Types.BOOLEAN, doDaylightCycle);
         });
     }
 
