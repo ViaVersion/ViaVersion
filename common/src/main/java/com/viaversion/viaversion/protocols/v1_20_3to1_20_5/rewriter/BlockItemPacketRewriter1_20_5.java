@@ -488,7 +488,11 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (blockEntityTag != null) {
             final CompoundTag clonedTag = blockEntityTag.copy();
             updateBlockEntityTag(connection, data, clonedTag);
-            item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
+
+            // Not always needed, e.g. shields that had the base color in a block entity tag before
+            if (blockEntityTag.contains("id")) {
+                item.dataContainer().set(StructuredDataKey.BLOCK_ENTITY_DATA, clonedTag);
+            }
         }
 
         final CompoundTag debugProperty = tag.getCompoundTag("DebugProperty");
