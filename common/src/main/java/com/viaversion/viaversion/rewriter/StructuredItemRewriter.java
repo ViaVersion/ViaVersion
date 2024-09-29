@@ -123,7 +123,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
         if (mappingData.getFullItemMappings() != null) {
             final Function<String, String> itemIdRewriter = clientbound ? id -> mappedIdentifier(mappingData.getFullItemMappings(), id) : id -> unmappedIdentifier(mappingData.getFullItemMappings(), id);
-            container.updateIfPresent(StructuredDataKey.USE_COOLDOWN, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.USE_COOLDOWN, value -> value.rewrite(itemIdRewriter));
         }
         if (mappingData.getBlockMappings() != null) {
             final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;

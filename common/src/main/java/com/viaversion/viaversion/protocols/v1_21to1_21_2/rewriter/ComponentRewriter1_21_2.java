@@ -61,6 +61,7 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
         }
 
         TagUtil.removeNamespaced(componentsTag, "fire_resistant");
+        TagUtil.removeNamespaced(componentsTag, "lock");
     }
 
     public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {

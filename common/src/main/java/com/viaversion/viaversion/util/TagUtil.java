@@ -19,6 +19,7 @@ package com.viaversion.viaversion.util;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -67,6 +68,11 @@ public final class TagUtil {
     public static @Nullable ListTag<CompoundTag> getNamespacedCompoundTagList(final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> listTag = tag.getListTag(Key.namespaced(key), CompoundTag.class);
         return listTag != null ? listTag : tag.getListTag(Key.stripMinecraftNamespace(key), CompoundTag.class);
+    }
+
+    public static @Nullable StringTag getNamespacedStringTag(final CompoundTag tag, final String key) {
+        final StringTag stringTag = tag.getStringTag(Key.namespaced(key));
+        return stringTag != null ? stringTag : tag.getStringTag(Key.stripMinecraftNamespace(key));
     }
 
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {
