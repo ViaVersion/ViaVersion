@@ -20,7 +20,6 @@ package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -123,7 +122,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         updateItemData(item);
 
         final StructuredDataContainer dataContainer = item.dataContainer();
-        if (dataContainer.contains(StructuredDataKey.RARITY)) {
+        if (dataContainer.has(StructuredDataKey.RARITY)) {
             return item;
         }
 
@@ -194,14 +193,14 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
 
     public static void resetRarityValues(final Item item, final String tagName) {
         final StructuredDataContainer dataContainer = item.dataContainer();
-
-        final StructuredData<CompoundTag> customData = dataContainer.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
+        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             return;
         }
-        if (customData.value().remove(tagName) != null) {
+
+        if (customData.remove(tagName) != null) {
             dataContainer.remove(StructuredDataKey.RARITY);
-            if (customData.value().isEmpty()) {
+            if (customData.isEmpty()) {
                 dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
             }
         }

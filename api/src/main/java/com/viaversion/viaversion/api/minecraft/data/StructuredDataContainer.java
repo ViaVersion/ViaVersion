@@ -33,6 +33,26 @@ import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Loosely represents Minecraft's data component patch, but may also be used for an item's full data components.
+ * <p>
+ * The most commonly used methods will ignore empty data (aka empty overrides that remove item defaults) since those will rarely be needed.
+ * These are:
+ * <ul>
+ *     <li>{@link #get(StructuredDataKey)}</li>
+ *     <li>{@link #set(StructuredDataKey, Object)}</li>
+ *     <li>{@link #set(StructuredDataKey)}</li>
+ *     <li>{@link #getNonEmptyData(StructuredDataKey)}</li>
+ *     <li>{@link #hasValue(StructuredDataKey)}</li>
+ * </ul>
+ *
+ * To interact with empty patches specifically, use:
+ * <ul>
+ *     <li>{@link #setEmpty(StructuredDataKey)}</li>
+ *     <li>{@link #hasEmpty(StructuredDataKey)}</li>
+ * </ul>
+ * Other methods (e.g. {@link #getData(StructuredDataKey)} and {@link #has(StructuredDataKey)}) will handle both empty and non-empty data.
+ */
 public final class StructuredDataContainer {
 
     private final Map<StructuredDataKey<?>, StructuredData<?>> data;
@@ -55,66 +75,45 @@ public final class StructuredDataContainer {
     }
 
     /**
-     * Returns structured data by id if present.
+     * Returns the non-empty value by id if present.
+     *
+     * @param key serializer id
+     * @param <T> data type
+     * @return structured data
+     * @see #hasEmpty(StructuredDataKey)
+     */
+    public @Nullable <T> T get(final StructuredDataKey<T> key) {
+        final StructuredData<?> data = this.data.get(key);
+        if (data == null || data.isEmpty()) {
+            return null;
+        }
+        //noinspection unchecked
+        return ((StructuredData<T>) data).value();
+    }
+
+    /**
+     * Returns structured data by id if present, either empty or non-empty.
      *
      * @param key serializer id
      * @param <T> data type
      * @return structured data
      */
-    public @Nullable <T> StructuredData<T> get(final StructuredDataKey<T> key) {
+    public @Nullable <T> StructuredData<T> getData(final StructuredDataKey<T> key) {
         //noinspection unchecked
         return (StructuredData<T>) this.data.get(key);
     }
 
     /**
-     * Returns structured data by id if not empty.
+     * Returns non-empty structured data by id if present.
      *
      * @param key serializer id
      * @param <T> data type
-     * @return structured data if not empty
+     * @return non-empty structured data
      */
-    public @Nullable <T> StructuredData<T> getNonEmpty(final StructuredDataKey<T> key) {
+    public @Nullable <T> StructuredData<T> getNonEmptyData(final StructuredDataKey<T> key) {
+        final StructuredData<?> data = this.data.get(key);
         //noinspection unchecked
-        final StructuredData<T> data = (StructuredData<T>) this.data.get(key);
-        return data != null && data.isPresent() ? data : null;
-    }
-
-    /**
-     * Returns structured data by id if not empty, or creates it.
-     *
-     * @param key             serializer id
-     * @param mappingFunction function to create structured data if not present
-     * @param <T>             data type
-     * @return structured data if not empty
-     */
-    public <T> StructuredData<T> computeIfAbsent(final StructuredDataKey<T> key, final Function<StructuredDataKey<T>, T> mappingFunction) {
-        final StructuredData<T> data = this.getNonEmpty(key);
-        if (data != null) {
-            return data;
-        }
-
-        final int id = serializerId(key);
-        final StructuredData<T> empty = StructuredData.of(key, mappingFunction.apply(key), id);
-        this.data.put(key, empty);
-        return empty;
-    }
-
-    /**
-     * Updates and returns the structured data by id if not empty.
-     *
-     * @param key             serializer id
-     * @param mappingFunction function to update existing data
-     * @param <T>             data type
-     * @return updated structured data if not empty
-     */
-    public <T> @Nullable StructuredData<T> updateIfPresent(final StructuredDataKey<T> key, final Function<T, T> mappingFunction) {
-        final StructuredData<T> data = this.getNonEmpty(key);
-        if (data == null) {
-            return null;
-        }
-
-        data.setValue(mappingFunction.apply(data.value()));
-        return data;
+        return data != null && data.isPresent() ? (StructuredData<T>) data : null;
     }
 
     public <T> void set(final StructuredDataKey<T> key, final T value) {
@@ -124,47 +123,103 @@ public final class StructuredDataContainer {
         }
     }
 
-    public <T> void replaceKey(final StructuredDataKey<T> key, final StructuredDataKey<T> toKey) {
-        replace(key, toKey, Function.identity());
-    }
-
-    public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, V> valueMapper) {
-        final StructuredData<T> data = remove(key);
-        if (data == null) {
-            return;
-        }
-
-        if (data.isPresent()) {
-            set(toKey, valueMapper.apply(data.value()));
-        } else {
-            addEmpty(toKey);
-        }
-    }
-
     public void set(final StructuredDataKey<Unit> key) {
         this.set(key, Unit.INSTANCE);
     }
 
-    public void addEmpty(final StructuredDataKey<?> key) {
+    public void setEmpty(final StructuredDataKey<?> key) {
         // Empty optional to override the Minecraft default
         this.data.put(key, StructuredData.empty(key, serializerId(key)));
     }
 
     /**
-     * Removes and returns structured data by the given key.
+     * Updates the structured data by id if not empty.
      *
-     * @param key serializer key
-     * @param <T> data type
-     * @return removed structured data
+     * @param key         serializer id
+     * @param valueMapper function to update existing data
+     * @param <T>         data type
      */
-    public @Nullable <T> StructuredData<T> remove(final StructuredDataKey<T> key) {
-        final StructuredData<?> data = this.data.remove(key);
-        //noinspection unchecked
-        return data != null ? (StructuredData<T>) data : null;
+    public <T> void replace(final StructuredDataKey<T> key, final Function<T, @Nullable T> valueMapper) {
+        final StructuredData<T> data = this.getNonEmptyData(key);
+        if (data == null) {
+            return;
+        }
+
+        final T replacement = valueMapper.apply(data.value());
+        if (replacement != null) {
+            data.setValue(replacement);
+        } else {
+            this.data.remove(key);
+        }
     }
 
-    public boolean contains(final StructuredDataKey<?> key) {
+    public <T> void replaceKey(final StructuredDataKey<T> key, final StructuredDataKey<T> toKey) {
+        replace(key, toKey, Function.identity());
+    }
+
+    public <T, V> void replace(final StructuredDataKey<T> key, final StructuredDataKey<V> toKey, final Function<T, @Nullable V> valueMapper) {
+        final StructuredData<?> data = this.data.remove(key);
+        if (data == null) {
+            return;
+        }
+
+        if (data.isPresent()) {
+            //noinspection unchecked
+            final T value = (T) data.value();
+            final V replacement = valueMapper.apply(value);
+            if (replacement != null) {
+                set(toKey, replacement);
+            }
+        } else {
+            // Also replace the key for empty data
+            setEmpty(toKey);
+        }
+    }
+
+    /**
+     * Removes data by the given key.
+     *
+     * @param key data key
+     * @see #replace(StructuredDataKey, Function)
+     * @see #replace(StructuredDataKey, StructuredDataKey, Function)
+     * @see #replaceKey(StructuredDataKey, StructuredDataKey)
+     */
+    public void remove(final StructuredDataKey<?> key) {
+        this.data.remove(key);
+    }
+
+    /**
+     * Returns whether there is data for the given key, either empty or non-empty.
+     *
+     * @param key data key
+     * @return whether there data for the given key
+     * @see #hasEmpty(StructuredDataKey)
+     * @see #hasValue(StructuredDataKey)
+     */
+    public boolean has(final StructuredDataKey<?> key) {
         return this.data.containsKey(key);
+    }
+
+    /**
+     * Returns whether there is non-empty data for the given key.
+     *
+     * @param key data key
+     * @return whether there is non-empty data for the given key
+     */
+    public boolean hasValue(final StructuredDataKey<?> key) {
+        final StructuredData<?> data = this.data.get(key);
+        return data != null && data.isPresent();
+    }
+
+    /**
+     * Returns whether the structured data has an empty patch/override.
+     *
+     * @param key serializer id
+     * @return whether the structured data has an empty patch/override
+     */
+    public boolean hasEmpty(final StructuredDataKey<?> key) {
+        final StructuredData<?> data = this.data.get(key);
+        return data != null && data.isEmpty();
     }
 
     /**

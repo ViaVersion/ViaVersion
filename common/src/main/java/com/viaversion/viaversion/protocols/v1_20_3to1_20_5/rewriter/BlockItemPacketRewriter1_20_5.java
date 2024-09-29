@@ -416,7 +416,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         final StructuredDataContainer data = item.dataContainer();
         data.setIdLookup(protocol, true);
 
-        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
+        final StructuredData<CompoundTag> customData = data.getNonEmptyData(StructuredDataKey.CUSTOM_DATA);
         final CompoundTag tag = customData != null ? customData.value() : new CompoundTag();
         final DataItem dataItem = new DataItem(item.identifier(), (byte) item.amount(), tag);
         if (!dataConverter.backupInconvertibleData() && customData != null && tag.remove(nbtTagName()) != null) {

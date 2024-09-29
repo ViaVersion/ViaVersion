@@ -52,15 +52,13 @@ public interface StructuredData<T> extends IdHolder {
         return new EmptyStructuredData<>(key, id);
     }
 
-    void setValue(final T value);
+    @Nullable T value();
 
-    void write(final ByteBuf buffer);
+    void setValue(final T value);
 
     void setId(final int id);
 
     StructuredDataKey<T> key();
-
-    @Nullable T value();
 
     /**
      * Returns whether the structured data is present. Even if true, the value may be null.
@@ -77,4 +75,6 @@ public interface StructuredData<T> extends IdHolder {
      * @return true if the structured data is empty
      */
     boolean isEmpty();
+
+    void write(final ByteBuf buffer);
 }

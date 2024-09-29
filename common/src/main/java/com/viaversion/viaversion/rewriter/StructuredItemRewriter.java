@@ -114,27 +114,27 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData.getItemMappings() != null) {
             final Int2IntFunction itemIdRewriter = clientbound ? mappingData::getNewItemId : mappingData::getOldItemId;
-            container.updateIfPresent(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
-            container.updateIfPresent(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
         }
         if (mappingData.getBlockMappings() != null) {
             final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;
-            container.updateIfPresent(StructuredDataKey.TOOL, value -> value.rewrite(blockIdRewriter));
-            container.updateIfPresent(StructuredDataKey.CAN_PLACE_ON, value -> value.rewrite(blockIdRewriter));
-            container.updateIfPresent(StructuredDataKey.CAN_BREAK, value -> value.rewrite(blockIdRewriter));
+            container.replace(StructuredDataKey.TOOL, value -> value.rewrite(blockIdRewriter));
+            container.replace(StructuredDataKey.CAN_PLACE_ON, value -> value.rewrite(blockIdRewriter));
+            container.replace(StructuredDataKey.CAN_BREAK, value -> value.rewrite(blockIdRewriter));
         }
         if (mappingData.getSoundMappings() != null) {
             final Int2IntFunction soundIdRewriter = clientbound ? mappingData::getNewSoundId : mappingData::getOldSoundId;
-            container.updateIfPresent(StructuredDataKey.INSTRUMENT, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
-            container.updateIfPresent(StructuredDataKey.JUKEBOX_PLAYABLE, value -> value.rewrite(soundIdRewriter));
+            container.replace(StructuredDataKey.INSTRUMENT, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
+            container.replace(StructuredDataKey.JUKEBOX_PLAYABLE, value -> value.rewrite(soundIdRewriter));
         }
         if (clientbound && protocol.getComponentRewriter() != null) {
             updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
             updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
 
-            final StructuredData<Tag[]> loreData = container.getNonEmpty(StructuredDataKey.LORE);
-            if (loreData != null) {
-                for (final Tag tag : loreData.value()) {
+            final Tag[] lore = container.get(StructuredDataKey.LORE);
+            if (lore != null) {
+                for (final Tag tag : lore) {
                     protocol.getComponentRewriter().processTag(connection, tag);
                 }
             }
@@ -166,35 +166,35 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
-        final StructuredData<Tag> name = item.dataContainer().getNonEmpty(key);
+        final Tag name = item.dataContainer().get(key);
         if (name == null) {
             return;
         }
 
-        final Tag originalName = name.value().copy();
-        protocol.getComponentRewriter().processTag(connection, name.value());
-        if (!name.value().equals(originalName)) {
+        final Tag originalName = name.copy();
+        protocol.getComponentRewriter().processTag(connection, name);
+        if (!name.equals(originalName)) {
             saveTag(createCustomTag(item), originalName, backupKey);
         }
     }
 
     protected void restoreTextComponents(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
-        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
+        final CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             return;
         }
 
         // Remove custom name
-        if (customData.value().remove(nbtTagName("added_custom_name")) != null) {
+        if (customData.remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
         } else {
-            final Tag customName = removeBackupTag(customData.value(), "custom_name");
+            final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
                 data.set(StructuredDataKey.CUSTOM_NAME, customName);
             }
 
-            final Tag itemName = removeBackupTag(customData.value(), "item_name");
+            final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
                 data.set(StructuredDataKey.ITEM_NAME, itemName);
             }
@@ -203,14 +203,12 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected CompoundTag createCustomTag(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
-        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null) {
-            return customData.value();
+        CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData == null) {
+            customData = new CompoundTag();
+            data.set(StructuredDataKey.CUSTOM_DATA, customData);
         }
-
-        final CompoundTag tag = new CompoundTag();
-        data.set(StructuredDataKey.CUSTOM_DATA, tag);
-        return tag;
+        return customData;
     }
 
     protected void saveTag(final CompoundTag customData, final Tag tag, final String name) {
