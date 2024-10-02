@@ -7,6 +7,7 @@ dependencies {
     api(projects.viaversionCommon)
     api(projects.viaversionBukkit)
     api(projects.viaversionVelocity)
+    api(projects.viaversionSponge)
     api(projects.viaversionFabric)
 }
 
