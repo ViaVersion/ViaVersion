@@ -51,6 +51,7 @@ public enum ClientboundPackets1_21_2 implements ClientboundPacket1_21_2 {
     DISCONNECT, // 0x1D
     DISGUISED_CHAT, // 0x1E
     ENTITY_EVENT, // 0x1F
+    ENTITY_POSITION_SYNC, // 0x73
     EXPLODE, // 0x20
     FORGET_LEVEL_CHUNK, // 0x21
     GAME_EVENT, // 0x22
@@ -85,7 +86,10 @@ public enum ClientboundPackets1_21_2 implements ClientboundPacket1_21_2 {
     PLAYER_INFO_UPDATE, // 0x3F
     PLAYER_LOOK_AT, // 0x40
     PLAYER_POSITION, // 0x41
-    RECIPE, // 0x42
+    PLAYER_ROTATION, // 0x41
+    RECIPE_BOOK_ADD, // 0x42
+    RECIPE_BOOK_REMOVE, // 0x42
+    RECIPE_BOOK_SETTINGS, // 0x42
     REMOVE_ENTITIES, // 0x43
     REMOVE_MOB_EFFECT, // 0x44
     RESET_SCORE, // 0x45

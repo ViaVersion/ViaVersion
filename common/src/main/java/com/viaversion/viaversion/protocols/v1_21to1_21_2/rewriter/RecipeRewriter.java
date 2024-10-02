@@ -17,32 +17,36 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 
-// Dead as of 1.21.2, the server only sends simple recipe display data instead of full results
-public class RecipeRewriter1_21_2<C extends ClientboundPacketType> extends RecipeRewriter1_20_3<C> {
+final class RecipeRewriter extends RecipeRewriter1_20_3<ClientboundPacket1_21> {
 
-    public RecipeRewriter1_21_2(final Protocol<C, ?, ?, ?> protocol) {
+    RecipeRewriter(final Protocol<ClientboundPacket1_21, ?, ?, ?> protocol) {
         super(protocol);
+    }
+
+    @Override
+    protected void handleIngredient(final PacketWrapper wrapper) {
+        wrapper.write(Types.HOLDER_SET, ingredient(wrapper));
     }
 
     @Override
     public void handleCraftingShaped(final PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         wrapper.passthrough(Types.VAR_INT); // Crafting book category
-        wrapper.passthrough(Types.VAR_INT); // Width
-        wrapper.passthrough(Types.VAR_INT); // Height
+        final int width = wrapper.passthrough(Types.VAR_INT);
+        final int height = wrapper.passthrough(Types.VAR_INT);
+        final int ingredients = width * height;
 
-        final int ingredients = wrapper.passthrough(Types.VAR_INT);
+        wrapper.write(Types.VAR_INT, ingredients);
         for (int i = 0; i < ingredients; i++) {
-            handleIngredient(wrapper);
+            wrapper.write(Types.HOLDER_SET, ingredient(wrapper));
         }
 
         wrapper.write(mappedItemType(), rewrite(wrapper.user(), wrapper.read(itemType()))); // Result
@@ -53,27 +57,38 @@ public class RecipeRewriter1_21_2<C extends ClientboundPacketType> extends Recip
     public void handleCraftingShapeless(final PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         wrapper.passthrough(Types.VAR_INT); // Crafting book category
-        wrapper.write(mappedItemType(), rewrite(wrapper.user(), wrapper.read(itemType()))); // Result
-        handleIngredients(wrapper);
+
+        final int ingredients = wrapper.read(Types.VAR_INT);
+        final HolderSet[] ingredient = new HolderSet[ingredients];
+        for (int i = 0; i < ingredients; i++) {
+            ingredient[i] = ingredient(wrapper);
+        }
+
+        wrapper.write(mappedItemType(), rewrite(wrapper.user(), wrapper.read(itemType())));
+
+        // Also moved below here
+        wrapper.write(Types.VAR_INT, ingredients);
+        for (final HolderSet item : ingredient) {
+            wrapper.write(Types.HOLDER_SET, item);
+        }
+    }
+
+    private HolderSet ingredient(final PacketWrapper wrapper) {
+        final Item[] items = wrapper.read(itemArrayType());
+        final int[] ids = new int[items.length];
+        for (int i = 0; i < items.length; i++) {
+            final Item item = rewrite(wrapper.user(), items[i]);
+            ids[i] = item.identifier();
+        }
+        return HolderSet.of(ids);
     }
 
     @Override
-    protected void handleIngredient(final PacketWrapper wrapper) {
-        final HolderSet items = wrapper.passthrough(Types.HOLDER_SET);
-        if (items.hasTagKey()) {
-            return;
+    public void handleRecipeType(final PacketWrapper wrapper, final String type) {
+        if (type.equals("crafting_special_suspiciousstew") || type.equals("crafting_special_shulkerboxcoloring")) {
+            wrapper.read(Types.VAR_INT); // Crafting book category
+        } else {
+            super.handleRecipeType(wrapper, type);
         }
-
-        final int[] ids = items.ids();
-        for (int i = 0; i < ids.length; i++) {
-            ids[i] = rewriteItemId(wrapper.user(), ids[i]);
-        }
-    }
-
-    protected int rewriteItemId(final UserConnection connection, final int id) {
-        if (protocol.getMappingData() != null && protocol.getMappingData().getItemMappings() != null) {
-            return protocol.getMappingData().getItemMappings().getNewIdOrDefault(id, id);
-        }
-        return id;
     }
 }

@@ -143,11 +143,14 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust", ParticleType.Readers.DUST)
+            .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK)
+            .reader("entity_effect", ParticleType.Readers.COLOR)
+            .reader("trail", ParticleType.Readers.TRAIL)
             .reader("item", ParticleType.Readers.item(Types1_21_2.ITEM));
         Types1_21_2.STRUCTURED_DATA.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT,

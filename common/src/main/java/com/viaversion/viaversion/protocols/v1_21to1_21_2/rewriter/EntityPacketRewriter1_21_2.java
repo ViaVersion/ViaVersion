@@ -18,9 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
-import com.viaversion.nbt.tag.ListTag;
-import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
@@ -33,12 +30,11 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.TagUtil;
-import java.util.Arrays;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
 
@@ -80,32 +76,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             instrumentsPacket.send(Protocol1_21To1_21_2.class);
         });
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper -> {
-            final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
-            RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
-            if (registryKey.equals("enchantment")) {
-                updateEnchantmentAttributes(entries, protocol.getMappingData().getAttributeMappings());
-            } else if (registryKey.equals("damage_type")) {
-                // Add new damage types
-                final int length = entries.length;
-                entries = Arrays.copyOf(entries, length + 2);
-
-                final CompoundTag enderpearlData = new CompoundTag();
-                enderpearlData.putString("scaling", "when_caused_by_living_non_player");
-                enderpearlData.putString("message_id", "fall");
-                enderpearlData.putFloat("exhaustion", 0.0F);
-                entries[length] = new RegistryEntry("minecraft:ender_pearl", enderpearlData);
-
-                final CompoundTag maceSmashData = new CompoundTag();
-                maceSmashData.putString("scaling", "when_caused_by_living_non_player");
-                maceSmashData.putString("message_id", "mace_smash");
-                maceSmashData.putFloat("exhaustion", 0.1F);
-                entries[length + 1] = new RegistryEntry("minecraft:mace_smash", maceSmashData);
-            }
-
-            wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
-            handleRegistryData1_20_5(wrapper.user(), registryKey, entries);
-        });
+        final RegistryDataRewriter registryDataRewriter = registryDataRewriter();
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerClientbound(ClientboundPackets1_21.LOGIN, new PacketHandlers() {
             @Override
@@ -233,6 +205,25 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.BYTE, updatedFlags);
         });
 
+        protocol.registerClientbound(ClientboundPackets1_21.TELEPORT_ENTITY, ClientboundPackets1_21_2.ENTITY_POSITION_SYNC, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+
+            // Unused...
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement X
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement Y
+            wrapper.write(Types.DOUBLE, 0D); // Delta movement Z
+
+            // Unpack y and x rot
+            final byte yaw = wrapper.read(Types.BYTE);
+            final byte pitch = wrapper.read(Types.BYTE);
+            wrapper.write(Types.FLOAT, yaw * 360F / 256F);
+            wrapper.write(Types.FLOAT, pitch * 360F / 256F);
+        });
+
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
@@ -255,66 +246,25 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
     }
 
-    public static void updateEnchantmentAttributes(final RegistryEntry[] entries, final FullMappings mappings) {
-        for (final RegistryEntry entry : entries) {
-            if (entry.tag() == null) {
-                continue;
-            }
+    private RegistryDataRewriter registryDataRewriter() {
+        final CompoundTag enderpearlData = new CompoundTag();
+        enderpearlData.putString("scaling", "when_caused_by_living_non_player");
+        enderpearlData.putString("message_id", "fall");
+        enderpearlData.putFloat("exhaustion", 0.0F);
 
-            final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
-            if (effects != null) {
-                updateLocationChangedAttributes(effects, mappings);
-                updateAttributesFields(effects, mappings);
-            }
-        }
-    }
+        final CompoundTag maceSmashData = new CompoundTag();
+        maceSmashData.putString("scaling", "when_caused_by_living_non_player");
+        maceSmashData.putString("message_id", "mace_smash");
+        maceSmashData.putFloat("exhaustion", 0.1F);
 
-    private static void updateAttributesFields(final CompoundTag effects, final FullMappings mappings) {
-        final ListTag<CompoundTag> attributesList = TagUtil.getNamespacedCompoundTagList(effects, "attributes");
-        if (attributesList == null) {
-            return;
-        }
-
-        for (final CompoundTag attributeData : attributesList) {
-            updateAttributeField(attributeData, mappings);
-        }
-    }
-
-    private static void updateLocationChangedAttributes(final CompoundTag effects, final FullMappings mappings) {
-        final ListTag<CompoundTag> locationChanged = TagUtil.getNamespacedCompoundTagList(effects, "location_changed");
-        if (locationChanged == null) {
-            return;
-        }
-
-        for (final CompoundTag data : locationChanged) {
-            final CompoundTag effect = data.getCompoundTag("effect");
-            if (effect == null) {
-                continue;
-            }
-
-            updateAttributeField(effect, mappings);
-
-            final ListTag<CompoundTag> innerEffects = effect.getListTag("effects", CompoundTag.class);
-            if (innerEffects != null) {
-                for (final CompoundTag innerEffect : innerEffects) {
-                    updateAttributeField(innerEffect, mappings);
-                }
-            }
-        }
-    }
-
-    private static void updateAttributeField(final CompoundTag attributeData, final FullMappings mappings) {
-        final StringTag attributeTag = attributeData.getStringTag("attribute");
-        if (attributeTag == null) {
-            return;
-        }
-
-        final String attribute = Key.stripMinecraftNamespace(attributeTag.getValue());
-        String mappedAttribute = mappings.mappedIdentifier(attribute);
-        if (mappedAttribute == null) {
-            mappedAttribute = mappings.mappedIdentifier(0); // Dummy
-        }
-        attributeTag.setValue(mappedAttribute);
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        registryDataRewriter.addEntries(
+            "damage_type",
+            new RegistryEntry("minecraft:ender_pearl", enderpearlData),
+            new RegistryEntry("minecraft:mace_smash", maceSmashData)
+        );
+        registryDataRewriter.addEnchantmentEffectRewriter("damage_item", tag -> tag.putString("type", "change_item_damage"));
+        return registryDataRewriter;
     }
 
     private void readOnGround(final PacketWrapper wrapper) {

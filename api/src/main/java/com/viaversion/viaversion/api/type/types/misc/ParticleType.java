@@ -137,6 +137,12 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Delay
         };
         public static final DataReader<Particle> COLOR = (buf, particle) -> particle.add(Types.INT, buf.readInt());
+        public static final DataReader<Particle> TRAIL = (buf, particle) -> {
+            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target X
+            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Y
+            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Z
+            particle.add(Types.INT, buf.readInt()); // Color
+        };
 
         public static DataReader<Particle> item(Type<Item> item) {
             return (buf, particle) -> particle.add(item, item.read(buf));

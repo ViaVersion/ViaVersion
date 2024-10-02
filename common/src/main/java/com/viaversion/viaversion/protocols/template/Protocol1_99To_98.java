@@ -105,16 +105,19 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         // EntityTypes1_20_5.initialize(this);
 
         // Uncomment if a new particle was added = ids shifted; requires a new Types_ class copied from the last
-        /*Types1_21.PARTICLE.filler(this)
-                .reader("block", ParticleType.Readers.BLOCK)
-                .reader("block_marker", ParticleType.Readers.BLOCK)
-                .reader("dust", ParticleType.Readers.DUST)
-                .reader("falling_dust", ParticleType.Readers.BLOCK)
-                .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
-                .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
-                .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
-                .reader("shriek", ParticleType.Readers.SHRIEK)
-                .reader("item", ParticleType.Readers.item(...));*/
+        /*Types1_21_2.PARTICLE.filler(this)
+            .reader("block", ParticleType.Readers.BLOCK)
+            .reader("block_marker", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST)
+            .reader("dust_pillar", ParticleType.Readers.BLOCK)
+            .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION)
+            .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
+            .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
+            .reader("shriek", ParticleType.Readers.SHRIEK)
+            .reader("entity_effect", ParticleType.Readers.COLOR)
+            .reader("trail", ParticleType.Readers.TRAIL)
+            .reader("item", ParticleType.Readers.item(...));*/
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data
     }

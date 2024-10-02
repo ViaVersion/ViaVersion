@@ -88,6 +88,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
             int newSize = size;
             for (int i = 0; i < size; i++) {
                 final String recipeIdentifier = wrapper.read(Types.STRING);
+                // TODO Recipe identifier, then int array item ids and that's it
 
                 final FullMappings recipeSerializerMappings = protocol.getMappingData().getRecipeSerializerMappings();
                 final int typeId = wrapper.read(Types.VAR_INT);
@@ -101,6 +102,11 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
 
                 handleRecipeType(wrapper, Key.stripMinecraftNamespace(recipeSerializerMappings.identifier(typeId))); // Use the original
             }
+
+            // Stonecutter recipes on their own
+            // List of:
+            //   Ingredient (item holder set)
+            //   Slot display id
         });
     }
 
