@@ -1,0 +1,66 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GNU GPLv3",
+  "global": {
+    "version": "${version}",
+    "links": {
+      "homepage": "https://viaversion.com/",
+      "source": "https://github.com/ViaVersion/ViaVersion",
+      "issues": "https://github.com/ViaVersion/ViaVersion/issues"
+    },
+    "contributors": [
+      {
+        "name": "_MylesC",
+        "description": "Maintainer"
+      },
+      {
+        "name": "creeper123123321",
+        "description": "Contributor"
+      },
+      {
+        "name": "Gerrygames",
+        "description": "Contributor"
+      },
+      {
+        "name": "kennytv",
+        "description": "Maintainer"
+      },
+      {
+        "name": "Matsv",
+        "description": "Contributor"
+      },
+      {
+        "name": "EnZaXD",
+        "description": "Maintainer"
+      },
+      {
+        "name": "RK_01",
+        "description": "Contributor"
+      }
+    ],
+    "dependencies": [
+      {
+        "id": "spongeapi",
+        "version": "8.0.0"
+      },
+      {
+        "id": "viasponge",
+        "version": "1.0.1"
+      }
+    ],
+    "branding": {
+      "logo": "assets/viaversion/textures/logo.png"
+    }
+  },
+  "plugins": [
+    {
+      "id": "viaversion",
+      "name": "ViaVersion",
+      "entrypoint": "com.viaversion.sponge.util.DummyEntrypoint",
+      "description": "${description}"
+    }
+  ]
+}
