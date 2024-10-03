@@ -22,50 +22,63 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.util.EitherImpl;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import java.util.Arrays;
 
-final class HolderSetImpl extends EitherImpl<String, int[]> implements HolderSet {
+final class HolderSetImpl {
 
-    HolderSetImpl(final String tagKey) {
-        super(tagKey, null);
-    }
+    record Tag(String tagKey) implements HolderSet {
+        @Override
+        public boolean hasTagKey() {
+            return true;
+        }
 
-    HolderSetImpl(final int[] ids) {
-        super(null, ids);
-    }
+        @Override
+        public int[] ids() {
+            throw new IllegalArgumentException("This holder set has a tag key");
+        }
 
-    @Override
-    public String tagKey() {
-        return left();
-    }
+        @Override
+        public boolean hasIds() {
+            return false;
+        }
 
-    @Override
-    public boolean hasTagKey() {
-        return isLeft();
-    }
-
-    @Override
-    public int[] ids() {
-        return right();
-    }
-
-    @Override
-    public boolean hasIds() {
-        return isRight();
-    }
-
-    @Override
-    public HolderSet rewrite(final Int2IntFunction idRewriter) {
-        if (hasTagKey()) {
+        @Override
+        public HolderSet rewrite(final Int2IntFunction idRewriter) {
             return this;
         }
+    }
 
-        final int[] ids = ids();
-        final int[] mappedIds = new int[ids.length];
-        for (int i = 0; i < mappedIds.length; i++) {
-            mappedIds[i] = idRewriter.applyAsInt(ids[i]);
+    record Ids(int[] ids) implements HolderSet {
+        @Override
+        public boolean hasTagKey() {
+            return false;
         }
-        return new HolderSetImpl(mappedIds);
+
+        @Override
+        public String tagKey() {
+            throw new IllegalArgumentException("This holder set has direct ids");
+        }
+
+        @Override
+        public boolean hasIds() {
+            return true;
+        }
+
+        @Override
+        public HolderSet rewrite(final Int2IntFunction idRewriter) {
+            final int[] mappedIds = new int[ids.length];
+            for (int i = 0; i < mappedIds.length; i++) {
+                mappedIds[i] = idRewriter.applyAsInt(ids[i]);
+            }
+            return new Ids(mappedIds);
+        }
+
+        @Override
+        public String toString() {
+            return "Ids{" +
+                "ids=" + Arrays.toString(ids) +
+                '}';
+        }
     }
 }

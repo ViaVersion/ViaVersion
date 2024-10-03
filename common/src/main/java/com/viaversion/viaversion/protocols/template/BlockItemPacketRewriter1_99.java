@@ -23,7 +23,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.RecipeRewriter1_21_2;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
@@ -70,9 +70,11 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
         registerExplosion1_21_2(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
-        new RecipeRewriter1_21_2<>(protocol).register1_20_5(ClientboundPackets1_21.UPDATE_RECIPES);
+        final RecipeDisplayRewriter<ClientboundPacket1_21> recipeRewriter = new RecipeDisplayRewriter<>(protocol);
+        recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21.UPDATE_RECIPES);
+        //recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21.RECIPE_BOOK_ADD);
+        recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21.PLACE_GHOST_RECIPE);
         // OR do this if serialization of recipes changed and override the relevant method
-        // Add new serializers to RecipeRewriter, or extend the last one for changes
-        // new RecipeRewriter1_21_2<ClientboundPacket1_21>(this) {}.register1_20_5(ClientboundPackets1_21.DECLARE_RECIPES);
+        // Add new serializers to RecipeDisplayRewriter, or extend the last one for changes
     }
 }

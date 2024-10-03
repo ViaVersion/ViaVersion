@@ -193,7 +193,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.UPDATE_RECIPES, wrapper -> {
-            final RecipeRewriter rewriter = new RecipeRewriter(protocol);
+            final RecipeRewriter1_21_2 rewriter = new RecipeRewriter1_21_2(protocol); // Holds state, create a new one for each packet
             wrapper.cancel(); // TODO
 
             final int size = wrapper.passthrough(Types.VAR_INT);

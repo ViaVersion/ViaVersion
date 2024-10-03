@@ -36,7 +36,7 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final String tagKey) {
-        return new HolderSetImpl(tagKey);
+        return new HolderSetImpl.Tag(tagKey);
     }
 
     /**
@@ -46,7 +46,7 @@ public interface HolderSet {
      * @return a new holder set
      */
     static HolderSet of(final int[] ids) {
-        return new HolderSetImpl(ids);
+        return new HolderSetImpl.Ids(ids);
     }
 
     /**
