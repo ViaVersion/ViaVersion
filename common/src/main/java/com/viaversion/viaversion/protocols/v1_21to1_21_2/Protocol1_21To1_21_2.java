@@ -18,8 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.MappingData;
-import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -39,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.data.MappingData1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
@@ -55,7 +54,7 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
 public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPacket1_21, ClientboundPacket1_21_2, ServerboundPacket1_20_5, ServerboundPacket1_21_2> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.21", "1.21.2");
+    public static final MappingData1_21_2 MAPPINGS = new MappingData1_21_2();
     private final EntityPacketRewriter1_21_2 entityRewriter = new EntityPacketRewriter1_21_2(this);
     private final BlockItemPacketRewriter1_21_2 itemRewriter = new BlockItemPacketRewriter1_21_2(this);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
@@ -181,7 +180,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
-    public MappingData getMappingData() {
+    public MappingData1_21_2 getMappingData() {
         return MAPPINGS;
     }
 
