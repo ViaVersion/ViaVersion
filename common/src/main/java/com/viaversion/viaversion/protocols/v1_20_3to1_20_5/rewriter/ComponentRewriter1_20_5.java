@@ -944,6 +944,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         } else {
             final ListTag<StringTag> identifiers = new ListTag<>(StringTag.class);
             for (final int id : set.ids()) {
+                // Can use old block list because new ids are only at the end :tm:
                 final String identifier = Protocol1_20_3To1_20_5.MAPPINGS.blockName(id);
                 if (identifier == null) {
                     continue;
