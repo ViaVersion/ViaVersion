@@ -404,7 +404,24 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 convertHolderSet(predicateTag, "blocks", predicate.holderSet());
             }
             if (predicate.propertyMatchers() != null) {
-                final CompoundTag state = convertPredicate(predicate);
+                final CompoundTag state = new CompoundTag();
+
+                for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
+                    final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
+                    if (match.isLeft()) {
+                        state.putString(matcher.name(), match.left());
+                    } else {
+                        final StatePropertyMatcher.RangedMatcher range = match.right();
+                        final CompoundTag rangeTag = new CompoundTag();
+                        if (range.minValue() != null) {
+                            rangeTag.putString("min", range.minValue());
+                        }
+                        if (range.maxValue() != null) {
+                            rangeTag.putString("max", range.maxValue());
+                        }
+                        state.put(matcher.name(), rangeTag);
+                    }
+                }
                 predicateTag.put("state", state);
             }
             if (predicate.tag() != null) {
@@ -418,27 +435,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putBoolean("show_in_tooltip", false);
         }
         return tag;
-    }
-
-    protected CompoundTag convertPredicate(final BlockPredicate predicate) {
-        final CompoundTag state = new CompoundTag();
-        for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
-            final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
-            if (match.isLeft()) {
-                state.putString(matcher.name(), match.left());
-            } else {
-                final StatePropertyMatcher.RangedMatcher range = match.right();
-                final CompoundTag rangeTag = new CompoundTag();
-                if (range.minValue() != null) {
-                    rangeTag.putString("min", range.minValue());
-                }
-                if (range.maxValue() != null) {
-                    rangeTag.putString("max", range.maxValue());
-                }
-                state.put(matcher.name(), rangeTag);
-            }
-        }
-        return state;
     }
 
     protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
@@ -946,7 +942,15 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         if (set.hasTagKey()) {
             tag.putString(name, set.tagKey());
         } else {
-            tag.put(name, new IntArrayTag(set.ids()));
+            final ListTag<StringTag> identifiers = new ListTag<>(StringTag.class);
+            for (final int id : set.ids()) {
+                final String identifier = Protocol1_20_3To1_20_5.MAPPINGS.blockName(id);
+                if (identifier == null) {
+                    continue;
+                }
+                identifiers.add(new StringTag(identifier));
+            }
+            tag.put(name, identifiers);
         }
     }
 
