@@ -396,6 +396,14 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     protected CompoundTag convertCanPlaceOn(final AdventureModePredicate value) {
+        return convertBlockPredicate(value);
+    }
+
+    protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
+        return convertBlockPredicate(value);
+    }
+
+    protected CompoundTag convertBlockPredicate(final AdventureModePredicate value) {
         final CompoundTag tag = new CompoundTag();
         final ListTag<CompoundTag> predicates = new ListTag<>(CompoundTag.class);
         for (final BlockPredicate predicate : value.predicates()) {
@@ -404,8 +412,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 convertHolderSet(predicateTag, "blocks", predicate.holderSet());
             }
             if (predicate.propertyMatchers() != null) {
-                final CompoundTag state = convertPredicate(predicate);
-                predicateTag.put("state", state);
+                predicateTag.put("state", createState(predicate));
             }
             if (predicate.tag() != null) {
                 predicateTag.put("nbt", predicate.tag());
@@ -420,8 +427,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertPredicate(final BlockPredicate predicate) {
+    // Not an own conversion method, just to avoid high nesting
+    protected CompoundTag createState(BlockPredicate predicate) {
         final CompoundTag state = new CompoundTag();
+
         for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
             final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
             if (match.isLeft()) {
@@ -439,10 +448,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
         }
         return state;
-    }
-
-    protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
-        return convertCanPlaceOn(value);
     }
 
     protected CompoundTag convertAttributeModifiers(final AttributeModifiers1_20_5 value) {
@@ -946,7 +951,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         if (set.hasTagKey()) {
             tag.putString(name, set.tagKey());
         } else {
-            tag.put(name, new IntArrayTag(set.ids()));
+            final ListTag<StringTag> identifiers = new ListTag<>(StringTag.class);
+            for (final int id : set.ids()) {
+                // Can use old block list because new ids are only at the end :tm:
+                final String identifier = Protocol1_20_3To1_20_5.MAPPINGS.blockName(id);
+                if (identifier == null) {
+                    continue;
+                }
+
+                identifiers.add(new StringTag(identifier));
+            }
+            tag.put(name, identifiers);
         }
     }
 
