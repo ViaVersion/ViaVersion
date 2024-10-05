@@ -396,6 +396,14 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     protected CompoundTag convertCanPlaceOn(final AdventureModePredicate value) {
+        return convertBlockPredicate(value);
+    }
+
+    protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
+        return convertBlockPredicate(value);
+    }
+
+    protected CompoundTag convertBlockPredicate(final AdventureModePredicate value) {
         final CompoundTag tag = new CompoundTag();
         final ListTag<CompoundTag> predicates = new ListTag<>(CompoundTag.class);
         for (final BlockPredicate predicate : value.predicates()) {
@@ -404,25 +412,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 convertHolderSet(predicateTag, "blocks", predicate.holderSet());
             }
             if (predicate.propertyMatchers() != null) {
-                final CompoundTag state = new CompoundTag();
-
-                for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
-                    final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
-                    if (match.isLeft()) {
-                        state.putString(matcher.name(), match.left());
-                    } else {
-                        final StatePropertyMatcher.RangedMatcher range = match.right();
-                        final CompoundTag rangeTag = new CompoundTag();
-                        if (range.minValue() != null) {
-                            rangeTag.putString("min", range.minValue());
-                        }
-                        if (range.maxValue() != null) {
-                            rangeTag.putString("max", range.maxValue());
-                        }
-                        state.put(matcher.name(), rangeTag);
-                    }
-                }
-                predicateTag.put("state", state);
+                predicateTag.put("state", createState(predicate));
             }
             if (predicate.tag() != null) {
                 predicateTag.put("nbt", predicate.tag());
@@ -437,8 +427,27 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected CompoundTag convertCanBreak(final AdventureModePredicate value) {
-        return convertCanPlaceOn(value);
+    // Not an own conversion method, just to avoid high nesting
+    protected CompoundTag createState(BlockPredicate predicate) {
+        final CompoundTag state = new CompoundTag();
+
+        for (final StatePropertyMatcher matcher : predicate.propertyMatchers()) {
+            final Either<String, StatePropertyMatcher.RangedMatcher> match = matcher.matcher();
+            if (match.isLeft()) {
+                state.putString(matcher.name(), match.left());
+            } else {
+                final StatePropertyMatcher.RangedMatcher range = match.right();
+                final CompoundTag rangeTag = new CompoundTag();
+                if (range.minValue() != null) {
+                    rangeTag.putString("min", range.minValue());
+                }
+                if (range.maxValue() != null) {
+                    rangeTag.putString("max", range.maxValue());
+                }
+                state.put(matcher.name(), rangeTag);
+            }
+        }
+        return state;
     }
 
     protected CompoundTag convertAttributeModifiers(final AttributeModifiers1_20_5 value) {
