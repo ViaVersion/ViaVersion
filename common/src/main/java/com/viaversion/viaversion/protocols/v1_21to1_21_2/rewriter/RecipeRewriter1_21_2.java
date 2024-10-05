@@ -71,7 +71,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     @Override
     public void handleStonecutting(final PacketWrapper wrapper) {
-        final int group = recipeGroupId(wrapper.read(Types.STRING));
+        final int group = readRecipeGroup(wrapper);
         final Item[] ingredient = readIngredient(wrapper);
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
 
@@ -83,12 +83,6 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         list.add(recipe);
         recipes.add(recipe);
         recipesByKey.put(currentRecipeIdentifier, recipe);
-    }
-
-    private int recipeGroupId(final String recipeGroup) {
-        final int size = recipeGroups.size();
-        final int value = recipeGroups.putIfAbsent(Key.stripMinecraftNamespace(recipeGroup), size);
-        return value != -1 ? value : size;
     }
 
     @Override
@@ -124,7 +118,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     @Override
     public void handleCraftingShaped(final PacketWrapper wrapper) {
-        final int group = recipeGroupId(wrapper.read(Types.STRING));
+        final int group = readRecipeGroup(wrapper);
         final int category = wrapper.read(Types.VAR_INT);
         final int width = wrapper.read(Types.VAR_INT);
         final int height = wrapper.read(Types.VAR_INT);
@@ -143,7 +137,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     @Override
     public void handleCraftingShapeless(final PacketWrapper wrapper) {
-        final int group = recipeGroupId(wrapper.read(Types.STRING));
+        final int group = readRecipeGroup(wrapper);
         final int category = wrapper.read(Types.VAR_INT);
         final int ingredientsSize = wrapper.read(Types.VAR_INT);
         final Item[][] ingredients = new Item[ingredientsSize][];
@@ -158,7 +152,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     @Override
     public void handleSmelting(final PacketWrapper wrapper) {
-        final int group = recipeGroupId(wrapper.read(Types.STRING));
+        final int group = readRecipeGroup(wrapper);
         final int category = wrapper.read(Types.VAR_INT);
         final Item[] ingredient = readIngredient(wrapper);
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
@@ -168,6 +162,21 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
         wrapper.read(Types.FLOAT); // EXP
         wrapper.read(Types.VAR_INT); // Cooking time
+    }
+
+    private int readRecipeGroup(final PacketWrapper wrapper) {
+        final String recipeGroup = Key.stripMinecraftNamespace(wrapper.read(Types.STRING));
+        if (recipeGroup.isEmpty()) {
+            return -1;
+        }
+
+        if (recipeGroups.containsKey(recipeGroup)) {
+            return recipeGroups.getInt(recipeGroup);
+        }
+
+        final int size = recipeGroups.size();
+        recipeGroups.put(recipeGroup, size);
+        return size;
     }
 
     private Item[] readIngredient(final PacketWrapper wrapper) {
@@ -313,7 +322,6 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     }
 
     private static void writeIngredientsDisplay(final PacketWrapper wrapper, final Item[][] ingredients) {
-        // TODO Check what the 24w40a server sends for shapeless/shaped ingredient slot displays
         wrapper.write(Types.VAR_INT, ingredients.length);
         for (final Item[] ingredient : ingredients) {
             writeIngredientDisplay(wrapper, ingredient);
@@ -326,7 +334,6 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             return;
         }
 
-        // TODO Check what's sent by the server
         wrapper.write(Types.VAR_INT, Recipe.SLOT_DISPLAY_COMPOSITE);
         wrapper.write(Types.VAR_INT, ingredient.length);
         for (final Item item : ingredient) {

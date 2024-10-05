@@ -125,14 +125,15 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         protocol.registerClientbound(ClientboundPackets1_21.PLACE_GHOST_RECIPE, wrapper -> {
             this.updateContainerId(wrapper);
 
-            // TODO
-            if (true) {
+            final String recipeKey = wrapper.read(Types.STRING);
+            final RecipeRewriter1_21_2.Recipe recipe = wrapper.user().get(RecipeRewriter1_21_2.class).recipe(recipeKey);
+            if (recipe == null) {
                 wrapper.cancel();
                 return;
             }
 
-            final String recipe = wrapper.read(Types.STRING);
-            wrapper.write(Types.VAR_INT, recipeDisplay(recipe));
+            wrapper.write(Types.VAR_INT, recipe.recipeDisplayId());
+            recipe.writeRecipeDisplay(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.PLACE_RECIPE, wrapper -> {
             this.updateContainerIdServerbound(wrapper);
