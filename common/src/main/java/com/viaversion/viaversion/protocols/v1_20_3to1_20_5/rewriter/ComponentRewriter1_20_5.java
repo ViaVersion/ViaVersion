@@ -948,6 +948,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
                 if (identifier == null) {
                     continue;
                 }
+
                 identifiers.add(new StringTag(identifier));
             }
             tag.put(name, identifiers);
