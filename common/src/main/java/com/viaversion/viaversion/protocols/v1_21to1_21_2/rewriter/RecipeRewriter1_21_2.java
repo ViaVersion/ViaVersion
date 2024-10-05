@@ -18,10 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -29,12 +27,10 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.util.Key;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntCollection;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 // Use directly as a connection storage. Slightly weird, but easiest and closed off from other packages
 final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1_21> implements StorableObject {
 
-    private static final int FALLBACK_CATEGORY = 3; // TODO ?
-    private final List<ShapelessRecipe> shapelessRecipes = new ArrayList<>();
-    private final List<ShapedRecipe> shapedRecipes = new ArrayList<>();
-    private final List<SmithingRecipe> smithingRecipes = new ArrayList<>();
     private final List<StoneCutterRecipe> stoneCutterRecipes = new ArrayList<>();
-    private final List<FurnaceRecipe> furnaceRecipes = new ArrayList<>();
     private final Object2IntMap<String> recipeGroups = new Object2IntOpenHashMap<>();
     private final Map<String, Recipe> recipesByKey = new HashMap<>();
     private final List<Recipe> recipes = new ArrayList<>();
@@ -75,35 +66,21 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         final Item[] ingredient = readIngredient(wrapper);
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
 
-        final StoneCutterRecipe recipe = new StoneCutterRecipe(recipesByKey.size(), currentRecipeIdentifier, group, ingredient, result);
-        addRecipe(stoneCutterRecipes, recipe);
+        final StoneCutterRecipe recipe = new StoneCutterRecipe(currentRecipeIdentifier, group, ingredient, result);
+        stoneCutterRecipes.add(recipe); // Sent separately in update_recipes
     }
 
-    private <T extends Recipe> void addRecipe(final List<T> list, final T recipe) {
-        list.add(recipe);
+    private void addRecipe(final Recipe recipe) {
         recipes.add(recipe);
         recipesByKey.put(currentRecipeIdentifier, recipe);
     }
 
     @Override
     public void handleSmithingTransform(final PacketWrapper wrapper) {
-        final IntList template = new IntArrayList();
-        readIngredientToList(wrapper, template);
-        //smithingTemplate.addAll(template);
-        readIngredient(wrapper);
-        readIngredient(wrapper);
-        //readIngredientToList(wrapper, smithingBase);
-        //readIngredientToList(wrapper, smithingAddition);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-
-        // TODO Correct ingredients?
-        final Item[] ingredients = new Item[template.size()];
-        for (int i = 0; i < template.size(); i++) {
-            ingredients[i] = new StructuredItem(template.getInt(i), 1);
-        }
-
-        final SmithingRecipe recipe = new SmithingRecipe(recipesByKey.size(), currentRecipeIdentifier, ingredients, result);
-        addRecipe(smithingRecipes, recipe);
+        readIngredient(wrapper); // Template
+        readIngredient(wrapper); // Base
+        readIngredient(wrapper); // Addition
+        wrapper.read(itemType()); // Result
     }
 
     @Override
@@ -111,9 +88,6 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         readIngredient(wrapper);
         readIngredient(wrapper);
         readIngredient(wrapper);
-        //readIngredientToList(wrapper, smithingTemplate);
-        //readIngredientToList(wrapper, smithingBase);
-        //readIngredientToList(wrapper, smithingAddition);
     }
 
     @Override
@@ -130,7 +104,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
 
         final ShapedRecipe recipe = new ShapedRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, width, height, ingredients, result);
-        addRecipe(shapedRecipes, recipe);
+        addRecipe(recipe);
 
         wrapper.read(Types.BOOLEAN); // Show notification
     }
@@ -147,7 +121,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
 
         final ShapelessRecipe recipe = new ShapelessRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, ingredients, result);
-        addRecipe(shapelessRecipes, recipe);
+        addRecipe(recipe);
     }
 
     @Override
@@ -158,7 +132,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
 
         final FurnaceRecipe recipe = new FurnaceRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, ingredient, result);
-        addRecipe(furnaceRecipes, recipe);
+        addRecipe(recipe);
 
         wrapper.read(Types.FLOAT); // EXP
         wrapper.read(Types.VAR_INT); // Cooking time
@@ -197,21 +171,26 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         return HolderSet.of(ids);
     }
 
-    private void readIngredientToList(final PacketWrapper wrapper, final IntCollection list) {
-        final Item[] items = wrapper.read(itemArrayType());
-        final MappingData mappings = protocol.getMappingData();
-        for (final Item item : items) {
-            final int mappedId = mappings.getNewItemId(item.identifier());
-            list.add(mappedId);
-        }
-    }
-
     public @Nullable Recipe recipe(final String key) {
         return recipesByKey.get(Key.stripMinecraftNamespace(key));
     }
 
     public @Nullable Recipe recipe(final int displayId) {
         return displayId >= 0 && displayId < recipes.size() ? recipes.get(displayId) : null;
+    }
+
+    public void writeStoneCutterRecipes(final PacketWrapper wrapper) {
+        wrapper.write(Types.VAR_INT, stoneCutterRecipes.size());
+        for (final StoneCutterRecipe recipe : stoneCutterRecipes) {
+            final HolderSet ingredient = toHolderSet(recipe.ingredient());
+            wrapper.write(Types.HOLDER_SET, ingredient);
+            writeItemDisplay(wrapper, recipe.result());
+        }
+    }
+
+    public void finalizeRecipes() {
+        // Need to be sorted alphabetically
+        stoneCutterRecipes.sort(Comparator.comparing(recipe -> recipe.identifier));
     }
 
     interface Recipe {
@@ -239,9 +218,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             return -1;
         }
 
-        default int category() {
-            return FALLBACK_CATEGORY;
-        }
+        int category();
 
         void writeRecipeDisplay(PacketWrapper wrapper);
     }
@@ -294,27 +271,12 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         }
     }
 
-    record StoneCutterRecipe(int index, String identifier, int group, Item[] ingredient,
-                             Item result) implements Recipe {
-        @Override
+    record StoneCutterRecipe(String identifier, int group, Item[] ingredient, Item result) {
+
         public int recipeDisplayId() {
             return 3;
         }
 
-        @Override
-        public void writeRecipeDisplay(final PacketWrapper wrapper) {
-            writeItemDisplay(wrapper, result);
-            writeCraftingStationDisplay(wrapper);
-        }
-    }
-
-    record SmithingRecipe(int index, String identifier, Item[] ingredient, Item result) implements Recipe {
-        @Override
-        public int recipeDisplayId() {
-            return 4;
-        }
-
-        @Override
         public void writeRecipeDisplay(final PacketWrapper wrapper) {
             writeItemDisplay(wrapper, result);
             writeCraftingStationDisplay(wrapper);

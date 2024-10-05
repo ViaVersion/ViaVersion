@@ -207,12 +207,12 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 rewriter.setCurrentRecipeIdentifier(recipeIdentifier);
                 rewriter.handleRecipeType(wrapper, serializerTypeIdentifier);
             }
+            rewriter.finalizeRecipes();
 
             // These are used for client predictions, such as what items can be used as fuel in a furnace
             protocol.getMappingData().writeInputs(wrapper);
 
-            // TODO Stonecutter ingredients
-            wrapper.write(Types.VAR_INT, 0);
+            rewriter.writeStoneCutterRecipes(wrapper);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.RECIPE, ClientboundPackets1_21_2.RECIPE_BOOK_ADD, wrapper -> {
@@ -330,18 +330,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         super.handleItemToServer(connection, item);
         downgradeItemData(item);
         return item;
-    }
-
-    private int recipeDisplay(String type) {
-        type = Key.stripMinecraftNamespace(type);
-        return switch (type) {
-            case "crafting_shapeless" -> 0;
-            case "crafting_shaped" -> 1;
-            case "furnace" -> 2;
-            case "stonecutter" -> 3;
-            case "smithing" -> 4;
-            default -> 0;
-        };
     }
 
     private void updateContainerId(final PacketWrapper wrapper) {
