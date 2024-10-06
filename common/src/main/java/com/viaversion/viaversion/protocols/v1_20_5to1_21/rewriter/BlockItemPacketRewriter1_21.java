@@ -120,9 +120,9 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             playerRotation.write(Types.FLOAT, pitch);
             playerRotation.write(Types.BOOLEAN, true); // On Ground
 
-            wrapper.cancel();
             playerRotation.sendToServer(Protocol1_20_5To1_21.class);
             wrapper.sendToServer(Protocol1_20_5To1_21.class);
+            wrapper.cancel();
         });
 
         new RecipeRewriter1_20_3<>(protocol).register1_20_5(ClientboundPackets1_20_5.UPDATE_RECIPES);
