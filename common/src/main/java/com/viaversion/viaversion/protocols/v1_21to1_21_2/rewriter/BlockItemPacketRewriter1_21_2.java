@@ -57,6 +57,12 @@ import java.util.Set;
 
 public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<ClientboundPacket1_21, ServerboundPacket1_21_2, Protocol1_21To1_21_2> {
 
+    private static final int RECIPE_NOTIFICATION_FLAG = 1 << 0;
+    private static final int RECIPE_HIGHLIGHT_FLAG = 1 << 1;
+    private static final int RECIPE_INIT = 0;
+    private static final int RECIPE_ADD = 1;
+    private static final int RECIPE_REMOVE = 2;
+
     public BlockItemPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol,
             Types1_21.ITEM, Types1_21.ITEM_ARRAY, Types1_21_2.ITEM, Types1_21_2.ITEM_ARRAY,
@@ -194,9 +200,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.UPDATE_RECIPES, wrapper -> {
-            // TODO Handle resending. Updating them in newer versions isn't as easy anymore
             final FullMappings recipeSerializerMappings = protocol.getMappingData().getRecipeSerializerMappings();
-            final RecipeRewriter1_21_2 rewriter = new RecipeRewriter1_21_2(protocol); // Holds state, create a new one for each packet
+            final RecipeRewriter1_21_2 rewriter = new RecipeRewriter1_21_2(protocol);
             wrapper.user().put(rewriter);
 
             final int size = wrapper.read(Types.VAR_INT);
@@ -228,7 +233,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             // Read recipe keys from the packet
             final String[] recipes = wrapper.read(Types.STRING_ARRAY);
             Set<String> toHighlight = Set.of();
-            if (state == 0) { // Init (1=Add, 2=Remove)
+            if (state == RECIPE_INIT) {
                 final String[] highlightRecipes = wrapper.read(Types.STRING_ARRAY);
                 toHighlight = Set.of(highlightRecipes);
             }
@@ -242,8 +247,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             wrapper.clearPacket();
 
-            if (state == 2) {
-                // Remove recipes
+            if (state == RECIPE_REMOVE) {
                 wrapper.setPacketType(ClientboundPackets1_21_2.RECIPE_BOOK_REMOVE);
 
                 final int[] ids = new int[recipes.length];
@@ -297,8 +301,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 }
 
                 byte flags = 0;
-                if (toHighlight.contains(recipeKey)) {
-                    flags |= (1 << 1); // Highlight
+                if (state == RECIPE_ADD) {
+                    if (recipe.showNotification()) {
+                        flags |= RECIPE_NOTIFICATION_FLAG;
+                    }
+                    flags |= RECIPE_HIGHLIGHT_FLAG;
+                } else if (toHighlight.contains(recipeKey)) {
+                    flags |= RECIPE_HIGHLIGHT_FLAG;
                 }
                 wrapper.write(Types.BYTE, flags);
             }

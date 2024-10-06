@@ -102,11 +102,10 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             ingredients[i] = readIngredient(wrapper);
         }
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
+        final boolean showNotification = wrapper.read(Types.BOOLEAN);
 
-        final ShapedRecipe recipe = new ShapedRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, width, height, ingredients, result);
+        final ShapedRecipe recipe = new ShapedRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, width, height, ingredients, result, showNotification);
         addRecipe(recipe);
-
-        wrapper.read(Types.BOOLEAN); // Show notification
     }
 
     @Override
@@ -218,6 +217,10 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             return -1;
         }
 
+        default boolean showNotification() {
+            return true;
+        }
+
         int category();
 
         void writeRecipeDisplay(PacketWrapper wrapper);
@@ -239,7 +242,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     }
 
     record ShapedRecipe(int index, String identifier, int group, int category, int width, int height,
-                        Item[][] ingredients, Item result) implements Recipe {
+                        Item[][] ingredients, Item result, boolean showNotification) implements Recipe {
         @Override
         public int recipeDisplayId() {
             return 1;
