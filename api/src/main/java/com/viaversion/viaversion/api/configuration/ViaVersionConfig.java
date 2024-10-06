@@ -471,4 +471,11 @@ public interface ViaVersionConfig extends Config {
      * @return true if enabled
      */
     boolean hideScoreboardNumbers();
+
+    /**
+     * Fixes 1.21+ clients on 1.20.5 servers placing water/lava buckets at the wrong location when moving fast.
+     *
+     * @return true if enabled
+     */
+    boolean fix1_21PlacementRotation();
 }
