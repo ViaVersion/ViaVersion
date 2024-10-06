@@ -247,7 +247,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 wrapper.setPacketType(ClientboundPackets1_21_2.RECIPE_BOOK_REMOVE);
 
                 final int[] ids = new int[recipes.length];
-                for (final String recipeKey : recipes) {
+                for (int i = 0; i < recipes.length; i++) {
+                    final String recipeKey = recipes[i];
                     final RecipeRewriter1_21_2.Recipe recipe = recipeRewriter.recipe(recipeKey);
                     if (recipe == null) {
                         protocol.getLogger().severe("Recipe not found for key " + recipeKey);
@@ -255,7 +256,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                         return;
                     }
 
-                    ids[recipe.index()] = recipe.index();
+                    ids[i] = recipe.index();
                 }
 
                 wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, ids);
@@ -268,7 +269,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             for (final String recipeKey : recipes) {
                 final RecipeRewriter1_21_2.Recipe recipe = recipeRewriter.recipe(recipeKey);
                 if (recipe == null) {
-                    // Special recipes, or bad data
+                    // Stonecutting and smithing recipes, or bad data
                     size--;
                     continue;
                 }
