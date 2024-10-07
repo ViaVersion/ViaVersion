@@ -32,27 +32,29 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Nullable String model,
-                         @Nullable HolderSet allowedEntities, boolean dispensable, boolean swappable,
-                         boolean damageOnHurt) {
+                         @Nullable String cameraOverlay, @Nullable HolderSet allowedEntities, boolean dispensable,
+                         boolean swappable, boolean damageOnHurt) {
 
     public static final Type<Equippable> TYPE = new Type<>(Equippable.class) {
         @Override
         public Equippable read(final ByteBuf buffer) {
             final int equipmentSlot = Types.VAR_INT.readPrimitive(buffer);
             final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
-            final String model = Types.STRING.read(buffer);
+            final String model = Types.OPTIONAL_STRING.read(buffer);
+            final String cameraOverlay = Types.OPTIONAL_STRING.read(buffer);
             final HolderSet allowedEntities = Types.HOLDER_SET.read(buffer);
             final boolean dispensable = buffer.readBoolean();
             final boolean swappable = buffer.readBoolean();
             final boolean damageOnHurt = buffer.readBoolean();
-            return new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable, swappable, damageOnHurt);
+            return new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt);
         }
 
         @Override
         public void write(final ByteBuf buffer, final Equippable value) {
             Types.VAR_INT.writePrimitive(buffer, value.equipmentSlot());
             Types.SOUND_EVENT.write(buffer, value.soundEvent());
-            Types.STRING.write(buffer, value.model());
+            Types.OPTIONAL_STRING.write(buffer, value.model());
+            Types.OPTIONAL_STRING.write(buffer, value.cameraOverlay());
             Types.HOLDER_SET.write(buffer, value.allowedEntities());
             buffer.writeBoolean(value.dispensable());
             buffer.writeBoolean(value.swappable());
@@ -62,6 +64,6 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
 
     public Equippable rewrite(final Int2IntFunction soundIdRewriter) {
         final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriter);
-        return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, allowedEntities, dispensable, swappable, damageOnHurt);
+        return soundEvent == this.soundEvent ? this : new Equippable(equipmentSlot, soundEvent, model, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt);
     }
 }

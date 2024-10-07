@@ -77,6 +77,10 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Blue 0-1
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Scale 0.01-4
         };
+        public static final DataReader<Particle> DUST1_21_2 = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // RGB
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Scale 0.01-4
+        };
         public static final DataReader<Particle> DUST_TRANSITION = (buf, particle) -> {
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Red 0-1
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Green 0-1
@@ -85,6 +89,11 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Red
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Green
             particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Blue
+        };
+        public static final DataReader<Particle> DUST_TRANSITION1_21_2 = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // From RGB
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // To RGB
+            particle.add(Types.FLOAT, Types.FLOAT.readPrimitive(buf)); // Scale 0.01-4
         };
         public static final DataReader<Particle> VIBRATION = (buf, particle) -> {
             particle.add(Types.BLOCK_POSITION1_14, Types.BLOCK_POSITION1_14.read(buf)); // From block pos
@@ -136,12 +145,14 @@ public class ParticleType extends DynamicType<Particle> {
         public static final DataReader<Particle> SHRIEK = (buf, particle) -> {
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Delay
         };
-        public static final DataReader<Particle> COLOR = (buf, particle) -> particle.add(Types.INT, buf.readInt());
+        public static final DataReader<Particle> COLOR = (buf, particle) -> {
+            particle.add(Types.INT, Types.INT.readPrimitive(buf));
+        };
         public static final DataReader<Particle> TRAIL = (buf, particle) -> {
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target X
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Y
             particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Z
-            particle.add(Types.INT, buf.readInt()); // Color
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
         };
 
         public static DataReader<Particle> item(Type<Item> item) {

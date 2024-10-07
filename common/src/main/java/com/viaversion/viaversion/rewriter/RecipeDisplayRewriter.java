@@ -97,20 +97,17 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleStoneCutter(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Input
         handleSlotDisplay(wrapper); // Result
         handleSlotDisplay(wrapper); // Crafting station
     }
 
     protected void handleSmithing(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Template
+        handleSlotDisplay(wrapper); // Base
+        handleSlotDisplay(wrapper); // Addition
         handleSlotDisplay(wrapper); // Result
         handleSlotDisplay(wrapper); // Crafting station
-    }
-
-    protected void handleSlotDisplayList(final PacketWrapper wrapper) {
-        final int size = wrapper.passthrough(Types.VAR_INT);
-        for (int i = 0; i < size; i++) {
-            handleSlotDisplay(wrapper);
-        }
     }
 
     protected void handleRecipeDisplay(final PacketWrapper wrapper) {
@@ -125,14 +122,34 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleSlotDisplay(final PacketWrapper wrapper) {
-        // empty, any_fuel, smithing_trim are empty
+        // empty and any_fuel are empty
         final int type = wrapper.passthrough(Types.VAR_INT);
         switch (type) {
             case 2 -> handleItemId(wrapper); // Item type
             case 3 -> handleItem(wrapper); // Item
             case 4 -> wrapper.passthrough(Types.STRING); // Tag key
-            case 6 -> handleSlotDisplayList(wrapper); // Composite
+            case 5 -> handleSmithingTrimSlotDisplay(wrapper); // Smithing trim
+            case 6 -> handleWithRemainderSlotDisplay(wrapper); // With remainder
+            case 7 -> handleSlotDisplayList(wrapper); // Composite
         }
+    }
+
+    protected void handleSlotDisplayList(final PacketWrapper wrapper) {
+        final int size = wrapper.passthrough(Types.VAR_INT);
+        for (int i = 0; i < size; i++) {
+            handleSlotDisplay(wrapper);
+        }
+    }
+
+    protected void handleSmithingTrimSlotDisplay(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Base
+        handleSlotDisplay(wrapper); // Material
+        handleSlotDisplay(wrapper); // Pattern
+    }
+
+    protected void handleWithRemainderSlotDisplay(final PacketWrapper wrapper) {
+        handleSlotDisplay(wrapper); // Input
+        handleSlotDisplay(wrapper); // Remainder
     }
 
     protected void handleIngredient(final PacketWrapper wrapper) {

@@ -129,12 +129,11 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         final int category = wrapper.read(Types.VAR_INT);
         final Item[] ingredient = readIngredient(wrapper);
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
+        final float experience = wrapper.read(Types.FLOAT);
+        final int cookingTime = wrapper.read(Types.VAR_INT);
 
-        final FurnaceRecipe recipe = new FurnaceRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, ingredient, result);
+        final FurnaceRecipe recipe = new FurnaceRecipe(recipesByKey.size(), currentRecipeIdentifier, group, category, ingredient, result, cookingTime, experience);
         addRecipe(recipe);
-
-        wrapper.read(Types.FLOAT); // EXP
-        wrapper.read(Types.VAR_INT); // Cooking time
     }
 
     private int readRecipeGroup(final PacketWrapper wrapper) {
@@ -196,7 +195,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         int SLOT_DISPLAY_EMPTY = 0;
         int SLOT_DISPLAY_ANY_FUEL = 1;
         int SLOT_DISPLAY_ITEM = 3;
-        int SLOT_DISPLAY_COMPOSITE = 6;
+        int SLOT_DISPLAY_COMPOSITE = 7;
 
         int index();
 
@@ -259,7 +258,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     }
 
     record FurnaceRecipe(int index, String identifier, int group, int category, Item[] ingredient,
-                         Item result) implements Recipe {
+                         Item result, int duration, float experience) implements Recipe {
         @Override
         public int recipeDisplayId() {
             return 2;
@@ -271,6 +270,8 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             wrapper.write(Types.VAR_INT, SLOT_DISPLAY_ANY_FUEL); // Fuel
             writeItemDisplay(wrapper, result);
             writeCraftingStationDisplay(wrapper);
+            wrapper.write(Types.VAR_INT, duration);
+            wrapper.write(Types.FLOAT, experience);
         }
     }
 
@@ -281,6 +282,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         }
 
         public void writeRecipeDisplay(final PacketWrapper wrapper) {
+            writeIngredientDisplay(wrapper, ingredient);
             writeItemDisplay(wrapper, result);
             writeCraftingStationDisplay(wrapper);
         }
@@ -308,7 +310,7 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     private static void writeItemDisplay(final PacketWrapper wrapper, final Item item) {
         wrapper.write(Types.VAR_INT, Recipe.SLOT_DISPLAY_ITEM);
-        wrapper.write(Types1_21_2.ITEM, item);
+        wrapper.write(Types1_21_2.ITEM, item.copy());
     }
 
     private static void writeCraftingStationDisplay(final PacketWrapper wrapper) {

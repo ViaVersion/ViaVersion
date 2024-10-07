@@ -36,8 +36,16 @@ public class IntType extends Type<Integer> implements TypeConverter<Integer> {
         return buffer.readInt();
     }
 
+    public int readPrimitive(ByteBuf buffer) {
+        return buffer.readInt();
+    }
+
     @Override
     public void write(ByteBuf buffer, Integer object) {
+        buffer.writeInt(object);
+    }
+
+    public void writePrimitive(ByteBuf buffer, int object) {
         buffer.writeInt(object);
     }
 

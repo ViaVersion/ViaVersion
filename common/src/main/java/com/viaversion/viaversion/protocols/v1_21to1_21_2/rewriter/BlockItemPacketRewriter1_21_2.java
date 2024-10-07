@@ -314,6 +314,8 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             // Update final size
             wrapper.set(Types.VAR_INT, 0, size);
+
+            wrapper.write(Types.BOOLEAN, state == RECIPE_INIT); // Replace
         });
     }
 
