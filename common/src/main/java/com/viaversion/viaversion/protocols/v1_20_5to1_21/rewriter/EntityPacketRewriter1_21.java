@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -132,6 +133,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         });
 
         // Tracks on ground state for block interactions
+        if (!Via.getConfig().fix1_21PlacementRotation()) {
+            return;
+        }
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
