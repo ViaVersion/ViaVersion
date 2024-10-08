@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundState;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
@@ -113,12 +114,13 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             if (!Via.getConfig().fix1_21PlacementRotation()) {
                 return;
             }
+            final OnGroundState tracker = wrapper.user().get(OnGroundState.class);
 
             // Not correct but *enough* for vanilla/normal servers to have block placement synchronized
             final PacketWrapper playerRotation = wrapper.create(ServerboundPackets1_20_5.MOVE_PLAYER_ROT);
             playerRotation.write(Types.FLOAT, yaw);
             playerRotation.write(Types.FLOAT, pitch);
-            playerRotation.write(Types.BOOLEAN, true); // On Ground
+            playerRotation.write(Types.BOOLEAN, tracker.onGround()); // On Ground
 
             playerRotation.sendToServer(Protocol1_20_5To1_21.class);
             wrapper.sendToServer(Protocol1_20_5To1_21.class);

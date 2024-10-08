@@ -554,6 +554,6 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
 
     @Override
     public boolean fix1_21PlacementRotation() {
-        return false && fix1_21PlacementRotation; // TODO Can't always set onGround to true
+        return fix1_21PlacementRotation;
     }
 }
