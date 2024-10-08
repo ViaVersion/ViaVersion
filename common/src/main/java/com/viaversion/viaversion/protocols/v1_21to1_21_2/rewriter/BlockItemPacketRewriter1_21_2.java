@@ -331,6 +331,27 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     }
 
     @Override
+    public void rewriteParticle(final UserConnection connection, final Particle particle) {
+        super.rewriteParticle(connection, particle);
+
+        final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
+        if (identifier.equals("minecraft:dust_color_transition")) {
+            floatsToARGB(particle, 0);
+            floatsToARGB(particle, 1);
+        } else if (identifier.equals("minecraft:dust")) {
+            floatsToARGB(particle, 0);
+        }
+    }
+
+    private void floatsToARGB(final Particle particle, final int fromIndex) {
+        final Particle.ParticleData<Float> r = particle.removeArgument(fromIndex);
+        final Particle.ParticleData<Float> g = particle.removeArgument(fromIndex);
+        final Particle.ParticleData<Float> b = particle.removeArgument(fromIndex);
+        final int rgb = 255 << 24 | (int) (r.getValue() * 255) << 16 | (int) (g.getValue() * 255) << 8 | (int) (b.getValue() * 255);
+        particle.add(fromIndex, Types.INT, rgb);
+    }
+
+    @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
         super.handleItemToClient(connection, item);
         updateItemData(item);

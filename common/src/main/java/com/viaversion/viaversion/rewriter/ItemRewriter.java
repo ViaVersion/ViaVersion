@@ -621,7 +621,8 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         wrapper.write(itemType, item);
     }
 
-    protected void rewriteParticle(UserConnection connection, Particle particle) {
+    @Override
+    public void rewriteParticle(UserConnection connection, Particle particle) {
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.id();
         if (mappings.isBlockParticle(id)) {

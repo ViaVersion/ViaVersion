@@ -35,12 +35,10 @@ import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -591,21 +589,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void rewriteParticle(UserConnection connection, Particle particle) {
+        if (protocol.getItemRewriter() != null) {
+            protocol.getItemRewriter().rewriteParticle(connection, particle);
+            return;
+        }
+
+        // Dupe parts of the logic if no item rewriter is available
         ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
         int id = particle.id();
         if (mappings.isBlockParticle(id)) {
             Particle.ParticleData<Integer> data = particle.getArgument(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
-        } else if (mappings.isItemParticle(id) && protocol.getItemRewriter() != null) {
-            Particle.ParticleData<Item> data = particle.getArgument(0);
-            ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-            Item item = itemRewriter.handleItemToClient(connection, data.getValue());
-            if (itemRewriter.mappedItemType() != null && itemRewriter.itemType() != itemRewriter.mappedItemType()) {
-                // Replace the type
-                particle.set(0, itemRewriter.mappedItemType(), item);
-            } else {
-                data.setValue(item);
-            }
         }
 
         particle.setId(protocol.getMappingData().getNewParticleId(id));
