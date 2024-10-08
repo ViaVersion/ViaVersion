@@ -137,11 +137,16 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.FLOAT); // Y rot
             wrapper.passthrough(Types.FLOAT); // X rot
 
-            // Add new delta movement flags so their current veloticy is kept
-            int relativeArguments = wrapper.read(Types.BYTE);
-            relativeArguments |= 1 << 5;
-            relativeArguments |= 1 << 6;
-            relativeArguments |= 1 << 7;
+            int relativeArguments = wrapper.read(Types.BYTE) & 0b00011111;
+            if ((relativeArguments & (1 << 0)) != 0) { // relative X
+                relativeArguments |= 1 << 5; // relative delta movement X
+            }
+            if ((relativeArguments & (1 << 1)) != 0) { // relative Y
+                relativeArguments |= 1 << 6; // relative delta movement Y
+            }
+            if ((relativeArguments & (1 << 2)) != 0) { // relative Z
+                relativeArguments |= 1 << 7; // relative delta movement Z
+            }
             wrapper.write(Types.INT, relativeArguments);
 
             final int teleportId = wrapper.read(Types.VAR_INT);
