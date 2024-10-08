@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
@@ -51,6 +52,7 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -159,23 +161,24 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.EXPLODE, wrapper -> {
-            wrapper.passthrough(Types.DOUBLE); // Center X
-            wrapper.passthrough(Types.DOUBLE); // Center Y
-            wrapper.passthrough(Types.DOUBLE); // Center Z
+            final int centerX = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center X
+            final int centerY = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center Y
+            final int centerZ = (int) Math.floor(wrapper.passthrough(Types.DOUBLE)); // Center Z
 
             final float power = wrapper.read(Types.FLOAT); // Power
+            final List<BlockPosition> affectedBlocks = new ArrayList<>();
             final int blocks = wrapper.read(Types.VAR_INT);
             for (int i = 0; i < blocks; i++) {
-                // TODO ?
-                wrapper.read(Types.BYTE); // Relative X
-                wrapper.read(Types.BYTE); // Relative Y
-                wrapper.read(Types.BYTE); // Relative Z
+                final int x = centerX + wrapper.read(Types.BYTE); // Relative X
+                final int y = centerY + wrapper.read(Types.BYTE); // Relative Y
+                final int z = centerZ + wrapper.read(Types.BYTE); // Relative Z
+                affectedBlocks.add(new BlockPosition(x, y, z));
             }
 
             final float knockbackX = wrapper.read(Types.FLOAT);
             final float knockbackY = wrapper.read(Types.FLOAT);
             final float knockbackZ = wrapper.read(Types.FLOAT);
-            if (knockbackX != 0 && knockbackY != 0 && knockbackZ != 0) {
+            if (knockbackX != 0 || knockbackY != 0 || knockbackZ != 0) {
                 wrapper.write(Types.BOOLEAN, true);
                 wrapper.write(Types.DOUBLE, (double) knockbackX);
                 wrapper.write(Types.DOUBLE, (double) knockbackY);
@@ -184,11 +187,19 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 wrapper.write(Types.BOOLEAN, false);
             }
 
-            wrapper.read(Types.VAR_INT); // Block interaction type
+            final int blockInteractionMode = wrapper.read(Types.VAR_INT);
+            if (blockInteractionMode == 1 || blockInteractionMode == 2) {
+                for (final BlockPosition affectedBlock : affectedBlocks) {
+                    final PacketWrapper blockUpdate = PacketWrapper.create(ClientboundPackets1_21_2.BLOCK_UPDATE, wrapper.user());
+                    blockUpdate.write(Types.BLOCK_POSITION1_14, affectedBlock); // position
+                    blockUpdate.write(Types.VAR_INT, 0); // block state
+                    blockUpdate.send(Protocol1_21To1_21_2.class);
+                }
+            }
 
             final Particle smallExplosionParticle = wrapper.read(Types1_21.PARTICLE);
             final Particle largeExplosionParticle = wrapper.read(Types1_21.PARTICLE);
-            if (power >= 2.0F && blocks != 0) {
+            if (power >= 2.0F && blockInteractionMode != 0) {
                 rewriteParticle(wrapper.user(), largeExplosionParticle);
                 wrapper.write(Types1_21_2.PARTICLE, largeExplosionParticle);
             } else {
