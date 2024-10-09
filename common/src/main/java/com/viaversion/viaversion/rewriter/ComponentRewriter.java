@@ -39,8 +39,8 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.BitSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles json and tag components, containing methods to override certain parts of the handling.
@@ -355,7 +355,6 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 return;
             }
 
-            // Until they're properly parsed
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {

@@ -97,6 +97,7 @@ import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,7 +155,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::suspiciousStewEffectsToTag, this::suspiciousStewEffectsFromTag);
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag, this::writableBookContentFromTag);
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag, this::writtenBookContentFromTag);
-        register(StructuredDataKey.TRIM, this::trimToTag);
+        register(StructuredDataKey.TRIM, this::trimToTag, this::trimFromTag);
         register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag, this::debugStickRateFromTag);
         register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag, this::entityDataFromTag);
         register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag, this::bucketEntityDataFromTag);
@@ -317,28 +318,28 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    public List<StructuredData<?>> toData(final CompoundTag tag) {
+    public List<StructuredData<?>> toData(final UserConnection connection, final CompoundTag tag) {
         final List<StructuredData<?>> list = new ArrayList<>();
         if (tag != null) {
             for (final Map.Entry<String, Tag> entry : tag.entrySet()) {
-                final StructuredData<?> data = readFromTag(entry.getKey(), entry.getValue());
+                final StructuredData<?> data = readFromTag(connection, entry.getKey(), entry.getValue());
                 list.add(data);
             }
         }
         return list;
     }
 
-    public StructuredData<?> readFromTag(final String identifier, final Tag tag) {
+    public StructuredData<?> readFromTag(final UserConnection connection, final String identifier, final Tag tag) {
         final int id = protocol.getMappingData().getDataComponentSerializerMappings().mappedId(identifier);
         Preconditions.checkArgument(id != -1, "Unknown data component: %s", identifier);
         final StructuredDataKey<?> key = structuredDataType.key(id);
-        return readFromTag(key, id, tag);
+        return readFromTag(connection, key, id, tag);
     }
 
-    private <T> StructuredData<T> readFromTag(final StructuredDataKey<T> key, final int id, final Tag tag) {
+    private <T> StructuredData<T> readFromTag(final UserConnection connection, final StructuredDataKey<T> key, final int id, final Tag tag) {
         final TagConverter<T> converter = tagConverter(key);
         Preconditions.checkNotNull(converter, "No converter found for: %s", key);
-        return StructuredData.of(key, converter.convert(tag), id);
+        return StructuredData.of(key, converter.convert(connection, tag), id);
     }
 
     private String mappedIdentifier(final int id) {
@@ -814,18 +815,18 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return itemArrayToTag(connection, value);
     }
 
-    protected Item[] chargedProjectilesFromTag(final Tag tag) {
+    protected Item[] chargedProjectilesFromTag(final UserConnection connection, final Tag tag) {
         final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
-        return itemArrayFromTag(value);
+        return itemArrayFromTag(connection, value);
     }
 
     protected ListTag<CompoundTag> bundleContentsToTag(final UserConnection connection, final Item[] value) {
         return itemArrayToTag(connection, value);
     }
 
-    protected Item[] bundleContentsFromTag(final Tag tag) {
+    protected Item[] bundleContentsFromTag(final UserConnection connection, final Tag tag) {
         final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
-        return itemArrayFromTag(value);
+        return itemArrayFromTag(connection, value);
     }
 
     protected CompoundTag potionContentsToTag(final PotionContents value) {
@@ -1033,10 +1034,48 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected ArmorTrim trimFromTag(final Tag tag) {
+    protected ArmorTrim trimFromTag(final UserConnection connection, final Tag tag) {
         final CompoundTag value = (CompoundTag) tag;
 
-        return null; //TODO
+        final Tag materialTag = value.get("material");
+        Holder<ArmorTrimMaterial> material;
+        final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
+        if (materialTag instanceof StringTag stringTag) {
+            material = Holder.of(trimStorage.trimMaterials().keyToId(stringTag.getValue()));
+        } else {
+            final CompoundTag materialValue = (CompoundTag) materialTag;
+            final String assetName = identifierFromTag(materialValue.getStringTag("asset_name"));
+            final int ingredient = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().mappedId(materialValue.getString("ingredient"));
+            final float itemModelIndex = materialValue.getFloat("item_model_index");
+            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
+            final CompoundTag overrideArmorMaterialsTag = materialValue.getCompoundTag("override_armor_materials");
+            if (overrideArmorMaterialsTag != null) {
+                for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
+                    final int materialId = ArmorMaterials1_20_5.keyToId(entry.getKey());
+                    if (materialId != -1) {
+                        overrideArmorMaterials.put(materialId, ((StringTag) entry.getValue()).getValue());
+                    }
+                }
+            }
+            final Tag description = materialValue.get("description");
+            material = Holder.of(new ArmorTrimMaterial(assetName, ingredient, itemModelIndex, overrideArmorMaterials, description));
+        }
+
+        final Tag patternTag = value.get("pattern");
+        Holder<ArmorTrimPattern> pattern;
+        if (patternTag instanceof StringTag stringTag) {
+            pattern = Holder.of(trimStorage.trimPatterns().keyToId(stringTag.getValue()));
+        } else {
+            final CompoundTag patternValue = (CompoundTag) patternTag;
+            final String assetName = identifierFromTag(patternValue.getStringTag("asset_id"));
+            final int templateItem = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().mappedId(patternValue.getString("template_item"));
+            final Tag description = patternValue.get("description");
+            final boolean decal = patternValue.getBoolean("decal", false);
+            pattern = Holder.of(new ArmorTrimPattern(assetName, templateItem, description, decal));
+        }
+
+        final boolean showInTooltip = value.getBoolean("show_in_tooltip", true);
+        return new ArmorTrim(material, pattern, showInTooltip);
     }
 
     protected CompoundTag debugStickRateToTag(final CompoundTag value) {
@@ -1310,12 +1349,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected Item[] containerFromTag(final Tag tag) {
+    protected Item[] containerFromTag(final UserConnection connection, final Tag tag) {
         final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
         final Item[] items = new Item[27];
         for (final CompoundTag itemTag : value) {
             final int slot = itemTag.getInt("slot");
-            final Item item = itemFromTag(itemTag.getCompoundTag("item"));
+            final Item item = itemFromTag(connection, itemTag.getCompoundTag("item"));
             items[slot] = item;
         }
         return items;
@@ -1503,10 +1542,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected Item[] itemArrayFromTag(final ListTag<CompoundTag> tag) {
+    protected Item[] itemArrayFromTag(final UserConnection connection, final ListTag<CompoundTag> tag) {
         final Item[] items = new Item[tag.size()];
         for (int i = 0; i < tag.size(); i++) {
-            items[i] = itemFromTag(tag.get(i));
+            items[i] = itemFromTag(connection, tag.get(i));
         }
         return items;
     }
@@ -1526,10 +1565,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("components", toTag(connection, components, true));
     }
 
-    protected Item itemFromTag(final CompoundTag tag) {
+    protected Item itemFromTag(final UserConnection connection, final CompoundTag tag) {
         final int id = mappedId(tag.getString("id", ""));
         final int amount = checkPositiveInt(tag.getInt("count", 1));
-        final List<StructuredData<?>> components = toData(tag.getCompoundTag("components"));
+        final List<StructuredData<?>> components = toData(connection, tag.getCompoundTag("components"));
 
         return new StructuredItem(id, amount, new StructuredDataContainer(components.toArray(StructuredData[]::new)));
     }
@@ -1816,13 +1855,14 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         converters.put(key, new ConverterPair<>(null, null));
     }
 
-    protected <T> void register(final StructuredDataKey<T> key, final DataConverter<T> dataConverter) { // TODO Remove this method
-        converters.put(key, new ConverterPair<>(dataConverter, null));
-    }
-
     protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter) {
         final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
         converters.put(key, new ConverterPair<>(converter, null));
+    }
+
+    protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter, final SimpleTagConverter<T> tagConverter) {
+        final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
+        converters.put(key, new ConverterPair<>(converter, (connection, tag) -> tagConverter.convert(tag)));
     }
 
     protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
@@ -1863,9 +1903,15 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     @FunctionalInterface
-    protected interface TagConverter<T> {
+    protected interface SimpleTagConverter<T> {
 
         T convert(final Tag tag);
+    }
+
+    @FunctionalInterface
+    protected interface TagConverter<T> {
+
+        T convert(UserConnection connection, Tag tag);
     }
 
     private record ConverterPair<T>(DataConverter<T> dataConverter, TagConverter<T> tagConverter) {
