@@ -839,9 +839,13 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         if (value.customColor() != null) {
             tag.putInt("custom_color", value.customColor());
         }
+        final ListTag<CompoundTag> customEffects = new ListTag<>(CompoundTag.class);
         for (final PotionEffect effect : value.customEffects()) {
-            potionEffectToTag(tag, effect);
+            final CompoundTag effectTag = new CompoundTag();
+            potionEffectToTag(effectTag, effect);
+            customEffects.add(effectTag);
         }
+        tag.put("custom_effects", customEffects);
         return tag;
     }
 
@@ -850,12 +854,14 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
         final int potion = Potions1_20_5.keyToId(value.getString("potion", ""));
         final Integer customColor = value.getInt("custom_color");
-        final List<PotionEffect> effects = new ArrayList<>();
-        for (final Map.Entry<String, Tag> entry : value.entrySet()) {
-            final PotionEffect effect = potionEffectFromTag((CompoundTag) entry.getValue());
-            effects.add(effect);
+        final ListTag<CompoundTag> customEffects = value.getListTag("custom_effects", CompoundTag.class);
+        final List<PotionEffect> list = new ArrayList<>();
+        if (customEffects != null) {
+            for (final CompoundTag effectTag : customEffects) {
+                list.add(potionEffectFromTag(effectTag));
+            }
         }
-        return new PotionContents(potion, customColor, effects.toArray(PotionEffect[]::new));
+        return new PotionContents(potion, customColor, list.toArray(PotionEffect[]::new));
     }
 
     protected ListTag<CompoundTag> suspiciousStewEffectsToTag(final SuspiciousStewEffect[] value) {
@@ -1221,7 +1227,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final CompoundTag value = (CompoundTag) tag;
 
         final String name = value.getString("name", null);
-        final UUID id = UUIDUtil.fromIntArray(value.getIntArrayTag("id").getValue());
+        final IntArrayTag idTag = value.getIntArrayTag("id");
+        final UUID id = idTag == null ? null : UUIDUtil.fromIntArray(idTag.getValue());
         final GameProfile.Property[] properties = propertiesFromTag(value);
         return new GameProfile(name, id, properties);
     }
@@ -1250,7 +1257,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final BannerPatternLayer[] layers = new BannerPatternLayer[value.size()];
         for (int i = 0; i < value.size(); i++) {
             final CompoundTag layerTag = value.get(i);
-            final Holder<BannerPattern> pattern = bannerPatternFromTag(layerTag.getCompoundTag("pattern"));
+            final Holder<BannerPattern> pattern = bannerPatternFromTag(layerTag.get("pattern"));
             final int color = dyeColorFromTag(layerTag.get("color"));
             layers[i] = new BannerPatternLayer(pattern, color);
         }
@@ -1620,11 +1627,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("pattern", patternTag);
     }
 
-    protected Holder<BannerPattern> bannerPatternFromTag(final CompoundTag tag) {
-        final Tag patternTag = tag.get("pattern");
-        if (patternTag instanceof StringTag stringTag) {
+    protected Holder<BannerPattern> bannerPatternFromTag(final Tag tag) {
+        if (tag instanceof StringTag stringTag) {
             return Holder.of(BannerPatterns1_20_5.keyToId(stringTag.getValue()));
-        } else if (patternTag instanceof CompoundTag compoundTag) {
+        } else if (tag instanceof CompoundTag compoundTag) {
             final String assetId = identifierFromTag(compoundTag.getStringTag("asset_id"));
             final String translationKey = compoundTag.getString("translation_key");
             return Holder.of(new BannerPattern(assetId, translationKey));
@@ -1705,7 +1711,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     protected Tag componentFromTag(final Tag value, final int max) {
         if (value instanceof StringTag stringTag) {
-            return serializerVersion().toTag(checkStringRange(0, max, stringTag.getValue()));
+            final String input = checkStringRange(0, max, stringTag.getValue());
+            return serializerVersion().toTag(serializerVersion().toComponent(input));
         } else {
             return null;
         }
@@ -1721,13 +1728,13 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return listTag;
     }
 
-    protected Tag[] componentsFromTag(final Tag value, final int maxLength) { // TODO verify
+    protected Tag[] componentsFromTag(final Tag value, final int maxLength) {
         final ListTag<StringTag> listTag = (ListTag<StringTag>) value;
         checkIntRange(0, maxLength, listTag.size());
 
         final Tag[] components = new Tag[listTag.size()];
         for (int i = 0; i < listTag.size(); i++) {
-            components[i] = serializerVersion().toTag(listTag.get(i).getValue());
+            components[i] = serializerVersion().toTag(serializerVersion().toComponent(listTag.get(i).getValue()));
         }
         return components;
     }
