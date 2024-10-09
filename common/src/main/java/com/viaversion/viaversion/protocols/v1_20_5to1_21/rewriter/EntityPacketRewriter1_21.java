@@ -158,6 +158,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
 
             wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+        });
     }
 
     @Override
