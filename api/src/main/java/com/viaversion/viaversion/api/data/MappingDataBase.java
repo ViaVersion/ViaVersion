@@ -204,6 +204,16 @@ public class MappingDataBase implements MappingData {
     }
 
     @Override
+    public int getNewSoundId(final int id) {
+        return checkValidity(id, soundMappings.getNewId(id), "sound");
+    }
+
+    @Override
+    public int getOldSoundId(final int i) {
+        return soundMappings.getNewIdOrDefault(i, 0);
+    }
+
+    @Override
     public @Nullable List<TagData> getTags(final RegistryType type) {
         return tags != null ? tags.get(type) : null;
     }

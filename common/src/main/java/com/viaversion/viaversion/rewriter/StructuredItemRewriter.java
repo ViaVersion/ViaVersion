@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
@@ -30,7 +31,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.Map;
@@ -63,40 +63,12 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final MappingData mappingData = protocol.getMappingData();
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        if (mappingData != null) {
-            if (mappingData.getItemMappings() != null) {
-                item.setIdentifier(mappingData.getNewItemId(item.identifier()));
-            }
-
-            final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
-            if (dataComponentMappings != null) {
-                dataContainer.setIdLookup(protocol, true);
-                dataContainer.updateIds(protocol, dataComponentMappings::getNewId);
-            }
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            item.setIdentifier(mappingData.getNewItemId(item.identifier()));
         }
 
-        final ComponentRewriter componentRewriter = protocol.getComponentRewriter();
-        if (componentRewriter != null) {
-            // Handle name and lore components
-            updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
-            updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
-
-            final StructuredData<Tag[]> loreData = dataContainer.getNonEmpty(StructuredDataKey.LORE);
-            if (loreData != null) {
-                for (final Tag tag : loreData.value()) {
-                    componentRewriter.processTag(connection, tag);
-                }
-            }
-        }
-
-        Int2IntFunction itemIdRewriter = null;
-        Int2IntFunction blockIdRewriter = null;
-        if (mappingData != null) {
-            itemIdRewriter = mappingData.getItemMappings() != null ? mappingData::getNewItemId : null;
-            blockIdRewriter = mappingData.getBlockMappings() != null ? mappingData::getNewBlockId : null;
-        }
-        updateItemComponents(connection, dataContainer, this::handleItemToClient, itemIdRewriter, blockIdRewriter);
+        updateItemDataComponentTypeIds(item.dataContainer(), true);
+        updateItemDataComponents(connection, item, true);
         return item;
     }
 
@@ -107,44 +79,69 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
 
         final MappingData mappingData = protocol.getMappingData();
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        if (mappingData != null) {
-            if (mappingData.getItemMappings() != null) {
-                item.setIdentifier(mappingData.getOldItemId(item.identifier()));
-            }
-
-            final FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
-            if (dataComponentMappings != null) {
-                dataContainer.setIdLookup(protocol, false);
-                dataContainer.updateIds(protocol, id -> dataComponentMappings.inverse().getNewId(id));
-            }
+        if (mappingData != null && mappingData.getItemMappings() != null) {
+            item.setIdentifier(mappingData.getOldItemId(item.identifier()));
         }
 
+        updateItemDataComponentTypeIds(item.dataContainer(), false);
+        updateItemDataComponents(connection, item, false);
         restoreTextComponents(item);
-
-        Int2IntFunction itemIdRewriter = null;
-        Int2IntFunction blockIdRewriter = null;
-        if (mappingData != null) {
-            itemIdRewriter = mappingData.getItemMappings() != null ? mappingData::getOldItemId : null;
-            blockIdRewriter = mappingData.getBlockMappings() != null ? mappingData::getOldBlockId : null;
-        }
-        updateItemComponents(connection, dataContainer, this::handleItemToServer, itemIdRewriter, blockIdRewriter);
         return item;
     }
 
-    protected void updateItemComponents(UserConnection connection, StructuredDataContainer container, ItemHandler itemHandler, @Nullable Int2IntFunction idRewriter, @Nullable Int2IntFunction blockIdRewriter) {
-        // Specific types that need deep handling
-        if (idRewriter != null) {
-            container.updateIfPresent(StructuredDataKey.TRIM, value -> value.rewrite(idRewriter));
-            container.updateIfPresent(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(idRewriter));
+    protected void updateItemDataComponentTypeIds(final StructuredDataContainer container, final boolean mappedNames) {
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData == null) {
+            return;
         }
-        if (blockIdRewriter != null) {
-            container.updateIfPresent(StructuredDataKey.TOOL, value -> value.rewrite(blockIdRewriter));
-            container.updateIfPresent(StructuredDataKey.CAN_PLACE_ON, value -> value.rewrite(blockIdRewriter));
-            container.updateIfPresent(StructuredDataKey.CAN_BREAK, value -> value.rewrite(blockIdRewriter));
+
+        FullMappings dataComponentMappings = mappingData.getDataComponentSerializerMappings();
+        if (dataComponentMappings == null) {
+            return;
+        }
+
+        if (!mappedNames) {
+            dataComponentMappings = dataComponentMappings.inverse();
+        }
+
+        container.setIdLookup(protocol, mappedNames); // Necessary to be set before trying to add values to the container
+        container.updateIds(protocol, dataComponentMappings::getNewId);
+    }
+
+    protected void updateItemDataComponents(final UserConnection connection, final Item item, final boolean clientbound) {
+        // Specific types that need deep handling
+        final StructuredDataContainer container = item.dataContainer();
+        final MappingData mappingData = protocol.getMappingData();
+        if (mappingData.getItemMappings() != null) {
+            final Int2IntFunction itemIdRewriter = clientbound ? mappingData::getNewItemId : mappingData::getOldItemId;
+            container.replace(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
+        }
+        if (mappingData.getBlockMappings() != null) {
+            final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;
+            container.replace(StructuredDataKey.TOOL, value -> value.rewrite(blockIdRewriter));
+            container.replace(StructuredDataKey.CAN_PLACE_ON, value -> value.rewrite(blockIdRewriter));
+            container.replace(StructuredDataKey.CAN_BREAK, value -> value.rewrite(blockIdRewriter));
+        }
+        if (mappingData.getSoundMappings() != null) {
+            final Int2IntFunction soundIdRewriter = clientbound ? mappingData::getNewSoundId : mappingData::getOldSoundId;
+            container.replace(StructuredDataKey.INSTRUMENT, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
+            container.replace(StructuredDataKey.JUKEBOX_PLAYABLE, value -> value.rewrite(soundIdRewriter));
+        }
+        if (clientbound && protocol.getComponentRewriter() != null) {
+            updateComponent(connection, item, StructuredDataKey.ITEM_NAME, "item_name");
+            updateComponent(connection, item, StructuredDataKey.CUSTOM_NAME, "custom_name");
+
+            final Tag[] lore = container.get(StructuredDataKey.LORE);
+            if (lore != null) {
+                for (final Tag tag : lore) {
+                    protocol.getComponentRewriter().processTag(connection, tag);
+                }
+            }
         }
 
         // Look for item types
+        final ItemHandler itemHandler = clientbound ? this::handleItemToClient : this::handleItemToServer;
         for (final Map.Entry<StructuredDataKey<?>, StructuredData<?>> entry : container.data().entrySet()) {
             final StructuredData<?> data = entry.getValue();
             if (data.isEmpty()) {
@@ -169,35 +166,35 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected void updateComponent(final UserConnection connection, final Item item, final StructuredDataKey<Tag> key, final String backupKey) {
-        final StructuredData<Tag> name = item.dataContainer().getNonEmpty(key);
+        final Tag name = item.dataContainer().get(key);
         if (name == null) {
             return;
         }
 
-        final Tag originalName = name.value().copy();
-        protocol.getComponentRewriter().processTag(connection, name.value());
-        if (!name.value().equals(originalName)) {
+        final Tag originalName = name.copy();
+        protocol.getComponentRewriter().processTag(connection, name);
+        if (!name.equals(originalName)) {
             saveTag(createCustomTag(item), originalName, backupKey);
         }
     }
 
     protected void restoreTextComponents(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
-        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
+        final CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             return;
         }
 
         // Remove custom name
-        if (customData.value().remove(nbtTagName("added_custom_name")) != null) {
+        if (customData.remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
         } else {
-            final Tag customName = removeBackupTag(customData.value(), "custom_name");
+            final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
                 data.set(StructuredDataKey.CUSTOM_NAME, customName);
             }
 
-            final Tag itemName = removeBackupTag(customData.value(), "item_name");
+            final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
                 data.set(StructuredDataKey.ITEM_NAME, itemName);
             }
@@ -206,14 +203,12 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected CompoundTag createCustomTag(final Item item) {
         final StructuredDataContainer data = item.dataContainer();
-        final StructuredData<CompoundTag> customData = data.getNonEmpty(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null) {
-            return customData.value();
+        CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData == null) {
+            customData = new CompoundTag();
+            data.set(StructuredDataKey.CUSTOM_DATA, customData);
         }
-
-        final CompoundTag tag = new CompoundTag();
-        data.set(StructuredDataKey.CUSTOM_DATA, tag);
-        return tag;
+        return customData;
     }
 
     protected void saveTag(final CompoundTag customData, final Tag tag, final String name) {
@@ -228,7 +223,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     @FunctionalInterface
-    public interface ItemHandler {
+    private interface ItemHandler {
 
         Item rewrite(UserConnection connection, Item item);
     }

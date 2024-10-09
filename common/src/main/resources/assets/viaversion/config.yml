@@ -167,6 +167,9 @@ handle-invalid-item-count: false
 # Hides scoreboard numbers for 1.20.3+ clients on older server versions.
 hide-scoreboard-numbers: false
 #
+# Fixes 1.21+ clients on 1.20.5 servers placing water/lava buckets at the wrong location when moving fast, NOTE: This may cause issues with anti-cheat plugins.
+fix-1_21-placement-rotation: false
+#
 #----------------------------------------------------------#
 #             1.9+ CLIENTS ON 1.8 SERVERS OPTIONS          #
 #----------------------------------------------------------#

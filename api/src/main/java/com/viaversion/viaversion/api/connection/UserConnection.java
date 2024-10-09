@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.connection;
 
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -99,14 +100,33 @@ public interface UserConnection {
     void addEntityTracker(Class<? extends Protocol> protocolClass, EntityTracker tracker);
 
     /**
-     * Clear stored objects and entity trackers.
+     * Returns the client world by the given protocol class if present.
+     *
+     * @param protocolClass protocol class
+     * @param <T>           client world type
+     * @return client world if present
+     */
+    @Nullable
+    <T extends ClientWorld> T getClientWorld(Class<? extends Protocol> protocolClass);
+
+    /**
+     * Adds a client world to the user connection.
+     * Does not override existing client worlds.
+     *
+     * @param protocolClass protocol class
+     * @param clientWorld   client world
+     */
+    void addClientWorld(Class<? extends Protocol> protocolClass, ClientWorld clientWorld);
+
+    /**
+     * Clear stored objects, entity trackers and client worlds.
      */
     default void clearStoredObjects() {
         clearStoredObjects(false);
     }
 
     /**
-     * Clear stored objects and entity trackers.
+     * Clear stored objects, entity trackers and client worlds.
      * If cleared for a proxy server switch, some stored objects and tracker data will be retained.
      *
      * @param isServerSwitch whether the clear is due to a server switch

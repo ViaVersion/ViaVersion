@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_12;
 import com.viaversion.viaversion.api.type.types.version.Types1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.EntityIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.data.ParticleIdMappings1_13;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
@@ -132,11 +133,29 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    ClientWorld clientChunks = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientChunks = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientChunks.setEnvironment(dimensionId);
                 });
                 handler(playerTrackerHandler());
+                handler(Protocol1_12_2To1_13.SEND_DECLARE_COMMANDS_AND_TAGS);
+            }
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_12_1.RESPAWN, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.INT); // 0 - Dimension ID
+                handler(wrapper -> {
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_12_2To1_13.class);
+                    int dimensionId = wrapper.get(Types.INT, 0);
+                    if (clientWorld.setEnvironment(dimensionId)) {
+                        if (Via.getConfig().isServersideBlockConnections()) {
+                            ConnectionData.clearBlockStorage(wrapper.user());
+                        }
+                        tracker(wrapper.user()).clearEntities();
+                    }
+                });
                 handler(Protocol1_12_2To1_13.SEND_DECLARE_COMMANDS_AND_TAGS);
             }
         });

@@ -25,14 +25,14 @@ import com.viaversion.viaversion.api.protocol.version.BlockedProtocolVersions;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.protocol.BlockedProtocolVersionsImpl;
 import com.viaversion.viaversion.util.Config;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractViaConfig extends Config implements ViaVersionConfig {
@@ -95,6 +95,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean handleInvalidItemCount;
     private boolean cancelBlockSounds;
     private boolean hideScoreboardNumbers;
+    private boolean fix1_21PlacementRotation;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -163,6 +164,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
         cancelBlockSounds = getBoolean("cancel-block-sounds", true);
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
+        fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", false);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -548,5 +550,10 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     @Override
     public boolean hideScoreboardNumbers() {
         return hideScoreboardNumbers;
+    }
+
+    @Override
+    public boolean fix1_21PlacementRotation() {
+        return false && fix1_21PlacementRotation; // TODO Can't always set onGround to true
     }
 }

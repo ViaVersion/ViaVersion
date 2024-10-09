@@ -119,6 +119,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 map(Types.LONG); // Seed
                 map(Types.UNSIGNED_BYTE); // Gamemode
                 handler(wrapper -> {
+                    tracker(wrapper.user()).clearEntities();
+
                     wrapper.write(Types.BYTE, (byte) -1); // Previous gamemode, set to none
 
                     // <= 1.14.4 didn't keep attributes on respawn and 1.15.x always kept them
@@ -145,9 +147,8 @@ public class EntityPacketRewriter1_16 extends EntityRewriter<ClientboundPackets1
                 handler(DIMENSION_HANDLER); // Dimension
                 map(Types.LONG); // Seed
                 map(Types.UNSIGNED_BYTE); // Max players
+                handler(playerTrackerHandler());
                 handler(wrapper -> {
-                    wrapper.user().getEntityTracker(Protocol1_15_2To1_16.class).addEntity(wrapper.get(Types.INT, 0), EntityTypes1_16.PLAYER);
-
                     final String type = wrapper.read(Types.STRING);// level type
                     wrapper.passthrough(Types.VAR_INT); // View distance
                     wrapper.passthrough(Types.BOOLEAN); // Reduced debug info

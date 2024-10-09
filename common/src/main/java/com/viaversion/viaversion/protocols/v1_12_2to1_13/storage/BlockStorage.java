@@ -26,7 +26,7 @@ import java.util.Map;
 
 // TODO Fix memory leak lolz (only a smol one tho)
 public class BlockStorage implements StorableObject {
-    private static final IntSet WHITELIST = new IntOpenHashSet(46, .99F);
+    private static final IntSet WHITELIST = new IntOpenHashSet(46);
     private final Map<BlockPosition, ReplacementData> blocks = new HashMap<>();
 
     static {

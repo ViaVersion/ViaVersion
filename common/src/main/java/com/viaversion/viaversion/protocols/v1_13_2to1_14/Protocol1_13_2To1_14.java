@@ -121,9 +121,7 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_14(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld());
-        }
+        userConnection.addClientWorld(this.getClass(), new ClientWorld());
     }
 
     @Override

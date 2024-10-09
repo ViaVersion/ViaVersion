@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class AchievementTranslations1_12 {
 
-    private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150, 0.99f);
+    private static final Object2ObjectOpenHashMap<String, String> ACHIEVEMENTS = new Object2ObjectOpenHashMap<>(150);
     private static final Set<String> SPECIAL_ACHIEVEMENTS = new HashSet<>(10);
 
     static {

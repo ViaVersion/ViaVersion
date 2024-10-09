@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record Instrument(Holder<SoundEvent> soundEvent, int useDuration, float range) {
 
@@ -47,4 +48,8 @@ public record Instrument(Holder<SoundEvent> soundEvent, int useDuration, float r
         }
     };
 
+    public Instrument rewrite(final Int2IntFunction soundIdRewriteFunction) {
+        final Holder<SoundEvent> soundEvent = this.soundEvent.updateId(soundIdRewriteFunction);
+        return soundEvent == this.soundEvent ? this : new Instrument(soundEvent, useDuration, range);
+    }
 }

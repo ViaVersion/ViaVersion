@@ -43,7 +43,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.ItemPacketRewriter
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.PlayerPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.SpawnPacketRewriter1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.rewriter.WorldPacketRewriter1_9;
-import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.CommandBlockStorage;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.InventoryTracker;
@@ -104,20 +104,12 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
 
     @Override
     public void init(UserConnection userConnection) {
-        // Entity tracker
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_9(userConnection));
-        // Chunk tracker
-        userConnection.put(new ClientChunks());
-        // Movement tracker
-        userConnection.put(new MovementTracker());
-        // Inventory tracker
-        userConnection.put(new InventoryTracker());
-        // CommandBlock storage
-        userConnection.put(new CommandBlockStorage());
+        userConnection.addClientWorld(this.getClass(), new ClientWorld1_9());
 
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld());
-        }
+        userConnection.put(new MovementTracker());
+        userConnection.put(new InventoryTracker());
+        userConnection.put(new CommandBlockStorage());
     }
 
     @Override

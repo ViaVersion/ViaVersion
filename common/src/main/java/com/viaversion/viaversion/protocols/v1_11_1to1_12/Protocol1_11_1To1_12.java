@@ -72,7 +72,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
         });
 
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_11_1To1_12.class);
 
             ChunkType1_9_3 type = ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment());
             Chunk chunk = wrapper.passthrough(type);
@@ -98,38 +98,6 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
                     // Add a fake block entity
                     chunk.getBlockEntities().add(tag);
                 }
-            }
-        });
-
-        registerClientbound(ClientboundPackets1_9_3.LOGIN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT);
-                map(Types.UNSIGNED_BYTE);
-                map(Types.INT);
-                handler(wrapper -> {
-                    UserConnection user = wrapper.user();
-                    ClientWorld clientChunks = user.get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 1);
-                    clientChunks.setEnvironment(dimensionId);
-
-                    // Reset recipes
-                    if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_13)) {
-                        wrapper.create(ClientboundPackets1_13.UPDATE_RECIPES, packetWrapper -> packetWrapper.write(Types.VAR_INT, 0))
-                            .scheduleSend(Protocol1_12_2To1_13.class);
-                    }
-                });
-            }
-        });
-        registerClientbound(ClientboundPackets1_9_3.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT);
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-                });
             }
         });
 
@@ -205,9 +173,7 @@ public class Protocol1_11_1To1_12 extends AbstractProtocol<ClientboundPackets1_9
     @Override
     public void init(UserConnection userConnection) {
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_12.EntityType.PLAYER));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld());
-        }
+        userConnection.addClientWorld(this.getClass(), new ClientWorld());
     }
 
     @Override

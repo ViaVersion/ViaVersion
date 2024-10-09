@@ -153,7 +153,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.INT); // 2 - Dimension
 
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_3To1_10.class);
 
                     int dimensionId = wrapper.get(Types.INT, 1);
                     clientWorld.setEnvironment(dimensionId);
@@ -168,7 +168,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
                 map(Types.INT); // 0 - Dimension ID
 
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_3To1_10.class);
 
                     int dimensionId = wrapper.get(Types.INT, 0);
                     clientWorld.setEnvironment(dimensionId);
@@ -178,7 +178,7 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
 
         // Chunk Data
         registerClientbound(ClientboundPackets1_9_3.LEVEL_CHUNK, wrapper -> {
-            ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+            ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9_3To1_10.class);
             Chunk chunk = wrapper.passthrough(ChunkType1_9_3.forEnvironment(clientWorld.getEnvironment()));
 
             if (Via.getConfig().isReplacePistons()) {
@@ -234,11 +234,9 @@ public class Protocol1_9_3To1_10 extends AbstractProtocol<ClientboundPackets1_9_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new ResourcePackTracker());
+        userConnection.addClientWorld(this.getClass(), new ClientWorld());
 
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld());
-        }
+        userConnection.put(new ResourcePackTracker());
     }
 
     @Override

@@ -23,13 +23,12 @@
 package com.viaversion.viaversion.api.minecraft;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Stored up until 1.14 to be used in chunk sending.
  */
 public class ClientWorld implements StorableObject {
-    private Environment environment;
+    private Environment environment = Environment.NORMAL;
 
     public ClientWorld() {
     }
@@ -38,11 +37,20 @@ public class ClientWorld implements StorableObject {
         this.environment = environment;
     }
 
-    public @Nullable Environment getEnvironment() {
+    public Environment getEnvironment() {
         return environment;
     }
 
-    public void setEnvironment(final int environmentId) {
+    /**
+     * Sets the environment of the world and returns whether the environment was changed.
+     *
+     * @param environmentId the id of the environment to set
+     * @return whether the environment was changed
+     */
+    public boolean setEnvironment(final int environmentId) {
+        final int previousEnvironmentId = environment.id();
         this.environment = Environment.getEnvironmentById(environmentId);
+
+        return previousEnvironmentId != environmentId;
     }
 }

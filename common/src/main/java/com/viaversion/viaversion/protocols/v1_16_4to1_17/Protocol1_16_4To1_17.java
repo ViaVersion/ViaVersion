@@ -37,7 +37,6 @@ import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.EntityPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.ItemPacketRewriter1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.rewriter.WorldPacketRewriter1_17;
-import com.viaversion.viaversion.protocols.v1_16_4to1_17.storage.InventoryAcknowledgements;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -192,7 +191,6 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(UserConnection user) {
         addEntityTracker(user, new EntityTrackerBase(user, EntityTypes1_17.PLAYER));
-        user.put(new InventoryAcknowledgements());
     }
 
     @Override

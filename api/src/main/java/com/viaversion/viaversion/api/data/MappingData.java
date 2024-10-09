@@ -83,6 +83,10 @@ public interface MappingData {
 
     int getNewAttributeId(int id);
 
+    int getNewSoundId(int id);
+
+    int getOldSoundId(int i);
+
     /**
      * Returns a list of tags to send if present.
      *

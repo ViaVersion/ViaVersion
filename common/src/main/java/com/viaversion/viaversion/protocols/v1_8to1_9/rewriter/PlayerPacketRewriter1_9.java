@@ -36,7 +36,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CommandBlockProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.CompressionProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MainHandProvider;
-import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientChunks;
+import com.viaversion.viaversion.protocols.v1_8to1_9.storage.ClientWorld1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -203,7 +203,7 @@ public class PlayerPacketRewriter1_9 {
 
                 // Track player's dimension
                 handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
                     int dimensionId = wrapper.get(Types.BYTE, 0);
                     clientWorld.setEnvironment(dimensionId);
                 });
@@ -295,27 +295,25 @@ public class PlayerPacketRewriter1_9 {
                 map(Types.UNSIGNED_BYTE); // 2 - GameMode
                 map(Types.STRING); // 3 - Level Type
 
-                // Track player's dimension
-                handler(wrapper -> {
-                    ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    int dimensionId = wrapper.get(Types.INT, 0);
-                    clientWorld.setEnvironment(dimensionId);
-                });
-
-                handler(wrapper -> {
-                    // Client unloads chunks on respawn
-                    wrapper.user().get(ClientChunks.class).getLoadedChunks().clear();
-
-                    int gamemode = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.setGameMode(GameMode.getById(gamemode));
-                });
-
-                // Fake permissions to get Commandblocks working
                 handler(wrapper -> {
                     CommandBlockProvider provider = Via.getManager().getProviders().get(CommandBlockProvider.class);
+                    // Fake permissions to get Commandblocks working
                     provider.sendPermission(wrapper.user());
-                    provider.unloadChunks(wrapper.user());
+
+                    EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
+                    int gamemode = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    tracker.setGameMode(GameMode.getById(gamemode));
+
+                    ClientWorld1_9 clientWorld = wrapper.user().getClientWorld(Protocol1_8To1_9.class);
+                    int dimensionId = wrapper.get(Types.INT, 0);
+
+                    // Track player's dimension
+                    if (clientWorld.setEnvironment(dimensionId)) {
+                        tracker.clearEntities();
+
+                        clientWorld.getLoadedChunks().clear();
+                        provider.unloadChunks(wrapper.user());
+                    }
                 });
             }
         });

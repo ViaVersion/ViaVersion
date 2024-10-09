@@ -21,7 +21,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public class EntityIdMappings1_13 {
-    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(83, .99F);
+    private static final Int2IntMap ENTITY_TYPES = new Int2IntOpenHashMap(83);
 
     static {
         ENTITY_TYPES.defaultReturnValue(-1);

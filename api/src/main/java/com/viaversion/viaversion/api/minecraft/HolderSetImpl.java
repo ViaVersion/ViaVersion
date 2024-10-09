@@ -64,7 +64,7 @@ final class HolderSetImpl extends EitherImpl<String, int[]> implements HolderSet
         final int[] ids = ids();
         final int[] mappedIds = new int[ids.length];
         for (int i = 0; i < mappedIds.length; i++) {
-            mappedIds[i] = idRewriter.apply(ids[i]);
+            mappedIds[i] = idRewriter.applyAsInt(ids[i]);
         }
         return new HolderSetImpl(mappedIds);
     }
