@@ -38,7 +38,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundState;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Key;
@@ -141,13 +141,13 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
 
-            wrapper.user().get(OnGroundState.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_ROT, wrapper -> {
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
 
-            wrapper.user().get(OnGroundState.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
@@ -156,7 +156,7 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
 
-            wrapper.user().get(OnGroundState.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
     }
 

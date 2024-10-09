@@ -19,7 +19,7 @@ package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class OnGroundState implements StorableObject {
+public final class OnGroundTracker implements StorableObject {
 
     private boolean onGround;
 
@@ -27,8 +27,7 @@ public class OnGroundState implements StorableObject {
         return onGround;
     }
 
-    public void setOnGround(boolean onGround) {
+    public void setOnGround(final boolean onGround) {
         this.onGround = onGround;
     }
-
 }
