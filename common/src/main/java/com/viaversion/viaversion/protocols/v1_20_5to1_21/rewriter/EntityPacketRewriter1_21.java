@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -33,9 +34,11 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.util.ArrayUtil;
 import com.viaversion.viaversion.util.Key;
@@ -127,6 +130,36 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
 
             // Resend attribute modifiers from items
             wrapper.user().get(EfficiencyAttributeStorage.class).onRespawn(wrapper.user());
+        });
+
+        // Tracks on ground state for block interactions
+        if (!Via.getConfig().fix1_21PlacementRotation()) {
+            return;
+        }
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS, wrapper -> {
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_ROT, wrapper -> {
+            wrapper.passthrough(Types.FLOAT); // Yaw
+            wrapper.passthrough(Types.FLOAT); // Pitch
+
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT, wrapper -> {
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Yaw
+            wrapper.passthrough(Types.FLOAT); // Pitch
+
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
+            wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
     }
 
