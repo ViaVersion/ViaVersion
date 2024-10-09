@@ -108,8 +108,23 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_SET_SLOT, wrapper -> {
             updateContainerId(wrapper);
-            wrapper.passthrough(Types.VAR_INT); // State id
-            wrapper.passthrough(Types.SHORT); // Slot id
+            final int containerId = wrapper.get(Types.VAR_INT, 0);
+            if (containerId == -1) { // cursor item
+                wrapper.setPacketType(ClientboundPackets1_21_2.SET_CURSOR_ITEM);
+                wrapper.resetReader();
+                wrapper.read(Types.VAR_INT); // container id
+                wrapper.read(Types.VAR_INT); // State id
+                wrapper.read(Types.SHORT); // Slot id
+            } else if (containerId == -2) { // cursor item
+                wrapper.setPacketType(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);
+                wrapper.resetReader();
+                wrapper.read(Types.VAR_INT); // container id
+                wrapper.read(Types.VAR_INT); // State id
+                wrapper.write(Types.VAR_INT, (int) wrapper.read(Types.SHORT)); // Slot id
+            } else {
+                wrapper.passthrough(Types.VAR_INT); // State id
+                wrapper.passthrough(Types.SHORT); // Slot id
+            }
             passthroughClientboundItem(wrapper);
         });
         protocol.registerClientbound(ClientboundPackets1_21.CONTAINER_CLOSE, this::updateContainerId);
@@ -378,7 +393,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     private void updateContainerId(final PacketWrapper wrapper) {
         // Container id handling was always a bit whack with most reading them as unsigned bytes, some as bytes, some already as var ints.
-        // In VV they're generally read as unsigned bytesto not have to look the type up every time, but we need to make sure they're
+        // In VV they're generally read as unsigned bytes to not have to look the type up every time, but we need to make sure they're
         // properly converted to ints when used
         final short containerId = wrapper.read(Types.UNSIGNED_BYTE);
         final int intId = (byte) containerId;
