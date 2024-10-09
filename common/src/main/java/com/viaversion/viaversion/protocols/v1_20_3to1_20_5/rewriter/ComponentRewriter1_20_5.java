@@ -99,6 +99,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -154,26 +155,26 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag, this::writableBookContentFromTag);
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag, this::writtenBookContentFromTag);
         register(StructuredDataKey.TRIM, this::trimToTag);
-        register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag);
-        register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag);
-        register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag);
-        register(StructuredDataKey.BLOCK_ENTITY_DATA, this::blockEntityDataToTag);
-        register(StructuredDataKey.INSTRUMENT, this::instrumentToTag);
-        register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::ominousBottleAmplifierToTag);
-        register(StructuredDataKey.RECIPES, this::recipesToTag);
-        register(StructuredDataKey.LODESTONE_TRACKER, this::lodestoneTrackerToTag);
-        register(StructuredDataKey.FIREWORK_EXPLOSION, this::fireworkExplosionToTag);
-        register(StructuredDataKey.FIREWORKS, this::fireworksToTag);
-        register(StructuredDataKey.PROFILE, this::profileToTag);
-        register(StructuredDataKey.NOTE_BLOCK_SOUND, this::noteBlockSoundToTag);
-        register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag);
-        register(StructuredDataKey.BASE_COLOR, this::baseColorToTag);
-        register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag);
-        register(StructuredDataKey.CONTAINER1_20_5, this::containerToTag);
-        register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag);
-        register(StructuredDataKey.BEES, this::beesToTag);
-        register(StructuredDataKey.LOCK, this::lockToTag);
-        register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag);
+        register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag, this::debugStickRateFromTag);
+        register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag, this::entityDataFromTag);
+        register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag, this::bucketEntityDataFromTag);
+        register(StructuredDataKey.BLOCK_ENTITY_DATA, this::blockEntityDataToTag, this::blockEntityDataFromTag);
+        register(StructuredDataKey.INSTRUMENT, this::instrumentToTag, this::instrumentFromTag);
+        register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::ominousBottleAmplifierToTag, this::ominousBottleAmplifierFromTag);
+        register(StructuredDataKey.RECIPES, this::recipesToTag, this::recipesFromTag);
+        register(StructuredDataKey.LODESTONE_TRACKER, this::lodestoneTrackerToTag, this::lodestoneTrackerFromTag);
+        register(StructuredDataKey.FIREWORK_EXPLOSION, this::fireworkExplosionToTag, this::fireworkExplosionFromTag);
+        register(StructuredDataKey.FIREWORKS, this::fireworksToTag, this::fireworksFromTag);
+        register(StructuredDataKey.PROFILE, this::profileToTag, this::profileFromTag);
+        register(StructuredDataKey.NOTE_BLOCK_SOUND, this::noteBlockSoundToTag, this::noteBlockSoundFromTag);
+        register(StructuredDataKey.BANNER_PATTERNS, this::bannerPatternsToTag, this::bannerPatternsFromTag);
+        register(StructuredDataKey.BASE_COLOR, this::baseColorToTag, this::baseColorFromTag);
+        register(StructuredDataKey.POT_DECORATIONS, this::potDecorationsToTag, this::potDecorationsFromTag);
+        register(StructuredDataKey.CONTAINER1_20_5, this::containerToTag, this::containerFromTag);
+        register(StructuredDataKey.BLOCK_STATE, this::blockStateToTag, this::blockStateFromTag);
+        register(StructuredDataKey.BEES, this::beesToTag, this::beesFromTag);
+        register(StructuredDataKey.LOCK, this::lockToTag, this::lockFromTag);
+        register(StructuredDataKey.CONTAINER_LOOT, this::containerLootToTag, this::containerLootFromTag);
     }
 
     @Override
@@ -349,7 +350,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     // ---------------------------------------------------------------------------------------
-    // Conversion methods, can be overridden in future protocols to handle new changes
+    // Conversion methods
 
     protected CompoundTag customDataToTag(final CompoundTag value) {
         return value;
@@ -1026,20 +1027,42 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected ArmorTrim trimFromTag(final Tag tag) {
+        final CompoundTag value = (CompoundTag) tag;
+
+        return null; //TODO
+    }
+
     protected CompoundTag debugStickRateToTag(final CompoundTag value) {
         return value;
+    }
+
+    protected CompoundTag debugStickRateFromTag(final Tag value) {
+        return (CompoundTag) value;
     }
 
     protected CompoundTag entityDataToTag(final CompoundTag value) {
         return nbtWithIdToTag(value);
     }
 
+    protected CompoundTag entityDataFromTag(final Tag value) {
+        return (CompoundTag) value;
+    }
+
     protected CompoundTag bucketEntityDataToTag(final CompoundTag value) {
         return nbtToTag(value);
     }
 
+    protected CompoundTag bucketEntityDataFromTag(final Tag value) {
+        return (CompoundTag) value;
+    }
+
     protected CompoundTag blockEntityDataToTag(final CompoundTag value) {
         return nbtWithIdToTag(value);
+    }
+
+    protected CompoundTag blockEntityDataFromTag(final Tag value) {
+        return (CompoundTag) value;
     }
 
     protected Tag instrumentToTag(final Holder<Instrument> value) {
@@ -1059,6 +1082,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             if (soundEvent.fixedRange() != null) {
                 soundEventTag.putFloat("range", soundEvent.fixedRange());
             }
+            tag.put("sound_event", soundEventTag);
         }
 
         tag.put("use_duration", positiveIntToTag(instrument.useDuration()));
@@ -1066,11 +1090,41 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected Holder<Instrument> instrumentFromTag(final Tag tag) {
+        if (tag instanceof StringTag stringTag) {
+            return Holder.of(Instruments1_20_3.keyToId(stringTag.getValue()));
+        }
+
+        final CompoundTag value = (CompoundTag) tag;
+        Holder<SoundEvent> soundEvent = null;
+        final Tag soundEventTag = value.get("sound_event");
+        if (soundEventTag instanceof StringTag stringTag) {
+            soundEvent = Holder.of(Protocol1_20_3To1_20_5.MAPPINGS.soundId(stringTag.getValue()));
+        } else if (soundEventTag instanceof CompoundTag compoundTag) {
+            final String soundId = identifierFromTag(compoundTag.getStringTag("sound_id"));
+            final Float range = compoundTag.getFloat("range", 0.0F);
+            soundEvent = Holder.of(new SoundEvent(soundId, range));
+        }
+
+        final int useDuration = checkPositiveInt(value.getInt("use_duration"));
+        final float range = checkPositiveFloat(value.getFloat("range"));
+
+        return Holder.of(new Instrument(soundEvent, useDuration, range));
+    }
+
     protected IntTag ominousBottleAmplifierToTag(final Integer value) {
         return intRangeToTag(value, 0, 4);
     }
 
+    protected Integer ominousBottleAmplifierFromTag(final Tag value) {
+        return checkIntRange(0, 4, asInt(value));
+    }
+
     protected Tag recipesToTag(final Tag value) {
+        return value; // Item rewriter takes care of validation
+    }
+
+    protected Tag recipesFromTag(final Tag value) {
         return value; // Item rewriter takes care of validation
     }
 
@@ -1083,6 +1137,13 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putBoolean("tracked", false);
         }
         return tag;
+    }
+
+    protected LodestoneTracker lodestoneTrackerFromTag(final Tag tag) {
+        final CompoundTag value = (CompoundTag) tag;
+        final GlobalBlockPosition position = globalPosFromTag(value);
+        final boolean tracked = value.getBoolean("tracked", true);
+        return new LodestoneTracker(position, tracked);
     }
 
     protected CompoundTag fireworkExplosionToTag(final FireworkExplosion value) {
@@ -1103,6 +1164,18 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected FireworkExplosion fireworkExplosionFromTag(final Tag tag) {
+        final CompoundTag value = (CompoundTag) tag;
+
+        final int shape = enumEntryFromTag(value.getStringTag("shape"), "small_ball", "large_ball", "star", "creeper", "burst");
+        final IntArrayTag colors = value.getIntArrayTag("colors");
+        final IntArrayTag fadeColors = value.getIntArrayTag("fade_colors");
+        final boolean trail = value.getBoolean("trail", false);
+        final boolean twinkle = value.getBoolean("twinkle", false);
+
+        return new FireworkExplosion(shape, colors == null ? new int[0] : colors.getValue(), fadeColors == null ? new int[0] : fadeColors.getValue(), trail, twinkle);
+    }
+
     protected CompoundTag fireworksToTag(final Fireworks value) {
         final CompoundTag tag = new CompoundTag();
         if (value.flightDuration() != 0) {
@@ -1119,6 +1192,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected Fireworks fireworksFromTag(final Tag value) {
+        final CompoundTag tag = (CompoundTag) value;
+        final int flightDuration = asUnsignedByte(tag.get("flight_duration"));
+        final ListTag<CompoundTag> explosions = tag.getListTag("explosions", CompoundTag.class);
+        final FireworkExplosion[] list = new FireworkExplosion[explosions.size()];
+        for (int i = 0; i < explosions.size(); i++) {
+            list[i] = fireworkExplosionFromTag(explosions.get(i));
+        }
+        return new Fireworks(flightDuration, list);
+    }
+
     protected CompoundTag profileToTag(final GameProfile value) {
         final CompoundTag tag = new CompoundTag();
         if (value.name() != null) {
@@ -1133,8 +1217,21 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected GameProfile profileFromTag(final Tag tag) {
+        final CompoundTag value = (CompoundTag) tag;
+
+        final String name = value.getString("name", null);
+        final UUID id = UUIDUtil.fromIntArray(value.getIntArrayTag("id").getValue());
+        final GameProfile.Property[] properties = propertiesFromTag(value);
+        return new GameProfile(name, id, properties);
+    }
+
     protected StringTag noteBlockSoundToTag(final String value) {
         return identifierToTag(value);
+    }
+
+    protected String noteBlockSoundFromTag(final Tag value) {
+        return identifierFromTag((StringTag) value);
     }
 
     protected ListTag<CompoundTag> bannerPatternsToTag(final BannerPatternLayer[] value) {
@@ -1148,8 +1245,24 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected BannerPatternLayer[] bannerPatternsFromTag(final Tag tag) {
+        final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
+        final BannerPatternLayer[] layers = new BannerPatternLayer[value.size()];
+        for (int i = 0; i < value.size(); i++) {
+            final CompoundTag layerTag = value.get(i);
+            final Holder<BannerPattern> pattern = bannerPatternFromTag(layerTag.getCompoundTag("pattern"));
+            final int color = dyeColorFromTag(layerTag.get("color"));
+            layers[i] = new BannerPatternLayer(pattern, color);
+        }
+        return layers;
+    }
+
     protected StringTag baseColorToTag(final Integer value) {
         return dyeColorToTag(value);
+    }
+
+    protected Integer baseColorFromTag(final Tag tag) {
+        return dyeColorFromTag(tag);
     }
 
     protected ListTag<StringTag> potDecorationsToTag(final PotDecorations value) {
@@ -1164,6 +1277,20 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected PotDecorations potDecorationsFromTag(final Tag tag) {
+        final ListTag<StringTag> value = (ListTag<StringTag>) tag;
+        final int[] itemIds = new int[value.size()];
+        for (int i = 0; i < value.size(); i++) {
+            final String identifier = value.get(i).getValue();
+            final int id = mappedId(identifier);
+            if (id == -1) {
+                throw new IllegalArgumentException("Unknown item: " + identifier);
+            }
+            itemIds[i] = id;
+        }
+        return new PotDecorations(itemIds);
+    }
+
     protected ListTag<CompoundTag> containerToTag(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
         final ListTag<CompoundTag> items = itemArrayToTag(connection, value);
@@ -1176,12 +1303,32 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected Item[] containerFromTag(final Tag tag) {
+        final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
+        final Item[] items = new Item[27];
+        for (final CompoundTag itemTag : value) {
+            final int slot = itemTag.getInt("slot");
+            final Item item = itemFromTag(itemTag.getCompoundTag("item"));
+            items[slot] = item;
+        }
+        return items;
+    }
+
     protected CompoundTag blockStateToTag(final BlockStateProperties value) {
         final CompoundTag tag = new CompoundTag();
         for (final Map.Entry<String, String> entry : value.properties().entrySet()) {
             tag.putString(entry.getKey(), entry.getValue());
         }
         return tag;
+    }
+
+    protected BlockStateProperties blockStateFromTag(final Tag tag) {
+        final CompoundTag value = (CompoundTag) tag;
+        final Map<String, String> properties = new HashMap<>();
+        for (final Map.Entry<String, Tag> entry : value.entrySet()) {
+            properties.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
+        }
+        return new BlockStateProperties(properties);
     }
 
     protected ListTag<CompoundTag> beesToTag(final Bee[] value) {
@@ -1197,12 +1344,33 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
+    protected Bee[] beesFromTag(final Tag tag) {
+        final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
+        final Bee[] bees = new Bee[value.size()];
+        for (int i = 0; i < value.size(); i++) {
+            final CompoundTag beeTag = value.get(i);
+            final CompoundTag entityData = beeTag.getCompoundTag("entity_data");
+            final int ticksInHive = beeTag.getInt("ticks_in_hive");
+            final int minTicksInHive = beeTag.getInt("min_ticks_in_hive");
+            bees[i] = new Bee(entityData, ticksInHive, minTicksInHive);
+        }
+        return bees;
+    }
+
     protected StringTag lockToTag(final Tag value) {
         return (StringTag) value;
     }
 
+    protected Tag lockFromTag(final Tag value) {
+        return value;
+    }
+
     protected CompoundTag containerLootToTag(final CompoundTag value) {
         return value; // Handled by the item rewriter
+    }
+
+    protected CompoundTag containerLootFromTag(final Tag value) {
+        return (CompoundTag) value;
     }
 
     // ---------------------------------------------------------------------------------------
@@ -1402,6 +1570,16 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("target", posTag);
     }
 
+    protected GlobalBlockPosition globalPosFromTag(final CompoundTag tag) {
+        final CompoundTag posTag = tag.getCompoundTag("target");
+        if (posTag == null) {
+            return null;
+        }
+        final String dimension = posTag.getString("dimension");
+        final int[] pos = posTag.getIntArrayTag("pos").getValue();
+        return new GlobalBlockPosition(dimension, pos[0], pos[1], pos[2]);
+    }
+
     protected void propertiesToTag(final CompoundTag tag, final GameProfile.Property[] properties) {
         final ListTag<CompoundTag> propertiesTag = new ListTag<>(CompoundTag.class);
         for (final GameProfile.Property property : properties) {
@@ -1414,6 +1592,19 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             propertiesTag.add(propertyTag);
         }
         tag.put("properties", propertiesTag);
+    }
+
+    protected GameProfile.Property[] propertiesFromTag(final CompoundTag tag) {
+        final ListTag<CompoundTag> propertiesTag = tag.getListTag("properties", CompoundTag.class);
+        final GameProfile.Property[] properties = new GameProfile.Property[propertiesTag.size()];
+        for (int i = 0; i < propertiesTag.size(); i++) {
+            final CompoundTag propertyTag = propertiesTag.get(i);
+            final String name = propertyTag.getString("name");
+            final String value = propertyTag.getString("value");
+            final String signature = propertyTag.getString("signature", null);
+            properties[i] = new GameProfile.Property(name, value, signature);
+        }
+        return properties;
     }
 
     protected void bannerPatternToTag(final CompoundTag tag, final Holder<BannerPattern> pattern) {
@@ -1429,6 +1620,19 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         tag.put("pattern", patternTag);
     }
 
+    protected Holder<BannerPattern> bannerPatternFromTag(final CompoundTag tag) {
+        final Tag patternTag = tag.get("pattern");
+        if (patternTag instanceof StringTag stringTag) {
+            return Holder.of(BannerPatterns1_20_5.keyToId(stringTag.getValue()));
+        } else if (patternTag instanceof CompoundTag compoundTag) {
+            final String assetId = identifierFromTag(compoundTag.getStringTag("asset_id"));
+            final String translationKey = compoundTag.getString("translation_key");
+            return Holder.of(new BannerPattern(assetId, translationKey));
+        } else {
+            return null;
+        }
+    }
+
     // ---------------------------------------------------------------------------------------
 
     protected Integer asInt(final Tag tag) {
@@ -1437,6 +1641,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     protected Boolean asBoolean(final Tag tag) {
         return ((ByteTag) tag).asByte() != 0;
+    }
+
+    protected Short asUnsignedByte(final Tag tag) {
+        return ((ByteTag) tag).asShort();
     }
 
     protected IntTag positiveIntToTag(final Integer value) {
@@ -1561,8 +1769,20 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return new StringTag(value);
     }
 
+    protected String identifierFromTag(final StringTag tag) {
+        final String value = tag.getValue();
+        if (!Key.isValid(value)) {
+            throw new IllegalArgumentException("Invalid identifier: " + value);
+        }
+        return value;
+    }
+
     protected StringTag dyeColorToTag(final Integer value) {
-        return new StringTag(DyeColors.colorById(value));
+        return new StringTag(DyeColors.idToKey(value));
+    }
+
+    protected Integer dyeColorFromTag(final Tag tag) {
+        return DyeColors.keyToId(((StringTag) tag).getValue());
     }
 
     // ---------------------------------------------------------------------------------------
