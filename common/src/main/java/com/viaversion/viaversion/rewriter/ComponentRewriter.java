@@ -39,8 +39,8 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.BitSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Handles json and tag components, containing methods to override certain parts of the handling.
@@ -360,6 +360,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
                 handleContainerContents(connection, componentsTag);
+                handleWrittenBookContents(connection, componentsTag);
+
                 handleItemArrayContents(connection, componentsTag, "bundle_contents");
                 handleItemArrayContents(connection, componentsTag, "charged_projectiles");
             }
@@ -384,6 +386,40 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final CompoundTag itemTag = entryTag.getCompoundTag("item");
             handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
         }
+    }
+
+    protected void handleWrittenBookContents(final UserConnection connection, final CompoundTag tag) {
+        final CompoundTag book = TagUtil.getNamespacedCompoundTag(tag, "minecraft:written_book_content");
+        if (book == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> pagesTag = book.getListTag("pages", CompoundTag.class);
+        if (pagesTag == null) {
+            return;
+        }
+
+        for (final CompoundTag compoundTag : pagesTag) {
+            final StringTag raw = compoundTag.getStringTag("raw");
+            processJsonString(connection, raw);
+
+            final StringTag filtered = compoundTag.getStringTag("filtered");
+            processJsonString(connection, filtered);
+        }
+    }
+
+    private void processJsonString(final UserConnection connection, final StringTag tag) {
+        if (tag == null) {
+            return;
+        }
+
+        final var input = inputSerializerVersion();
+        final var output = outputSerializerVersion();
+
+        final Tag asTag = input.toTag(input.toComponent(tag.getValue()));
+        processTag(connection, asTag);
+
+        tag.setValue(output.toString(output.toComponent(asTag)));
     }
 
     protected void handleItemArrayContents(final UserConnection connection, final CompoundTag tag, final String key) {
