@@ -22,8 +22,7 @@
     "RK_01"
   ],
   "depends": {
-    "fabricloader": ">=0.14.0",
-    "viafabric": ">=0.4.10"
+    "viafabric": ">=0.4.14"
   },
   "custom": {
     "modmenu:api": true,
