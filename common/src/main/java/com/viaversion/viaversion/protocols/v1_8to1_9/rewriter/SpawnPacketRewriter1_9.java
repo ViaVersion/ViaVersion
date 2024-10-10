@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.rewriter;
 
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -63,7 +64,10 @@ public class SpawnPacketRewriter1_9 {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     int typeID = wrapper.get(Types.BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.addEntity(entityID, EntityTypes1_9.getTypeFromId(typeID, true));
+                    EntityType entityType = EntityTypes1_9.getTypeFromId(typeID, true);
+                    if (entityType != null) {
+                        tracker.addEntity(entityID, entityType);
+                    }
                 });
 
                 map(Types.INT, toNewDouble); // 3 - X - Needs to be divided by 32
@@ -176,7 +180,10 @@ public class SpawnPacketRewriter1_9 {
                     int entityID = wrapper.get(Types.VAR_INT, 0);
                     int typeID = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
-                    tracker.addEntity(entityID, EntityTypes1_9.getTypeFromId(typeID, false));
+                    EntityType type = EntityTypes1_9.getTypeFromId(typeID, false);
+                    if (type != null) {
+                        tracker.addEntity(entityID, type);
+                    }
                 });
 
                 map(Types.INT, toNewDouble); // 3 - X - Needs to be divided by 32
