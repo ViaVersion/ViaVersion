@@ -23,13 +23,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
 import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
-import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.GameMode;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.EntityIdProvider;
+import com.viaversion.viaversion.util.ComponentUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -233,7 +234,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     if (entityData.id() == 2) {
                         BossBar bar = bossBarMap.get(entityId);
                         String title = (String) entityData.getValue();
-                        title = title.isEmpty() ? (type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE) : title;
+                        if (title.isEmpty()) {
+                            title = type == EntityType.ENDER_DRAGON ? DRAGON_TRANSLATABLE : WITHER_TRANSLATABLE;
+                        } else {
+                            title = ComponentUtil.plainToJson(title).toString();
+                        }
                         if (bar == null) {
                             bar = Via.getAPI().legacyAPI().createLegacyBossBar(title, BossColor.PINK, BossStyle.SOLID);
                             bossBarMap.put(entityId, bar);
