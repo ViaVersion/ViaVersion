@@ -17,26 +17,35 @@
  */
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data;
 
+import com.viaversion.viaversion.util.KeyMappings;
+
 public final class DyeColors {
 
-    public static String colorById(final int id) {
-        return switch (id) {
-            case 1 -> "orange";
-            case 2 -> "magenta";
-            case 3 -> "light_blue";
-            case 4 -> "yellow";
-            case 5 -> "lime";
-            case 6 -> "pink";
-            case 7 -> "gray";
-            case 8 -> "light_gray";
-            case 9 -> "cyan";
-            case 10 -> "purple";
-            case 11 -> "blue";
-            case 12 -> "brown";
-            case 13 -> "green";
-            case 14 -> "red";
-            case 15 -> "black";
-            default -> "white";
-        };
+    public static final KeyMappings COLORS = new KeyMappings(
+        "white",
+        "orange",
+        "magenta",
+        "light_blue",
+        "yellow",
+        "lime",
+        "pink",
+        "gray",
+        "light_gray",
+        "cyan",
+        "purple",
+        "blue",
+        "brown",
+        "green",
+        "red",
+        "black"
+    );
+
+    public static String idToKey(final int id) {
+        final String color = COLORS.idToKey(id);
+        return color == null ? "white" : color;
+    }
+
+    public static int keyToId(final String pattern) {
+        return COLORS.keyToId(pattern);
     }
 }
