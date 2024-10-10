@@ -28,6 +28,8 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
+import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
@@ -136,6 +138,16 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             if (lore != null) {
                 for (final Tag tag : lore) {
                     protocol.getComponentRewriter().processTag(connection, tag);
+                }
+            }
+
+            final WrittenBook book = container.get(StructuredDataKey.WRITTEN_BOOK_CONTENT);
+            if (book != null) {
+                for (final FilterableComponent page : book.pages()) {
+                    protocol.getComponentRewriter().processTag(connection, page.raw());
+                    if (page.isFiltered()) {
+                        protocol.getComponentRewriter().processTag(connection, page.filtered());
+                    }
                 }
             }
         }
