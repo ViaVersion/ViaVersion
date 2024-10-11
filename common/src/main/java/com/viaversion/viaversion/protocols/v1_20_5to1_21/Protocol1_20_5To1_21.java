@@ -217,6 +217,11 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         tagRewriter.addEmptyTags(RegistryType.ENTITY, "minecraft:can_turn_in_boats", "minecraft:deflects_projectiles", "minecraft:immune_to_infested",
             "minecraft:immune_to_oozing", "minecraft:no_anger_from_wind_charge");
         tagRewriter.addTag(RegistryType.ENCHANTMENT, "minecraft:curse", 10, 41); // Binding and vanishing curse
+        // Add other enchantment tags empty
+        tagRewriter.addEmptyTags(RegistryType.ENCHANTMENT, "double_trade_price", "in_enchanting_table", "non_treasure", "on_mob_spawn_equipment", "on_random_loot",
+            "on_traded_equipment", "prevents_bee_spawns_when_mining", "prevents_decorated_pot_shattering", "prevents_ice_melting", "prevents_infested_spawns", "smelts_loot",
+            "tooltip_order", "tradeable", "treasure", "exclusive_set/armor", "exclusive_set/boots", "exclusive_set/bow", "exclusive_set/crossbow", "exclusive_set/damage",
+            "exclusive_set/mining", "exclusive_set/riptide");
     }
 
     @Override

@@ -286,6 +286,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         tagRewriter.renameTag(RegistryType.ITEM, "minecraft:axolotl_tempt_items", "minecraft:axolotl_food");
         tagRewriter.removeTag(RegistryType.ITEM, "minecraft:tools");
         tagRewriter.addEmptyTags(RegistryType.BLOCK, "minecraft:badlands_terracotta");
+        tagRewriter.addEmptyTags(RegistryType.ITEM, "minecraft:enchantable/mace");
 
         super.onMappingDataLoaded();
     }
