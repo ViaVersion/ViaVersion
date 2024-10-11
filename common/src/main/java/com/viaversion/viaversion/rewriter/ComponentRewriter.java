@@ -360,7 +360,9 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
                 handleContainerContents(connection, componentsTag);
-                handleWrittenBookContents(connection, componentsTag);
+                if (inputSerializerVersion() != null) {
+                    handleWrittenBookContents(connection, componentsTag);
+                }
 
                 handleItemArrayContents(connection, componentsTag, "bundle_contents");
                 handleItemArrayContents(connection, componentsTag, "charged_projectiles");
