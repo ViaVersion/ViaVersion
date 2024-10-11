@@ -40,18 +40,14 @@ public final class MappingData1_21_2 extends MappingDataBase {
         addRecipeInputs(extraMappings, "smithing_template");
         addRecipeInputs(extraMappings, "smithing_base");
         addRecipeInputs(extraMappings, "furnace_input");
-        addRecipeInputs(extraMappings, "smoker_input", "smelting_input"); // Pretty sure Mojang typo'd this
+        addRecipeInputs(extraMappings, "smoker_input");
         addRecipeInputs(extraMappings, "blast_furnace_input");
         addRecipeInputs(extraMappings, "campfire_input");
     }
 
-    private void addRecipeInputs(final CompoundTag tag, final String key, final String outputKey) {
-        final int[] ids = tag.getIntArrayTag(key).getValue();
-        recipeInputs.add(new RecipeInputs(outputKey, ids));
-    }
-
     private void addRecipeInputs(final CompoundTag tag, final String key) {
-        addRecipeInputs(tag, key, key);
+        final int[] ids = tag.getIntArrayTag(key).getValue();
+        recipeInputs.add(new RecipeInputs(key, ids));
     }
 
     public void writeInputs(final PacketWrapper wrapper) {
