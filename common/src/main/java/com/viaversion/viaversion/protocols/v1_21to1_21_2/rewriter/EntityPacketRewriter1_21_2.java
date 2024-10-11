@@ -298,6 +298,8 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         filter().type(EntityTypes1_21_2.DOLPHIN).addIndex(16); // Baby
         filter().type(EntityTypes1_21_2.GLOW_SQUID).addIndex(16); // Baby
         filter().type(EntityTypes1_21_2.SQUID).addIndex(16); // Baby
+
+        filter().type(EntityTypes1_21_2.ABSTRACT_ARROW).addIndex(10); // In ground
     }
 
     @Override
