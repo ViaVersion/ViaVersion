@@ -129,7 +129,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         wrapper.passthrough(Types.BYTE); // View distance
         wrapper.passthrough(Types.VAR_INT); // Chat visibility
         wrapper.passthrough(Types.BOOLEAN); // Chat colors
-        wrapper.passthrough(Types.BYTE); // Skin parts
+        wrapper.passthrough(Types.UNSIGNED_BYTE); // Skin parts
         wrapper.passthrough(Types.VAR_INT); // Main hand
         wrapper.passthrough(Types.BOOLEAN); // Text filtering enabled
         wrapper.passthrough(Types.BOOLEAN); // Allow listing

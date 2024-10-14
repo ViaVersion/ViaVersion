@@ -60,7 +60,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, Types1_21.ENTITY_DATA_LIST, Types1_21_2.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
+        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper instrumentsPacket = wrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA);
             instrumentsPacket.write(Types.STRING, "minecraft:instrument");
             final RegistryEntry[] entries = new RegistryEntry[GOAT_HORN_INSTRUMENTS.length];
