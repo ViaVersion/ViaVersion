@@ -27,8 +27,11 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.util.Key;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -39,9 +42,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 // Use directly as a connection storage. Slightly weird, but easiest and closed off from other packages
 final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1_21> implements StorableObject {
 
+    private static final int[] EMPTY_ARRAY = new int[0];
     private final List<StoneCutterRecipe> stoneCutterRecipes = new ArrayList<>();
     private final Object2IntMap<String> recipeGroups = new Object2IntOpenHashMap<>();
     private final Map<String, Recipe> recipesByKey = new HashMap<>();
+    private final Map<String, IntSet> recipeInputs = new Object2ObjectArrayMap<>();
     private final List<Recipe> recipes = new ArrayList<>();
     private String currentRecipeIdentifier;
 
@@ -52,6 +57,11 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
     RecipeRewriter1_21_2(final Protocol<ClientboundPacket1_21, ?, ?, ?> protocol) {
         super(protocol);
         recipeGroups.defaultReturnValue(-1);
+
+        recipeHandlers.put("smelting", wrapper -> handleSmelting("furnace_input", wrapper));
+        recipeHandlers.put("blasting", wrapper -> handleSmelting("blast_furnace_input", wrapper));
+        recipeHandlers.put("smoking", wrapper -> handleSmelting("smoker_input", wrapper));
+        recipeHandlers.put("campfire_cooking", wrapper -> handleSmelting("campfire_input", wrapper));
     }
 
     @Override
@@ -77,17 +87,17 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
 
     @Override
     public void handleSmithingTransform(final PacketWrapper wrapper) {
-        readIngredient(wrapper); // Template
-        readIngredient(wrapper); // Base
-        readIngredient(wrapper); // Addition
+        readRecipeInputs("smithing_template", wrapper);
+        readRecipeInputs("smithing_base", wrapper);
+        readRecipeInputs("smithing_addition", wrapper);
         wrapper.read(itemType()); // Result
     }
 
     @Override
     public void handleSmithingTrim(final PacketWrapper wrapper) {
-        readIngredient(wrapper);
-        readIngredient(wrapper);
-        readIngredient(wrapper);
+        readRecipeInputs("smithing_template", wrapper);
+        readRecipeInputs("smithing_base", wrapper);
+        readRecipeInputs("smithing_addition", wrapper);
     }
 
     @Override
@@ -123,11 +133,10 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         addRecipe(recipe);
     }
 
-    @Override
-    public void handleSmelting(final PacketWrapper wrapper) {
+    public void handleSmelting(final String key, final PacketWrapper wrapper) {
         final int group = readRecipeGroup(wrapper);
         final int category = wrapper.read(Types.VAR_INT);
-        final Item[] ingredient = readIngredient(wrapper);
+        final Item[] ingredient = readRecipeInputs(key, wrapper);
         final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
         final float experience = wrapper.read(Types.FLOAT);
         final int cookingTime = wrapper.read(Types.VAR_INT);
@@ -177,7 +186,20 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         return displayId >= 0 && displayId < recipes.size() ? recipes.get(displayId) : null;
     }
 
-    public void writeStoneCutterRecipes(final PacketWrapper wrapper) {
+    public void finalizeRecipes() {
+        // Need to be sorted alphabetically
+        stoneCutterRecipes.sort(Comparator.comparing(recipe -> recipe.identifier));
+    }
+
+    public void writeUpdateRecipeInputs(final PacketWrapper wrapper) {
+        // Smithing and smelting inputs
+        wrapper.write(Types.VAR_INT, recipeInputs.size());
+        for (final Map.Entry<String, IntSet> entry : recipeInputs.entrySet()) {
+            wrapper.write(Types.STRING, entry.getKey());
+            wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, entry.getValue().toArray(EMPTY_ARRAY));
+        }
+
+        // Stonecutter recipes
         wrapper.write(Types.VAR_INT, stoneCutterRecipes.size());
         for (final StoneCutterRecipe recipe : stoneCutterRecipes) {
             final HolderSet ingredient = toHolderSet(recipe.ingredient());
@@ -186,9 +208,14 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
         }
     }
 
-    public void finalizeRecipes() {
-        // Need to be sorted alphabetically
-        stoneCutterRecipes.sort(Comparator.comparing(recipe -> recipe.identifier));
+    private Item[] readRecipeInputs(final String key, final PacketWrapper wrapper) {
+        // Collect inputs for new UPDATE_RECIPE
+        final Item[] ingredient = readIngredient(wrapper);
+        final IntSet ids = recipeInputs.computeIfAbsent(key, $ -> new IntOpenHashSet(ingredient.length));
+        for (final Item item : ingredient) {
+            ids.add(item.identifier());
+        }
+        return ingredient;
     }
 
     interface Recipe {

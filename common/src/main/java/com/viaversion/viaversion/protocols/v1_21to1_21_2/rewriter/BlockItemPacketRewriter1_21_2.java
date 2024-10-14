@@ -240,10 +240,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
             rewriter.finalizeRecipes();
 
-            // These are used for client predictions, such as what items can be used as fuel in a furnace
-            protocol.getMappingData().writeInputs(wrapper);
-
-            rewriter.writeStoneCutterRecipes(wrapper);
+            // These are used for client predictions, such smithing or furnace inputs.
+            // Other recipes will be written in RECIPE/RECIPE_BOOK_ADD
+            rewriter.writeUpdateRecipeInputs(wrapper);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.RECIPE, ClientboundPackets1_21_2.RECIPE_BOOK_ADD, wrapper -> {
