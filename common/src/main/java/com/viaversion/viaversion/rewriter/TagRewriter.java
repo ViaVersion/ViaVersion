@@ -162,7 +162,7 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
             wrapper.write(Types.STRING, registryKey);
 
-            final RegistryType type = RegistryType.getByKey(registryKey);
+            final RegistryType type = RegistryType.getByKey(strippedKey);
             if (type != null) {
                 handle(wrapper, type);
                 readTypes.add(type);
