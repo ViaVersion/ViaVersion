@@ -290,7 +290,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @return true if the protocol version is unknown
      */
     public boolean isKnown() {
-        return version != -1;
+        return this != unknown;
     }
 
     /**
