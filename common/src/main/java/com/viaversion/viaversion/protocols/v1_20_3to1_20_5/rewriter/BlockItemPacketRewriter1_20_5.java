@@ -1530,7 +1530,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 patternTag.remove("Pattern");
                 patternTag.remove("Color");
                 patternTag.putString("pattern", fullPatternIdentifier);
-                patternTag.putString("color", DyeColors.colorById(color));
+                patternTag.putString("color", DyeColors.idToKey(color));
 
                 final int id = patternStorage != null ? patternStorage.bannerPatterns().keyToId(fullPatternIdentifier) : BannerPatterns1_20_5.keyToId(fullPatternIdentifier);
                 return id != -1 ? new BannerPatternLayer(Holder.of(id), color) : null;
