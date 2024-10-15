@@ -285,9 +285,9 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     }
 
     /**
-     * Returns whether the protocol is set. Should only be unknown for unregistered protocols returned by {@link #getProtocol(int)}.
+     * Returns whether the protocol version is {@link #unknown}. For checking if the protocol version is registered, use {@link #isRegistered(VersionType, int)}
      *
-     * @return true if the protocol is set
+     * @return true if the protocol version is unknown
      */
     public boolean isKnown() {
         return version != -1;
