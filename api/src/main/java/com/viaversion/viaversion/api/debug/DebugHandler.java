@@ -78,7 +78,7 @@ public interface DebugHandler {
 
     /**
      * Returns whether packets should be logged after being transformed.
-     * Set to true by default.
+     * Set to false by default.
      *
      * @return whether packets should be logged after being transformed
      */
