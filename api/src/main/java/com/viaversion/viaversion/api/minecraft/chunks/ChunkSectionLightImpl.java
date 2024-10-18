@@ -31,12 +31,22 @@ public class ChunkSectionLightImpl implements ChunkSectionLight {
     private NibbleArray skyLight;
 
     public ChunkSectionLightImpl() {
-        // Block light is always written
-        this.blockLight = new NibbleArray(ChunkSection.SIZE);
+        this(true);
+    }
+
+    public ChunkSectionLightImpl(final boolean holdsBlockLight) {
+        if (holdsBlockLight) {
+            this.blockLight = new NibbleArray(LIGHT_LENGTH * 2);
+        }
     }
 
     @Override
     public void setBlockLight(byte[] data) {
+        if (data == null) {
+            this.blockLight = null;
+            return;
+        }
+
         if (data.length != LIGHT_LENGTH) throw new IllegalArgumentException("Data length != " + LIGHT_LENGTH);
         if (this.blockLight == null) {
             this.blockLight = new NibbleArray(data);
