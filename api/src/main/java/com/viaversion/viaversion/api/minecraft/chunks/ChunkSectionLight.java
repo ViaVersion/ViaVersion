@@ -35,7 +35,7 @@ public interface ChunkSectionLight {
     /**
      * Returns whether the section has sky light.
      *
-     * @return true if skylight is present
+     * @return true if sky light is present
      */
     boolean hasSkyLight();
 
@@ -43,7 +43,7 @@ public interface ChunkSectionLight {
      * Returns whether the section has block light.
      * This returns true unless specifically set to null.
      *
-     * @return true if skylight is present
+     * @return true if block light is present
      */
     boolean hasBlockLight();
 
