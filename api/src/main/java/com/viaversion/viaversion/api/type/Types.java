@@ -189,7 +189,9 @@ public final class Types {
     public static final Type<PlayerMessageSignature> OPTIONAL_PLAYER_MESSAGE_SIGNATURE = new PlayerMessageSignatureType.OptionalPlayerMessageSignatureType();
     public static final Type<PlayerMessageSignature[]> PLAYER_MESSAGE_SIGNATURE_ARRAY = new ArrayType<>(PLAYER_MESSAGE_SIGNATURE);
 
-    public static final BitSetType PROFILE_ACTIONS_ENUM = new BitSetType(6);
+    public static final BitSetType PROFILE_ACTIONS_ENUM1_19_3 = new BitSetType(6);
+    public static final BitSetType PROFILE_ACTIONS_ENUM1_21_2 = new BitSetType(7);
+
     public static final ByteArrayType SIGNATURE_BYTES = new ByteArrayType(256);
     public static final BitSetType ACKNOWLEDGED_BIT_SET = new BitSetType(20);
     public static final ByteArrayType.OptionalByteArrayType OPTIONAL_SIGNATURE_BYTES = new ByteArrayType.OptionalByteArrayType(256);

@@ -268,7 +268,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_INFO_UPDATE, wrapper -> {
-            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_19_3);
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID);

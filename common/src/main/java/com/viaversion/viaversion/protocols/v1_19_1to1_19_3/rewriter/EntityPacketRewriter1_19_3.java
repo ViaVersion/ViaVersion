@@ -116,7 +116,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 set.set(action == 1 ? action + 1 : action + 2);
             }
 
-            wrapper.write(Types.PROFILE_ACTIONS_ENUM, set);
+            wrapper.write(Types.PROFILE_ACTIONS_ENUM1_19_3, set);
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID); // UUID

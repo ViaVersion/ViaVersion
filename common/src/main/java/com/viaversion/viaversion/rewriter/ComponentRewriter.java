@@ -142,7 +142,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
 
     public void registerPlayerInfoUpdate1_20_3(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_19_3);
             if (!actions.get(5)) { // Update display name
                 return;
             }
