@@ -146,6 +146,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             if (!actions.get(5)) { // Update display name
                 return;
             }
+
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID);
@@ -173,6 +174,49 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                     wrapper.passthrough(Types.VAR_INT); // Latency
                 }
                 processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+            }
+        });
+    }
+
+    public void registerPlayerInfoUpdate1_21_2(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_21_2);
+            if (!actions.get(5)) { // Update display name
+                return;
+            }
+
+            final int entries = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Types.UUID);
+                if (actions.get(0)) {
+                    wrapper.passthrough(Types.STRING); // Player Name
+
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
+                    }
+                }
+                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.UUID); // Session UUID
+                    wrapper.passthrough(Types.PROFILE_KEY);
+                }
+                if (actions.get(2)) {
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                }
+                if (actions.get(3)) {
+                    wrapper.passthrough(Types.BOOLEAN); // Listed
+                }
+                if (actions.get(4)) {
+                    wrapper.passthrough(Types.VAR_INT); // Latency
+                }
+
+                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+
+                if (actions.get(6)) {
+                    wrapper.passthrough(Types.VAR_INT); // List order
+                }
             }
         });
     }

@@ -50,6 +50,7 @@ import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
+import java.util.BitSet;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
@@ -121,6 +122,42 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             }
             wrapper.write(Types.LONG, dayTime);
             wrapper.write(Types.BOOLEAN, doDaylightCycle);
+        });
+
+        registerClientbound(ClientboundPackets1_21.PLAYER_INFO_UPDATE, wrapper -> {
+            final BitSet actions = wrapper.passthroughAndMap(Types.PROFILE_ACTIONS_ENUM1_19_3, Types.PROFILE_ACTIONS_ENUM1_21_2);
+            if (!actions.get(5)) { // Update display name
+                return;
+            }
+
+            final int entries = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Types.UUID);
+                if (actions.get(0)) {
+                    wrapper.passthrough(Types.STRING); // Player Name
+
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
+                    }
+                }
+                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.UUID); // Session UUID
+                    wrapper.passthrough(Types.PROFILE_KEY);
+                }
+                if (actions.get(2)) {
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                }
+                if (actions.get(3)) {
+                    wrapper.passthrough(Types.BOOLEAN); // Listed
+                }
+                if (actions.get(4)) {
+                    wrapper.passthrough(Types.VAR_INT); // Latency
+                }
+                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+            }
         });
     }
 

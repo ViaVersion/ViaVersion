@@ -76,6 +76,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
+        componentRewriter.registerPlayerInfoUpdate1_21_2(ClientboundPackets1_21.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
 
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
