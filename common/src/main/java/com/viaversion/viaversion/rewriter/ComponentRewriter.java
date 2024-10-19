@@ -486,16 +486,16 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         }
     }
 
-    protected SerializerVersion inputSerializerVersion() {
+    protected @Nullable SerializerVersion inputSerializerVersion() {
         return null;
     }
 
-    protected SerializerVersion outputSerializerVersion() {
+    protected @Nullable SerializerVersion outputSerializerVersion() {
         return inputSerializerVersion(); // Only matters if the nbt serializer changed
     }
 
     private void convertLegacyContents(final CompoundTag hoverEvent) {
-        if (inputSerializerVersion() == null || outputSerializerVersion() == null) {
+        if (inputSerializerVersion() == null) {
             return;
         }
 
