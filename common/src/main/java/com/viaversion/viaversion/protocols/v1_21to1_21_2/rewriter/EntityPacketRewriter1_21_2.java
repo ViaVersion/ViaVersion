@@ -283,7 +283,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
         protocol.registerServerbound(ServerboundPackets1_21_2.ACCEPT_TELEPORTATION, wrapper -> {
             final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
-            if (playerPositionStorage.hasPlayerPosition()) {
+            if (playerPositionStorage.checkHasPlayerPosition()) {
                 // Send move player after accept teleportation
                 wrapper.sendToServer(Protocol1_21To1_21_2.class);
                 wrapper.cancel();

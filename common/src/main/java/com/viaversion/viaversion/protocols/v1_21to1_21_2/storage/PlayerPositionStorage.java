@@ -40,6 +40,7 @@ public class PlayerPositionStorage implements StorableObject {
 
     public boolean checkPong(final int id) {
         if (this.pendingPongs.remove(id)) {
+            this.reset(); // Ensure we don't have any leftover state
             this.captureNextPlayerPositionPacket = true;
             return true;
         } else {
@@ -51,7 +52,8 @@ public class PlayerPositionStorage implements StorableObject {
         if (this.captureNextPlayerPositionPacket) {
             this.captureNextPlayerPositionPacket = false;
             return true;
-        } else {
+        } else { // Packet order was wrong
+            this.reset();
             return false;
         }
     }
@@ -60,8 +62,13 @@ public class PlayerPositionStorage implements StorableObject {
         this.playerPosition = playerPosition;
     }
 
-    public boolean hasPlayerPosition() {
-        return this.playerPosition != null;
+    public boolean checkHasPlayerPosition() {
+        if (this.playerPosition != null) {
+            return true;
+        } else { // Packet order was wrong (ACCEPT_TELEPORTATION before MOVE_PLAYER_POS_ROT packet)
+            this.reset();
+            return false;
+        }
     }
 
     public void sendMovePlayerPosRot(final UserConnection user) {
@@ -73,6 +80,10 @@ public class PlayerPositionStorage implements StorableObject {
         movePlayerPosRot.write(Types.FLOAT, this.playerPosition.pitch); // Pitch
         movePlayerPosRot.write(Types.BOOLEAN, this.playerPosition.onGround); // On Ground
         movePlayerPosRot.sendToServer(Protocol1_21To1_21_2.class);
+        this.reset();
+    }
+
+    private void reset() {
         this.captureNextPlayerPositionPacket = false;
         this.playerPosition = null;
     }
