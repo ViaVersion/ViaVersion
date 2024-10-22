@@ -76,7 +76,7 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
             @Override
             public void write(final ByteBuf buffer, final ConsumeEffect<?> value) {
                 Types.VAR_INT.writePrimitive(buffer, value.id);
-                value.write(buffer);
+                value.writeValue(buffer);
             }
         };
         public static final Type<ConsumeEffect<?>[]> ARRAY_TYPE = new ArrayType<>(TYPE);
@@ -86,9 +86,8 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
             return new ConsumeEffect<>(id, type, (T) value);
         }
 
-        void write(final ByteBuf buf) {
-            Types.VAR_INT.writePrimitive(buf, id);
-            type.write(buf, value);
+        void writeValue(final ByteBuf buf) {
+            this.type.write(buf, this.value);
         }
     }
 
