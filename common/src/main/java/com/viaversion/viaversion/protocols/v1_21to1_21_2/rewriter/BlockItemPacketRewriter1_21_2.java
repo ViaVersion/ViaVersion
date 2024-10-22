@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -35,6 +36,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
+import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -414,7 +416,14 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             return Holder.of(new Instrument1_21_2(value.soundEvent(), value.useDuration() / 20F, value.range(), new StringTag("")));
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21, StructuredDataKey.FOOD1_21_2, food -> {
-            // Just assume the item type default for CONSUMABLE; add USE_REMAINDER from old food properties
+            final Holder<SoundEvent> sound = Holder.of(new SoundEvent("minecraft:entity.generic.eat", null));
+            final Consumable1_21_2.ConsumeEffect<?>[] consumeEffects = new Consumable1_21_2.ConsumeEffect[food.possibleEffects().length];
+            for (int i = 0; i < consumeEffects.length; i++) {
+                final FoodProperties1_20_5.FoodEffect effect = food.possibleEffects()[i];
+                final Consumable1_21_2.ApplyStatusEffects applyStatusEffects = new Consumable1_21_2.ApplyStatusEffects(new PotionEffect[]{effect.effect()}, effect.probability());
+                consumeEffects[i] = new Consumable1_21_2.ConsumeEffect<>(0 /* add status effect */, Consumable1_21_2.ApplyStatusEffects.TYPE, applyStatusEffects);
+            }
+            dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
             if (food.usingConvertsTo() != null) {
                 dataContainer.set(StructuredDataKey.USE_REMAINDER, food.usingConvertsTo());
             }
@@ -455,7 +464,17 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final Consumable1_21_2 consumableData = dataContainer.get(StructuredDataKey.CONSUMABLE1_21_2);
             final Item useRemainderData = dataContainer.get(StructuredDataKey.USE_REMAINDER);
             final float eatSeconds = consumableData != null ? consumableData.consumeSeconds() : 1.6F;
-            return new FoodProperties1_20_5(food.nutrition(), food.saturationModifier(), food.canAlwaysEat(), eatSeconds, useRemainderData, new FoodProperties1_20_5.FoodEffect[0]);
+            final List<FoodProperties1_20_5.FoodEffect> foodEffects = new ArrayList<>();
+            if (consumableData != null) {
+                for (Consumable1_21_2.ConsumeEffect<?> consumeEffect : consumableData.consumeEffects()) {
+                    if (consumeEffect.value() instanceof Consumable1_21_2.ApplyStatusEffects applyStatusEffects) {
+                        for (PotionEffect effect : applyStatusEffects.effects()) {
+                            foodEffects.add(new FoodProperties1_20_5.FoodEffect(effect, applyStatusEffects.probability()));
+                        }
+                    }
+                }
+            }
+            return new FoodProperties1_20_5(food.nutrition(), food.saturationModifier(), food.canAlwaysEat(), eatSeconds, useRemainderData, foodEffects.toArray(new FoodProperties1_20_5.FoodEffect[0]));
         });
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21);
