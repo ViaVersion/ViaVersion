@@ -32,9 +32,12 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
 
@@ -151,6 +154,27 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             final int teleportId = wrapper.read(Types.VAR_INT);
             wrapper.set(Types.VAR_INT, 0, teleportId);
+
+            // Accept teleportation and player position were swapped.
+            // Send a ping first to then capture and send the player position the accept teleportation
+            final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+            if (!isBundling) {
+                final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                bundleStart.send(Protocol1_21To1_21_2.class);
+            }
+
+            final int pingId = ThreadLocalRandom.current().nextInt();
+            wrapper.user().get(PlayerPositionStorage.class).addPendingPong(pingId);
+            final PacketWrapper ping = wrapper.create(ClientboundPackets1_21_2.PING);
+            ping.write(Types.INT, pingId); // id
+            ping.send(Protocol1_21To1_21_2.class);
+            wrapper.send(Protocol1_21To1_21_2.class);
+            wrapper.cancel();
+
+            if (!isBundling) {
+                final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                bundleEnd.send(Protocol1_21To1_21_2.class);
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.SET_PASSENGERS, wrapper -> {
@@ -236,12 +260,20 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             readOnGround(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS_ROT, wrapper -> {
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.FLOAT); // Yaw
-            wrapper.passthrough(Types.FLOAT); // Pitch
+            final double x = wrapper.passthrough(Types.DOUBLE); // X
+            final double y = wrapper.passthrough(Types.DOUBLE); // Y
+            final double z = wrapper.passthrough(Types.DOUBLE); // Z
+            final float yaw = wrapper.passthrough(Types.FLOAT); // Yaw
+            final float pitch = wrapper.passthrough(Types.FLOAT); // Pitch
             readOnGround(wrapper);
+
+            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            if (playerPositionStorage.checkCaptureNextPlayerPositionPacket()) {
+                // Capture this packet and send it after accept teleportation
+                final boolean onGround = wrapper.get(Types.BOOLEAN, 0);
+                playerPositionStorage.setPlayerPosition(new PlayerPositionStorage.PlayerPosition(x, y, z, yaw, pitch, onGround));
+                wrapper.cancel();
+            }
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_ROT, wrapper -> {
             wrapper.passthrough(Types.FLOAT); // Yaw
@@ -249,6 +281,15 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             readOnGround(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
+        protocol.registerServerbound(ServerboundPackets1_21_2.ACCEPT_TELEPORTATION, wrapper -> {
+            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            if (playerPositionStorage.hasPlayerPosition()) {
+                // Send move player after accept teleportation
+                wrapper.sendToServer(Protocol1_21To1_21_2.class);
+                wrapper.cancel();
+                playerPositionStorage.sendMovePlayerPosRot(wrapper.user());
+            }
+        });
     }
 
     private RegistryDataRewriter registryDataRewriter() {

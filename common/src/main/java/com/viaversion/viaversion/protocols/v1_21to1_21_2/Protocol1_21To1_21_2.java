@@ -46,6 +46,8 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.BlockItemPacketRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ComponentRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRewriter1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -159,6 +161,14 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
                 componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
             }
         });
+
+        registerClientbound(ClientboundPackets1_21.BUNDLE_DELIMITER, wrapper -> wrapper.user().get(BundleStateTracker.class).toggleBundling());
+        registerServerbound(ServerboundPackets1_21_2.PONG, wrapper -> {
+            final int id = wrapper.passthrough(Types.INT); // id
+            if (wrapper.user().get(PlayerPositionStorage.class).checkPong(id)) {
+                wrapper.cancel();
+            }
+        });
     }
 
     private void clientInformation(final PacketWrapper wrapper) {
@@ -215,6 +225,8 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_2.PLAYER));
+        connection.put(new BundleStateTracker());
+        connection.put(new PlayerPositionStorage());
     }
 
     @Override
