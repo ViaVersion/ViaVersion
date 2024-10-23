@@ -89,6 +89,10 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_21_2 = register(768, "1.21.2-1.21.3", new SubVersionRange("1.21", 2, 3));
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
 
+    static {
+        unknown.known = false;
+    }
+
     public static ProtocolVersion register(int version, String name) {
         return register(version, -1, name);
     }
@@ -152,7 +156,11 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
                 return protocolVersion;
             }
         }
-        return new ProtocolVersion(VersionType.SPECIAL, version, -1, "Unknown (" + version + ")", null);
+
+        // Will be made nullable instead in the future...
+        final ProtocolVersion unknown = new ProtocolVersion(versionType, version, -1, "Unknown (" + version + ")", null);
+        unknown.known = false;
+        return unknown;
     }
 
     public static @NonNull ProtocolVersion getProtocol(final int version) {
@@ -203,6 +211,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     private final int snapshotVersion;
     private final String name;
     private final Set<String> includedVersions;
+    @Deprecated // Remove when getProtocol is made nullable
+    private boolean known = true;
 
     /**
      * Constructs a new ProtocolVersion instance.
@@ -292,7 +302,7 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
      * @return true if the protocol version is unknown
      */
     public boolean isKnown() {
-        return this != unknown;
+        return known;
     }
 
     /**
