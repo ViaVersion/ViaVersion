@@ -19,7 +19,9 @@ dependencies {
     api(libs.vianbt) {
         exclude("it.unimi.dsi", "fastutil")
     }
-    api(libs.gson)
+    api(libs.gson) {
+        exclude("com.google.errorprone", "error_prone_annotations")
+    }
     implementation(rootProject.libs.text) {
         exclude("com.google.code.gson", "gson")
         exclude("com.viaversion", "nbt")
