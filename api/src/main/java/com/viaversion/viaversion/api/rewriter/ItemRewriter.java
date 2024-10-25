@@ -51,7 +51,8 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
     @Nullable
     Item handleItemToServer(UserConnection connection, @Nullable Item item);
 
-    void rewriteParticle(UserConnection connection, Particle particle);
+    default void rewriteParticle(UserConnection connection, Particle particle) {
+    }
 
     /**
      * Returns the item type of the current protocol.

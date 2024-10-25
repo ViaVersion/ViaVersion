@@ -24,6 +24,7 @@ import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.Int2IntMapMappings;
 import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.data.ParticleMappings;
@@ -60,7 +61,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class EntityRewriter<C extends ClientboundPacketType, T extends Protocol<C, ?, ?, ?>>
     extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.EntityRewriter<T> {
-    private static final EntityData[] EMPTY_ARRAY = new EntityData[0];
     protected final List<EntityDataFilter> entityDataFilters = new ArrayList<>();
     protected final boolean trackMappedType;
     protected Mappings typeMappings;
@@ -154,6 +154,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     @Override
     public int newEntityId(int id) {
         return typeMappings != null ? typeMappings.getNewIdOrDefault(id, id) : id;
+    }
+
+    @Override
+    public String mappedEntityIdentifier(final String identifier) {
+        if (typeMappings instanceof final FullMappings fullMappings) {
+            final String mappedIdentifier = fullMappings.mappedIdentifier(identifier);
+            if (mappedIdentifier != null) {
+                return mappedIdentifier;
+            }
+        }
+        return identifier;
     }
 
     /**

@@ -390,6 +390,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final CompoundTag contents = hoverEventTag.getCompoundTag("contents");
             if (contents != null) {
                 processTag(connection, contents.get("name"));
+
+                final StringTag typeTag = contents.getStringTag("type");
+                if (typeTag != null && protocol.getEntityRewriter() != null) {
+                    typeTag.setValue(protocol.getEntityRewriter().mappedEntityIdentifier(typeTag.getValue()));
+                }
             }
         } else if (action.equals("show_item")) {
             convertLegacyContents(hoverEventTag);
