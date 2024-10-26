@@ -281,7 +281,7 @@ public enum EntityTypes1_20_5 implements EntityType {
     }
 
     public static EntityType getTypeFromId(final int typeId) {
-        return EntityTypeUtil.getTypeFromId(TYPES, typeId, ENTITY);
+        return EntityTypeUtil.getTypeFromId(TYPES, typeId, null);
     }
 
     public static void initialize(final Protocol<?, ?, ?, ?> protocol) {
