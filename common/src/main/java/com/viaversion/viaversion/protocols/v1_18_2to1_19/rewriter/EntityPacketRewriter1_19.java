@@ -331,7 +331,7 @@ public final class EntityPacketRewriter1_19 extends EntityRewriter<ClientboundPa
                 }
             }
 
-            rewriteParticle(event.user(), particle);
+            protocol.getParticleRewriter().rewriteParticle(event.user(), particle);
         });
 
         registerEntityDataTypeHandler(Types1_19.ENTITY_DATA_TYPES.itemType, Types1_19.ENTITY_DATA_TYPES.optionalBlockStateType, null);

@@ -57,7 +57,5 @@ public class ItemPacketRewriter1_16_2 extends ItemRewriter<ClientboundPackets1_1
         registerContainerClick(ServerboundPackets1_16_2.CONTAINER_CLICK);
         registerSetCreativeModeSlot(ServerboundPackets1_16_2.SET_CREATIVE_MODE_SLOT);
         protocol.registerServerbound(ServerboundPackets1_16_2.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
-
-        registerLevelParticles(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
     }
 }

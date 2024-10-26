@@ -23,7 +23,6 @@
 package com.viaversion.viaversion.api.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
@@ -50,9 +49,6 @@ public interface ItemRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter<T
      */
     @Nullable
     Item handleItemToServer(UserConnection connection, @Nullable Item item);
-
-    default void rewriteParticle(UserConnection connection, Particle particle) {
-    }
 
     /**
      * Returns the item type of the current protocol.

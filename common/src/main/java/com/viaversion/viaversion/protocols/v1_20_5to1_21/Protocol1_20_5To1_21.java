@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvide
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
+import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
@@ -47,6 +48,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -62,6 +64,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     public static final MappingData1_21 MAPPINGS = new MappingData1_21();
     private final EntityPacketRewriter1_21 entityRewriter = new EntityPacketRewriter1_21(this);
     private final BlockItemPacketRewriter1_21 itemRewriter = new BlockItemPacketRewriter1_21(this);
+    private final ParticleRewriter<ClientboundPacket1_20_5> particleRewriter = new ParticleRewriter<>(this, Types1_20_5.PARTICLE, Types1_21.PARTICLE);
     private final TagRewriter<ClientboundPacket1_20_5> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter<ClientboundPacket1_20_5> componentRewriter = new ComponentRewriter1_21(this);
 
@@ -91,6 +94,9 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         componentRewriter.registerTabList(ClientboundPackets1_20_5.TAB_LIST);
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_5.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SYSTEM_CHAT);
+
+        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES);
+        particleRewriter.registerExplosion(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
 
         registerClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Message
@@ -244,6 +250,11 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     @Override
     public BlockItemPacketRewriter1_21 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPacket1_20_5> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

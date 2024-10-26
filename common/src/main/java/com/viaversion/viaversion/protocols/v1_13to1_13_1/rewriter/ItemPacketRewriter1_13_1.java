@@ -97,7 +97,5 @@ public class ItemPacketRewriter1_13_1 extends ItemRewriter<ClientboundPackets1_1
 
         registerContainerClick(ServerboundPackets1_13.CONTAINER_CLICK);
         registerSetCreativeModeSlot(ServerboundPackets1_13.SET_CREATIVE_MODE_SLOT);
-
-        registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
     }
 }

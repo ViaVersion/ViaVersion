@@ -53,6 +53,7 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationSt
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastTags;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -64,6 +65,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingDataBase("1.20", "1.20.2");
     private final EntityPacketRewriter1_20_2 entityPacketRewriter = new EntityPacketRewriter1_20_2(this);
     private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
+    private final ParticleRewriter<ClientboundPackets1_19_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_20To1_20_2() {
@@ -78,6 +80,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
+
+        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_4.LEVEL_PARTICLES);
 
         registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
@@ -375,6 +379,11 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemRewriter<Protocol1_20To1_20_2> getItemRewriter() {
         return itemPacketRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_19_4> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

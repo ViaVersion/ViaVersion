@@ -49,6 +49,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.BlockItemPacketRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ComponentRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.EntityPacketRewriter1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ParticleRewriter1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
@@ -71,6 +72,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     public static boolean strictErrorHandling = System.getProperty("viaversion.strict-error-handling1_20_5", "true").equalsIgnoreCase("true");
     private final EntityPacketRewriter1_20_5 entityRewriter = new EntityPacketRewriter1_20_5(this);
     private final BlockItemPacketRewriter1_20_5 itemRewriter = new BlockItemPacketRewriter1_20_5(this);
+    private final ParticleRewriter1_20_5 particleRewriter = new ParticleRewriter1_20_5(this);
     private final TagRewriter<ClientboundPacket1_20_3> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_20_5<ClientboundPacket1_20_3> componentRewriter = new ComponentRewriter1_20_5<>(this, Types1_20_5.STRUCTURED_DATA);
 
@@ -316,6 +318,11 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_5 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter1_20_5 getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

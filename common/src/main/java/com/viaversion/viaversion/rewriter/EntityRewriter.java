@@ -27,7 +27,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.Int2IntMapMappings;
 import com.viaversion.viaversion.api.data.Mappings;
-import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
@@ -237,11 +236,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
                     data.setValue(protocol.getMappingData().getNewBlockStateId(value));
                 }
             } else if (type == particleType) {
-                rewriteParticle(event.user(), data.value());
+                protocol.getParticleRewriter().rewriteParticle(event.user(), data.value());
             } else if (type == particlesType) {
                 final Particle[] particles = data.value();
                 for (final Particle particle : particles) {
-                    rewriteParticle(event.user(), particle);
+                    protocol.getParticleRewriter().rewriteParticle(event.user(), particle);
                 }
             } else if (type == componentType || type == optionalComponentType) {
                 if (protocol.getComponentRewriter() != null) {
@@ -597,23 +596,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         final RegistryEntry[] newEntries = Arrays.copyOf(entries, length + toAdd.length);
         System.arraycopy(toAdd, 0, newEntries, length, toAdd.length);
         return newEntries;
-    }
-
-    public void rewriteParticle(UserConnection connection, Particle particle) {
-        if (protocol.getItemRewriter() != null) {
-            protocol.getItemRewriter().rewriteParticle(connection, particle);
-            return;
-        }
-
-        // Dupe parts of the logic if no item rewriter is available
-        ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        int id = particle.id();
-        if (mappings.isBlockParticle(id)) {
-            Particle.ParticleData<Integer> data = particle.getArgument(0);
-            data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
-        }
-
-        particle.setId(protocol.getMappingData().getNewParticleId(id));
     }
 
     private void logException(Exception e, @Nullable EntityType type, List<EntityData> entityDataList, EntityData entityData) {

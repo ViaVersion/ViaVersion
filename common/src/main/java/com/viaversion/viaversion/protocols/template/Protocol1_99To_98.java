@@ -50,6 +50,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
+    //private final ParticleRewriter<ClientboundPacket1_21> particleRewriter = new ParticleRewriter<>(this, Types1_OLD.PARTICLE, Types1_21.PARTICLE);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_99 componentRewriter = new ComponentRewriter1_99(this);
 
@@ -78,6 +79,10 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
         componentRewriter.registerPlayerInfoUpdate1_21_2(ClientboundPackets1_21.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
+
+        //Create own class to handle particle changes, otherwise use the commented out code above
+        //particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
+        //particleRewriter.registerExplosion1_21_2(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
@@ -145,6 +150,11 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
     public BlockItemPacketRewriter1_99 getItemRewriter() {
         return itemRewriter;
     }
+
+//    @Override
+//    public ParticleRewriter<ClientboundPacket1_21, ServerboundPacket1_20_5> getParticleRewriter() {
+//        return particleRewriter;
+//    }
 
     @Override
     public TagRewriter<ClientboundPacket1_21> getTagRewriter() {

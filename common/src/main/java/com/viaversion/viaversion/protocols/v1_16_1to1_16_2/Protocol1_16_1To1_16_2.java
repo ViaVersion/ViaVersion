@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.EntityPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.ItemPacketRewriter1_16_2;
 import com.viaversion.viaversion.protocols.v1_16_1to1_16_2.rewriter.WorldPacketRewriter1_16_2;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -40,6 +41,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
     public static final MappingData1_16_2 MAPPINGS = new MappingData1_16_2();
     private final EntityPacketRewriter1_16_2 entityRewriter = new EntityPacketRewriter1_16_2(this);
     private final ItemPacketRewriter1_16_2 itemRewriter = new ItemPacketRewriter1_16_2(this);
+    private final ParticleRewriter<ClientboundPackets1_16> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_16> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_16_1To1_16_2() {
@@ -53,6 +55,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
         WorldPacketRewriter1_16_2.register(this);
 
         tagRewriter.register(ClientboundPackets1_16.UPDATE_TAGS, RegistryType.ENTITY);
+        particleRewriter.registerLevelParticles(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_16.AWARD_STATS);
 
@@ -109,6 +112,11 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     public ItemPacketRewriter1_16_2 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_16> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

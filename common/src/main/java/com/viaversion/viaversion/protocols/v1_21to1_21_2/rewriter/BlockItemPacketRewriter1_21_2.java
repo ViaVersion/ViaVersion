@@ -70,8 +70,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     public BlockItemPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol,
             Types1_21.ITEM, Types1_21.ITEM_ARRAY, Types1_21_2.ITEM, Types1_21_2.ITEM_ARRAY,
-            Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST,
-            Types1_21.PARTICLE, Types1_21_2.PARTICLE
+            Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST
         );
     }
 
@@ -89,7 +88,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
 
         protocol.registerClientbound(ClientboundPackets1_21.COOLDOWN, wrapper -> {
             final MappingData mappingData = protocol.getMappingData();
@@ -217,10 +215,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final Particle smallExplosionParticle = wrapper.read(Types1_21.PARTICLE);
             final Particle largeExplosionParticle = wrapper.read(Types1_21.PARTICLE);
             if (power >= 2.0F && blockInteractionMode != 0) {
-                rewriteParticle(wrapper.user(), largeExplosionParticle);
+                protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
                 wrapper.write(Types1_21_2.PARTICLE, largeExplosionParticle);
             } else {
-                rewriteParticle(wrapper.user(), smallExplosionParticle);
+                protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
                 wrapper.write(Types1_21_2.PARTICLE, smallExplosionParticle);
             }
 
@@ -355,27 +353,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         }
 
         wrapper.write(Types.STRING, recipe.identifier());
-    }
-
-    @Override
-    public void rewriteParticle(final UserConnection connection, final Particle particle) {
-        super.rewriteParticle(connection, particle);
-
-        final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
-        if (identifier.equals("minecraft:dust_color_transition")) {
-            floatsToARGB(particle, 0);
-            floatsToARGB(particle, 1);
-        } else if (identifier.equals("minecraft:dust")) {
-            floatsToARGB(particle, 0);
-        }
-    }
-
-    private void floatsToARGB(final Particle particle, final int fromIndex) {
-        final Particle.ParticleData<Float> r = particle.removeArgument(fromIndex);
-        final Particle.ParticleData<Float> g = particle.removeArgument(fromIndex);
-        final Particle.ParticleData<Float> b = particle.removeArgument(fromIndex);
-        final int rgb = 255 << 24 | (int) (r.getValue() * 255) << 16 | (int) (g.getValue() * 255) << 8 | (int) (b.getValue() * 255);
-        particle.add(fromIndex, Types.INT, rgb);
     }
 
     @Override
