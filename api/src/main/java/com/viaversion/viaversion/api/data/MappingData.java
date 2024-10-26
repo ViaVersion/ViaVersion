@@ -35,56 +35,82 @@ public interface MappingData {
     void load();
 
     /**
-     * Returns the mapped block state id, or -1 if unmapped.
+     * Returns the mapped block state id, or 0 if unmapped.
      *
      * @param id unmapped block state id
-     * @return mapped block state id, or -1 if unmapped
+     * @return mapped block state id, or 0 if unmapped
      * @throws NullPointerException if this mappingdata does not hold block state mappings
      */
     int getNewBlockStateId(int id);
 
     /**
-     * Returns the mapped block id, or -1 if unmapped.
+     * Returns the mapped block id, or 0 if unmapped.
      *
      * @param id unmapped block id
-     * @return mapped block id, or -1 if unmapped
+     * @return mapped block id, or 0 if unmapped
      * @throws NullPointerException if this mappingdata does not hold block mappings
      */
     int getNewBlockId(int id);
 
+    /**
+     * Returns the backwards mapped block id, or 1 if unmapped.
+     *
+     * @param id mapped block id
+     * @return backwards mapped block id, or 1 if unmapped
+     */
     int getOldBlockId(int id);
 
     /**
-     * Returns the mapped item id, or -1 if unmapped.
+     * Returns the mapped item id, or 0 if unmapped.
      *
      * @param id unmapped item id
-     * @return mapped item id, or -1 if unmapped
+     * @return mapped item id, or 0 if unmapped
      * @throws NullPointerException if this mappingdata does not hold item mappings
      */
     int getNewItemId(int id);
 
     /**
-     * Returns the backwards mapped item id, or -1 if unmapped.
+     * Returns the backwards mapped item id, or 1 if unmapped.
      *
      * @param id mapped item id
-     * @return backwards mapped item id, or -1 if unmapped
+     * @return backwards mapped item id, or 1 if unmapped
      * @throws NullPointerException if this mappingdata does not hold item mappings
      */
     int getOldItemId(int id);
 
     /**
-     * Returns the mapped particle id, or -1 if unmapped.
+     * Returns the mapped particle id, or 0 if unmapped.
      *
      * @param id unmapped particle id
-     * @return mapped particle id, or -1 if unmapped
+     * @return mapped particle id, or 0 if unmapped
      * @throws NullPointerException if this mappingdata does not hold particle mappings
      */
     int getNewParticleId(int id);
 
+    /**
+     * Returns the mapped attribute id, or 0 if unmapped.
+     *
+     * @param id unmapped attribute id
+     * @return mapped attribute id, or 0 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold attribute mappings
+     */
     int getNewAttributeId(int id);
 
+    /**
+     * Returns the mapped entity id, or 0 if unmapped.
+     *
+     * @param id unmapped entity id
+     * @return mapped entity id, or 0 if unmapped
+     * @throws NullPointerException if this mappingdata does not hold sound mappings
+     */
     int getNewSoundId(int id);
 
+    /**
+     * Returns the backwards mapped sound id, or 1 if unmapped.
+     *
+     * @param i mapped sound id
+     * @return backwards mapped sound id, or 1 if unmapped
+     */
     int getOldSoundId(int i);
 
     /**
