@@ -97,10 +97,10 @@ public interface MappingData {
     int getNewAttributeId(int id);
 
     /**
-     * Returns the mapped entity id, or 0 if unmapped.
+     * Returns the mapped sound id, or 0 if unmapped.
      *
-     * @param id unmapped entity id
-     * @return mapped entity id, or 0 if unmapped
+     * @param id unmapped sound id
+     * @return mapped sound id, or 0 if unmapped
      * @throws NullPointerException if this mappingdata does not hold sound mappings
      */
     int getNewSoundId(int id);
