@@ -130,7 +130,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         tagRewriter.register(ClientboundPackets1_13.UPDATE_TAGS, RegistryType.ITEM);
-        particleRewriter.registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
     }

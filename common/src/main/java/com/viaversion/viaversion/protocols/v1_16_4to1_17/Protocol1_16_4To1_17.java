@@ -88,7 +88,7 @@ public final class Protocol1_16_4To1_17 extends AbstractProtocol<ClientboundPack
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND);
         soundRewriter.registerSound(ClientboundPackets1_16_2.SOUND_ENTITY);
 
-        particleRewriter.registerLevelParticles(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
 
         registerClientbound(ClientboundPackets1_16_2.RESOURCE_PACK, wrapper -> {
             wrapper.passthrough(Types.STRING);

@@ -68,7 +68,7 @@ public class Protocol1_13_2To1_14 extends AbstractProtocol<ClientboundPackets1_1
         new SoundRewriter<>(this).registerSound(ClientboundPackets1_13.SOUND);
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
 
-        particleRewriter.registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
 
         ComponentRewriter<ClientboundPackets1_13> componentRewriter = new ComponentRewriter1_14<>(this);
         componentRewriter.registerComponentPacket(ClientboundPackets1_13.CHAT);

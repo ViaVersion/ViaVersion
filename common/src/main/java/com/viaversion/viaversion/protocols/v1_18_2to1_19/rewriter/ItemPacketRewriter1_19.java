@@ -69,7 +69,7 @@ public final class ItemPacketRewriter1_19 extends ItemRewriter<ClientboundPacket
                         }
                     }
                 });
-                handler(protocol.getParticleRewriter().levelParticlesHandler(Types.VAR_INT));
+                handler(protocol.getParticleRewriter().levelParticlesHandler1_13(Types.VAR_INT));
             }
         });
 

@@ -36,16 +36,22 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
     private final Type<Particle> mappedParticleType;
 
     public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol) {
-        this(protocol, null, null);
+        this(protocol, null);
     }
 
-    public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol, Type<Particle> particleType, Type<Particle> mappedParticleType) {
+    public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol, final Type<Particle> particleType) {
+        this.protocol = protocol;
+        this.particleType = particleType;
+        this.mappedParticleType = particleType;
+    }
+
+    public ParticleRewriter(final Protocol<C, ?, ?, ?> protocol, final Type<Particle> particleType, final Type<Particle> mappedParticleType) {
         this.protocol = protocol;
         this.particleType = particleType;
         this.mappedParticleType = mappedParticleType;
     }
 
-    public void registerLevelParticles(C packetType, Type<?> coordType) {
+    public void registerLevelParticles1_13(C packetType, Type<?> coordType) {
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
@@ -59,7 +65,7 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
                 map(Types.FLOAT); // 7 - Offset Z
                 map(Types.FLOAT); // 8 - Particle Data
                 map(Types.INT); // 9 - Particle Count
-                handler(levelParticlesHandler());
+                handler(levelParticlesHandler1_13(Types.INT));
             }
         });
     }
@@ -78,33 +84,53 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
                 map(Types.FLOAT); // 7 - Offset Z
                 map(Types.FLOAT); // 8 - Particle Data
                 map(Types.INT); // 9 - Particle Count
-                handler(levelParticlesHandler(Types.VAR_INT));
+                handler(levelParticlesHandler1_13(Types.VAR_INT));
             }
         });
     }
 
-    public void registerLevelParticles1_20_5(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BOOLEAN); // Long Distance
-                map(Types.DOUBLE); // X
-                map(Types.DOUBLE); // Y
-                map(Types.DOUBLE); // Z
-                map(Types.FLOAT); // Offset X
-                map(Types.FLOAT); // Offset Y
-                map(Types.FLOAT); // Offset Z
-                map(Types.FLOAT); // Particle Data
-                map(Types.INT); // Particle Count
-                handler(wrapper -> {
-                    final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
-                    rewriteParticle(wrapper.user(), particle);
-                });
+    public PacketHandler levelParticlesHandler1_13(Type<Integer> idType) {
+        return wrapper -> {
+            int id = wrapper.get(idType, 0);
+            if (id == -1) {
+                return;
             }
+
+            ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+            if (mappings.isBlockParticle(id)) {
+                int data = wrapper.read(Types.VAR_INT);
+                wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
+            } else if (mappings.isItemParticle(id)) {
+                ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
+                final Item item = wrapper.read(itemRewriter.itemType());
+                wrapper.write(itemRewriter.mappedItemType(), itemRewriter.handleItemToClient(wrapper.user(), item));
+            }
+
+            int mappedId = protocol.getMappingData().getNewParticleId(id);
+            if (mappedId != id) {
+                wrapper.set(idType, 0, mappedId);
+            }
+        };
+    }
+
+    public void registerLevelParticles1_20_5(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.BOOLEAN); // Long Distance
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Offset X
+            wrapper.passthrough(Types.FLOAT); // Offset Y
+            wrapper.passthrough(Types.FLOAT); // Offset Z
+            wrapper.passthrough(Types.FLOAT); // Particle Data
+            wrapper.passthrough(Types.INT); // Particle Count
+
+            final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
+            rewriteParticle(wrapper.user(), particle);
         });
     }
 
-    public void registerExplosion(C packetType) {
+    public void registerExplode1_20_5(final C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
@@ -131,7 +157,7 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         });
     }
 
-    public void registerExplosion1_21_2(C packetType) {
+    public void registerExplode1_21_2(final C packetType) {
         final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
@@ -149,45 +175,17 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
         });
     }
 
-    public PacketHandler levelParticlesHandler() {
-        return levelParticlesHandler(Types.INT);
-    }
-
-    public PacketHandler levelParticlesHandler(Type<Integer> idType) {
-        return wrapper -> {
-            int id = wrapper.get(idType, 0);
-            if (id == -1) {
-                return;
-            }
-
-            ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-            if (mappings.isBlockParticle(id)) {
-                int data = wrapper.read(Types.VAR_INT);
-                wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
-            } else if (mappings.isItemParticle(id)) {
-                ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-                final Item item = wrapper.read(itemRewriter.itemType());
-                wrapper.write(itemRewriter.mappedItemType(), itemRewriter.handleItemToClient(wrapper.user(), item));
-            }
-
-            int mappedId = protocol.getMappingData().getNewParticleId(id);
-            if (mappedId != id) {
-                wrapper.set(idType, 0, mappedId);
-            }
-        };
-    }
-
     @Override
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
-        ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-        int id = particle.id();
+        final ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
+        final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
+        final int id = particle.id();
         if (mappings.isBlockParticle(id)) {
-            Particle.ParticleData<Integer> data = particle.getArgument(0);
+            final Particle.ParticleData<Integer> data = particle.getArgument(0);
             data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
         } else if (mappings.isItemParticle(id) && itemRewriter != null) {
-            Particle.ParticleData<Item> data = particle.getArgument(0);
-            Item item = itemRewriter.handleItemToClient(connection, data.getValue());
+            final Particle.ParticleData<Item> data = particle.getArgument(0);
+            final Item item = itemRewriter.handleItemToClient(connection, data.getValue());
             if (itemRewriter.mappedItemType() != null && itemRewriter.itemType() != itemRewriter.mappedItemType()) {
                 // Replace the type
                 particle.set(0, itemRewriter.mappedItemType(), item);

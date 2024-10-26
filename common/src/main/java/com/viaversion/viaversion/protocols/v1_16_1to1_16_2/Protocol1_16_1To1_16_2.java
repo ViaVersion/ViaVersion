@@ -55,7 +55,7 @@ public class Protocol1_16_1To1_16_2 extends AbstractProtocol<ClientboundPackets1
         WorldPacketRewriter1_16_2.register(this);
 
         tagRewriter.register(ClientboundPackets1_16.UPDATE_TAGS, RegistryType.ENTITY);
-        particleRewriter.registerLevelParticles(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_16.LEVEL_PARTICLES, Types.DOUBLE);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_16.AWARD_STATS);
 

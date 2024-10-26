@@ -96,7 +96,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_5.SYSTEM_CHAT);
 
         particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES);
-        particleRewriter.registerExplosion(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
+        particleRewriter.registerExplode1_20_5(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
 
         registerClientbound(ClientboundPackets1_20_5.DISGUISED_CHAT, wrapper -> {
             componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.TAG)); // Message
