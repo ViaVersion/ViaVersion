@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 
-public class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPacket1_21> {
+public final class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPacket1_21> {
 
     public ParticleRewriter1_21_2(final Protocol<ClientboundPacket1_21, ?, ?, ?> protocol) {
         super(protocol, Types1_21.PARTICLE, Types1_21_2.PARTICLE);

@@ -375,6 +375,11 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
         return null;
     }
 
+    /**
+     * Returns the protocol's particle rewriter if present.
+     *
+     * @return particle rewriter
+     */
     default @Nullable ParticleRewriter getParticleRewriter() {
         return null;
     }

@@ -249,6 +249,11 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     }
 
     @Override
+    public ParticleRewriter1_21_2 getParticleRewriter() {
+        return particleRewriter;
+    }
+
+    @Override
     public TagRewriter<ClientboundPacket1_21> getTagRewriter() {
         return tagRewriter;
     }

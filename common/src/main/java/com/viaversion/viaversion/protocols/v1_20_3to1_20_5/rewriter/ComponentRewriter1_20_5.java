@@ -100,7 +100,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
+public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
     private final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
     private final StructuredDataType structuredDataType;

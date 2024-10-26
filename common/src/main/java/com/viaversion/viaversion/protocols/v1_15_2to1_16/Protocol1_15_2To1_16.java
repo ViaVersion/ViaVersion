@@ -258,6 +258,11 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         return itemRewriter;
     }
 
+    @Override
+    public ParticleRewriter<ClientboundPackets1_15> getParticleRewriter() {
+        return particleRewriter;
+    }
+
     public ComponentRewriter1_16 getComponentRewriter() {
         return componentRewriter;
     }
