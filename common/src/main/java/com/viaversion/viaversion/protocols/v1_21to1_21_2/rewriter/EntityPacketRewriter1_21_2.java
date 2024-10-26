@@ -18,9 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_2;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -34,9 +37,12 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class EntityPacketRewriter1_21_2 extends EntityRewriter<ClientboundPacket1_21, Protocol1_21To1_21_2> {
@@ -62,6 +68,32 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         registerTrackerWithData1_19(ClientboundPackets1_21.ADD_ENTITY, EntityTypes1_21_2.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, Types1_21.ENTITY_DATA_LIST, Types1_21_2.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
+
+        protocol.appendClientbound(ClientboundPackets1_21.ADD_ENTITY, wrapper -> {
+            final int entityType = wrapper.get(Types.VAR_INT, 1);
+
+            final EntityType type = typeFromId(entityType);
+            if (type == null || !type.isOrHasParent(EntityTypes1_21_2.ABSTRACT_BOAT)) {
+                return;
+            }
+
+            final int entityId = wrapper.get(Types.VAR_INT, 0);
+            final UUID uuid = wrapper.get(Types.UUID, 0);
+
+            final double x = wrapper.get(Types.DOUBLE, 0);
+            final double y = wrapper.get(Types.DOUBLE, 1);
+            final double z = wrapper.get(Types.DOUBLE, 2);
+
+            final float pitch = wrapper.get(Types.BYTE, 0) * 256.0F / 360.0F;
+            final float yaw = wrapper.get(Types.BYTE, 1) * 256.0F / 360.0F;
+
+            final int data = wrapper.get(Types.VAR_INT, 2);
+
+            final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+            final EntityTracker1_21_2.BoatEntity entity = tracker.trackBoatEntity(entityId, uuid, data);
+            entity.setPosition(x, y, z);
+            entity.setRotation(yaw, pitch);
+        });
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             final PacketWrapper instrumentsPacket = wrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA);
@@ -185,6 +217,12 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
                 wrapper.user().remove(ClientVehicleStorage.class);
             }
 
+            final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+            final EntityTracker1_21_2.BoatEntity entity = tracker.trackedBoatEntity(vehicleId);
+            if (entity != null) {
+                entity.setPassengers(passengerIds);
+            }
+
             final int clientEntityId = tracker(wrapper.user()).clientEntityId();
             for (final int passenger : passengerIds) {
                 if (passenger == clientEntityId) {
@@ -235,11 +273,11 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.TELEPORT_ENTITY, ClientboundPackets1_21_2.ENTITY_POSITION_SYNC, wrapper -> {
-            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity ID
 
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
+            final double x = wrapper.passthrough(Types.DOUBLE); // X
+            final double y = wrapper.passthrough(Types.DOUBLE); // Y
+            final double z = wrapper.passthrough(Types.DOUBLE); // Z
 
             // Unused...
             wrapper.write(Types.DOUBLE, 0D); // Delta movement X
@@ -247,11 +285,22 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.write(Types.DOUBLE, 0D); // Delta movement Z
 
             // Unpack y and x rot
-            final byte yaw = wrapper.read(Types.BYTE);
-            final byte pitch = wrapper.read(Types.BYTE);
-            wrapper.write(Types.FLOAT, yaw * 360F / 256F);
-            wrapper.write(Types.FLOAT, pitch * 360F / 256F);
+            final float yaw = wrapper.read(Types.BYTE) * 360F / 256F;
+            final float pitch = wrapper.read(Types.BYTE) * 360F / 256F;
+            wrapper.write(Types.FLOAT, yaw);
+            wrapper.write(Types.FLOAT, pitch);
+
+            final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+            final EntityTracker1_21_2.BoatEntity trackedEntity = tracker.trackedBoatEntity(entityId);
+            if (trackedEntity == null) {
+                return;
+            }
+            trackedEntity.setPosition(x, y, z);
+            trackedEntity.setRotation(yaw, pitch);
         });
+        protocol.registerClientbound(ClientboundPackets1_21.MOVE_ENTITY_POS, wrapper -> storeEntityPositionRotation(wrapper, true, false));
+        protocol.registerClientbound(ClientboundPackets1_21.MOVE_ENTITY_POS_ROT, wrapper -> storeEntityPositionRotation(wrapper, true, true));
+        protocol.registerClientbound(ClientboundPackets1_21.MOVE_ENTITY_ROT, wrapper -> storeEntityPositionRotation(wrapper, false, true));
 
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS, wrapper -> {
             wrapper.passthrough(Types.DOUBLE); // X
@@ -318,6 +367,27 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         wrapper.write(Types.BOOLEAN, (data & 1) != 0); // On ground, ignoring horizontal collision data
     }
 
+    private void storeEntityPositionRotation(final PacketWrapper wrapper, final boolean position, final boolean rotation) {
+        final int entityId = wrapper.passthrough(Types.VAR_INT); // Entity id
+
+        final EntityTracker1_21_2 tracker = tracker(wrapper.user());
+        final EntityTracker1_21_2.BoatEntity trackedEntity = tracker.trackedBoatEntity(entityId);
+        if (trackedEntity == null) {
+            return;
+        }
+        if (position) {
+            final double x = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta X
+            final double y = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta Y
+            final double z = wrapper.passthrough(Types.SHORT) / 4096.0; // Delta Z
+            trackedEntity.setPosition(trackedEntity.x() + x, trackedEntity.y() + y, trackedEntity.z() + z);
+        }
+        if (rotation) {
+            final float yaw = wrapper.passthrough(Types.BYTE) * 360.0F / 256.0F;
+            final float pitch = wrapper.passthrough(Types.BYTE) * 360.0F / 256.0F;
+            trackedEntity.setRotation(yaw, pitch);
+        }
+    }
+
     @Override
     protected void registerRewrites() {
         filter().mapDataType(Types1_21_2.ENTITY_DATA_TYPES::byId);
@@ -333,12 +403,159 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         );
         registerBlockStateHandler(EntityTypes1_21_2.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_21_2.ABSTRACT_BOAT).removeIndex(11); // Goodbye boat type
+        filter().type(EntityTypes1_21_2.ABSTRACT_BOAT).handler((event, data) -> {
+            final int dataIndex = event.index();
+            // Boat type - now set as own entity type
+            // Idea is to remove the old entity, then add a new one and re-apply entity data and passengers
+            if (dataIndex > 11) {
+                event.setIndex(dataIndex - 1);
+                return;
+            }
+            if (dataIndex != 11) {
+                return;
+            }
+            event.cancel();
+
+            final EntityTracker1_21_2 tracker = tracker(event.user());
+            final EntityTracker1_21_2.BoatEntity entity = tracker.trackedBoatEntity(event.entityId());
+            if (entity == null) {
+                return;
+            }
+
+            final boolean isBundling = event.user().get(BundleStateTracker.class).isBundling();
+            if (!isBundling) {
+                final PacketWrapper bundleStart = PacketWrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER, event.user());
+                bundleStart.send(Protocol1_21To1_21_2.class);
+            }
+
+            // Remove old entity
+            final PacketWrapper removeEntityPacket = PacketWrapper.create(ClientboundPackets1_21_2.REMOVE_ENTITIES, event.user());
+            removeEntityPacket.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[] { event.entityId() });
+            removeEntityPacket.send(Protocol1_21To1_21_2.class);
+
+            // Detect correct boat entity type from entity data
+            final int boatType = (int) data.getValue();
+            EntityType entityType;
+            if (tracker.entityType(event.entityId()).isOrHasParent(EntityTypes1_21_2.ABSTRACT_CHEST_BOAT)) {
+                entityType = entityTypeFromChestBoatType(boatType);
+            } else {
+                entityType = entityTypeFromBoatType(boatType);
+            }
+
+            // Spawn new entity
+            final PacketWrapper spawnEntityPacket = PacketWrapper.create(ClientboundPackets1_21_2.ADD_ENTITY, event.user());
+            spawnEntityPacket.write(Types.VAR_INT, event.entityId()); // Entity ID
+            spawnEntityPacket.write(Types.UUID, entity.uuid()); // Entity UUID
+            spawnEntityPacket.write(Types.VAR_INT, entityType.getId()); // Entity type
+            spawnEntityPacket.write(Types.DOUBLE, entity.x()); // X
+            spawnEntityPacket.write(Types.DOUBLE, entity.y()); // Y
+            spawnEntityPacket.write(Types.DOUBLE, entity.z()); // Z
+            spawnEntityPacket.write(Types.BYTE, (byte) Math.floor(entity.pitch() * 256.0F / 360.0F)); // Pitch
+            spawnEntityPacket.write(Types.BYTE, (byte) Math.floor(entity.yaw() * 256.0F / 360.0F)); // Yaw
+            spawnEntityPacket.write(Types.BYTE, (byte) 0); // Head yaw
+            spawnEntityPacket.write(Types.VAR_INT, entity.data()); // Data
+            spawnEntityPacket.write(Types.SHORT, (short) 0); // Velocity X
+            spawnEntityPacket.write(Types.SHORT, (short) 0); // Velocity Y
+            spawnEntityPacket.write(Types.SHORT, (short) 0); // Velocity Z
+            spawnEntityPacket.send(Protocol1_21To1_21_2.class);
+
+            // Update tracked entity in storage with new entity type
+            tracker.updateBoatType(event.entityId(), entityType);
+
+            // Re-apply entity data previously set
+            final PacketWrapper setEntityDataPacket = PacketWrapper.create(ClientboundPackets1_21_2.SET_ENTITY_DATA, event.user());
+            setEntityDataPacket.write(Types.VAR_INT, event.entityId());
+            setEntityDataPacket.write(Types1_21_2.ENTITY_DATA_LIST, entity.entityData());
+            setEntityDataPacket.send(Protocol1_21To1_21_2.class);
+
+            // Re-attach all passengers
+            if (entity.passengers() != null) {
+                final PacketWrapper setPassengersPacket = PacketWrapper.create(ClientboundPackets1_21_2.SET_PASSENGERS, event.user());
+                setPassengersPacket.write(Types.VAR_INT, event.entityId());
+                setPassengersPacket.write(Types.VAR_INT_ARRAY_PRIMITIVE, entity.passengers());
+                setPassengersPacket.send(Protocol1_21To1_21_2.class);
+            }
+
+            if (!isBundling) {
+                final PacketWrapper bundleEnd = PacketWrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER, event.user());
+                bundleEnd.send(Protocol1_21To1_21_2.class);
+            }
+        });
 
         filter().type(EntityTypes1_21_2.SALMON).addIndex(17); // Data type
         filter().type(EntityTypes1_21_2.AGEABLE_WATER_CREATURE).addIndex(16); // Baby
 
         filter().type(EntityTypes1_21_2.ABSTRACT_ARROW).addIndex(10); // In ground
+    }
+
+    @Override
+    public void handleEntityData(final int entityId, final List<EntityData> dataList, final UserConnection connection) {
+        super.handleEntityData(entityId, dataList, connection);
+
+        final EntityTracker1_21_2 tracker = tracker(connection);
+        final EntityType entityType = tracker.entityType(entityId);
+        if (entityType != null && !entityType.isOrHasParent(EntityTypes1_21_2.ABSTRACT_BOAT)) {
+            return;
+        }
+
+        final List<EntityData> entityData = tracker.trackedBoatEntity(entityId).entityData();
+        entityData.removeIf(first -> dataList.stream().anyMatch(second -> first.id() == second.id()));
+        for (final EntityData data : dataList) {
+            final Object value = data.value();
+            if (value instanceof Item item) {
+                entityData.add(new EntityData(data.id(), data.dataType(), item.copy()));
+            } else {
+                entityData.add(new EntityData(data.id(), data.dataType(), value));
+            }
+        }
+    }
+
+    private EntityType entityTypeFromBoatType(final int boatType) {
+        if (boatType == 0) {
+            return EntityTypes1_21_2.OAK_BOAT;
+        } else if (boatType == 1) {
+            return EntityTypes1_21_2.SPRUCE_BOAT;
+        } else if (boatType == 2) {
+            return EntityTypes1_21_2.BIRCH_BOAT;
+        } else if (boatType == 3) {
+            return EntityTypes1_21_2.JUNGLE_BOAT;
+        } else if (boatType == 4) {
+            return EntityTypes1_21_2.ACACIA_BOAT;
+        } else if (boatType == 5) {
+            return EntityTypes1_21_2.CHERRY_BOAT;
+        } else if (boatType == 6) {
+            return EntityTypes1_21_2.DARK_OAK_BOAT;
+        } else if (boatType == 7) {
+            return EntityTypes1_21_2.MANGROVE_BOAT;
+        } else if (boatType == 8) {
+            return EntityTypes1_21_2.BAMBOO_RAFT;
+        } else {
+            return EntityTypes1_21_2.OAK_BOAT; // Fallback
+        }
+    }
+
+    private EntityType entityTypeFromChestBoatType(final int chestBoatType) {
+        if (chestBoatType == 0) {
+            return EntityTypes1_21_2.OAK_CHEST_BOAT;
+        } else if (chestBoatType == 1) {
+            return EntityTypes1_21_2.SPRUCE_CHEST_BOAT;
+        } else if (chestBoatType == 2) {
+            return EntityTypes1_21_2.BIRCH_CHEST_BOAT;
+        } else if (chestBoatType == 3) {
+            return EntityTypes1_21_2.JUNGLE_CHEST_BOAT;
+        } else if (chestBoatType == 4) {
+            return EntityTypes1_21_2.ACACIA_CHEST_BOAT;
+        } else if (chestBoatType == 5) {
+            return EntityTypes1_21_2.CHERRY_CHEST_BOAT;
+        } else if (chestBoatType == 6) {
+            return EntityTypes1_21_2.DARK_OAK_CHEST_BOAT;
+        } else if (chestBoatType == 7) {
+            return EntityTypes1_21_2.MANGROVE_CHEST_BOAT;
+        } else if (chestBoatType == 8) {
+            return EntityTypes1_21_2.BAMBOO_CHEST_RAFT;
+        } else {
+            return EntityTypes1_21_2.OAK_CHEST_BOAT; // Fallback
+        }
     }
 
     @Override
