@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
@@ -66,7 +67,13 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
                     enableFeaturesPacket.write(Types.VAR_INT, 1);
                     enableFeaturesPacket.write(Types.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.scheduleSend(Protocol1_19_1To1_19_3.class);
+
+                    if (wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+                        // Make sure it's included in the configuration packets
+                        enableFeaturesPacket.send(Protocol1_19_1To1_19_3.class);
+                    } else {
+                        enableFeaturesPacket.scheduleSend(Protocol1_19_1To1_19_3.class);
+                    }
                 });
             }
         });
