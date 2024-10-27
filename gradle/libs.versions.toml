@@ -3,17 +3,17 @@ metadata.format.version = "1.1"
 [versions]
 
 gson = "2.11.0"
-fastutil = "8.5.14"
+fastutil = "8.5.15"
 vianbt = "5.0.1"
-mcstructs = "5-2.5.4-SNAPSHOT"
+mcstructs = "5-2.5.4"
 
 # Common provided
 netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "2.2"
 
-junit = "5.11.2"
-checkerQual = "3.48.0"
+junit = "5.11.3"
+checkerQual = "3.48.1"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
