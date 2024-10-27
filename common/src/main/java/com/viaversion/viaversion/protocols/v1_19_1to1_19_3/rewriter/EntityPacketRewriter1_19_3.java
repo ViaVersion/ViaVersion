@@ -63,10 +63,9 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 handler(worldDataTrackerHandlerByKey());
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
-                    // Also enable vanilla features
+                    // Also enable vanilla features (set by default in later versions, but keeping it explicit is nicer)
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
-                    enableFeaturesPacket.write(Types.VAR_INT, 1);
-                    enableFeaturesPacket.write(Types.STRING, "minecraft:vanilla");
+                    enableFeaturesPacket.write(Types.STRING_ARRAY, new String[]{"minecraft:vanilla"});
 
                     if (wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
                         // Make sure it's included in the configuration packets
