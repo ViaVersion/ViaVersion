@@ -145,13 +145,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerSetSlot(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
-                map(Types.SHORT); // Slot id
-                handler(wrapper -> passthroughClientboundItem(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            wrapper.passthrough(Types.SHORT); // Slot id
+            passthroughClientboundItem(wrapper);
         });
     }
 
@@ -174,56 +171,42 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     // Sub 1.16
     public void registerSetEquippedItem(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Entity ID
-                map(Types.VAR_INT); // Slot ID
-                handler(wrapper -> passthroughClientboundItem(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            wrapper.passthrough(Types.VAR_INT); // Slot ID
+            passthroughClientboundItem(wrapper);
         });
     }
 
     // 1.16+
     public void registerSetEquipment(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
 
-                handler(wrapper -> {
-                    byte slot;
-                    do {
-                        slot = wrapper.passthrough(Types.BYTE);
-                        // & 0x7F into an extra variable if slot is needed
-                        passthroughClientboundItem(wrapper);
-                    } while (slot < 0);
-                });
-            }
+            byte slot;
+            do {
+                slot = wrapper.passthrough(Types.BYTE);
+                // & 0x7F into an extra variable if slot is needed
+                passthroughClientboundItem(wrapper);
+            } while (slot < 0);
         });
     }
 
     public void registerSetCreativeModeSlot(S packetType) {
-        protocol.registerServerbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.SHORT); // 0 - Slot
-                handler(wrapper -> passthroughServerboundItem(wrapper));
-            }
+        protocol.registerServerbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.SHORT); // Slot
+            passthroughServerboundItem(wrapper);
         });
     }
 
     public void registerContainerClick(S packetType) {
-        protocol.registerServerbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // 0 - Container ID
-                map(Types.SHORT); // 1 - Slot
-                map(Types.BYTE); // 2 - Button
-                map(Types.SHORT); // 3 - Action number
-                map(Types.VAR_INT); // 4 - Mode
-                handler(wrapper -> passthroughServerboundItem(wrapper));
-            }
+        protocol.registerServerbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container ID
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.passthrough(Types.BYTE); // Button
+            wrapper.passthrough(Types.SHORT); // Action number
+            wrapper.passthrough(Types.VAR_INT); // Mode
+            passthroughServerboundItem(wrapper);
         });
     }
 
@@ -460,22 +443,18 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
-                handler(wrapper -> {
-                    Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
-                    if (mappings == null) {
-                        return;
-                    }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
 
-                    short property = wrapper.passthrough(Types.SHORT);
-                    if (property >= 4 && property <= 6) { // Enchantment id
-                        short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
-                        wrapper.write(Types.SHORT, enchantmentId);
-                    }
-                });
+            Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+            if (mappings == null) {
+                return;
+            }
+
+            short property = wrapper.passthrough(Types.SHORT);
+            if (property >= 4 && property <= 6) { // Enchantment id
+                short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
+                wrapper.write(Types.SHORT, enchantmentId);
             }
         });
     }

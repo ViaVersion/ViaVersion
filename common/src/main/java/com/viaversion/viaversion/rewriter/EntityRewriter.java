@@ -38,6 +38,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
@@ -260,14 +261,11 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTracker(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
-                map(Types.UUID); // 1 - Entity UUID
-                map(Types.VAR_INT); // 2 - Entity Type
-                handler(trackerHandler());
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            wrapper.passthrough(Types.UUID); // Entity UUID
+            wrapper.passthrough(Types.VAR_INT); // Entity Type
+            trackerHandler().handle(wrapper);
         });
     }
 
@@ -275,15 +273,15 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         protocol.registerClientbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.VAR_INT); // 0 - Entity id
-                map(Types.UUID); // 1 - Entity UUID
-                map(Types.VAR_INT); // 2 - Entity Type
-                map(Types.DOUBLE); // 3 - X
-                map(Types.DOUBLE); // 4 - Y
-                map(Types.DOUBLE); // 5 - Z
-                map(Types.BYTE); // 6 - Pitch
-                map(Types.BYTE); // 7 - Yaw
-                map(Types.INT); // 8 - Data
+                map(Types.VAR_INT); // Entity id
+                map(Types.UUID); // Entity UUID
+                map(Types.VAR_INT); // Entity Type
+                map(Types.DOUBLE); // X
+                map(Types.DOUBLE); // Y
+                map(Types.DOUBLE); // Z
+                map(Types.BYTE); // Pitch
+                map(Types.BYTE); // Yaw
+                map(Types.INT); // Data
                 handler(trackerHandler());
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
@@ -297,31 +295,22 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public void registerTrackerWithData1_19(C packetType, EntityType fallingBlockType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Entity id
-                map(Types.UUID); // Entity UUID
-                map(Types.VAR_INT); // Entity type
-                map(Types.DOUBLE); // X
-                map(Types.DOUBLE); // Y
-                map(Types.DOUBLE); // Z
-                map(Types.BYTE); // Pitch
-                map(Types.BYTE); // Yaw
-                map(Types.BYTE); // Head yaw
-                map(Types.VAR_INT); // Data
-                handler(trackerHandler());
-                handler(wrapper -> {
-                    if (protocol.getMappingData() == null) {
-                        return;
-                    }
+        protocol.registerClientbound(packetType, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            wrapper.passthrough(Types.UUID); // Entity UUID
+            final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.BYTE); // Pitch
+            wrapper.passthrough(Types.BYTE); // Yaw
+            wrapper.passthrough(Types.BYTE); // Head yaw
+            final int data = wrapper.passthrough(Types.VAR_INT);
 
-                    int entityId = wrapper.get(Types.VAR_INT, 0);
-                    EntityType entityType = tracker(wrapper.user()).entityType(entityId);
-                    if (entityType == fallingBlockType) {
-                        wrapper.set(Types.VAR_INT, 2, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.VAR_INT, 2)));
-                    }
-                });
+            final EntityType entityType = trackAndRewrite(wrapper, entityTypeId, entityId);
+            if (protocol.getMappingData() != null && entityType == fallingBlockType) {
+                final int mappedBlockStateId = protocol.getMappingData().getNewBlockStateId(data);
+                wrapper.set(Types.VAR_INT, 2, mappedBlockStateId);
             }
         });
     }
@@ -388,12 +377,13 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     public PacketHandler playerTrackerHandler() {
-        return wrapper -> {
-            final EntityTracker tracker = tracker(wrapper.user());
-            final int entityId = wrapper.get(Types.INT, 0);
-            tracker.setClientEntityId(entityId);
-            tracker.addEntity(entityId, tracker.playerType());
-        };
+        return wrapper -> trackPlayer(wrapper.user(), wrapper.get(Types.INT, 0));
+    }
+
+    public void trackPlayer(final UserConnection connection, final int entityId) {
+        final EntityTracker tracker = tracker(connection);
+        tracker.setClientEntityId(entityId);
+        tracker.addEntity(entityId, tracker.playerType());
     }
 
     /**
@@ -533,6 +523,17 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
     }
 
+    public EntityType trackAndRewrite(final PacketWrapper wrapper, final int typeId, final int entityId) {
+        final int mappedTypeId = newEntityId(typeId);
+        if (mappedTypeId != typeId) {
+            wrapper.set(Types.VAR_INT, 1, mappedTypeId);
+        }
+
+        final EntityType entityType = typeFromId(trackMappedType ? mappedTypeId : typeId);
+        tracker(wrapper.user()).addEntity(entityId, entityType);
+        return entityType;
+    }
+
     // ---------------------------------------------------------------------------
     // Sub 1.14.1 methods
 
@@ -546,16 +547,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return wrapper -> {
             int entityId = wrapper.get(Types.VAR_INT, 0);
             int type = wrapper.get(Types.VAR_INT, 1);
-
-            int newType = newEntityId(type);
-            if (newType != type) {
-                wrapper.set(Types.VAR_INT, 1, newType);
-            }
-
-            EntityType entType = typeFromId(trackMappedType ? newType : type);
-            // Register Type ID
-            tracker(wrapper.user()).addEntity(entityId, entType);
-
+            trackAndRewrite(wrapper, type, entityId);
             if (dataType != null) {
                 handleEntityData(entityId, wrapper.get(dataType, 0), wrapper.user());
             }

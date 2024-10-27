@@ -35,7 +35,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.MathUtil;
@@ -68,83 +67,61 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockEvent(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(positionType); // Location
-                map(Types.UNSIGNED_BYTE); // Action id
-                map(Types.UNSIGNED_BYTE); // Action param
-                map(Types.VAR_INT); // Block id - /!\ NOT BLOCK STATE
-                handler(wrapper -> {
-                    if (protocol.getMappingData().getBlockMappings() == null) {
-                        return;
-                    }
+        if (protocol.getMappingData().getBlockMappings() == null) {
+            return;
+        }
 
-                    int id = wrapper.get(Types.VAR_INT, 0);
-                    int mappedId = protocol.getMappingData().getNewBlockId(id);
-                    if (mappedId == -1) {
-                        // Block (action) has been removed
-                        wrapper.cancel();
-                        return;
-                    }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(positionType); // Location
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Action id
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Action param
+            final int blockId = wrapper.passthrough(Types.VAR_INT);
+            final int mappedId = protocol.getMappingData().getNewBlockId(blockId);
+            if (mappedId == -1) {
+                wrapper.cancel();
+                return;
+            }
 
-                    wrapper.set(Types.VAR_INT, 0, mappedId);
-                });
+            if (blockId != mappedId) {
+                wrapper.set(Types.VAR_INT, 0, mappedId);
             }
         });
     }
 
     public void registerBlockUpdate(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(positionType);
-                map(Types.VAR_INT);
-                handler(wrapper -> wrapper.set(Types.VAR_INT, 0, protocol.getMappingData().getNewBlockStateId(wrapper.get(Types.VAR_INT, 0))));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(positionType);
+
+            final int blockId = wrapper.read(Types.VAR_INT);
+            wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(blockId));
         });
     }
 
     public void registerChunkBlocksUpdate(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // 0 - Chunk X
-                map(Types.INT); // 1 - Chunk Z
-                handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Types.BLOCK_CHANGE_ARRAY)) {
-                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.INT); // Chunk X
+            wrapper.passthrough(Types.INT); // Chunk Z
+            for (BlockChangeRecord record : wrapper.passthrough(Types.BLOCK_CHANGE_ARRAY)) {
+                record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
             }
         });
     }
 
     public void registerSectionBlocksUpdate(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.LONG); // Chunk position
-                map(Types.BOOLEAN); // Suppress light updates
-                handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
-                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.LONG); // Chunk position
+            wrapper.passthrough(Types.BOOLEAN); // Suppress light updates
+            for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
+                record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
             }
         });
     }
 
     public void registerSectionBlocksUpdate1_20(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.LONG); // Chunk position
-                handler(wrapper -> {
-                    for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
-                        record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.LONG); // Chunk position
+            for (BlockChangeRecord record : wrapper.passthrough(Types.VAR_LONG_BLOCK_CHANGE_ARRAY)) {
+                record.setBlockId(protocol.getMappingData().getNewBlockStateId(record.getBlockId()));
             }
         });
     }
