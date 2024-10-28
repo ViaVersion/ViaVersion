@@ -17,7 +17,10 @@
  */
 package com.viaversion.viaversion.protocols.v1_13_1to1_13_2.rewriter;
 
+import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -30,8 +33,16 @@ public class EntityPacketRewriter1_13_2 {
 
     public static void register(Protocol1_13_1To1_13_2 protocol) {
         final PacketHandler dataTypeHandler = wrapper -> {
-            for (EntityData data : wrapper.get(Types1_13_2.ENTITY_DATA_LIST, 0)) {
-                data.setDataType(Types1_13_2.ENTITY_DATA_TYPES.byId(data.dataType().typeId()));
+            for (final EntityData data : wrapper.get(Types1_13_2.ENTITY_DATA_LIST, 0)) {
+                final EntityDataType dataType = Types1_13_2.ENTITY_DATA_TYPES.byId(data.dataType().typeId());
+                if (dataType == Types1_13_2.ENTITY_DATA_TYPES.particleType) {
+                    final Particle particle = data.value();
+                    if (particle.id() == 27) {
+                        final Item item = particle.<Item>getArgument(0).getValue();
+                        particle.set(0, Types.ITEM1_13_2, item);
+                    }
+                }
+                data.setDataType(dataType);
             }
         };
 

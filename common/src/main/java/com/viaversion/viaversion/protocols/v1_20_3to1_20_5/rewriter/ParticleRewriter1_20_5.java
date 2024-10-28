@@ -18,7 +18,10 @@
 package com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.StructuredItem;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
@@ -34,8 +37,14 @@ public final class ParticleRewriter1_20_5 extends ParticleRewriter<ClientboundPa
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
         super.rewriteParticle(connection, particle);
 
-        if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
+        final ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
+        if (particle.id() == particleMappings.mappedId("entity_effect")) {
             particle.add(Types.INT, 0); // Default color, changed in the area effect handler
+        } else if (particle.id() == particleMappings.mappedId("item")) {
+            final Particle.ParticleData<Item> data = particle.getArgument(0);
+            if (data.getValue().isEmpty()) {
+                data.setValue(new StructuredItem(1, 1));
+            }
         }
     }
 }
