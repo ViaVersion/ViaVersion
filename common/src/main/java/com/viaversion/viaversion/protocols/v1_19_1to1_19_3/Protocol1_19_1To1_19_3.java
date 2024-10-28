@@ -52,6 +52,7 @@ import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.storage.ReceivedMessa
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ClientboundPackets1_19_1;
 import com.viaversion.viaversion.protocols.v1_19to1_19_1.packet.ServerboundPackets1_19_1;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -68,6 +69,7 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     private static final byte[] EMPTY_BYTES = new byte[0];
     private final EntityPacketRewriter1_19_3 entityRewriter = new EntityPacketRewriter1_19_3(this);
     private final ItemPacketRewriter1_19_3 itemRewriter = new ItemPacketRewriter1_19_3(this);
+    private final ParticleRewriter<ClientboundPackets1_19_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19_1To1_19_3() {
@@ -77,6 +79,8 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     protected void registerPackets() {
         tagRewriter.registerGeneric(ClientboundPackets1_19_1.UPDATE_TAGS);
+
+        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_1.LEVEL_PARTICLES);
 
         entityRewriter.register();
         itemRewriter.register();
@@ -378,6 +382,11 @@ public final class Protocol1_19_1To1_19_3 extends AbstractProtocol<ClientboundPa
     @Override
     public ItemPacketRewriter1_19_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_19_1> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

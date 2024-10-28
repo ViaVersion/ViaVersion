@@ -136,8 +136,6 @@ public class ItemPacketRewriter1_16 extends ItemRewriter<ClientboundPackets1_15,
         });
 
         protocol.registerServerbound(ServerboundPackets1_16.EDIT_BOOK, wrapper -> handleItemToServer(wrapper.user(), wrapper.passthrough(Types.ITEM1_13_2)));
-
-        registerLevelParticles(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
     }
 
     @Override

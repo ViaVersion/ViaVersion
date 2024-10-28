@@ -91,7 +91,7 @@ public final class BlockItemPacketRewriter1_20_3 extends ItemRewriter<Clientboun
                         wrapper.write(Types.VAR_INT, resourceLocation.equals("block") ? 0 : 1);
                     }
                 });
-                handler(levelParticlesHandler(Types.VAR_INT));
+                handler(protocol.getParticleRewriter().levelParticlesHandler1_13(Types.VAR_INT));
             }
         });
 

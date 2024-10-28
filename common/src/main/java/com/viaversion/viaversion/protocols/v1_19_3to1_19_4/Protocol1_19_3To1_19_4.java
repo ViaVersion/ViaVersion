@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_4;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_4;
@@ -36,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.EntityPacket
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.ItemPacketRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.storage.PlayerVehicleTracker;
 import com.viaversion.viaversion.rewriter.CommandRewriter;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -48,6 +48,7 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     public static final MappingData1_19_4 MAPPINGS = new MappingData1_19_4();
     private final EntityPacketRewriter1_19_4 entityRewriter = new EntityPacketRewriter1_19_4(this);
     private final ItemPacketRewriter1_19_4 itemRewriter = new ItemPacketRewriter1_19_4(this);
+    private final ParticleRewriter<ClientboundPackets1_19_3> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_3> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19_3To1_19_4() {
@@ -59,6 +60,8 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
         super.registerPackets();
 
         tagRewriter.registerGeneric(ClientboundPackets1_19_3.UPDATE_TAGS);
+        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
+
         new StatisticsRewriter<>(this).register(ClientboundPackets1_19_3.AWARD_STATS);
 
         final SoundRewriter<ClientboundPackets1_19_3> soundRewriter = new SoundRewriter<>(this);
@@ -131,6 +134,11 @@ public final class Protocol1_19_3To1_19_4 extends AbstractProtocol<ClientboundPa
     @Override
     public ItemPacketRewriter1_19_4 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_19_3> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

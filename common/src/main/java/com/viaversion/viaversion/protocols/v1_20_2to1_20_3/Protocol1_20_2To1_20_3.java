@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -61,6 +62,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
     private final BlockItemPacketRewriter1_20_3 itemRewriter = new BlockItemPacketRewriter1_20_3(this);
+    private final ParticleRewriter<ClientboundPacket1_20_2> particleRewriter = new ParticleRewriter<>(this);
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
     private final TagRewriter<ClientboundPacket1_20_2> tagRewriter = new TagRewriter<>(this);
 
@@ -379,6 +381,11 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPacket1_20_2> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

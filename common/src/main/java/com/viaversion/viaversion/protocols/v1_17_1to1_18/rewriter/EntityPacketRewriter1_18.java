@@ -90,7 +90,7 @@ public final class EntityPacketRewriter1_18 extends EntityRewriter<ClientboundPa
             } else if (particle.id() == 3) { // Light block
                 particle.add(Types.VAR_INT, 7786); // Light block state
             } else {
-                rewriteParticle(event.user(), particle);
+                protocol.getParticleRewriter().rewriteParticle(event.user(), particle);
             }
         });
 

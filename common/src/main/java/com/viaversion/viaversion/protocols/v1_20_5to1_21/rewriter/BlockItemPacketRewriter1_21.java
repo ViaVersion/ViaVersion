@@ -52,8 +52,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
     public BlockItemPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol,
             Types1_20_5.ITEM, Types1_20_5.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY,
-            Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST,
-            Types1_20_5.PARTICLE, Types1_21.PARTICLE
+            Types1_20_5.ITEM_COST, Types1_20_5.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST
         );
     }
 
@@ -74,8 +73,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);
         registerMerchantOffers1_20_5(ClientboundPackets1_20_5.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_20_5.LEVEL_PARTICLES);
-        registerExplosion(ClientboundPackets1_20_5.EXPLODE); // Rewrites the included sound and particles
 
         protocol.registerClientbound(ClientboundPackets1_20_5.HORSE_SCREEN_OPEN, wrapper -> {
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id

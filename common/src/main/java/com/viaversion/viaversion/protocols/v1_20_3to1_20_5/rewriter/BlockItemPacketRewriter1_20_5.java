@@ -306,8 +306,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final Particle smallExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
             final Particle largeExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
-            rewriteParticle(wrapper.user(), smallExplosionParticle);
-            rewriteParticle(wrapper.user(), largeExplosionParticle);
+            protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
+            protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
 
             final String sound = wrapper.read(Types.STRING);
             final Float range = wrapper.read(Types.OPTIONAL_FLOAT);
