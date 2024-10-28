@@ -368,17 +368,20 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         super.handleItemToClient(connection, item);
         updateItemData(item);
 
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        // Item name is now overridden by special handled item names (e.g. potions), previously always used after custom name
-        final Tag itemName = dataContainer.get(StructuredDataKey.ITEM_NAME);
-        if (itemName != null && !dataContainer.has(StructuredDataKey.CUSTOM_NAME)) {
-            final CompoundTag name = new CompoundTag();
-            name.putBoolean("italic", false);
-            name.putString("text", "");
-            name.put("extra", new ListTag<>(Collections.singletonList(itemName)));
+        // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
+        final int identifier = item.identifier();
+        if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
+            final StructuredDataContainer data = item.dataContainer();
+            final Tag itemName = data.get(StructuredDataKey.ITEM_NAME);
+            if (itemName != null && !data.has(StructuredDataKey.CUSTOM_NAME)) {
+                final CompoundTag name = new CompoundTag();
+                name.putBoolean("italic", false);
+                name.putString("text", "");
+                name.put("extra", new ListTag<>(Collections.singletonList(itemName)));
 
-            dataContainer.set(StructuredDataKey.CUSTOM_NAME, name);
-            saveTag(createCustomTag(item), new ByteTag(true), nbtTagName("custom_name"));
+                data.set(StructuredDataKey.CUSTOM_NAME, name);
+                saveTag(createCustomTag(item), new ByteTag(true), nbtTagName("custom_name"));
+            }
         }
         return item;
     }
@@ -394,13 +397,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         final StructuredDataContainer dataContainer = item.dataContainer();
         final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null) {
-            final Tag customName = customData.remove(nbtTagName("custom_name"));
-            if (customName != null) {
-                dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
-                if (customData.isEmpty()) {
-                    dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
-                }
+        if (customData != null && customData.remove(nbtTagName("custom_name")) != null) {
+            dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
+            if (customData.isEmpty()) {
+                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
             }
         }
         return item;
