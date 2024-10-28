@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.data.entity.DimensionData;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
@@ -50,7 +49,6 @@ import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEventImpl;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -505,23 +503,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         tracker(connection).setDimensions(dimensionDataMap);
     }
 
-    public void handleRegistryData1_20_5(final UserConnection connection, final String registryKey, final RegistryEntry[] entries) {
-        if (registryKey.equals("worldgen/biome")) {
-            tracker(connection).setBiomesSent(entries.length);
-        } else if (registryKey.equals("dimension_type")) {
-            final Map<String, DimensionData> dimensionDataMap = new HashMap<>(entries.length);
-            for (int i = 0; i < entries.length; i++) {
-                final RegistryEntry entry = entries[i];
-                final String key = Key.stripMinecraftNamespace(entry.key());
-                final DimensionData dimensionData = entry.tag() != null
-                    ? new DimensionDataImpl(i, (CompoundTag) entry.tag())
-                    : DimensionDataImpl.withDefaultsFor(key, i);
-                dimensionDataMap.put(key, dimensionData);
-            }
-            tracker(connection).setDimensions(dimensionDataMap);
-        }
-    }
-
     public EntityType trackAndRewrite(final PacketWrapper wrapper, final int typeId, final int entityId) {
         final int mappedTypeId = newEntityId(typeId);
         if (mappedTypeId != typeId) {
@@ -582,13 +563,6 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
     }
 
     // ---------------------------------------------------------------------------
-
-    public RegistryEntry[] addRegistryEntries(final RegistryEntry[] entries, final RegistryEntry... toAdd) {
-        final int length = entries.length;
-        final RegistryEntry[] newEntries = Arrays.copyOf(entries, length + toAdd.length);
-        System.arraycopy(toAdd, 0, newEntries, length, toAdd.length);
-        return newEntries;
-    }
 
     private void logException(Exception e, @Nullable EntityType type, List<EntityData> entityDataList, EntityData entityData) {
         if (!Via.getConfig().isSuppressMetadataErrors() || Via.getManager().isDebug()) {

@@ -40,8 +40,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.util.ArrayUtil;
-import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
 
@@ -55,20 +54,13 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         registerSetEntityData(ClientboundPackets1_20_5.SET_ENTITY_DATA, Types1_20_5.ENTITY_DATA_LIST, Types1_21.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
-            final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
-            final RegistryEntry[] entries = wrapper.passthrough(Types.REGISTRY_ENTRY_ARRAY);
-            if (type.equals("damage_type")) {
-                // Add required damage type
-                final CompoundTag campfireDamageType = new CompoundTag();
-                campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
-                campfireDamageType.putString("message_id", "inFire");
-                campfireDamageType.putFloat("exhaustion", 0.1F);
-                wrapper.set(Types.REGISTRY_ENTRY_ARRAY, 0, ArrayUtil.add(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
-            } else {
-                handleRegistryData1_20_5(wrapper.user(), type, entries);
-            }
-        });
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        final CompoundTag campfireDamageType = new CompoundTag();
+        campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
+        campfireDamageType.putString("message_id", "inFire");
+        campfireDamageType.putFloat("exhaustion", 0.1F);
+        registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
             // Add new registries

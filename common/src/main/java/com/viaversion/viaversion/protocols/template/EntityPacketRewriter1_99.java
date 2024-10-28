@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.protocols.template;
 
-import com.viaversion.viaversion.api.minecraft.RegistryEntry;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_20_5;
 import com.viaversion.viaversion.api.type.Types;
@@ -26,7 +25,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 // Replace if needed
 //  Types1_OLD
@@ -44,11 +43,8 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
         registerSetEntityData(ClientboundPackets1_21.SET_ENTITY_DATA, /*Types1_OLD_ENTITY_DATA_LIST, */Types1_21.ENTITY_DATA_LIST); // Specify old and new entity data list if changed
         registerRemoveEntities(ClientboundPackets1_21.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper -> {
-            final String registryKey = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
-            final RegistryEntry[] entries = wrapper.passthrough(Types.REGISTRY_ENTRY_ARRAY);
-            handleRegistryData1_20_5(wrapper.user(), registryKey, entries); // Caches dimensions to access data like height later and tracks the amount of biomes sent for chunk data
-        });
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
         protocol.registerClientbound(ClientboundPackets1_21.LOGIN, wrapper -> {
             final int entityId = wrapper.passthrough(Types.INT); // Entity id
