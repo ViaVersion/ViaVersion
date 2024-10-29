@@ -22,11 +22,15 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -48,6 +52,8 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -81,7 +87,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21.BLOCK_ENTITY_DATA);
 
         registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
@@ -341,6 +346,50 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             wrapper.set(Types.VAR_INT, 0, size);
 
             wrapper.write(Types.BOOLEAN, state == RECIPE_INIT); // Replace
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
+            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_20_2::new);
+            final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+            if (blockEntityMappings != null) {
+                final List<BlockEntity> blockEntities = chunk.blockEntities();
+                for (int i = 0; i < blockEntities.size(); i++) {
+                    final BlockEntity blockEntity = blockEntities.get(i);
+                    final int id = blockEntity.typeId();
+                    final int mappedId = blockEntityMappings.getNewIdOrDefault(id, id);
+                    if (id != mappedId) {
+                        blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                    }
+                }
+            }
+
+            final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            if (chunkLoadTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) {
+                // Unload the old chunk, so the new one can be loaded without graphical glitches
+                // Bundling it prevents the client from falling through the world during the chunk swap
+                final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+                if (!isBundling) {
+                    final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleStart.send(Protocol1_21To1_21_2.class);
+                }
+
+                final PacketWrapper forgetLevelChunk = wrapper.create(ClientboundPackets1_21_2.FORGET_LEVEL_CHUNK);
+                forgetLevelChunk.write(Types.CHUNK_POSITION, new ChunkPosition(chunk.getX(), chunk.getZ()));
+                forgetLevelChunk.send(Protocol1_21To1_21_2.class);
+                wrapper.send(Protocol1_21To1_21_2.class);
+                wrapper.cancel();
+
+                if (!isBundling) {
+                    final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleEnd.send(Protocol1_21To1_21_2.class);
+                }
+            } else {
+                chunkLoadTracker.addChunk(chunk.getX(), chunk.getZ());
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_21.FORGET_LEVEL_CHUNK, wrapper -> {
+            final ChunkPosition chunkPosition = wrapper.passthrough(Types.CHUNK_POSITION);
+            wrapper.user().get(ChunkLoadTracker.class).removeChunk(chunkPosition.chunkX(), chunkPosition.chunkZ());
         });
     }
 
