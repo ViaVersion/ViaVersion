@@ -48,6 +48,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ComponentRewri
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ParticleRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -231,6 +232,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_2.PLAYER));
         connection.put(new BundleStateTracker());
         connection.put(new PlayerPositionStorage());
+        connection.put(new ChunkLoadTracker());
     }
 
     @Override
