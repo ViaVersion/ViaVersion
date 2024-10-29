@@ -110,3 +110,6 @@ nb-configuration.xml
 
 ### MacOS ###
 .DS_Store
+
+### Run Folder ###
+common/run/
