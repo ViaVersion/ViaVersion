@@ -60,6 +60,10 @@ public final class TagUtil {
         return tag.remove(Key.namespaced(key)) != null || tag.remove(Key.stripMinecraftNamespace(key)) != null;
     }
 
+    public static boolean containsNamespaced(final CompoundTag tag, final String key) {
+        return tag.contains(Key.namespaced(key)) || tag.contains(Key.stripMinecraftNamespace(key));
+    }
+
     public static @Nullable CompoundTag getNamespacedCompoundTag(final CompoundTag tag, final String key) {
         final CompoundTag compoundTag = tag.getCompoundTag(Key.namespaced(key));
         return compoundTag != null ? compoundTag : tag.getCompoundTag(Key.stripMinecraftNamespace(key));
