@@ -100,10 +100,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
+public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
-    private final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
-    private final StructuredDataType structuredDataType;
+    protected final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
+    protected final StructuredDataType structuredDataType;
 
     /**
      * @param protocol           protocol
@@ -327,7 +327,7 @@ public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> exte
         return readFromTag(key, id, tag);
     }
 
-    private <T> StructuredData<T> readFromTag(final StructuredDataKey<T> key, final int id, final Tag tag) {
+    protected <T> StructuredData<T> readFromTag(final StructuredDataKey<T> key, final int id, final Tag tag) {
         final TagConverter<T> converter = tagConverter(key);
         Preconditions.checkNotNull(converter, "No converter found for: %s", key);
         return StructuredData.of(key, converter.convert(tag), id);
@@ -338,7 +338,6 @@ public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> exte
     }
 
     // ---------------------------------------------------------------------------------------
-    // Conversion methods, can be overridden in future protocols to handle new changes
 
     protected CompoundTag convertCustomData(final CompoundTag value) {
         return value;
@@ -601,8 +600,15 @@ public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> exte
         if (value.customColor() != null) {
             tag.putInt("custom_color", value.customColor());
         }
+        final ListTag<CompoundTag> customEffects = new ListTag<>(CompoundTag.class);
         for (final PotionEffect effect : value.customEffects()) {
-            convertPotionEffect(tag, effect);
+            final CompoundTag effectTag = new CompoundTag();
+            convertPotionEffect(effectTag, effect);
+            customEffects.add(effectTag);
+        }
+        tag.put("custom_effects", customEffects);
+        if (value.customName() != null) {
+            tag.putString("custom_name", value.customName());
         }
         return tag;
     }
@@ -645,15 +651,14 @@ public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> exte
 
     protected CompoundTag convertWrittenBookContent(final WrittenBook value) {
         final CompoundTag tag = new CompoundTag();
-        convertFilterableString(tag, value.title(), 32);
-        tag.putString("author", value.author());
-        if (value.generation() != 0) {
-            tag.put("generation", convertIntRange(value.generation(), 0, 3));
-        }
 
         final CompoundTag title = new CompoundTag();
         convertFilterableString(title, value.title(), 32);
         tag.put("title", title);
+        tag.putString("author", value.author());
+        if (value.generation() != 0) {
+            tag.put("generation", convertIntRange(value.generation(), 0, 3));
+        }
 
         final ListTag<CompoundTag> pagesTag = new ListTag<>(CompoundTag.class);
         for (final FilterableComponent page : value.pages()) {
@@ -1123,17 +1128,17 @@ public final class ComponentRewriter1_20_5<C extends ClientboundPacketType> exte
 
     // ---------------------------------------------------------------------------------------
 
-    private int checkIntRange(final int min, final int max, final int value) {
+    protected int checkIntRange(final int min, final int max, final int value) {
         Preconditions.checkArgument(value >= min && value <= max, "Value out of range: " + value);
         return value;
     }
 
-    private float checkFloatRange(final float min, final float max, final float value) {
+    protected float checkFloatRange(final float min, final float max, final float value) {
         Preconditions.checkArgument(value >= min && value <= max, "Value out of range: " + value);
         return value;
     }
 
-    private String checkStringRange(final int min, final int max, final String value) {
+    protected String checkStringRange(final int min, final int max, final String value) {
         final int length = value.length();
         Preconditions.checkArgument(length >= min && length <= max, "Value out of range: " + value);
         return value;
