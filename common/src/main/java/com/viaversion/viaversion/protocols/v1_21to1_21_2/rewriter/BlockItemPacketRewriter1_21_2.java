@@ -429,7 +429,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 name.put("extra", new ListTag<>(Collections.singletonList(itemName)));
 
                 data.set(StructuredDataKey.CUSTOM_NAME, name);
-                saveTag(createCustomTag(item), new ByteTag(true), nbtTagName("custom_name"));
+                saveTag(createCustomTag(item), new ByteTag(true), "remove_custom_name");
             }
         }
         return item;
@@ -446,7 +446,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         final StructuredDataContainer dataContainer = item.dataContainer();
         final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null && customData.remove(nbtTagName("custom_name")) != null) {
+        if (customData != null && customData.remove(nbtTagName("remove_custom_name")) != null) {
             dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
             if (customData.isEmpty()) {
                 dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
