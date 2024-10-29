@@ -22,12 +22,12 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.Pair;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler {
     // Object -> string (id without namespace) or byte (numeric id)
-    private static final Map<Pair<?, Byte>, Integer> flowers = new ConcurrentHashMap<>();
+    private static final Map<Pair<?, Byte>, Integer> flowers = new HashMap<>();
 
     static {
         register("air", (byte) 0, (byte) 0, 5265);

@@ -22,12 +22,12 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.util.Pair;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage implements StorableObject {
-    private final Map<Pair<Integer, Integer>, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
+    private final Map<Pair<Integer, Integer>, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new HashMap<>();
     private boolean permissions;
 
     public void unloadChunk(int x, int z) {
@@ -39,7 +39,7 @@ public class CommandBlockStorage implements StorableObject {
         Pair<Integer, Integer> chunkPos = getChunkCoords(position);
 
         if (!storedCommandBlocks.containsKey(chunkPos)) {
-            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
+            storedCommandBlocks.put(chunkPos, new HashMap<>());
         }
 
         Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
