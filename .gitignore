@@ -111,5 +111,5 @@ nb-configuration.xml
 ### MacOS ###
 .DS_Store
 
-### Run Folder ###
+### Run Folder (ViaProxy) ###
 common/run/
