@@ -17,8 +17,11 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
+import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
@@ -56,6 +59,7 @@ import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -357,15 +361,48 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
     @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
         super.handleItemToClient(connection, item);
         updateItemData(item);
+
+        // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
+        final int identifier = item.identifier();
+        if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
+            final StructuredDataContainer data = item.dataContainer();
+            final Tag itemName = data.get(StructuredDataKey.ITEM_NAME);
+            if (itemName != null && !data.has(StructuredDataKey.CUSTOM_NAME)) {
+                final CompoundTag name = new CompoundTag();
+                name.putBoolean("italic", false);
+                name.putString("text", "");
+                name.put("extra", new ListTag<>(Collections.singletonList(itemName)));
+
+                data.set(StructuredDataKey.CUSTOM_NAME, name);
+                saveTag(createCustomTag(item), new ByteTag(true), nbtTagName("custom_name"));
+            }
+        }
         return item;
     }
 
     @Override
     public Item handleItemToServer(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
         super.handleItemToServer(connection, item);
         downgradeItemData(item);
+
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null && customData.remove(nbtTagName("custom_name")) != null) {
+            dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
+            if (customData.isEmpty()) {
+                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
+            }
+        }
         return item;
     }
 
