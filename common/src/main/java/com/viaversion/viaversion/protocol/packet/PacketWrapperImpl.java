@@ -243,11 +243,11 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     private InformativeException createInformativeException(final Exception cause, final Type<?> type, final int index) {
         return new InformativeException(cause)
+            .set("Packet Type", this.packetType)
             .set("Index", index)
             .set("Type", type.getTypeName())
-            .set("Packet ID", this.id)
-            .set("Packet Type", this.packetType)
-            .set("Data", this.packetValues);
+            .set("Data", this.packetValues)
+            .set("Packet ID", this.id);
     }
 
     @Override

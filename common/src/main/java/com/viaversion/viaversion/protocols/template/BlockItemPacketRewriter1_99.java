@@ -23,8 +23,8 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
-import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
+import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
 // To replace if needed:
@@ -37,8 +37,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         super(protocol, Types1_21.ITEM, Types1_21.ITEM_ARRAY);
         /*super(protocol,
             Types1_OLD.ITEM, Types1_OLD.ITEM_ARRAY, Types1_21.ITEM, Types1_21.ITEM_ARRAY,
-            Types1_OLD.ITEM_COST, Types1_OLD.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST,
-            Types1_OLD.PARTICLE, Types1_21.PARTICLE
+            Types1_OLD.ITEM_COST, Types1_OLD.OPTIONAL_ITEM_COST, Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST
         );*/
     }
 
@@ -67,8 +66,6 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         registerContainerClick1_21_2(ServerboundPackets1_20_5.CONTAINER_CLICK);
         registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_20_5.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
-        registerExplosion1_21_2(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
         final RecipeDisplayRewriter<ClientboundPacket1_21> recipeRewriter = new RecipeDisplayRewriter<>(protocol);
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21.UPDATE_RECIPES);

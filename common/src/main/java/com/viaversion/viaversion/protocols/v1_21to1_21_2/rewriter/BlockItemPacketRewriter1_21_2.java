@@ -17,16 +17,23 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
+import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
+import com.viaversion.viaversion.api.data.Mappings;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.blockentity.BlockEntity;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -48,6 +55,8 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -56,6 +65,7 @@ import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -70,8 +80,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     public BlockItemPacketRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol,
             Types1_21.ITEM, Types1_21.ITEM_ARRAY, Types1_21_2.ITEM, Types1_21_2.ITEM_ARRAY,
-            Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST,
-            Types1_21.PARTICLE, Types1_21_2.PARTICLE
+            Types1_21.ITEM_COST, Types1_21.OPTIONAL_ITEM_COST, Types1_21_2.ITEM_COST, Types1_21_2.OPTIONAL_ITEM_COST
         );
     }
 
@@ -82,14 +91,12 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21.BLOCK_ENTITY_DATA);
 
         registerAdvancements1_20_3(ClientboundPackets1_21.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_21.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_21_2.SET_CREATIVE_MODE_SLOT);
-        registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
 
         protocol.registerClientbound(ClientboundPackets1_21.COOLDOWN, wrapper -> {
             final MappingData mappingData = protocol.getMappingData();
@@ -217,10 +224,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final Particle smallExplosionParticle = wrapper.read(Types1_21.PARTICLE);
             final Particle largeExplosionParticle = wrapper.read(Types1_21.PARTICLE);
             if (power >= 2.0F && blockInteractionMode != 0) {
-                rewriteParticle(wrapper.user(), largeExplosionParticle);
+                protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
                 wrapper.write(Types1_21_2.PARTICLE, largeExplosionParticle);
             } else {
-                rewriteParticle(wrapper.user(), smallExplosionParticle);
+                protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
                 wrapper.write(Types1_21_2.PARTICLE, smallExplosionParticle);
             }
 
@@ -344,6 +351,50 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             wrapper.write(Types.BOOLEAN, state == RECIPE_INIT); // Replace
         });
+
+        protocol.registerClientbound(ClientboundPackets1_21.LEVEL_CHUNK_WITH_LIGHT, wrapper -> {
+            final Chunk chunk = blockRewriter.handleChunk1_19(wrapper, ChunkType1_20_2::new);
+            final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+            if (blockEntityMappings != null) {
+                final List<BlockEntity> blockEntities = chunk.blockEntities();
+                for (int i = 0; i < blockEntities.size(); i++) {
+                    final BlockEntity blockEntity = blockEntities.get(i);
+                    final int id = blockEntity.typeId();
+                    final int mappedId = blockEntityMappings.getNewIdOrDefault(id, id);
+                    if (id != mappedId) {
+                        blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                    }
+                }
+            }
+
+            final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            if (chunkLoadTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) {
+                // Unload the old chunk, so the new one can be loaded without graphical glitches
+                // Bundling it prevents the client from falling through the world during the chunk swap
+                final boolean isBundling = wrapper.user().get(BundleStateTracker.class).isBundling();
+                if (!isBundling) {
+                    final PacketWrapper bundleStart = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleStart.send(Protocol1_21To1_21_2.class);
+                }
+
+                final PacketWrapper forgetLevelChunk = wrapper.create(ClientboundPackets1_21_2.FORGET_LEVEL_CHUNK);
+                forgetLevelChunk.write(Types.CHUNK_POSITION, new ChunkPosition(chunk.getX(), chunk.getZ()));
+                forgetLevelChunk.send(Protocol1_21To1_21_2.class);
+                wrapper.send(Protocol1_21To1_21_2.class);
+                wrapper.cancel();
+
+                if (!isBundling) {
+                    final PacketWrapper bundleEnd = wrapper.create(ClientboundPackets1_21_2.BUNDLE_DELIMITER);
+                    bundleEnd.send(Protocol1_21To1_21_2.class);
+                }
+            } else {
+                chunkLoadTracker.addChunk(chunk.getX(), chunk.getZ());
+            }
+        });
+        protocol.registerClientbound(ClientboundPackets1_21.FORGET_LEVEL_CHUNK, wrapper -> {
+            final ChunkPosition chunkPosition = wrapper.passthrough(Types.CHUNK_POSITION);
+            wrapper.user().get(ChunkLoadTracker.class).removeChunk(chunkPosition.chunkX(), chunkPosition.chunkZ());
+        });
     }
 
     private void convertServerboundRecipeDisplayId(final PacketWrapper wrapper) {
@@ -358,37 +409,49 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     }
 
     @Override
-    public void rewriteParticle(final UserConnection connection, final Particle particle) {
-        super.rewriteParticle(connection, particle);
-
-        final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
-        if (identifier.equals("minecraft:dust_color_transition")) {
-            floatsToARGB(particle, 0);
-            floatsToARGB(particle, 1);
-        } else if (identifier.equals("minecraft:dust")) {
-            floatsToARGB(particle, 0);
-        }
-    }
-
-    private void floatsToARGB(final Particle particle, final int fromIndex) {
-        final Particle.ParticleData<Float> r = particle.removeArgument(fromIndex);
-        final Particle.ParticleData<Float> g = particle.removeArgument(fromIndex);
-        final Particle.ParticleData<Float> b = particle.removeArgument(fromIndex);
-        final int rgb = 255 << 24 | (int) (r.getValue() * 255) << 16 | (int) (g.getValue() * 255) << 8 | (int) (b.getValue() * 255);
-        particle.add(fromIndex, Types.INT, rgb);
-    }
-
-    @Override
     public Item handleItemToClient(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
         super.handleItemToClient(connection, item);
         updateItemData(item);
+
+        // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
+        final int identifier = item.identifier();
+        if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
+            final StructuredDataContainer data = item.dataContainer();
+            final Tag itemName = data.get(StructuredDataKey.ITEM_NAME);
+            if (itemName != null && !data.has(StructuredDataKey.CUSTOM_NAME)) {
+                final CompoundTag name = new CompoundTag();
+                name.putBoolean("italic", false);
+                name.putString("text", "");
+                name.put("extra", new ListTag<>(Collections.singletonList(itemName)));
+
+                data.set(StructuredDataKey.CUSTOM_NAME, name);
+                saveTag(createCustomTag(item), new ByteTag(true), "remove_custom_name");
+            }
+        }
         return item;
     }
 
     @Override
     public Item handleItemToServer(final UserConnection connection, final Item item) {
+        if (item.isEmpty()) {
+            return item;
+        }
+
         super.handleItemToServer(connection, item);
         downgradeItemData(item);
+
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null && customData.remove(nbtTagName("remove_custom_name")) != null) {
+            dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
+            if (customData.isEmpty()) {
+                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
+            }
+        }
         return item;
     }
 

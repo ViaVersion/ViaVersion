@@ -15,18 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
+package com.viaversion.viaversion.protocols.v1_21to1_21_2.storage;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ClientWorld1_9 extends ClientWorld {
+public class ChunkLoadTracker implements StorableObject {
 
     private final Set<Long> loadedChunks = new HashSet<>();
 
-    public Set<Long> getLoadedChunks() {
-        return loadedChunks;
+    public void addChunk(final int x, final int z) {
+        this.loadedChunks.add(ChunkPosition.chunkKey(x, z));
+    }
+
+    public void removeChunk(final int x, final int z) {
+        this.loadedChunks.remove(ChunkPosition.chunkKey(x, z));
+    }
+
+    public boolean isChunkLoaded(final int x, final int z) {
+        return this.loadedChunks.contains(ChunkPosition.chunkKey(x, z));
+    }
+
+    public void clear() {
+        this.loadedChunks.clear();
     }
 
 }

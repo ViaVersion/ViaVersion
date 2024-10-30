@@ -22,14 +22,11 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.Mappings;
-import com.viaversion.viaversion.api.data.ParticleMappings;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
@@ -47,14 +44,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     private final Type<Item> mappedItemCostType;
     private final Type<Item> optionalItemCostType;
     private final Type<Item> mappedOptionalItemCostType;
-    private final Type<Particle> particleType;
-    private final Type<Particle> mappedParticleType;
 
     public ItemRewriter(
         T protocol,
         Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
-        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType,
-        Type<Particle> particleType, Type<Particle> mappedParticleType
+        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType
     ) {
         super(protocol);
         this.itemType = itemType;
@@ -65,12 +59,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         this.mappedItemCostType = mappedItemCostType;
         this.optionalItemCostType = optionalItemCostType;
         this.mappedOptionalItemCostType = mappedOptionalItemCostType;
-        this.particleType = particleType;
-        this.mappedParticleType = mappedParticleType;
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
-        this(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, null, null, null, null, null, null);
+        this(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, null, null, null, null);
     }
 
     public ItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType) {
@@ -145,13 +137,10 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     }
 
     public void registerSetSlot(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
-                map(Types.SHORT); // Slot id
-                handler(wrapper -> passthroughClientboundItem(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            wrapper.passthrough(Types.SHORT); // Slot id
+            passthroughClientboundItem(wrapper);
         });
     }
 
@@ -174,56 +163,42 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     // Sub 1.16
     public void registerSetEquippedItem(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Entity ID
-                map(Types.VAR_INT); // Slot ID
-                handler(wrapper -> passthroughClientboundItem(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
+            wrapper.passthrough(Types.VAR_INT); // Slot ID
+            passthroughClientboundItem(wrapper);
         });
     }
 
     // 1.16+
     public void registerSetEquipment(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Entity ID
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Entity ID
 
-                handler(wrapper -> {
-                    byte slot;
-                    do {
-                        slot = wrapper.passthrough(Types.BYTE);
-                        // & 0x7F into an extra variable if slot is needed
-                        passthroughClientboundItem(wrapper);
-                    } while (slot < 0);
-                });
-            }
+            byte slot;
+            do {
+                slot = wrapper.passthrough(Types.BYTE);
+                // & 0x7F into an extra variable if slot is needed
+                passthroughClientboundItem(wrapper);
+            } while (slot < 0);
         });
     }
 
     public void registerSetCreativeModeSlot(S packetType) {
-        protocol.registerServerbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.SHORT); // 0 - Slot
-                handler(wrapper -> passthroughServerboundItem(wrapper));
-            }
+        protocol.registerServerbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.SHORT); // Slot
+            passthroughServerboundItem(wrapper);
         });
     }
 
     public void registerContainerClick(S packetType) {
-        protocol.registerServerbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // 0 - Container ID
-                map(Types.SHORT); // 1 - Slot
-                map(Types.BYTE); // 2 - Button
-                map(Types.SHORT); // 3 - Action number
-                map(Types.VAR_INT); // 4 - Mode
-                handler(wrapper -> passthroughServerboundItem(wrapper));
-            }
+        protocol.registerServerbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container ID
+            wrapper.passthrough(Types.SHORT); // Slot
+            wrapper.passthrough(Types.BYTE); // Button
+            wrapper.passthrough(Types.SHORT); // Action number
+            wrapper.passthrough(Types.VAR_INT); // Mode
+            passthroughServerboundItem(wrapper);
         });
     }
 
@@ -460,155 +435,20 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     // Pre 1.21 for enchantments
     public void registerContainerSetData(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Container id
-                handler(wrapper -> {
-                    Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
-                    if (mappings == null) {
-                        return;
-                    }
-
-                    short property = wrapper.passthrough(Types.SHORT);
-                    if (property >= 4 && property <= 6) { // Enchantment id
-                        short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
-                        wrapper.write(Types.SHORT, enchantmentId);
-                    }
-                });
-            }
-        });
-    }
-
-    // Not the very best place for this, but has to stay here until *everything* is abstracted
-    public void registerLevelParticles(C packetType, Type<?> coordType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // 0 - Particle ID
-                map(Types.BOOLEAN); // 1 - Long Distance
-                map(coordType); // 2 - X
-                map(coordType); // 3 - Y
-                map(coordType); // 4 - Z
-                map(Types.FLOAT); // 5 - Offset X
-                map(Types.FLOAT); // 6 - Offset Y
-                map(Types.FLOAT); // 7 - Offset Z
-                map(Types.FLOAT); // 8 - Particle Data
-                map(Types.INT); // 9 - Particle Count
-                handler(levelParticlesHandler());
-            }
-        });
-    }
-
-    public void registerLevelParticles1_19(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // 0 - Particle ID
-                map(Types.BOOLEAN); // 1 - Long Distance
-                map(Types.DOUBLE); // 2 - X
-                map(Types.DOUBLE); // 3 - Y
-                map(Types.DOUBLE); // 4 - Z
-                map(Types.FLOAT); // 5 - Offset X
-                map(Types.FLOAT); // 6 - Offset Y
-                map(Types.FLOAT); // 7 - Offset Z
-                map(Types.FLOAT); // 8 - Particle Data
-                map(Types.INT); // 9 - Particle Count
-                handler(levelParticlesHandler(Types.VAR_INT));
-            }
-        });
-    }
-
-    public void registerLevelParticles1_20_5(C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BOOLEAN); // Long Distance
-                map(Types.DOUBLE); // X
-                map(Types.DOUBLE); // Y
-                map(Types.DOUBLE); // Z
-                map(Types.FLOAT); // Offset X
-                map(Types.FLOAT); // Offset Y
-                map(Types.FLOAT); // Offset Z
-                map(Types.FLOAT); // Particle Data
-                map(Types.INT); // Particle Count
-                handler(wrapper -> {
-                    final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
-                    rewriteParticle(wrapper.user(), particle);
-                });
-            }
-        });
-    }
-
-    public void registerExplosion(C packetType) {
-        final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
         protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.FLOAT); // Power
-            final int blocks = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < blocks; i++) {
-                wrapper.passthrough(Types.BYTE); // Relative X
-                wrapper.passthrough(Types.BYTE); // Relative Y
-                wrapper.passthrough(Types.BYTE); // Relative Z
-            }
-            wrapper.passthrough(Types.FLOAT); // Knockback X
-            wrapper.passthrough(Types.FLOAT); // Knockback Y
-            wrapper.passthrough(Types.FLOAT); // Knockback Z
-            wrapper.passthrough(Types.VAR_INT); // Block interaction type
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
 
-            final Particle smallExplosionParticle = wrapper.passthroughAndMap(particleType, mappedParticleType);
-            final Particle largeExplosionParticle = wrapper.passthroughAndMap(particleType, mappedParticleType);
-            rewriteParticle(wrapper.user(), smallExplosionParticle);
-            rewriteParticle(wrapper.user(), largeExplosionParticle);
-
-            soundRewriter.soundHolderHandler().handle(wrapper);
-        });
-    }
-
-    public void registerExplosion1_21_2(C packetType) {
-        final SoundRewriter<C> soundRewriter = new SoundRewriter<>(protocol);
-        protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.DOUBLE); // Knockback X
-            wrapper.passthrough(Types.DOUBLE); // Knockback Y
-            wrapper.passthrough(Types.DOUBLE); // Knockback Z
-
-            final Particle explosionParticle = wrapper.read(particleType);
-            wrapper.write(mappedParticleType, explosionParticle);
-            rewriteParticle(wrapper.user(), explosionParticle);
-
-            soundRewriter.soundHolderHandler().handle(wrapper);
-        });
-    }
-
-    public PacketHandler levelParticlesHandler() {
-        return levelParticlesHandler(Types.INT);
-    }
-
-    public PacketHandler levelParticlesHandler(Type<Integer> idType) {
-        return wrapper -> {
-            int id = wrapper.get(idType, 0);
-            if (id == -1) {
+            Mappings mappings = protocol.getMappingData().getEnchantmentMappings();
+            if (mappings == null) {
                 return;
             }
 
-            ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-            if (mappings.isBlockParticle(id)) {
-                int data = wrapper.read(Types.VAR_INT);
-                wrapper.write(Types.VAR_INT, protocol.getMappingData().getNewBlockStateId(data));
-            } else if (mappings.isItemParticle(id)) {
-                passthroughClientboundItem(wrapper);
+            short property = wrapper.passthrough(Types.SHORT);
+            if (property >= 4 && property <= 6) { // Enchantment id
+                short enchantmentId = (short) mappings.getNewId(wrapper.read(Types.SHORT));
+                wrapper.write(Types.SHORT, enchantmentId);
             }
-
-            int mappedId = protocol.getMappingData().getNewParticleId(id);
-            if (mappedId != id) {
-                wrapper.set(idType, 0, mappedId);
-            }
-        };
+        });
     }
 
     protected void passthroughClientboundItem(final PacketWrapper wrapper) {
@@ -619,27 +459,6 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
     protected void passthroughServerboundItem(final PacketWrapper wrapper) {
         final Item item = handleItemToServer(wrapper.user(), wrapper.read(mappedItemType));
         wrapper.write(itemType, item);
-    }
-
-    @Override
-    public void rewriteParticle(UserConnection connection, Particle particle) {
-        ParticleMappings mappings = protocol.getMappingData().getParticleMappings();
-        int id = particle.id();
-        if (mappings.isBlockParticle(id)) {
-            Particle.ParticleData<Integer> data = particle.getArgument(0);
-            data.setValue(protocol.getMappingData().getNewBlockStateId(data.getValue()));
-        } else if (mappings.isItemParticle(id)) {
-            Particle.ParticleData<Item> data = particle.getArgument(0);
-            Item item = handleItemToClient(connection, data.getValue());
-            if (mappedItemType() != null && itemType() != mappedItemType()) {
-                // Replace the type
-                particle.set(0, mappedItemType(), item);
-            } else {
-                data.setValue(item);
-            }
-        }
-
-        particle.setId(protocol.getMappingData().getNewParticleId(id));
     }
 
     protected @Nullable String mappedIdentifier(final FullMappings mappings, final String identifier) {

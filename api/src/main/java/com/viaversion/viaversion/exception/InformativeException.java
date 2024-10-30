@@ -22,11 +22,12 @@
  */
 package com.viaversion.viaversion.exception;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InformativeException extends RuntimeException {
-    private final Map<String, Object> info = new HashMap<>();
+    private final List<DataEntry> dataEntries = new ArrayList<>();
     private boolean shouldBePrinted = true;
     private int sources;
 
@@ -34,8 +35,8 @@ public class InformativeException extends RuntimeException {
         super(cause);
     }
 
-    public InformativeException set(String key, Object value) {
-        info.put(key, value);
+    public InformativeException set(String key, @Nullable Object value) {
+        dataEntries.add(new DataEntry(key, value));
         return this;
     }
 
@@ -59,11 +60,11 @@ public class InformativeException extends RuntimeException {
     public String getMessage() {
         StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
         boolean first = true;
-        for (Map.Entry<String, Object> entry : info.entrySet()) {
+        for (DataEntry entry : dataEntries) {
             if (!first) {
                 builder.append(", ");
             }
-            builder.append(entry.getKey()).append(": ").append(entry.getValue());
+            builder.append(entry.name()).append(": ").append(entry.value());
             first = false;
         }
         return builder.toString();
@@ -73,5 +74,8 @@ public class InformativeException extends RuntimeException {
     public Throwable fillInStackTrace() {
         // Don't record this stack
         return this;
+    }
+
+    private record DataEntry(String name, @Nullable Object value) {
     }
 }

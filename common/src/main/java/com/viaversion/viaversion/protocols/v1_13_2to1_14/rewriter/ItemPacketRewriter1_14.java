@@ -206,8 +206,6 @@ public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13,
         });
 
         registerSetCreativeModeSlot(ServerboundPackets1_14.SET_CREATIVE_MODE_SLOT);
-
-        registerLevelParticles(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
     }
 
     @Override

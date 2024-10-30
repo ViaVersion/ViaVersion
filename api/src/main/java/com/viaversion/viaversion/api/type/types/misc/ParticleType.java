@@ -149,9 +149,9 @@ public class ParticleType extends DynamicType<Particle> {
             particle.add(Types.INT, Types.INT.readPrimitive(buf));
         };
         public static final DataReader<Particle> TRAIL = (buf, particle) -> {
-            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target X
-            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Y
-            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Target Z
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target X
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Y
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Z
             particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
         };
 

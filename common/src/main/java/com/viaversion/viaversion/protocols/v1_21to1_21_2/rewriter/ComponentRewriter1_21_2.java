@@ -20,6 +20,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
@@ -27,6 +28,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
+import java.util.Collections;
 import java.util.Iterator;
 
 public final class ComponentRewriter1_21_2 extends ComponentRewriter<ClientboundPacket1_21> {
@@ -62,6 +64,26 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
 
         TagUtil.removeNamespaced(componentsTag, "fire_resistant");
         TagUtil.removeNamespaced(componentsTag, "lock");
+
+        final StringTag customName = TagUtil.getNamespacedStringTag(componentsTag, "custom_name");
+        final StringTag itemName = TagUtil.getNamespacedStringTag(componentsTag, "item_name");
+        if (customName != null || itemName == null) {
+            return;
+        }
+
+        final int identifier = protocol.getMappingData().getFullItemMappings().mappedId(itemTag.getString("id"));
+        if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
+            final var input = inputSerializerVersion();
+            final var output = outputSerializerVersion();
+
+            final CompoundTag name = new CompoundTag();
+            name.putBoolean("italic", false);
+            name.putString("text", "");
+            final Tag nameTag = input.toTag(input.toComponent(itemName.getValue()));
+            name.put("extra", new ListTag<>(Collections.singletonList(nameTag)));
+
+            componentsTag.put("minecraft:custom_name", new StringTag(output.toString(output.toComponent(name))));
+        }
     }
 
     public static void convertAttributes(final CompoundTag componentsTag, final FullMappings mappings) {

@@ -15,18 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
+package com.viaversion.viaversion.api.rewriter;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import java.util.HashSet;
-import java.util.Set;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Particle;
 
-public class ClientWorld1_9 extends ClientWorld {
+public interface ParticleRewriter {
 
-    private final Set<Long> loadedChunks = new HashSet<>();
-
-    public Set<Long> getLoadedChunks() {
-        return loadedChunks;
-    }
+    void rewriteParticle(UserConnection connection, Particle particle);
 
 }

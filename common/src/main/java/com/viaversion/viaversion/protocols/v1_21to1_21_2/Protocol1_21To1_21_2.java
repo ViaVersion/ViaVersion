@@ -45,7 +45,9 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.BlockItemPacketRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ComponentRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRewriter1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ParticleRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
@@ -61,6 +63,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingDataBase("1.21", "1.21.2");
     private final EntityPacketRewriter1_21_2 entityRewriter = new EntityPacketRewriter1_21_2(this);
     private final BlockItemPacketRewriter1_21_2 itemRewriter = new BlockItemPacketRewriter1_21_2(this);
+    private final ParticleRewriter1_21_2 particleRewriter = new ParticleRewriter1_21_2(this);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_21_2 componentRewriter = new ComponentRewriter1_21_2(this);
 
@@ -86,6 +89,8 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
         componentRewriter.registerPing();
+
+        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
 
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
@@ -189,9 +194,10 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         Types1_21_2.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST1_21_2)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("block_crumble", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST1_21_2)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION1_21_2)
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
@@ -227,6 +233,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTracker1_21_2(connection));
         connection.put(new BundleStateTracker());
         connection.put(new PlayerPositionStorage());
+        connection.put(new ChunkLoadTracker());
     }
 
     @Override
@@ -242,6 +249,11 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     public BlockItemPacketRewriter1_21_2 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter1_21_2 getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

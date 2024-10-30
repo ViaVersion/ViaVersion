@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_14_4to1_15.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.EntityPacketRewriter1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.ItemPacketRewriter1_15;
 import com.viaversion.viaversion.protocols.v1_14_4to1_15.rewriter.WorldPacketRewriter1_15;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -40,6 +41,7 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.14", "1.15");
     private final EntityPacketRewriter1_15 entityRewriter = new EntityPacketRewriter1_15(this);
     private final ItemPacketRewriter1_15 itemRewriter = new ItemPacketRewriter1_15(this);
+    private final ParticleRewriter<ClientboundPackets1_14_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_14_4> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_14_4To1_15() {
@@ -93,6 +95,11 @@ public class Protocol1_14_4To1_15 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_15 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_14_4> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

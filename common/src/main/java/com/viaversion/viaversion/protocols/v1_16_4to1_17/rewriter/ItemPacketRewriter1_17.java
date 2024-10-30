@@ -46,7 +46,6 @@ public final class ItemPacketRewriter1_17 extends ItemRewriter<ClientboundPacket
         registerSetSlot(ClientboundPackets1_16_2.CONTAINER_SET_SLOT);
         registerAdvancements(ClientboundPackets1_16_2.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_16_2.SET_EQUIPMENT);
-        registerLevelParticles(ClientboundPackets1_16_2.LEVEL_PARTICLES, Types.DOUBLE);
 
         new RecipeRewriter<>(protocol).register(ClientboundPackets1_16_2.UPDATE_RECIPES);
 

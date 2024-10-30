@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.EntityPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.ItemPacketRewriter1_13_1;
 import com.viaversion.viaversion.protocols.v1_13to1_13_1.rewriter.WorldPacketRewriter1_13_1;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 
@@ -43,6 +44,7 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.13", "1.13.2");
     private final EntityPacketRewriter1_13_1 entityRewriter = new EntityPacketRewriter1_13_1(this);
     private final ItemPacketRewriter1_13_1 itemRewriter = new ItemPacketRewriter1_13_1(this);
+    private final ParticleRewriter<ClientboundPackets1_13> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_13> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_13To1_13_1() {
@@ -128,6 +130,8 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
         });
 
         tagRewriter.register(ClientboundPackets1_13.UPDATE_TAGS, RegistryType.ITEM);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_13.LEVEL_PARTICLES, Types.FLOAT);
+
         new StatisticsRewriter<>(this).register(ClientboundPackets1_13.AWARD_STATS);
     }
 
@@ -150,6 +154,11 @@ public class Protocol1_13To1_13_1 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_13_1 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_13> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

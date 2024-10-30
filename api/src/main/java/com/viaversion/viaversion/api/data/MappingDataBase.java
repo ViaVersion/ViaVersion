@@ -179,7 +179,7 @@ public class MappingDataBase implements MappingData {
 
     @Override
     public int getOldBlockId(final int id) {
-        return blockMappings.getNewIdOrDefault(id, 1);
+        return blockMappings.inverse().getNewIdOrDefault(id, 1);
     }
 
     @Override

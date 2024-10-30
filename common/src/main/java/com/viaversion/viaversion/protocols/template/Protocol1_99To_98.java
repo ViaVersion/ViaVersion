@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
@@ -33,6 +34,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfi
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPackets1_21;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -44,12 +46,14 @@ import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 //   ClientboundPacket1_21
 //   ServerboundPacket1_20_5
 //   EntityTypes1_20_5 (MAPPED type)
+//   Types1_21_2.PARTICLE
 //   1.99, 1.98
 final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, ClientboundPacket1_21, ServerboundPacket1_20_5, ServerboundPacket1_20_5> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.98", "1.99");
     private final EntityPacketRewriter1_99 entityRewriter = new EntityPacketRewriter1_99(this);
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
+    private final ParticleRewriter<ClientboundPacket1_21> particleRewriter = new ParticleRewriter<>(this, /*Types1_OLD.PARTICLE,*/ Types1_21_2.PARTICLE);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_99 componentRewriter = new ComponentRewriter1_99(this);
 
@@ -78,6 +82,10 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
         componentRewriter.registerPlayerInfoUpdate1_21_2(ClientboundPackets1_21.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
+
+        // If needed for any particle, item, or block changes. Extend ParticleRewriter for particle serializer changes
+        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
+        particleRewriter.registerExplode1_21_2(ClientboundPackets1_21.EXPLODE); // Rewrites the included sound and particles
 
         final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
@@ -109,9 +117,10 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         /*Types1_21_2.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
-            .reader("dust", ParticleType.Readers.DUST1_21_2)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
             .reader("falling_dust", ParticleType.Readers.BLOCK)
+            .reader("block_crumble", ParticleType.Readers.BLOCK)
+            .reader("dust", ParticleType.Readers.DUST1_21_2)
             .reader("dust_color_transition", ParticleType.Readers.DUST_TRANSITION1_21_2)
             .reader("vibration", ParticleType.Readers.VIBRATION1_20_3)
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
@@ -144,6 +153,11 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
     @Override
     public BlockItemPacketRewriter1_99 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPacket1_21> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

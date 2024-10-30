@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -66,17 +65,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     public void registerBossEvent(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UUID);
-                map(Types.VAR_INT);
-                handler(wrapper -> {
-                    final int action = wrapper.get(Types.VAR_INT, 0);
-                    if (action == 0 || action == 3) {
-                        passthroughAndProcess(wrapper);
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UUID);
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            if (action == 0 || action == 3) {
+                passthroughAndProcess(wrapper);
             }
         });
     }
@@ -112,24 +105,18 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     public void registerLegacyOpenWindow(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Id
-                map(Types.STRING); // Window Type
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Id
+            wrapper.passthrough(Types.STRING); // Window Type
+            processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
     }
 
     public void registerOpenScreen(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Id
-                map(Types.VAR_INT); // Window Type
-                handler(wrapper -> passthroughAndProcess(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Id
+            wrapper.passthrough(Types.VAR_INT); // Window Type
+            passthroughAndProcess(wrapper);
         });
     }
 
@@ -222,23 +209,17 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     public void registerPlayerCombatKill(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Player ID
-                map(Types.INT); // Killer ID
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Player ID
+            wrapper.passthrough(Types.INT); // Killer ID
+            processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
     }
 
     public void registerPlayerCombatKill1_20(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Player ID
-                handler(wrapper -> passthroughAndProcess(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Player ID
+            passthroughAndProcess(wrapper);
         });
     }
 
@@ -404,7 +385,6 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 return;
             }
 
-            // Until they're properly parsed
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {

@@ -56,7 +56,6 @@ public final class ItemPacketRewriter1_19_3 extends ItemRewriter<ClientboundPack
         registerMerchantOffers1_19(ClientboundPackets1_19_1.MERCHANT_OFFERS);
         registerSetCreativeModeSlot(ServerboundPackets1_19_3.SET_CREATIVE_MODE_SLOT);
         registerContainerSetData(ClientboundPackets1_19_1.CONTAINER_SET_DATA);
-        registerLevelParticles1_19(ClientboundPackets1_19_1.LEVEL_PARTICLES);
 
         final RecipeRewriter<ClientboundPackets1_19_1> recipeRewriter = new RecipeRewriter<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_19_1.UPDATE_RECIPES, wrapper -> {
