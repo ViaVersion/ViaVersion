@@ -19,10 +19,12 @@ package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
@@ -34,8 +36,24 @@ public final class ComponentRewriter1_21 extends ComponentRewriter<ClientboundPa
         super(protocol, ReadType.NBT);
     }
 
-    private void convertAttributeModifiersComponent(final CompoundTag tag) {
-        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(tag, "minecraft:attribute_modifiers");
+    @Override
+    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, CompoundTag componentsTag) {
+        super.handleShowItem(connection, itemTag, componentsTag);
+        final String identifier = Key.stripMinecraftNamespace(itemTag.getString("id"));
+        if (identifier.equals("trident") || identifier.equals("piglin_banner_pattern")) {
+            if (componentsTag == null) {
+                itemTag.put("components", componentsTag = new CompoundTag());
+            }
+            if (!TagUtil.containsNamespaced(componentsTag, "rarity")) {
+                componentsTag.put("minecraft:rarity", new StringTag("common"));
+            }
+        }
+
+        if (componentsTag == null) {
+            return;
+        }
+
+        final CompoundTag attributeModifiers = TagUtil.getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
         if (attributeModifiers == null) {
             return;
         }
@@ -45,14 +63,6 @@ public final class ComponentRewriter1_21 extends ComponentRewriter<ClientboundPa
             final UUID uuid = UUIDUtil.fromIntArray(modifier.getIntArrayTag("uuid").getValue());
             final String id = Protocol1_20_5To1_21.mapAttributeUUID(uuid, name);
             modifier.putString("id", id);
-        }
-    }
-
-    @Override
-    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final CompoundTag componentsTag) {
-        super.handleShowItem(connection, itemTag, componentsTag);
-        if (componentsTag != null) {
-            convertAttributeModifiersComponent(componentsTag);
         }
     }
 
