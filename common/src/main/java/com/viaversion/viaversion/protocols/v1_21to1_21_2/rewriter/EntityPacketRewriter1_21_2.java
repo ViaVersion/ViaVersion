@@ -502,7 +502,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
         final EntityTracker1_21_2 tracker = tracker(connection);
         final EntityType entityType = tracker.entityType(entityId);
-        if (entityType != null && !entityType.isOrHasParent(EntityTypes1_21_2.ABSTRACT_BOAT)) {
+        if (entityType == null || !entityType.isOrHasParent(EntityTypes1_21_2.ABSTRACT_BOAT)) {
             return;
         }
 
