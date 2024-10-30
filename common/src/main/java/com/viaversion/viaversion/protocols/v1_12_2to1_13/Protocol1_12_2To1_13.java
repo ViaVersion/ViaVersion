@@ -61,6 +61,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.ItemPacketRewr
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.rewriter.WorldPacketRewriter1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockConnectionStorage;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.BlockStorage;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.LastCompletion;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ClientboundPackets1_12_1;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
@@ -256,9 +257,9 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         componentRewriter.registerComponentPacket(ClientboundPackets1_12_1.CHAT);
 
         registerClientbound(ClientboundPackets1_12_1.COMMAND_SUGGESTIONS, wrapper -> {
-            wrapper.write(Types.VAR_INT, wrapper.user().get(TabCompleteTracker.class).getTransactionId());
+            wrapper.write(Types.VAR_INT, wrapper.user().get(LastCompletion.class).getTransactionId());
 
-            String input = wrapper.user().get(TabCompleteTracker.class).getInput();
+            String input = wrapper.user().get(LastCompletion.class).getInput();
             // Start & End
             int index;
             int length;
@@ -547,13 +548,13 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     }
                     int tid = wrapper.read(Types.VAR_INT);
                     // Save transaction id
-                    wrapper.user().get(TabCompleteTracker.class).setTransactionId(tid);
+                    wrapper.user().get(LastCompletion.class).setTransactionId(tid);
                 });
                 // Prepend /
                 map(Types.STRING, new ValueTransformer<>(Types.STRING) {
                     @Override
                     public String transform(PacketWrapper wrapper, String inputValue) {
-                        wrapper.user().get(TabCompleteTracker.class).setInput(inputValue);
+                        wrapper.user().get(LastCompletion.class).setInput(inputValue);
                         return "/" + inputValue;
                     }
                 });
@@ -836,7 +837,10 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
         userConnection.addEntityTracker(this.getClass(), new EntityTrackerBase(userConnection, EntityTypes1_13.EntityType.PLAYER));
         userConnection.addClientWorld(this.getClass(), new ClientWorld());
 
-        userConnection.put(new TabCompleteTracker());
+        if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
+            userConnection.put(new TabCompleteTracker(userConnection));
+        }
+        userConnection.put(new LastCompletion());
         userConnection.put(new BlockStorage());
         if (Via.getConfig().isServersideBlockConnections()) {
             if (Via.getManager().getProviders().get(BlockConnectionProvider.class) instanceof PacketBlockConnectionProvider) {

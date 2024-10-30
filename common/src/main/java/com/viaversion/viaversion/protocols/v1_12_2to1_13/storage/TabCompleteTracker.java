@@ -18,46 +18,35 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.storage;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.connection.tickable.TickableStoredObject;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.PlayerLookTargetProvider;
 import com.viaversion.viaversion.protocols.v1_12to1_12_1.packet.ServerboundPackets1_12_1;
 
-public class TabCompleteTracker implements StorableObject {
-    private int transactionId;
-    private String input;
+public class TabCompleteTracker extends TickableStoredObject {
     private String lastTabComplete;
     private long timeToSend;
 
-    public void sendPacketToServer(UserConnection connection) {
-        if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) return;
-        PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.COMMAND_SUGGESTION, null, connection);
+    public TabCompleteTracker(final UserConnection user) {
+        super(Protocol1_12_2To1_13.class, user);
+    }
+
+    @Override
+    public void serverTick() {
+        if (lastTabComplete == null || timeToSend > System.currentTimeMillis()) {
+            return;
+        }
+        PacketWrapper wrapper = PacketWrapper.create(ServerboundPackets1_12_1.COMMAND_SUGGESTION, user());
         wrapper.write(Types.STRING, lastTabComplete);
         wrapper.write(Types.BOOLEAN, false);
-        final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(connection);
+        final BlockPosition playerLookTarget = Via.getManager().getProviders().get(PlayerLookTargetProvider.class).getPlayerLookTarget(user());
         wrapper.write(Types.OPTIONAL_POSITION1_8, playerLookTarget);
         wrapper.scheduleSendToServer(Protocol1_12_2To1_13.class);
         lastTabComplete = null;
-    }
-
-    public int getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(int transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    public String getInput() {
-        return input;
-    }
-
-    public void setInput(final String input) {
-        this.input = input;
     }
 
     public String getLastTabComplete() {

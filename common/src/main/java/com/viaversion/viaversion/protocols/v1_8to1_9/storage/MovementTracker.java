@@ -17,18 +17,39 @@
  */
 package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 
-import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.connection.tickable.TickableStoredObject;
+import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 
-public class MovementTracker implements StorableObject {
+public class MovementTracker extends TickableStoredObject {
     private static final long IDLE_PACKET_DELAY = 50L; // Update every 50ms (20tps)
     private static final long IDLE_PACKET_LIMIT = 20; // Max 20 ticks behind
     private long nextIdlePacket;
     private boolean ground;
 
+    public MovementTracker(final UserConnection user) {
+        super(Protocol1_8To1_9.class, user);
+    }
+
     public void incrementIdlePacket() {
         // Notify of next update
         // Allow a maximum lag spike of 1 second (20 ticks/updates)
         this.nextIdlePacket = Math.max(nextIdlePacket + IDLE_PACKET_DELAY, System.currentTimeMillis() - IDLE_PACKET_DELAY * IDLE_PACKET_LIMIT);
+    }
+
+    @Override
+    public void serverTick() {
+        if (nextIdlePacket <= System.currentTimeMillis() && user().getChannel().isOpen()) {
+            tick();
+        }
+    }
+
+    @Override
+    public void tick() {
+        // Send on tick end for 1.21.2+ clients
+        Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(user());
     }
 
     public long getNextIdlePacket() {

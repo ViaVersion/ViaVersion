@@ -452,6 +452,9 @@ public class PlayerPacketRewriter1_9 {
 
         final PacketHandler onGroundHandler = wrapper -> {
             final MovementTracker tracker = wrapper.user().get(MovementTracker.class);
+            if (tracker == null) {
+                return;
+            }
             tracker.incrementIdlePacket();
             tracker.setGround(wrapper.get(Types.BOOLEAN, 0));
         };

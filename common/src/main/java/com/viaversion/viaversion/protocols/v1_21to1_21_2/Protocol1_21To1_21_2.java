@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.v1_21to1_21_2;
 
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
@@ -31,6 +32,7 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
+import com.viaversion.viaversion.connection.tickable.TickableStoredObject;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
@@ -172,6 +174,17 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             final int id = wrapper.passthrough(Types.INT); // id
             if (wrapper.user().get(PlayerPositionStorage.class).checkPong(id)) {
                 wrapper.cancel();
+            }
+        });
+        registerServerbound(ServerboundPackets1_21_2.CLIENT_TICK_END, null, wrapper -> {
+            wrapper.cancel();
+
+            for (final StorableObject storage : wrapper.user().getStoredObjects().values()) {
+                if (storage instanceof TickableStoredObject storableObject) {
+                    if (wrapper.user().getProtocolInfo().getPipeline().contains(storableObject.protocolClass())) {
+                        storableObject.clientTick();
+                    }
+                }
             }
         });
     }

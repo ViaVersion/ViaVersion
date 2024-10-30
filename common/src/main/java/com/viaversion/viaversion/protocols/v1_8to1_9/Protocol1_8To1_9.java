@@ -18,8 +18,8 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9;
 
 import com.google.gson.JsonElement;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -107,7 +107,10 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_8, Cl
         userConnection.addEntityTracker(this.getClass(), new EntityTracker1_9(userConnection));
         userConnection.addClientWorld(this.getClass(), new ClientWorld1_9());
 
-        userConnection.put(new MovementTracker());
+        if (Via.getConfig().isSimulatePlayerTick()) {
+            userConnection.put(new MovementTracker(userConnection));
+        }
+
         userConnection.put(new InventoryTracker());
         userConnection.put(new CommandBlockStorage());
     }

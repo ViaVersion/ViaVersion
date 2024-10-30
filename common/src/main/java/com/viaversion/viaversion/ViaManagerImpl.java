@@ -36,12 +36,11 @@ import com.viaversion.viaversion.api.scheduler.Scheduler;
 import com.viaversion.viaversion.commands.ViaCommandHandler;
 import com.viaversion.viaversion.configuration.ConfigurationProviderImpl;
 import com.viaversion.viaversion.connection.ConnectionManagerImpl;
+import com.viaversion.viaversion.connection.tickable.TickableStorageTask;
 import com.viaversion.viaversion.debug.DebugHandlerImpl;
 import com.viaversion.viaversion.protocol.ProtocolManagerImpl;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionRange;
 import com.viaversion.viaversion.protocol.ServerProtocolVersionSingleton;
-import com.viaversion.viaversion.protocols.v1_12_2to1_13.task.TabCompleteTask;
-import com.viaversion.viaversion.protocols.v1_8to1_9.task.IdlePacketTask;
 import com.viaversion.viaversion.scheduler.TaskScheduler;
 import com.viaversion.viaversion.update.UpdateUtil;
 import java.util.ArrayList;
@@ -171,17 +170,8 @@ public class ViaManagerImpl implements ViaManager {
             }
         }, 10L);
 
-        final ProtocolVersion serverProtocolVersion = protocolManager.getServerProtocolVersion().lowestSupportedProtocolVersion();
-        if (serverProtocolVersion.olderThan(ProtocolVersion.v1_9)) {
-            if (Via.getConfig().isSimulatePlayerTick()) {
-                Via.getPlatform().runRepeatingSync(new IdlePacketTask(), 1L);
-            }
-        }
-        if (serverProtocolVersion.olderThan(ProtocolVersion.v1_13)) {
-            if (Via.getConfig().get1_13TabCompleteDelay() > 0) {
-                Via.getPlatform().runRepeatingSync(new TabCompleteTask(), 1L);
-            }
-        }
+        // Register global task to tick all tickable objects
+        Via.getPlatform().runRepeatingSync(new TickableStorageTask(), 1L);
 
         // Refresh Versions
         protocolManager.refreshVersions();
