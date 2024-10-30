@@ -59,6 +59,8 @@ public class RegistryDataRewriter {
         key = Key.stripMinecraftNamespace(key);
         if (key.equals("enchantment")) {
             updateEnchantments(entries);
+        } else if (key.equals("trim_material")) {
+            updateTrimMaterials(entries);
         }
 
         final List<RegistryEntry> toAdd = this.toAdd.get(key);
@@ -123,6 +125,22 @@ public class RegistryDataRewriter {
             }
 
             updateAttributesFields(effects);
+        }
+    }
+
+    public void updateTrimMaterials(final RegistryEntry[] entries) {
+        if (protocol.getMappingData().getFullItemMappings() == null) {
+            return;
+        }
+
+        for (final RegistryEntry entry : entries) {
+            if (entry.tag() == null) {
+                continue;
+            }
+
+            final StringTag ingredientTag = ((CompoundTag) entry.tag()).getStringTag("ingredient");
+            final String mappedIngredient = protocol.getMappingData().getFullItemMappings().mappedIdentifier(ingredientTag.getValue());
+            ingredientTag.setValue(mappedIngredient);
         }
     }
 
