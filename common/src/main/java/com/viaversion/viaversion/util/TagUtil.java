@@ -17,8 +17,10 @@
  */
 package com.viaversion.viaversion.util;
 
+import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import java.util.Map;
@@ -77,6 +79,11 @@ public final class TagUtil {
     public static @Nullable StringTag getNamespacedStringTag(final CompoundTag tag, final String key) {
         final StringTag stringTag = tag.getStringTag(Key.namespaced(key));
         return stringTag != null ? stringTag : tag.getStringTag(Key.stripMinecraftNamespace(key));
+    }
+
+    public static @Nullable NumberTag getNamespacedNumberTag(final CompoundTag tag, final String key) {
+        final NumberTag numberTag = tag.getNumberTag(Key.namespaced(key));
+        return numberTag != null ? numberTag : tag.getNumberTag(Key.stripMinecraftNamespace(key));
     }
 
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {

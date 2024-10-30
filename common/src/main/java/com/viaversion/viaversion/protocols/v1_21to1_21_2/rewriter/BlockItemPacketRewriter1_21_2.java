@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntArrayTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
@@ -39,6 +40,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.DamageResistant;
+import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
@@ -64,6 +66,8 @@ import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -421,10 +425,32 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
 
+        final StructuredDataContainer data = item.dataContainer();
+        final Enchantments enchantments = data.get(StructuredDataKey.ENCHANTMENTS);
+        if (enchantments != null && enchantments.size() != 0) {
+            // Level 0 is no longer allowed
+            final IntList enchantmentIds = new IntArrayList();
+            enchantments.enchantments().int2IntEntrySet().removeIf(entry -> {
+                if (entry.getIntValue() == 0) {
+                    enchantmentIds.add(entry.getIntKey());
+                    return true;
+                }
+                return false;
+            });
+
+            if (!enchantmentIds.isEmpty()) {
+                final IntArrayTag enchantmentIdsTag = new IntArrayTag(enchantmentIds.toIntArray());
+                saveTag(createCustomTag(item), enchantmentIdsTag, "0_enchants");
+            }
+            if (enchantments.size() == 0 && !data.has(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE)) {
+                data.set(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE, true);
+                saveTag(createCustomTag(item), new ByteTag(true), "remove_glint");
+            }
+        }
+
         // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
         final int identifier = item.identifier();
         if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
-            final StructuredDataContainer data = item.dataContainer();
             final Tag itemName = data.get(StructuredDataKey.ITEM_NAME);
             if (itemName != null && !data.has(StructuredDataKey.CUSTOM_NAME)) {
                 final CompoundTag name = new CompoundTag();
@@ -450,8 +476,32 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         final StructuredDataContainer dataContainer = item.dataContainer();
         final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData != null && customData.remove(nbtTagName("remove_custom_name")) != null) {
+        if (customData == null) {
+            return item;
+        }
+
+        if (customData.remove(nbtTagName("remove_custom_name")) != null) {
             dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
+            if (customData.isEmpty()) {
+                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
+            }
+        }
+
+        final IntArrayTag emptyEnchantments = customData.getIntArrayTag(nbtTagName("0_enchants"));
+        if (emptyEnchantments != null) {
+            Enchantments enchantments = dataContainer.get(StructuredDataKey.ENCHANTMENTS);
+            if (enchantments == null) {
+                enchantments = new Enchantments(true);
+                dataContainer.set(StructuredDataKey.ENCHANTMENTS, enchantments);
+            }
+            for (final int enchantmentId : emptyEnchantments.getValue()) {
+                enchantments.enchantments().put(enchantmentId, 0);
+            }
+            customData.remove(nbtTagName("0_enchants"));
+
+            if (customData.remove(nbtTagName("remove_glint")) != null) {
+                dataContainer.remove(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE);
+            }
             if (customData.isEmpty()) {
                 dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
             }

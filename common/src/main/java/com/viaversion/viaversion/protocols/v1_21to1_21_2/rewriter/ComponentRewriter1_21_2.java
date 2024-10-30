@@ -19,6 +19,7 @@ package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -60,6 +61,13 @@ public final class ComponentRewriter1_21_2 extends ComponentRewriter<Clientbound
             }
             food.remove("eat_seconds");
             food.remove("effects");
+        }
+
+
+        final CompoundTag enchantments = TagUtil.getNamespacedCompoundTag(componentsTag, "enchantments");
+        if (enchantments != null) {
+            final CompoundTag levels = enchantments.getCompoundTag("levels");
+            levels.entrySet().removeIf(entry -> ((NumberTag) entry.getValue()).asInt() == 0);
         }
 
         TagUtil.removeNamespaced(componentsTag, "fire_resistant");
