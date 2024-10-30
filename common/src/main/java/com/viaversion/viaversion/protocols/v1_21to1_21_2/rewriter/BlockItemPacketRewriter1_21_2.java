@@ -45,6 +45,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
@@ -415,7 +416,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         }
 
         super.handleItemToClient(connection, item);
-        updateItemData(item);
+        updateItemData(connection, item);
 
         // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
         final int identifier = item.identifier();
@@ -469,7 +470,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         wrapper.write(Types.UNSIGNED_BYTE, (short) containerId);
     }
 
-    public static void updateItemData(final Item item) {
+    public static void updateItemData(final UserConnection user, final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_20_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> {
             if (instrument.hasId()) {
@@ -486,7 +487,16 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 final Consumable1_21_2.ApplyStatusEffects applyStatusEffects = new Consumable1_21_2.ApplyStatusEffects(new PotionEffect[]{effect.effect()}, effect.probability());
                 consumeEffects[i] = new Consumable1_21_2.ConsumeEffect<>(0 /* add status effect */, Consumable1_21_2.ApplyStatusEffects.TYPE, applyStatusEffects);
             }
-            dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
+
+            int animation = 1; // eat
+            if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+                if (item.identifier() == 840 || item.identifier() == 845 || item.identifier() == 850 || item.identifier() == 855 || item.identifier() == 860) { // swords
+                    // Change the consume animation of swords to block
+                    animation = 3; // block
+                }
+            }
+
+            dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), animation /* eat */, sound, true, consumeEffects));
             if (food.usingConvertsTo() != null) {
                 dataContainer.set(StructuredDataKey.USE_REMAINDER, food.usingConvertsTo());
             }
