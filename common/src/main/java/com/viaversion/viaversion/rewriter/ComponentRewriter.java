@@ -385,7 +385,6 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 return;
             }
 
-            // Until they're properly parsed
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
