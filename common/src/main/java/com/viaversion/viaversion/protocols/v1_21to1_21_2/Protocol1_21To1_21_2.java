@@ -31,7 +31,6 @@ import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
-import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPacket1_20_5;
@@ -49,6 +48,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter.ParticleRewriter1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -230,7 +230,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     public void init(final UserConnection connection) {
-        addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_21_2.PLAYER));
+        addEntityTracker(connection, new EntityTracker1_21_2(connection));
         connection.put(new BundleStateTracker());
         connection.put(new PlayerPositionStorage());
         connection.put(new ChunkLoadTracker());
