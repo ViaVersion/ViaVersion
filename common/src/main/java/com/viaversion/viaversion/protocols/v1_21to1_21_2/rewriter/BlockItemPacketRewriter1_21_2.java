@@ -416,7 +416,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         }
 
         super.handleItemToClient(connection, item);
-        updateItemData(connection, item);
+        updateItemData(item);
 
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
@@ -484,7 +484,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         }
     }
 
-    public static void updateItemData(final UserConnection user, final Item item) {
+    public static void updateItemData(final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_20_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> {
             if (instrument.hasId()) {
