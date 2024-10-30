@@ -23,7 +23,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacke
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 
-public final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_21> {
+final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_21> {
 
     public ComponentRewriter1_99(final Protocol1_99To_98 protocol) {
         super(protocol, ReadType.NBT);

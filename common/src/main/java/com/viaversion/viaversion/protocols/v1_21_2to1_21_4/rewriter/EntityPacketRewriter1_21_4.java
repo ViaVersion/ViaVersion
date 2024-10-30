@@ -43,7 +43,7 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
     @Override
     public void registerPackets() {
         registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_2.FALLING_BLOCK);
-        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_2.ENTITY_DATA_LIST, Types1_21_4.ENTITY_DATA_LIST); // Specify old and new entity data list if changed
+        registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_2.ENTITY_DATA_LIST, Types1_21_4.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
 
         final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
@@ -117,14 +117,14 @@ public final class EntityPacketRewriter1_21_4 extends EntityRewriter<Clientbound
         registerBlockStateHandler(EntityTypes1_21_2.ABSTRACT_MINECART, 11);
 
         filter().type(EntityTypes1_21_2.CREAKING_TRANSIENT).addIndex(18); // Is tearing down
-        filter().type(EntityTypes1_21_2.SALMON).index(17).handler((data, event) -> {
-            final String type = event.value();
+        filter().type(EntityTypes1_21_2.SALMON).index(17).handler((event, data) -> {
+            final String type = data.value();
             final int typeId = switch (type) {
                 case "small" -> 0;
                 case "large" -> 2;
                 default -> 1; // medium
             };
-            event.setTypeAndValue(Types1_21_4.ENTITY_DATA_TYPES.varIntType, typeId);
+            data.setTypeAndValue(Types1_21_4.ENTITY_DATA_TYPES.varIntType, typeId);
         });
     }
 
