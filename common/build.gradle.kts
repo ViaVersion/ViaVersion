@@ -30,6 +30,7 @@ tasks.register<JavaExec>("runViaProxy") {
     mainClass.set("net.raphimc.viaproxy.ViaProxy")
     classpath = viaProxyConfiguration
     workingDir = file("run")
+    jvmArgs = listOf("-DskipUpdateCheck")
 
     doFirst {
         val jarsDir = file("$workingDir/jars")
