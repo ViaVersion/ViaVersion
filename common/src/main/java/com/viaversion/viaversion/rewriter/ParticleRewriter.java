@@ -115,7 +115,25 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
 
     public void registerLevelParticles1_20_5(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            wrapper.passthrough(Types.BOOLEAN); // Long Distance
+            wrapper.passthrough(Types.BOOLEAN); // Override limiter
+            wrapper.passthrough(Types.DOUBLE); // X
+            wrapper.passthrough(Types.DOUBLE); // Y
+            wrapper.passthrough(Types.DOUBLE); // Z
+            wrapper.passthrough(Types.FLOAT); // Offset X
+            wrapper.passthrough(Types.FLOAT); // Offset Y
+            wrapper.passthrough(Types.FLOAT); // Offset Z
+            wrapper.passthrough(Types.FLOAT); // Particle Data
+            wrapper.passthrough(Types.INT); // Particle Count
+
+            final Particle particle = wrapper.passthroughAndMap(particleType, mappedParticleType);
+            rewriteParticle(wrapper.user(), particle);
+        });
+    }
+
+    public void registerLevelParticles1_21_4(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.BOOLEAN); // Override limiter
+            wrapper.passthrough(Types.BOOLEAN); // Always show
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z

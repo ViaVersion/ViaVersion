@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.util.Key;
 import io.netty.buffer.ByteBuf;
 
@@ -148,11 +147,18 @@ public class ParticleType extends DynamicType<Particle> {
         public static final DataReader<Particle> COLOR = (buf, particle) -> {
             particle.add(Types.INT, Types.INT.readPrimitive(buf));
         };
-        public static final DataReader<Particle> TRAIL = (buf, particle) -> {
+        public static final DataReader<Particle> TRAIL1_21_2 = (buf, particle) -> {
             particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target X
             particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Y
             particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Z
             particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
+        };
+        public static final DataReader<Particle> TRAIL1_21_4 = (buf, particle) -> {
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target X
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Y
+            particle.add(Types.DOUBLE, Types.DOUBLE.readPrimitive(buf)); // Target Z
+            particle.add(Types.INT, Types.INT.readPrimitive(buf)); // Color
+            particle.add(Types.VAR_INT, Types.VAR_INT.readPrimitive(buf)); // Duration
         };
 
         public static DataReader<Particle> item(Type<Item> item) {

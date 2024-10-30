@@ -80,7 +80,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.DISGUISED_CHAT);
-        componentRewriter.registerPlayerInfoUpdate1_21_2(ClientboundPackets1_21.PLAYER_INFO_UPDATE);
+        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
 
         // If needed for any particle, item, or block changes. Extend ParticleRewriter for particle serializer changes
@@ -126,7 +126,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21, Cl
             .reader("sculk_charge", ParticleType.Readers.SCULK_CHARGE)
             .reader("shriek", ParticleType.Readers.SHRIEK)
             .reader("entity_effect", ParticleType.Readers.COLOR)
-            .reader("trail", ParticleType.Readers.TRAIL)
+            .reader("trail", ParticleType.Readers.TRAIL1_21_4)
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));*/
 
         super.onMappingDataLoaded(); // Calls load methods on rewriters. Last in case the rewriters access the above filled data

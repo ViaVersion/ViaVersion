@@ -193,6 +193,7 @@ public final class Types {
 
     public static final BitSetType PROFILE_ACTIONS_ENUM1_19_3 = new BitSetType(6);
     public static final BitSetType PROFILE_ACTIONS_ENUM1_21_2 = new BitSetType(7);
+    public static final BitSetType PROFILE_ACTIONS_ENUM1_21_4 = new BitSetType(8);
 
     public static final ByteArrayType SIGNATURE_BYTES = new ByteArrayType(256);
     public static final BitSetType ACKNOWLEDGED_BIT_SET = new BitSetType(20);

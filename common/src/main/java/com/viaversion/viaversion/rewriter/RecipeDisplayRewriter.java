@@ -94,6 +94,8 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
         handleSlotDisplay(wrapper); // Fuel
         handleSlotDisplay(wrapper); // Result
         handleSlotDisplay(wrapper); // Crafting station
+        wrapper.passthrough(Types.VAR_INT); // Duration
+        wrapper.passthrough(Types.FLOAT); // Experience
     }
 
     protected void handleStoneCutter(final PacketWrapper wrapper) {
@@ -165,7 +167,7 @@ public class RecipeDisplayRewriter<C extends ClientboundPacketType> {
     }
 
     protected void handleItemId(final PacketWrapper wrapper) {
-        final int id = wrapper.passthrough(Types.VAR_INT);
+        final int id = wrapper.read(Types.VAR_INT);
         wrapper.write(Types.VAR_INT, rewriteItemId(id));
     }
 
