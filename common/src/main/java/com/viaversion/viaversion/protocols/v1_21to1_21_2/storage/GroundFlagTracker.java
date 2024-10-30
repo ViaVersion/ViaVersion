@@ -24,11 +24,6 @@ public final class GroundFlagTracker implements StorableObject {
     private boolean onGround;
     private boolean horizontalCollision;
 
-    public void clear() {
-        this.onGround = false;
-        this.horizontalCollision = false;
-    }
-
     public boolean onGround() {
         return this.onGround;
     }

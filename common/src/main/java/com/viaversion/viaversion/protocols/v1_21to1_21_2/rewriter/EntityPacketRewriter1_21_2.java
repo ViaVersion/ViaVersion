@@ -164,7 +164,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
 
-            wrapper.user().get(GroundFlagTracker.class).clear();
+            wrapper.user().put(new GroundFlagTracker());
             wrapper.user().remove(ClientVehicleStorage.class);
         });
 
