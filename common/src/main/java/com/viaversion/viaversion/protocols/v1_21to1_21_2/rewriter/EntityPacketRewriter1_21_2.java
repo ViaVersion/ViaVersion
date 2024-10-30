@@ -159,7 +159,10 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             final EntityTracker entityTracker = tracker(wrapper.user());
             if (entityTracker.currentWorld() != null && !entityTracker.currentWorld().equals(world)) {
-                wrapper.user().get(ChunkLoadTracker.class).clear();
+                final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+                if (chunkLoadTracker != null) {
+                    chunkLoadTracker.clear();
+                }
             }
 
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);

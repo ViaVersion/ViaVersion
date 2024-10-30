@@ -376,6 +376,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             }
 
             final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            if (chunkLoadTracker == null) {
+                return;
+            }
+
             if (chunkLoadTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) {
                 // Unload the old chunk, so the new one can be loaded without graphical glitches
                 // Bundling it prevents the client from falling through the world during the chunk swap
@@ -401,7 +405,11 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         protocol.registerClientbound(ClientboundPackets1_21.FORGET_LEVEL_CHUNK, wrapper -> {
             final ChunkPosition chunkPosition = wrapper.passthrough(Types.CHUNK_POSITION);
-            wrapper.user().get(ChunkLoadTracker.class).removeChunk(chunkPosition.chunkX(), chunkPosition.chunkZ());
+
+            final ChunkLoadTracker chunkLoadTracker = wrapper.user().get(ChunkLoadTracker.class);
+            if (chunkLoadTracker != null) {
+                chunkLoadTracker.removeChunk(chunkPosition.chunkX(), chunkPosition.chunkZ());
+            }
         });
     }
 

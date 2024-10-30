@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
@@ -234,8 +235,14 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         addEntityTracker(connection, new EntityTracker1_21_2(connection));
         connection.put(new BundleStateTracker());
         connection.put(new PlayerPositionStorage());
-        connection.put(new ChunkLoadTracker());
         connection.put(new GroundFlagTracker());
+
+        // <= 1.21.1 clients allowed loaded chunks to get replaced with new data without unloading them first.
+        // 1.21.2 introduced a graphical bug where it doesn't properly render the new data unless the chunk is unloaded beforehand.
+        // 1.21.4 fixed this bug, so the workaround is no longer needed.
+        if (connection.getProtocolInfo().protocolVersion().equals(ProtocolVersion.v1_21_2)) {
+            connection.put(new ChunkLoadTracker());
+        }
     }
 
     @Override
