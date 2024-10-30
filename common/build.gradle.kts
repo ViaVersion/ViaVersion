@@ -19,7 +19,8 @@ tasks.named<Jar>("sourcesJar") {
     from(project(":viaversion-api").sourceSets.main.get().allSource)
 }
 
-// Task to quickly test/debug code changes using ViaProxy
+// Task to quickly test/debug code changes using https://github.com/ViaVersion/ViaProxy
+// For further instructions see the ViaProxy repository README
 tasks.register<JavaExec>("runViaProxy") {
     dependsOn(tasks.shadowJar)
 
