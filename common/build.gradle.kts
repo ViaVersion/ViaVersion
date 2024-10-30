@@ -32,6 +32,10 @@ tasks.register<JavaExec>("runViaProxy") {
     workingDir = file("run")
     jvmArgs = listOf("-DskipUpdateCheck")
 
+    if (System.getProperty("viaproxy.gui.autoStart") != null) {
+        jvmArgs("-Dviaproxy.gui.autoStart")
+    }
+
     doFirst {
         val jarsDir = file("$workingDir/jars")
         jarsDir.mkdirs()
