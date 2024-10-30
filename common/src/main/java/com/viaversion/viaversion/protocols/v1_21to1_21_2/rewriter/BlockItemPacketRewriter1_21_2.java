@@ -418,6 +418,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         super.handleItemToClient(connection, item);
         updateItemData(connection, item);
 
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, item);
+
         // Item name is now overridden by custom implemented display names (compass, player head, potion, shield, tipped arrow)
         final int identifier = item.identifier();
         if (identifier == 952 || identifier == 1147 || identifier == 1039 || identifier == 1203 || identifier == 1200 || identifier == 1204 || identifier == 1202) {
@@ -470,6 +473,17 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         wrapper.write(Types.UNSIGNED_BYTE, (short) containerId);
     }
 
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8) && item.dataContainer().hasValue(StructuredDataKey.CONSUMABLE1_21_2)) {
+            if (item.identifier() == 840 || item.identifier() == 845 || item.identifier() == 850 || item.identifier() == 855 || item.identifier() == 860) { // swords
+                // Change the consume animation of swords to block
+                final Consumable1_21_2 consumable = item.dataContainer().get(StructuredDataKey.CONSUMABLE1_21_2);
+                item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(consumable.consumeSeconds(), 3, consumable.sound(), consumable.hasConsumeParticles(), consumable.consumeEffects()));
+            }
+        }
+    }
+
     public static void updateItemData(final UserConnection user, final Item item) {
         final StructuredDataContainer dataContainer = item.dataContainer();
         dataContainer.replace(StructuredDataKey.INSTRUMENT1_20_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> {
@@ -488,15 +502,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 consumeEffects[i] = new Consumable1_21_2.ConsumeEffect<>(0 /* add status effect */, Consumable1_21_2.ApplyStatusEffects.TYPE, applyStatusEffects);
             }
 
-            int animation = 1; // eat
-            if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-                if (item.identifier() == 840 || item.identifier() == 845 || item.identifier() == 850 || item.identifier() == 855 || item.identifier() == 860) { // swords
-                    // Change the consume animation of swords to block
-                    animation = 3; // block
-                }
-            }
-
-            dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), animation /* eat */, sound, true, consumeEffects));
+            dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
             if (food.usingConvertsTo() != null) {
                 dataContainer.set(StructuredDataKey.USE_REMAINDER, food.usingConvertsTo());
             }
