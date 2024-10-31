@@ -563,15 +563,17 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
         dataContainer.replaceKey(StructuredDataKey.POTION_CONTENTS1_20_5, StructuredDataKey.POTION_CONTENTS1_21_2);
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant("minecraft:is_fire"));
-        dataContainer.replace(StructuredDataKey.LOCK, lock -> {
+        dataContainer.replace(StructuredDataKey.LOCK, tag -> {
+            final String lock = ((StringTag) tag).getValue();
+            if (lock.isEmpty()) {
+                // Previously ignored empty values since the data was arbitrary, custom_name doesn't accept empty values
+                return null;
+            }
+
             final CompoundTag predicateTag = new CompoundTag();
             final CompoundTag itemComponentsTag = new CompoundTag();
-            if (!(lock instanceof StringTag tag && (tag.getValue().isEmpty() || tag.getValue().contains(" ")))) {
-                itemComponentsTag.put("custom_name", lock);
-            }
-            if (!itemComponentsTag.isEmpty()) {
-                predicateTag.put("components", itemComponentsTag);
-            }
+            predicateTag.put("components", itemComponentsTag);
+            itemComponentsTag.put("custom_name", tag);
             return predicateTag;
         });
     }
