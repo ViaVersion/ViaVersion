@@ -43,13 +43,12 @@ public final class Types1_21_2 {
     public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
     public static final Type<StructuredData<?>[]> STRUCTURED_DATA_ARRAY = new ArrayType<>(STRUCTURED_DATA);
     public static final ItemType1_20_5 ITEM = new ItemType1_20_5(STRUCTURED_DATA);
-    public static final Type<Item> OPTIONAL_ITEM = ITEM.new OptionalItemType(); // Optional as in boolean prefixed, not via the amount
     public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
     public static final Type<Item> ITEM_COST = new ItemCostType1_20_5(STRUCTURED_DATA_ARRAY);
     public static final Type<Item> OPTIONAL_ITEM_COST = new ItemCostType1_20_5.OptionalItemCostType(ITEM_COST);
 
     public static final ParticleType PARTICLE = new ParticleType();
-    public static final ArrayType<Particle> PARTICLES = new ArrayType<>(PARTICLE);
+    public static final Type<Particle[]> PARTICLES = new ArrayType<>(PARTICLE);
     public static final EntityDataTypes1_21_2 ENTITY_DATA_TYPES = new EntityDataTypes1_21_2(ITEM, PARTICLE, PARTICLES);
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
