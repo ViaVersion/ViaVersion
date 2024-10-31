@@ -566,8 +566,12 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.replace(StructuredDataKey.LOCK, lock -> {
             final CompoundTag predicateTag = new CompoundTag();
             final CompoundTag itemComponentsTag = new CompoundTag();
-            predicateTag.put("components", itemComponentsTag);
-            itemComponentsTag.put("custom_name", lock);
+            if (!(lock instanceof StringTag tag && (tag.getValue().isEmpty() || tag.getValue().contains(" ")))) {
+                itemComponentsTag.put("custom_name", lock);
+            }
+            if (!itemComponentsTag.isEmpty()) {
+                predicateTag.put("components", itemComponentsTag);
+            }
             return predicateTag;
         });
     }
