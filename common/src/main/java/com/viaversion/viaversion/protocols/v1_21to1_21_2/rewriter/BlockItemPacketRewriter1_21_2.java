@@ -484,9 +484,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         if (customData.remove(nbtTagName("remove_custom_name")) != null) {
             dataContainer.remove(StructuredDataKey.CUSTOM_NAME);
-            if (customData.isEmpty()) {
-                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
-            }
+            removeCustomTag(dataContainer, customData);
         }
 
         final IntArrayTag emptyEnchantments = customData.getIntArrayTag(nbtTagName("0_enchants"));
@@ -504,9 +502,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             if (customData.remove(nbtTagName("remove_glint")) != null) {
                 dataContainer.remove(StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE);
             }
-            if (customData.isEmpty()) {
-                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
-            }
+            removeCustomTag(dataContainer, customData);
         }
         return item;
     }

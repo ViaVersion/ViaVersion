@@ -136,14 +136,13 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         super.handleItemToClient(connection, item);
         updateItemData(item);
 
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        if (dataContainer.has(StructuredDataKey.RARITY)) {
+        final StructuredDataContainer data = item.dataContainer();
+        if (data.has(StructuredDataKey.RARITY)) {
             return item;
         }
-
         // Change rarity of trident and piglin banner pattern
         if (item.identifier() == 1188 || item.identifier() == 1200) {
-            dataContainer.set(StructuredDataKey.RARITY, 0); // Common
+            data.set(StructuredDataKey.RARITY, 0); // Common
             saveTag(createCustomTag(item), new ByteTag(true), "rarity");
         }
         return item;
@@ -174,7 +173,16 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
 
         super.handleItemToServer(connection, item);
         downgradeItemData(item);
-        resetRarityValues(item, nbtTagName("rarity"));
+
+        final StructuredDataContainer data = item.dataContainer();
+        final CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData == null) {
+            return item;
+        }
+        if (customData.remove(nbtTagName("rarity")) != null) {
+            data.remove(StructuredDataKey.RARITY);
+            removeCustomTag(data, customData);
+        }
         return item;
     }
 
@@ -204,21 +212,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             }).filter(Objects::nonNull).toArray(AttributeModifiers1_20_5.AttributeModifier[]::new);
             return new AttributeModifiers1_20_5(modifiers, attributeModifiers.showInTooltip());
         });
-    }
-
-    public static void resetRarityValues(final Item item, final String tagName) {
-        final StructuredDataContainer dataContainer = item.dataContainer();
-        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
-        if (customData == null) {
-            return;
-        }
-
-        if (customData.remove(tagName) != null) {
-            dataContainer.remove(StructuredDataKey.RARITY);
-            if (customData.isEmpty()) {
-                dataContainer.remove(StructuredDataKey.CUSTOM_DATA);
-            }
-        }
     }
 
     private int itemToJubeboxSong(final int id) {

@@ -41,6 +41,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
 
+    public static final String MARKER_KEY = "VV|custom_data";
+
     public StructuredItemRewriter(
         T protocol,
         Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
@@ -205,15 +207,18 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         // Remove custom name
         if (customData.remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
+            removeCustomTag(data, customData);
         } else {
             final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
                 data.set(StructuredDataKey.CUSTOM_NAME, customName);
+                removeCustomTag(data, customData);
             }
 
             final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
                 data.set(StructuredDataKey.ITEM_NAME, itemName);
+                removeCustomTag(data, customData);
             }
         }
     }
@@ -223,6 +228,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             customData = new CompoundTag();
+            customData.putBoolean(MARKER_KEY, true);
             data.set(StructuredDataKey.CUSTOM_DATA, customData);
         }
         return customData;
@@ -237,6 +243,16 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected @Nullable Tag removeBackupTag(final CompoundTag customData, final String tagName) {
         return customData.remove(nbtTagName(tagName));
+    }
+
+    protected void removeCustomTag(final StructuredDataContainer data, final CompoundTag customData) {
+        // Only remove if we initially added it and it's now empty again
+        if (customData.contains(MARKER_KEY)) {
+            customData.remove(MARKER_KEY);
+            if (customData.isEmpty()) {
+                data.remove(StructuredDataKey.CUSTOM_DATA);
+            }
+        }
     }
 
     @FunctionalInterface
