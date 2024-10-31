@@ -32,7 +32,7 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 
-public final class EntityDataTypes1_21 extends AbstractEntityDataTypes {
+public final class EntityDataTypes1_21_2 extends AbstractEntityDataTypes {
 
     public final EntityDataType byteType = add(0, Types.BYTE);
     public final EntityDataType varIntType = add(1, Types.VAR_INT);
@@ -60,13 +60,13 @@ public final class EntityDataTypes1_21 extends AbstractEntityDataTypes {
     public final EntityDataType wolfVariantType = add(23, WolfVariant.TYPE);
     public final EntityDataType frogVariantType = add(24, Types.VAR_INT);
     public final EntityDataType optionalGlobalPosition = add(25, Types.OPTIONAL_GLOBAL_POSITION);
-    public final EntityDataType paintingVariantType = add(26, PaintingVariant.TYPE1_21);
+    public final EntityDataType paintingVariantType = add(26, PaintingVariant.TYPE1_21_2);
     public final EntityDataType snifferState = add(27, Types.VAR_INT);
     public final EntityDataType armadilloState = add(28, Types.VAR_INT);
     public final EntityDataType vector3FType = add(29, Types.VECTOR3F);
     public final EntityDataType quaternionType = add(30, Types.QUATERNION);
 
-    public EntityDataTypes1_21(final Type<Item> itemType, final ParticleType particleType, final ArrayType<Particle> particlesType) {
+    public EntityDataTypes1_21_2(final Type<Item> itemType, final ParticleType particleType, final ArrayType<Particle> particlesType) {
         super(31);
         this.itemType = add(7, itemType);
         this.particleType = add(17, particleType);

@@ -25,7 +25,7 @@ package com.viaversion.viaversion.api.type.types.version;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.ArrayType;
@@ -50,7 +50,7 @@ public final class Types1_21_2 {
 
     public static final ParticleType PARTICLE = new ParticleType();
     public static final ArrayType<Particle> PARTICLES = new ArrayType<>(PARTICLE);
-    public static final EntityDataTypes1_21 ENTITY_DATA_TYPES = new EntityDataTypes1_21(ITEM, PARTICLE, PARTICLES);
+    public static final EntityDataTypes1_21_2 ENTITY_DATA_TYPES = new EntityDataTypes1_21_2(ITEM, PARTICLE, PARTICLES);
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType(ENTITY_DATA_TYPES);
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
 }

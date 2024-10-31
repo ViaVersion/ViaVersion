@@ -22,13 +22,19 @@
  */
 package com.viaversion.viaversion.api.minecraft;
 
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record PaintingVariant(int width, int height, String assetId) {
+public record PaintingVariant(int width, int height, String assetId, @Nullable Tag title, @Nullable Tag author) {
 
-    public static HolderType<PaintingVariant> TYPE = new HolderType<>() {
+    public PaintingVariant(final int width, final int height, final String assetId) {
+        this(width, height, assetId, null, null);
+    }
+
+    public static HolderType<PaintingVariant> TYPE1_21 = new HolderType<>() {
         @Override
         public PaintingVariant readDirect(final ByteBuf buffer) {
             final int width = Types.VAR_INT.readPrimitive(buffer);
@@ -42,6 +48,26 @@ public record PaintingVariant(int width, int height, String assetId) {
             Types.VAR_INT.writePrimitive(buffer, variant.width());
             Types.VAR_INT.writePrimitive(buffer, variant.height());
             Types.STRING.write(buffer, variant.assetId());
+        }
+    };
+    public static HolderType<PaintingVariant> TYPE1_21_2 = new HolderType<>() {
+        @Override
+        public PaintingVariant readDirect(final ByteBuf buffer) {
+            final int width = Types.VAR_INT.readPrimitive(buffer);
+            final int height = Types.VAR_INT.readPrimitive(buffer);
+            final String assetId = Types.STRING.read(buffer);
+            final Tag title = Types.OPTIONAL_TAG.read(buffer);
+            final Tag author = Types.OPTIONAL_TAG.read(buffer);
+            return new PaintingVariant(width, height, assetId, title, author);
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, final PaintingVariant variant) {
+            Types.VAR_INT.writePrimitive(buffer, variant.width());
+            Types.VAR_INT.writePrimitive(buffer, variant.height());
+            Types.STRING.write(buffer, variant.assetId());
+            Types.OPTIONAL_TAG.write(buffer, variant.title());
+            Types.OPTIONAL_TAG.write(buffer, variant.author());
         }
     };
 }
