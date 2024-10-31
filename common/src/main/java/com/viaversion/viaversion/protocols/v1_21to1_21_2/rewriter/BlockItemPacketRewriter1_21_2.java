@@ -565,7 +565,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant("minecraft:is_fire"));
         dataContainer.replace(StructuredDataKey.LOCK, tag -> {
             final String lock = ((StringTag) tag).getValue();
-            if (lock.isEmpty()) {
+            if (lock.isBlank()) {
                 // Previously ignored empty values since the data was arbitrary, custom_name doesn't accept empty values
                 return null;
             }
