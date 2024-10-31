@@ -40,6 +40,7 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTrac
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ClientVehicleStorage;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.EntityTracker1_21_2;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.GroundFlagTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
 import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
@@ -163,6 +164,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
 
+            wrapper.user().put(new GroundFlagTracker());
             wrapper.user().remove(ClientVehicleStorage.class);
         });
 
@@ -314,7 +316,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
-            readOnGround(wrapper);
+            handleOnGround(wrapper);
         });
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_POS_ROT, wrapper -> {
             final double x = wrapper.passthrough(Types.DOUBLE); // X
@@ -322,7 +324,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
             final double z = wrapper.passthrough(Types.DOUBLE); // Z
             final float yaw = wrapper.passthrough(Types.FLOAT); // Yaw
             final float pitch = wrapper.passthrough(Types.FLOAT); // Pitch
-            readOnGround(wrapper);
+            handleOnGround(wrapper);
 
             final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
             if (playerPositionStorage.checkCaptureNextPlayerPositionPacket()) {
@@ -335,9 +337,19 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_ROT, wrapper -> {
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
-            readOnGround(wrapper);
+            handleOnGround(wrapper);
         });
-        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, this::readOnGround);
+        protocol.registerServerbound(ServerboundPackets1_21_2.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
+            final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
+            final boolean prevOnGround = tracker.onGround();
+            final boolean prevHorizontalCollision = tracker.horizontalCollision();
+
+            handleOnGround(wrapper);
+            if (prevOnGround == tracker.onGround() && prevHorizontalCollision != tracker.horizontalCollision()) {
+                // Newer clients will send idle packets even though the on ground state didn't change, ignore them
+                wrapper.cancel();
+            }
+        });
         protocol.registerServerbound(ServerboundPackets1_21_2.ACCEPT_TELEPORTATION, wrapper -> {
             final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
             if (playerPositionStorage.checkHasPlayerPosition()) {
@@ -370,9 +382,12 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
         return registryDataRewriter;
     }
 
-    private void readOnGround(final PacketWrapper wrapper) {
+    private void handleOnGround(final PacketWrapper wrapper) {
+        final GroundFlagTracker tracker = wrapper.user().get(GroundFlagTracker.class);
+
         final short data = wrapper.read(Types.UNSIGNED_BYTE);
-        wrapper.write(Types.BOOLEAN, (data & 1) != 0); // On ground, ignoring horizontal collision data
+        wrapper.write(Types.BOOLEAN, tracker.setOnGround((data & 1) != 0)); // Ignoring horizontal collision data
+        tracker.setHorizontalCollision((data & 2) != 0);
     }
 
     private void storeEntityPositionRotation(final PacketWrapper wrapper, final boolean position, final boolean rotation) {
