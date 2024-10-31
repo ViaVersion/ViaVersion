@@ -63,7 +63,9 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracke
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -565,15 +567,11 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.replace(StructuredDataKey.FIRE_RESISTANT, StructuredDataKey.DAMAGE_RESISTANT, fireResistant -> new DamageResistant("minecraft:is_fire"));
         dataContainer.replace(StructuredDataKey.LOCK, tag -> {
             final String lock = ((StringTag) tag).getValue();
-            if (lock.isBlank()) {
-                // Previously ignored empty values since the data was arbitrary, custom_name doesn't accept empty values
-                return null;
-            }
-
             final CompoundTag predicateTag = new CompoundTag();
             final CompoundTag itemComponentsTag = new CompoundTag();
             predicateTag.put("components", itemComponentsTag);
-            itemComponentsTag.put("custom_name", tag);
+            // As json here...
+            itemComponentsTag.putString("custom_name", ComponentUtil.plainToJson(lock).toString());
             return predicateTag;
         });
     }
@@ -584,7 +582,9 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             final CompoundTag predicateTag = (CompoundTag) lock;
             final CompoundTag itemComponentsTag = predicateTag.getCompoundTag("components");
             if (itemComponentsTag != null) {
-                return TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
+                // Back from json in the string tag to plain text
+                final StringTag customName = TagUtil.getNamespacedStringTag(itemComponentsTag, "custom_name");
+                return new StringTag(SerializerVersion.V1_20_5.toComponent(customName.getValue()).asUnformattedString());
             }
             return null;
         });
