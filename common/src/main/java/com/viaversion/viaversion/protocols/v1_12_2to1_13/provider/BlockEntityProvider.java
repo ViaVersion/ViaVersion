@@ -58,7 +58,7 @@ public class BlockEntityProvider implements Provider {
         handlers.put("minecraft:chest", customNameHandler);
         handlers.put("minecraft:dispenser", customNameHandler);
         handlers.put("minecraft:dropper", customNameHandler);
-        handlers.put("minecraft:enchantment_table", customNameHandler);
+        handlers.put("minecraft:enchanting_table", customNameHandler);
         handlers.put("minecraft:furnace", customNameHandler);
         handlers.put("minecraft:hopper", customNameHandler);
         handlers.put("minecraft:shulker_box", customNameHandler);
