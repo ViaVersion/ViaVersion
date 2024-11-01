@@ -246,12 +246,9 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
     }
 
     protected void removeCustomTag(final StructuredDataContainer data, final CompoundTag customData) {
-        // Only remove if we initially added it and it's now empty again
-        if (customData.contains(MARKER_KEY)) {
-            customData.remove(MARKER_KEY);
-            if (customData.isEmpty()) {
-                data.remove(StructuredDataKey.CUSTOM_DATA);
-            }
+        // Only remove if we initially added it and only the marker is left
+        if (customData.contains(MARKER_KEY) && customData.size() == 1) {
+            data.remove(StructuredDataKey.CUSTOM_DATA);
         }
     }
 
