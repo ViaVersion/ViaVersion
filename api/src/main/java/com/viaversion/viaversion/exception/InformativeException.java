@@ -22,11 +22,13 @@
  */
 package com.viaversion.viaversion.exception;
 
+import com.viaversion.viaversion.api.Via;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InformativeException extends RuntimeException {
+    private static final int MAX_MESSAGE_LENGTH = 5_000;
     private final List<DataEntry> dataEntries = new ArrayList<>();
     private boolean shouldBePrinted = true;
     private int sources;
@@ -58,14 +60,21 @@ public class InformativeException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
+        final StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
         boolean first = true;
-        for (DataEntry entry : dataEntries) {
+        for (final DataEntry entry : dataEntries) {
             if (!first) {
                 builder.append(", ");
+            } else {
+                first = false;
             }
-            builder.append(entry.name()).append(": ").append(entry.value());
-            first = false;
+
+            builder.append(entry.name()).append(": ");
+            String s = String.valueOf(entry.value());
+            if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > MAX_MESSAGE_LENGTH) {
+                s = s.substring(0, MAX_MESSAGE_LENGTH - builder.length()) + "...";
+            }
+            builder.append(s.replaceAll("\\s", ""));
         }
         return builder.toString();
     }
