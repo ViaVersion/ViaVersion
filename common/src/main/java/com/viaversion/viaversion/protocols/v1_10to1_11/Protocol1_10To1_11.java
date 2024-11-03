@@ -132,13 +132,13 @@ public class Protocol1_10To1_11 extends AbstractProtocol<ClientboundPackets1_9_3
                     if (effectID == 2002) {
                         int data = packetWrapper.get(Types.INT, 1);
                         boolean isInstant = false;
-                        Pair<Integer, Boolean> newData = PotionColorMappings1_11.getNewData(data);
+                        PotionColorMappings1_11.PotionData newData = PotionColorMappings1_11.getNewData(data);
                         if (newData == null) {
                             getLogger().warning("Received unknown potion data: " + data);
                             data = 0;
                         } else {
-                            data = newData.key();
-                            isInstant = newData.value();
+                            data = newData.data();
+                            isInstant = newData.instant();
                         }
                         if (isInstant) {
                             packetWrapper.set(Types.INT, 0, 2007);

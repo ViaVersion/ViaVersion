@@ -18,16 +18,19 @@
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.StringTag;
+import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.BlockEntityProvider;
 import com.viaversion.viaversion.util.Key;
-import com.viaversion.viaversion.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler {
-    // Object -> string (id without namespace) or byte (numeric id)
-    private static final Map<Pair<?, Byte>, Integer> flowers = new HashMap<>();
+    private static final int EMPTY_POT = 5265;
+    private static final Map<String, Byte> STRING_TO_BYTE_ID = new HashMap<>();
+    private static final Map<IntIdPair, Integer> FLOWERS = new HashMap<>();
 
     static {
         register("air", (byte) 0, (byte) 0, 5265);
@@ -55,37 +58,40 @@ public class FlowerPotHandler implements BlockEntityProvider.BlockEntityHandler 
 
     }
 
-    public static void register(String identifier, byte numbericBlockId, byte blockData, int newId) {
-        flowers.put(new Pair<>(identifier, blockData), newId);
-        flowers.put(new Pair<>(numbericBlockId, blockData), newId);
+    private static void register(String identifier, byte blockId, byte blockData, int newId) {
+        STRING_TO_BYTE_ID.put(identifier, blockId);
+        FLOWERS.put(new IntIdPair(blockId, blockData), newId);
     }
 
     @Override
     public int transform(UserConnection user, CompoundTag tag) {
-        Object item = tag.contains("Item") ? tag.get("Item").getValue() : null;
-        Object data = tag.contains("Data") ? tag.get("Data").getValue() : null;
-
         // Convert item to String without namespace or to Byte
-        if (item instanceof String) {
-            item = Key.stripMinecraftNamespace((String) item);
-        } else if (item instanceof Number) {
-            item = ((Number) item).byteValue();
-        } else {
-            item = (byte) 0;
+        Tag itemTag = tag.get("Item");
+        byte item = 0;
+        if (itemTag instanceof StringTag stringTag) {
+            item = STRING_TO_BYTE_ID.getOrDefault(Key.stripMinecraftNamespace(stringTag.getValue()), (byte) 0);
+        } else if (itemTag instanceof NumberTag numberTag) {
+            item = numberTag.asByte();
         }
 
-        // Convert data to Byte
-        if (data instanceof Number) {
-            data = ((Number) data).byteValue();
-        } else {
-            data = (byte) 0;
+        byte data = 0;
+        if (tag.get("Data") instanceof NumberTag dataTag) {
+            data = dataTag.asByte();
         }
 
-        Integer flower = flowers.get(new Pair<>(item, (byte) data));
-        if (flower != null) return flower;
-        flower = flowers.get(new Pair<>(item, (byte) 0));
-        if (flower != null) return flower;
+        Integer flower = FLOWERS.get(new IntIdPair(item, data));
+        if (flower != null) {
+            return flower;
+        }
 
-        return 5265; // Fallback to empty pot
+        flower = FLOWERS.get(new IntIdPair(item, (byte) 0));
+        if (flower != null) {
+            return flower;
+        }
+
+        return EMPTY_POT; // Fallback to empty pot
+    }
+
+    private record IntIdPair(int id, byte data) {
     }
 }
