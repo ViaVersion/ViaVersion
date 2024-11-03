@@ -133,8 +133,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
         if (mappingData.getSoundMappings() != null) {
             final Int2IntFunction soundIdRewriter = clientbound ? mappingData::getNewSoundId : mappingData::getOldSoundId;
-            container.replace(StructuredDataKey.INSTRUMENT1_20_5, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
-            container.replace(StructuredDataKey.INSTRUMENT1_21_2, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
+            container.replace(StructuredDataKey.INSTRUMENT1_20_5, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value.updateId(soundIdRewriter));
+            container.replace(StructuredDataKey.INSTRUMENT1_21_2, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value.updateId(soundIdRewriter));
             container.replace(StructuredDataKey.JUKEBOX_PLAYABLE, value -> value.rewrite(soundIdRewriter));
         }
         if (clientbound && protocol.getComponentRewriter() != null) {
