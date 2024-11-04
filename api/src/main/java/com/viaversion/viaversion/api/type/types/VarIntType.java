@@ -61,6 +61,15 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
         buffer.writeByte(value);
     }
 
+    public static int varIntLength(int value) {
+        int length = 1;
+        while ((value & MULTI_BYTE_BITS) != 0) {
+            length++;
+            value >>>= 7;
+        }
+        return length;
+    }
+
     /**
      * @deprecated use {@link #readPrimitive(ByteBuf)} for manual reading to avoid wrapping
      */

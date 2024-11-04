@@ -29,8 +29,8 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.exception.InformativeException;
 import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
@@ -335,7 +335,7 @@ public class UserConnectionImpl implements UserConnection {
             return;
         }
 
-        int id = Types.VAR_INT.readPrimitive(buf);
+        final int id = Types.VAR_INT.readPrimitive(buf);
         if (id == PacketWrapper.PASSTHROUGH_ID) {
             if (!passthroughTokens.remove(Types.UUID.read(buf))) {
                 throw new IllegalArgumentException("Invalid token");
@@ -343,29 +343,43 @@ public class UserConnectionImpl implements UserConnection {
             return;
         }
 
-        PacketWrapperImpl wrapper = new PacketWrapperImpl(id, buf, this);
-        State state = protocolInfo.getState(direction);
+        final int valuesReaderIndex = buf.readerIndex();
+        final PacketWrapperImpl wrapper = new PacketWrapperImpl(id, buf, this);
         try {
-            protocolInfo.getPipeline().transform(direction, state, wrapper);
-        } catch (CancelException ex) {
+            protocolInfo.getPipeline().transform(direction, protocolInfo.getState(direction), wrapper);
+        } catch (final CancelException ex) {
             throw cancelSupplier.apply(ex);
         }
 
-        writeToBuffer(wrapper, buf);
+        writeToBuffer(wrapper, buf, id, valuesReaderIndex);
     }
 
-    private void writeToBuffer(final PacketWrapperImpl wrapper, final ByteBuf buf) {
+    private void writeToBuffer(final PacketWrapperImpl wrapper, final ByteBuf buf, final int originalId, final int originalReaderIndex) {
+        final int remainingBytes = buf.readableBytes();
+        if (buf.readerIndex() == originalReaderIndex && wrapper.areStoredPacketValuesEmpty()) {
+            if (wrapper.getId() == originalId) {
+                // No changes needed; just set the reader and writer indexes and we're done
+                buf.setIndex(0, originalReaderIndex + remainingBytes);
+                return;
+            }
+            if (VarIntType.varIntLength(wrapper.getId()) == VarIntType.varIntLength(originalId)) {
+                // If the var int encoded length is the same, simply replace the id at the head
+                buf.setIndex(0, 0);
+                Types.VAR_INT.writePrimitive(buf, wrapper.getId());
+                buf.writerIndex(originalReaderIndex + remainingBytes);
+                return;
+            }
+        }
+
         // Instead of allocating a possible unnecessarily large buffer to write the wrapper contents to,
         // only allocate the remaining bytes and write the rest to the original buf's head directly.
-        final int remainingBytes = buf.readableBytes();
         final ByteBuf remainingBuf = buf.alloc().buffer(remainingBytes);
         try {
             // Copy before modifying the buffer
             remainingBuf.writeBytes(buf, remainingBytes);
 
             // Reset indexes, write wrapper contents, then the unread bytes
-            buf.readerIndex(0);
-            buf.writerIndex(0);
+            buf.setIndex(0, 0);
             wrapper.writeProcessedValues(buf);
             buf.writeBytes(remainingBuf);
         } finally {

@@ -228,6 +228,11 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
     }
 
+    public boolean areStoredPacketValuesEmpty() {
+        // Check for read/added packet values, not the input buffer
+        return packetValues.isEmpty() && readableObjects.isEmpty();
+    }
+
     public void writeProcessedValues(ByteBuf buffer) throws InformativeException {
         if (id != -1) {
             Types.VAR_INT.writePrimitive(buffer, id);
