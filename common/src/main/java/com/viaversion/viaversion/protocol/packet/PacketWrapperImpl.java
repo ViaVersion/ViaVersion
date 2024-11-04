@@ -320,7 +320,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         final ProtocolInfo protocolInfo = user().getProtocolInfo();
         final List<Protocol> protocols = protocolInfo.getPipeline().pipes(protocolClass, skipCurrentPipeline, direction);
         apply(direction, protocolInfo.getState(direction), protocols);
-        final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        final ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             return output.retain();
@@ -354,7 +354,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return cancelledFuture();
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             return user().sendRawPacketFuture(output.retain());
@@ -373,7 +373,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             if (currentThread) {
@@ -384,6 +384,14 @@ public class PacketWrapperImpl implements PacketWrapper {
         } finally {
             output.release();
         }
+    }
+
+    public ByteBuf allocateOutputBuffer() {
+        if (inputBuffer == null) {
+            return user().getChannel().alloc().buffer();
+        }
+        // May have already been partially or fully read
+        return inputBuffer.alloc().buffer(Math.max(inputBuffer.readableBytes(), 256));
     }
 
     private ChannelFuture cancelledFuture() {
@@ -454,7 +462,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             if (currentThread) {

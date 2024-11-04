@@ -55,6 +55,7 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class UserConnectionImpl implements UserConnection {
+    private static final int PASSTHROUGH_DATA_BYTES = Long.BYTES * 2 + 2;
     private static final AtomicLong IDS = new AtomicLong();
     private final long id = IDS.incrementAndGet();
     private final Map<Class<?>, StorableObject> storedObjects = new ConcurrentHashMap<>();
@@ -244,7 +245,8 @@ public class UserConnectionImpl implements UserConnection {
     }
 
     private void sendRawPacketToServerServerSide(final ByteBuf packet, final boolean currentThread) {
-        final ByteBuf buf = packet.alloc().buffer();
+        final int initialCapacity = active ? packet.readableBytes() + PASSTHROUGH_DATA_BYTES : packet.readableBytes();
+        final ByteBuf buf = packet.alloc().buffer(initialCapacity);
         try {
             // We'll use passing through because there are some encoder wrappers
             ChannelHandlerContext context = PipelineUtil
@@ -341,7 +343,7 @@ public class UserConnectionImpl implements UserConnection {
             return;
         }
 
-        PacketWrapper wrapper = new PacketWrapperImpl(id, buf, this);
+        PacketWrapperImpl wrapper = new PacketWrapperImpl(id, buf, this);
         State state = protocolInfo.getState(direction);
         try {
             protocolInfo.getPipeline().transform(direction, state, wrapper);
@@ -349,7 +351,7 @@ public class UserConnectionImpl implements UserConnection {
             throw cancelSupplier.apply(ex);
         }
 
-        ByteBuf transformed = buf.alloc().buffer();
+        ByteBuf transformed = wrapper.allocateOutputBuffer();
         try {
             wrapper.writeToBuffer(transformed);
             buf.clear().writeBytes(transformed);

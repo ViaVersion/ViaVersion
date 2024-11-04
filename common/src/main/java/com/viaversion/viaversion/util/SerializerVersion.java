@@ -48,7 +48,8 @@ public enum SerializerVersion {
     V1_18(TextComponentSerializer.V1_18, SNbtSerializer.V1_14),
     V1_19_4(TextComponentSerializer.V1_19_4, SNbtSerializer.V1_14),
     V1_20_3(TextComponentCodec.V1_20_3, SNbtSerializer.V1_14),
-    V1_20_5(TextComponentCodec.V1_20_5, SNbtSerializer.V1_14);
+    V1_20_5(TextComponentCodec.V1_20_5, SNbtSerializer.V1_14),
+    V1_21_4(TextComponentCodec.V1_21_4, SNbtSerializer.V1_14);
 
     final TextComponentSerializer jsonSerializer;
     final SNbtSerializer<? extends Tag> snbtSerializer;
