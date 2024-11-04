@@ -222,6 +222,13 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public void writeToBuffer(ByteBuf buffer) throws InformativeException {
+        writeProcessedValues(buffer);
+        if (inputBuffer != null) {
+            buffer.writeBytes(inputBuffer);
+        }
+    }
+
+    public void writeProcessedValues(ByteBuf buffer) throws InformativeException {
         if (id != -1) {
             Types.VAR_INT.writePrimitive(buffer, id);
         }
@@ -238,7 +245,6 @@ public class PacketWrapperImpl implements PacketWrapper {
                 throw createInformativeException(e, packetValue.type(), i);
             }
         }
-        writeRemaining(buffer);
     }
 
     private InformativeException createInformativeException(final Exception cause, final Type<?> type, final int index) {
@@ -262,12 +268,6 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void clearPacket() {
         clearInputBuffer();
         packetValues.clear();
-    }
-
-    private void writeRemaining(ByteBuf output) {
-        if (inputBuffer != null) {
-            output.writeBytes(inputBuffer);
-        }
     }
 
     @Override
@@ -386,7 +386,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         }
     }
 
-    public ByteBuf allocateOutputBuffer() {
+    private ByteBuf allocateOutputBuffer() {
         if (inputBuffer == null) {
             return user().getChannel().alloc().buffer();
         }

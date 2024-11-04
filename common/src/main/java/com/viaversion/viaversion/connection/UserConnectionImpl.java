@@ -351,12 +351,25 @@ public class UserConnectionImpl implements UserConnection {
             throw cancelSupplier.apply(ex);
         }
 
-        ByteBuf transformed = wrapper.allocateOutputBuffer();
+        writeToBuffer(wrapper, buf);
+    }
+
+    private void writeToBuffer(final PacketWrapperImpl wrapper, final ByteBuf buf) {
+        // Instead of allocating a possible unnecessarily large buffer to write the wrapper contents to,
+        // only allocate the remaining bytes and write the rest to the original buf's head directly.
+        final int remainingBytes = buf.readableBytes();
+        final ByteBuf remainingBuf = buf.alloc().buffer(remainingBytes);
         try {
-            wrapper.writeToBuffer(transformed);
-            buf.clear().writeBytes(transformed);
+            // Copy before modifying the buffer
+            remainingBuf.writeBytes(buf, remainingBytes);
+
+            // Reset indexes, write wrapper contents, then the unread bytes
+            buf.readerIndex(0);
+            buf.writerIndex(0);
+            wrapper.writeProcessedValues(buf);
+            buf.writeBytes(remainingBuf);
         } finally {
-            transformed.release();
+            remainingBuf.release();
         }
     }
 
