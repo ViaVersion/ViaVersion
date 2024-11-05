@@ -52,14 +52,10 @@ public final class ChunkType1_18 extends Type<Chunk> {
         final CompoundTag heightMap = Types.NAMED_COMPOUND_TAG.read(buffer);
 
         // Read sections
-        final ByteBuf sectionsBuf = buffer.readBytes(Types.VAR_INT.readPrimitive(buffer));
+        final ByteBuf sectionsBuf = buffer.readSlice(Types.VAR_INT.readPrimitive(buffer));
         final ChunkSection[] sections = new ChunkSection[ySectionCount];
-        try {
-            for (int i = 0; i < ySectionCount; i++) {
-                sections[i] = sectionType.read(sectionsBuf);
-            }
-        } finally {
-            sectionsBuf.release();
+        for (int i = 0; i < ySectionCount; i++) {
+            sections[i] = sectionType.read(sectionsBuf);
         }
 
         final int blockEntitiesLength = Types.VAR_INT.readPrimitive(buffer);
@@ -78,16 +74,9 @@ public final class ChunkType1_18 extends Type<Chunk> {
 
         Types.NAMED_COMPOUND_TAG.write(buffer, chunk.getHeightMap());
 
-        final ByteBuf sectionBuffer = buffer.alloc().buffer();
-        try {
-            for (final ChunkSection section : chunk.getSections()) {
-                sectionType.write(sectionBuffer, section);
-            }
-            sectionBuffer.readerIndex(0);
-            Types.VAR_INT.writePrimitive(buffer, sectionBuffer.readableBytes());
-            buffer.writeBytes(sectionBuffer);
-        } finally {
-            sectionBuffer.release(); // release buffer
+        Types.VAR_INT.writePrimitive(buffer, sectionType.serializedSize(chunk));
+        for (final ChunkSection section : chunk.getSections()) {
+            sectionType.write(buffer, section);
         }
 
         Types.VAR_INT.writePrimitive(buffer, chunk.blockEntities().size());

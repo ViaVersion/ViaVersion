@@ -32,6 +32,15 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
     private static final int VALUE_BITS = 0x7F;
     private static final int MULTI_BYTE_BITS = ~VALUE_BITS;
     private static final int MAX_BYTES = 5;
+    private static final int[] VAR_INT_LENGTHS = new int[65];
+
+    static {
+        // Copied from Velocity https://github.com/PaperMC/Velocity/blob/08a42b3723633ea5eb6b96c0bb42180f3c2b07eb/proxy/src/main/java/com/velocitypowered/proxy/protocol/ProtocolUtils.java#L166
+        for (int i = 0; i <= 32; ++i) {
+            VAR_INT_LENGTHS[i] = (int) Math.ceil((31d - (i - 1)) / 7d);
+        }
+        VAR_INT_LENGTHS[32] = 1; // Special case for the number 0.
+    }
 
     public VarIntType() {
         super("VarInt", Integer.class);
@@ -61,15 +70,6 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
         buffer.writeByte(value);
     }
 
-    public static int varIntLength(int value) {
-        int length = 1;
-        while ((value & MULTI_BYTE_BITS) != 0) {
-            length++;
-            value >>>= 7;
-        }
-        return length;
-    }
-
     /**
      * @deprecated use {@link #readPrimitive(ByteBuf)} for manual reading to avoid wrapping
      */
@@ -96,5 +96,9 @@ public class VarIntType extends Type<Integer> implements TypeConverter<Integer> 
             return boo ? 1 : 0;
         }
         throw new UnsupportedOperationException();
+    }
+
+    public static int varIntLength(final int value) {
+        return VAR_INT_LENGTHS[Integer.numberOfLeadingZeros(value)];
     }
 }

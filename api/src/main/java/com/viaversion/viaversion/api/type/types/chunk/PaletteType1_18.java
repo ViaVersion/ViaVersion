@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import com.viaversion.viaversion.util.MathUtil;
 import io.netty.buffer.ByteBuf;
@@ -94,13 +95,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             return;
         }
 
-        // 1, 2, and 3 bit linear block palettes can't be read by the client
-        final int min = type == PaletteType.BLOCKS ? 4 : 1;
-        int bitsPerValue = Math.max(min, MathUtil.ceilLog2(size));
-        if (bitsPerValue > type.highestBitsPerValue()) {
-            bitsPerValue = globalPaletteBits;
-        }
-
+        final int bitsPerValue = bitsPerValue(size);
         buffer.writeByte(bitsPerValue);
 
         if (bitsPerValue != globalPaletteBits) {
@@ -112,5 +107,40 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         }
 
         Types.LONG_ARRAY_PRIMITIVE.write(buffer, CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt));
+    }
+
+    private int bitsPerValue(final int size) {
+        // 1, 2, and 3 bit linear block palettes can't be read by the client
+        final int min = type == PaletteType.BLOCKS ? 4 : 1;
+        int bitsPerValue = Math.max(min, MathUtil.ceilLog2(size));
+        if (bitsPerValue > type.highestBitsPerValue()) {
+            bitsPerValue = globalPaletteBits;
+        }
+        return bitsPerValue;
+    }
+
+    public int serializedSize(final DataPalette palette) {
+        // This is a bit of extra work, but worth it to avoid otherwise having to allocate and write to an extra buffer.
+        // On top of saving memory, it provides small but measurable speedup compared to writing to a separate buffer and then back
+        final int size = palette.size();
+        final int bitsPerValue = bitsPerValue(size);
+        int serializedTypesSize = 0;
+        int serializedValuesSize = 1; // At least one byte for 0 length
+        if (size == 1) {
+            serializedTypesSize = VarIntType.varIntLength(palette.idByIndex(0));
+        } else {
+            if (bitsPerValue != globalPaletteBits) {
+                serializedTypesSize = VarIntType.varIntLength(size);
+                for (int i = 0; i < size; i++) {
+                    serializedTypesSize += VarIntType.varIntLength(palette.idByIndex(i));
+                }
+            }
+
+            final int valuesPerLong = 64 / bitsPerValue;
+            final int values = (type.size() + valuesPerLong - 1) / valuesPerLong;
+            serializedValuesSize = VarIntType.varIntLength(values) + (Long.BYTES * values);
+        }
+
+        return Byte.BYTES + serializedTypesSize + serializedValuesSize;
     }
 }
