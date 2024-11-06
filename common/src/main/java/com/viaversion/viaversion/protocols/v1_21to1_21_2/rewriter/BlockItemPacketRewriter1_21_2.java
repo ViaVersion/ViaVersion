@@ -569,7 +569,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
             dataContainer.set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(food.eatSeconds(), 1 /* eat */, sound, true, consumeEffects));
             if (food.usingConvertsTo() != null) {
-                dataContainer.set(StructuredDataKey.USE_REMAINDER, food.usingConvertsTo());
+                dataContainer.set(StructuredDataKey.USE_REMAINDER1_21_2, food.usingConvertsTo());
             }
             return new FoodProperties1_21_2(food.nutrition(), food.saturationModifier(), food.canAlwaysEat());
         });
@@ -610,7 +610,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         });
         dataContainer.replace(StructuredDataKey.FOOD1_21_2, StructuredDataKey.FOOD1_21, food -> {
             final Consumable1_21_2 consumableData = dataContainer.get(StructuredDataKey.CONSUMABLE1_21_2);
-            final Item useRemainderData = dataContainer.get(StructuredDataKey.USE_REMAINDER);
+            final Item useRemainderData = dataContainer.get(StructuredDataKey.USE_REMAINDER1_21_2);
             final float eatSeconds = consumableData != null ? consumableData.consumeSeconds() : 1.6F;
             final List<FoodProperties1_20_5.FoodEffect> foodEffects = new ArrayList<>();
             if (consumableData != null) {
@@ -637,7 +637,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.REPAIRABLE);
         dataContainer.remove(StructuredDataKey.ENCHANTABLE);
         dataContainer.remove(StructuredDataKey.CONSUMABLE1_21_2);
-        dataContainer.remove(StructuredDataKey.USE_REMAINDER);
+        dataContainer.remove(StructuredDataKey.USE_REMAINDER1_21_2);
         dataContainer.remove(StructuredDataKey.USE_COOLDOWN);
         dataContainer.remove(StructuredDataKey.ITEM_MODEL);
         dataContainer.remove(StructuredDataKey.EQUIPPABLE);

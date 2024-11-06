@@ -117,7 +117,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData.getItemMappings() != null) {
             final Int2IntFunction itemIdRewriter = clientbound ? mappingData::getNewItemId : mappingData::getOldItemId;
-            container.replace(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.TRIM1_20_5, value -> value.rewrite(itemIdRewriter));
             container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
             container.replace(StructuredDataKey.REPAIRABLE, value -> value.rewrite(itemIdRewriter));
         }

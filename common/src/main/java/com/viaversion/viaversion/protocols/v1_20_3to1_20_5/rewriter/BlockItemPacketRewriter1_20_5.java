@@ -459,7 +459,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag customModelData = tag.getNumberTag("CustomModelData");
         if (customModelData != null) {
-            data.set(StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
+            data.set(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, customModelData.asInt());
         }
 
         final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
@@ -1045,7 +1045,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             ));
         } else return;
 
-        data.set(StructuredDataKey.TRIM, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
+        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
     }
 
     private void updateMobTags(final StructuredDataContainer data, final CompoundTag tag) {

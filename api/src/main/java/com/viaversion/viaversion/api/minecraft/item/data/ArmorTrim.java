@@ -29,10 +29,10 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPattern> pattern, boolean showInTooltip) {
 
-    public static final Type<ArmorTrim> TYPE = new Type<>(ArmorTrim.class) {
+    public static final Type<ArmorTrim> TYPE1_20_5 = new Type<>(ArmorTrim.class) {
         @Override
         public ArmorTrim read(final ByteBuf buffer) {
-            final Holder<ArmorTrimMaterial> material = ArmorTrimMaterial.TYPE.read(buffer);
+            final Holder<ArmorTrimMaterial> material = ArmorTrimMaterial.TYPE1_20_5.read(buffer);
             final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE.read(buffer);
             final boolean showInTooltip = buffer.readBoolean();
             return new ArmorTrim(material, pattern, showInTooltip);
@@ -40,7 +40,23 @@ public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPatt
 
         @Override
         public void write(final ByteBuf buffer, final ArmorTrim value) {
-            ArmorTrimMaterial.TYPE.write(buffer, value.material);
+            ArmorTrimMaterial.TYPE1_20_5.write(buffer, value.material);
+            ArmorTrimPattern.TYPE.write(buffer, value.pattern);
+            buffer.writeBoolean(value.showInTooltip);
+        }
+    };
+    public static final Type<ArmorTrim> TYPE1_21_4 = new Type<>(ArmorTrim.class) {
+        @Override
+        public ArmorTrim read(final ByteBuf buffer) {
+            final Holder<ArmorTrimMaterial> material = ArmorTrimMaterial.TYPE1_21_4.read(buffer);
+            final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE.read(buffer);
+            final boolean showInTooltip = buffer.readBoolean();
+            return new ArmorTrim(material, pattern, showInTooltip);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final ArmorTrim value) {
+            ArmorTrimMaterial.TYPE1_21_4.write(buffer, value.material);
             ArmorTrimPattern.TYPE.write(buffer, value.pattern);
             buffer.writeBoolean(value.showInTooltip);
         }

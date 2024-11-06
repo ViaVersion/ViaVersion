@@ -240,11 +240,11 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
 
     public void registerCooldown1_21_2(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            String itemIdentifier = wrapper.read(Types.OPTIONAL_STRING);
+            String itemIdentifier = wrapper.read(Types.STRING);
             if (itemIdentifier != null) {
                 itemIdentifier = mappedIdentifier(protocol.getMappingData().getFullItemMappings(), itemIdentifier);
             }
-            wrapper.write(Types.OPTIONAL_STRING, itemIdentifier);
+            wrapper.write(Types.STRING, itemIdentifier);
         });
     }
 

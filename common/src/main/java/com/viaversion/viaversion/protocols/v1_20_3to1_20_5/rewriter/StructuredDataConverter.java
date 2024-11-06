@@ -151,7 +151,7 @@ public final class StructuredDataConverter {
                 putHideFlag(tag, HIDE_ATTRIBUTES);
             }
         });
-        register(StructuredDataKey.CUSTOM_MODEL_DATA, (data, tag) -> tag.putInt("CustomModelData", data));
+        register(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, (data, tag) -> tag.putInt("CustomModelData", data));
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, (data, tag) -> putHideFlag(tag, 0x20));
         register(StructuredDataKey.REPAIR_COST, (data, tag) -> tag.putInt("RepairCost", data));
         register(StructuredDataKey.DYED_COLOR, (data, tag) -> {
@@ -513,7 +513,7 @@ public final class StructuredDataConverter {
                 tag.putInt("map_scale_direction", 1);
             }
         });
-        register(StructuredDataKey.TRIM, (connection, data, tag) -> {
+        register(StructuredDataKey.TRIM1_20_5, (connection, data, tag) -> {
             final CompoundTag trimTag = new CompoundTag();
             final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
             if (data.material().isDirect()) {

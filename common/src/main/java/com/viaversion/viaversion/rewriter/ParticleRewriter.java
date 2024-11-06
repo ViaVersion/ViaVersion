@@ -181,9 +181,11 @@ public class ParticleRewriter<C extends ClientboundPacketType> implements com.vi
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.DOUBLE); // Knockback X
-            wrapper.passthrough(Types.DOUBLE); // Knockback Y
-            wrapper.passthrough(Types.DOUBLE); // Knockback Z
+            if (wrapper.passthrough(Types.BOOLEAN)) {
+                wrapper.passthrough(Types.DOUBLE); // Knockback X
+                wrapper.passthrough(Types.DOUBLE); // Knockback Y
+                wrapper.passthrough(Types.DOUBLE); // Knockback Z
+            }
 
             final Particle explosionParticle = wrapper.read(particleType);
             wrapper.write(mappedParticleType, explosionParticle);

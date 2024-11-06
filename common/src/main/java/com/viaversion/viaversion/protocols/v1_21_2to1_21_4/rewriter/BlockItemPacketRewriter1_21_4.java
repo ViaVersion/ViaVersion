@@ -17,6 +17,12 @@
  */
 package com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
@@ -71,5 +77,55 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         recipeRewriter.registerUpdateRecipes(ClientboundPackets1_21_2.UPDATE_RECIPES);
         recipeRewriter.registerRecipeBookAdd(ClientboundPackets1_21_2.RECIPE_BOOK_ADD);
         recipeRewriter.registerPlaceGhostRecipe(ClientboundPackets1_21_2.PLACE_GHOST_RECIPE);
+    }
+
+    @Override
+    public Item handleItemToClient(final UserConnection connection, final Item item) {
+        super.handleItemToClient(connection, item);
+
+        final Integer modelData = item.dataContainer().get(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
+        if (modelData != null) {
+            saveTag(createCustomTag(item), new IntTag(modelData), "custom_model_data");
+        }
+
+        updateItemData(item);
+        return item;
+    }
+
+    @Override
+    public Item handleItemToServer(final UserConnection connection, final Item item) {
+        super.handleItemToServer(connection, item);
+
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        final CompoundTag customData = dataContainer.get(StructuredDataKey.CUSTOM_DATA);
+        if (customData != null) {
+            if (customData.remove(nbtTagName("custom_model_data")) instanceof final IntTag customModelData) {
+                dataContainer.set(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, customModelData.asInt());
+                removeCustomTag(dataContainer, customData);
+            }
+        }
+
+        downgradeItemData(item);
+        return item;
+    }
+
+    public static void updateItemData(final Item item) {
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21_4);
+        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21_4);
+        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21_4);
+        dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_2, StructuredDataKey.USE_REMAINDER1_21_4);
+        dataContainer.replaceKey(StructuredDataKey.TRIM1_20_5, StructuredDataKey.TRIM1_21_4);
+        dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
+    }
+
+    public static void downgradeItemData(final Item item) {
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_4, StructuredDataKey.CHARGED_PROJECTILES1_21_2);
+        dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
+        dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.CONTAINER1_21_2);
+        dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_4, StructuredDataKey.USE_REMAINDER1_21_2);
+        dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_20_5);
+        dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_21_2);
     }
 }

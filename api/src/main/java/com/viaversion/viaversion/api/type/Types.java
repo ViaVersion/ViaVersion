@@ -45,12 +45,14 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.ChunkPosition;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.BitSetType;
+import com.viaversion.viaversion.api.type.types.BooleanArrayType;
 import com.viaversion.viaversion.api.type.types.BooleanType;
 import com.viaversion.viaversion.api.type.types.ByteArrayType;
 import com.viaversion.viaversion.api.type.types.ByteType;
 import com.viaversion.viaversion.api.type.types.ComponentType;
 import com.viaversion.viaversion.api.type.types.DoubleType;
 import com.viaversion.viaversion.api.type.types.EmptyType;
+import com.viaversion.viaversion.api.type.types.FloatArrayType;
 import com.viaversion.viaversion.api.type.types.FloatType;
 import com.viaversion.viaversion.api.type.types.IntArrayType;
 import com.viaversion.viaversion.api.type.types.IntType;
@@ -115,14 +117,17 @@ public final class Types {
     public static final Type<byte[]> OPTIONAL_BYTE_ARRAY_PRIMITIVE = new ByteArrayType.OptionalByteArrayType();
     public static final Type<byte[]> SHORT_BYTE_ARRAY = new ShortByteArrayType();
     public static final Type<byte[]> REMAINING_BYTES = new RemainingBytesType();
-    public static final Type<int[]> INT_ARRAY_PRIMITIVE = new IntArrayType();
 
     public static final ShortType SHORT = new ShortType();
     public static final UnsignedShortType UNSIGNED_SHORT = new UnsignedShortType();
 
     public static final IntType INT = new IntType();
+    public static final Type<int[]> INT_ARRAY_PRIMITIVE = new IntArrayType();
+
     public static final FloatType FLOAT = new FloatType();
     public static final FloatType.OptionalFloatType OPTIONAL_FLOAT = new FloatType.OptionalFloatType();
+    public static final Type<float[]> FLOAT_ARRAY_PRIMITIVE = new FloatArrayType();
+
     public static final DoubleType DOUBLE = new DoubleType();
 
     public static final LongType LONG = new LongType();
@@ -130,6 +135,7 @@ public final class Types {
 
     public static final BooleanType BOOLEAN = new BooleanType();
     public static final BooleanType.OptionalBooleanType OPTIONAL_BOOLEAN = new BooleanType.OptionalBooleanType();
+    public static final Type<boolean[]> BOOLEAN_ARRAY_PRIMITIVE = new BooleanArrayType();
 
     /* Other Types */
     public static final Type<JsonElement> COMPONENT = new ComponentType();
