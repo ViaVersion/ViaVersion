@@ -65,7 +65,6 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPattern
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -530,8 +529,8 @@ public final class StructuredDataConverter {
 
                 final CompoundTag overrideArmorMaterials = new CompoundTag();
                 if (!material.overrideArmorMaterials().isEmpty()) {
-                    for (final Int2ObjectMap.Entry<String> entry : material.overrideArmorMaterials().int2ObjectEntrySet()) {
-                        overrideArmorMaterials.put(Integer.toString(entry.getIntKey()), new StringTag(entry.getValue()));
+                    for (final Map.Entry<String, String> entry : material.overrideArmorMaterials().entrySet()) {
+                        overrideArmorMaterials.put(entry.getKey(), new StringTag(entry.getValue()));
                     }
                     materialTag.put("override_armor_materials", overrideArmorMaterials);
                 }

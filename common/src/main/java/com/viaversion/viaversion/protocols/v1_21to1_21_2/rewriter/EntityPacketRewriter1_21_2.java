@@ -453,7 +453,7 @@ public final class EntityPacketRewriter1_21_2 extends EntityRewriter<Clientbound
 
             // Remove old entity
             final PacketWrapper removeEntityPacket = PacketWrapper.create(ClientboundPackets1_21_2.REMOVE_ENTITIES, event.user());
-            removeEntityPacket.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[] { event.entityId() });
+            removeEntityPacket.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{event.entityId()});
             removeEntityPacket.send(Protocol1_21To1_21_2.class);
 
             // Detect correct boat entity type from entity data

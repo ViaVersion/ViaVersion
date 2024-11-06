@@ -105,8 +105,7 @@ import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1000,17 +999,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.getCompoundTag("override_armor_materials");
             final Tag descriptionTag = materialCompoundTag.get("description");
 
-            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             if (overrideArmorMaterialsTag != null) {
                 for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
                     if (!(entry.getValue() instanceof StringTag valueTag)) {
                         continue;
                     }
-                    try {
-                        final int id = Integer.parseInt(entry.getKey());
-                        overrideArmorMaterials.put(id, valueTag.getValue());
-                    } catch (NumberFormatException ignored) {
-                    }
+
+                    overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
                 }
             }
 

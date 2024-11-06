@@ -27,11 +27,11 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import java.util.Map;
 
 public record ArmorTrimMaterial(String assetName, int itemId, float itemModelIndex,
-                                Int2ObjectMap<String> overrideArmorMaterials, Tag description) {
+                                Map<String, String> overrideArmorMaterials, Tag description) {
 
     public static final HolderType<ArmorTrimMaterial> TYPE = new HolderType<>() {
         @Override
@@ -41,9 +41,9 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             final float itemModelIndex = buffer.readFloat();
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>(overrideArmorMaterialsSize);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
-                final int key = Types.VAR_INT.readPrimitive(buffer);
+                final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
                 overrideArmorMaterials.put(key, value);
             }
@@ -59,8 +59,8 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             buffer.writeFloat(value.itemModelIndex());
 
             Types.VAR_INT.writePrimitive(buffer, value.overrideArmorMaterials().size());
-            for (final Int2ObjectMap.Entry<String> entry : value.overrideArmorMaterials().int2ObjectEntrySet()) {
-                Types.VAR_INT.writePrimitive(buffer, entry.getIntKey());
+            for (final Map.Entry<String, String> entry : value.overrideArmorMaterials().entrySet()) {
+                Types.STRING.write(buffer, entry.getKey());
                 Types.STRING.write(buffer, entry.getValue());
             }
 

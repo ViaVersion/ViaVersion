@@ -74,7 +74,6 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.types.UnsignedByteType;
 import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
-import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.ArmorMaterials1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DyeColors;
@@ -92,7 +91,6 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -693,11 +691,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
 
             final CompoundTag overrideArmorMaterialsTag = new CompoundTag();
-            for (final Int2ObjectMap.Entry<String> entry : armorTrimMaterial.overrideArmorMaterials().int2ObjectEntrySet()) {
-                final String materialKey = ArmorMaterials1_20_5.idToKey(entry.getIntKey());
-                if (materialKey != null) {
-                    overrideArmorMaterialsTag.putString(materialKey, entry.getValue());
-                }
+            for (final Map.Entry<String, String> entry : armorTrimMaterial.overrideArmorMaterials().entrySet()) {
+                overrideArmorMaterialsTag.putString(entry.getKey(), entry.getValue());
             }
 
             materialTag.putString("asset_name", armorTrimMaterial.assetName());
