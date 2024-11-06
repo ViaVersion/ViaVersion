@@ -169,7 +169,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
         Types1_21_4.STRUCTURED_DATA.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS, StructuredDataKey.CAN_PLACE_ON,
-            StructuredDataKey.CAN_BREAK, StructuredDataKey.CUSTOM_MODEL_DATA1_21_2, StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP,
+            StructuredDataKey.CAN_BREAK, StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP,
             StructuredDataKey.REPAIR_COST, StructuredDataKey.CREATIVE_SLOT_LOCK, StructuredDataKey.ENCHANTMENT_GLINT_OVERRIDE,
             StructuredDataKey.INTANGIBLE_PROJECTILE, StructuredDataKey.STORED_ENCHANTMENTS, StructuredDataKey.DYED_COLOR,
             StructuredDataKey.MAP_COLOR, StructuredDataKey.MAP_ID, StructuredDataKey.MAP_DECORATIONS, StructuredDataKey.MAP_POST_PROCESSING,

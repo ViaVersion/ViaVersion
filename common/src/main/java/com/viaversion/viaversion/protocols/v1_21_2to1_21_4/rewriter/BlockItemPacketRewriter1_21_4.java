@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
@@ -83,8 +84,15 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
     public Item handleItemToClient(final UserConnection connection, final Item item) {
         super.handleItemToClient(connection, item);
 
-        final Integer modelData = item.dataContainer().get(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
+        final StructuredDataContainer dataContainer = item.dataContainer();
+        final Integer modelData = dataContainer.get(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
         if (modelData != null) {
+            dataContainer.set(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, new CustomModelData1_21_4(
+                new float[]{modelData.floatValue()},
+                new boolean[0],
+                new String[0],
+                new int[0]
+            ));
             saveTag(createCustomTag(item), new IntTag(modelData), "custom_model_data");
         }
 
@@ -126,6 +134,6 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.CONTAINER1_21_2);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_4, StructuredDataKey.USE_REMAINDER1_21_2);
         dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_20_5);
-        dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_21_2);
+        dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4);
     }
 }

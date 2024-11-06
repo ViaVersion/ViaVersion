@@ -85,7 +85,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<AttributeModifiers1_20_5> ATTRIBUTE_MODIFIERS1_20_5 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_20_5.TYPE);
     public static final StructuredDataKey<AttributeModifiers1_21> ATTRIBUTE_MODIFIERS1_21 = new StructuredDataKey<>("attribute_modifiers", AttributeModifiers1_21.TYPE);
     public static final StructuredDataKey<Integer> CUSTOM_MODEL_DATA1_20_5 = new StructuredDataKey<>("custom_model_data", Types.VAR_INT);
-    public static final StructuredDataKey<CustomModelData1_21_4> CUSTOM_MODEL_DATA1_21_2 = new StructuredDataKey<>("custom_model_data", CustomModelData1_21_4.TYPE);
+    public static final StructuredDataKey<CustomModelData1_21_4> CUSTOM_MODEL_DATA1_21_4 = new StructuredDataKey<>("custom_model_data", CustomModelData1_21_4.TYPE);
     public static final StructuredDataKey<Unit> HIDE_ADDITIONAL_TOOLTIP = new StructuredDataKey<>("hide_additional_tooltip", Types.EMPTY);
     public static final StructuredDataKey<Unit> HIDE_TOOLTIP = new StructuredDataKey<>("hide_tooltip", Types.EMPTY);
     public static final StructuredDataKey<Integer> REPAIR_COST = new StructuredDataKey<>("repair_cost", Types.VAR_INT);
