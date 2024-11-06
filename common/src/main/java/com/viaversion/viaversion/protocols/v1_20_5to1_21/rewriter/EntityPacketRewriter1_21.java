@@ -125,10 +125,10 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         });
 
         // Tracks on ground state for block interactions
-        if (!Via.getConfig().fix1_21PlacementRotation()) {
-            return;
-        }
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS, wrapper -> {
+            if (!Via.getConfig().fix1_21PlacementRotation()) {
+                return;
+            }
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
@@ -136,12 +136,18 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_ROT, wrapper -> {
+            if (!Via.getConfig().fix1_21PlacementRotation()) {
+                return;
+            }
             wrapper.passthrough(Types.FLOAT); // Yaw
             wrapper.passthrough(Types.FLOAT); // Pitch
 
             wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT, wrapper -> {
+            if (!Via.getConfig().fix1_21PlacementRotation()) {
+                return;
+            }
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
@@ -151,6 +157,9 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
             wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
         protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
+            if (!Via.getConfig().fix1_21PlacementRotation()) {
+                return;
+            }
             wrapper.user().get(OnGroundTracker.class).setOnGround(wrapper.passthrough(Types.BOOLEAN));
         });
     }
