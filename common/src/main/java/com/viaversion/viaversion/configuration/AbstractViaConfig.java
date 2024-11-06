@@ -164,7 +164,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         handleInvalidItemCount = getBoolean("handle-invalid-item-count", false);
         cancelBlockSounds = getBoolean("cancel-block-sounds", true);
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
-        fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", false);
+        fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
