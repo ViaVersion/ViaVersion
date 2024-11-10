@@ -38,6 +38,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
@@ -48,6 +49,14 @@ import java.util.Objects;
 public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<ClientboundPacket1_20_5, ServerboundPacket1_20_5, Protocol1_20_5To1_21> {
 
     private static final List<String> DISCS = List.of("11", "13", "5", "blocks", "cat", "chirp", "far", "mall", "mellohi", "otherside", "pigstep", "relic", "stal", "strad", "wait", "ward");
+    private static final int HELMET_SLOT = 5;
+    private static final int CHESTPLATE_SLOT = 6;
+    private static final int LEGGINGS_SLOT = 7;
+    private static final int BOOTS_SLOT = 8;
+
+    private static final int AQUA_AFFINITY_ID = 6;
+    private static final int DEPTH_STRIDER_ID = 8;
+    private static final int SWIFT_SNEAK_ID = 12;
 
     public BlockItemPacketRewriter1_21(final Protocol1_20_5To1_21 protocol) {
         super(protocol,
@@ -67,7 +76,31 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
 
         registerCooldown(ClientboundPackets1_20_5.COOLDOWN);
         registerSetContent1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_CONTENT);
-        registerSetSlot1_17_1(ClientboundPackets1_20_5.CONTAINER_SET_SLOT);
+        protocol.registerClientbound(ClientboundPackets1_20_5.CONTAINER_SET_SLOT, wrapper -> {
+            final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
+            wrapper.passthrough(Types.VAR_INT); // State id
+            Short slotId = wrapper.passthrough(Types.SHORT); // Slot id
+            final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType));
+            wrapper.write(mappedItemType, item);
+
+            // When a players' armor is set, update their attributes
+            if (containerId != 0
+                || slotId > BOOTS_SLOT
+                || slotId < HELMET_SLOT
+                || slotId == CHESTPLATE_SLOT) return;
+
+            final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
+            if (storage == null) return;
+            var enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS);
+            var active = storage.activeEnchants();
+            active = switch (slotId) {
+                case HELMET_SLOT -> active.aquaAffinity(enchants == null ? 0 : enchants.getLevel(AQUA_AFFINITY_ID));
+                case LEGGINGS_SLOT -> active.swiftSneak(enchants == null ? 0 : enchants.getLevel(SWIFT_SNEAK_ID));
+                case BOOTS_SLOT -> active.depthStrider(enchants == null ? 0 : enchants.getLevel(DEPTH_STRIDER_ID));
+                default -> active;
+            };
+            storage.setEnchants(-1, wrapper.user(), active);
+        });
         registerAdvancements1_20_3(ClientboundPackets1_20_5.UPDATE_ADVANCEMENTS);
         registerSetEquipment(ClientboundPackets1_20_5.SET_EQUIPMENT);
         registerContainerClick1_17_1(ServerboundPackets1_20_5.CONTAINER_CLICK);

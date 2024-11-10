@@ -45,25 +45,10 @@ public final class EfficiencyAttributeStorage implements StorableObject {
     private volatile boolean loginSent;
     private ActiveEnchants activeEnchants = DEFAULT;
 
-    public void setEnchants(final int entityId, final UserConnection connection, final int efficiency, final int soulSpeed,
-                            final int swiftSneak, final int aquaAffinity, final int depthStrider) {
-        // Always called from the main thread
-        if (efficiency == activeEnchants.efficiency.level
-            && soulSpeed == activeEnchants.soulSpeed.level
-            && swiftSneak == activeEnchants.swiftSneak.level
-            && aquaAffinity == activeEnchants.aquaAffinity.level
-            && depthStrider == activeEnchants.depthStrider.level) {
-            return;
-        }
-
+    public void setEnchants(final int entityId, final UserConnection connection, final ActiveEnchants enchants) {
+        if (activeEnchants == enchants) return;
         synchronized (lock) {
-            this.activeEnchants = new ActiveEnchants(entityId,
-                new ActiveEnchant(activeEnchants.efficiency, efficiency),
-                new ActiveEnchant(activeEnchants.soulSpeed, soulSpeed),
-                new ActiveEnchant(activeEnchants.swiftSneak, swiftSneak),
-                new ActiveEnchant(activeEnchants.aquaAffinity, aquaAffinity),
-                new ActiveEnchant(activeEnchants.depthStrider, depthStrider)
-            );
+            this.activeEnchants = entityId == -1 ? enchants : enchants.withEntityId(entityId);
             this.attributesSent = false;
         }
         sendAttributesPacket(connection, false);
@@ -73,7 +58,10 @@ public final class EfficiencyAttributeStorage implements StorableObject {
         return activeEnchants;
     }
 
-    public void onLoginSent(final UserConnection connection) {
+    public void onLoginSent(final int entityId, final UserConnection connection) {
+        synchronized (lock) {
+            activeEnchants = activeEnchants.withEntityId(entityId);
+        }
         // Always called from the netty thread
         this.loginSent = true;
         sendAttributesPacket(connection, false);
@@ -128,6 +116,56 @@ public final class EfficiencyAttributeStorage implements StorableObject {
 
     public record ActiveEnchants(int entityId, ActiveEnchant efficiency, ActiveEnchant soulSpeed,
                                  ActiveEnchant swiftSneak, ActiveEnchant aquaAffinity, ActiveEnchant depthStrider) {
+        private ActiveEnchants withEntityId(int entityId) {
+            return this.entityId == entityId ? this : new ActiveEnchants(entityId,
+                efficiency,
+                soulSpeed,
+                swiftSneak,
+                aquaAffinity,
+                depthStrider);
+        }
+
+        public ActiveEnchants efficiency(int level) {
+            return efficiency.level == level ? this : new ActiveEnchants(entityId,
+                    new ActiveEnchant(efficiency, level),
+                    soulSpeed,
+                    swiftSneak,
+                    aquaAffinity,
+                    depthStrider);
+        }
+
+        public ActiveEnchants soulSpeed(int level) {
+            return soulSpeed.level == level ? this : new ActiveEnchants(entityId,
+                efficiency,
+                new ActiveEnchant(soulSpeed, level),
+                swiftSneak,
+                aquaAffinity,
+                depthStrider);
+        }
+        public ActiveEnchants swiftSneak(int level) {
+            return swiftSneak.level == level ? this : new ActiveEnchants(entityId,
+                efficiency,
+                soulSpeed,
+                new ActiveEnchant(swiftSneak, level),
+                aquaAffinity,
+                depthStrider);
+        }
+        public ActiveEnchants aquaAffinity(int level) {
+            return aquaAffinity.level == level ? this : new ActiveEnchants(entityId,
+                efficiency,
+                soulSpeed,
+                swiftSneak,
+                new ActiveEnchant(aquaAffinity, level),
+                depthStrider);
+        }
+        public ActiveEnchants depthStrider(int level) {
+            return depthStrider.level == level ? this : new ActiveEnchants(entityId,
+                efficiency,
+                soulSpeed,
+                swiftSneak,
+                aquaAffinity,
+                new ActiveEnchant(depthStrider, level));
+        }
     }
 
     public record ActiveEnchant(EnchantAttributeModifier modifier, int previousLevel, int level) {

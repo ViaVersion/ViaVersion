@@ -28,6 +28,7 @@ import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListen
 import com.viaversion.viaversion.bukkit.listeners.v1_14_4to1_15.EntityToggleGlideListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_18_2to1_19.BlockBreakListener;
+import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.LegacyChangeItemListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.DeathListener;
@@ -184,7 +185,7 @@ public class BukkitViaLoader implements ViaPlatformLoader {
             if (PaperViaInjector.hasClass("io.papermc.paper.event.player.PlayerInventorySlotChangeEvent")) {
                 new PaperPlayerChangeItemListener(plugin).register();
             } else {
-                new PlayerChangeItemListener(plugin).register();
+                new LegacyChangeItemListener(plugin).register();
             }
         }
     }

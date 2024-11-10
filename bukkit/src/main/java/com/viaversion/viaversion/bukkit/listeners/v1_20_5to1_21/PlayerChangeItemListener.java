@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21;
 
 import com.viaversion.viaversion.ViaVersionPlugin;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.bukkit.listeners.ViaBukkitListener;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
@@ -38,11 +37,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class PlayerChangeItemListener extends ViaBukkitListener {
 
     // Use legacy function and names here to support all versions
-    private final Enchantment efficiency = getByName("efficiency", "DIG_SPEED");
-    private final Enchantment aquaAffinity = getByName("aqua_affinity", "WATER_WORKER");
-    private final Enchantment depthStrider = getByName("depth_strider", "DEPTH_STRIDER");
-    private final Enchantment soulSpeed = getByName("soul_speed", "SOUL_SPEED");
-    private final Enchantment swiftSneak = getByName("swift_sneak", "SWIFT_SNEAK");
+    protected final Enchantment efficiency = getByName("efficiency", "DIG_SPEED");
+    protected final Enchantment aquaAffinity = getByName("aqua_affinity", "WATER_WORKER");
+    protected final Enchantment depthStrider = getByName("depth_strider", "DEPTH_STRIDER");
+    protected final Enchantment soulSpeed = getByName("soul_speed", "SOUL_SPEED");
+    protected final Enchantment swiftSneak = getByName("swift_sneak", "SWIFT_SNEAK");
 
     public PlayerChangeItemListener(final ViaVersionPlugin plugin) {
         super(plugin, Protocol1_20_5To1_21.class);
@@ -55,35 +54,26 @@ public class PlayerChangeItemListener extends ViaBukkitListener {
         sendAttributeUpdate(player, item, Slot.HAND);
     }
 
+    protected EfficiencyAttributeStorage getEfficiencyStorage(final UserConnection connection) {
+        return isOnPipe(connection) ? connection.get(EfficiencyAttributeStorage.class) : null;
+    }
+
     void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {
-        final UserConnection connection = Via.getAPI().getConnection(player.getUniqueId());
-        if (connection == null || !isOnPipe(player)) {
-            return;
-        }
+        final UserConnection connection = getUserConnection(player);
+        final EfficiencyAttributeStorage storage = getEfficiencyStorage(connection);
+        if (storage == null) return;
 
-        final EfficiencyAttributeStorage storage = connection.get(EfficiencyAttributeStorage.class);
-        if (storage == null) {
-            return;
-        }
-
-        final EfficiencyAttributeStorage.ActiveEnchants activeEnchants = storage.activeEnchants();
-        int efficiencyLevel = activeEnchants.efficiency().level();
-        int aquaAffinityLevel = activeEnchants.aquaAffinity().level();
-        int soulSpeedLevel = activeEnchants.soulSpeed().level();
-        int swiftSneakLevel = activeEnchants.swiftSneak().level();
-        int depthStriderLevel = activeEnchants.depthStrider().level();
-        switch (slot) {
-            case HAND -> efficiencyLevel = item != null ? item.getEnchantmentLevel(efficiency) : 0;
-            case HELMET -> aquaAffinityLevel = item != null ? item.getEnchantmentLevel(aquaAffinity) : 0;
-            case LEGGINGS -> swiftSneakLevel = item != null && swiftSneak != null ? item.getEnchantmentLevel(swiftSneak) : 0;
-            case BOOTS -> {
-                depthStriderLevel = item != null && depthStrider != null ? item.getEnchantmentLevel(depthStrider) : 0;
-                // TODO This needs continuous ticking for the supporting block as a conditional effect
-                //  and is even more prone to desync from high ping than the other attributes
-                //soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
-            }
-        }
-        storage.setEnchants(player.getEntityId(), connection, efficiencyLevel, soulSpeedLevel, swiftSneakLevel, aquaAffinityLevel, depthStriderLevel);
+        var enchants = storage.activeEnchants();
+        enchants = switch (slot) {
+            case HAND -> enchants.efficiency(item != null ? item.getEnchantmentLevel(efficiency) : 0);
+            case HELMET -> enchants.aquaAffinity(item != null ? item.getEnchantmentLevel(aquaAffinity) : 0);
+            case LEGGINGS -> enchants.swiftSneak(item != null && swiftSneak != null ? item.getEnchantmentLevel(swiftSneak) : 0);
+            case BOOTS -> enchants.depthStrider(item != null && depthStrider != null ? item.getEnchantmentLevel(depthStrider) : 0);
+            // TODO This needs continuous ticking for the supporting block as a conditional effect
+            //  and is even more prone to desync from high ping than the other attributes
+            //soulSpeedLevel = item != null && soulSpeed != null ? item.getEnchantmentLevel(soulSpeed) : 0;
+        };
+        storage.setEnchants(player.getEntityId(), connection, enchants);
     }
 
     enum Slot {

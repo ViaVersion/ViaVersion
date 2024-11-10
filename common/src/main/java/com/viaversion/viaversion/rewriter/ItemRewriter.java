@@ -36,14 +36,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends RewriterBase<T> implements com.viaversion.viaversion.api.rewriter.ItemRewriter<T> {
-    private final Type<Item> itemType;
-    private final Type<Item> mappedItemType;
-    private final Type<Item[]> itemArrayType;
-    private final Type<Item[]> mappedItemArrayType;
-    private final Type<Item> itemCostType;
-    private final Type<Item> mappedItemCostType;
-    private final Type<Item> optionalItemCostType;
-    private final Type<Item> mappedOptionalItemCostType;
+    protected final Type<Item> itemType;
+    protected final Type<Item> mappedItemType;
+    protected final Type<Item[]> itemArrayType;
+    protected final Type<Item[]> mappedItemArrayType;
+    protected final Type<Item> itemCostType;
+    protected final Type<Item> mappedItemCostType;
+    protected final Type<Item> optionalItemCostType;
+    protected final Type<Item> mappedOptionalItemCostType;
 
     public ItemRewriter(
         T protocol,
