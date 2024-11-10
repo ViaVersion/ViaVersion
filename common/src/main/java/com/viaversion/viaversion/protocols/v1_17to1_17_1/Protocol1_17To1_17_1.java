@@ -92,7 +92,9 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             ListTag<StringTag> pagesTag = new ListTag<>(StringTag.class);
             for (int i = 0; i < pages; i++) {
                 String page = wrapper.read(PAGE_STRING_TYPE);
-                pagesTag.add(new StringTag(page));
+                if (i < 200) { // Apply network limit as per game code
+                    pagesTag.add(new StringTag(page));
+                }
             }
 
             // Legacy servers don't like an empty pages list
