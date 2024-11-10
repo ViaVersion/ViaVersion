@@ -172,7 +172,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                         final String channel = wrapper.get(Types.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
-                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            if (Via.getManager().isDebug()) {
                                 getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
@@ -181,7 +181,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                             List<String> checkedChannels = new ArrayList<>(channels.length);
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
-                                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                    if (Via.getManager().isDebug()) {
                                         getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 32 characters");
                                     }
                                     continue;

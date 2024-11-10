@@ -205,7 +205,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                     String old = channel;
                     channel = getOldPluginChannelId(channel);
                     if (channel == null) {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getManager().isDebug()) {
                             protocol.getLogger().warning("Ignoring serverbound plugin message with channel: " + old);
                         }
                         wrapper.cancel();
@@ -217,7 +217,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                             String rewritten = getOldPluginChannelId(s);
                             if (rewritten != null) {
                                 rewrittenChannels.add(rewritten);
-                            } else if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            } else if (Via.getManager().isDebug()) {
                                 protocol.getLogger().warning("Ignoring plugin channel in serverbound " + channel + ": " + s);
                             }
                         }
