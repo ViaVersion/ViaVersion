@@ -211,7 +211,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                         wrapper.cancel();
                         return;
                     } else if (channel.equals("REGISTER") || channel.equals("UNREGISTER")) {
-                        String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                        String[] channels = new String(wrapper.read(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA), StandardCharsets.UTF_8).split("\0");
                         List<String> rewrittenChannels = new ArrayList<>();
                         for (String s : channels) {
                             String rewritten = getOldPluginChannelId(s);
@@ -221,7 +221,7 @@ public class ItemPacketRewriter1_13 extends ItemRewriter<ClientboundPackets1_12_
                                 protocol.getLogger().warning("Ignoring plugin channel in serverbound " + channel + ": " + s);
                             }
                         }
-                        wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
+                        wrapper.write(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA, Joiner.on('\0').join(rewrittenChannels).getBytes(StandardCharsets.UTF_8));
                     }
                     wrapper.set(Types.STRING, 0, channel);
                 });

@@ -65,6 +65,7 @@ import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.Limit;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import com.viaversion.viaversion.util.Unit;
@@ -154,7 +155,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             wrapper.passthrough(Types.SHORT); // Slot
             wrapper.passthrough(Types.BYTE); // Button
             wrapper.passthrough(Types.VAR_INT); // Mode
-            final int length = wrapper.passthrough(Types.VAR_INT);
+            final int length = Limit.max(wrapper.passthrough(Types.VAR_INT), 128);
             for (int i = 0; i < length; i++) {
                 wrapper.passthrough(Types.SHORT); // Slot
                 passthroughServerboundItem(wrapper);

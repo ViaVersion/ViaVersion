@@ -59,6 +59,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
@@ -74,7 +75,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Tag> CUSTOM_NAME = new StructuredDataKey<>("custom_name", Types.TAG);
     public static final StructuredDataKey<Tag> ITEM_NAME = new StructuredDataKey<>("item_name", Types.TAG);
     public static final StructuredDataKey<String> ITEM_MODEL = new StructuredDataKey<>("item_model", Types.STRING);
-    public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", Types.TAG_ARRAY);
+    public static final StructuredDataKey<Tag[]> LORE = new StructuredDataKey<>("lore", new ArrayType<>(Types.TAG, 256));
     public static final StructuredDataKey<Integer> RARITY = new StructuredDataKey<>("rarity", Types.VAR_INT);
     public static final StructuredDataKey<Enchantments> ENCHANTMENTS = new StructuredDataKey<>("enchantments", Enchantments.TYPE);
     public static final StructuredDataKey<AdventureModePredicate> CAN_PLACE_ON = new StructuredDataKey<>("can_place_on", AdventureModePredicate.TYPE);
@@ -140,7 +141,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<PotDecorations> POT_DECORATIONS = new StructuredDataKey<>("pot_decorations", PotDecorations.TYPE);
     public static final StructuredDataKey<Item[]> CONTAINER1_20_5 = new StructuredDataKey<>("container", Types1_20_5.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> CONTAINER1_21 = new StructuredDataKey<>("container", Types1_21.ITEM_ARRAY);
-    public static final StructuredDataKey<Item[]> CONTAINER1_21_2 = new StructuredDataKey<>("container", Types1_21_2.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CONTAINER1_21_2 = new StructuredDataKey<>("container", new ArrayType<>(Types1_21_2.ITEM, 256));
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);

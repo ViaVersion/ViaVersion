@@ -149,6 +149,8 @@ public final class Types {
     public static final VarLongType VAR_LONG = new VarLongType();
 
     /* MC Types */
+    public static final Type<byte[]> SERVERBOUND_CUSTOM_PAYLOAD_DATA = new RemainingBytesType(Short.MAX_VALUE);
+
     public static final Type<BlockPosition> BLOCK_POSITION1_8 = new BlockPositionType1_8();
     public static final Type<BlockPosition> OPTIONAL_POSITION1_8 = new BlockPositionType1_8.OptionalBlockPositionType();
     public static final Type<BlockPosition> BLOCK_POSITION1_14 = new BlockPositionType1_14();

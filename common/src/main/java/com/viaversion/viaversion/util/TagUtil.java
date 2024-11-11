@@ -17,7 +17,6 @@
  */
 package com.viaversion.viaversion.util;
 
-import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.NumberTag;

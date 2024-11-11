@@ -177,7 +177,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
-                            String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            String[] channels = new String(wrapper.read(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA), StandardCharsets.UTF_8).split("\0");
                             List<String> checkedChannels = new ArrayList<>(channels.length);
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
@@ -195,7 +195,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                                 return;
                             }
 
-                            wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
+                            wrapper.write(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
                         }
                     });
                 }
