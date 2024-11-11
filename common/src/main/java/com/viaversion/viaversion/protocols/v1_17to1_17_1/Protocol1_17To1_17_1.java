@@ -29,7 +29,6 @@ import com.viaversion.viaversion.api.type.types.StringType;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ClientboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_16_4to1_17.packet.ServerboundPackets1_17;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
-import com.viaversion.viaversion.util.Limit;
 
 public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPackets1_17, ClientboundPackets1_17_1, ServerboundPackets1_17, ServerboundPackets1_17> {
 
@@ -89,11 +88,13 @@ public final class Protocol1_17To1_17_1 extends AbstractProtocol<ClientboundPack
             int slot = wrapper.read(Types.VAR_INT);
 
             // Save pages to tag
-            int pages = Limit.max(wrapper.read(Types.VAR_INT), 200);
+            int pages = wrapper.read(Types.VAR_INT);
             ListTag<StringTag> pagesTag = new ListTag<>(StringTag.class);
             for (int i = 0; i < pages; i++) {
                 String page = wrapper.read(PAGE_STRING_TYPE);
-                pagesTag.add(new StringTag(page));
+                if (i < 200) { // Apply network limit as per game code
+                    pagesTag.add(new StringTag(page));
+                }
             }
 
             // Legacy servers don't like an empty pages list
