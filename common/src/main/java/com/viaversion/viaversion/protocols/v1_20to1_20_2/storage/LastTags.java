@@ -31,6 +31,7 @@ import java.util.List;
 public class LastTags implements StorableObject {
 
     private final List<RegistryTags> registryTags = new ArrayList<>();
+    private boolean sentDuringConfigPhase;
 
     public LastTags(final PacketWrapper wrapper) {
         final int length = wrapper.passthrough(Types.VAR_INT);
@@ -63,6 +64,14 @@ public class LastTags implements StorableObject {
             }
         }
         packet.send(Protocol1_20To1_20_2.class);
+    }
+
+    public void setSentDuringConfigPhase(final boolean sentDuringConfigPhase) {
+        this.sentDuringConfigPhase = sentDuringConfigPhase;
+    }
+
+    public boolean sentDuringConfigPhase() {
+        return sentDuringConfigPhase;
     }
 
     private record RegistryTags(String registryKey, List<TagData> tags) {

@@ -77,6 +77,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_3.CONTAINER_SLOT_STATE_CHANGED);
 
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.UPDATE_TAGS);
+        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND);
@@ -307,7 +308,6 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
         registerServerbound(ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, resourcePackStatusHandler());
         registerClientbound(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH, resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
     }
 
     private PacketHandler resourcePackStatusHandler() {

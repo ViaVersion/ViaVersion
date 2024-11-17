@@ -124,11 +124,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
         });
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, wrapper -> {
-            tagRewriter.handleGeneric(wrapper);
-            wrapper.resetReader();
-            wrapper.user().put(new LastTags(wrapper));
-        });
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, this::handleConfigTags);
 
         registerClientbound(ClientboundPackets1_19_4.SET_DISPLAY_OBJECTIVE, wrapper -> {
             final byte slot = wrapper.read(Types.BYTE);
@@ -229,6 +225,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
     }
 
+    private void handleConfigTags(final PacketWrapper wrapper) {
+        tagRewriter.handleGeneric(wrapper);
+        wrapper.resetReader();
+
+        final LastTags lastTags = new LastTags(wrapper);
+        lastTags.setSentDuringConfigPhase(true);
+        wrapper.user().put(lastTags);
+    }
+
     private static void sanitizeCustomPayload(final PacketWrapper wrapper) {
         final String channel = Key.namespaced(wrapper.get(Types.STRING, 0));
         if (channel.equals("minecraft:brand")) {
@@ -299,6 +304,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_TAGS.getId()) {
+                handleConfigTags(packetWrapper); // Manually put through handler
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
             } else {
                 // Not a packet that can be mapped to the configuration protocol
@@ -327,8 +333,12 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         final LastTags lastTags = connection.get(LastTags.class);
         if (lastTags != null) {
-            // The server might still follow up with a tags packet, but we wouldn't know
-            lastTags.sendLastTags(connection);
+            if (lastTags.sentDuringConfigPhase()) {
+                lastTags.setSentDuringConfigPhase(false);
+            } else {
+                // The server might still follow up with a tags packet, but we wouldn't know
+                lastTags.sendLastTags(connection);
+            }
         }
 
         if (lastResourcePack != null && connection.getProtocolInfo().protocolVersion() == ProtocolVersion.v1_20_2) {

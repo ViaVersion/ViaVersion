@@ -166,8 +166,8 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
                     wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, tag.getValue().clone());
                 }
             });
-            if (w.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
-                // Make sure it's included in the configuration packets
+            if (w.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_5)) {
+                // Make sure it's included in the configuration packets as it may already be required for registry data
                 tagsPacket.send(Protocol1_12_2To1_13.class);
             } else {
                 tagsPacket.scheduleSend(Protocol1_12_2To1_13.class);
