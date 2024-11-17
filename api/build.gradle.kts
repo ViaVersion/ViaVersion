@@ -8,7 +8,7 @@ sourceSets {
         blossom {
             javaSources {
                 property("version", project.version.toString())
-                property("impl_version", "git-ViaVersion-${project.version}:${rootProject.latestCommitHash()}")
+                property("impl_version", "git-ViaVersion-${project.version}:${rootProject.latestCommitHash().get()}")
             }
         }
     }

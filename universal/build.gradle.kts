@@ -31,7 +31,7 @@ tasks {
     }
 }
 
-val branch = rootProject.branchName()
+val branch = rootProject.branchName().get()
 val baseVersion = project.version as String
 val isRelease = !baseVersion.contains('-')
 val isMainBranch = branch == "master"
@@ -40,8 +40,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
     val changelogContent = if (isRelease) {
         "See [GitHub](https://github.com/ViaVersion/ViaVersion) for release notes."
     } else {
-        val commitHash = rootProject.latestCommitHash()
-        "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage()}"
+        val commitHash = rootProject.latestCommitHash().get()
+        "[$commitHash](https://github.com/ViaVersion/ViaVersion/commit/$commitHash) ${rootProject.latestCommitMessage().get()}"
     }
 
     modrinth {
