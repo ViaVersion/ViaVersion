@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityMappings1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -91,6 +92,7 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 8 - Data
 
                 // Track Entity
+                handler(objectTrackerHandler());
                 handler(wrapper -> {
                     byte type = wrapper.get(Types.BYTE, 0);
                     if (type == EntityTypes1_10.ObjectType.FISHIHNG_HOOK.getId()) {
@@ -102,13 +104,15 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
 
                         final int entityId = wrapper.get(Types.VAR_INT, 0);
 
+                        final List<EntityData> entityDataList = new ArrayList<>();
+                        entityDataList.add(new EntityData(6, EntityDataTypes1_9.ITEM, new DataItem(1, (byte) 1, null)));
+
                         final PacketWrapper setItem = PacketWrapper.create(ClientboundPackets1_9_3.SET_ENTITY_DATA, wrapper.user());
                         setItem.write(Types.VAR_INT, entityId);
-                        setItem.write(Types1_9.ENTITY_DATA_LIST, List.of(new EntityData(6, EntityDataTypes1_9.ITEM, new DataItem(1, (byte) 1, null))));
+                        setItem.write(Types1_9.ENTITY_DATA_LIST, entityDataList);
                         setItem.send(Protocol1_10To1_11.class);
                     }
                 });
-                handler(objectTrackerHandler());
             }
         });
 

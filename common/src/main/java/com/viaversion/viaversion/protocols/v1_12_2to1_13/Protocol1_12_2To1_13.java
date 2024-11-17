@@ -168,7 +168,7 @@ public class Protocol1_12_2To1_13 extends AbstractProtocol<ClientboundPackets1_1
             });
             if (w.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
                 // Make sure it's included in the configuration packets
-                tagsPacket.send(Protocol1_12_2To1_13.class);
+                tagsPacket.scheduleSend(Protocol1_12_2To1_13.class);
             } else {
                 tagsPacket.scheduleSend(Protocol1_12_2To1_13.class);
             }
