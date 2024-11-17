@@ -42,7 +42,7 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             final Holder<SoundEvent> soundEvent = Types.SOUND_EVENT.read(buffer);
             final String model = Types.OPTIONAL_STRING.read(buffer);
             final String cameraOverlay = Types.OPTIONAL_STRING.read(buffer);
-            final HolderSet allowedEntities = Types.HOLDER_SET.read(buffer);
+            final HolderSet allowedEntities = Types.OPTIONAL_HOLDER_SET.read(buffer);
             final boolean dispensable = buffer.readBoolean();
             final boolean swappable = buffer.readBoolean();
             final boolean damageOnHurt = buffer.readBoolean();
@@ -55,7 +55,7 @@ public record Equippable(int equipmentSlot, Holder<SoundEvent> soundEvent, @Null
             Types.SOUND_EVENT.write(buffer, value.soundEvent());
             Types.OPTIONAL_STRING.write(buffer, value.model());
             Types.OPTIONAL_STRING.write(buffer, value.cameraOverlay());
-            Types.HOLDER_SET.write(buffer, value.allowedEntities());
+            Types.OPTIONAL_HOLDER_SET.write(buffer, value.allowedEntities());
             buffer.writeBoolean(value.dispensable());
             buffer.writeBoolean(value.swappable());
             buffer.writeBoolean(value.damageOnHurt());
