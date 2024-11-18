@@ -24,9 +24,9 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_11.EntityType;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_9;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -37,6 +37,7 @@ import com.viaversion.viaversion.protocols.v1_10to1_11.data.EntityMappings1_11;
 import com.viaversion.viaversion.protocols.v1_10to1_11.storage.EntityTracker1_11;
 import com.viaversion.viaversion.protocols.v1_9_1to1_9_3.packet.ClientboundPackets1_9_3;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -91,13 +92,27 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
                 map(Types.INT); // 8 - Data
 
                 // Track Entity
+                handler(objectTrackerHandler());
                 handler(wrapper -> {
                     byte type = wrapper.get(Types.BYTE, 0);
                     if (type == EntityTypes1_10.ObjectType.FISHIHNG_HOOK.getId()) {
                         tryFixFishingHookVelocity(wrapper);
+                    } else if (type == EntityTypes1_10.ObjectType.ITEM.getId()) {
+                        // Older clients used stone as fallback as long as the entity data was not set
+                        wrapper.send(Protocol1_10To1_11.class);
+                        wrapper.cancel();
+
+                        final int entityId = wrapper.get(Types.VAR_INT, 0);
+
+                        final List<EntityData> entityDataList = new ArrayList<>();
+                        entityDataList.add(new EntityData(6, EntityDataTypes1_9.ITEM, new DataItem(1, (byte) 1, null)));
+
+                        final PacketWrapper setItem = PacketWrapper.create(ClientboundPackets1_9_3.SET_ENTITY_DATA, wrapper.user());
+                        setItem.write(Types.VAR_INT, entityId);
+                        setItem.write(Types1_9.ENTITY_DATA_LIST, entityDataList);
+                        setItem.send(Protocol1_10To1_11.class);
                     }
                 });
-                handler(objectTrackerHandler());
             }
         });
 
