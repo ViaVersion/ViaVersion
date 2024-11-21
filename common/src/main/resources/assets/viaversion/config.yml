@@ -215,3 +215,6 @@ chunk-border-fix: false
 left-handed-handling: true
 # Tries to cancel block break/place sounds sent by 1.8 servers to 1.9+ clients to prevent them from playing twice
 cancel-block-sounds: true
+# If enabled, 1.20.5+ clients will have legitimate sword blocking mechanics on 1.8 servers. Note that you won't be able to see
+# the blocking in first person if the client is older than 1.21.4.
+legitimate-sword-blocking: true
