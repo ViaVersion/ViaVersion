@@ -480,10 +480,10 @@ public interface ViaVersionConfig extends Config {
     boolean fix1_21PlacementRotation();
 
     /**
-     * If enabled, 1.20.5+ clients will have legitimate sword blocking mechanics on 1.8 servers. Note that you won't be able to see
-     * the blocking in first person if the client is older than 1.21.4.
+     * If enabled, 1.20.5+ clients will have sword blocking mechanics on 1.8 servers using the consumable item component.
+     * Note that you won't be able to see the blocking in first person if the client is older than 1.21.4.
      *
      * @return true if enabled
      */
-    boolean legitimateSwordBlocking();
+    boolean swordBlockingViaConsumable();
 }

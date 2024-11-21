@@ -96,7 +96,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     private boolean cancelBlockSounds;
     private boolean hideScoreboardNumbers;
     private boolean fix1_21PlacementRotation;
-    private boolean legitimateSwordBlocking;
+    private boolean swordBlockingViaConsumable;
 
     protected AbstractViaConfig(final File configFile, final Logger logger) {
         super(configFile, logger);
@@ -166,7 +166,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
         cancelBlockSounds = getBoolean("cancel-block-sounds", true);
         hideScoreboardNumbers = getBoolean("hide-scoreboard-numbers", false);
         fix1_21PlacementRotation = getBoolean("fix-1_21-placement-rotation", true);
-        legitimateSwordBlocking = getBoolean("legitimate-sword-blocking", true);
+        swordBlockingViaConsumable = getBoolean("sword-blocking-via-consumable", true);
     }
 
     private BlockedProtocolVersions loadBlockedProtocolVersions() {
@@ -560,7 +560,7 @@ public abstract class AbstractViaConfig extends Config implements ViaVersionConf
     }
 
     @Override
-    public boolean legitimateSwordBlocking() {
-        return legitimateSwordBlocking;
+    public boolean swordBlockingViaConsumable() {
+        return swordBlockingViaConsumable;
     }
 }
