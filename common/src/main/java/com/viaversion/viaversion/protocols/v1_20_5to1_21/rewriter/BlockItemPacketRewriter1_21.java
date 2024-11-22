@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.AttributeModifiers1_21;
+import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
@@ -79,20 +80,21 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         protocol.registerClientbound(ClientboundPackets1_20_5.CONTAINER_SET_SLOT, wrapper -> {
             final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
             wrapper.passthrough(Types.VAR_INT); // State id
-            Short slotId = wrapper.passthrough(Types.SHORT); // Slot id
+            final short slotId = wrapper.passthrough(Types.SHORT); // Slot id
             final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType));
             wrapper.write(mappedItemType, item);
 
             // When a players' armor is set, update their attributes
-            if (containerId != 0
-                || slotId > BOOTS_SLOT
-                || slotId < HELMET_SLOT
-                || slotId == CHESTPLATE_SLOT) return;
+            if (containerId != 0 || slotId > BOOTS_SLOT || slotId < HELMET_SLOT || slotId == CHESTPLATE_SLOT) {
+                return;
+            }
 
             final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
-            if (storage == null) return;
-            var enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS);
-            var active = storage.activeEnchants();
+            if (storage == null) {
+                return;
+            }
+            Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS);
+            EfficiencyAttributeStorage.ActiveEnchants active = storage.activeEnchants();
             active = switch (slotId) {
                 case HELMET_SLOT -> active.aquaAffinity(enchants == null ? 0 : enchants.getLevel(AQUA_AFFINITY_ID));
                 case LEGGINGS_SLOT -> active.swiftSneak(enchants == null ? 0 : enchants.getLevel(SWIFT_SNEAK_ID));

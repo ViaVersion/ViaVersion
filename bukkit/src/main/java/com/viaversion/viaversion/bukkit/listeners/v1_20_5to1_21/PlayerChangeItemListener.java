@@ -55,7 +55,7 @@ public class PlayerChangeItemListener extends ViaBukkitListener {
     }
 
     protected EfficiencyAttributeStorage getEfficiencyStorage(final UserConnection connection) {
-        return isOnPipe(connection) ? connection.get(EfficiencyAttributeStorage.class) : null;
+        return connection != null ? connection.get(EfficiencyAttributeStorage.class) : null;
     }
 
     void sendAttributeUpdate(final Player player, @Nullable final ItemStack item, final Slot slot) {
@@ -63,7 +63,7 @@ public class PlayerChangeItemListener extends ViaBukkitListener {
         final EfficiencyAttributeStorage storage = getEfficiencyStorage(connection);
         if (storage == null) return;
 
-        var enchants = storage.activeEnchants();
+        EfficiencyAttributeStorage.ActiveEnchants enchants = storage.activeEnchants();
         enchants = switch (slot) {
             case HAND -> enchants.efficiency(item != null ? item.getEnchantmentLevel(efficiency) : 0);
             case HELMET -> enchants.aquaAffinity(item != null ? item.getEnchantmentLevel(aquaAffinity) : 0);

@@ -127,11 +127,11 @@ public final class EfficiencyAttributeStorage implements StorableObject {
 
         public ActiveEnchants efficiency(int level) {
             return efficiency.level == level ? this : new ActiveEnchants(entityId,
-                    new ActiveEnchant(efficiency, level),
-                    soulSpeed,
-                    swiftSneak,
-                    aquaAffinity,
-                    depthStrider);
+                new ActiveEnchant(efficiency, level),
+                soulSpeed,
+                swiftSneak,
+                aquaAffinity,
+                depthStrider);
         }
 
         public ActiveEnchants soulSpeed(int level) {
@@ -142,6 +142,7 @@ public final class EfficiencyAttributeStorage implements StorableObject {
                 aquaAffinity,
                 depthStrider);
         }
+
         public ActiveEnchants swiftSneak(int level) {
             return swiftSneak.level == level ? this : new ActiveEnchants(entityId,
                 efficiency,
@@ -150,6 +151,7 @@ public final class EfficiencyAttributeStorage implements StorableObject {
                 aquaAffinity,
                 depthStrider);
         }
+
         public ActiveEnchants aquaAffinity(int level) {
             return aquaAffinity.level == level ? this : new ActiveEnchants(entityId,
                 efficiency,
@@ -158,6 +160,7 @@ public final class EfficiencyAttributeStorage implements StorableObject {
                 new ActiveEnchant(aquaAffinity, level),
                 depthStrider);
         }
+
         public ActiveEnchants depthStrider(int level) {
             return depthStrider.level == level ? this : new ActiveEnchants(entityId,
                 efficiency,

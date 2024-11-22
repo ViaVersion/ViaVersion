@@ -27,6 +27,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class LegacyChangeItemListener extends PlayerChangeItemListener {
 
@@ -43,21 +44,24 @@ public class LegacyChangeItemListener extends PlayerChangeItemListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClose(final InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player player)) return;
-        if (event.getInventory().getType() != InventoryType.CRAFTING &&
-            event.getInventory().getType() != InventoryType.PLAYER) return;
-        sendArmorUpdate(player);
+        if (event.getPlayer() instanceof Player player &&
+            (event.getInventory().getType() == InventoryType.CRAFTING ||
+                event.getInventory().getType() == InventoryType.PLAYER)) {
+            sendArmorUpdate(player);
+        }
     }
 
-    void sendArmorUpdate(final Player player) {
+    private void sendArmorUpdate(final Player player) {
         final UserConnection connection = getUserConnection(player);
         final EfficiencyAttributeStorage storage = getEfficiencyStorage(connection);
-        if (storage == null) return;
+        if (storage == null) {
+            return;
+        }
 
-        final var inventory = player.getInventory();
-        ItemStack helmet = inventory.getHelmet();
-        ItemStack leggings = swiftSneak != null ? inventory.getLeggings() : null;
-        ItemStack boots = depthStrider != null ? inventory.getBoots() : null;
+        final PlayerInventory inventory = player.getInventory();
+        final ItemStack helmet = inventory.getHelmet();
+        final ItemStack leggings = swiftSneak != null ? inventory.getLeggings() : null;
+        final ItemStack boots = depthStrider != null ? inventory.getBoots() : null;
 
         storage.setEnchants(player.getEntityId(), connection, storage.activeEnchants()
             .aquaAffinity(helmet != null ? helmet.getEnchantmentLevel(aquaAffinity) : 0)
