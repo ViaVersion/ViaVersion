@@ -81,8 +81,8 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             final short containerId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Container id
             wrapper.passthrough(Types.VAR_INT); // State id
             final short slotId = wrapper.passthrough(Types.SHORT); // Slot id
-            final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType));
-            wrapper.write(mappedItemType, item);
+            final Item item = handleItemToClient(wrapper.user(), wrapper.read(itemType()));
+            wrapper.write(mappedItemType(), item);
 
             // When a players' armor is set, update their attributes
             if (containerId != 0 || slotId > BOOTS_SLOT || slotId < HELMET_SLOT || slotId == CHESTPLATE_SLOT) {
@@ -90,9 +90,6 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             }
 
             final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
-            if (storage == null) {
-                return;
-            }
             Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS);
             EfficiencyAttributeStorage.ActiveEnchants active = storage.activeEnchants();
             active = switch (slotId) {
