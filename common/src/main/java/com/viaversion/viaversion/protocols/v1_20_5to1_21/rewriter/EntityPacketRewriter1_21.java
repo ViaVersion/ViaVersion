@@ -111,7 +111,8 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey1_20_5(3));
                 handler(playerTrackerHandler());
-                handler(wrapper -> wrapper.user().get(EfficiencyAttributeStorage.class).onLoginSent(wrapper.user()));
+                handler(wrapper -> wrapper.user().get(EfficiencyAttributeStorage.class)
+                    .onLoginSent(wrapper.get(Types.INT, 0), wrapper.user()));
             }
         });
 
