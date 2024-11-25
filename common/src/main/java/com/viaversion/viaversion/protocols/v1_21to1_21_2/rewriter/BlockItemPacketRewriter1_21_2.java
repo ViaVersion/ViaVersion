@@ -423,12 +423,20 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
         }
 
         super.handleItemToClient(connection, item);
+
+        // Handle food properties item manually here - the only protocol that has it
+        // The other way around it's handled by the super handleItemToServer method
+        final StructuredDataContainer data = item.dataContainer();
+        final FoodProperties1_20_5 food = data.get(StructuredDataKey.FOOD1_21);
+        if (food != null && food.usingConvertsTo() != null) {
+            this.handleItemToClient(connection, food.usingConvertsTo());
+        }
+
         updateItemData(item);
 
         // Add data components to fix issues in older protocols
         appendItemDataFixComponents(connection, item);
 
-        final StructuredDataContainer data = item.dataContainer();
         final Enchantments enchantments = data.get(StructuredDataKey.ENCHANTMENTS);
         if (enchantments != null && enchantments.size() != 0) {
             // Level 0 is no longer allowed

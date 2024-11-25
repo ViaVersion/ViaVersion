@@ -28,9 +28,10 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public record FoodProperties1_20_5(int nutrition, float saturationModifier, boolean canAlwaysEat, float eatSeconds,
-                                   Item usingConvertsTo, FoodEffect[] possibleEffects) {
+                                   @Nullable Item usingConvertsTo, FoodEffect[] possibleEffects) {
 
     public static final Type<FoodProperties1_20_5> TYPE1_20_5 = new Type<>(FoodProperties1_20_5.class) {
         @Override
