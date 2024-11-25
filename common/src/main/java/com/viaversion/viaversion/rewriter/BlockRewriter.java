@@ -67,11 +67,11 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     }
 
     public void registerBlockEvent(C packetType) {
-        if (protocol.getMappingData().getBlockMappings() == null) {
-            return;
-        }
-
         protocol.registerClientbound(packetType, wrapper -> {
+            if (protocol.getMappingData().getBlockMappings() == null) {
+                return;
+            }
+
             wrapper.passthrough(positionType); // Location
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Action id
             wrapper.passthrough(Types.UNSIGNED_BYTE); // Action param
