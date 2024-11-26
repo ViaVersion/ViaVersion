@@ -172,7 +172,8 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         registerClientbound(ClientboundPackets1_21.BUNDLE_DELIMITER, wrapper -> wrapper.user().get(BundleStateTracker.class).toggleBundling());
         registerServerbound(ServerboundPackets1_21_2.PONG, wrapper -> {
             final int id = wrapper.passthrough(Types.INT); // id
-            if (wrapper.user().get(PlayerPositionStorage.class).checkPong(id)) {
+            final PlayerPositionStorage playerPositionStorage = wrapper.user().get(PlayerPositionStorage.class);
+            if (playerPositionStorage != null && playerPositionStorage.checkPong(id)) {
                 wrapper.cancel();
             }
         });
@@ -234,13 +235,17 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTracker1_21_2(connection));
         connection.put(new BundleStateTracker());
-        connection.put(new PlayerPositionStorage());
         connection.put(new GroundFlagTracker());
+
+        final ProtocolVersion protocolVersion = connection.getProtocolInfo().protocolVersion();
+        if (protocolVersion.olderThan(ProtocolVersion.v1_21_4)) { // Only needed for 1.21.2/1.21.3
+            connection.put(new PlayerPositionStorage());
+        }
 
         // <= 1.21.1 clients allowed loaded chunks to get replaced with new data without unloading them first.
         // 1.21.2 introduced a graphical bug where it doesn't properly render the new data unless the chunk is unloaded beforehand.
         // 1.21.4 fixed this bug, so the workaround is no longer needed.
-        if (connection.getProtocolInfo().protocolVersion().equals(ProtocolVersion.v1_21_2)) {
+        if (protocolVersion.equals(ProtocolVersion.v1_21_2)) {
             connection.put(new ChunkLoadTracker());
         }
     }
