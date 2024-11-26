@@ -38,7 +38,7 @@ final class RecipeRewriter1_20_5 <C extends ClientboundPacketType> extends Recip
         final List<Item> newItems = new ArrayList<>(items.length);
         for (final Item item : items) {
             if (item == null || item.isEmpty()) continue;
-            newItems.add(item);
+            newItems.add(rewrite(wrapper.user(), item));
         }
         wrapper.write(mappedItemArrayType(), newItems.toArray(new Item[0]));
     }
