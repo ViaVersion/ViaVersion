@@ -342,12 +342,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         });
 
-        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol) {
-            @Override
-            protected Item rewrite(final UserConnection connection, @Nullable Item item) {
-                return handleNonEmptyItemToClient(connection, item);
-            }
-        };
+        final RecipeRewriter1_20_5<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_5<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {

@@ -108,23 +108,19 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         for (int i = 0; i < ingredientsNo; i++) {
             handleIngredient(wrapper);
         }
-
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleCraftingShapeless(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredients(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmelting(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredient(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
         wrapper.passthrough(Types.FLOAT); // EXP
         wrapper.passthrough(Types.VAR_INT); // Cooking time
     }
@@ -132,15 +128,13 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     public void handleStonecutting(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredient(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmithing(PacketWrapper wrapper) {
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Addition
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSimpleRecipe(final PacketWrapper wrapper) {
@@ -151,8 +145,7 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Template
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmithingTrim(final PacketWrapper wrapper) {
@@ -188,6 +181,11 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
+    }
+
+    protected void handleResult(final PacketWrapper wrapper) {
+        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
+        wrapper.write(mappedItemType(), result);
     }
 
     @FunctionalInterface

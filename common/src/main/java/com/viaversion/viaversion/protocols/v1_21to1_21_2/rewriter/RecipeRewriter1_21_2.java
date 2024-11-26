@@ -327,6 +327,10 @@ final class RecipeRewriter1_21_2 extends RecipeRewriter1_20_3<ClientboundPacket1
             wrapper.write(Types.VAR_INT, Recipe.SLOT_DISPLAY_EMPTY);
             return;
         }
+        if (ingredient.length == 1) {
+            writeItemDisplay(wrapper, ingredient[0]);
+            return;
+        }
 
         wrapper.write(Types.VAR_INT, Recipe.SLOT_DISPLAY_COMPOSITE);
         wrapper.write(Types.VAR_INT, ingredient.length);
