@@ -39,9 +39,7 @@ public class RecipeRewriter1_20_3<C extends ClientboundPacketType> extends Recip
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
-
-        final Item item = rewrite(wrapper.user(), wrapper.read(itemType())); // Result
-        wrapper.write(mappedItemType(), item);
+        handleResult(wrapper);
         wrapper.passthrough(Types.BOOLEAN); // Show notification
     }
 
