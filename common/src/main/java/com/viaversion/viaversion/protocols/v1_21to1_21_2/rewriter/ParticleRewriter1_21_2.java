@@ -18,7 +18,6 @@
 package com.viaversion.viaversion.protocols.v1_21to1_21_2.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.type.Types;
@@ -45,8 +44,7 @@ public final class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPa
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
         super.rewriteParticle(connection, particle);
         
-        ParticleMappings particleMappings = protocol.getMappingData().getParticleMappings();
-        final String identifier = particleMappings.mappedIdentifier(particle.id());
+        final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
         if ("minecraft:dust_color_transition".equals(identifier)) {
             floatsToARGB(particle, 0);
             floatsToARGB(particle, 1);
