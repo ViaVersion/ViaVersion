@@ -373,7 +373,7 @@ public class UserConnectionImpl implements UserConnection {
 
         // Instead of allocating a possible unnecessarily large buffer to write the wrapper contents to,
         // only allocate the remaining bytes and write the rest to the original buf's head directly.
-        final ByteBuf remainingBuf = buf.alloc().buffer(remainingBytes);
+        final ByteBuf remainingBuf = buf.alloc().buffer(remainingBytes, remainingBytes);
         try {
             // Copy before modifying the buffer
             remainingBuf.writeBytes(buf, remainingBytes);
