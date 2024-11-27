@@ -95,7 +95,7 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public String mappedIdentifier(final int mappedId) {
+    public @Nullable String mappedIdentifier(final int mappedId) {
         if (mappedId < 0 || mappedId >= mappedIdToString.length) {
             return null;
         }
