@@ -43,12 +43,12 @@ public final class ParticleRewriter1_21_2 extends ParticleRewriter<ClientboundPa
     @Override
     public void rewriteParticle(final UserConnection connection, final Particle particle) {
         super.rewriteParticle(connection, particle);
-
+        
         final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
-        if (identifier.equals("minecraft:dust_color_transition")) {
+        if ("minecraft:dust_color_transition".equals(identifier)) {
             floatsToARGB(particle, 0);
             floatsToARGB(particle, 1);
-        } else if (identifier.equals("minecraft:dust")) {
+        } else if ("minecraft:dust".equals(identifier)) {
             floatsToARGB(particle, 0);
         }
     }
