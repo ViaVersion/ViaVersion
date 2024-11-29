@@ -227,7 +227,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE, StructuredDataKey.ITEM_MODEL,
             StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION,
             // Volatile thanks to containing item
-            StructuredDataKey.CHARGED_PROJECTILES1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.USE_REMAINDER1_21_4);
+            StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.USE_REMAINDER1_21_2);
         super.onMappingDataLoaded();
     }
 

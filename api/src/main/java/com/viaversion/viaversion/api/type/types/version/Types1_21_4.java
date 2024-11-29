@@ -43,7 +43,6 @@ public final class Types1_21_4 {
     public static final StructuredDataType STRUCTURED_DATA = new StructuredDataType();
     public static final Type<StructuredData<?>[]> STRUCTURED_DATA_ARRAY = new ArrayType<>(STRUCTURED_DATA);
     public static final ItemType1_20_5 ITEM = new ItemType1_20_5(STRUCTURED_DATA);
-    public static final Type<Item> OPTIONAL_ITEM = ITEM.new OptionalItemType(); // Optional as in boolean prefixed, not via the amount
     public static final Type<Item[]> ITEM_ARRAY = new ArrayType<>(ITEM);
     public static final Type<Item> ITEM_COST = new ItemCostType1_20_5(STRUCTURED_DATA_ARRAY);
     public static final Type<Item> OPTIONAL_ITEM_COST = new ItemCostType1_20_5.OptionalItemCostType(ITEM_COST);
