@@ -19,9 +19,30 @@ package com.viaversion.viaversion.protocols.v1_20_5to1_21.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public final class OnGroundTracker implements StorableObject {
+public final class PlayerPositionStorage implements StorableObject {
 
+    private double x;
+    private double y;
+    private double z;
     private boolean onGround;
+
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public double z() {
+        return z;
+    }
+
+    public void setPosition(final double x, final double y, final double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     public boolean onGround() {
         return onGround;
