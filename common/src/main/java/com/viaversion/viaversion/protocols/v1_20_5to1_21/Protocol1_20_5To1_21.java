@@ -46,7 +46,7 @@ import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.BlockItemPacke
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.ComponentRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter.EntityPacketRewriter1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
@@ -234,7 +234,7 @@ public final class Protocol1_20_5To1_21 extends AbstractProtocol<ClientboundPack
     public void init(final UserConnection connection) {
         addEntityTracker(connection, new EntityTrackerBase(connection, EntityTypes1_20_5.PLAYER));
         connection.put(new EfficiencyAttributeStorage());
-        connection.put(new OnGroundTracker());
+        connection.put(new PlayerPositionStorage());
     }
 
     @Override

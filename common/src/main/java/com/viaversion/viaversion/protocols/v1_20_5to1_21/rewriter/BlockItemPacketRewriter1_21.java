@@ -40,7 +40,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.AttributeModifierMappings1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.OnGroundTracker;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import java.util.Arrays;
@@ -143,13 +143,16 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             if (!Via.getConfig().fix1_21PlacementRotation()) {
                 return;
             }
-            final OnGroundTracker tracker = wrapper.user().get(OnGroundTracker.class);
+            final PlayerPositionStorage storage = wrapper.user().get(PlayerPositionStorage.class);
 
             // Not correct but *enough* for vanilla/normal servers to have block placement synchronized
-            final PacketWrapper playerRotation = wrapper.create(ServerboundPackets1_20_5.MOVE_PLAYER_ROT);
+            final PacketWrapper playerRotation = wrapper.create(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT);
+            playerRotation.write(Types.DOUBLE, storage.x());
+            playerRotation.write(Types.DOUBLE, storage.y());
+            playerRotation.write(Types.DOUBLE, storage.z());
             playerRotation.write(Types.FLOAT, yaw);
             playerRotation.write(Types.FLOAT, pitch);
-            playerRotation.write(Types.BOOLEAN, tracker.onGround());
+            playerRotation.write(Types.BOOLEAN, storage.onGround());
 
             playerRotation.sendToServer(Protocol1_20_5To1_21.class);
             wrapper.sendToServer(Protocol1_20_5To1_21.class);
