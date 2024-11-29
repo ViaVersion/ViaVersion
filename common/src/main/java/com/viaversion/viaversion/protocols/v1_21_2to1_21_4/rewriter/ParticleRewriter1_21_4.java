@@ -38,7 +38,7 @@ public final class ParticleRewriter1_21_4 extends ParticleRewriter<ClientboundPa
         super.rewriteParticle(connection, particle);
 
         final String identifier = protocol.getMappingData().getParticleMappings().mappedIdentifier(particle.id());
-        if (identifier.equals("minecraft:trail")) {
+        if ("minecraft:trail".equals(identifier)) {
             // Duration
             particle.add(Types.VAR_INT, ThreadLocalRandom.current().nextInt(40) + 10);
         }
