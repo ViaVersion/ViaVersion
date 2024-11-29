@@ -45,6 +45,22 @@ public record ArmorTrim(Holder<ArmorTrimMaterial> material, Holder<ArmorTrimPatt
             buffer.writeBoolean(value.showInTooltip);
         }
     };
+    public static final Type<ArmorTrim> TYPE1_21_2 = new Type<>(ArmorTrim.class) {
+        @Override
+        public ArmorTrim read(final ByteBuf buffer) {
+            final Holder<ArmorTrimMaterial> material = ArmorTrimMaterial.TYPE1_21_2.read(buffer);
+            final Holder<ArmorTrimPattern> pattern = ArmorTrimPattern.TYPE.read(buffer);
+            final boolean showInTooltip = buffer.readBoolean();
+            return new ArmorTrim(material, pattern, showInTooltip);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final ArmorTrim value) {
+            ArmorTrimMaterial.TYPE1_21_2.write(buffer, value.material);
+            ArmorTrimPattern.TYPE.write(buffer, value.pattern);
+            buffer.writeBoolean(value.showInTooltip);
+        }
+    };
     public static final Type<ArmorTrim> TYPE1_21_4 = new Type<>(ArmorTrim.class) {
         @Override
         public ArmorTrim read(final ByteBuf buffer) {

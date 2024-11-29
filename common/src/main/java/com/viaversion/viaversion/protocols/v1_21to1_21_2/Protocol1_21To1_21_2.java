@@ -216,7 +216,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
             StructuredDataKey.INTANGIBLE_PROJECTILE, StructuredDataKey.STORED_ENCHANTMENTS, StructuredDataKey.DYED_COLOR,
             StructuredDataKey.MAP_COLOR, StructuredDataKey.MAP_ID, StructuredDataKey.MAP_DECORATIONS, StructuredDataKey.MAP_POST_PROCESSING,
             StructuredDataKey.POTION_CONTENTS1_21_2, StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, StructuredDataKey.WRITABLE_BOOK_CONTENT,
-            StructuredDataKey.WRITTEN_BOOK_CONTENT, StructuredDataKey.TRIM1_20_5, StructuredDataKey.DEBUG_STICK_STATE, StructuredDataKey.ENTITY_DATA,
+            StructuredDataKey.WRITTEN_BOOK_CONTENT, StructuredDataKey.TRIM1_21_2, StructuredDataKey.DEBUG_STICK_STATE, StructuredDataKey.ENTITY_DATA,
             StructuredDataKey.BUCKET_ENTITY_DATA, StructuredDataKey.BLOCK_ENTITY_DATA, StructuredDataKey.INSTRUMENT1_21_2,
             StructuredDataKey.RECIPES, StructuredDataKey.LODESTONE_TRACKER, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS,
             StructuredDataKey.PROFILE, StructuredDataKey.NOTE_BLOCK_SOUND, StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BASE_COLOR,

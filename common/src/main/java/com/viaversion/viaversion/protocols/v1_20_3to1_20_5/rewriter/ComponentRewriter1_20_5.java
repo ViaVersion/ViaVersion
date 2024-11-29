@@ -74,6 +74,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.type.types.UnsignedByteType;
 import com.viaversion.viaversion.api.type.types.item.StructuredDataType;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.ArmorMaterials1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.DyeColors;
@@ -692,7 +693,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
             final CompoundTag overrideArmorMaterialsTag = new CompoundTag();
             for (final Map.Entry<String, String> entry : armorTrimMaterial.overrideArmorMaterials().entrySet()) {
-                overrideArmorMaterialsTag.putString(entry.getKey(), entry.getValue());
+                final String materialKey = ArmorMaterials1_20_5.idToKey(Integer.parseInt(entry.getKey()));
+                if (materialKey != null) {
+                    overrideArmorMaterialsTag.putString(materialKey, entry.getValue());
+                }
             }
 
             materialTag.putString("asset_name", armorTrimMaterial.assetName());

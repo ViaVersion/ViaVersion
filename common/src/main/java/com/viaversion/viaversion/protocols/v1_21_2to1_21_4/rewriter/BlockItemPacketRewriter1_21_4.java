@@ -123,7 +123,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_2, StructuredDataKey.BUNDLE_CONTENTS1_21_4);
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21_4);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_2, StructuredDataKey.USE_REMAINDER1_21_4);
-        dataContainer.replaceKey(StructuredDataKey.TRIM1_20_5, StructuredDataKey.TRIM1_21_4);
+        dataContainer.replaceKey(StructuredDataKey.TRIM1_21_2, StructuredDataKey.TRIM1_21_4);
         dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5);
     }
 
@@ -133,7 +133,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_2);
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.CONTAINER1_21_2);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_4, StructuredDataKey.USE_REMAINDER1_21_2);
-        dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_20_5);
+        dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_21_2);
         dataContainer.remove(StructuredDataKey.CUSTOM_MODEL_DATA1_21_4);
     }
 }

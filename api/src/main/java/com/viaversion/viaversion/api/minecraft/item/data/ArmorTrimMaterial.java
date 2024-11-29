@@ -38,6 +38,43 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
     }
 
     public static final HolderType<ArmorTrimMaterial> TYPE1_20_5 = new HolderType<>() {
+        // The override key is an int, but given we don't use it at all and that creating a new type is annoying,
+        // we'll just store it in the string map:tm:
+        @Override
+        public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
+            final String assetName = Types.STRING.read(buffer);
+            final int item = Types.VAR_INT.readPrimitive(buffer);
+            final float itemModelIndex = buffer.readFloat();
+
+            final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
+            for (int i = 0; i < overrideArmorMaterialsSize; i++) {
+                final int key = Types.VAR_INT.readPrimitive(buffer);
+                final String value = Types.STRING.read(buffer);
+                overrideArmorMaterials.put(Integer.toString(key), value);
+            }
+
+            final Tag description = Types.TAG.read(buffer);
+            return new ArmorTrimMaterial(assetName, item, itemModelIndex, overrideArmorMaterials, description);
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimMaterial value) {
+            Types.STRING.write(buffer, value.assetName());
+            Types.VAR_INT.writePrimitive(buffer, value.itemId());
+            buffer.writeFloat(value.itemModelIndex());
+
+            Types.VAR_INT.writePrimitive(buffer, value.overrideArmorMaterials().size());
+            for (final Map.Entry<String, String> entry : value.overrideArmorMaterials().entrySet()) {
+                Types.VAR_INT.writePrimitive(buffer, Integer.parseInt(entry.getKey()));
+                Types.STRING.write(buffer, entry.getValue());
+            }
+
+            Types.TAG.write(buffer, value.description());
+        }
+    };
+
+    public static final HolderType<ArmorTrimMaterial> TYPE1_21_2 = new HolderType<>() {
         @Override
         public ArmorTrimMaterial readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);

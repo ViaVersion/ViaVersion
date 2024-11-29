@@ -128,6 +128,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<FilterableString[]> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", FilterableString.ARRAY_TYPE);
     public static final StructuredDataKey<WrittenBook> WRITTEN_BOOK_CONTENT = new StructuredDataKey<>("written_book_content", WrittenBook.TYPE);
     public static final StructuredDataKey<ArmorTrim> TRIM1_20_5 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_20_5);
+    public static final StructuredDataKey<ArmorTrim> TRIM1_21_2 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_2);
     public static final StructuredDataKey<ArmorTrim> TRIM1_21_4 = new StructuredDataKey<>("trim", ArmorTrim.TYPE1_21_4);
     public static final StructuredDataKey<CompoundTag> DEBUG_STICK_STATE = new StructuredDataKey<>("debug_stick_state", Types.COMPOUND_TAG);
     public static final StructuredDataKey<CompoundTag> ENTITY_DATA = new StructuredDataKey<>("entity_data", Types.COMPOUND_TAG);

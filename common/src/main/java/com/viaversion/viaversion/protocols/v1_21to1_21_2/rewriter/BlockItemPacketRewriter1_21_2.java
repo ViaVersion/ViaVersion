@@ -587,6 +587,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
             itemComponentsTag.putString("custom_name", ComponentUtil.plainToJson(lock).toString());
             return predicateTag;
         });
+        dataContainer.replace(StructuredDataKey.TRIM1_20_5, StructuredDataKey.TRIM1_21_2, trim -> {
+            // TODO Rewrite from int to string id via sent registry
+            if (trim.material().isDirect()) {
+                trim.material().value().overrideArmorMaterials().clear();
+            }
+            return trim;
+        });
     }
 
     public static void downgradeItemData(final Item item) {
@@ -623,6 +630,13 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 }
             }
             return new FoodProperties1_20_5(food.nutrition(), food.saturationModifier(), food.canAlwaysEat(), eatSeconds, useRemainderData, foodEffects.toArray(new FoodProperties1_20_5.FoodEffect[0]));
+        });
+        dataContainer.replace(StructuredDataKey.TRIM1_21_2, StructuredDataKey.TRIM1_20_5, trim -> {
+            // TODO
+            if (trim.material().isDirect()) {
+                trim.material().value().overrideArmorMaterials().clear();
+            }
+            return trim;
         });
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_2, StructuredDataKey.CONTAINER1_21);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21_2, StructuredDataKey.CHARGED_PROJECTILES1_21);
