@@ -33,6 +33,7 @@ import com.viaversion.viaversion.bukkit.platform.BukkitViaInjector;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaLoader;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTask;
 import com.viaversion.viaversion.bukkit.platform.BukkitViaTaskTask;
+import com.viaversion.viaversion.bukkit.platform.FoliaViaTask;
 import com.viaversion.viaversion.bukkit.platform.PaperViaInjector;
 import com.viaversion.viaversion.dump.PluginInfo;
 import com.viaversion.viaversion.unsupported.UnsupportedPlugin;
@@ -171,11 +172,18 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
 
     @Override
     public PlatformTask runSync(Runnable runnable, long delay) {
+        if (FOLIA) {
+            // Set the delayed tick to at least 1, as Folia requires this.
+            return new FoliaViaTask(getServer().getGlobalRegionScheduler().runDelayed(this, (e) -> runnable.run(), delay <= 0L ? 1L : delay));
+        }
         return new BukkitViaTask(getServer().getScheduler().runTaskLater(this, runnable, delay));
     }
 
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long period) {
+        if (FOLIA) {
+            return new FoliaViaTask(getServer().getGlobalRegionScheduler().runAtFixedRate(this, (e) -> runnable.run(), 1, period));
+        }
         return new BukkitViaTask(getServer().getScheduler().runTaskTimer(this, runnable, 0, period));
     }
 
