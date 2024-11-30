@@ -135,6 +135,7 @@ public final class StructuredDataConverter {
                 }
 
                 final CompoundTag modifierTag = new CompoundTag();
+                modifierTag.put("UUID", new IntArrayTag(UUIDUtil.toIntArray(modifier.modifier().uuid())));
                 modifierTag.putString("AttributeName", identifier.equals("generic.jump_strength") ? "horse.jump_strength" : identifier);
                 modifierTag.putString("Name", modifier.modifier().name());
                 modifierTag.putDouble("Amount", modifier.modifier().amount());
