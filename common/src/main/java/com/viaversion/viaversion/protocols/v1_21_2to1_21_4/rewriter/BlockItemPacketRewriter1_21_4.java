@@ -65,6 +65,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         protocol.cancelServerbound(ServerboundPackets1_21_4.PICK_ITEM_FROM_ENTITY);
 
         protocol.registerClientbound(ClientboundPackets1_21_2.SET_CURSOR_ITEM, this::passthroughClientboundItem);
+        registerSetPlayerInventory(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);
         registerCooldown1_21_2(ClientboundPackets1_21_2.COOLDOWN);
         registerSetContent1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_CONTENT);
         registerSetSlot1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_SLOT);

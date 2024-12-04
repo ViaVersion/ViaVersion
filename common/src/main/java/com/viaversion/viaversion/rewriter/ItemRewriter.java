@@ -231,6 +231,13 @@ public class ItemRewriter<C extends ClientboundPacketType, S extends Serverbound
         });
     }
 
+    public void registerSetPlayerInventory(C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Slot
+            passthroughClientboundItem(wrapper);
+        });
+    }
+
     public void registerCooldown(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
             int itemId = wrapper.read(Types.VAR_INT);
