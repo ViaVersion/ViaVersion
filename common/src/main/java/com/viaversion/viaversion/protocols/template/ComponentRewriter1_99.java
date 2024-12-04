@@ -19,11 +19,11 @@ package com.viaversion.viaversion.protocols.template;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
+import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 
-final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_21> {
+final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_21_2> {
 
     public ComponentRewriter1_99(final Protocol1_99To_98 protocol) {
         super(protocol, ReadType.NBT);
@@ -41,6 +41,6 @@ final class ComponentRewriter1_99 extends ComponentRewriter<ClientboundPacket1_2
 
     @Override
     protected SerializerVersion inputSerializerVersion() {
-        return SerializerVersion.V1_20_5;
+        return SerializerVersion.V1_21_4;
     }
 }
