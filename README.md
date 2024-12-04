@@ -20,6 +20,13 @@ Supported Versions:
 
 **User Docs:** https://docs.viaversion.com/display/VIAVERSION/
 
+Snapshot support
+--------
+**ViaVersion will only be released a few days *after* a Minecraft update** unless the protocol changes of the update were trivial. If you want early-access, usually days or even weeks before the final release, you can subscribe to either:
+- [GitHub Sponsors](https://github.com/sponsors/kennytv/sponsorships?sponsor=kennytv&tier_id=385613&preview=false) (preferred option. Use the `/verify` command on this Discord after), or alternatively
+- [Patreon](https://www.patreon.com/kennytv/membership) (see the highest tier and make sure to link Patreon to your Discord account under Settings->Connections)
+  This also includes access to a private repository with the code, which will be pushed to the public repository after the given delay on a Minecraft update.
+
 Releases/Dev Builds
 --------
 You can find official releases in the following places:
