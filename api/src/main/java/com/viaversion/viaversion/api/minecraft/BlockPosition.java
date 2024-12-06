@@ -37,6 +37,13 @@ public class BlockPosition {
         return new BlockPosition(x + face.modX(), y + face.modY(), z + face.modZ());
     }
 
+    public double distanceFromCenterSquared(final double x, final double y, final double z) {
+        final double dx = this.x + 0.5 - x;
+        final double dy = this.y + 0.5 - y;
+        final double dz = this.z + 0.5 - z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
     public int x() {
         return x;
     }

@@ -26,24 +26,25 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.bukkit.listeners.UpdateListener;
 import com.viaversion.viaversion.bukkit.listeners.multiversion.PlayerSneakListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_14_4to1_15.EntityToggleGlideListener;
-import com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_18_2to1_19.BlockBreakListener;
+import com.viaversion.viaversion.bukkit.listeners.v1_19_3to1_19_4.ArmorToggleListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.LegacyChangeItemListener;
+import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.PaperPlayerChangeItemListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.ArmorListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.BlockListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.DeathListener;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.HandItemCache;
 import com.viaversion.viaversion.bukkit.listeners.v1_8to1_9.PaperPatch;
-import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.PaperPlayerChangeItemListener;
-import com.viaversion.viaversion.bukkit.listeners.v1_20_5to1_21.PlayerChangeItemListener;
 import com.viaversion.viaversion.bukkit.providers.BukkitAckSequenceProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitBlockConnectionProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitInventoryQuickMoveProvider;
+import com.viaversion.viaversion.bukkit.providers.BukkitPickItemProvider;
 import com.viaversion.viaversion.bukkit.providers.BukkitViaMovementTransmitter;
 import com.viaversion.viaversion.protocols.v1_11_1to1_12.provider.InventoryQuickMoveProvider;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.ConnectionData;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.blockconnections.providers.BlockConnectionProvider;
 import com.viaversion.viaversion.protocols.v1_18_2to1_19.provider.AckSequenceProvider;
+import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.HandItemProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import java.util.HashSet;
@@ -186,6 +187,11 @@ public class BukkitViaLoader implements ViaPlatformLoader {
                 new PaperPlayerChangeItemListener(plugin).register();
             } else {
                 new LegacyChangeItemListener(plugin).register();
+            }
+        }
+        if (serverProtocolVersion.olderThan(ProtocolVersion.v1_21_4)) {
+            if (PaperViaInjector.hasMethod(Material.class, "isItem")) {
+                Via.getManager().getProviders().use(PickItemProvider.class, new BukkitPickItemProvider(plugin));
             }
         }
     }

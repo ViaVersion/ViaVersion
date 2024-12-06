@@ -19,7 +19,9 @@ package com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.IntTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -31,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.Protocol1_21_2To1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
+import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
@@ -61,8 +64,18 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
             wrapper.write(Types.VAR_INT, (int) slot);
         });
 
-        protocol.cancelServerbound(ServerboundPackets1_21_4.PICK_ITEM_FROM_BLOCK);
-        protocol.cancelServerbound(ServerboundPackets1_21_4.PICK_ITEM_FROM_ENTITY);
+        protocol.registerServerbound(ServerboundPackets1_21_4.PICK_ITEM_FROM_BLOCK, null, wrapper -> {
+            final BlockPosition blockPosition = wrapper.read(Types.BLOCK_POSITION1_14);
+            final boolean includeData = wrapper.read(Types.BOOLEAN);
+            Via.getManager().getProviders().get(PickItemProvider.class).pickItemFromBlock(wrapper.user(), blockPosition, includeData);
+            wrapper.cancel();
+        });
+        protocol.registerServerbound(ServerboundPackets1_21_4.PICK_ITEM_FROM_ENTITY, null, wrapper -> {
+            final int entityId = wrapper.read(Types.VAR_INT);
+            final boolean includeData = wrapper.read(Types.BOOLEAN);
+            Via.getManager().getProviders().get(PickItemProvider.class).pickItemFromEntity(wrapper.user(), entityId, includeData);
+            wrapper.cancel();
+        });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.SET_CURSOR_ITEM, this::passthroughClientboundItem);
         registerSetPlayerInventory(ClientboundPackets1_21_2.SET_PLAYER_INVENTORY);

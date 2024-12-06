@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.data.MappingDataBase;
 import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
@@ -35,6 +36,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundCon
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
+import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.BlockItemPacketRewriter1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.ComponentRewriter1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.EntityPacketRewriter1_21_4;
@@ -188,6 +190,11 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
             // Volatile thanks to containing item
             StructuredDataKey.CHARGED_PROJECTILES1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.USE_REMAINDER1_21_4);
         super.onMappingDataLoaded();
+    }
+
+    @Override
+    public void register(final ViaProviders providers) {
+        providers.register(PickItemProvider.class, new PickItemProvider());
     }
 
     @Override

@@ -65,12 +65,7 @@ public final class PaperViaInjector {
     }
 
     private static boolean hasServerProtocolMethod() {
-        try {
-            Class.forName("org.bukkit.UnsafeValues").getDeclaredMethod("getProtocolVersion");
-            return true;
-        } catch (final ClassNotFoundException | NoSuchMethodException e) {
-            return false;
-        }
+        return hasMethod("org.bukkit.UnsafeValues", "getProtocolVersion");
     }
 
     private static boolean hasPaperInjectionMethod() {
@@ -78,12 +73,7 @@ public final class PaperViaInjector {
     }
 
     private static boolean hasIsStoppingMethod() {
-        try {
-            Bukkit.class.getDeclaredMethod("isStopping");
-            return true;
-        } catch (final NoSuchMethodException e) {
-            return false;
-        }
+        return hasMethod(Bukkit.class, "isStopping");
     }
 
     private static boolean hasPacketLimiter() {
@@ -95,6 +85,24 @@ public final class PaperViaInjector {
             Class.forName(className);
             return true;
         } catch (final ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    public static boolean hasMethod(final String className, final String method) {
+        try {
+            Class.forName(className).getDeclaredMethod(method);
+            return true;
+        } catch (final ClassNotFoundException | NoSuchMethodException e) {
+            return false;
+        }
+    }
+
+    public static boolean hasMethod(final Class<?> clazz, final String method) {
+        try {
+            clazz.getDeclaredMethod(method);
+            return true;
+        } catch (final NoSuchMethodException e) {
             return false;
         }
     }
