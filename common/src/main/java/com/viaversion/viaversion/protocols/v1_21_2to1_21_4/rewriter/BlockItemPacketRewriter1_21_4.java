@@ -22,10 +22,14 @@ import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.Consumable1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.CustomModelData1_21_4;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
@@ -111,6 +115,9 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
         }
 
         updateItemData(item);
+
+        // Add data components to fix issues in older protocols
+        appendItemDataFixComponents(connection, item);
         return item;
     }
 
@@ -129,6 +136,18 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
 
         downgradeItemData(item);
         return item;
+    }
+
+    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
+        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
+        if (Via.getConfig().swordBlockingViaConsumable() && serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+            if (item.identifier() == 849 || item.identifier() == 854 || item.identifier() == 859 || item.identifier() == 864 || item.identifier() == 869) { // swords
+                // Make sword "eatable" to enable clientside instant blocking on 1.8. Set consume animation to block,
+                // and consume time really high, so the eating animation doesn't play
+                item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2,
+                        new Consumable1_21_2(3600, 3, Holder.of(0), false, new Consumable1_21_2.ConsumeEffect[0]));
+            }
+        }
     }
 
     public static void updateItemData(final Item item) {

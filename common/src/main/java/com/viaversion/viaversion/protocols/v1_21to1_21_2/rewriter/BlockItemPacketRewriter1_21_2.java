@@ -47,7 +47,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_21_2;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
@@ -442,9 +441,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         updateItemData(item);
 
-        // Add data components to fix issues in older protocols
-        appendItemDataFixComponents(connection, item);
-
         final Enchantments enchantments = data.get(StructuredDataKey.ENCHANTMENTS);
         if (enchantments != null && enchantments.size() != 0) {
             // Level 0 is no longer allowed
@@ -536,17 +532,6 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
     private void updateContainerIdServerbound(final PacketWrapper wrapper) {
         final int containerId = wrapper.read(Types.VAR_INT);
         wrapper.write(Types.UNSIGNED_BYTE, (short) containerId);
-    }
-
-    private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
-        final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
-        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8) && item.dataContainer().hasValue(StructuredDataKey.CONSUMABLE1_21_2)) {
-            if (item.identifier() == 840 || item.identifier() == 845 || item.identifier() == 850 || item.identifier() == 855 || item.identifier() == 860) { // swords
-                // Change the consume animation of swords to block
-                final Consumable1_21_2 consumable = item.dataContainer().get(StructuredDataKey.CONSUMABLE1_21_2);
-                item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2, new Consumable1_21_2(consumable.consumeSeconds(), 3, consumable.sound(), consumable.hasConsumeParticles(), consumable.consumeEffects()));
-            }
-        }
     }
 
     public static void updateItemData(final Item item) {
