@@ -79,6 +79,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
             final ItemStack item = new ItemStack(block.getBlockData().getPlacementMaterial(), 1);
             if (includeData && item.getItemMeta() instanceof final BlockStateMeta blockStateMeta) {
                 blockStateMeta.setBlockState(block.getState());
+                item.setItemMeta(blockStateMeta);
             }
             return item;
         } else if (block.getType().isItem()) {
