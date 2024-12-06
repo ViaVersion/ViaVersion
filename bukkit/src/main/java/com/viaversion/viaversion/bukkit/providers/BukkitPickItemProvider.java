@@ -157,7 +157,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
     }
 
     private void moveToHotbar(final PlayerInventory inventory, final int sourceSlot, final ItemStack[] contents) {
-        if (sourceSlot <= 9) {
+        if (sourceSlot < 9) {
             inventory.setHeldItemSlot(sourceSlot);
             return;
         }
