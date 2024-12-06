@@ -140,7 +140,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
 
     private void appendItemDataFixComponents(final UserConnection connection, final Item item) {
         final ProtocolVersion serverVersion = connection.getProtocolInfo().serverProtocolVersion();
-        if (Via.getConfig().swordBlockingViaConsumable() && serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
+        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
             if (item.identifier() == 849 || item.identifier() == 854 || item.identifier() == 859 || item.identifier() == 864 || item.identifier() == 869) { // swords
                 // Make sword "eatable" to enable clientside instant blocking on 1.8. Set consume animation to block,
                 // and consume time really high, so the eating animation doesn't play

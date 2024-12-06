@@ -103,8 +103,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
      * The item in the offhand will be cleared if there is no sword in the main hand.
      */
     public void syncShieldWithSword() {
-        if (Via.getConfig().swordBlockingViaConsumable()
-                && user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_4)) {
+        if (user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_4)) {
             // If sword blocking is done through consumables, don't add a shield.
             return;
         }
@@ -194,8 +193,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                         if ((data & 0x10) == 0x10) {
                             // If sword blocking is done through consumables, don't add a shield. We can use
                             // 1.20.5 here because consumables display properly in 3rd person even in 1.20.5-1.21.3
-                            if (validBlocking.contains(entityId) && (!Via.getConfig().swordBlockingViaConsumable()
-                                    || user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_20_5))) {
+                            if (validBlocking.contains(entityId) &&
+                                    user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_20_5)) {
                                 Item shield = new DataItem(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
