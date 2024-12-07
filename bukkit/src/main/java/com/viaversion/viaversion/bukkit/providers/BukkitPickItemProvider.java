@@ -29,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
@@ -37,8 +38,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BukkitPickItemProvider extends PickItemProvider {
-    private static final boolean HAS_PLACEMENT_MATERIAL_METHOD = PaperViaInjector.hasMethod("org.bukkit.block.BlockData", "getPlacementMaterial");
-    private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, "getSpawnEgg");
+    private static final boolean HAS_PLACEMENT_MATERIAL_METHOD = PaperViaInjector.hasMethod("org.bukkit.block.data.BlockData", "getPlacementMaterial");
+    private static final boolean HAS_SPAWN_EGG_METHOD = PaperViaInjector.hasMethod(ItemFactory.class, "getSpawnEgg", EntityType.class);
     private static final double BLOCK_RANGE = 4.5 + 1;
     private static final double BLOCK_RANGE_SQUARED = BLOCK_RANGE * BLOCK_RANGE;
     private static final double ENTITY_RANGE = 3 + 3;
