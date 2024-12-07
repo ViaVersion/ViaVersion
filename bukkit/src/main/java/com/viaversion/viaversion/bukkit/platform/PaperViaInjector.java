@@ -98,9 +98,9 @@ public final class PaperViaInjector {
         }
     }
 
-    public static boolean hasMethod(final Class<?> clazz, final String method) {
+    public static boolean hasMethod(final Class<?> clazz, final String method, final Class<?>... params) {
         try {
-            clazz.getDeclaredMethod(method);
+            clazz.getDeclaredMethod(method, params);
             return true;
         } catch (final NoSuchMethodException e) {
             return false;
