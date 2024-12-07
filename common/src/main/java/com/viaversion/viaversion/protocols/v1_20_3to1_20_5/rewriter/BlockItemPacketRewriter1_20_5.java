@@ -619,12 +619,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 item.dataContainer().set(StructuredDataKey.MAX_DAMAGE, 326);
             }
         }
-        if (Via.getConfig().swordBlockingViaConsumable() && serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            if (item.identifier() == 814 || item.identifier() == 819 || item.identifier() == 824 || item.identifier() == 829 || item.identifier() == 834) { // swords
-                // Make sword "eatable" to enable clientside instant blocking on 1.8. Consume time is set really high, so the eating animation doesn't play
-                item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties1_20_5(0, 0F, true, 3600, null, new FoodEffect[0]));
-            }
-        }
     }
 
     private int unmappedItemId(final String name) {

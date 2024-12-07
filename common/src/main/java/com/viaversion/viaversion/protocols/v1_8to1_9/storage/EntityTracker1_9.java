@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
@@ -102,6 +103,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
      * The item in the offhand will be cleared if there is no sword in the main hand.
      */
     public void syncShieldWithSword() {
+        if (user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_21_4)) {
+            // If sword blocking is done through consumables, don't add a shield.
+            return;
+        }
+
         boolean swordInHand = hasSwordInHand();
 
         // Update if there is no sword in the main hand or if the player has no shield in the second hand but a sword in the main hand
@@ -183,7 +189,9 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 if (entityData.id() == 0) {
                     // Byte
                     byte data = (byte) entityData.getValue();
-                    if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
+                    // If sword blocking is done through consumables (1.21.4+), don't add a shield.
+                    if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()
+                            && user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
                         if ((data & 0x10) == 0x10) {
                             if (validBlocking.contains(entityId)) {
                                 Item shield = new DataItem(442, (byte) 1, (short) 0, null);
