@@ -191,10 +191,9 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                     byte data = (byte) entityData.getValue();
                     if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
                         if ((data & 0x10) == 0x10) {
-                            // If sword blocking is done through consumables, don't add a shield. We can use
-                            // 1.20.5 here because consumables display properly in 3rd person even in 1.20.5-1.21.3
+                            // If sword blocking is done through consumables, don't add a shield.
                             if (validBlocking.contains(entityId) &&
-                                    user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_20_5)) {
+                                    user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
                                 Item shield = new DataItem(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
