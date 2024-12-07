@@ -189,11 +189,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
                 if (entityData.id() == 0) {
                     // Byte
                     byte data = (byte) entityData.getValue();
-                    if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()) {
+                    // If sword blocking is done through consumables (1.21.4+), don't add a shield.
+                    if (entityId != getProvidedEntityId() && Via.getConfig().isShieldBlocking()
+                            && user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
                         if ((data & 0x10) == 0x10) {
-                            // If sword blocking is done through consumables, don't add a shield.
-                            if (validBlocking.contains(entityId) &&
-                                    user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
+                            if (validBlocking.contains(entityId)) {
                                 Item shield = new DataItem(442, (byte) 1, (short) 0, null);
                                 setSecondHand(entityId, shield);
                             } else {
