@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
@@ -297,8 +298,9 @@ public class WorldPacketRewriter1_9 {
             wrapper.write(Types.UNSIGNED_BYTE, (short) 255);
             // Write item in hand
             Item item = Via.getManager().getProviders().get(HandItemProvider.class).getHandItem(wrapper.user());
-            // Blocking patch
-            if (Via.getConfig().isShieldBlocking()) {
+            // Blocking patch for 1.9-1.21.3 clients
+            if (Via.getConfig().isShieldBlocking() &&
+                    wrapper.user().getProtocolInfo().protocolVersion().olderThan(ProtocolVersion.v1_21_4)) {
                 EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 
                 // Check if the shield is already there or if we have to give it here
