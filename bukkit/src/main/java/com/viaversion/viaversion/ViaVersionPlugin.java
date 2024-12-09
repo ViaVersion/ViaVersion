@@ -47,6 +47,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -56,6 +57,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> {
     private static final boolean FOLIA = PaperViaInjector.hasClass("io.papermc.paper.threadedregions.RegionizedServer");
+    private static final Runnable DUMMY_RUNNABLE = () -> {
+    };
     private static ViaVersionPlugin instance;
     private final BukkitCommandHandler commandHandler = new BukkitCommandHandler();
     private final BukkitViaConfig conf;
@@ -177,6 +180,24 @@ public class ViaVersionPlugin extends JavaPlugin implements ViaPlatform<Player> 
             return new FoliaViaTask(getServer().getGlobalRegionScheduler().runDelayed(this, (e) -> runnable.run(), delay <= 0L ? 1L : delay));
         }
         return new BukkitViaTask(getServer().getScheduler().runTaskLater(this, runnable, delay));
+    }
+
+    public PlatformTask<?> runSyncAt(Runnable runnable, Block block) {
+        if (FOLIA) {
+            return new FoliaViaTask(getServer().getRegionScheduler().run(this, block.getLocation(), (e) -> runnable.run()));
+        }
+        return runSync(runnable);
+    }
+
+    public PlatformTask<?> runSyncFor(Runnable runnable, Player player) {
+        if (FOLIA) {
+            return new FoliaViaTask(player.getScheduler().run(this, (e) -> runnable.run(), DUMMY_RUNNABLE));
+        }
+        return runSync(() -> {
+            if (player.isOnline()) {
+                runnable.run();
+            }
+        });
     }
 
     @Override

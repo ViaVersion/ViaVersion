@@ -52,12 +52,12 @@ public final class BukkitPickItemProvider extends PickItemProvider {
     @Override
     public void pickItemFromBlock(final UserConnection connection, final BlockPosition blockPosition, final boolean includeData) {
         final UUID uuid = connection.getProtocolInfo().getUuid();
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
-            final Player player = plugin.getServer().getPlayer(uuid);
-            if (player == null) {
-                return;
-            }
+        final Player player = plugin.getServer().getPlayer(uuid);
+        if (player == null) {
+            return;
+        }
 
+        plugin.runSyncFor(() -> {
             final Location playerLocation = player.getLocation();
             if (blockPosition.distanceFromCenterSquared(playerLocation.getX(), playerLocation.getY(), playerLocation.getZ()) > BLOCK_RANGE_SQUARED) {
                 return;
@@ -72,7 +72,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
             if (item != null) {
                 pickItem(player, item);
             }
-        });
+        }, player);
     }
 
     private @Nullable ItemStack blockToItem(final Block block, final boolean includeData) {
@@ -96,12 +96,12 @@ public final class BukkitPickItemProvider extends PickItemProvider {
         }
 
         final UUID uuid = connection.getProtocolInfo().getUuid();
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
-            final Player player = plugin.getServer().getPlayer(uuid);
-            if (player == null) {
-                return;
-            }
+        final Player player = plugin.getServer().getPlayer(uuid);
+        if (player == null) {
+            return;
+        }
 
+        plugin.runSyncFor(() -> {
             final Entity entity = player.getWorld().getNearbyEntities(player.getLocation(), ENTITY_RANGE, ENTITY_RANGE, ENTITY_RANGE).stream()
                 .filter(e -> e.getEntityId() == entityId)
                 .findAny()
@@ -114,7 +114,7 @@ public final class BukkitPickItemProvider extends PickItemProvider {
             if (spawnEggType != null) {
                 pickItem(player, new ItemStack(spawnEggType, 1));
             }
-        });
+        }, player);
     }
 
     private void pickItem(final Player player, final ItemStack item) {
