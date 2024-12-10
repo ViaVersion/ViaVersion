@@ -17,7 +17,7 @@ send-supported-versions: false
 # You can use both this and the block-protocols option at the same time as well.
 block-versions: []
 # Block specific Minecraft protocol version numbers.
-# List of all Minecraft protocol versions: https://wiki.vg/Protocol_version_numbers, or use a generator: https://via.krusic22.com
+# List of all Minecraft protocol versions: https://minecraft.wiki/w/Protocol_version, or use a generator: https://via.krusic22.com
 block-protocols: []
 # Change the blocked disconnect message
 block-disconnect-msg: "You are using an unsupported Minecraft version!"
@@ -46,7 +46,7 @@ velocity-ping-save: true
 #
 # The format for the following is:
 #  servername: protocolversion
-# You can find protocol ids on https://wiki.vg/Protocol_version_numbers
+# You can find protocol ids on https://minecraft.wiki/w/Protocol_version
 # It will fall back to the default option if none found.
 velocity-servers: {}
 #
