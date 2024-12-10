@@ -108,7 +108,13 @@ public class RegistryDataRewriter {
                 continue;
             }
 
-            final CompoundTag effects = ((CompoundTag) entry.tag()).getCompoundTag("effects");
+            final CompoundTag tag = (CompoundTag) entry.tag();
+            if (protocol.getMappingData().getFullItemMappings() != null) {
+                updateItemList(tag.getListTag("supported_items", StringTag.class));
+                updateItemList(tag.getListTag("primary_items", StringTag.class));
+            }
+
+            final CompoundTag effects = tag.getCompoundTag("effects");
             if (effects == null) {
                 continue;
             }
@@ -118,8 +124,8 @@ public class RegistryDataRewriter {
                 if (effectEntry.getValue() instanceof final CompoundTag compoundTag) {
                     updateNestedEffect(compoundTag);
                 } else if (effectEntry.getValue() instanceof final ListTag<?> listTag && listTag.getElementType() == CompoundTag.class) {
-                    for (final Tag tag : listTag) {
-                        updateNestedEffect((CompoundTag) tag);
+                    for (final Tag effectTag : listTag) {
+                        updateNestedEffect((CompoundTag) effectTag);
                     }
                 }
             }
@@ -209,5 +215,21 @@ public class RegistryDataRewriter {
 
     private boolean hasAttributeMappings() {
         return protocol.getMappingData() != null && protocol.getMappingData().getAttributeMappings() != null;
+    }
+
+    private void updateItemList(final ListTag<StringTag> listTag) {
+        if (listTag == null) {
+            return;
+        }
+        for (final StringTag tag : listTag) {
+            updateItem(tag);
+        }
+    }
+
+    private void updateItem(final StringTag tag) {
+        final String mapped = protocol.getMappingData().getFullItemMappings().mappedIdentifier(tag.getValue());
+        if (mapped != null) {
+            tag.setValue(mapped);
+        }
     }
 }
