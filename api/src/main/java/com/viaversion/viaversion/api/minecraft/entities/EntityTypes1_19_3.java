@@ -25,8 +25,8 @@ package com.viaversion.viaversion.api.minecraft.entities;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.EntityTypeUtil;
-import java.util.Locale;
 import com.viaversion.viaversion.util.Key;
+import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum EntityTypes1_19_3 implements EntityType {
@@ -266,7 +266,7 @@ public enum EntityTypes1_19_3 implements EntityType {
     }
 
     public static EntityType getTypeFromId(final int typeId) {
-        return EntityTypeUtil.getTypeFromId(TYPES, typeId, ENTITY);
+        return EntityTypeUtil.getTypeFromId(TYPES, typeId, PIG);
     }
 
     public static void initialize(final Protocol<?, ?, ?, ?> protocol) {

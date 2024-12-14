@@ -18,15 +18,15 @@
 package com.viaversion.viaversion.protocols.v1_13_2to1_14.rewriter;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.VillagerData;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_13;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_14;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -82,40 +82,43 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     int typeId = wrapper.get(Types.VAR_INT, 1);
 
                     EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
+                    if (type1_13 == null) {
+                        // <= 1.31.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
+                        wrapper.cancel();
+                        return;
+                    }
+
                     typeId = newEntityId(type1_13.getId());
                     EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
-
-                    if (type1_14 != null) {
-                        int data = wrapper.get(Types.INT, 0);
-                        if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
-                            wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                        } else if (type1_14.is(EntityTypes1_14.MINECART)) {
-                            typeId = switch (data) {
-                                case 1 -> EntityTypes1_14.CHEST_MINECART.getId();
-                                case 2 -> EntityTypes1_14.FURNACE_MINECART.getId();
-                                case 3 -> EntityTypes1_14.TNT_MINECART.getId();
-                                case 4 -> EntityTypes1_14.SPAWNER_MINECART.getId();
-                                case 5 -> EntityTypes1_14.HOPPER_MINECART.getId();
-                                case 6 -> EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
-                                default -> typeId; // default 0 = rideable minecart
-                            };
-                        } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
-                            || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
-                            if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
-                                wrapper.set(Types.INT, 0, data - 1);
-                            }
-                            // send velocity in separate packet, 1.14 is now ignoring the velocity
-                            PacketWrapper velocity = wrapper.create(ClientboundPackets1_14.SET_ENTITY_MOTION);
-                            velocity.write(Types.VAR_INT, entityId);
-                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 0));
-                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 1));
-                            velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 2));
-                            velocity.scheduleSend(Protocol1_13_2To1_14.class);
+                    int data = wrapper.get(Types.INT, 0);
+                    if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
+                        wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
+                    } else if (type1_14.is(EntityTypes1_14.MINECART)) {
+                        typeId = switch (data) {
+                            case 1 -> EntityTypes1_14.CHEST_MINECART.getId();
+                            case 2 -> EntityTypes1_14.FURNACE_MINECART.getId();
+                            case 3 -> EntityTypes1_14.TNT_MINECART.getId();
+                            case 4 -> EntityTypes1_14.SPAWNER_MINECART.getId();
+                            case 5 -> EntityTypes1_14.HOPPER_MINECART.getId();
+                            case 6 -> EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
+                            default -> typeId; // default 0 = rideable minecart
+                        };
+                    } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
+                        || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
+                        if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
+                            wrapper.set(Types.INT, 0, data - 1);
                         }
-
-                        // Register Type ID
-                        wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class).addEntity(entityId, type1_14);
+                        // send velocity in separate packet, 1.14 is now ignoring the velocity
+                        PacketWrapper velocity = wrapper.create(ClientboundPackets1_14.SET_ENTITY_MOTION);
+                        velocity.write(Types.VAR_INT, entityId);
+                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 0));
+                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 1));
+                        velocity.write(Types.SHORT, wrapper.get(Types.SHORT, 2));
+                        velocity.scheduleSend(Protocol1_13_2To1_14.class);
                     }
+
+                    // Register Type ID
+                    wrapper.user().getEntityTracker(Protocol1_13_2To1_14.class).addEntity(entityId, type1_14);
 
                     wrapper.set(Types.VAR_INT, 1, typeId);
                 });
