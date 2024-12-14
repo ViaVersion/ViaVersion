@@ -59,7 +59,6 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
 import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
@@ -95,7 +94,7 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -674,7 +673,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         }
         if (value.possibleEffects().length > 0) {
             final ListTag<CompoundTag> effects = new ListTag<>(CompoundTag.class);
-            for (final FoodEffect foodEffect : value.possibleEffects()) {
+            for (final FoodProperties1_20_5.FoodEffect foodEffect : value.possibleEffects()) {
                 final CompoundTag effectTag = new CompoundTag();
                 final CompoundTag potionEffectTag = new CompoundTag();
                 potionEffectToTag(potionEffectTag, foodEffect.effect());
@@ -688,7 +687,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected FoodProperties foodFromTag(final Tag tag) {
+    protected FoodProperties1_20_5 foodFromTag(final Tag tag) {
         final CompoundTag value = (CompoundTag) tag;
 
         final int nutrition = checkNonNegativeInt(value.getInt("nutrition"));
@@ -696,15 +695,15 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final boolean canAlwaysEat = value.getBoolean("can_always_eat", false);
         final float eatSeconds = checkPositiveFloat(value.getFloat("eat_seconds", 1.6F));
         final ListTag<CompoundTag> effects = value.getListTag("effects", CompoundTag.class);
-        final List<FoodEffect> list = new ArrayList<>();
+        final List<FoodProperties1_20_5.FoodEffect> list = new ArrayList<>();
         if (effects != null) {
             for (final CompoundTag effectTag : effects) {
                 final PotionEffect effect = potionEffectFromTag(effectTag.getCompoundTag("effect"));
                 final float probability = effectTag.getFloat("probability", 1.0F);
-                list.add(new FoodEffect(effect, probability));
+                list.add(new FoodProperties1_20_5.FoodEffect(effect, probability));
             }
         }
-        return new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, null, list.toArray(FoodEffect[]::new));
+        return new FoodProperties1_20_5(nutrition, saturation, canAlwaysEat, eatSeconds, null, list.toArray(FoodProperties1_20_5.FoodEffect[]::new));
     }
 
     protected CompoundTag fireResistantToTag(final Unit value) {
@@ -1047,14 +1046,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             final String assetName = identifierFromTag(materialValue.getStringTag("asset_name"));
             final int ingredient = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().mappedId(materialValue.getString("ingredient"));
             final float itemModelIndex = materialValue.getFloat("item_model_index");
-            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
+            final Map<String, String> overrideArmorMaterials = new HashMap<>();
             final CompoundTag overrideArmorMaterialsTag = materialValue.getCompoundTag("override_armor_materials");
             if (overrideArmorMaterialsTag != null) {
                 for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
-                    final int materialId = ArmorMaterials1_20_5.keyToId(entry.getKey());
-                    if (materialId != -1) {
-                        overrideArmorMaterials.put(materialId, ((StringTag) entry.getValue()).getValue());
-                    }
+                    overrideArmorMaterials.put(entry.getKey(), ((StringTag) entry.getValue()).getValue());
                 }
             }
             final Tag description = materialValue.get("description");
@@ -1154,7 +1150,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final int useDuration = checkPositiveInt(value.getInt("use_duration"));
         final float range = checkPositiveFloat(value.getFloat("range"));
 
-        return Holder.of(new Instrument(soundEvent, useDuration, range));
+        return Holder.of(new Instrument1_20_5(soundEvent, useDuration, range));
     }
 
     protected IntTag ominousBottleAmplifierToTag(final Integer value) {
