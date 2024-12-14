@@ -36,4 +36,8 @@ public record RegistryEntry(String key, @Nullable Tag tag) {
     public RegistryEntry withKey(final String key) {
         return new RegistryEntry(key, tag != null ? tag.copy() : null);
     }
+
+    public RegistryEntry copy() {
+        return new RegistryEntry(key, tag != null ? tag.copy() : null);
+    }
 }

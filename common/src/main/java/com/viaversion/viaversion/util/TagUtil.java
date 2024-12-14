@@ -19,6 +19,8 @@ package com.viaversion.viaversion.util;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.NumberTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -59,6 +61,10 @@ public final class TagUtil {
         return tag.remove(Key.namespaced(key)) != null || tag.remove(Key.stripMinecraftNamespace(key)) != null;
     }
 
+    public static boolean containsNamespaced(final CompoundTag tag, final String key) {
+        return tag.contains(Key.namespaced(key)) || tag.contains(Key.stripMinecraftNamespace(key));
+    }
+
     public static @Nullable CompoundTag getNamespacedCompoundTag(final CompoundTag tag, final String key) {
         final CompoundTag compoundTag = tag.getCompoundTag(Key.namespaced(key));
         return compoundTag != null ? compoundTag : tag.getCompoundTag(Key.stripMinecraftNamespace(key));
@@ -67,6 +73,16 @@ public final class TagUtil {
     public static @Nullable ListTag<CompoundTag> getNamespacedCompoundTagList(final CompoundTag tag, final String key) {
         final ListTag<CompoundTag> listTag = tag.getListTag(Key.namespaced(key), CompoundTag.class);
         return listTag != null ? listTag : tag.getListTag(Key.stripMinecraftNamespace(key), CompoundTag.class);
+    }
+
+    public static @Nullable StringTag getNamespacedStringTag(final CompoundTag tag, final String key) {
+        final StringTag stringTag = tag.getStringTag(Key.namespaced(key));
+        return stringTag != null ? stringTag : tag.getStringTag(Key.stripMinecraftNamespace(key));
+    }
+
+    public static @Nullable NumberTag getNamespacedNumberTag(final CompoundTag tag, final String key) {
+        final NumberTag numberTag = tag.getNumberTag(Key.namespaced(key));
+        return numberTag != null ? numberTag : tag.getNumberTag(Key.stripMinecraftNamespace(key));
     }
 
     public static Tag handleDeep(final Tag tag, final TagUpdater consumer) {

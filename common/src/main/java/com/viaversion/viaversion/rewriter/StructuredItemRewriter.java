@@ -23,29 +23,32 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.minecraft.Holder;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredData;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
+import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.type.Type;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import java.util.Map;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class StructuredItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType,
     T extends Protocol<C, ?, ?, S>> extends ItemRewriter<C, S, T> {
 
+    public static final String MARKER_KEY = "VV|custom_data";
+
     public StructuredItemRewriter(
         T protocol,
         Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType,
-        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType,
-        Type<Particle> particleType, Type<Particle> mappedParticleType
+        Type<Item> itemCostType, Type<Item> optionalItemCostType, Type<Item> mappedItemCostType, Type<Item> mappedOptionalItemCostType
     ) {
-        super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, itemCostType, optionalItemCostType, mappedItemCostType, mappedOptionalItemCostType, particleType, mappedParticleType);
+        super(protocol, itemType, itemArrayType, mappedItemType, mappedItemArrayType, itemCostType, optionalItemCostType, mappedItemCostType, mappedOptionalItemCostType);
     }
 
     public StructuredItemRewriter(T protocol, Type<Item> itemType, Type<Item[]> itemArrayType, Type<Item> mappedItemType, Type<Item[]> mappedItemArrayType) {
@@ -114,8 +117,15 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         final MappingData mappingData = protocol.getMappingData();
         if (mappingData.getItemMappings() != null) {
             final Int2IntFunction itemIdRewriter = clientbound ? mappingData::getNewItemId : mappingData::getOldItemId;
-            container.replace(StructuredDataKey.TRIM, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.TRIM1_20_5, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.TRIM1_21_2, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.TRIM1_21_4, value -> value.rewrite(itemIdRewriter));
             container.replace(StructuredDataKey.POT_DECORATIONS, value -> value.rewrite(itemIdRewriter));
+            container.replace(StructuredDataKey.REPAIRABLE, value -> value.rewrite(itemIdRewriter));
+        }
+        if (mappingData.getFullItemMappings() != null) {
+            final Function<String, String> itemIdRewriter = clientbound ? id -> mappedIdentifier(mappingData.getFullItemMappings(), id) : id -> unmappedIdentifier(mappingData.getFullItemMappings(), id);
+            container.replace(StructuredDataKey.USE_COOLDOWN, value -> value.rewrite(itemIdRewriter));
         }
         if (mappingData.getBlockMappings() != null) {
             final Int2IntFunction blockIdRewriter = clientbound ? mappingData::getNewBlockId : mappingData::getOldBlockId;
@@ -125,7 +135,8 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         }
         if (mappingData.getSoundMappings() != null) {
             final Int2IntFunction soundIdRewriter = clientbound ? mappingData::getNewSoundId : mappingData::getOldSoundId;
-            container.replace(StructuredDataKey.INSTRUMENT, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
+            container.replace(StructuredDataKey.INSTRUMENT1_20_5, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
+            container.replace(StructuredDataKey.INSTRUMENT1_21_2, value -> value.isDirect() ? Holder.of(value.value().rewrite(soundIdRewriter)) : value);
             container.replace(StructuredDataKey.JUKEBOX_PLAYABLE, value -> value.rewrite(soundIdRewriter));
         }
         if (clientbound && protocol.getComponentRewriter() != null) {
@@ -136,6 +147,16 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
             if (lore != null) {
                 for (final Tag tag : lore) {
                     protocol.getComponentRewriter().processTag(connection, tag);
+                }
+            }
+
+            final WrittenBook book = container.get(StructuredDataKey.WRITTEN_BOOK_CONTENT);
+            if (book != null) {
+                for (final FilterableComponent page : book.pages()) {
+                    protocol.getComponentRewriter().processTag(connection, page.raw());
+                    if (page.isFiltered()) {
+                        protocol.getComponentRewriter().processTag(connection, page.filtered());
+                    }
                 }
             }
         }
@@ -188,15 +209,18 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         // Remove custom name
         if (customData.remove(nbtTagName("added_custom_name")) != null) {
             data.remove(StructuredDataKey.CUSTOM_NAME);
+            removeCustomTag(data, customData);
         } else {
             final Tag customName = removeBackupTag(customData, "custom_name");
             if (customName != null) {
                 data.set(StructuredDataKey.CUSTOM_NAME, customName);
+                removeCustomTag(data, customData);
             }
 
             final Tag itemName = removeBackupTag(customData, "item_name");
             if (itemName != null) {
                 data.set(StructuredDataKey.ITEM_NAME, itemName);
+                removeCustomTag(data, customData);
             }
         }
     }
@@ -206,6 +230,7 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
         CompoundTag customData = data.get(StructuredDataKey.CUSTOM_DATA);
         if (customData == null) {
             customData = new CompoundTag();
+            customData.putBoolean(MARKER_KEY, true);
             data.set(StructuredDataKey.CUSTOM_DATA, customData);
         }
         return customData;
@@ -220,6 +245,13 @@ public class StructuredItemRewriter<C extends ClientboundPacketType, S extends S
 
     protected @Nullable Tag removeBackupTag(final CompoundTag customData, final String tagName) {
         return customData.remove(nbtTagName(tagName));
+    }
+
+    protected void removeCustomTag(final StructuredDataContainer data, final CompoundTag customData) {
+        // Only remove if we initially added it and only the marker is left
+        if (customData.contains(MARKER_KEY) && customData.size() == 1) {
+            data.remove(StructuredDataKey.CUSTOM_DATA);
+        }
     }
 
     @FunctionalInterface

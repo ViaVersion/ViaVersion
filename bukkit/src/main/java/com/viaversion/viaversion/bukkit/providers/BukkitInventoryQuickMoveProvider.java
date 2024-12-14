@@ -84,7 +84,6 @@ public class BukkitInventoryQuickMoveProvider extends InventoryQuickMoveProvider
             updateTask = new BukkitInventoryUpdateTask(this, uuid);
             updateTasks.put(uuid, updateTask);
         }
-        // http://wiki.vg/index.php?title=Protocol&oldid=13223#Click_Window
         updateTask.addItem(windowId, slotId, actionId);
         if (!registered && Via.getPlatform().isPluginEnabled()) {
             Via.getPlatform().runSync(updateTask);

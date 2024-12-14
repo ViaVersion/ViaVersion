@@ -35,7 +35,7 @@ public class ReloadSubCmd implements ViaSubCommand {
     @Override
     public boolean execute(ViaCommandSender sender, String[] args) {
         Via.getManager().getConfigurationProvider().reloadConfigs();
-        sendMessage(sender, "&6Configuration successfully reloaded! Some features may need a restart.");
+        sendMessage(sender, "&6Configuration successfully reloaded! Some config options may require a restart to take effect.");
         return true;
     }
 }

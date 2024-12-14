@@ -198,6 +198,14 @@ public abstract class AbstractProtocol<CU extends ClientboundPacketType, CM exte
         }
     }
 
+    public void registerFinishConfiguration(final CU packetType, final PacketHandler handler) {
+        registerClientbound(packetType, wrapper -> {
+            // TODO Temporary solution to handle the finish configuration packet already having changed our tracked protocol state in a previous handler
+            wrapper.user().getProtocolInfo().setServerState(State.CONFIGURATION);
+            handler.handle(wrapper);
+        });
+    }
+
     @Override
     public final void loadMappingData() {
         getMappingData().load();

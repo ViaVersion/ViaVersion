@@ -31,6 +31,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -143,11 +144,14 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
 
     public void handleGeneric(final PacketWrapper wrapper) {
         final int length = wrapper.passthrough(Types.VAR_INT);
-        int editedLength = length;
+        int finalLength = length;
+        final Set<RegistryType> readTypes = EnumSet.noneOf(RegistryType.class);
         for (int i = 0; i < length; i++) {
             final String registryKey = wrapper.read(Types.STRING);
-            if (toRemoveRegistries.contains(Key.stripMinecraftNamespace(registryKey))) {
-                wrapper.set(Types.VAR_INT, 0, --editedLength);
+            final String strippedKey = Key.stripMinecraftNamespace(registryKey);
+            if (toRemoveRegistries.contains(strippedKey)) {
+                finalLength--;
+
                 final int tagsSize = wrapper.read(Types.VAR_INT);
                 for (int j = 0; j < tagsSize; j++) {
                     wrapper.read(Types.STRING);
@@ -157,7 +161,29 @@ public class TagRewriter<C extends ClientboundPacketType> implements com.viavers
             }
 
             wrapper.write(Types.STRING, registryKey);
-            handle(wrapper, Key.stripMinecraftNamespace(registryKey));
+
+            final RegistryType type = RegistryType.getByKey(strippedKey);
+            if (type != null) {
+                handle(wrapper, type);
+                readTypes.add(type);
+            } else {
+                handle(wrapper, null, null, null, null);
+            }
+        }
+
+        for (final Map.Entry<RegistryType, List<TagData>> entry : toAdd.entrySet()) {
+            if (readTypes.contains(entry.getKey())) {
+                continue;
+            }
+
+            // Registry wasn't present in the packet, add them here
+            wrapper.write(Types.STRING, entry.getKey().resourceLocation());
+            appendNewTags(wrapper, entry.getKey());
+            finalLength++;
+        }
+
+        if (length != finalLength) {
+            wrapper.set(Types.VAR_INT, 0, finalLength);
         }
     }
 

@@ -20,69 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft;
+package com.viaversion.viaversion.api.type.types;
 
 import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
+import io.netty.buffer.ByteBuf;
 
-final class HolderImpl<T> implements Holder<T> {
+public class FloatArrayType extends Type<float[]> {
 
-    private final T value;
-    private final int id;
+    private final int length;
 
-    HolderImpl(final int id) {
-        Preconditions.checkArgument(id >= 0, "id cannot be negative");
-        this.value = null;
-        this.id = id;
+    public FloatArrayType(final int length) {
+        super(float[].class);
+        this.length = length;
     }
 
-    HolderImpl(final T value) {
-        this.value = value;
-        this.id = -1;
-    }
-
-    @Override
-    public boolean isDirect() {
-        return id == -1;
+    public FloatArrayType() {
+        super(float[].class);
+        this.length = -1;
     }
 
     @Override
-    public boolean hasId() {
-        return id != -1;
-    }
-
-    @Override
-    public T value() {
-        Preconditions.checkArgument(isDirect(), "Holder is not direct");
-        return value;
-    }
-
-    @Override
-    public int id() {
-        return id;
-    }
-
-    @Override
-    public Holder<T> updateId(final Int2IntFunction rewriteFunction) {
-        if (isDirect()) {
-            return this;
+    public void write(final ByteBuf buffer, final float[] object) {
+        if (this.length != -1) {
+            Preconditions.checkArgument(length == object.length, "Length does not match expected length");
+        } else {
+            Types.VAR_INT.writePrimitive(buffer, object.length);
         }
-
-        final int rewrittenId = rewriteFunction.applyAsInt(id);
-        if (rewrittenId == id) {
-            return this;
+        for (final float f : object) {
+            buffer.writeFloat(f);
         }
-        if (rewrittenId == -1) {
-            throw new IllegalArgumentException("Received invalid id in updateId");
-        }
-        return Holder.of(rewrittenId);
     }
 
     @Override
-    public String toString() {
-        return "HolderImpl{" +
-            "value=" + value +
-            ", id=" + id +
-            '}';
+    public float[] read(final ByteBuf buffer) {
+        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
+        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        final float[] array = new float[length];
+        for (int i = 0; i < length; i++) {
+            array[i] = buffer.readFloat();
+        }
+        return array;
     }
 }

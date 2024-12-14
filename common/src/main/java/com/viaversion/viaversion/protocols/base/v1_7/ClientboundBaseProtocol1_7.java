@@ -128,7 +128,7 @@ public class ClientboundBaseProtocol1_7 extends AbstractProtocol<BaseClientbound
         });
 
         // Track player name/uuid and setup connection + track state
-        registerClientbound(ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+        registerClientbound(ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
 
             if (info.serverProtocolVersion().olderThan(ProtocolVersion.v1_16)) {

@@ -2,24 +2,24 @@ metadata.format.version = "1.1"
 
 [versions]
 
-gson = "2.10.1"
-fastutil = "8.5.12"
-vianbt = "5.0.0"
-mcstructs = "5-2.5.3"
+gson = "2.11.0"
+fastutil = "8.5.15"
+vianbt = "5.0.1"
+mcstructs = "5-2.5.5-SNAPSHOT"
 
 # Common provided
 netty = "4.0.20.Final"
 guava = "17.0"
 snakeYaml = "2.2"
 
-junit = "5.10.2"
-checkerQual = "3.43.0"
+junit = "5.11.3"
+checkerQual = "3.48.1"
 
 # Platforms
 paper = "1.20.4-R0.1-SNAPSHOT"
 legacyBukkit = "1.8.8-R0.1-SNAPSHOT"
 velocity = "3.1.1"
-
+viaProxy = "3.3.7-SNAPSHOT"
 
 [libraries]
 
@@ -40,6 +40,7 @@ checkerQual = { group = "org.checkerframework", name = "checker-qual", version.r
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 legacyBukkit = { group = "org.bukkit", name = "bukkit", version.ref = "legacyBukkit" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+viaProxy = { group = "net.raphimc", name = "ViaProxy", version.ref = "viaProxy" }
 
 
 [bundles]

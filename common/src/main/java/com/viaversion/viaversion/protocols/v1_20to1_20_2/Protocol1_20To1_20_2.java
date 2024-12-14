@@ -53,6 +53,7 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationSt
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.ConfigurationState.BridgePhase;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastResourcePack;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.storage.LastTags;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
 import com.viaversion.viaversion.util.Key;
@@ -64,6 +65,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingDataBase("1.20", "1.20.2");
     private final EntityPacketRewriter1_20_2 entityPacketRewriter = new EntityPacketRewriter1_20_2(this);
     private final BlockItemPacketRewriter1_20_2 itemPacketRewriter = new BlockItemPacketRewriter1_20_2(this);
+    private final ParticleRewriter<ClientboundPackets1_19_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_20To1_20_2() {
@@ -78,6 +80,8 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND_ENTITY);
+
+        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_4.LEVEL_PARTICLES);
 
         registerClientbound(ClientboundPackets1_19_4.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
@@ -120,11 +124,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             wrapper.resetReader();
             wrapper.user().put(new LastTags(wrapper));
         });
-        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, wrapper -> {
-            tagRewriter.handleGeneric(wrapper);
-            wrapper.resetReader();
-            wrapper.user().put(new LastTags(wrapper));
-        });
+        registerClientbound(State.CONFIGURATION, ClientboundConfigurationPackets1_20_2.UPDATE_TAGS, this::handleConfigTags);
 
         registerClientbound(ClientboundPackets1_19_4.SET_DISPLAY_OBJECTIVE, wrapper -> {
             final byte slot = wrapper.read(Types.BYTE);
@@ -144,7 +144,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         // We need to wait for it send the login ack before actually sending the play login,
         // hence packets are added to a queue. With the data from the login packet, we sent what is needed
         // during the configuration phase before finally transitioning to the play state with the client as well.
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             wrapper.user().get(ConfigurationState.class).setBridgePhase(BridgePhase.PROFILE_SENT);
             wrapper.user().getProtocolInfo().setServerState(State.PLAY);
         });
@@ -225,6 +225,15 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
         });
     }
 
+    private void handleConfigTags(final PacketWrapper wrapper) {
+        tagRewriter.handleGeneric(wrapper);
+        wrapper.resetReader();
+
+        final LastTags lastTags = new LastTags(wrapper);
+        lastTags.setSentDuringConfigPhase(true);
+        wrapper.user().put(lastTags);
+    }
+
     private static void sanitizeCustomPayload(final PacketWrapper wrapper) {
         final String channel = Key.namespaced(wrapper.get(Types.STRING, 0));
         if (channel.equals("minecraft:brand")) {
@@ -295,6 +304,7 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_ENABLED_FEATURES.getId()) {
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_ENABLED_FEATURES);
             } else if (unmappedId == ClientboundPackets1_19_4.UPDATE_TAGS.getId()) {
+                handleConfigTags(packetWrapper); // Manually put through handler
                 packetWrapper.setPacketType(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
             } else {
                 // Not a packet that can be mapped to the configuration protocol
@@ -323,8 +333,12 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
 
         final LastTags lastTags = connection.get(LastTags.class);
         if (lastTags != null) {
-            // The server might still follow up with a tags packet, but we wouldn't know
-            lastTags.sendLastTags(connection);
+            if (lastTags.sentDuringConfigPhase()) {
+                lastTags.setSentDuringConfigPhase(false);
+            } else {
+                // The server might still follow up with a tags packet, but we wouldn't know
+                lastTags.sendLastTags(connection);
+            }
         }
 
         if (lastResourcePack != null && connection.getProtocolInfo().protocolVersion() == ProtocolVersion.v1_20_2) {
@@ -375,6 +389,11 @@ public final class Protocol1_20To1_20_2 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemRewriter<Protocol1_20To1_20_2> getItemRewriter() {
         return itemPacketRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_19_4> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

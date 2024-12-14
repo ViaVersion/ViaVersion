@@ -66,6 +66,17 @@ public final class ChunkPosition {
         return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
     }
 
+    /**
+     * Returns a long key for the given block coordinates.
+     *
+     * @param x the block X coordinate
+     * @param z the block Z coordinate
+     * @return the chunk key
+     */
+    public static long chunkKeyForBlock(final int x, final int z) {
+        return chunkKey(x >> 4, z >> 4);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

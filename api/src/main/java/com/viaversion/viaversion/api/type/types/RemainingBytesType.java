@@ -26,19 +26,35 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 public class RemainingBytesType extends Type<byte[]> {
+    private final int maxLength;
+
     public RemainingBytesType() {
+        this(-1);
+    }
+
+    public RemainingBytesType(final int maxLength) {
         super(byte[].class);
+        this.maxLength = maxLength;
     }
 
     @Override
-    public byte[] read(ByteBuf buffer) {
-        byte[] array = new byte[buffer.readableBytes()];
+    public byte[] read(final ByteBuf buffer) {
+        final int bytes = buffer.readableBytes();
+        if (maxLength != -1 && bytes > maxLength) {
+            throw new RuntimeException("Remaining bytes cannot be longer than " + maxLength + " (got " + bytes + ")");
+        }
+
+        final byte[] array = new byte[bytes];
         buffer.readBytes(array);
         return array;
     }
 
     @Override
-    public void write(ByteBuf buffer, byte[] object) {
+    public void write(final ByteBuf buffer, final byte[] object) {
+        if (maxLength != -1 && object.length > maxLength) {
+            throw new RuntimeException("Remaining bytes cannot be longer than " + maxLength + " (got " + object.length + ")");
+        }
+
         buffer.writeBytes(object);
     }
 }

@@ -26,13 +26,22 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArrayType<T> extends Type<T[]> {
     private final Type<T> elementType;
+    private final int maxLength;
 
     public ArrayType(Type<T> type) {
+        this(type, -1);
+    }
+
+    public ArrayType(Type<T> type, int maxLength) {
+        //noinspection unchecked
         super(type.getTypeName() + " Array", (Class<T[]>) getArrayClass(type.getOutputClass()));
         this.elementType = type;
+        this.maxLength = maxLength;
     }
 
     public static Class<?> getArrayClass(Class<?> componentType) {
@@ -43,16 +52,40 @@ public class ArrayType<T> extends Type<T[]> {
     @Override
     public T[] read(ByteBuf buffer) {
         int amount = Types.VAR_INT.readPrimitive(buffer);
-        T[] array = (T[]) Array.newInstance(elementType.getOutputClass(), amount);
+        if (maxLength != -1 && amount > maxLength) {
+            throw new IllegalArgumentException("Array length " + amount + " is longer than maximum " + maxLength);
+        }
 
-        for (int i = 0; i < amount; i++) {
+        return amount < Short.MAX_VALUE ? readArray(buffer, amount) : readList(buffer, amount);
+    }
+
+    private T[] readArray(ByteBuf buffer, int length) {
+        T[] array = createArray(length);
+        for (int i = 0; i < length; i++) {
             array[i] = elementType.read(buffer);
         }
         return array;
     }
 
+    private T[] readList(ByteBuf buffer, int length) {
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            list.add(elementType.read(buffer));
+        }
+        return list.toArray(createArray(0));
+    }
+
+    private T[] createArray(int length) {
+        //noinspection unchecked
+        return (T[]) Array.newInstance(elementType.getOutputClass(), length);
+    }
+
     @Override
     public void write(ByteBuf buffer, T[] object) {
+        if (maxLength != -1 && object.length > maxLength) {
+            throw new IllegalArgumentException("Array length " + object.length + " is longer than maximum " + maxLength);
+        }
+
         Types.VAR_INT.writePrimitive(buffer, object.length);
         for (T o : object) {
             elementType.write(buffer, o);

@@ -31,6 +31,7 @@ import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ServerboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_4to1_20.rewriter.EntityPacketRewriter1_20;
 import com.viaversion.viaversion.protocols.v1_19_4to1_20.rewriter.ItemPacketRewriter1_20;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -40,6 +41,7 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
     public static final MappingData MAPPINGS = new MappingDataBase("1.19.4", "1.20");
     private final EntityPacketRewriter1_20 entityRewriter = new EntityPacketRewriter1_20(this);
     private final ItemPacketRewriter1_20 itemRewriter = new ItemPacketRewriter1_20(this);
+    private final ParticleRewriter<ClientboundPackets1_19_4> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_19_4> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_19_4To1_20() {
@@ -51,6 +53,7 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
         super.registerPackets();
 
         tagRewriter.registerGeneric(ClientboundPackets1_19_4.UPDATE_TAGS);
+        particleRewriter.registerLevelParticles1_19(ClientboundPackets1_19_4.LEVEL_PARTICLES);
 
         final SoundRewriter<ClientboundPackets1_19_4> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_19_4.SOUND);
@@ -106,6 +109,11 @@ public final class Protocol1_19_4To1_20 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemPacketRewriter1_20 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_19_4> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

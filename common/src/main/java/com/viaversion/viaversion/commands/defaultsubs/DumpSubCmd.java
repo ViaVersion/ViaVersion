@@ -30,7 +30,7 @@ public class DumpSubCmd implements ViaSubCommand {
 
     @Override
     public String description() {
-        return "Dump information about your server, this is helpful if you report bugs.";
+        return "Dump information about your platform implementation, this is helpful if you report bugs.";
     }
 
     @Override

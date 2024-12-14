@@ -22,6 +22,7 @@
  */
 package com.viaversion.viaversion.api.type.types.chunk;
 
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
@@ -53,5 +54,15 @@ public final class ChunkSectionType1_18 extends Type<ChunkSection> {
         buffer.writeShort(section.getNonAirBlocksCount());
         blockPaletteType.write(buffer, section.palette(PaletteType.BLOCKS));
         biomePaletteType.write(buffer, section.palette(PaletteType.BIOMES));
+    }
+
+    public int serializedSize(final Chunk chunk) {
+        int length = 0;
+        for (final ChunkSection section : chunk.getSections()) {
+            length += Short.BYTES
+                + blockPaletteType.serializedSize(section.palette(PaletteType.BLOCKS))
+                + biomePaletteType.serializedSize(section.palette(PaletteType.BIOMES));
+        }
+        return length;
     }
 }

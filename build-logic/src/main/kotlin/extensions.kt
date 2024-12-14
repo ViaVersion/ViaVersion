@@ -1,7 +1,6 @@
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import java.io.ByteArrayOutputStream
 
 fun Project.latestCommitHash(): String {
     return runGitCommand(listOf("rev-parse", "--short", "HEAD"))
@@ -16,12 +15,9 @@ fun Project.branchName(): String {
 }
 
 fun Project.runGitCommand(args: List<String>): String {
-    val byteOut = ByteArrayOutputStream()
-    exec {
+    return providers.exec {
         commandLine = listOf("git") + args
-        standardOutput = byteOut
-    }
-    return byteOut.toString(Charsets.UTF_8.name()).trim()
+    }.standardOutput.asBytes.get().toString(Charsets.UTF_8).trim()
 }
 
 fun JavaPluginExtension.javaTarget(version: Int) {

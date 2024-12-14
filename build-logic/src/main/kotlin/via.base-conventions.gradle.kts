@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `jvm-test-suite`
 }
 
 tasks {

@@ -35,7 +35,7 @@ public interface Holder<T> {
      * @throws IllegalArgumentException if the id is negative
      */
     static <T> Holder<T> of(final int id) {
-        return new HolderImpl<>(id);
+        return new IdHolder<>(id);
     }
 
     /**
@@ -46,7 +46,7 @@ public interface Holder<T> {
      * @return a new direct holder
      */
     static <T> Holder<T> of(final T value) {
-        return new HolderImpl<>(value);
+        return new ValueHolder<>(value);
     }
 
     /**

@@ -44,8 +44,8 @@ import com.viaversion.viaversion.api.minecraft.item.data.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionEffectData;
 import com.viaversion.viaversion.api.minecraft.item.data.StatePropertyMatcher;
@@ -65,7 +65,6 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.BannerPattern
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -136,6 +135,7 @@ public final class StructuredDataConverter {
                 }
 
                 final CompoundTag modifierTag = new CompoundTag();
+                modifierTag.put("UUID", new IntArrayTag(UUIDUtil.toIntArray(modifier.modifier().uuid())));
                 modifierTag.putString("AttributeName", identifier.equals("generic.jump_strength") ? "horse.jump_strength" : identifier);
                 modifierTag.putString("Name", modifier.modifier().name());
                 modifierTag.putDouble("Amount", modifier.modifier().amount());
@@ -151,7 +151,7 @@ public final class StructuredDataConverter {
                 putHideFlag(tag, HIDE_ATTRIBUTES);
             }
         });
-        register(StructuredDataKey.CUSTOM_MODEL_DATA, (data, tag) -> tag.putInt("CustomModelData", data));
+        register(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, (data, tag) -> tag.putInt("CustomModelData", data));
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, (data, tag) -> putHideFlag(tag, 0x20));
         register(StructuredDataKey.REPAIR_COST, (data, tag) -> tag.putInt("RepairCost", data));
         register(StructuredDataKey.DYED_COLOR, (data, tag) -> {
@@ -278,12 +278,12 @@ public final class StructuredDataConverter {
             }
             profileTag.put("Properties", propertiesTag);
         });
-        register(StructuredDataKey.INSTRUMENT, (data, tag) -> {
+        register(StructuredDataKey.INSTRUMENT1_20_5, (data, tag) -> {
             // Can't do anything with direct values
             if (!data.hasId()) {
                 if (backupInconvertibleData) {
                     final CompoundTag backupTag = new CompoundTag();
-                    final Instrument instrument = data.value();
+                    final Instrument1_20_5 instrument = data.value();
                     if (instrument.soundEvent().hasId()) {
                         backupTag.putInt("sound_event", instrument.soundEvent().id());
                     } else {
@@ -398,7 +398,7 @@ public final class StructuredDataConverter {
 
             enchantmentsTag.add(invalidEnchantment);
         });
-        register(StructuredDataKey.POTION_CONTENTS, (data, tag) -> {
+        register(StructuredDataKey.POTION_CONTENTS1_20_5, (data, tag) -> {
             if (data.potion() != null) {
                 final String potion = Potions1_20_5.idToKey(data.potion()); // Include 1.20.5 names
                 if (potion != null) {
@@ -513,7 +513,7 @@ public final class StructuredDataConverter {
                 tag.putInt("map_scale_direction", 1);
             }
         });
-        register(StructuredDataKey.TRIM, (connection, data, tag) -> {
+        register(StructuredDataKey.TRIM1_20_5, (connection, data, tag) -> {
             final CompoundTag trimTag = new CompoundTag();
             final ArmorTrimStorage trimStorage = connection.get(ArmorTrimStorage.class);
             if (data.material().isDirect()) {
@@ -530,8 +530,8 @@ public final class StructuredDataConverter {
 
                 final CompoundTag overrideArmorMaterials = new CompoundTag();
                 if (!material.overrideArmorMaterials().isEmpty()) {
-                    for (final Int2ObjectMap.Entry<String> entry : material.overrideArmorMaterials().int2ObjectEntrySet()) {
-                        overrideArmorMaterials.put(Integer.toString(entry.getIntKey()), new StringTag(entry.getValue()));
+                    for (final Map.Entry<String, String> entry : material.overrideArmorMaterials().entrySet()) {
+                        overrideArmorMaterials.put(entry.getKey(), new StringTag(entry.getValue()));
                     }
                     materialTag.put("override_armor_materials", overrideArmorMaterials);
                 }

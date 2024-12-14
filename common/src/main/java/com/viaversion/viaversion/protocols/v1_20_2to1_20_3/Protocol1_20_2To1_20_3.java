@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ClientboundPacke
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPacket1_20_2;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundPackets1_20_2;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -61,6 +62,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.20.2", "1.20.3");
     private final BlockItemPacketRewriter1_20_3 itemRewriter = new BlockItemPacketRewriter1_20_3(this);
+    private final ParticleRewriter<ClientboundPacket1_20_2> particleRewriter = new ParticleRewriter<>(this);
     private final EntityPacketRewriter1_20_3 entityRewriter = new EntityPacketRewriter1_20_3(this);
     private final TagRewriter<ClientboundPacket1_20_2> tagRewriter = new TagRewriter<>(this);
 
@@ -75,6 +77,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
         cancelServerbound(ServerboundPackets1_20_3.CONTAINER_SLOT_STATE_CHANGED);
 
         tagRewriter.registerGeneric(ClientboundPackets1_20_2.UPDATE_TAGS);
+        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
 
         final SoundRewriter<ClientboundPacket1_20_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_20_2.SOUND);
@@ -268,7 +271,7 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
             }
         });
         registerClientbound(ClientboundPackets1_20_2.PLAYER_INFO_UPDATE, wrapper -> {
-            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_19_3);
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID);
@@ -305,7 +308,6 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
 
         registerServerbound(ServerboundConfigurationPackets1_20_2.RESOURCE_PACK, resourcePackStatusHandler());
         registerClientbound(ClientboundConfigurationPackets1_20_2.RESOURCE_PACK, ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_PUSH, resourcePackHandler(ClientboundConfigurationPackets1_20_3.RESOURCE_PACK_POP));
-        tagRewriter.registerGeneric(ClientboundConfigurationPackets1_20_2.UPDATE_TAGS);
     }
 
     private PacketHandler resourcePackStatusHandler() {
@@ -379,6 +381,11 @@ public final class Protocol1_20_2To1_20_3 extends AbstractProtocol<ClientboundPa
     @Override
     public BlockItemPacketRewriter1_20_3 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPacket1_20_2> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

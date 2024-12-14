@@ -87,5 +87,12 @@ public class StructuredDataType extends Type<StructuredData<?>> {
             types[id] = key;
             return this;
         }
+
+        public DataFiller add(final StructuredDataKey<?>... keys) {
+            for (final StructuredDataKey<?> key : keys) {
+                add(key);
+            }
+            return this;
+        }
     }
 }

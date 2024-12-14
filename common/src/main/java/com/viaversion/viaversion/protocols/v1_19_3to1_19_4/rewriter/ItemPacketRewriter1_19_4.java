@@ -19,7 +19,6 @@ package com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_18;
 import com.viaversion.viaversion.protocols.v1_19_1to1_19_3.packet.ClientboundPackets1_19_3;
@@ -91,7 +90,6 @@ public final class ItemPacketRewriter1_19_4 extends ItemRewriter<ClientboundPack
         registerSetEquipment(ClientboundPackets1_19_3.SET_EQUIPMENT);
         registerMerchantOffers1_19(ClientboundPackets1_19_3.MERCHANT_OFFERS);
         registerContainerSetData(ClientboundPackets1_19_3.CONTAINER_SET_DATA);
-        registerLevelParticles1_19(ClientboundPackets1_19_3.LEVEL_PARTICLES);
         registerSetCreativeModeSlot(ServerboundPackets1_19_4.SET_CREATIVE_MODE_SLOT);
         registerContainerClick1_17_1(ServerboundPackets1_19_4.CONTAINER_CLICK);
 

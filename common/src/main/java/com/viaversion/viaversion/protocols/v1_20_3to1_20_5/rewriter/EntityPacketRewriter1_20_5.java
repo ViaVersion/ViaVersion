@@ -548,14 +548,6 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
     }
 
     @Override
-    public void rewriteParticle(final UserConnection connection, final Particle particle) {
-        super.rewriteParticle(connection, particle);
-        if (particle.id() == protocol.getMappingData().getParticleMappings().mappedId("entity_effect")) {
-            particle.add(Types.INT, 0); // Default color, changed in the area effect handler
-        }
-    }
-
-    @Override
     public void onMappingDataLoaded() {
         mapTypes();
     }

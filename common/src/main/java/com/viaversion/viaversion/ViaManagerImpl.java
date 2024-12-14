@@ -244,9 +244,12 @@ public class ViaManagerImpl implements ViaManager {
         }
 
         if (version < 17) {
-            platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 17 (your version is " + javaVersion + ").");
+            platform.getLogger().warning("You are running an outdated Java version, please update it to at least Java 21 (your version is " + javaVersion + ").");
             platform.getLogger().warning("ViaVersion no longer officially supports this version of Java, only offering unsupported compatibility builds.");
             platform.getLogger().warning("See https://github.com/ViaVersion/ViaVersion/releases/tag/5.0.0 for more information.");
+        } else if (version < 21) {
+            platform.getLogger().warning("Please update your Java runtime to at least Java 21 (your version is " + javaVersion + ").");
+            platform.getLogger().warning("At some point in the future, ViaVersion will no longer be compatible with this version of Java.");
         }
     }
 

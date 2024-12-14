@@ -33,7 +33,6 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -66,17 +65,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     public void registerBossEvent(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UUID);
-                map(Types.VAR_INT);
-                handler(wrapper -> {
-                    final int action = wrapper.get(Types.VAR_INT, 0);
-                    if (action == 0 || action == 3) {
-                        passthroughAndProcess(wrapper);
-                    }
-                });
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UUID);
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            if (action == 0 || action == 3) {
+                passthroughAndProcess(wrapper);
             }
         });
     }
@@ -112,24 +105,18 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
     }
 
     public void registerLegacyOpenWindow(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.UNSIGNED_BYTE); // Id
-                map(Types.STRING); // Window Type
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Id
+            wrapper.passthrough(Types.STRING); // Window Type
+            processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
         });
     }
 
     public void registerOpenScreen(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Id
-                map(Types.VAR_INT); // Window Type
-                handler(wrapper -> passthroughAndProcess(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Id
+            wrapper.passthrough(Types.VAR_INT); // Window Type
+            passthroughAndProcess(wrapper);
         });
     }
 
@@ -142,10 +129,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
 
     public void registerPlayerInfoUpdate1_20_3(final C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM);
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_19_3);
             if (!actions.get(5)) { // Update display name
                 return;
             }
+
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID);
@@ -177,24 +165,64 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         });
     }
 
-    public void registerPlayerCombatKill(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Player ID
-                map(Types.INT); // Killer ID
-                handler(wrapper -> processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT)));
+    public void registerPlayerInfoUpdate1_21_4(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            final BitSet actions = wrapper.passthrough(Types.PROFILE_ACTIONS_ENUM1_21_4);
+            if (!actions.get(5)) { // Update display name
+                return;
+            }
+
+            final int entries = wrapper.passthrough(Types.VAR_INT);
+            for (int i = 0; i < entries; i++) {
+                wrapper.passthrough(Types.UUID);
+                if (actions.get(0)) {
+                    wrapper.passthrough(Types.STRING); // Player Name
+
+                    final int properties = wrapper.passthrough(Types.VAR_INT);
+                    for (int j = 0; j < properties; j++) {
+                        wrapper.passthrough(Types.STRING); // Name
+                        wrapper.passthrough(Types.STRING); // Value
+                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
+                    }
+                }
+                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
+                    wrapper.passthrough(Types.UUID); // Session UUID
+                    wrapper.passthrough(Types.PROFILE_KEY);
+                }
+                if (actions.get(2)) {
+                    wrapper.passthrough(Types.VAR_INT); // Gamemode
+                }
+                if (actions.get(3)) {
+                    wrapper.passthrough(Types.BOOLEAN); // Listed
+                }
+                if (actions.get(4)) {
+                    wrapper.passthrough(Types.VAR_INT); // Latency
+                }
+
+                processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
+
+                if (actions.get(6)) {
+                    wrapper.passthrough(Types.VAR_INT); // List order
+                }
+                if (actions.get(7)) {
+                    wrapper.passthrough(Types.BOOLEAN); // Show hat
+                }
             }
         });
     }
 
+    public void registerPlayerCombatKill(final C packetType) {
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Player ID
+            wrapper.passthrough(Types.INT); // Killer ID
+            processText(wrapper.user(), wrapper.passthrough(Types.COMPONENT));
+        });
+    }
+
     public void registerPlayerCombatKill1_20(final C packetType) {
-        protocol.registerClientbound(packetType, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.VAR_INT); // Player ID
-                handler(wrapper -> passthroughAndProcess(wrapper));
-            }
+        protocol.registerClientbound(packetType, wrapper -> {
+            wrapper.passthrough(Types.VAR_INT); // Player ID
+            passthroughAndProcess(wrapper);
         });
     }
 
@@ -346,6 +374,11 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final CompoundTag contents = hoverEventTag.getCompoundTag("contents");
             if (contents != null) {
                 processTag(connection, contents.get("name"));
+
+                final StringTag typeTag = contents.getStringTag("type");
+                if (typeTag != null && protocol.getEntityRewriter() != null) {
+                    typeTag.setValue(protocol.getEntityRewriter().mappedEntityIdentifier(typeTag.getValue()));
+                }
             }
         } else if (action.equals("show_item")) {
             convertLegacyContents(hoverEventTag);
@@ -358,11 +391,23 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final CompoundTag componentsTag = contentsTag.getCompoundTag("components");
             handleShowItem(connection, contentsTag, componentsTag);
             if (componentsTag != null) {
+                final CompoundTag useRemainder = TagUtil.getNamespacedCompoundTag(componentsTag, "use_remainder");
+                if (useRemainder != null) {
+                    handleShowItem(connection, useRemainder);
+                }
                 handleContainerContents(connection, componentsTag);
+                if (inputSerializerVersion() != null) {
+                    handleWrittenBookContents(connection, componentsTag);
+                }
+
                 handleItemArrayContents(connection, componentsTag, "bundle_contents");
                 handleItemArrayContents(connection, componentsTag, "charged_projectiles");
             }
         }
+    }
+
+    protected final void handleShowItem(final UserConnection connection, final CompoundTag itemTag) {
+        handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
     }
 
     protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, @Nullable final CompoundTag componentsTag) {
@@ -380,9 +425,42 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         }
 
         for (final CompoundTag entryTag : container) {
-            final CompoundTag itemTag = entryTag.getCompoundTag("item");
-            handleShowItem(connection, itemTag, itemTag.getCompoundTag("components"));
+            handleShowItem(connection, entryTag.getCompoundTag("item"));
         }
+    }
+
+    protected void handleWrittenBookContents(final UserConnection connection, final CompoundTag tag) {
+        final CompoundTag book = TagUtil.getNamespacedCompoundTag(tag, "minecraft:written_book_content");
+        if (book == null) {
+            return;
+        }
+
+        final ListTag<CompoundTag> pagesTag = book.getListTag("pages", CompoundTag.class);
+        if (pagesTag == null) {
+            return;
+        }
+
+        for (final CompoundTag compoundTag : pagesTag) {
+            final StringTag raw = compoundTag.getStringTag("raw");
+            processJsonString(connection, raw);
+
+            final StringTag filtered = compoundTag.getStringTag("filtered");
+            processJsonString(connection, filtered);
+        }
+    }
+
+    private void processJsonString(final UserConnection connection, final StringTag tag) {
+        if (tag == null) {
+            return;
+        }
+
+        final var input = inputSerializerVersion();
+        final var output = outputSerializerVersion();
+
+        final Tag asTag = input.toTag(input.toComponent(tag.getValue()));
+        processTag(connection, asTag);
+
+        tag.setValue(output.toString(output.toComponent(asTag)));
     }
 
     protected void handleItemArrayContents(final UserConnection connection, final CompoundTag tag, final String key) {
@@ -396,16 +474,16 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         }
     }
 
-    protected SerializerVersion inputSerializerVersion() {
+    protected @Nullable SerializerVersion inputSerializerVersion() {
         return null;
     }
 
-    protected SerializerVersion outputSerializerVersion() {
-        return null;
+    protected @Nullable SerializerVersion outputSerializerVersion() {
+        return inputSerializerVersion(); // Only matters if the nbt serializer changed
     }
 
     private void convertLegacyContents(final CompoundTag hoverEvent) {
-        if (inputSerializerVersion() == null || outputSerializerVersion() == null) {
+        if (inputSerializerVersion() == null) {
             return;
         }
 

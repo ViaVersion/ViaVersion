@@ -168,6 +168,7 @@ public final class WorldPacketRewriter1_18 {
                 lightStorage.getLight(chunk.getX(), chunk.getZ()) : lightStorage.removeLight(chunk.getX(), chunk.getZ());
             if (light == null) {
                 protocol.getLogger().warning("No light data found for chunk at " + chunk.getX() + ", " + chunk.getZ() + ". Chunk was already loaded: " + alreadyLoaded);
+                protocol.getLogger().warning("This means another plugin is sending chunk data in a bad order, or you need to re-enable the cache-1_17-light config option.");
 
                 final BitSet emptyLightMask = new BitSet();
                 emptyLightMask.set(0, tracker.currentWorldSectionHeight() + 2);

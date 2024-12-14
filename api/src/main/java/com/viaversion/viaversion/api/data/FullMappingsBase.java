@@ -84,7 +84,18 @@ public class FullMappingsBase implements FullMappings {
     }
 
     @Override
-    public String mappedIdentifier(final int mappedId) {
+    public @Nullable String identifier(final String mappedIdentifier) {
+        final int mappedId = mappedId(mappedIdentifier);
+        if (mappedId == -1) {
+            return null;
+        }
+
+        final int id = mappings.inverse().getNewId(mappedId);
+        return id != -1 ? identifier(id) : null;
+    }
+
+    @Override
+    public @Nullable String mappedIdentifier(final int mappedId) {
         if (mappedId < 0 || mappedId >= mappedIdToString.length) {
             return null;
         }

@@ -59,6 +59,14 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
     int newEntityId(int id);
 
     /**
+     * Returns the mapped entity (or the same if it has not changed).
+     *
+     * @param identifier unmapped entity identifier
+     * @return mapped entity identifier
+     */
+    String mappedEntityIdentifier(String identifier);
+
+    /**
      * Handles and transforms entity data of an entity.
      *
      * @param entityId     entity id

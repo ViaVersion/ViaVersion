@@ -43,7 +43,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     private static final List<ProtocolVersion> VERSION_LIST = new ArrayList<>();
 
     public static final ProtocolVersion v1_7_2 = register(4, "1.7.2-1.7.5", new SubVersionRange("1.7", 2, 5));
-    @Deprecated(forRemoval=true) public static final ProtocolVersion v1_7_1 = v1_7_2;
+    @Deprecated(forRemoval = true)
+    public static final ProtocolVersion v1_7_1 = v1_7_2;
     public static final ProtocolVersion v1_7_6 = register(5, "1.7.6-1.7.10", new SubVersionRange("1.7", 6, 10));
     public static final ProtocolVersion v1_8 = register(47, "1.8.x", new SubVersionRange("1.8", 0, 9));
     public static final ProtocolVersion v1_9 = register(107, "1.9");
@@ -85,7 +86,13 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     public static final ProtocolVersion v1_20_3 = register(765, "1.20.3-1.20.4", new SubVersionRange("1.20", 3, 4));
     public static final ProtocolVersion v1_20_5 = register(766, "1.20.5-1.20.6", new SubVersionRange("1.20", 5, 6));
     public static final ProtocolVersion v1_21 = register(767, "1.21-1.21.1", new SubVersionRange("1.21", 0, 1));
+    public static final ProtocolVersion v1_21_2 = register(768, "1.21.2-1.21.3", new SubVersionRange("1.21", 2, 3));
+    public static final ProtocolVersion v1_21_4 = register(769, "1.21.4");
     public static final ProtocolVersion unknown = new ProtocolVersion(VersionType.SPECIAL, -1, -1, "UNKNOWN", null);
+
+    static {
+        unknown.known = false;
+    }
 
     public static ProtocolVersion register(int version, String name) {
         return register(version, -1, name);
@@ -150,7 +157,11 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
                 return protocolVersion;
             }
         }
-        return new ProtocolVersion(VersionType.SPECIAL, version, -1, "Unknown (" + version + ")", null);
+
+        // Will be made nullable instead in the future...
+        final ProtocolVersion unknown = new ProtocolVersion(versionType, version, -1, "Unknown (" + version + ")", null);
+        unknown.known = false;
+        return unknown;
     }
 
     public static @NonNull ProtocolVersion getProtocol(final int version) {
@@ -201,6 +212,8 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     private final int snapshotVersion;
     private final String name;
     private final Set<String> includedVersions;
+    @Deprecated // Remove when getProtocol is made nullable
+    private boolean known = true;
 
     /**
      * Constructs a new ProtocolVersion instance.
@@ -285,12 +298,12 @@ public class ProtocolVersion implements Comparable<ProtocolVersion> {
     }
 
     /**
-     * Returns whether the protocol is set. Should only be unknown for unregistered protocols returned by {@link #getProtocol(int)}.
+     * Returns whether the protocol version is {@link #unknown}. For checking if the protocol version is registered, use {@link #isRegistered(VersionType, int)}
      *
-     * @return true if the protocol is set
+     * @return true if the protocol version is unknown
      */
     public boolean isKnown() {
-        return version != -1;
+        return known;
     }
 
     /**

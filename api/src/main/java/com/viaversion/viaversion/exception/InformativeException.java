@@ -22,11 +22,14 @@
  */
 package com.viaversion.viaversion.exception;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.viaversion.viaversion.api.Via;
+import java.util.ArrayList;
+import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class InformativeException extends RuntimeException {
-    private final Map<String, Object> info = new HashMap<>();
+    private static final int MAX_MESSAGE_LENGTH = 5_000;
+    private final List<DataEntry> dataEntries = new ArrayList<>();
     private boolean shouldBePrinted = true;
     private int sources;
 
@@ -34,8 +37,8 @@ public class InformativeException extends RuntimeException {
         super(cause);
     }
 
-    public InformativeException set(String key, Object value) {
-        info.put(key, value);
+    public InformativeException set(String key, @Nullable Object value) {
+        dataEntries.add(new DataEntry(key, value));
         return this;
     }
 
@@ -57,14 +60,21 @@ public class InformativeException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
+        final StringBuilder builder = new StringBuilder("Please report this on the Via support Discord or open an issue on the relevant GitHub repository\n");
         boolean first = true;
-        for (Map.Entry<String, Object> entry : info.entrySet()) {
+        for (final DataEntry entry : dataEntries) {
             if (!first) {
                 builder.append(", ");
+            } else {
+                first = false;
             }
-            builder.append(entry.getKey()).append(": ").append(entry.getValue());
-            first = false;
+
+            builder.append(entry.name()).append(": ");
+            String s = String.valueOf(entry.value());
+            if (!Via.getManager().isDebug() && s.length() > 10 && builder.length() + s.length() > MAX_MESSAGE_LENGTH) {
+                s = s.substring(0, MAX_MESSAGE_LENGTH - builder.length()) + "...";
+            }
+            builder.append(s.replaceAll("\\s", ""));
         }
         return builder.toString();
     }
@@ -73,5 +83,8 @@ public class InformativeException extends RuntimeException {
     public Throwable fillInStackTrace() {
         // Don't record this stack
         return this;
+    }
+
+    private record DataEntry(String name, @Nullable Object value) {
     }
 }

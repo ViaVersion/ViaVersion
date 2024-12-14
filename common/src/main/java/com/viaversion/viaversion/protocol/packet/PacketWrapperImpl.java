@@ -222,6 +222,18 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public void writeToBuffer(ByteBuf buffer) throws InformativeException {
+        writeProcessedValues(buffer);
+        if (inputBuffer != null) {
+            buffer.writeBytes(inputBuffer);
+        }
+    }
+
+    public boolean areStoredPacketValuesEmpty() {
+        // Check for read/added packet values, not the input buffer
+        return packetValues.isEmpty() && readableObjects.isEmpty();
+    }
+
+    public void writeProcessedValues(ByteBuf buffer) throws InformativeException {
         if (id != -1) {
             Types.VAR_INT.writePrimitive(buffer, id);
         }
@@ -238,16 +250,15 @@ public class PacketWrapperImpl implements PacketWrapper {
                 throw createInformativeException(e, packetValue.type(), i);
             }
         }
-        writeRemaining(buffer);
     }
 
     private InformativeException createInformativeException(final Exception cause, final Type<?> type, final int index) {
         return new InformativeException(cause)
+            .set("Packet Type", this.packetType)
             .set("Index", index)
             .set("Type", type.getTypeName())
-            .set("Packet ID", this.id)
-            .set("Packet Type", this.packetType)
-            .set("Data", this.packetValues);
+            .set("Data", this.packetValues)
+            .set("Packet ID", this.id);
     }
 
     @Override
@@ -262,12 +273,6 @@ public class PacketWrapperImpl implements PacketWrapper {
     public void clearPacket() {
         clearInputBuffer();
         packetValues.clear();
-    }
-
-    private void writeRemaining(ByteBuf output) {
-        if (inputBuffer != null) {
-            output.writeBytes(inputBuffer);
-        }
     }
 
     @Override
@@ -320,7 +325,7 @@ public class PacketWrapperImpl implements PacketWrapper {
         final ProtocolInfo protocolInfo = user().getProtocolInfo();
         final List<Protocol> protocols = protocolInfo.getPipeline().pipes(protocolClass, skipCurrentPipeline, direction);
         apply(direction, protocolInfo.getState(direction), protocols);
-        final ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        final ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             return output.retain();
@@ -354,7 +359,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return cancelledFuture();
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             return user().sendRawPacketFuture(output.retain());
@@ -373,7 +378,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             if (currentThread) {
@@ -384,6 +389,14 @@ public class PacketWrapperImpl implements PacketWrapper {
         } finally {
             output.release();
         }
+    }
+
+    private ByteBuf allocateOutputBuffer() {
+        if (inputBuffer == null) {
+            return user().getChannel().alloc().buffer();
+        }
+        // May have already been partially or fully read
+        return inputBuffer.alloc().buffer(Math.max(inputBuffer.readableBytes(), 256));
     }
 
     private ChannelFuture cancelledFuture() {
@@ -454,7 +467,7 @@ public class PacketWrapperImpl implements PacketWrapper {
             return;
         }
 
-        ByteBuf output = inputBuffer == null ? user().getChannel().alloc().buffer() : inputBuffer.alloc().buffer();
+        ByteBuf output = allocateOutputBuffer();
         try {
             writeToBuffer(output);
             if (currentThread) {

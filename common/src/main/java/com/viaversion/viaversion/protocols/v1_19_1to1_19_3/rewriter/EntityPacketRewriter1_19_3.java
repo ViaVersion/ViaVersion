@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_19_3;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_19;
 import com.viaversion.viaversion.api.type.types.version.Types1_19_3;
@@ -62,11 +63,16 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 handler(worldDataTrackerHandlerByKey());
                 handler(playerTrackerHandler());
                 handler(wrapper -> {
-                    // Also enable vanilla features
+                    // Also enable vanilla features (set by default in later versions, but keeping it explicit is nicer)
                     final PacketWrapper enableFeaturesPacket = wrapper.create(ClientboundPackets1_19_3.UPDATE_ENABLED_FEATURES);
-                    enableFeaturesPacket.write(Types.VAR_INT, 1);
-                    enableFeaturesPacket.write(Types.STRING, "minecraft:vanilla");
-                    enableFeaturesPacket.scheduleSend(Protocol1_19_1To1_19_3.class);
+                    enableFeaturesPacket.write(Types.STRING_ARRAY, new String[]{"minecraft:vanilla"});
+
+                    if (wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_20_2)) {
+                        // Make sure it's included in the configuration packets
+                        enableFeaturesPacket.send(Protocol1_19_1To1_19_3.class);
+                    } else {
+                        enableFeaturesPacket.scheduleSend(Protocol1_19_1To1_19_3.class);
+                    }
                 });
             }
         });
@@ -116,7 +122,7 @@ public final class EntityPacketRewriter1_19_3 extends EntityRewriter<Clientbound
                 set.set(action == 1 ? action + 1 : action + 2);
             }
 
-            wrapper.write(Types.PROFILE_ACTIONS_ENUM, set);
+            wrapper.write(Types.PROFILE_ACTIONS_ENUM1_19_3, set);
             final int entries = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < entries; i++) {
                 wrapper.passthrough(Types.UUID); // UUID

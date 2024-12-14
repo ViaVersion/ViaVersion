@@ -58,9 +58,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
@@ -95,9 +95,7 @@ import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,8 +107,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
 
-    private final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
-    private final StructuredDataType structuredDataType;
+    protected final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
+    protected final StructuredDataType structuredDataType;
 
     /**
      * @param protocol           protocol
@@ -133,7 +131,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         register(StructuredDataKey.CAN_PLACE_ON, this::canPlaceOnToTag, this::canPlaceOnFromTag);
         register(StructuredDataKey.CAN_BREAK, this::canBreakToTag, this::canBreakFromTag);
         register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, this::attributeModifiersToTag, this::attributeModifiersFromTag);
-        register(StructuredDataKey.CUSTOM_MODEL_DATA, this::customModelDataToTag, this::customModelDataFromTag);
+        register(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, this::customModelDataToTag, this::customModelDataFromTag);
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, this::hideAdditionalTooltipToTag, this::hideAdditionalTooltipFromTag);
         register(StructuredDataKey.HIDE_TOOLTIP, this::hideTooltipToTag, this::hideTooltipFromTag);
         register(StructuredDataKey.REPAIR_COST, this::repairCostToTag, this::repairCostFromTag);
@@ -151,16 +149,16 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         registerEmpty(StructuredDataKey.MAP_POST_PROCESSING);
         register(StructuredDataKey.CHARGED_PROJECTILES1_20_5, this::chargedProjectilesToTag, this::chargedProjectilesFromTag);
         register(StructuredDataKey.BUNDLE_CONTENTS1_20_5, this::bundleContentsToTag, this::bundleContentsFromTag);
-        register(StructuredDataKey.POTION_CONTENTS, this::potionContentsToTag, this::potionContentsFromTag);
+        register(StructuredDataKey.POTION_CONTENTS1_20_5, this::potionContentsToTag, this::potionContentsFromTag);
         register(StructuredDataKey.SUSPICIOUS_STEW_EFFECTS, this::suspiciousStewEffectsToTag, this::suspiciousStewEffectsFromTag);
         register(StructuredDataKey.WRITABLE_BOOK_CONTENT, this::writableBookContentToTag, this::writableBookContentFromTag);
         register(StructuredDataKey.WRITTEN_BOOK_CONTENT, this::writtenBookContentToTag, this::writtenBookContentFromTag);
-        register(StructuredDataKey.TRIM, this::trimToTag, this::trimFromTag);
+        register(StructuredDataKey.TRIM1_20_5, this::trimToTag, this::trimFromTag);
         register(StructuredDataKey.DEBUG_STICK_STATE, this::debugStickRateToTag, this::debugStickRateFromTag);
         register(StructuredDataKey.ENTITY_DATA, this::entityDataToTag, this::entityDataFromTag);
         register(StructuredDataKey.BUCKET_ENTITY_DATA, this::bucketEntityDataToTag, this::bucketEntityDataFromTag);
         register(StructuredDataKey.BLOCK_ENTITY_DATA, this::blockEntityDataToTag, this::blockEntityDataFromTag);
-        register(StructuredDataKey.INSTRUMENT, this::instrumentToTag, this::instrumentFromTag);
+        register(StructuredDataKey.INSTRUMENT1_20_5, this::instrumentToTag, this::instrumentFromTag);
         register(StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER, this::ominousBottleAmplifierToTag, this::ominousBottleAmplifierFromTag);
         register(StructuredDataKey.RECIPES, this::recipesToTag, this::recipesFromTag);
         register(StructuredDataKey.LODESTONE_TRACKER, this::lodestoneTrackerToTag, this::lodestoneTrackerFromTag);
@@ -336,7 +334,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return readFromTag(connection, key, id, tag);
     }
 
-    private <T> StructuredData<T> readFromTag(final UserConnection connection, final StructuredDataKey<T> key, final int id, final Tag tag) {
+    protected <T> StructuredData<T> readFromTag(final UserConnection connection, final StructuredDataKey<T> key, final int id, final Tag tag) {
         final TagConverter<T> converter = tagConverter(key);
         Preconditions.checkNotNull(converter, "No converter found for: %s", key);
         return StructuredData.of(key, converter.convert(connection, tag), id);
@@ -351,7 +349,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     // ---------------------------------------------------------------------------------------
-    // Conversion methods
 
     protected CompoundTag customDataToTag(final CompoundTag value) {
         return value;
@@ -665,7 +662,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return value;
     }
 
-    protected CompoundTag foodToTag(final FoodProperties value) {
+    protected CompoundTag foodToTag(final FoodProperties1_20_5 value) {
         final CompoundTag tag = new CompoundTag();
         tag.put("nutrition", nonNegativeIntToTag(value.nutrition()));
         tag.putFloat("saturation", value.saturationModifier());
@@ -847,6 +844,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             customEffects.add(effectTag);
         }
         tag.put("custom_effects", customEffects);
+        if (value.customName() != null) {
+            tag.putString("custom_name", value.customName());
+        }
+        tag.put("custom_effects", customEffects);
         return tag;
     }
 
@@ -935,7 +936,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         final CompoundTag title = new CompoundTag();
         filterableStringToTag(title, value.title(), 32);
         tag.put("title", title);
-
         tag.putString("author", value.author());
         if (value.generation() != 0) {
             tag.put("generation", intRangeToTag(value.generation(), 0, 3));
@@ -993,8 +993,8 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             }
 
             final CompoundTag overrideArmorMaterialsTag = new CompoundTag();
-            for (final Int2ObjectMap.Entry<String> entry : armorTrimMaterial.overrideArmorMaterials().int2ObjectEntrySet()) {
-                final String materialKey = ArmorMaterials1_20_5.idToKey(entry.getIntKey());
+            for (final Map.Entry<String, String> entry : armorTrimMaterial.overrideArmorMaterials().entrySet()) {
+                final String materialKey = ArmorMaterials1_20_5.idToKey(Integer.parseInt(entry.getKey()));
                 if (materialKey != null) {
                     overrideArmorMaterialsTag.putString(materialKey, entry.getValue());
                 }
@@ -1110,12 +1110,12 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return (CompoundTag) value;
     }
 
-    protected Tag instrumentToTag(final Holder<Instrument> value) {
+    protected Tag instrumentToTag(final Holder<Instrument1_20_5> value) {
         if (value.hasId()) {
             return new StringTag(Instruments1_20_3.idToKey(value.id()));
         }
 
-        final Instrument instrument = value.value();
+        final Instrument1_20_5 instrument = value.value();
         final CompoundTag tag = new CompoundTag();
         final Holder<SoundEvent> sound = instrument.soundEvent();
         if (sound.hasId()) {
@@ -1135,7 +1135,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return tag;
     }
 
-    protected Holder<Instrument> instrumentFromTag(final Tag tag) {
+    protected Holder<Instrument1_20_5> instrumentFromTag(final Tag tag) {
         if (tag instanceof StringTag stringTag) {
             return Holder.of(Instruments1_20_3.keyToId(stringTag.getValue()));
         }
@@ -1833,17 +1833,17 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     // ---------------------------------------------------------------------------------------
 
-    private int checkIntRange(final int min, final int max, final int value) {
+    protected int checkIntRange(final int min, final int max, final int value) {
         Preconditions.checkArgument(value >= min && value <= max, "Value out of range: " + value);
         return value;
     }
 
-    private float checkFloatRange(final float min, final float max, final float value) {
+    protected float checkFloatRange(final float min, final float max, final float value) {
         Preconditions.checkArgument(value >= min && value <= max, "Value out of range: " + value);
         return value;
     }
 
-    private String checkStringRange(final int min, final int max, final String value) {
+    protected String checkStringRange(final int min, final int max, final String value) {
         final int length = value.length();
         Preconditions.checkArgument(length >= min && length <= max, "Value out of range: " + value);
         return value;

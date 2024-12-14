@@ -17,16 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.v1_8to1_9.storage;
 
-import com.google.common.collect.Sets;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ClientWorld1_9 extends ClientWorld {
-    private final Set<Long> loadedChunks = Sets.newConcurrentHashSet();
 
-    public static long toLong(int msw, int lsw) {
-        return ((long) msw << 32) + lsw + 2147483648L;
-    }
+    private final Set<Long> loadedChunks = new HashSet<>();
 
     public Set<Long> getLoadedChunks() {
         return loadedChunks;

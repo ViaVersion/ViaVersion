@@ -20,28 +20,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.ArrayType;
-import io.netty.buffer.ByteBuf;
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record FoodEffect(PotionEffect effect, float probability) {
+record IdHolder<T>(int id) implements Holder<T> {
 
-    public static final Type<FoodEffect> TYPE = new Type<>(FoodEffect.class) {
-        @Override
-        public FoodEffect read(final ByteBuf buffer) {
-            final PotionEffect effect = PotionEffect.TYPE.read(buffer);
-            final float probability = buffer.readFloat();
-            return new FoodEffect(effect, probability);
+    IdHolder {
+        Preconditions.checkArgument(id >= 0, "id cannot be negative");
+    }
+
+    @Override
+    public boolean isDirect() {
+        return false;
+    }
+
+    @Override
+    public boolean hasId() {
+        return true;
+    }
+
+    @Override
+    public T value() {
+        throw new IllegalArgumentException("Holder is not direct");
+    }
+
+    @Override
+    public Holder<T> updateId(final Int2IntFunction rewriteFunction) {
+        final int rewrittenId = rewriteFunction.applyAsInt(id);
+        if (rewrittenId == id) {
+            return this;
         }
-
-        @Override
-        public void write(final ByteBuf buffer, final FoodEffect value) {
-            PotionEffect.TYPE.write(buffer, value.effect);
-            buffer.writeFloat(value.probability);
+        if (rewrittenId == -1) {
+            throw new IllegalArgumentException("Received invalid id in updateId");
         }
-    };
-    public static final Type<FoodEffect[]> ARRAY_TYPE = new ArrayType<>(TYPE);
-
+        return Holder.of(rewrittenId);
+    }
 }

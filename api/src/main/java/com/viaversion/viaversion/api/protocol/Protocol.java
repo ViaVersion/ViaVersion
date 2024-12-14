@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.api.rewriter.EntityRewriter;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.api.rewriter.TagRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.exception.CancelException;
@@ -371,6 +372,15 @@ public interface Protocol<CU extends ClientboundPacketType, CM extends Clientbou
      * @return item rewriter
      */
     default @Nullable ItemRewriter<?> getItemRewriter() {
+        return null;
+    }
+
+    /**
+     * Returns the protocol's particle rewriter if present.
+     *
+     * @return particle rewriter
+     */
+    default @Nullable ParticleRewriter getParticleRewriter() {
         return null;
     }
 

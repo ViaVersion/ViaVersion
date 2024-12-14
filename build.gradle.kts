@@ -16,10 +16,10 @@ val main = setOf(
     projects.viaversionBukkit,
     projects.viaversionVelocity,
     projects.viaversionFabric
-).map { it.dependencyProject }
+).map { it.path }
 
 subprojects {
-    when (this) {
+    when (path) {
         in main -> plugins.apply("via.shadow-conventions")
         else -> plugins.apply("via.base-conventions")
     }

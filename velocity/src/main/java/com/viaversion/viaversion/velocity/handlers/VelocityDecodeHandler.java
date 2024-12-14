@@ -20,6 +20,7 @@ package com.viaversion.viaversion.velocity.handlers;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
+import com.viaversion.viaversion.util.ByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -43,7 +44,7 @@ public class VelocityDecodeHandler extends MessageToMessageDecoder<ByteBuf> {
             return;
         }
 
-        ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+        ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
             info.transformIncoming(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());

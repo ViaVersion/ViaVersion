@@ -17,14 +17,13 @@
  */
 package com.viaversion.viaversion.protocols.v1_10to1_11.data;
 
-import com.viaversion.viaversion.util.Pair;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PotionColorMappings1_11 {
 
-    //<oldData> to <newData, isInstant> mapping
-    private static final Int2ObjectMap<Pair<Integer, Boolean>> POTIONS = new Int2ObjectOpenHashMap<>(37);
+    private static final Int2ObjectMap<PotionData> POTIONS = new Int2ObjectOpenHashMap<>(37);
 
     static {
         addRewrite(0, 3694022, false);
@@ -66,12 +65,14 @@ public class PotionColorMappings1_11 {
         addRewrite(36, 3381504, false);
     }
 
-    public static Pair<Integer, Boolean> getNewData(int oldData) {
+    public static @Nullable PotionData getNewData(int oldData) {
         return POTIONS.get(oldData);
     }
 
     private static void addRewrite(int oldData, int newData, boolean isInstant) {
-        POTIONS.put(oldData, new Pair<>(newData, isInstant));
+        POTIONS.put(oldData, new PotionData(newData, isInstant));
     }
 
+    public record PotionData(int data, boolean instant) {
+    }
 }

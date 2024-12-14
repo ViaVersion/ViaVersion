@@ -33,6 +33,7 @@ import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities.
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities.FlowerPotHandler;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities.SkullHandler;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.provider.blockentities.SpawnerHandler;
+import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,21 @@ public class BlockEntityProvider implements Provider {
         handlers.put("minecraft:skull", new SkullHandler());
         handlers.put("minecraft:mob_spawner", new SpawnerHandler());
         handlers.put("minecraft:command_block", new CommandBlockHandler());
+
+        final BlockEntityHandler customNameHandler = (user, tag) -> {
+            final StringTag name = tag.getStringTag("CustomName");
+            if (name != null) {
+                name.setValue(ComponentUtil.legacyToJsonString(name.getValue()));
+            }
+            return -1;
+        };
+        handlers.put("minecraft:chest", customNameHandler);
+        handlers.put("minecraft:dispenser", customNameHandler);
+        handlers.put("minecraft:dropper", customNameHandler);
+        handlers.put("minecraft:enchanting_table", customNameHandler);
+        handlers.put("minecraft:furnace", customNameHandler);
+        handlers.put("minecraft:hopper", customNameHandler);
+        handlers.put("minecraft:shulker_box", customNameHandler);
     }
 
     /**

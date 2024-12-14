@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.rewriter;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// Base up to and including 1.21.1
 public class RecipeRewriter<C extends ClientboundPacketType> {
 
     protected final Protocol<C, ?, ?, ?> protocol;
@@ -80,13 +82,22 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
 
     public void register1_20_5(C packetType) {
         protocol.registerClientbound(packetType, wrapper -> {
-            int size = wrapper.passthrough(Types.VAR_INT);
+            final int size = wrapper.passthrough(Types.VAR_INT);
+            int newSize = size;
             for (int i = 0; i < size; i++) {
-                wrapper.passthrough(Types.STRING); // Recipe Identifier
+                final String recipeIdentifier = wrapper.read(Types.STRING);
 
-                final int typeId = wrapper.passthrough(Types.VAR_INT);
-                final String type = protocol.getMappingData().getRecipeSerializerMappings().identifier(typeId);
-                handleRecipeType(wrapper, type);
+                final FullMappings recipeSerializerMappings = protocol.getMappingData().getRecipeSerializerMappings();
+                final int typeId = wrapper.read(Types.VAR_INT);
+                final int mappedId = recipeSerializerMappings.getNewId(typeId);
+                if (mappedId != -1) {
+                    wrapper.write(Types.STRING, recipeIdentifier);
+                    wrapper.write(Types.VAR_INT, mappedId);
+                } else {
+                    wrapper.set(Types.VAR_INT, 0, --newSize);
+                }
+
+                handleRecipeType(wrapper, Key.stripMinecraftNamespace(recipeSerializerMappings.identifier(typeId))); // Use the original
             }
         });
     }
@@ -97,23 +108,19 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         for (int i = 0; i < ingredientsNo; i++) {
             handleIngredient(wrapper);
         }
-
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleCraftingShapeless(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredients(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmelting(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredient(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
         wrapper.passthrough(Types.FLOAT); // EXP
         wrapper.passthrough(Types.VAR_INT); // Cooking time
     }
@@ -121,15 +128,13 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
     public void handleStonecutting(PacketWrapper wrapper) {
         wrapper.passthrough(Types.STRING); // Group
         handleIngredient(wrapper);
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmithing(PacketWrapper wrapper) {
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Addition
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSimpleRecipe(final PacketWrapper wrapper) {
@@ -140,14 +145,20 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         handleIngredient(wrapper); // Template
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
-        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
-        wrapper.write(mappedItemType(), result);
+        handleResult(wrapper);
     }
 
     public void handleSmithingTrim(final PacketWrapper wrapper) {
         handleIngredient(wrapper); // Template
         handleIngredient(wrapper); // Base
         handleIngredient(wrapper); // Additions
+    }
+
+    protected int rewrite(final int itemId) {
+        if (protocol.getMappingData() != null && protocol.getItemRewriter() != null) {
+            return protocol.getMappingData().getNewItemId(itemId);
+        }
+        return itemId;
     }
 
     protected @Nullable Item rewrite(UserConnection connection, @Nullable Item item) {
@@ -170,6 +181,11 @@ public class RecipeRewriter<C extends ClientboundPacketType> {
         for (int i = 0; i < ingredients; i++) {
             handleIngredient(wrapper);
         }
+    }
+
+    protected void handleResult(final PacketWrapper wrapper) {
+        final Item result = rewrite(wrapper.user(), wrapper.read(itemType()));
+        wrapper.write(mappedItemType(), result);
     }
 
     @FunctionalInterface

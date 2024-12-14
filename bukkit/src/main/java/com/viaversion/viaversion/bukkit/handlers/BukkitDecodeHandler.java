@@ -22,6 +22,7 @@ import com.viaversion.viaversion.bukkit.util.NMSUtil;
 import com.viaversion.viaversion.exception.CancelCodecException;
 import com.viaversion.viaversion.exception.CancelDecoderException;
 import com.viaversion.viaversion.exception.InformativeException;
+import com.viaversion.viaversion.util.ByteBufUtil;
 import com.viaversion.viaversion.util.PipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -39,7 +40,7 @@ public final class BukkitDecodeHandler extends MessageToMessageDecoder<ByteBuf> 
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext ctx, final ByteBuf bytebuf, final List<Object> out) throws Exception {
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf bytebuf, final List<Object> out) {
         if (!connection.checkServerboundPacket()) {
             throw CancelDecoderException.generate(null);
         }
@@ -48,7 +49,7 @@ public final class BukkitDecodeHandler extends MessageToMessageDecoder<ByteBuf> 
             return;
         }
 
-        final ByteBuf transformedBuf = ctx.alloc().buffer().writeBytes(bytebuf);
+        final ByteBuf transformedBuf = ByteBufUtil.copy(ctx.alloc(), bytebuf);
         try {
             connection.transformIncoming(transformedBuf, CancelDecoderException::generate);
             out.add(transformedBuf.retain());

@@ -30,9 +30,17 @@ public class ChunkSectionLightImpl implements ChunkSectionLight {
     private NibbleArray blockLight;
     private NibbleArray skyLight;
 
-    public ChunkSectionLightImpl() {
-        // Block light is always written
-        this.blockLight = new NibbleArray(ChunkSection.SIZE);
+    protected ChunkSectionLightImpl() {
+    }
+
+    public static ChunkSectionLight createWithBlockLight() {
+        final ChunkSectionLightImpl light = new ChunkSectionLightImpl();
+        light.blockLight = new NibbleArray(ChunkSection.SIZE);
+        return light;
+    }
+
+    public static ChunkSectionLight createEmpty() {
+        return new ChunkSectionLightImpl();
     }
 
     @Override

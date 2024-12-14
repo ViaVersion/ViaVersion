@@ -21,53 +21,35 @@ import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.api.minecraft.ChunkPosition;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CommandBlockStorage implements StorableObject {
-    private final Map<Pair<Integer, Integer>, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new ConcurrentHashMap<>();
+    private final Map<Long, Map<BlockPosition, CompoundTag>> storedCommandBlocks = new HashMap<>();
     private boolean permissions;
 
     public void unloadChunk(int x, int z) {
-        Pair<Integer, Integer> chunkPos = new Pair<>(x, z);
-        storedCommandBlocks.remove(chunkPos);
+        storedCommandBlocks.remove(ChunkPosition.chunkKey(x, z));
     }
 
     public void addOrUpdateBlock(BlockPosition position, CompoundTag tag) {
-        Pair<Integer, Integer> chunkPos = getChunkCoords(position);
-
-        if (!storedCommandBlocks.containsKey(chunkPos)) {
-            storedCommandBlocks.put(chunkPos, new ConcurrentHashMap<>());
-        }
-
-        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(chunkPos);
-
-        if (blocks.containsKey(position) && blocks.get(position).equals(tag)) {
-            return;
-        }
-
+        long chunkKey = ChunkPosition.chunkKeyForBlock(position.x(), position.z());
+        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.computeIfAbsent(chunkKey, k -> new HashMap<>());
         blocks.put(position, tag);
     }
 
-    private Pair<Integer, Integer> getChunkCoords(BlockPosition position) {
-        int chunkX = Math.floorDiv(position.x(), 16);
-        int chunkZ = Math.floorDiv(position.z(), 16);
-
-        return new Pair<>(chunkX, chunkZ);
-    }
-
     public Optional<CompoundTag> getCommandBlock(BlockPosition position) {
-        Pair<Integer, Integer> chunkCoords = getChunkCoords(position);
-
-        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(chunkCoords);
-        if (blocks == null)
+        Map<BlockPosition, CompoundTag> blocks = storedCommandBlocks.get(ChunkPosition.chunkKeyForBlock(position.x(), position.z()));
+        if (blocks == null) {
             return Optional.empty();
+        }
 
         CompoundTag tag = blocks.get(position);
-        if (tag == null)
+        if (tag == null) {
             return Optional.empty();
+        }
 
         tag = tag.copy();
         tag.put("powered", new ByteTag((byte) 0));

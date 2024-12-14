@@ -60,9 +60,9 @@ import com.viaversion.viaversion.api.minecraft.item.data.FilterableComponent;
 import com.viaversion.viaversion.api.minecraft.item.data.FilterableString;
 import com.viaversion.viaversion.api.minecraft.item.data.FireworkExplosion;
 import com.viaversion.viaversion.api.minecraft.item.data.Fireworks;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodEffect;
-import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties;
-import com.viaversion.viaversion.api.minecraft.item.data.Instrument;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5;
+import com.viaversion.viaversion.api.minecraft.item.data.FoodProperties1_20_5.FoodEffect;
+import com.viaversion.viaversion.api.minecraft.item.data.Instrument1_20_5;
 import com.viaversion.viaversion.api.minecraft.item.data.LodestoneTracker;
 import com.viaversion.viaversion.api.minecraft.item.data.PotDecorations;
 import com.viaversion.viaversion.api.minecraft.item.data.PotionContents;
@@ -105,8 +105,7 @@ import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -306,8 +305,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final Particle smallExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
             final Particle largeExplosionParticle = wrapper.passthroughAndMap(Types1_20_3.PARTICLE, Types1_20_5.PARTICLE);
-            rewriteParticle(wrapper.user(), smallExplosionParticle);
-            rewriteParticle(wrapper.user(), largeExplosionParticle);
+            protocol.getParticleRewriter().rewriteParticle(wrapper.user(), smallExplosionParticle);
+            protocol.getParticleRewriter().rewriteParticle(wrapper.user(), largeExplosionParticle);
 
             final String sound = wrapper.read(Types.STRING);
             final Float range = wrapper.read(Types.OPTIONAL_FLOAT);
@@ -343,12 +342,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         });
 
-        final RecipeRewriter1_20_3<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_3<>(protocol) {
-            @Override
-            protected Item rewrite(final UserConnection connection, @Nullable Item item) {
-                return handleNonEmptyItemToClient(connection, item);
-            }
-        };
+        final RecipeRewriter1_20_5<ClientboundPacket1_20_3> recipeRewriter = new RecipeRewriter1_20_5<>(protocol);
         protocol.registerClientbound(ClientboundPackets1_20_3.UPDATE_RECIPES, wrapper -> {
             final int size = wrapper.passthrough(Types.VAR_INT);
             for (int i = 0; i < size; i++) {
@@ -465,7 +459,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag customModelData = tag.getNumberTag("CustomModelData");
         if (customModelData != null) {
-            data.set(StructuredDataKey.CUSTOM_MODEL_DATA, customModelData.asInt());
+            data.set(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, customModelData.asInt());
         }
 
         final CompoundTag blockState = tag.getCompoundTag("BlockStateTag");
@@ -536,7 +530,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         if (instrument != null) {
             final int id = Instruments1_20_3.keyToId(instrument);
             if (id != -1) {
-                data.set(StructuredDataKey.INSTRUMENT, Holder.of(id));
+                data.set(StructuredDataKey.INSTRUMENT1_20_5, Holder.of(id));
             }
         }
 
@@ -623,12 +617,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (item.identifier() == 1182) { // crossbow
                 // Change crossbow damage to value used in 1.17.1 and lower
                 item.dataContainer().set(StructuredDataKey.MAX_DAMAGE, 326);
-            }
-        }
-        if (serverVersion.olderThanOrEqualTo(ProtocolVersion.v1_8)) {
-            if (item.identifier() == 814 || item.identifier() == 819 || item.identifier() == 824 || item.identifier() == 829 || item.identifier() == 834) { // swords
-                // Make sword "eatable" to enable clientside instant blocking on 1.8. Consume time is set really high, so the eating animation doesn't play
-                item.dataContainer().set(StructuredDataKey.FOOD1_20_5, new FoodProperties(0, 0F, true, 3600, null, new FoodEffect[0]));
             }
         }
     }
@@ -727,7 +715,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             soundEvent = Holder.of(instrument.getInt("sound_event"));
         }
 
-        data.set(StructuredDataKey.INSTRUMENT, Holder.of(new Instrument(soundEvent, useDuration, range)));
+        data.set(StructuredDataKey.INSTRUMENT1_20_5, Holder.of(new Instrument1_20_5(soundEvent, useDuration, range)));
     }
 
     private void restoreFoodFromBackup(final CompoundTag food, final StructuredDataContainer data) {
@@ -756,7 +744,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 effect.getFloat("probability")
             ));
         }
-        data.set(StructuredDataKey.FOOD1_20_5, new FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, null, possibleEffects.toArray(new FoodEffect[0])));
+        data.set(StructuredDataKey.FOOD1_20_5, new FoodProperties1_20_5(nutrition, saturation, canAlwaysEat, eatSeconds, null, possibleEffects.toArray(new FoodEffect[0])));
     }
 
     private void restoreToolFromBackup(final CompoundTag tool, final StructuredDataContainer data) {
@@ -965,7 +953,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
         }
 
         if (potionId != null || customPotionColorTag != null || potionEffects != null) {
-            data.set(StructuredDataKey.POTION_CONTENTS, new PotionContents(
+            data.set(StructuredDataKey.POTION_CONTENTS1_20_5, new PotionContents(
                 potionId,
                 customPotionColorTag != null ? customPotionColorTag.asInt() : null,
                 potionEffects != null ? potionEffects : new PotionEffect[0]
@@ -1000,17 +988,14 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             final CompoundTag overrideArmorMaterialsTag = materialCompoundTag.getCompoundTag("override_armor_materials");
             final Tag descriptionTag = materialCompoundTag.get("description");
 
-            final Int2ObjectMap<String> overrideArmorMaterials = new Int2ObjectOpenHashMap<>();
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             if (overrideArmorMaterialsTag != null) {
                 for (final Map.Entry<String, Tag> entry : overrideArmorMaterialsTag.entrySet()) {
                     if (!(entry.getValue() instanceof StringTag valueTag)) {
                         continue;
                     }
-                    try {
-                        final int id = Integer.parseInt(entry.getKey());
-                        overrideArmorMaterials.put(id, valueTag.getValue());
-                    } catch (NumberFormatException ignored) {
-                    }
+
+                    overrideArmorMaterials.put(entry.getKey(), valueTag.getValue());
                 }
             }
 
@@ -1054,7 +1039,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             ));
         } else return;
 
-        data.set(StructuredDataKey.TRIM, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
+        data.set(StructuredDataKey.TRIM1_20_5, new ArmorTrim(materialHolder, patternHolder, showInTooltip));
     }
 
     private void updateMobTags(final StructuredDataContainer data, final CompoundTag tag) {

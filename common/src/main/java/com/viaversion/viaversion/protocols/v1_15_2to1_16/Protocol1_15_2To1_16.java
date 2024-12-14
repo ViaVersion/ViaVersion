@@ -47,6 +47,7 @@ import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.EntityPacketRe
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.ItemPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.rewriter.WorldPacketRewriter1_16;
 import com.viaversion.viaversion.protocols.v1_15_2to1_16.storage.InventoryTracker1_16;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -63,6 +64,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     public static final MappingData MAPPINGS = new MappingDataBase("1.15", "1.16");
     private final EntityPacketRewriter1_16 entityRewriter = new EntityPacketRewriter1_16(this);
     private final ItemPacketRewriter1_16 itemRewriter = new ItemPacketRewriter1_16(this);
+    private final ParticleRewriter<ClientboundPackets1_15> particleRewriter = new ParticleRewriter<>(this);
     private final ComponentRewriter1_16 componentRewriter = new ComponentRewriter1_16(this);
     private final TagRewriter<ClientboundPackets1_15> tagRewriter = new TagRewriter<>(this);
 
@@ -77,11 +79,12 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
         WorldPacketRewriter1_16.register(this);
 
         tagRewriter.register(ClientboundPackets1_15.UPDATE_TAGS, RegistryType.ENTITY);
+        particleRewriter.registerLevelParticles1_13(ClientboundPackets1_15.LEVEL_PARTICLES, Types.DOUBLE);
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_15.AWARD_STATS);
 
         // Login Success
-        registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, wrapper -> {
+        registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, wrapper -> {
             // Transform string to a uuid
             UUID uuid = UUID.fromString(wrapper.read(Types.STRING));
             wrapper.write(Types.UUID, uuid);
@@ -169,16 +172,16 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                         final String channel = wrapper.get(Types.STRING, 0);
                         final String namespacedChannel = Key.namespaced(channel);
                         if (channel.length() > 32) {
-                            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                            if (Via.getManager().isDebug()) {
                                 getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 32 characters: " + channel);
                             }
                             wrapper.cancel();
                         } else if (namespacedChannel.equals("minecraft:register") || namespacedChannel.equals("minecraft:unregister")) {
-                            String[] channels = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0");
+                            String[] channels = new String(wrapper.read(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA), StandardCharsets.UTF_8).split("\0");
                             List<String> checkedChannels = new ArrayList<>(channels.length);
                             for (String registeredChannel : channels) {
                                 if (registeredChannel.length() > 32) {
-                                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                    if (Via.getManager().isDebug()) {
                                         getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 32 characters");
                                     }
                                     continue;
@@ -192,7 +195,7 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
                                 return;
                             }
 
-                            wrapper.write(Types.REMAINING_BYTES, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
+                            wrapper.write(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA, Joiner.on('\0').join(checkedChannels).getBytes(StandardCharsets.UTF_8));
                         }
                     });
                 }
@@ -253,6 +256,11 @@ public class Protocol1_15_2To1_16 extends AbstractProtocol<ClientboundPackets1_1
     @Override
     public ItemPacketRewriter1_16 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_15> getParticleRewriter() {
+        return particleRewriter;
     }
 
     public ComponentRewriter1_16 getComponentRewriter() {

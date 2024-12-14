@@ -35,6 +35,7 @@ import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.ItemPacketRewr
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.rewriter.WorldPacketRewriter1_18;
 import com.viaversion.viaversion.protocols.v1_17_1to1_18.storage.ChunkLightStorage;
 import com.viaversion.viaversion.protocols.v1_17to1_17_1.packet.ClientboundPackets1_17_1;
+import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -46,6 +47,7 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     public static final ProtocolLogger LOGGER = new ProtocolLogger(Protocol1_17_1To1_18.class);
     private final EntityPacketRewriter1_18 entityRewriter = new EntityPacketRewriter1_18(this);
     private final ItemPacketRewriter1_18 itemRewriter = new ItemPacketRewriter1_18(this);
+    private final ParticleRewriter<ClientboundPackets1_17_1> particleRewriter = new ParticleRewriter<>(this);
     private final TagRewriter<ClientboundPackets1_17_1> tagRewriter = new TagRewriter<>(this);
 
     public Protocol1_17_1To1_18() {
@@ -121,6 +123,11 @@ public final class Protocol1_17_1To1_18 extends AbstractProtocol<ClientboundPack
     @Override
     public ItemPacketRewriter1_18 getItemRewriter() {
         return itemRewriter;
+    }
+
+    @Override
+    public ParticleRewriter<ClientboundPackets1_17_1> getParticleRewriter() {
+        return particleRewriter;
     }
 
     @Override

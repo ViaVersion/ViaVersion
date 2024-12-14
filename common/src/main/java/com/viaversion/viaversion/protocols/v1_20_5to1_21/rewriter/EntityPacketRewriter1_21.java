@@ -18,6 +18,7 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
@@ -33,12 +34,13 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Enchantments1_20
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPacket1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ClientboundPackets1_20_5;
+import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.Protocol1_20_5To1_21;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.data.Paintings1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.EfficiencyAttributeStorage;
+import com.viaversion.viaversion.protocols.v1_20_5to1_21.storage.PlayerPositionStorage;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
-import com.viaversion.viaversion.util.ArrayUtil;
-import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.rewriter.RegistryDataRewriter;
 
 public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPacket1_20_5, Protocol1_20_5To1_21> {
 
@@ -52,22 +54,15 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
         registerSetEntityData(ClientboundPackets1_20_5.SET_ENTITY_DATA, Types1_20_5.ENTITY_DATA_LIST, Types1_21.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_20_5.REMOVE_ENTITIES);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, wrapper -> {
-            final String type = Key.stripMinecraftNamespace(wrapper.passthrough(Types.STRING));
-            final RegistryEntry[] entries = wrapper.passthrough(Types.REGISTRY_ENTRY_ARRAY);
-            if (type.equals("damage_type")) {
-                // Add required damage type
-                final CompoundTag campfireDamageType = new CompoundTag();
-                campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
-                campfireDamageType.putString("message_id", "inFire");
-                campfireDamageType.putFloat("exhaustion", 0.1F);
-                wrapper.set(Types.REGISTRY_ENTRY_ARRAY, 0, ArrayUtil.add(entries, new RegistryEntry("minecraft:campfire", campfireDamageType)));
-            } else {
-                handleRegistryData1_20_5(wrapper.user(), type, entries);
-            }
-        });
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        final CompoundTag campfireDamageType = new CompoundTag();
+        campfireDamageType.putString("scaling", "when_caused_by_living_non_player");
+        campfireDamageType.putString("message_id", "inFire");
+        campfireDamageType.putFloat("exhaustion", 0.1F);
+        registryDataRewriter.addEntries("damage_type", new RegistryEntry("minecraft:campfire", campfireDamageType));
+        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA, registryDataRewriter::handle);
 
-        protocol.registerClientbound(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
+        protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_20_5.FINISH_CONFIGURATION, wrapper -> {
             // Add new registries
             final PacketWrapper paintingRegistryPacket = wrapper.create(ClientboundConfigurationPackets1_20_5.REGISTRY_DATA);
             paintingRegistryPacket.write(Types.STRING, "minecraft:painting_variant");
@@ -116,7 +111,8 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
                 map(Types.STRING); // World
                 handler(worldDataTrackerHandlerByKey1_20_5(3));
                 handler(playerTrackerHandler());
-                handler(wrapper -> wrapper.user().get(EfficiencyAttributeStorage.class).onLoginSent(wrapper.user()));
+                handler(wrapper -> wrapper.user().get(EfficiencyAttributeStorage.class)
+                    .onLoginSent(wrapper.get(Types.INT, 0), wrapper.user()));
             }
         });
 
@@ -127,7 +123,49 @@ public final class EntityPacketRewriter1_21 extends EntityRewriter<ClientboundPa
 
             // Resend attribute modifiers from items
             wrapper.user().get(EfficiencyAttributeStorage.class).onRespawn(wrapper.user());
+
+            wrapper.user().put(new PlayerPositionStorage());
         });
+
+        // Tracking player position and on ground for block interactions, rotations is kept from the interaction packet
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS, wrapper -> {
+            if (Via.getConfig().fix1_21PlacementRotation()) {
+                storePosition(wrapper);
+                storeOnGround(wrapper);
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_ROT, wrapper -> {
+            if (Via.getConfig().fix1_21PlacementRotation()) {
+                wrapper.passthrough(Types.FLOAT); // Yaw
+                wrapper.passthrough(Types.FLOAT); // Pitch
+                storeOnGround(wrapper);
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_POS_ROT, wrapper -> {
+            if (Via.getConfig().fix1_21PlacementRotation()) {
+                storePosition(wrapper);
+                wrapper.passthrough(Types.FLOAT); // Yaw
+                wrapper.passthrough(Types.FLOAT); // Pitch
+                storeOnGround(wrapper);
+            }
+        });
+        protocol.registerServerbound(ServerboundPackets1_20_5.MOVE_PLAYER_STATUS_ONLY, wrapper -> {
+            if (Via.getConfig().fix1_21PlacementRotation()) {
+                storeOnGround(wrapper);
+            }
+        });
+    }
+
+    private void storePosition(final PacketWrapper wrapper) {
+        final double x = wrapper.passthrough(Types.DOUBLE);
+        final double y = wrapper.passthrough(Types.DOUBLE);
+        final double z = wrapper.passthrough(Types.DOUBLE);
+        wrapper.user().get(PlayerPositionStorage.class).setPosition(x, y, z);
+    }
+
+    private void storeOnGround(final PacketWrapper wrapper) {
+        final boolean onGround = wrapper.passthrough(Types.BOOLEAN);
+        wrapper.user().get(PlayerPositionStorage.class).setOnGround(onGround);
     }
 
     @Override

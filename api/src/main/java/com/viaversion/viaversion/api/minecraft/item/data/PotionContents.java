@@ -27,15 +27,20 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record PotionContents(@Nullable Integer potion, @Nullable Integer customColor, PotionEffect[] customEffects) {
+public record PotionContents(@Nullable Integer potion, @Nullable Integer customColor, PotionEffect[] customEffects,
+                             @Nullable String customName) {
 
-    public static final Type<PotionContents> TYPE = new Type<>(PotionContents.class) {
+    public PotionContents(final @Nullable Integer potion, final @Nullable Integer customColor, final PotionEffect[] customEffects) {
+        this(potion, customColor, customEffects, null);
+    }
+
+    public static final Type<PotionContents> TYPE1_20_5 = new Type<>(PotionContents.class) {
         @Override
         public PotionContents read(final ByteBuf buffer) {
             final Integer potion = buffer.readBoolean() ? Types.VAR_INT.readPrimitive(buffer) : null;
             final Integer customColor = buffer.readBoolean() ? buffer.readInt() : null;
             final PotionEffect[] customEffects = PotionEffect.ARRAY_TYPE.read(buffer);
-            return new PotionContents(potion, customColor, customEffects);
+            return new PotionContents(potion, customColor, customEffects, null);
         }
 
         @Override
@@ -51,6 +56,33 @@ public record PotionContents(@Nullable Integer potion, @Nullable Integer customC
             }
 
             PotionEffect.ARRAY_TYPE.write(buffer, value.customEffects);
+        }
+    };
+
+    public static final Type<PotionContents> TYPE1_21_2 = new Type<>(PotionContents.class) {
+        @Override
+        public PotionContents read(final ByteBuf buffer) {
+            final Integer potion = buffer.readBoolean() ? Types.VAR_INT.readPrimitive(buffer) : null;
+            final Integer customColor = buffer.readBoolean() ? buffer.readInt() : null;
+            final PotionEffect[] customEffects = PotionEffect.ARRAY_TYPE.read(buffer);
+            final String customName = Types.OPTIONAL_STRING.read(buffer);
+            return new PotionContents(potion, customColor, customEffects, customName);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final PotionContents value) {
+            buffer.writeBoolean(value.potion != null);
+            if (value.potion != null) {
+                Types.VAR_INT.writePrimitive(buffer, value.potion);
+            }
+
+            buffer.writeBoolean(value.customColor != null);
+            if (value.customColor != null) {
+                buffer.writeInt(value.customColor);
+            }
+
+            PotionEffect.ARRAY_TYPE.write(buffer, value.customEffects);
+            Types.OPTIONAL_STRING.write(buffer, value.customName);
         }
     };
 }
