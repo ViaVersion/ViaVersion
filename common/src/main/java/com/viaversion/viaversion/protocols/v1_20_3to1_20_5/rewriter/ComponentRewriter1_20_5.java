@@ -1851,19 +1851,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         converters.put(key, new ConverterPair<>(null, null));
     }
 
-    protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter) {
-        final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
-        converters.put(key, new ConverterPair<>(converter, null));
-    }
-
     protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter, final SimpleTagConverter<T> tagConverter) {
         final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
         converters.put(key, new ConverterPair<>(converter, (connection, tag) -> tagConverter.convert(tag)));
-    }
-
-    protected <T> void register(final StructuredDataKey<T> key, final SimpleDataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
-        final DataConverter<T> converter = ($, value) -> dataConverter.convert(value);
-        converters.put(key, new ConverterPair<>(converter, tagConverter));
     }
 
     protected <T> void register(final StructuredDataKey<T> key, final DataConverter<T> dataConverter, final TagConverter<T> tagConverter) {
