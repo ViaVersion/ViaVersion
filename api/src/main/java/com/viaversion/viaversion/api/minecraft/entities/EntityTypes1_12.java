@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.minecraft.entities;
 
-import com.viaversion.viaversion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,10 +34,6 @@ public class EntityTypes1_12 {
             type = ObjectType.getEntityType(typeId);
         } else {
             type = EntityType.findById(typeId);
-        }
-        if (type == null) {
-            Via.getPlatform().getLogger().severe("Could not find 1.12 type id " + typeId + " objectType=" + object);
-            return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type;
     }

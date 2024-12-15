@@ -510,6 +510,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
 
         final EntityType entityType = typeFromId(trackMappedType ? mappedTypeId : typeId);
+        if (entityType == null) {
+            return null;
+        }
         tracker(wrapper.user()).addEntity(entityId, entityType);
         return entityType;
     }
@@ -557,6 +560,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             byte type = wrapper.get(Types.BYTE, 0);
 
             EntityType entType = objectTypeFromId(type);
+            if (entType == null) {
+                return;
+            }
             // Register Type ID
             tracker(wrapper.user()).addEntity(entityId, entType);
         };
