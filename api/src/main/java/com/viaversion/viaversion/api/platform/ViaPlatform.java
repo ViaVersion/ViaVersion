@@ -163,7 +163,10 @@ public interface ViaPlatform<T> {
      *
      * @return True if it is enabled
      */
-    boolean isPluginEnabled();
+    @Deprecated(forRemoval = true)
+    default boolean isPluginEnabled() {
+        return true;
+    }
 
     /**
      * Get the API for this platform
