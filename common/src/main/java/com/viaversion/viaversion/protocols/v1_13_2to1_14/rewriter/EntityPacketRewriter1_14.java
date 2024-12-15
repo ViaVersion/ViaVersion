@@ -83,8 +83,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
                     EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
                     if (type1_13 == null) {
-                        // <= 1.31.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
-                        wrapper.cancel();
                         return;
                     }
 
@@ -142,7 +140,14 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 map(Types.SHORT); // 11 - Velocity Z
                 map(Types1_13_2.ENTITY_DATA_LIST, Types1_14.ENTITY_DATA_LIST); // 12 - Entity data
 
-                handler(trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST));
+                handler(wrapper -> {
+                    int entityType = wrapper.get(Types.VAR_INT, 1);
+                    if (EntityTypes1_13.getTypeFromId(entityType, false) == null) {
+                        // <= 1.31.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
+                        wrapper.cancel();
+                    }
+                    trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST).handle(wrapper);
+                });
             }
         });
 
