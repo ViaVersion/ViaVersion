@@ -145,7 +145,9 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     if (EntityTypes1_13.getTypeFromId(entityType, false) == null) {
                         // <= 1.13.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
                         wrapper.cancel();
+                        return;
                     }
+
                     trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST).handle(wrapper);
                 });
             }
