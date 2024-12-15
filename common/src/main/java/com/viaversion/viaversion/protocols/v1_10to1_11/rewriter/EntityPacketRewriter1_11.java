@@ -331,7 +331,6 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
     public EntityType rewriteEntityType(int numType, List<EntityData> entityData) {
         EntityType type = EntityType.findById(numType);
         if (type == null) {
-            Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with entity data: " + entityData);
             return null;
         }
 

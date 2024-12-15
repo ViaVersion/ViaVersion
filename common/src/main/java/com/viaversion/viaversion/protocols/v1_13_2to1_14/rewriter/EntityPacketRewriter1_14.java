@@ -143,7 +143,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     int entityType = wrapper.get(Types.VAR_INT, 1);
                     if (EntityTypes1_13.getTypeFromId(entityType, false) == null) {
-                        // <= 1.31.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
+                        // <= 1.13.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
                         wrapper.cancel();
                     }
                     trackerAndRewriterHandler(Types1_14.ENTITY_DATA_LIST).handle(wrapper);
