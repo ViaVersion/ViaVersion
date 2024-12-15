@@ -513,6 +513,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         if (entityType == null) {
             return null;
         }
+
         tracker(wrapper.user()).addEntity(entityId, entityType);
         return entityType;
     }
@@ -563,7 +564,7 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             if (entType == null) {
                 return;
             }
-            // Register Type ID
+
             tracker(wrapper.user()).addEntity(entityId, entType);
         };
     }
