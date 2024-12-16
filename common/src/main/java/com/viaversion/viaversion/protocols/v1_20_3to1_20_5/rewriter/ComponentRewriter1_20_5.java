@@ -85,7 +85,6 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_2
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -178,93 +177,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         if (actionTag == null) {
             return;
         }
-
-        if (actionTag.getValue().equals("show_item")) {
-            final Tag valueTag = hoverEventTag.remove("value");
-            if (valueTag != null) { // Convert legacy hover event to new format for rewriting (Doesn't handle all cases, but good enough)
-                final CompoundTag tag = ComponentUtil.deserializeShowItem(valueTag, SerializerVersion.V1_20_3);
-                final CompoundTag contentsTag = new CompoundTag();
-                contentsTag.put("id", tag.getStringTag("id"));
-                contentsTag.put("count", new IntTag(tag.getByte("Count")));
-                if (tag.get("tag") instanceof CompoundTag) {
-                    contentsTag.put("tag", new StringTag(SerializerVersion.V1_20_3.toSNBT(tag.getCompoundTag("tag"))));
-                }
-                hoverEventTag.put("contents", contentsTag);
-            }
-
-            final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");
-            if (contentsTag == null) {
-                return;
-            }
-
-            final StringTag idTag = contentsTag.getStringTag("id");
-            if (idTag == null) {
-                return;
-            }
-
-            int itemId = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().id(idTag.getValue());
-            if (itemId == -1) {
-                // Default to stone (anything that is not air)
-                itemId = 1;
-            }
-
-            final StringTag tag = (StringTag) contentsTag.remove("tag");
-            final CompoundTag tagTag;
-            try {
-                tagTag = tag != null ? (CompoundTag) SerializerVersion.V1_20_3.toTag(tag.getValue()) : null;
-            } catch (final Exception e) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
-                    protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + contentsTag, e);
-                }
-                return;
-            }
-
-            final Item dataItem = new DataItem();
-            dataItem.setIdentifier(itemId);
-            if (tagTag != null) { // We don't need to remap data if there is none
-                dataItem.setTag(tagTag);
-            }
-
-            final Item structuredItem = protocol.getItemRewriter().handleItemToClient(connection, dataItem);
-            if (structuredItem.amount() < 1) {
-                // Cannot be empty
-                structuredItem.setAmount(1);
-            }
-
-            if (structuredItem.identifier() != 0) {
-                final String identifier = mappedIdentifier(structuredItem.identifier());
-                if (identifier != null) {
-                    contentsTag.putString("id", identifier);
-                }
-            } else {
-                // Cannot be air
-                contentsTag.putString("id", "minecraft:stone");
-            }
-
-            final Map<StructuredDataKey<?>, StructuredData<?>> data = structuredItem.dataContainer().data();
-            if (!data.isEmpty()) {
-                final CompoundTag components;
-                try {
-                    components = toTag(connection, data, false);
-                } catch (final Exception e) {
-                    if (!Via.getConfig().isSuppressConversionWarnings()) {
-                        protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
-                    }
-                    return;
-                }
-                contentsTag.put("components", components);
-            }
-        } else if (actionTag.getValue().equals("show_entity")) {
-            final Tag valueTag = hoverEventTag.remove("value");
-            if (valueTag != null) { // Convert legacy hover event to new format for rewriting (Doesn't handle all cases, but good enough)
-                final CompoundTag tag = ComponentUtil.deserializeShowItem(valueTag, SerializerVersion.V1_20_3);
-                final CompoundTag contentsTag = new CompoundTag();
-                contentsTag.put("type", tag.getStringTag("type"));
-                contentsTag.put("id", tag.getStringTag("id"));
-                contentsTag.put("name", SerializerVersion.V1_20_3.toTag(SerializerVersion.V1_20_3.toComponent(tag.getString("name"))));
-                hoverEventTag.put("contents", contentsTag);
-            }
-
+        if (actionTag.getValue().equals("show_entity")) {
             final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");
             if (contentsTag == null) {
                 return;
@@ -273,6 +186,69 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             if (this.protocol.getMappingData().getEntityMappings().mappedId(contentsTag.getString("type")) == -1) {
                 contentsTag.put("type", new StringTag("pig"));
             }
+        }
+    }
+
+    @Override
+    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final @Nullable CompoundTag componentsTag) {
+        super.handleShowItem(connection, itemTag, componentsTag);
+
+        final StringTag idTag = itemTag.getStringTag("id");
+        if (idTag == null) {
+            return;
+        }
+
+        int itemId = Protocol1_20_3To1_20_5.MAPPINGS.getFullItemMappings().id(idTag.getValue());
+        if (itemId == -1) {
+            // Default to stone (anything that is not air)
+            itemId = 1;
+        }
+
+        final StringTag tag = (StringTag) itemTag.remove("tag");
+        final CompoundTag tagTag;
+        try {
+            tagTag = tag != null ? (CompoundTag) inputSerializerVersion().toTag(tag.getValue()) : null;
+        } catch (final Exception e) {
+            if (!Via.getConfig().isSuppressConversionWarnings()) {
+                protocol.getLogger().log(Level.WARNING, "Error reading NBT in show_item: " + itemTag, e);
+            }
+            return;
+        }
+
+        final Item dataItem = new DataItem();
+        dataItem.setIdentifier(itemId);
+        if (tagTag != null) { // We don't need to remap data if there is none
+            dataItem.setTag(tagTag);
+        }
+
+        final Item structuredItem = protocol.getItemRewriter().handleItemToClient(connection, dataItem);
+        if (structuredItem.amount() < 1) {
+            // Cannot be empty
+            structuredItem.setAmount(1);
+        }
+
+        if (structuredItem.identifier() != 0) {
+            final String identifier = mappedIdentifier(structuredItem.identifier());
+            if (identifier != null) {
+                itemTag.putString("id", identifier);
+            }
+        } else {
+            // Cannot be air
+            itemTag.putString("id", "minecraft:stone");
+        }
+
+        final Map<StructuredDataKey<?>, StructuredData<?>> data = structuredItem.dataContainer().data();
+        if (!data.isEmpty()) {
+            final CompoundTag components;
+            try {
+                components = toTag(connection, data, false);
+            } catch (final Exception e) {
+                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                    protocol.getLogger().log(Level.WARNING, "Error writing components in show_item!", e);
+                }
+                return;
+            }
+            itemTag.put("components", components);
         }
     }
 
@@ -1080,7 +1056,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
     }
 
     protected StringTag convertComponent(final Tag value, final int max) {
-        final String json = serializerVersion().toString(serializerVersion().toComponent(value));
+        final String json = outputSerializerVersion().toString(outputSerializerVersion().toComponent(value));
         return new StringTag(checkStringRange(0, max, json));
     }
 
@@ -1088,7 +1064,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         checkIntRange(0, maxLength, value.length);
         final ListTag<StringTag> listTag = new ListTag<>(StringTag.class);
         for (final Tag tag : value) {
-            final String json = serializerVersion().toString(serializerVersion().toComponent(tag));
+            final String json = outputSerializerVersion().toString(outputSerializerVersion().toComponent(tag));
             listTag.add(new StringTag(json));
         }
         return listTag;
@@ -1174,7 +1150,13 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
         return converters != null ? converters.tagConverter : null;
     }
 
-    public SerializerVersion serializerVersion() {
+    @Override
+    protected @Nullable SerializerVersion inputSerializerVersion() {
+        return SerializerVersion.V1_20_3;
+    }
+
+    @Override
+    protected @Nullable SerializerVersion outputSerializerVersion() {
         return SerializerVersion.V1_20_5;
     }
 
