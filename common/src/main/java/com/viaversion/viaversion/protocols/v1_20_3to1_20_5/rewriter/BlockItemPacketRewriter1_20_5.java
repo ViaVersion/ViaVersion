@@ -81,7 +81,6 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_3;
 import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPacket1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.packet.ClientboundPackets1_20_3;
-import com.viaversion.viaversion.protocols.v1_20_2to1_20_3.rewriter.RecipeRewriter1_20_3;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.Protocol1_20_3To1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Attributes1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.BannerPatterns1_20_5;
@@ -603,9 +602,10 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             }
         }
 
+        // Only for VB, but kept here for simplicity; In VV we backup the original tag and later restore it, in VB
+        // we use the converted data and manually restore what broke during the conversion
         final CompoundTag backupTag = StructuredDataConverter.removeBackupTag(tag);
         if (backupTag != null) {
-            // Restore original data components
             restoreFromBackupTag(backupTag, data);
         }
         return item;

@@ -60,7 +60,6 @@ import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacke
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.BundleStateTracker;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.storage.ChunkLoadTracker;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
-import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Key;
@@ -238,7 +237,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
                 wrapper.write(Types1_21_2.PARTICLE, smallExplosionParticle);
             }
 
-            new SoundRewriter<>(protocol).soundHolderHandler().handle(wrapper);
+            protocol.getSoundRewriter().soundHolderHandler().handle(wrapper);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21.UPDATE_RECIPES, wrapper -> {
