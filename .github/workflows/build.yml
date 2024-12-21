@@ -24,3 +24,10 @@ jobs:
         check-latest: true
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Upload Artifacts to GitHub
+      # Only upload on the preview repository as there is no CI job for it.
+      if: ${{ github.repository == 'ViaVersionDev' && github.ref_name == 'preview' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: Artifacts
+        path: build/libs/
