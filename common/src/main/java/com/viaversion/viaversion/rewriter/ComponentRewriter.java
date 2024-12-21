@@ -371,6 +371,8 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
             final Tag value = hoverEventTag.get("value");
             processTag(connection, value != null ? value : hoverEventTag.get("contents"));
         } else if (action.equals("show_entity")) {
+            convertLegacyEntityContents(hoverEventTag);
+
             final CompoundTag contents = hoverEventTag.getCompoundTag("contents");
             if (contents != null) {
                 processTag(connection, contents.get("name"));
@@ -381,7 +383,7 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
                 }
             }
         } else if (action.equals("show_item")) {
-            convertLegacyContents(hoverEventTag);
+            convertLegacyItemContents(hoverEventTag);
 
             final CompoundTag contentsTag = hoverEventTag.getCompoundTag("contents");
             if (contentsTag == null) {
@@ -482,7 +484,23 @@ public class ComponentRewriter<C extends ClientboundPacketType> implements com.v
         return inputSerializerVersion(); // Only matters if the nbt serializer changed
     }
 
-    private void convertLegacyContents(final CompoundTag hoverEvent) {
+    private void convertLegacyEntityContents(final CompoundTag hoverEvent) {
+        if (inputSerializerVersion() == null) {
+            return;
+        }
+
+        final Tag valueTag = hoverEvent.remove("value");
+        if (valueTag != null) {
+            final CompoundTag tag = ComponentUtil.deserializeShowItem(valueTag, inputSerializerVersion());
+            final CompoundTag contentsTag = new CompoundTag();
+            contentsTag.put("type", tag.getStringTag("type"));
+            contentsTag.put("id", tag.getStringTag("id"));
+            contentsTag.put("name", outputSerializerVersion().toTag(outputSerializerVersion().toComponent(tag.getString("name"))));
+            hoverEvent.put("contents", contentsTag);
+        }
+    }
+
+    private void convertLegacyItemContents(final CompoundTag hoverEvent) {
         if (inputSerializerVersion() == null) {
             return;
         }
