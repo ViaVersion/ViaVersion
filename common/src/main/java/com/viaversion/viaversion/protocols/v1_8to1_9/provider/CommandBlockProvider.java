@@ -55,7 +55,7 @@ public class CommandBlockProvider implements Provider {
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
         wrapper.write(Types.INT, tracker.getProvidedEntityId()); // Entity ID
-        wrapper.write(Types.BYTE, (byte) 26); // Hardcoded op permission level
+        wrapper.write(Types.BYTE, (byte) 28); // Hardcoded op permission level 4
 
         wrapper.scheduleSend(Protocol1_8To1_9.class);
 
