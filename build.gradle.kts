@@ -14,8 +14,7 @@ val main = setOf(
     projects.viaversionCommon,
     projects.viaversionApi,
     projects.viaversionBukkit,
-    projects.viaversionVelocity,
-    projects.viaversionFabric
+    projects.viaversionVelocity
 ).map { it.path }
 
 subprojects {

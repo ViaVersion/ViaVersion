@@ -95,11 +95,6 @@ public final class TestPlatform implements ViaPlatform {
     }
 
     @Override
-    public boolean isPluginEnabled() {
-        return false;
-    }
-
-    @Override
     public ViaAPI getApi() {
         return new ViaAPIBase() {
             @Override
