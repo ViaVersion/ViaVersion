@@ -245,6 +245,7 @@ public class EntityTypes1_8 {
             return id;
         }
 
+        @Override
         public int getData() {
             return data;
         }
