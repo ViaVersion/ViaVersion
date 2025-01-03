@@ -106,6 +106,7 @@ import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -557,9 +558,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5, false);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5, false);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1224,13 +1225,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
-                                final String key, final StructuredDataKey<Item[]> dataKey, final boolean allowEmpty) {
+                                final String key, final StructuredDataKey<Item[]> dataKey) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
                 .map(item -> itemFromTag(connection, item))
-                .filter(item -> allowEmpty || !item.isEmpty())
+                .filter(item -> !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
         }
@@ -1486,8 +1487,16 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, baseColorIntTag.asInt());
             }
 
-            if (tag.contains("Items")) {
-                updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER1_20_5, true);
+            final ListTag<CompoundTag> itemsTag = tag.getListTag("Items", CompoundTag.class);
+            if (itemsTag != null) {
+                final Item[] items = new Item[27];
+                Arrays.fill(items, StructuredItem.empty());
+                for (final CompoundTag itemTag : itemsTag) {
+                    final int slot = itemTag.getByte("Slot");
+                    items[slot] = itemFromTag(connection, itemTag);
+                }
+
+                data.set(StructuredDataKey.CONTAINER1_20_5, items);
                 addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
             }
         }
