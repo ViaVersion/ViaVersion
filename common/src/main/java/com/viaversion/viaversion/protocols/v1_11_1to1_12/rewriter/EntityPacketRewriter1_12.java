@@ -80,6 +80,12 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
                 map(Types.VAR_INT); // 0 - Entity id
                 map(Types.UUID); // 1 - UUID
                 map(Types.BYTE); // 2 - Type
+                map(Types.DOUBLE); // 3 - X
+                map(Types.DOUBLE); // 4 - Y
+                map(Types.DOUBLE); // 5 - Z
+                map(Types.BYTE); // 6 - Pitch
+                map(Types.BYTE); // 7 - Yaw
+                map(Types.INT); // 8 - Data
 
                 // Track Entity
                 handler(objectTrackerHandler());
@@ -125,11 +131,11 @@ public class EntityPacketRewriter1_12 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public EntityType typeFromId(int type) {
-        return EntityTypes1_12.getTypeFromId(type, false);
+        return EntityTypes1_12.EntityType.findById(type);
     }
 
     @Override
-    public EntityType objectTypeFromId(int type) {
-        return EntityTypes1_12.getTypeFromId(type, true);
+    public EntityType objectTypeFromId(int type, int data) {
+        return EntityTypes1_12.ObjectType.getEntityType(type, data);
     }
 }

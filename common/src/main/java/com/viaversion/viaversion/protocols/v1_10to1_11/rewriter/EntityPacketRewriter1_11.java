@@ -320,12 +320,12 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public com.viaversion.viaversion.api.minecraft.entities.EntityType typeFromId(int type) {
-        return EntityTypes1_11.getTypeFromId(type, false);
+        return EntityTypes1_11.EntityType.findById(type);
     }
 
     @Override
-    public com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type) {
-        return EntityTypes1_11.getTypeFromId(type, true);
+    public com.viaversion.viaversion.api.minecraft.entities.EntityType objectTypeFromId(int type, int data) {
+        return EntityTypes1_11.ObjectType.getEntityType(type, data);
     }
 
     public EntityType rewriteEntityType(int numType, List<EntityData> entityData) {

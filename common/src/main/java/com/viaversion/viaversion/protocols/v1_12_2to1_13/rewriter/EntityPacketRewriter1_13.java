@@ -60,7 +60,8 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     byte type = wrapper.get(Types.BYTE, 0);
-                    EntityTypes1_13.EntityType entType = EntityTypes1_13.getTypeFromId(type, true);
+                    int data = wrapper.get(Types.INT, 0);
+                    EntityTypes1_13.EntityType entType = EntityTypes1_13.ObjectType.getEntityType(type, data);
                     if (entType == null) return;
 
                     // Register Type ID
@@ -74,7 +75,6 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
 
                     // Fix ItemFrame hitbox
                     if (entType.is(EntityTypes1_13.EntityType.ITEM_FRAME)) {
-                        int data = wrapper.get(Types.INT, 0);
                         switch (data) {
                             case 0 -> data = 3; // South
                             case 1 -> data = 4; // West
@@ -247,11 +247,11 @@ public class EntityPacketRewriter1_13 extends EntityRewriter<ClientboundPackets1
 
     @Override
     public EntityType typeFromId(int type) {
-        return EntityTypes1_13.getTypeFromId(type, false);
+        return EntityTypes1_13.EntityType.findById(type);
     }
 
     @Override
-    public EntityType objectTypeFromId(int type) {
-        return EntityTypes1_13.getTypeFromId(type, true);
+    public EntityType objectTypeFromId(int type, int data) {
+        return EntityTypes1_13.ObjectType.getEntityType(type, data);
     }
 }

@@ -559,8 +559,9 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         return wrapper -> {
             int entityId = wrapper.get(Types.VAR_INT, 0);
             byte type = wrapper.get(Types.BYTE, 0);
+            int data = wrapper.get(Types.INT, 0);
 
-            EntityType entType = objectTypeFromId(type);
+            EntityType entType = objectTypeFromId(type, data);
             if (entType == null) {
                 return;
             }
