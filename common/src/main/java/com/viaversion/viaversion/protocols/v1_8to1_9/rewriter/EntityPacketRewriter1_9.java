@@ -478,11 +478,11 @@ public class EntityPacketRewriter1_9 extends EntityRewriter<ClientboundPackets1_
 
     @Override
     public EntityType typeFromId(int type) {
-        return EntityTypes1_9.getTypeFromId(type, false);
+        return EntityTypes1_9.EntityType.findById(type);
     }
 
     @Override
-    public EntityType objectTypeFromId(int type) {
-        return EntityTypes1_9.getTypeFromId(type, true);
+    public EntityType objectTypeFromId(int type, int data) {
+        return EntityTypes1_9.ObjectType.getEntityType(type, data);
     }
 }

@@ -44,9 +44,10 @@ public interface EntityRewriter<T extends Protocol<?, ?, ?, ?>> extends Rewriter
      * From 1.14 and onwards, this is the same exact value as {@link #typeFromId(int)}.
      *
      * @param type entity type id
+     * @param data entity data
      * @return EntityType from id
      */
-    default EntityType objectTypeFromId(int type) {
+    default EntityType objectTypeFromId(int type, int data) {
         return typeFromId(type);
     }
 

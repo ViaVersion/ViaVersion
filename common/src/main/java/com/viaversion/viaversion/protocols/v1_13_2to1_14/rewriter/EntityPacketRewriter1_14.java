@@ -80,15 +80,15 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     int typeId = wrapper.get(Types.VAR_INT, 1);
+                    int data = wrapper.get(Types.INT, 0);
 
-                    EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
+                    EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.ObjectType.getEntityType(typeId, data);
                     if (type1_13 == null) {
                         return;
                     }
 
                     typeId = newEntityId(type1_13.getId());
                     EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
-                    int data = wrapper.get(Types.INT, 0);
                     if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
                         wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
                     } else if (type1_14.is(EntityTypes1_14.MINECART)) {
@@ -142,7 +142,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
                 handler(wrapper -> {
                     int entityType = wrapper.get(Types.VAR_INT, 1);
-                    if (EntityTypes1_13.getTypeFromId(entityType, false) == null) {
+                    if (EntityTypes1_13.EntityType.findById(entityType) == null) {
                         // <= 1.13.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
                         wrapper.cancel();
                         return;
