@@ -1500,7 +1500,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     }
 
                     final int slot = itemTag.getByte("Slot");
-                    highestSlot = MathUtil.clamp(slot, highestSlot, 256);
+                    highestSlot = MathUtil.clamp(slot, highestSlot, 255);
                 }
 
                 final Item[] filteredItems = new Item[highestSlot + 1];
