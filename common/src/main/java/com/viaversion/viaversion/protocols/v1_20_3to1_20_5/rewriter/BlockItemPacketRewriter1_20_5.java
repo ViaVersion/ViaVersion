@@ -101,6 +101,7 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -1499,7 +1500,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     }
 
                     final int slot = itemTag.getByte("Slot");
-                    highestSlot = Math.max(Math.min(slot, 256), highestSlot);
+                    highestSlot = MathUtil.clamp(slot, highestSlot, 256);
                 }
 
                 final Item[] filteredItems = new Item[highestSlot + 1];
