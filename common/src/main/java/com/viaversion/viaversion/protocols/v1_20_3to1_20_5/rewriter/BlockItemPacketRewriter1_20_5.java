@@ -1494,7 +1494,6 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 for (int i = 0; i < Math.min(itemsTag.size(), 256); i++) {
                     final CompoundTag itemTag = itemsTag.get(i);
                     final Item item = itemFromTag(connection, itemTag);
-                    System.out.println(item.identifier());
                     if (item.isEmpty()) {
                         continue;
                     }
