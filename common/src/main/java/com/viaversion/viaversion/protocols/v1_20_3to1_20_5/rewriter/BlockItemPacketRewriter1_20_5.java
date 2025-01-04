@@ -1491,7 +1491,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             if (itemsTag != null) {
                 int highestSlot = 0;
 
-                for (int i = 0; i < Math.min(itemsTag.size(), 256); i++) {
+                for (int i = 0, size = Math.min(itemsTag.size(), 256); i < size; i++) {
                     final CompoundTag itemTag = itemsTag.get(i);
                     final Item item = itemFromTag(connection, itemTag);
                     if (item.isEmpty()) {
@@ -1499,9 +1499,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                     }
 
                     final int slot = itemTag.getByte("Slot");
-                    if (slot > highestSlot) {
-                        highestSlot = slot;
-                    }
+                    highestSlot = Math.max(Math.min(slot, 256), highestSlot);
                 }
 
                 final Item[] filteredItems = new Item[highestSlot + 1];
