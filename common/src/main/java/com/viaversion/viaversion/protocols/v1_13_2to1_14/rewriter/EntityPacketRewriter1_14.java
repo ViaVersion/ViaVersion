@@ -91,16 +91,6 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                     EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
                     if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
                         wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                    } else if (type1_14.is(EntityTypes1_14.MINECART)) {
-                        typeId = switch (data) {
-                            case 1 -> EntityTypes1_14.CHEST_MINECART.getId();
-                            case 2 -> EntityTypes1_14.FURNACE_MINECART.getId();
-                            case 3 -> EntityTypes1_14.TNT_MINECART.getId();
-                            case 4 -> EntityTypes1_14.SPAWNER_MINECART.getId();
-                            case 5 -> EntityTypes1_14.HOPPER_MINECART.getId();
-                            case 6 -> EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
-                            default -> typeId; // default 0 = rideable minecart
-                        };
                     } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
                         || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
                         if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
