@@ -1489,14 +1489,37 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
             final ListTag<CompoundTag> itemsTag = tag.getListTag("Items", CompoundTag.class);
             if (itemsTag != null) {
-                final Item[] items = new Item[27];
-                Arrays.fill(items, StructuredItem.empty());
-                for (final CompoundTag itemTag : itemsTag) {
+                int highestSlot = 0;
+
+                for (int i = 0; i < Math.min(itemsTag.size(), 256); i++) {
+                    final CompoundTag itemTag = itemsTag.get(i);
+                    final Item item = itemFromTag(connection, itemTag);
+                    System.out.println(item.identifier());
+                    if (item.isEmpty()) {
+                        continue;
+                    }
+
                     final int slot = itemTag.getByte("Slot");
-                    items[slot] = itemFromTag(connection, itemTag);
+                    if (slot > highestSlot) {
+                        highestSlot = slot;
+                    }
                 }
 
-                data.set(StructuredDataKey.CONTAINER1_20_5, items);
+                final Item[] filteredItems = new Item[highestSlot + 1];
+                Arrays.fill(filteredItems, StructuredItem.empty());
+                for (final CompoundTag itemTag : itemsTag) {
+                    final Item item = itemFromTag(connection, itemTag);
+                    if (item.isEmpty()) {
+                        continue;
+                    }
+
+                    final int slot = itemTag.getByte("Slot");
+                    if (slot >= 0 && slot < filteredItems.length) {
+                        filteredItems[slot] = item;
+                    }
+                }
+
+                data.set(StructuredDataKey.CONTAINER1_20_5, filteredItems);
                 addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
             }
         }
