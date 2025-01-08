@@ -57,6 +57,7 @@ import com.viaversion.viaversion.api.minecraft.item.data.SuspiciousStewEffect;
 import com.viaversion.viaversion.api.minecraft.item.data.ToolProperties;
 import com.viaversion.viaversion.api.minecraft.item.data.Unbreakable;
 import com.viaversion.viaversion.api.minecraft.item.data.UseCooldown;
+import com.viaversion.viaversion.api.minecraft.item.data.Weapon;
 import com.viaversion.viaversion.api.minecraft.item.data.WrittenBook;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -65,6 +66,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
+import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.util.Unit;
 
 public record StructuredDataKey<T>(String identifier, Type<T> type) {
@@ -98,10 +100,13 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Consumable1_21_2> CONSUMABLE1_21_2 = new StructuredDataKey<>("consumable", Consumable1_21_2.TYPE);
     public static final StructuredDataKey<Item> USE_REMAINDER1_21_2 = new StructuredDataKey<>("use_remainder", Types1_21_2.ITEM);
     public static final StructuredDataKey<Item> USE_REMAINDER1_21_4 = new StructuredDataKey<>("use_remainder", Types1_21_4.ITEM);
+    public static final StructuredDataKey<Item> USE_REMAINDER1_21_5 = new StructuredDataKey<>("use_remainder", Types1_21_5.ITEM);
     public static final StructuredDataKey<UseCooldown> USE_COOLDOWN = new StructuredDataKey<>("use_cooldown", UseCooldown.TYPE);
     public static final StructuredDataKey<Unit> FIRE_RESISTANT = new StructuredDataKey<>("fire_resistant", Types.EMPTY);
     public static final StructuredDataKey<DamageResistant> DAMAGE_RESISTANT = new StructuredDataKey<>("damage_resistant", DamageResistant.TYPE);
-    public static final StructuredDataKey<ToolProperties> TOOL = new StructuredDataKey<>("tool", ToolProperties.TYPE);
+    public static final StructuredDataKey<ToolProperties> TOOL1_20_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_20_5);
+    public static final StructuredDataKey<ToolProperties> TOOL1_21_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_21_5);
+    public static final StructuredDataKey<Weapon> WEAPON = new StructuredDataKey<>("weapon", Weapon.TYPE);
     public static final StructuredDataKey<Integer> ENCHANTABLE = new StructuredDataKey<>("enchantable", Types.VAR_INT);
     public static final StructuredDataKey<Equippable> EQUIPPABLE = new StructuredDataKey<>("equippable", Equippable.TYPE);
     public static final StructuredDataKey<HolderSet> REPAIRABLE = new StructuredDataKey<>("repairable", Types.HOLDER_SET);
@@ -118,12 +123,15 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_21 = new StructuredDataKey<>("charged_projectiles", Types1_21.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_21_2 = new StructuredDataKey<>("charged_projectiles", Types1_21_2.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_21_4 = new StructuredDataKey<>("charged_projectiles", Types1_21_4.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CHARGED_PROJECTILES1_21_5 = new StructuredDataKey<>("charged_projectiles", Types1_21_5.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_20_5 = new StructuredDataKey<>("bundle_contents", Types1_20_5.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_21 = new StructuredDataKey<>("bundle_contents", Types1_21.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_21_2 = new StructuredDataKey<>("bundle_contents", Types1_21_2.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_21_4 = new StructuredDataKey<>("bundle_contents", Types1_21_4.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> BUNDLE_CONTENTS1_21_5 = new StructuredDataKey<>("bundle_contents", Types1_21_5.ITEM_ARRAY);
     public static final StructuredDataKey<PotionContents> POTION_CONTENTS1_20_5 = new StructuredDataKey<>("potion_contents", PotionContents.TYPE1_20_5);
     public static final StructuredDataKey<PotionContents> POTION_CONTENTS1_21_2 = new StructuredDataKey<>("potion_contents", PotionContents.TYPE1_21_2);
+    public static final StructuredDataKey<Float> POTION_DURATION_SCALE = new StructuredDataKey<>("potion_duration_scale", Types.FLOAT);
     public static final StructuredDataKey<SuspiciousStewEffect[]> SUSPICIOUS_STEW_EFFECTS = new StructuredDataKey<>("suspicious_stew_effects", SuspiciousStewEffect.ARRAY_TYPE);
     public static final StructuredDataKey<FilterableString[]> WRITABLE_BOOK_CONTENT = new StructuredDataKey<>("writable_book_content", FilterableString.ARRAY_TYPE);
     public static final StructuredDataKey<WrittenBook> WRITTEN_BOOK_CONTENT = new StructuredDataKey<>("written_book_content", WrittenBook.TYPE);
@@ -151,6 +159,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Item[]> CONTAINER1_21 = new StructuredDataKey<>("container", Types1_21.ITEM_ARRAY);
     public static final StructuredDataKey<Item[]> CONTAINER1_21_2 = new StructuredDataKey<>("container", new ArrayType<>(Types1_21_2.ITEM, 256));
     public static final StructuredDataKey<Item[]> CONTAINER1_21_4 = new StructuredDataKey<>("container", Types1_21_4.ITEM_ARRAY);
+    public static final StructuredDataKey<Item[]> CONTAINER1_21_5 = new StructuredDataKey<>("container", Types1_21_5.ITEM_ARRAY);
     public static final StructuredDataKey<BlockStateProperties> BLOCK_STATE = new StructuredDataKey<>("block_state", BlockStateProperties.TYPE);
     public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);

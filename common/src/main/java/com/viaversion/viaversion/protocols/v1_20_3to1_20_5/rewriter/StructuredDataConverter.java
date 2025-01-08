@@ -633,7 +633,7 @@ public final class StructuredDataConverter {
                 getBackupTag(tag).putBoolean("fire_resistant", true);
             }
         });
-        register(StructuredDataKey.TOOL, (data, tag) -> {
+        register(StructuredDataKey.TOOL1_20_5, (data, tag) -> {
             if (backupInconvertibleData) {
                 final CompoundTag backupTag = new CompoundTag();
                 final ListTag<CompoundTag> rulesTag = new ListTag<>(CompoundTag.class);

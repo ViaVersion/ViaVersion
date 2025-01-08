@@ -131,6 +131,7 @@ public final class Types {
     public static final DoubleType DOUBLE = new DoubleType();
 
     public static final LongType LONG = new LongType();
+    public static final Type<Long> OPTIONAL_LONG = new LongType.OptionalLongType();
     public static final Type<long[]> LONG_ARRAY_PRIMITIVE = new LongArrayType();
 
     public static final BooleanType BOOLEAN = new BooleanType();

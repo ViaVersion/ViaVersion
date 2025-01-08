@@ -18,9 +18,10 @@
 package com.viaversion.viaversion.protocols.v1_20_5to1_21.packet;
 
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 
-public enum ClientboundConfigurationPackets1_21 implements ClientboundPacket1_21, ClientboundPacket1_21_2 {
+public enum ClientboundConfigurationPackets1_21 implements ClientboundPacket1_21, ClientboundPacket1_21_2, ClientboundPacket1_21_5 {
 
     COOKIE_REQUEST, // 0x00
     CUSTOM_PAYLOAD, // 0x01

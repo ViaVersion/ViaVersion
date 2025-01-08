@@ -776,7 +776,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 tag.contains("correct_for_drops") ? tag.getBoolean("correct_for_drops") : null
             ));
         }
-        data.set(StructuredDataKey.TOOL, new ToolProperties(
+        data.set(StructuredDataKey.TOOL1_20_5, new ToolProperties(
             rules.toArray(new ToolRule[0]),
             tool.getFloat("default_mining_speed"),
             tool.getInt("damage_per_block")

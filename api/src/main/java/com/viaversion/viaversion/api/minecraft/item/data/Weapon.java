@@ -20,60 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types;
+package com.viaversion.viaversion.api.minecraft.item.data;
 
-import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.TypeConverter;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public class LongType extends Type<Long> implements TypeConverter<Long> {
+public record Weapon(int damagePerAttack, boolean canDisableBlocking) {
 
-    public LongType() {
-        super(Long.class);
-    }
-
-    /**
-     * @deprecated use {@link #readPrimitive(ByteBuf)} for manual reading to avoid wrapping
-     */
-    @Override
-    @Deprecated
-    public Long read(ByteBuf buffer) {
-        return buffer.readLong();
-    }
-
-    /**
-     * @deprecated use {@link #readPrimitive(ByteBuf)} for manual reading to avoid wrapping
-     */
-    @Override
-    @Deprecated
-    public void write(ByteBuf buffer, Long object) {
-        buffer.writeLong(object);
-    }
-
-    @Override
-    public Long from(Object o) {
-        if (o instanceof Number number) {
-            return number.longValue();
-        } else if (o instanceof Boolean boo) {
-            return boo ? 1L : 0;
+    public static final Type<Weapon> TYPE = new Type<>(Weapon.class) {
+        @Override
+        public Weapon read(final ByteBuf buffer) {
+            final int damagePerAttack = Types.VAR_INT.readPrimitive(buffer);
+            final boolean canDisableBlocking = buffer.readBoolean();
+            return new Weapon(damagePerAttack, canDisableBlocking);
         }
-        throw new UnsupportedOperationException();
-    }
 
-    public long readPrimitive(ByteBuf buffer) {
-        return buffer.readLong();
-    }
-
-    public void writePrimitive(ByteBuf buffer, long object) {
-        buffer.writeLong(object);
-    }
-
-    public static final class OptionalLongType extends OptionalType<Long> {
-
-        public OptionalLongType() {
-            super(Types.LONG);
+        @Override
+        public void write(final ByteBuf buffer, final Weapon value) {
+            Types.VAR_INT.writePrimitive(buffer, value.damagePerAttack());
+            buffer.writeBoolean(value.canDisableBlocking());
         }
-    }
+    };
 }

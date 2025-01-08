@@ -27,15 +27,19 @@ import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock) {
+public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int damagePerBlock, boolean canDestroyBlocksInCreative) {
 
-    public static final Type<ToolProperties> TYPE = new Type<>(ToolProperties.class) {
+    public ToolProperties(final ToolRule[] rules, final float defaultMiningSpeed, final int damagePerBlock) {
+        this(rules, defaultMiningSpeed, damagePerBlock, false);
+    }
+
+    public static final Type<ToolProperties> TYPE1_20_5 = new Type<>(ToolProperties.class) {
         @Override
         public ToolProperties read(final ByteBuf buffer) {
             final ToolRule[] rules = ToolRule.ARRAY_TYPE.read(buffer);
             final float defaultMiningSpeed = buffer.readFloat();
             final int damagePerBlock = Types.VAR_INT.readPrimitive(buffer);
-            return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock);
+            return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock, true);
         }
 
         @Override
@@ -45,12 +49,30 @@ public record ToolProperties(ToolRule[] rules, float defaultMiningSpeed, int dam
             Types.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
         }
     };
+    public static final Type<ToolProperties> TYPE1_21_5 = new Type<>(ToolProperties.class) {
+        @Override
+        public ToolProperties read(final ByteBuf buffer) {
+            final ToolRule[] rules = ToolRule.ARRAY_TYPE.read(buffer);
+            final float defaultMiningSpeed = buffer.readFloat();
+            final int damagePerBlock = Types.VAR_INT.readPrimitive(buffer);
+            final boolean canDestroyBlocksInCreative = buffer.readBoolean();
+            return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final ToolProperties value) {
+            ToolRule.ARRAY_TYPE.write(buffer, value.rules());
+            buffer.writeFloat(value.defaultMiningSpeed());
+            Types.VAR_INT.writePrimitive(buffer, value.damagePerBlock());
+            buffer.writeBoolean(value.canDestroyBlocksInCreative());
+        }
+    };
 
     public ToolProperties rewrite(final Int2IntFunction blockIdRewriter) {
         final ToolRule[] rules = new ToolRule[this.rules.length];
         for (int i = 0; i < rules.length; i++) {
             rules[i] = this.rules[i].rewrite(blockIdRewriter);
         }
-        return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock);
+        return new ToolProperties(rules, defaultMiningSpeed, damagePerBlock, canDestroyBlocksInCreative);
     }
 }

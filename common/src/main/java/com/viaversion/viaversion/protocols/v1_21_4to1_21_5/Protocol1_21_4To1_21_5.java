@@ -15,57 +15,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viaversion.protocols.v1_21_2to1_21_4;
+package com.viaversion.viaversion.protocols.v1_21_4to1_21_5;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.MappingData;
 import com.viaversion.viaversion.api.data.MappingDataBase;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
-import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.provider.PacketTypesProvider;
 import com.viaversion.viaversion.api.protocol.packet.provider.SimplePacketTypesProvider;
-import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.misc.ParticleType;
-import com.viaversion.viaversion.api.type.types.version.Types1_21_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
+import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.provider.PickItemProvider;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.BlockItemPacketRewriter1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.ComponentRewriter1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.EntityPacketRewriter1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.rewriter.ParticleRewriter1_21_4;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.BlockItemPacketRewriter1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.ComponentRewriter1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.EntityPacketRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPacket1_21_2;
-import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ServerboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
-import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
+import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
-import java.util.BitSet;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_2, ServerboundPacket1_21_4> {
+public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
 
-    public static final MappingData MAPPINGS = new MappingDataBase("1.21.2", "1.21.4");
-    private final EntityPacketRewriter1_21_4 entityRewriter = new EntityPacketRewriter1_21_4(this);
-    private final BlockItemPacketRewriter1_21_4 itemRewriter = new BlockItemPacketRewriter1_21_4(this);
-    private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter1_21_4(this);
+    public static final MappingData MAPPINGS = new MappingDataBase("1.21.4", "1.21.5");
+    private final EntityPacketRewriter1_21_5 entityRewriter = new EntityPacketRewriter1_21_5(this);
+    private final BlockItemPacketRewriter1_21_5 itemRewriter = new BlockItemPacketRewriter1_21_5(this);
+    private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this, Types1_21_4.PARTICLE, Types1_21_5.PARTICLE);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
-    private final JsonNBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_21_4(this);
+    private final ComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_21_5(this);
 
-    public Protocol1_21_2To1_21_4() {
-        super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_2.class, ServerboundPacket1_21_2.class, ServerboundPacket1_21_4.class);
+    public Protocol1_21_4To1_21_5() {
+        super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_5.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_4.class);
     }
 
     @Override
@@ -75,7 +69,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
         tagRewriter.registerGeneric(ClientboundPackets1_21_2.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
 
-        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_2.OPEN_SCREEN);
+        componentRewriter.registerOpenScreen(ClientboundPackets1_21_2.OPEN_SCREEN);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_ACTION_BAR_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_TITLE_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_SUBTITLE_TEXT);
@@ -85,24 +79,11 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_21_2.PLAYER_COMBAT_KILL);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SYSTEM_CHAT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.DISGUISED_CHAT);
+        componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
 
+        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21_2.LEVEL_PARTICLES);
         particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_2.EXPLODE);
-        registerClientbound(ClientboundPackets1_21_2.LEVEL_PARTICLES, wrapper -> {
-            wrapper.passthrough(Types.BOOLEAN); // Override limiter
-            wrapper.write(Types.BOOLEAN, false); // Always show
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
-            wrapper.passthrough(Types.FLOAT); // Offset X
-            wrapper.passthrough(Types.FLOAT); // Offset Y
-            wrapper.passthrough(Types.FLOAT); // Offset Z
-            wrapper.passthrough(Types.FLOAT); // Particle Data
-            wrapper.passthrough(Types.INT); // Particle Count
-
-            final Particle particle = wrapper.passthroughAndMap(Types1_21_2.PARTICLE, Types1_21_4.PARTICLE);
-            particleRewriter.rewriteParticle(wrapper.user(), particle);
-        });
 
         final SoundRewriter<ClientboundPacket1_21_2> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21_2.SOUND);
@@ -110,52 +91,11 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21_2.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_2.UPDATE_ATTRIBUTES);
-
-        registerClientbound(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE, wrapper -> {
-            // Added "show hat" - true by default, keep it like that
-            final BitSet actions = wrapper.passthroughAndMap(Types.PROFILE_ACTIONS_ENUM1_21_2, Types.PROFILE_ACTIONS_ENUM1_21_4);
-            if (!actions.get(5)) { // Update display name
-                return;
-            }
-
-            final int entries = wrapper.passthrough(Types.VAR_INT);
-            for (int i = 0; i < entries; i++) {
-                wrapper.passthrough(Types.UUID);
-                if (actions.get(0)) {
-                    wrapper.passthrough(Types.STRING); // Player Name
-
-                    final int properties = wrapper.passthrough(Types.VAR_INT);
-                    for (int j = 0; j < properties; j++) {
-                        wrapper.passthrough(Types.STRING); // Name
-                        wrapper.passthrough(Types.STRING); // Value
-                        wrapper.passthrough(Types.OPTIONAL_STRING); // Signature
-                    }
-                }
-                if (actions.get(1) && wrapper.passthrough(Types.BOOLEAN)) {
-                    wrapper.passthrough(Types.UUID); // Session UUID
-                    wrapper.passthrough(Types.PROFILE_KEY);
-                }
-                if (actions.get(2)) {
-                    wrapper.passthrough(Types.VAR_INT); // Gamemode
-                }
-                if (actions.get(3)) {
-                    wrapper.passthrough(Types.BOOLEAN); // Listed
-                }
-                if (actions.get(4)) {
-                    wrapper.passthrough(Types.VAR_INT); // Latency
-                }
-                componentRewriter.processTag(wrapper.user(), wrapper.passthrough(Types.OPTIONAL_TAG));
-                if (actions.get(6)) {
-                    wrapper.passthrough(Types.VAR_INT); // List order
-                }
-            }
-        });
     }
 
     @Override
     protected void onMappingDataLoaded() {
-        EntityTypes1_21_4.initialize(this);
-        Types1_21_4.PARTICLE.filler(this)
+        Types1_21_5.PARTICLE.filler(this)
             .reader("block", ParticleType.Readers.BLOCK)
             .reader("block_marker", ParticleType.Readers.BLOCK)
             .reader("dust_pillar", ParticleType.Readers.BLOCK)
@@ -169,7 +109,7 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
             .reader("entity_effect", ParticleType.Readers.COLOR)
             .reader("trail", ParticleType.Readers.TRAIL1_21_4)
             .reader("item", ParticleType.Readers.item(itemRewriter.mappedItemType()));
-        Types1_21_4.STRUCTURED_DATA.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
+        Types1_21_5.STRUCTURED_DATA.filler(this).add(StructuredDataKey.CUSTOM_DATA, StructuredDataKey.MAX_STACK_SIZE, StructuredDataKey.MAX_DAMAGE,
             StructuredDataKey.UNBREAKABLE, StructuredDataKey.RARITY, StructuredDataKey.HIDE_TOOLTIP, StructuredDataKey.DAMAGE_RESISTANT,
             StructuredDataKey.CUSTOM_NAME, StructuredDataKey.LORE, StructuredDataKey.ENCHANTMENTS, StructuredDataKey.CAN_PLACE_ON,
             StructuredDataKey.CAN_BREAK, StructuredDataKey.CUSTOM_MODEL_DATA1_21_4, StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP,
@@ -182,19 +122,15 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
             StructuredDataKey.RECIPES, StructuredDataKey.LODESTONE_TRACKER, StructuredDataKey.FIREWORK_EXPLOSION, StructuredDataKey.FIREWORKS,
             StructuredDataKey.PROFILE, StructuredDataKey.NOTE_BLOCK_SOUND, StructuredDataKey.BANNER_PATTERNS, StructuredDataKey.BASE_COLOR,
             StructuredDataKey.POT_DECORATIONS, StructuredDataKey.BLOCK_STATE, StructuredDataKey.BEES, StructuredDataKey.LOCK,
-            StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_20_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
+            StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
             StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
             StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE, StructuredDataKey.ITEM_MODEL,
-            StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION,
+            StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.WEAPON,
+            StructuredDataKey.POTION_DURATION_SCALE,
             // Volatile thanks to containing item
-            StructuredDataKey.CHARGED_PROJECTILES1_21_4, StructuredDataKey.BUNDLE_CONTENTS1_21_4, StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.USE_REMAINDER1_21_4);
+            StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.USE_REMAINDER1_21_5);
         super.onMappingDataLoaded();
-    }
-
-    @Override
-    public void register(final ViaProviders providers) {
-        providers.register(PickItemProvider.class, new PickItemProvider());
     }
 
     @Override
@@ -208,12 +144,12 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    public EntityPacketRewriter1_21_4 getEntityRewriter() {
+    public EntityPacketRewriter1_21_5 getEntityRewriter() {
         return entityRewriter;
     }
 
     @Override
-    public BlockItemPacketRewriter1_21_4 getItemRewriter() {
+    public BlockItemPacketRewriter1_21_5 getItemRewriter() {
         return itemRewriter;
     }
 
@@ -228,16 +164,16 @@ public final class Protocol1_21_2To1_21_4 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    public JsonNBTComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
+    public ComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
         return componentRewriter;
     }
 
     @Override
-    protected PacketTypesProvider<ClientboundPacket1_21_2, ClientboundPacket1_21_2, ServerboundPacket1_21_2, ServerboundPacket1_21_4> createPacketTypesProvider() {
+    protected PacketTypesProvider<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_4> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_21_2.class, ClientboundConfigurationPackets1_21.class),
-            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_21_2.class, ClientboundConfigurationPackets1_21.class),
-            packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_2.class, ServerboundConfigurationPackets1_20_5.class),
+            packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_21_5.class, ClientboundConfigurationPackets1_21.class),
+            packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_4.class, ServerboundConfigurationPackets1_20_5.class),
             packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_4.class, ServerboundConfigurationPackets1_20_5.class)
         );
     }

@@ -139,7 +139,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         register(StructuredDataKey.INTANGIBLE_PROJECTILE, this::intangibleProjectileToTag, this::intangibleProjectileFromTag);
         register(StructuredDataKey.FOOD1_20_5, this::foodToTag, this::foodFromTag);
         register(StructuredDataKey.FIRE_RESISTANT, this::fireResistantToTag, this::fireResistantFromTag);
-        register(StructuredDataKey.TOOL, this::toolToTag, this::toolFromTag);
+        register(StructuredDataKey.TOOL1_20_5, this::toolToTag, this::toolFromTag);
         register(StructuredDataKey.STORED_ENCHANTMENTS, this::storedEnchantmentsToTag, this::storedEnchantmentsFromTag);
         register(StructuredDataKey.DYED_COLOR, this::dyedColorToTag, this::dyedColorFromTag);
         register(StructuredDataKey.MAP_COLOR, this::mapColorToTag, this::mapColorFromTag);
