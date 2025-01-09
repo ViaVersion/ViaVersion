@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -163,7 +163,10 @@ public interface ViaPlatform<T> {
      *
      * @return True if it is enabled
      */
-    boolean isPluginEnabled();
+    @Deprecated(forRemoval = true)
+    default boolean isPluginEnabled() {
+        return true;
+    }
 
     /**
      * Get the API for this platform

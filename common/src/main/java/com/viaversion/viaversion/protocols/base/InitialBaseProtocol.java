@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,6 +130,10 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
                 wrapper.set(Types.VAR_INT, 0, serverProtocol.getOriginalVersion());
             }
 
+            if (state == TRANSFER_INTENT && serverProtocol.olderThan(ProtocolVersion.v1_20_5)) {
+                wrapper.set(Types.VAR_INT, 1, LOGIN_INTENT);
+            }
+
             // Send client intention into the pipeline in case protocols down the line need to transform it
             try {
                 final List<Protocol> protocols = new ArrayList<>(pipeline.pipes());
@@ -148,14 +152,8 @@ public class InitialBaseProtocol extends AbstractProtocol<BaseClientboundPacket,
             // Set initial state
             if (state == STATUS_INTENT) {
                 info.setState(State.STATUS);
-            } else if (state == LOGIN_INTENT) {
+            } else if (state == LOGIN_INTENT || state == TRANSFER_INTENT) {
                 info.setState(State.LOGIN);
-            } else if (state == TRANSFER_INTENT) {
-                info.setState(State.LOGIN);
-
-                if (serverProtocol.olderThan(ProtocolVersion.v1_20_5)) {
-                    wrapper.set(Types.VAR_INT, 1, LOGIN_INTENT);
-                }
             }
         });
     }

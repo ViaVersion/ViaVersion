@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ package com.viaversion.viaversion.api.minecraft.entities;
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.util.EntityTypeUtil;
-import java.util.Locale;
 import com.viaversion.viaversion.util.Key;
+import java.util.Locale;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum EntityTypes1_19_4 implements EntityType {
@@ -273,7 +273,7 @@ public enum EntityTypes1_19_4 implements EntityType {
     }
 
     public static EntityType getTypeFromId(final int typeId) {
-        return EntityTypeUtil.getTypeFromId(TYPES, typeId, ENTITY);
+        return EntityTypeUtil.getTypeFromId(TYPES, typeId, PIG);
     }
 
     public static void initialize(final Protocol<?, ?, ?, ?> protocol) {

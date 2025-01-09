@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -331,7 +331,6 @@ public class EntityPacketRewriter1_11 extends EntityRewriter<ClientboundPackets1
     public EntityType rewriteEntityType(int numType, List<EntityData> entityData) {
         EntityType type = EntityType.findById(numType);
         if (type == null) {
-            Via.getManager().getPlatform().getLogger().severe("Error: could not find Entity type " + numType + " with entity data: " + entityData);
             return null;
         }
 

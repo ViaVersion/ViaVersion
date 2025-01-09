@@ -68,6 +68,9 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             optional.project("viarewind")
         }
     }
+    tasks.modrinth {
+        notCompatibleWithConfigurationCache("")
+    }
 
     hangarPublish {
         publications.register("plugin") {
@@ -103,5 +106,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                 }
             }
         }
+    }
+    tasks.named("publishPluginPublicationToHangar") {
+        notCompatibleWithConfigurationCache("")
     }
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,11 +91,6 @@ public final class TestPlatform implements ViaPlatform {
 
     @Override
     public boolean kickPlayer(UUID uuid, String message) {
-        return false;
-    }
-
-    @Override
-    public boolean isPluginEnabled() {
         return false;
     }
 

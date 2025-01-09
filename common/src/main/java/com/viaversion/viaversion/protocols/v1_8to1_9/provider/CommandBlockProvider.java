@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ public class CommandBlockProvider implements Provider {
 
         EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_8To1_9.class);
         wrapper.write(Types.INT, tracker.getProvidedEntityId()); // Entity ID
-        wrapper.write(Types.BYTE, (byte) 26); // Hardcoded op permission level
+        wrapper.write(Types.BYTE, (byte) 28); // Hardcoded op permission level 4
 
         wrapper.scheduleSend(Protocol1_8To1_9.class);
 

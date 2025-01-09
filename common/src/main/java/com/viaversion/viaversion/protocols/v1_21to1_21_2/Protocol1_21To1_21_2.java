@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,6 +68,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     private final ParticleRewriter1_21_2 particleRewriter = new ParticleRewriter1_21_2(this);
     private final TagRewriter<ClientboundPacket1_21> tagRewriter = new TagRewriter<>(this);
     private final ComponentRewriter1_21_2 componentRewriter = new ComponentRewriter1_21_2(this);
+    private final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
 
     public Protocol1_21To1_21_2() {
         super(ClientboundPacket1_21.class, ClientboundPacket1_21_2.class, ServerboundPacket1_20_5.class, ServerboundPacket1_21_2.class);
@@ -94,7 +95,6 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
 
         particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21.LEVEL_PARTICLES);
 
-        final SoundRewriter<ClientboundPacket1_21> soundRewriter = new SoundRewriter<>(this);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND);
         soundRewriter.registerSound1_19_3(ClientboundPackets1_21.SOUND_ENTITY);
 
@@ -278,6 +278,10 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
     @Override
     public ComponentRewriter getComponentRewriter() {
         return componentRewriter;
+    }
+
+    public SoundRewriter<ClientboundPacket1_21> getSoundRewriter() {
+        return soundRewriter;
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -510,6 +510,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
         }
 
         final EntityType entityType = typeFromId(trackMappedType ? mappedTypeId : typeId);
+        if (entityType == null) {
+            return null;
+        }
+
         tracker(wrapper.user()).addEntity(entityId, entityType);
         return entityType;
     }
@@ -557,7 +561,10 @@ public abstract class EntityRewriter<C extends ClientboundPacketType, T extends 
             byte type = wrapper.get(Types.BYTE, 0);
 
             EntityType entType = objectTypeFromId(type);
-            // Register Type ID
+            if (entType == null) {
+                return;
+            }
+
             tracker(wrapper.user()).addEntity(entityId, entType);
         };
     }

@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaVersion - https://github.com/ViaVersion/ViaVersion
- * Copyright (C) 2016-2024 ViaVersion and contributors
+ * Copyright (C) 2016-2025 ViaVersion and contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
  */
 package com.viaversion.viaversion.api.minecraft.entities;
 
-import com.viaversion.viaversion.api.Via;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,10 +34,6 @@ public class EntityTypes1_10 {
             type = ObjectType.getEntityType(typeId);
         } else {
             type = EntityType.findById(typeId);
-        }
-        if (type == null) {
-            Via.getPlatform().getLogger().severe("Could not find 1.10 type id " + typeId + " objectType=" + object);
-            return EntityType.ENTITY; // Fall back to the basic ENTITY
         }
         return type;
     }
