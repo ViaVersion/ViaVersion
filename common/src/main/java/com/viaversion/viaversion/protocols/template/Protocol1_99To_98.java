@@ -84,7 +84,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         componentRewriter.registerPing();
 
         // If needed for any particle, item, or block changes. Extend ParticleRewriter for particle serializer changes
-        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21_2.LEVEL_PARTICLES);
+        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_2.LEVEL_PARTICLES);
         particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_2.EXPLODE); // Rewrites the included sound and particles
 
         final SoundRewriter<ClientboundPacket1_21_2> soundRewriter = new SoundRewriter<>(this);

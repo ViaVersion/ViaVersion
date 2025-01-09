@@ -82,7 +82,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerPlayerInfoUpdate1_21_4(ClientboundPackets1_21_2.PLAYER_INFO_UPDATE);
         componentRewriter.registerPing();
 
-        particleRewriter.registerLevelParticles1_20_5(ClientboundPackets1_21_2.LEVEL_PARTICLES);
+        particleRewriter.registerLevelParticles1_21_4(ClientboundPackets1_21_2.LEVEL_PARTICLES);
         particleRewriter.registerExplode1_21_2(ClientboundPackets1_21_2.EXPLODE);
 
         final SoundRewriter<ClientboundPacket1_21_2> soundRewriter = new SoundRewriter<>(this);
