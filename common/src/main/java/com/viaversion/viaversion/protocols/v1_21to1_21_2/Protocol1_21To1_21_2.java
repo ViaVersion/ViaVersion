@@ -81,7 +81,7 @@ public final class Protocol1_21To1_21_2 extends AbstractProtocol<ClientboundPack
         tagRewriter.registerGeneric(ClientboundPackets1_21.UPDATE_TAGS);
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
 
-        componentRewriter.registerOpenScreen(ClientboundPackets1_21.OPEN_SCREEN);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21.OPEN_SCREEN);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_ACTION_BAR_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_TITLE_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21.SET_SUBTITLE_TEXT);

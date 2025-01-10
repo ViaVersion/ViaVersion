@@ -33,7 +33,7 @@ import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPac
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.AttributeRewriter;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.NBTComponentRewriter;
 import com.viaversion.viaversion.rewriter.ParticleRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
@@ -55,7 +55,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     private final BlockItemPacketRewriter1_99 itemRewriter = new BlockItemPacketRewriter1_99(this);
     private final ParticleRewriter<ClientboundPacket1_21_2> particleRewriter = new ParticleRewriter<>(this, /*Types1_OLD.PARTICLE,*/ Types1_21_4.PARTICLE);
     private final TagRewriter<ClientboundPacket1_21_2> tagRewriter = new TagRewriter<>(this);
-    private final ComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_99(this);
+    private final NBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_99(this);
 
     public Protocol1_99To_98() {
         // Passing the class types into the super constructor is needed for automatic packet type id remapping, but can otherwise be omitted
@@ -70,7 +70,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
         tagRewriter.registerGeneric(ClientboundConfigurationPackets1_21.UPDATE_TAGS);
 
         // If needed for item or component changes
-        componentRewriter.registerOpenScreen(ClientboundPackets1_21_2.OPEN_SCREEN);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_21_2.OPEN_SCREEN);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_ACTION_BAR_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_TITLE_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_21_2.SET_SUBTITLE_TEXT);
@@ -166,7 +166,7 @@ final class Protocol1_99To_98 extends AbstractProtocol<ClientboundPacket1_21_2, 
     }
 
     @Override
-    public ComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
+    public NBTComponentRewriter<ClientboundPacket1_21_2> getComponentRewriter() {
         return componentRewriter;
     }
 

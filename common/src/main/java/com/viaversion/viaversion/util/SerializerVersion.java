@@ -19,7 +19,7 @@ package com.viaversion.viaversion.util;
 
 import com.google.gson.JsonElement;
 import com.viaversion.nbt.tag.Tag;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtDeserializeException;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
@@ -32,7 +32,7 @@ import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
  * Only contains versions which have actual changes we handle.
  *
  * @see ComponentUtil
- * @see ComponentRewriter
+ * @see JsonNBTComponentRewriter
  */
 public enum SerializerVersion {
     V1_6(TextComponentSerializer.V1_6, null),
