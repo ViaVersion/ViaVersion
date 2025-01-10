@@ -159,6 +159,7 @@ public abstract class ComponentRewriterBase<C extends ClientboundPacketType> imp
     // -----------------------------------------------------------------------
     // Json methods
 
+    @Override
     public JsonElement processText(final UserConnection connection, final String value) {
         try {
             final JsonElement root = JsonParser.parseString(value);
