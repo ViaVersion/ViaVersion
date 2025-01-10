@@ -101,11 +101,13 @@ import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -557,9 +559,9 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         updateMobTags(data, tag);
 
-        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5, false);
+        updateItemList(connection, data, tag, "ChargedProjectiles", StructuredDataKey.CHARGED_PROJECTILES1_20_5);
         if (old.identifier() == 927) {
-            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5, false);
+            updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5);
         }
 
         updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
@@ -1224,13 +1226,13 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
     }
 
     private void updateItemList(final UserConnection connection, final StructuredDataContainer data, final CompoundTag tag,
-                                final String key, final StructuredDataKey<Item[]> dataKey, final boolean allowEmpty) {
+                                final String key, final StructuredDataKey<Item[]> dataKey) {
         final ListTag<CompoundTag> itemsTag = tag.getListTag(key, CompoundTag.class);
         if (itemsTag != null) {
             final Item[] items = itemsTag.stream()
                 .limit(256)
                 .map(item -> itemFromTag(connection, item))
-                .filter(item -> allowEmpty || !item.isEmpty())
+                .filter(item -> !item.isEmpty())
                 .toArray(Item[]::new);
             data.set(dataKey, items);
         }
@@ -1486,8 +1488,36 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
                 data.set(StructuredDataKey.BASE_COLOR, baseColorIntTag.asInt());
             }
 
-            if (tag.contains("Items")) {
-                updateItemList(connection, data, tag, "Items", StructuredDataKey.CONTAINER1_20_5, true);
+            final ListTag<CompoundTag> itemsTag = tag.getListTag("Items", CompoundTag.class);
+            if (itemsTag != null) {
+                int highestSlot = 0;
+
+                for (int i = 0, size = Math.min(itemsTag.size(), 256); i < size; i++) {
+                    final CompoundTag itemTag = itemsTag.get(i);
+                    final Item item = itemFromTag(connection, itemTag);
+                    if (item.isEmpty()) {
+                        continue;
+                    }
+
+                    final int slot = itemTag.getByte("Slot");
+                    highestSlot = MathUtil.clamp(slot, highestSlot, 255);
+                }
+
+                final Item[] filteredItems = new Item[highestSlot + 1];
+                Arrays.fill(filteredItems, StructuredItem.empty());
+                for (final CompoundTag itemTag : itemsTag) {
+                    final Item item = itemFromTag(connection, itemTag);
+                    if (item.isEmpty()) {
+                        continue;
+                    }
+
+                    final int slot = itemTag.getByte("Slot");
+                    if (slot >= 0 && slot < filteredItems.length) {
+                        filteredItems[slot] = item;
+                    }
+                }
+
+                data.set(StructuredDataKey.CONTAINER1_20_5, filteredItems);
                 addBlockEntityId(tag, "shulker_box"); // Won't happen to the others and doesn't actually have to be correct otherwise
             }
         }
