@@ -24,7 +24,7 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
@@ -32,7 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-public final class ComponentRewriter1_21_5 extends ComponentRewriter<ClientboundPacket1_21_2> {
+public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<ClientboundPacket1_21_2> {
 
     public ComponentRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol, ReadType.NBT);
@@ -233,11 +233,12 @@ public final class ComponentRewriter1_21_5 extends ComponentRewriter<Clientbound
 
         for (final CompoundTag compoundTag : pagesTag) {
             // To proper nbt
-            if (compoundTag.remove("raw") instanceof final StringTag raw) {
-                compoundTag.put("raw", uglyJsonToTag(connection, raw.getValue()));
-            }
-            if (compoundTag.remove("filtered") instanceof final StringTag raw) {
-                compoundTag.put("filtered", uglyJsonToTag(connection, raw.getValue()));
+            final String raw = compoundTag.getString("raw");
+            compoundTag.put("raw", uglyJsonToTag(connection, raw));
+
+            final String filtered = compoundTag.getString("filtered");
+            if (filtered != null) {
+                compoundTag.put("filtered", uglyJsonToTag(connection, filtered));
             }
         }
     }

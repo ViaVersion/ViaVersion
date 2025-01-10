@@ -223,7 +223,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
         return inputSerializerVersion(); // Only matters if the nbt serializer changed
     }
 
-    private void convertLegacyEntityContents(final CompoundTag hoverEvent) {
+    protected void convertLegacyEntityContents(final CompoundTag hoverEvent) {
         if (inputSerializerVersion() == null) {
             return;
         }
@@ -239,7 +239,7 @@ public class JsonNBTComponentRewriter<C extends ClientboundPacketType> extends C
         }
     }
 
-    private void convertLegacyItemContents(final CompoundTag hoverEvent) {
+    protected void convertLegacyItemContents(final CompoundTag hoverEvent) {
         if (inputSerializerVersion() == null) {
             return;
         }

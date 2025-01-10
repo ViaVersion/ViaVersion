@@ -103,7 +103,13 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
 
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(Types1_21_5.ENTITY_DATA_TYPES::byId);
+        filter().mapDataType(id -> {
+            int mappedId = id;
+            if (id >= 25) { // Pig variant
+                mappedId++;
+            }
+            return Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId);
+        });
 
         registerEntityDataTypeHandler(
             Types1_21_5.ENTITY_DATA_TYPES.itemType,
