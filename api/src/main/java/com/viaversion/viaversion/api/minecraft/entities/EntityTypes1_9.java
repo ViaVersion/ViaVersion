@@ -27,17 +27,6 @@ import java.util.Map;
 
 public class EntityTypes1_9 {
 
-    public static EntityType getTypeFromId(final int typeId, final boolean object) {
-        EntityType type;
-
-        if (object) {
-            type = ObjectType.getEntityType(typeId);
-        } else {
-            type = EntityType.findById(typeId);
-        }
-        return type;
-    }
-
     public enum EntityType implements com.viaversion.viaversion.api.minecraft.entities.EntityType {
 
         ENTITY,
@@ -211,7 +200,13 @@ public class EntityTypes1_9 {
         BOAT(1, EntityType.BOAT),
         ITEM(2, EntityType.ITEM),
         AREA_EFFECT_CLOUD(3, EntityType.AREA_EFFECT_CLOUD),
-        MINECART(10, EntityType.MINECART), // There are multiple types, but we don't need them
+        MINECART(10, EntityType.MINECART),
+        CHEST_MINECART(10, 1, EntityType.CHEST_MINECART),
+        FURNACE_MINECART(10, 2, EntityType.FURNACE_MINECART),
+        TNT_MINECART(10, 3, EntityType.TNT_MINECART),
+        SPAWNER_MINECART(10, 4, EntityType.SPAWNER_MINECART),
+        HOPPER_MINECART(10, 5, EntityType.HOPPER_MINECART),
+        COMMAND_BLOCK_MINECART(10, 6, EntityType.COMMAND_BLOCK_MINECART),
         TNT_PRIMED(50, EntityType.TNT),
         ENDER_CRYSTAL(51, EntityType.END_CRYSTAL),
         TIPPED_ARROW(60, EntityType.ARROW),
@@ -237,16 +232,22 @@ public class EntityTypes1_9 {
         private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
 
         private final int id;
+        private final int data;
         private final EntityType type;
 
         static {
             for (ObjectType type : ObjectType.values()) {
-                TYPES.put(type.id, type);
+                TYPES.put(type.id + type.data, type);
             }
         }
 
         ObjectType(int id, EntityType type) {
+            this(id, 0, type);
+        }
+
+        ObjectType(int id, int data, EntityType type) {
             this.id = id;
+            this.data = data;
             this.type = type;
         }
 
@@ -256,19 +257,24 @@ public class EntityTypes1_9 {
         }
 
         @Override
+        public int getData() {
+            return data;
+        }
+
+        @Override
         public EntityType getType() {
             return type;
         }
 
-        public static ObjectType findById(final int id) {
+        public static ObjectType findById(final int id, final int data) {
             if (id == -1) {
                 return null;
             }
-            return TYPES.get(id);
+            return TYPES.get(id + data);
         }
 
-        public static EntityType getEntityType(final int id) {
-            final ObjectType objectType = findById(id);
+        public static EntityType getEntityType(final int id, final int data) {
+            final ObjectType objectType = findById(id, data);
             return objectType != null ? objectType.type : null;
         }
     }

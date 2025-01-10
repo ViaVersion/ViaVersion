@@ -80,27 +80,17 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
                 handler(wrapper -> {
                     int entityId = wrapper.get(Types.VAR_INT, 0);
                     int typeId = wrapper.get(Types.VAR_INT, 1);
+                    int data = wrapper.get(Types.INT, 0);
 
-                    EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.getTypeFromId(typeId, true);
+                    EntityTypes1_13.EntityType type1_13 = EntityTypes1_13.ObjectType.getEntityType(typeId, data);
                     if (type1_13 == null) {
                         return;
                     }
 
                     typeId = newEntityId(type1_13.getId());
                     EntityType type1_14 = EntityTypes1_14.getTypeFromId(typeId);
-                    int data = wrapper.get(Types.INT, 0);
                     if (type1_14.is(EntityTypes1_14.FALLING_BLOCK)) {
                         wrapper.set(Types.INT, 0, protocol.getMappingData().getNewBlockStateId(data));
-                    } else if (type1_14.is(EntityTypes1_14.MINECART)) {
-                        typeId = switch (data) {
-                            case 1 -> EntityTypes1_14.CHEST_MINECART.getId();
-                            case 2 -> EntityTypes1_14.FURNACE_MINECART.getId();
-                            case 3 -> EntityTypes1_14.TNT_MINECART.getId();
-                            case 4 -> EntityTypes1_14.SPAWNER_MINECART.getId();
-                            case 5 -> EntityTypes1_14.HOPPER_MINECART.getId();
-                            case 6 -> EntityTypes1_14.COMMAND_BLOCK_MINECART.getId();
-                            default -> typeId; // default 0 = rideable minecart
-                        };
                     } else if ((type1_14.is(EntityTypes1_14.ITEM) && data > 0)
                         || type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
                         if (type1_14.isOrHasParent(EntityTypes1_14.ABSTRACT_ARROW)) {
@@ -142,7 +132,7 @@ public class EntityPacketRewriter1_14 extends EntityRewriter<ClientboundPackets1
 
                 handler(wrapper -> {
                     int entityType = wrapper.get(Types.VAR_INT, 1);
-                    if (EntityTypes1_13.getTypeFromId(entityType, false) == null) {
+                    if (EntityTypes1_13.EntityType.findById(entityType) == null) {
                         // <= 1.13.2 will ignore unknown entity types, 1.14+ will spawn a pig as default
                         wrapper.cancel();
                         return;
