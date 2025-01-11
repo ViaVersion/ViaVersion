@@ -275,7 +275,7 @@ public class EntityTypes1_13 {
         DRAGON_FIREBALL(93, EntityType.DRAGON_FIREBALL),
         TRIDENT(94, EntityType.TRIDENT);
 
-        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
+        private static final Map<Integer, Map<Integer, ObjectType>> TYPES = new HashMap<>();
 
         private final int id;
         private final int data;
@@ -283,7 +283,7 @@ public class EntityTypes1_13 {
 
         static {
             for (ObjectType type : ObjectType.values()) {
-                TYPES.put(type.id + type.data, type);
+                TYPES.computeIfAbsent(type.id, k -> new HashMap<>()).put(type.data, type);
             }
         }
 
@@ -313,10 +313,13 @@ public class EntityTypes1_13 {
         }
 
         public static ObjectType findById(final int id, final int data) {
-            if (id == -1) {
+            final Map<Integer, ObjectType> types = TYPES.get(id);
+            if (types == null) {
                 return null;
             }
-            return TYPES.get(id + data);
+
+            final ObjectType type = types.get(data);
+            return type != null ? type : types.get(0);
         }
 
         public static EntityType getEntityType(final int id, final int data) {
