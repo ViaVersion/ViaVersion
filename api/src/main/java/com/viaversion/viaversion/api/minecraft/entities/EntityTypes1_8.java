@@ -256,10 +256,8 @@ public class EntityTypes1_8 {
         }
 
         public static ObjectType findById(final int id, final int data) {
-            if (id == -1) {
-                return null;
-            }
-            return TYPES.get(id + data);
+            final ObjectType objectType = TYPES.get(id + data);
+            return objectType != null ? objectType : TYPES.get(id);
         }
 
         public static EntityType getEntityType(final int id, final int data) {
