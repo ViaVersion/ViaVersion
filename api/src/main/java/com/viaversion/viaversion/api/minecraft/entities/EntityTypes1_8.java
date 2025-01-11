@@ -218,7 +218,7 @@ public class EntityTypes1_8 {
         ARMOR_STAND(78, EntityType.ARMOR_STAND),
         FISHIHNG_HOOK(90, EntityType.FISHING_HOOK);
 
-        private static final Map<Integer, ObjectType> TYPES = new HashMap<>();
+        private static final Map<Integer, Map<Integer, ObjectType>> TYPES = new HashMap<>();
 
         private final int id;
         private final int data;
@@ -226,7 +226,7 @@ public class EntityTypes1_8 {
 
         static {
             for (ObjectType type : ObjectType.values()) {
-                TYPES.put(type.id + type.data, type);
+                TYPES.computeIfAbsent(type.id, k -> new HashMap<>()).put(type.data, type);
             }
         }
 
@@ -256,8 +256,9 @@ public class EntityTypes1_8 {
         }
 
         public static ObjectType findById(final int id, final int data) {
-            final ObjectType objectType = TYPES.get(id + data);
-            return objectType != null ? objectType : TYPES.get(id);
+            final Map<Integer, ObjectType> types = TYPES.get(id);
+            final ObjectType type = types.get(data);
+            return type != null ? type : types.get(0);
         }
 
         public static EntityType getEntityType(final int id, final int data) {
