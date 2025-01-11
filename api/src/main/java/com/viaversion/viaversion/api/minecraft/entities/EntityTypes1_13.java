@@ -314,6 +314,10 @@ public class EntityTypes1_13 {
 
         public static ObjectType findById(final int id, final int data) {
             final Map<Integer, ObjectType> types = TYPES.get(id);
+            if (types == null) {
+                return null;
+            }
+
             final ObjectType type = types.get(data);
             return type != null ? type : types.get(0);
         }
