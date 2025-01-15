@@ -1376,7 +1376,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
             final CompoundTag entityData = beeTag.getCompoundTag("entity_data");
             final int ticksInHive = beeTag.getInt("ticks_in_hive");
             final int minTicksInHive = beeTag.getInt("min_ticks_in_hive");
-            bees[i] = new Bee(entityData, ticksInHive, minTicksInHive);
+            bees[i] = new Bee(entityData != null ? entityData : new CompoundTag(), ticksInHive, minTicksInHive);
         }
         return bees;
     }
@@ -1623,6 +1623,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
 
     protected GameProfile.Property[] propertiesFromTag(final CompoundTag tag) {
         final ListTag<CompoundTag> propertiesTag = tag.getListTag("properties", CompoundTag.class);
+        if (propertiesTag == null) {
+            return new GameProfile.Property[0];
+        }
+
         final GameProfile.Property[] properties = new GameProfile.Property[propertiesTag.size()];
         for (int i = 0; i < propertiesTag.size(); i++) {
             final CompoundTag propertyTag = propertiesTag.get(i);
