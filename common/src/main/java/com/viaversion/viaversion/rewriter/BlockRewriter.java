@@ -38,6 +38,8 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.MathUtil;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -197,20 +199,29 @@ public class BlockRewriter<C extends ClientboundPacketType> {
             final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
             if (blockEntityMappings != null || blockEntityHandler != null) {
                 final List<BlockEntity> blockEntities = chunk.blockEntities();
+                final IntList toRemove = new IntArrayList();
                 for (int i = 0; i < blockEntities.size(); i++) {
                     final BlockEntity blockEntity = blockEntities.get(i);
                     if (blockEntityMappings != null) {
                         final int id = blockEntity.typeId();
-                        final int mappedId = blockEntityMappings.getNewIdOrDefault(id, id);
-                        if (id != mappedId) {
-                            blockEntities.set(i, blockEntity.withTypeId(mappedId));
+                        final int mappedId = blockEntityMappings.getNewId(id);
+                        if (id == mappedId) {
+                            continue;
                         }
+                        if (mappedId == -1) {
+                            toRemove.add(i);
+                            continue;
+                        }
+
+                        blockEntities.set(i, blockEntity.withTypeId(mappedId));
                     }
 
                     if (blockEntityHandler != null && blockEntity.tag() != null) {
                         blockEntityHandler.accept(wrapper.user(), blockEntity);
                     }
                 }
+
+                toRemove.forEach(blockEntities::remove);
             }
         };
     }
