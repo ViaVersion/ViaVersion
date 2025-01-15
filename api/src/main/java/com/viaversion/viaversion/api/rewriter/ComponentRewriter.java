@@ -32,4 +32,6 @@ public interface ComponentRewriter {
     void processTag(UserConnection connection, @Nullable Tag tag);
 
     void processText(UserConnection connection, @Nullable JsonElement element);
+
+    JsonElement processText(UserConnection connection, @Nullable String json);
 }

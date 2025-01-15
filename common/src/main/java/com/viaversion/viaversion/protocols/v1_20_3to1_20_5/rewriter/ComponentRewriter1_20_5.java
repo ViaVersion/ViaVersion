@@ -86,7 +86,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Instruments1_20_
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.PotionEffects1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.data.Potions1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.SerializerVersion;
@@ -103,7 +103,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends ComponentRewriter<C> {
+public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends JsonNBTComponentRewriter<C> {
 
     protected final Map<StructuredDataKey<?>, ConverterPair<?>> converters = new Reference2ObjectOpenHashMap<>();
     protected final StructuredDataType structuredDataType;
@@ -1311,12 +1311,18 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
 
     protected ListTag<CompoundTag> containerToTag(final UserConnection connection, final Item[] value) {
         final ListTag<CompoundTag> tag = new ListTag<>(CompoundTag.class);
-        final ListTag<CompoundTag> items = itemArrayToTag(connection, value);
-        for (int i = 0; i < items.size(); i++) {
+        for (int i = 0; i < value.length; i++) {
+            final Item item = value[i];
+            if (item.isEmpty()) {
+                continue;
+            }
+
+            final CompoundTag slotTag = new CompoundTag();
             final CompoundTag itemTag = new CompoundTag();
-            itemTag.putInt("slot", i);
-            itemTag.put("item", items.get(i));
-            tag.add(itemTag);
+            itemToTag(connection, itemTag, item);
+            slotTag.putInt("slot", i);
+            slotTag.put("item", itemTag);
+            tag.add(slotTag);
         }
         return tag;
     }
@@ -1534,7 +1540,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Co
             tag.putInt("count", 1);
         }
         final Map<StructuredDataKey<?>, StructuredData<?>> components = item.dataContainer().data();
-        tag.put("components", toTag(connection, components, true));
+        final CompoundTag componentsTag = toTag(connection, components, true);
+        if (!componentsTag.isEmpty()) {
+            tag.put("components", componentsTag);
+        }
     }
 
     protected Item itemFromTag(final UserConnection connection, final CompoundTag tag) {

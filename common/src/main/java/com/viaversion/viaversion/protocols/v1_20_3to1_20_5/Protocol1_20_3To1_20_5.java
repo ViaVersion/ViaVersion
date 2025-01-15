@@ -53,7 +53,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.rewriter.ParticleRewr
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.AcknowledgedMessagesStorage;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStorage;
 import com.viaversion.viaversion.protocols.v1_20to1_20_2.packet.ServerboundConfigurationPackets1_20_2;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.rewriter.SoundRewriter;
 import com.viaversion.viaversion.rewriter.StatisticsRewriter;
 import com.viaversion.viaversion.rewriter.TagRewriter;
@@ -98,7 +98,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         componentRewriter.registerPlayerCombatKill1_20(ClientboundPackets1_20_3.PLAYER_COMBAT_KILL);
 
         // People add item hovers to all sorts of weird places...
-        componentRewriter.registerOpenScreen(ClientboundPackets1_20_3.OPEN_SCREEN);
+        componentRewriter.registerOpenScreen1_14(ClientboundPackets1_20_3.OPEN_SCREEN);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_ACTION_BAR_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_TITLE_TEXT);
         componentRewriter.registerComponentPacket(ClientboundPackets1_20_3.SET_SUBTITLE_TEXT);
@@ -330,7 +330,7 @@ public final class Protocol1_20_3To1_20_5 extends AbstractProtocol<ClientboundPa
         return tagRewriter;
     }
 
-    public ComponentRewriter<ClientboundPacket1_20_3> getComponentRewriter() {
+    public JsonNBTComponentRewriter<ClientboundPacket1_20_3> getComponentRewriter() {
         return componentRewriter;
     }
 

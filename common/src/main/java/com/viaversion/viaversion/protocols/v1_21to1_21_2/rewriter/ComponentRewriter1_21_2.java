@@ -26,13 +26,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.FullMappings;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundPacket1_21;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.Protocol1_21To1_21_2;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.TagUtil;
 import java.util.Collections;
 import java.util.Iterator;
 
-public final class ComponentRewriter1_21_2 extends ComponentRewriter<ClientboundPacket1_21> {
+public final class ComponentRewriter1_21_2 extends JsonNBTComponentRewriter<ClientboundPacket1_21> {
 
     public ComponentRewriter1_21_2(final Protocol1_21To1_21_2 protocol) {
         super(protocol, ReadType.NBT);

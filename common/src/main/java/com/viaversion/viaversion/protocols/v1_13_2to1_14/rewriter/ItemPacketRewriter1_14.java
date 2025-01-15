@@ -37,7 +37,7 @@ import com.viaversion.viaversion.protocols.v1_13_2to1_14.Protocol1_13_2To1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ClientboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.packet.ServerboundPackets1_14;
 import com.viaversion.viaversion.protocols.v1_13_2to1_14.storage.EntityTracker1_14;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.rewriter.ItemRewriter;
 import com.viaversion.viaversion.rewriter.RecipeRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -47,7 +47,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ItemPacketRewriter1_14 extends ItemRewriter<ClientboundPackets1_13, ServerboundPackets1_14, Protocol1_13_2To1_14> {
     private static final Set<String> REMOVED_RECIPE_TYPES = Sets.newHashSet("crafting_special_banneraddpattern", "crafting_special_repairitem");
-    private static final ComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new ComponentRewriter<>(null, ComponentRewriter.ReadType.JSON) {
+    private static final JsonNBTComponentRewriter<ClientboundPackets1_13> COMPONENT_REWRITER = new JsonNBTComponentRewriter<>(null, JsonNBTComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             super.handleTranslate(object, translate);
