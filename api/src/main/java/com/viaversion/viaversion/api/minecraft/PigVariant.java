@@ -20,26 +20,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.minecraft.item.data;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record Weapon(int itemDamagePerAttack, boolean canDisableBlocking) {
+public record PigVariant(int modelType, String texture, @Nullable HolderSet biomes) {
 
-    public static final Type<Weapon> TYPE = new Type<>(Weapon.class) {
+    public static HolderType<PigVariant> TYPE = new HolderType<>() {
         @Override
-        public Weapon read(final ByteBuf buffer) {
-            final int damagePerAttack = Types.VAR_INT.readPrimitive(buffer);
-            final boolean canDisableBlocking = buffer.readBoolean();
-            return new Weapon(damagePerAttack, canDisableBlocking);
+        public PigVariant readDirect(final ByteBuf buffer) {
+            final int modelType = Types.VAR_INT.readPrimitive(buffer);
+            final String texture = Types.STRING.read(buffer);
+            final HolderSet biomes = Types.OPTIONAL_HOLDER_SET.read(buffer);
+            return new PigVariant(modelType, texture, biomes);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final Weapon value) {
-            Types.VAR_INT.writePrimitive(buffer, value.itemDamagePerAttack());
-            buffer.writeBoolean(value.canDisableBlocking());
+        public void writeDirect(final ByteBuf buffer, final PigVariant variant) {
+            Types.VAR_INT.writePrimitive(buffer, variant.modelType());
+            Types.STRING.write(buffer, variant.texture());
+            Types.OPTIONAL_HOLDER_SET.write(buffer, variant.biomes());
         }
     };
 }

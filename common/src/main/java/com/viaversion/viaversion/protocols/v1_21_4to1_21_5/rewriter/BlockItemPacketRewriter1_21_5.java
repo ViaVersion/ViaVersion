@@ -25,16 +25,16 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
-import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPackets1_21_2;
 import com.viaversion.viaversion.rewriter.BlockRewriter;
 import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
-public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_21_4To1_21_5> {
+public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_5, Protocol1_21_4To1_21_5> {
 
     public BlockItemPacketRewriter1_21_5(final Protocol1_21_4To1_21_5 protocol) {
         super(protocol,
@@ -60,8 +60,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         registerSetSlot1_21_2(ClientboundPackets1_21_2.CONTAINER_SET_SLOT);
         registerSetEquipment(ClientboundPackets1_21_2.SET_EQUIPMENT);
         registerMerchantOffers1_20_5(ClientboundPackets1_21_2.MERCHANT_OFFERS);
-        registerContainerClick1_21_2(ServerboundPackets1_21_4.CONTAINER_CLICK);
-        registerSetCreativeModeSlot(ServerboundPackets1_21_4.SET_CREATIVE_MODE_SLOT);
+        registerContainerClick1_21_2(ServerboundPackets1_21_5.CONTAINER_CLICK);
+        registerSetCreativeModeSlot(ServerboundPackets1_21_5.SET_CREATIVE_MODE_SLOT);
 
         registerAdvancements1_20_3(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS);
         protocol.appendClientbound(ClientboundPackets1_21_2.UPDATE_ADVANCEMENTS, wrapper -> {
@@ -108,6 +108,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_4, StructuredDataKey.CONTAINER1_21_5);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_4, StructuredDataKey.USE_REMAINDER1_21_5);
         dataContainer.replaceKey(StructuredDataKey.TOOL1_20_5, StructuredDataKey.TOOL1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_2, StructuredDataKey.EQUIPPABLE1_21_5);
     }
 
     public static void downgradeItemData(final Item item) {
@@ -117,7 +118,29 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.CONTAINER1_21_4);
         dataContainer.replaceKey(StructuredDataKey.USE_REMAINDER1_21_5, StructuredDataKey.USE_REMAINDER1_21_4);
         dataContainer.replaceKey(StructuredDataKey.TOOL1_21_5, StructuredDataKey.TOOL1_20_5);
+        dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_21_2);
         dataContainer.remove(StructuredDataKey.POTION_DURATION_SCALE);
         dataContainer.remove(StructuredDataKey.WEAPON);
+        dataContainer.remove(StructuredDataKey.VILLAGER_VARIANT);
+        dataContainer.remove(StructuredDataKey.WOLF_VARIANT);
+        dataContainer.remove(StructuredDataKey.WOLF_COLLAR);
+        dataContainer.remove(StructuredDataKey.FOX_VARIANT);
+        dataContainer.remove(StructuredDataKey.SALMON_SIZE);
+        dataContainer.remove(StructuredDataKey.PARROT_VARIANT);
+        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_PATTERN);
+        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_BASE_COLOR);
+        dataContainer.remove(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR);
+        dataContainer.remove(StructuredDataKey.MOOSHROOM_VARIANT);
+        dataContainer.remove(StructuredDataKey.RABBIT_VARIANT);
+        dataContainer.remove(StructuredDataKey.PIG_VARIANT);
+        dataContainer.remove(StructuredDataKey.FROG_VARIANT);
+        dataContainer.remove(StructuredDataKey.HORSE_VARIANT);
+        dataContainer.remove(StructuredDataKey.PAINTING_VARIANT);
+        dataContainer.remove(StructuredDataKey.LLAMA_VARIANT);
+        dataContainer.remove(StructuredDataKey.AXOLOTL_VARIANT);
+        dataContainer.remove(StructuredDataKey.CAT_VARIANT);
+        dataContainer.remove(StructuredDataKey.CAT_COLLAR);
+        dataContainer.remove(StructuredDataKey.SHEEP_COLOR);
+        dataContainer.remove(StructuredDataKey.SHULKER_COLOR);
     }
 }

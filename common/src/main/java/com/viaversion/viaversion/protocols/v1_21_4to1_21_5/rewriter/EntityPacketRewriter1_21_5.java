@@ -121,6 +121,16 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             Types1_21_5.ENTITY_DATA_TYPES.optionalComponentType
         );
         registerBlockStateHandler(EntityTypes1_21_4.ABSTRACT_MINECART, 11);
+
+        filter().type(EntityTypes1_21_4.MOOSHROOM).index(17).handler(((event, data) -> {
+            final String typeName = data.value();
+            final int typeId = typeName.equals("red") ? 0 : 1;
+            data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.varIntType, typeId);
+        }));
+
+        // Removed saddles
+        filter().type(EntityTypes1_21_4.PIG).cancel(17);
+        filter().type(EntityTypes1_21_4.STRIDER).cancel(19);
     }
 
     @Override

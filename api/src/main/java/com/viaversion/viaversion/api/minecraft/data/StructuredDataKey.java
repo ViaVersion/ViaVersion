@@ -27,6 +27,9 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
+import com.viaversion.viaversion.api.minecraft.PaintingVariant;
+import com.viaversion.viaversion.api.minecraft.PigVariant;
+import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.item.data.AdventureModePredicate;
 import com.viaversion.viaversion.api.minecraft.item.data.ArmorTrim;
@@ -108,7 +111,8 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<ToolProperties> TOOL1_21_5 = new StructuredDataKey<>("tool", ToolProperties.TYPE1_21_5);
     public static final StructuredDataKey<Weapon> WEAPON = new StructuredDataKey<>("weapon", Weapon.TYPE);
     public static final StructuredDataKey<Integer> ENCHANTABLE = new StructuredDataKey<>("enchantable", Types.VAR_INT);
-    public static final StructuredDataKey<Equippable> EQUIPPABLE = new StructuredDataKey<>("equippable", Equippable.TYPE);
+    public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_2 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_2);
+    public static final StructuredDataKey<Equippable> EQUIPPABLE1_21_5 = new StructuredDataKey<>("equippable", Equippable.TYPE1_21_5);
     public static final StructuredDataKey<HolderSet> REPAIRABLE = new StructuredDataKey<>("repairable", Types.HOLDER_SET);
     public static final StructuredDataKey<Unit> GLIDER = new StructuredDataKey<>("glider", Types.EMPTY);
     public static final StructuredDataKey<String> TOOLTIP_STYLE = new StructuredDataKey<>("tooltip_style", Types.STRING);
@@ -164,6 +168,27 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Bee[]> BEES = new StructuredDataKey<>("bees", Bee.ARRAY_TYPE);
     public static final StructuredDataKey<Tag> LOCK = new StructuredDataKey<>("lock", Types.TAG);
     public static final StructuredDataKey<CompoundTag> CONTAINER_LOOT = new StructuredDataKey<>("container_loot", Types.COMPOUND_TAG);
+    public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Holder<WolfVariant>> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", WolfVariant.TYPE);
+    public static final StructuredDataKey<Integer> WOLF_COLLAR = new StructuredDataKey<>("wolf/collar", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> FOX_VARIANT = new StructuredDataKey<>("fox/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> SALMON_SIZE = new StructuredDataKey<>("salmon/size", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> PARROT_VARIANT = new StructuredDataKey<>("parrot/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN = new StructuredDataKey<>("tropical_fish/pattern", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> TROPICAL_FISH_BASE_COLOR = new StructuredDataKey<>("tropical_fish/base_color", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN_COLOR = new StructuredDataKey<>("tropical_fish/pattern_color", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> MOOSHROOM_VARIANT = new StructuredDataKey<>("mooshroom/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> RABBIT_VARIANT = new StructuredDataKey<>("rabbit/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Holder<PigVariant>> PIG_VARIANT = new StructuredDataKey<>("pig/variant", PigVariant.TYPE);
+    public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);
+    public static final StructuredDataKey<Integer> LLAMA_VARIANT = new StructuredDataKey<>("llama/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> AXOLOTL_VARIANT = new StructuredDataKey<>("axolotl/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> CAT_VARIANT = new StructuredDataKey<>("cat/variant", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> CAT_COLLAR = new StructuredDataKey<>("cat/collar", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> SHEEP_COLOR = new StructuredDataKey<>("sheep/color", Types.VAR_INT);
+    public static final StructuredDataKey<Integer> SHULKER_COLOR = new StructuredDataKey<>("shulker/color", Types.VAR_INT);
 
     @Override
     public String toString() {

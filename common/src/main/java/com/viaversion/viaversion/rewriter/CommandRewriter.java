@@ -65,6 +65,7 @@ public class CommandRewriter<C extends ClientboundPacketType> {
         this.parserHandlers.put("minecraft:resource_or_tag", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location/tag
         this.parserHandlers.put("minecraft:resource_or_tag_key", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location
         this.parserHandlers.put("minecraft:resource_key", wrapper -> wrapper.passthrough(Types.STRING)); // Resource location/tag
+        this.parserHandlers.put("minecraft:resource_selector", wrapper -> wrapper.passthrough(Types.STRING));
     }
 
     public void registerDeclareCommands(C packetType) {

@@ -29,12 +29,15 @@ import com.viaversion.viaversion.api.type.types.misc.ParticleType;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_5;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.rewriter.CommandRewriter1_19_4;
 import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.packet.ServerboundConfigurationPackets1_20_5;
 import com.viaversion.viaversion.protocols.v1_20_5to1_21.packet.ClientboundConfigurationPackets1_21;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPacket1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ClientboundPackets1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPacket1_21_5;
+import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.packet.ServerboundPackets1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.BlockItemPacketRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.ComponentRewriter1_21_5;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter.EntityPacketRewriter1_21_5;
@@ -49,7 +52,7 @@ import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 
 import static com.viaversion.viaversion.util.ProtocolUtil.packetTypeMap;
 
-public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_4> {
+public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_5> {
 
     public static final MappingData MAPPINGS = new MappingDataBase("1.21.4", "1.21.5");
     private final EntityPacketRewriter1_21_5 entityRewriter = new EntityPacketRewriter1_21_5(this);
@@ -59,7 +62,7 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     private final JsonNBTComponentRewriter<ClientboundPacket1_21_2> componentRewriter = new ComponentRewriter1_21_5(this);
 
     public Protocol1_21_4To1_21_5() {
-        super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_5.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_4.class);
+        super(ClientboundPacket1_21_2.class, ClientboundPacket1_21_5.class, ServerboundPacket1_21_4.class, ServerboundPacket1_21_5.class);
     }
 
     @Override
@@ -91,6 +94,11 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
 
         new StatisticsRewriter<>(this).register(ClientboundPackets1_21_2.AWARD_STATS);
         new AttributeRewriter<>(this).register1_21(ClientboundPackets1_21_2.UPDATE_ATTRIBUTES);
+
+        new CommandRewriter1_19_4<>(this).registerDeclareCommands1_19(ClientboundPackets1_21_2.COMMANDS);
+
+        cancelServerbound(ServerboundPackets1_21_5.TEST_INSTANCE_BLOCK_ACTION);
+        cancelServerbound(ServerboundPackets1_21_5.SET_TEST_BLOCK);
     }
 
     @Override
@@ -125,9 +133,14 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
             StructuredDataKey.CONTAINER_LOOT, StructuredDataKey.TOOL1_21_5, StructuredDataKey.ITEM_NAME, StructuredDataKey.OMINOUS_BOTTLE_AMPLIFIER,
             StructuredDataKey.FOOD1_21_2, StructuredDataKey.JUKEBOX_PLAYABLE, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21,
             StructuredDataKey.REPAIRABLE, StructuredDataKey.ENCHANTABLE, StructuredDataKey.CONSUMABLE1_21_2,
-            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE, StructuredDataKey.ITEM_MODEL,
+            StructuredDataKey.USE_COOLDOWN, StructuredDataKey.DAMAGE, StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.ITEM_MODEL,
             StructuredDataKey.GLIDER, StructuredDataKey.TOOLTIP_STYLE, StructuredDataKey.DEATH_PROTECTION, StructuredDataKey.WEAPON,
-            StructuredDataKey.POTION_DURATION_SCALE,
+            StructuredDataKey.POTION_DURATION_SCALE, StructuredDataKey.VILLAGER_VARIANT, StructuredDataKey.WOLF_VARIANT, StructuredDataKey.WOLF_COLLAR,
+            StructuredDataKey.FOX_VARIANT, StructuredDataKey.SALMON_SIZE, StructuredDataKey.PARROT_VARIANT, StructuredDataKey.TROPICAL_FISH_PATTERN,
+            StructuredDataKey.TROPICAL_FISH_BASE_COLOR, StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR, StructuredDataKey.MOOSHROOM_VARIANT,
+            StructuredDataKey.RABBIT_VARIANT, StructuredDataKey.PIG_VARIANT, StructuredDataKey.FROG_VARIANT, StructuredDataKey.HORSE_VARIANT,
+            StructuredDataKey.PAINTING_VARIANT, StructuredDataKey.LLAMA_VARIANT, StructuredDataKey.AXOLOTL_VARIANT, StructuredDataKey.CAT_VARIANT,
+            StructuredDataKey.CAT_COLLAR, StructuredDataKey.SHEEP_COLOR, StructuredDataKey.SHULKER_COLOR,
             // Volatile thanks to containing item
             StructuredDataKey.CHARGED_PROJECTILES1_21_5, StructuredDataKey.BUNDLE_CONTENTS1_21_5, StructuredDataKey.CONTAINER1_21_5, StructuredDataKey.USE_REMAINDER1_21_5);
         super.onMappingDataLoaded();
@@ -169,12 +182,12 @@ public final class Protocol1_21_4To1_21_5 extends AbstractProtocol<ClientboundPa
     }
 
     @Override
-    protected PacketTypesProvider<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_4> createPacketTypesProvider() {
+    protected PacketTypesProvider<ClientboundPacket1_21_2, ClientboundPacket1_21_5, ServerboundPacket1_21_4, ServerboundPacket1_21_5> createPacketTypesProvider() {
         return new SimplePacketTypesProvider<>(
             packetTypeMap(unmappedClientboundPacketType, ClientboundPackets1_21_2.class, ClientboundConfigurationPackets1_21.class),
             packetTypeMap(mappedClientboundPacketType, ClientboundPackets1_21_5.class, ClientboundConfigurationPackets1_21.class),
             packetTypeMap(mappedServerboundPacketType, ServerboundPackets1_21_4.class, ServerboundConfigurationPackets1_20_5.class),
-            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_4.class, ServerboundConfigurationPackets1_20_5.class)
+            packetTypeMap(unmappedServerboundPacketType, ServerboundPackets1_21_5.class, ServerboundConfigurationPackets1_20_5.class)
         );
     }
 }

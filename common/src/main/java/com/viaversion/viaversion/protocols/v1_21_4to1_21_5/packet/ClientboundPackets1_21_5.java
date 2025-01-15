@@ -138,17 +138,18 @@ public enum ClientboundPackets1_21_5 implements ClientboundPacket1_21_5 {
     TAG_QUERY, // 0x74
     TAKE_ITEM_ENTITY, // 0x75
     TELEPORT_ENTITY, // 0x76
-    TICKING_STATE, // 0x77
-    TICKING_STEP, // 0x78
-    TRANSFER, // 0x79
-    UPDATE_ADVANCEMENTS, // 0x7A
-    UPDATE_ATTRIBUTES, // 0x7B
-    UPDATE_MOB_EFFECT, // 0x7C
-    UPDATE_RECIPES, // 0x7D
-    UPDATE_TAGS, // 0x7E
-    PROJECTILE_POWER, // 0x7F
-    CUSTOM_REPORT_DETAILS, // 0x80
-    SERVER_LINKS; // 0x81
+    TEST_INSTANCE_BLOCK_STATUS, // 0x77
+    TICKING_STATE, // 0x78
+    TICKING_STEP, // 0x79
+    TRANSFER, // 0x7A
+    UPDATE_ADVANCEMENTS, // 0x7B
+    UPDATE_ATTRIBUTES, // 0x7C
+    UPDATE_MOB_EFFECT, // 0x7D
+    UPDATE_RECIPES, // 0x7E
+    UPDATE_TAGS, // 0x7F
+    PROJECTILE_POWER, // 0x80
+    CUSTOM_REPORT_DETAILS, // 0x81
+    SERVER_LINKS; // 0x82
 
     @Override
     public int getId() {
