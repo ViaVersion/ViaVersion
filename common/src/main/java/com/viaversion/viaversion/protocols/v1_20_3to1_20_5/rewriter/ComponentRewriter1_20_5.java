@@ -489,9 +489,9 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         if (predicates != null) {
             for (final CompoundTag predicateTag : predicates) {
                 final HolderSet holderSet = holderSetFromTag(predicateTag, "blocks");
-                final List<StatePropertyMatcher> state = fromState(predicateTag.getCompoundTag("state"));
+                final StatePropertyMatcher[] state = fromState(predicateTag.getCompoundTag("state"));
 
-                list.add(new BlockPredicate(holderSet, state.toArray(StatePropertyMatcher[]::new), predicateTag.getCompoundTag("nbt")));
+                list.add(new BlockPredicate(holderSet, state, predicateTag.getCompoundTag("nbt")));
             }
         }
 
@@ -524,10 +524,11 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         return state;
     }
 
-    protected List<StatePropertyMatcher> fromState(final CompoundTag value) {
+    protected StatePropertyMatcher @Nullable [] fromState(final CompoundTag value) {
         if (value == null) {
             return null;
         }
+
         final List<StatePropertyMatcher> list = new ArrayList<>();
         for (final Map.Entry<String, Tag> entry : value.entrySet()) {
             final String name = entry.getKey();
@@ -540,7 +541,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
                 list.add(new StatePropertyMatcher(name, Either.right(new StatePropertyMatcher.RangedMatcher(min, max))));
             }
         }
-        return list;
+        return list.toArray(StatePropertyMatcher[]::new);
     }
 
     protected CompoundTag attributeModifiersToTag(final AttributeModifiers1_20_5 value) {
@@ -830,7 +831,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         final CompoundTag value = (CompoundTag) tag;
 
         final int potion = Potions1_20_5.keyToId(value.getString("potion", ""));
-        final Integer customColor = value.getInt("custom_color");
+        final IntTag customColor = value.getIntTag("custom_color");
         final ListTag<CompoundTag> customEffects = value.getListTag("custom_effects", CompoundTag.class);
         final List<PotionEffect> list = new ArrayList<>();
         if (customEffects != null) {
@@ -838,7 +839,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
                 list.add(potionEffectFromTag(effectTag));
             }
         }
-        return new PotionContents(potion, customColor, list.toArray(PotionEffect[]::new));
+        return new PotionContents(potion != -1 ? potion : null, customColor != null ? customColor.asInt() : null, list.toArray(PotionEffect[]::new));
     }
 
     protected ListTag<CompoundTag> suspiciousStewEffectsToTag(final SuspiciousStewEffect[] value) {
@@ -1237,7 +1238,7 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
     protected GameProfile profileFromTag(final Tag tag) {
         final CompoundTag value = (CompoundTag) tag;
 
-        final String name = value.getString("name", null);
+        final String name = value.getString("name");
         final IntArrayTag idTag = value.getIntArrayTag("id");
         final UUID id = idTag == null ? null : UUIDUtil.fromIntArray(idTag.getValue());
         final GameProfile.Property[] properties = propertiesFromTag(value);
