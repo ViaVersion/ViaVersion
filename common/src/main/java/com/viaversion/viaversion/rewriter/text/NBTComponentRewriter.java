@@ -52,7 +52,7 @@ public class NBTComponentRewriter<C extends ClientboundPacketType> extends Compo
 
         final String action = actionTag.getValue();
         if (action.equals("show_text")) {
-            processTag(connection, hoverEventTag.get("text"));
+            processTag(connection, hoverEventTag.get("value"));
         } else if (action.equals("show_entity")) {
             processTag(connection, hoverEventTag.get("name"));
 
