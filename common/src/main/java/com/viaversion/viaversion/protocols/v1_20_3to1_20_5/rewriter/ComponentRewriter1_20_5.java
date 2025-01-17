@@ -1212,10 +1212,10 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
 
     protected Fireworks fireworksFromTag(final Tag value) {
         final CompoundTag tag = (CompoundTag) value;
-        final int flightDuration = asUnsignedByte(tag.get("flight_duration"));
+        final short flightDuration = tag.getShort("flight_duration");
         final ListTag<CompoundTag> explosions = tag.getListTag("explosions", CompoundTag.class);
-        final FireworkExplosion[] list = new FireworkExplosion[explosions.size()];
-        for (int i = 0; i < explosions.size(); i++) {
+        final FireworkExplosion[] list = new FireworkExplosion[explosions != null ? explosions.size() : 0];
+        for (int i = 0; i < list.length; i++) {
             list[i] = fireworkExplosionFromTag(explosions.get(i));
         }
         return new Fireworks(flightDuration, list);
