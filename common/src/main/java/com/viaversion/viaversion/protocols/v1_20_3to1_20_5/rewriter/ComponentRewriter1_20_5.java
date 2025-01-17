@@ -89,6 +89,7 @@ import com.viaversion.viaversion.protocols.v1_20_3to1_20_5.storage.ArmorTrimStor
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.Either;
 import com.viaversion.viaversion.util.Key;
+import com.viaversion.viaversion.util.MathUtil;
 import com.viaversion.viaversion.util.SerializerVersion;
 import com.viaversion.viaversion.util.UUIDUtil;
 import com.viaversion.viaversion.util.Unit;
@@ -1330,13 +1331,32 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
 
     protected Item[] containerFromTag(final UserConnection connection, final Tag tag) {
         final ListTag<CompoundTag> value = (ListTag<CompoundTag>) tag;
-        final Item[] items = new Item[27];
-        for (final CompoundTag itemTag : value) {
+        int highestSlot = 0;
+
+        for (int i = 0, size = Math.min(value.size(), 256); i < size; i++) {
+            final CompoundTag itemTag = value.get(i);
+            final Item item = itemFromTag(connection, itemTag);
+            if (item.isEmpty()) {
+                continue;
+            }
+
             final int slot = itemTag.getInt("slot");
-            final Item item = itemFromTag(connection, itemTag.getCompoundTag("item"));
-            items[slot] = item;
+            highestSlot = MathUtil.clamp(slot, highestSlot, 255);
         }
-        return items;
+
+        final Item[] filteredItems = new Item[highestSlot + 1];
+        for (final CompoundTag itemTag : value) {
+            final Item item = itemFromTag(connection, itemTag.getCompoundTag("item"));
+            if (item.isEmpty()) {
+                continue;
+            }
+
+            final int slot = itemTag.getInt("slot");
+            if (slot >= 0 && slot < filteredItems.length) {
+                filteredItems[slot] = item;
+            }
+        }
+        return filteredItems;
     }
 
     protected CompoundTag blockStateToTag(final BlockStateProperties value) {
@@ -1896,6 +1916,6 @@ public class ComponentRewriter1_20_5<C extends ClientboundPacketType> extends Js
         T convert(UserConnection connection, Tag tag);
     }
 
-    private record ConverterPair<T>(DataConverter<T> dataConverter, TagConverter<T> tagConverter) {
+    protected record ConverterPair<T>(DataConverter<T> dataConverter, TagConverter<T> tagConverter) {
     }
 }
