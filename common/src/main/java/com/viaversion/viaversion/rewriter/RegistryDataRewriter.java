@@ -73,7 +73,7 @@ public class RegistryDataRewriter {
             int index = 0;
             for (final RegistryEntry entry : entries) {
                 if (!toAddKeys.contains(entry.key())) {
-                    updatedEntries[index++] = entry.copy();
+                    updatedEntries[index++] = entry;
                 }
             }
             for (final RegistryEntry entry : toAdd) {
