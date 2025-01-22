@@ -90,7 +90,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
             }
 
             final EfficiencyAttributeStorage storage = wrapper.user().get(EfficiencyAttributeStorage.class);
-            Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS);
+            Enchantments enchants = item.dataContainer().get(StructuredDataKey.ENCHANTMENTS1_20_5);
             EfficiencyAttributeStorage.ActiveEnchants active = storage.activeEnchants();
             active = switch (slotId) {
                 case HELMET_SLOT -> active.aquaAffinity(enchants == null ? 0 : enchants.getLevel(AQUA_AFFINITY_ID));
@@ -227,7 +227,7 @@ public final class BlockItemPacketRewriter1_21 extends StructuredItemRewriter<Cl
         dataContainer.replaceKey(StructuredDataKey.CONTAINER1_21, StructuredDataKey.CONTAINER1_20_5);
         dataContainer.replaceKey(StructuredDataKey.CHARGED_PROJECTILES1_21, StructuredDataKey.CHARGED_PROJECTILES1_20_5);
         dataContainer.replaceKey(StructuredDataKey.BUNDLE_CONTENTS1_21, StructuredDataKey.BUNDLE_CONTENTS1_20_5);
-        dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE);
+        dataContainer.remove(StructuredDataKey.JUKEBOX_PLAYABLE1_21);
         dataContainer.replace(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, attributeModifiers -> {
             final AttributeModifiers1_20_5.AttributeModifier[] modifiers = Arrays.stream(attributeModifiers.modifiers()).map(modifier -> {
                 final int mappedAttributeId = Protocol1_20_5To1_21.MAPPINGS.getAttributeMappings().inverse().getNewId(modifier.attribute());

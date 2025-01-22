@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class HolderType<T> extends Type<Holder<T>> {
 
@@ -55,4 +56,27 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
     public abstract T readDirect(final ByteBuf buffer);
 
     public abstract void writeDirect(final ByteBuf buffer, final T object);
+
+    public abstract static class OptionalHolderType<T> extends HolderType<T> {
+        private final HolderType<T> type;
+
+        protected OptionalHolderType(final HolderType<T> type) {
+            this.type = type;
+        }
+
+        @Override
+        public @Nullable T readDirect(ByteBuf buffer) {
+            return buffer.readBoolean() ? this.type.readDirect(buffer) : null;
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, @Nullable final T value) {
+            if (value == null) {
+                buffer.writeBoolean(false);
+            } else {
+                buffer.writeBoolean(true);
+                this.type.writeDirect(buffer, value);
+            }
+        }
+    }
 }

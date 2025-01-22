@@ -53,7 +53,7 @@ public class RegistryDataRewriter {
     public void handle(final PacketWrapper wrapper) {
         final String registryKey = wrapper.passthrough(Types.STRING);
         RegistryEntry[] entries = wrapper.read(Types.REGISTRY_ENTRY_ARRAY);
-        entries = handle(wrapper.user(), registryKey, entries);
+        entries = handle(wrapper.user(), Key.stripMinecraftNamespace(registryKey), entries);
         wrapper.write(Types.REGISTRY_ENTRY_ARRAY, entries);
     }
 

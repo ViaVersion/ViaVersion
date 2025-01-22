@@ -440,7 +440,7 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         updateItemData(item);
 
-        final Enchantments enchantments = data.get(StructuredDataKey.ENCHANTMENTS);
+        final Enchantments enchantments = data.get(StructuredDataKey.ENCHANTMENTS1_20_5);
         if (enchantments != null && enchantments.size() != 0) {
             // Level 0 is no longer allowed
             final IntList enchantmentIds = new IntArrayList();
@@ -501,10 +501,10 @@ public final class BlockItemPacketRewriter1_21_2 extends StructuredItemRewriter<
 
         final IntArrayTag emptyEnchantments = customData.getIntArrayTag(nbtTagName("0_enchants"));
         if (emptyEnchantments != null) {
-            Enchantments enchantments = dataContainer.get(StructuredDataKey.ENCHANTMENTS);
+            Enchantments enchantments = dataContainer.get(StructuredDataKey.ENCHANTMENTS1_20_5);
             if (enchantments == null) {
                 enchantments = new Enchantments(true);
-                dataContainer.set(StructuredDataKey.ENCHANTMENTS, enchantments);
+                dataContainer.set(StructuredDataKey.ENCHANTMENTS1_20_5, enchantments);
             }
             for (final int enchantmentId : emptyEnchantments.getValue()) {
                 enchantments.enchantments().put(enchantmentId, 0);

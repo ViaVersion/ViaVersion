@@ -31,7 +31,11 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record ArmorTrimPattern(String assetName, int itemId, Tag description, boolean decal) implements Copyable {
 
-    public static final HolderType<ArmorTrimPattern> TYPE = new HolderType<>() {
+    public ArmorTrimPattern(final String assetName, final Tag description, final boolean decal) {
+        this(assetName, -1, description, decal);
+    }
+
+    public static final HolderType<ArmorTrimPattern> TYPE1_20_5 = new HolderType<>() {
         @Override
         public ArmorTrimPattern readDirect(final ByteBuf buffer) {
             final String assetName = Types.STRING.read(buffer);
@@ -45,6 +49,22 @@ public record ArmorTrimPattern(String assetName, int itemId, Tag description, bo
         public void writeDirect(final ByteBuf buffer, final ArmorTrimPattern value) {
             Types.STRING.write(buffer, value.assetName());
             Types.VAR_INT.writePrimitive(buffer, value.itemId());
+            Types.TAG.write(buffer, value.description());
+            buffer.writeBoolean(value.decal());
+        }
+    };
+    public static final HolderType<ArmorTrimPattern> TYPE1_21_5 = new HolderType<>() {
+        @Override
+        public ArmorTrimPattern readDirect(final ByteBuf buffer) {
+            final String assetName = Types.STRING.read(buffer);
+            final Tag description = Types.TAG.read(buffer);
+            final boolean decal = buffer.readBoolean();
+            return new ArmorTrimPattern(assetName, description, decal);
+        }
+
+        @Override
+        public void writeDirect(final ByteBuf buffer, final ArmorTrimPattern value) {
+            Types.STRING.write(buffer, value.assetName());
             Types.TAG.write(buffer, value.description());
             buffer.writeBoolean(value.decal());
         }

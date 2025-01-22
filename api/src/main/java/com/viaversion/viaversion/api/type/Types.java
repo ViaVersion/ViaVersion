@@ -213,6 +213,7 @@ public final class Types {
     public static final Type<HolderSet> OPTIONAL_HOLDER_SET = new HolderSetType.OptionalHolderSetType();
 
     public static final HolderType<SoundEvent> SOUND_EVENT = new SoundEventType();
+    public static final HolderType<SoundEvent> OPTIONAL_SOUND_EVENT = new SoundEventType.OptionalSoundEventType();
 
     public static final Type<Item> ITEM1_8 = new ItemType1_8();
     public static final Type<Item> ITEM1_13 = new ItemType1_13();

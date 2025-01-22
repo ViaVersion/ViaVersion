@@ -23,46 +23,59 @@
 package com.viaversion.viaversion.api.minecraft.item.data;
 
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import com.viaversion.viaversion.api.type.types.misc.HolderType;
-import com.viaversion.viaversion.util.Either;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record JukeboxPlayable(Either<Holder<JukeboxSong>, String> song, boolean showInTooltip) {
+public record JukeboxPlayable(EitherHolder<JukeboxSong> song, boolean showInTooltip) {
 
     public JukeboxPlayable(final Holder<JukeboxSong> song, final boolean showInTooltip) {
-        this(Either.left(song), showInTooltip);
+        this(EitherHolder.of(song), showInTooltip);
     }
 
     public JukeboxPlayable(final String resourceKey, final boolean showInTooltip) {
-        this(Either.right(resourceKey), showInTooltip);
+        this(EitherHolder.of(resourceKey), showInTooltip);
     }
 
-    public static final Type<JukeboxPlayable> TYPE = new Type<>(JukeboxPlayable.class) {
+    public static final Type<JukeboxPlayable> TYPE1_21 = new Type<>(JukeboxPlayable.class) {
         @Override
         public JukeboxPlayable read(final ByteBuf buffer) {
-            final Either<Holder<JukeboxSong>, String> position = Type.readEither(buffer, JukeboxSong.TYPE, Types.STRING);
+            final EitherHolder<JukeboxSong> position = EitherHolderType.read(buffer, JukeboxSong.TYPE);
             final boolean showInTooltip = buffer.readBoolean();
             return new JukeboxPlayable(position, showInTooltip);
         }
 
         @Override
         public void write(final ByteBuf buffer, final JukeboxPlayable value) {
-            Type.writeEither(buffer, value.song, JukeboxSong.TYPE, Types.STRING);
+            EitherHolderType.write(buffer, value.song, JukeboxSong.TYPE);
             buffer.writeBoolean(value.showInTooltip);
+        }
+    };
+    public static final Type<JukeboxPlayable> TYPE1_21_5 = new Type<>(JukeboxPlayable.class) {
+        @Override
+        public JukeboxPlayable read(final ByteBuf buffer) {
+            final EitherHolder<JukeboxSong> position = EitherHolderType.read(buffer, JukeboxSong.TYPE);
+            return new JukeboxPlayable(position, true);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final JukeboxPlayable value) {
+            EitherHolderType.write(buffer, value.song, JukeboxSong.TYPE);
         }
     };
 
     public JukeboxPlayable rewrite(final Int2IntFunction soundIdRewriteFunction) {
-        if (song.isRight()) {
+        if (this.song.hasKey()) {
             return this;
         }
 
-        final Holder<JukeboxSong> songHolder = this.song.left();
+        final Holder<JukeboxSong> songHolder = this.song.holder();
         if (songHolder.hasId()) {
             return this;
         }

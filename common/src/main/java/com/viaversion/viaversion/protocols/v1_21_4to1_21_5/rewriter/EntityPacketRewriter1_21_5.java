@@ -18,9 +18,12 @@
 package com.viaversion.viaversion.protocols.v1_21_4to1_21_5.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.RegistryEntry;
+import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_4;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_21_5;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
@@ -42,7 +45,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
 
     @Override
     public void registerPackets() {
-        registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_4.FALLING_BLOCK);
+        registerTrackerWithData1_19(ClientboundPackets1_21_2.ADD_ENTITY, EntityTypes1_21_5.FALLING_BLOCK);
         registerSetEntityData(ClientboundPackets1_21_2.SET_ENTITY_DATA, Types1_21_4.ENTITY_DATA_LIST, Types1_21_5.ENTITY_DATA_LIST);
         registerRemoveEntities(ClientboundPackets1_21_2.REMOVE_ENTITIES);
 
@@ -50,7 +53,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         protocol.registerClientbound(ClientboundPackets1_21_2.ADD_EXPERIENCE_ORB, ClientboundPackets1_21_5.ADD_ENTITY, wrapper -> {
             wrapper.passthrough(Types.VAR_INT); // Entity ID
             wrapper.write(Types.UUID, UUID.randomUUID()); // UUID...
-            wrapper.write(Types.VAR_INT, EntityTypes1_21_4.EXPERIENCE_ORB.getId()); // Type
+            wrapper.write(Types.VAR_INT, EntityTypes1_21_5.EXPERIENCE_ORB.getId()); // Type
             wrapper.passthrough(Types.DOUBLE); // X
             wrapper.passthrough(Types.DOUBLE); // Y
             wrapper.passthrough(Types.DOUBLE); // Z
@@ -63,17 +66,38 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             wrapper.write(Types.SHORT, (short) 0);
         });
 
-        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol);
+        final RegistryDataRewriter registryDataRewriter = new RegistryDataRewriter(protocol) {
+            @Override
+            public RegistryEntry[] handle(final UserConnection connection, final String key, final RegistryEntry[] entries) {
+                if (!key.equals("wolf_variant")) {
+                    return super.handle(connection, key, entries);
+                }
+
+                for (final RegistryEntry entry : entries) {
+                    if (entry.tag() == null) {
+                        continue;
+                    }
+
+                    final CompoundTag variant = (CompoundTag) entry.tag();
+                    final CompoundTag assets = new CompoundTag();
+                    variant.put("assets", assets);
+                    assets.put("wild", variant.remove("wild_texture"));
+                    assets.put("tame", variant.remove("tame_texture"));
+                    assets.put("angry", variant.remove("angry_texture"));
+                    variant.remove("biomes");
+                }
+                return entries;
+            }
+        };
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
-        // Send pig variant
+        // Send pig, frog and cat variant
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
-            final PacketWrapper pigVariantspacket = wrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA);
-            pigVariantspacket.write(Types.STRING, "minecraft:pig_variant");
-            final CompoundTag temperatePig = new CompoundTag();
-            temperatePig.putString("texture", "entity/pig/pig");
-            pigVariantspacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{new RegistryEntry("pig", temperatePig)});
-            pigVariantspacket.send(Protocol1_21_4To1_21_5.class);
+            // Old registries, but now also modifiable
+            sendEntityVariants(wrapper.user(), "minecraft:frog_variant", "frog", true, "temperate", "warm", "cold");
+            sendEntityVariants(wrapper.user(), "minecraft:cat_variant", "cat", false, "tabby", "black", "red", "siamese", "british_shorthair", "calico", "persian", "ragdoll", "white", "jellie", "all_black");
+            // New variants
+            sendEntityVariants(wrapper.user(), "minecraft:pig_variant", "pig", false, "pig"); // temperate
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
@@ -101,14 +125,41 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         });
     }
 
+    private void sendEntityVariants(final UserConnection connection, final String key, final String entityName, final boolean suffixedWithOwnName, final String... entryKeys) {
+        final PacketWrapper variantsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, connection);
+        variantsPacket.write(Types.STRING, key);
+
+        final RegistryEntry[] entries = new RegistryEntry[entryKeys.length];
+        for (int i = 0; i < entryKeys.length; i++) {
+            final CompoundTag tag = new CompoundTag();
+            String assetId = "entity/" + entityName + "/" + entryKeys[i];
+            if (suffixedWithOwnName) {
+                // Because frogs have that...
+                assetId = assetId + "_" + entityName;
+            }
+            tag.putString("asset_id", assetId);
+            entries[i] = new RegistryEntry(entryKeys[i], tag);
+        }
+
+        variantsPacket.write(Types.REGISTRY_ENTRY_ARRAY, entries);
+        variantsPacket.send(Protocol1_21_4To1_21_5.class);
+    }
+
     @Override
     protected void registerRewrites() {
-        filter().mapDataType(id -> {
+        filter().handler((event, data) -> {
+            final int id = data.dataType().typeId();
+            if (id == Types1_21_4.ENTITY_DATA_TYPES.wolfVariantType.typeId()) {
+                final Holder<WolfVariant> wolfVariant = data.value();
+                data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.wolfVariantType, wolfVariant.hasId() ? wolfVariant.id() : 0);
+                return;
+            }
+
             int mappedId = id;
             if (id >= 25) { // Pig variant
                 mappedId++;
             }
-            return Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId);
+            data.setDataType(Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId));
         });
 
         registerEntityDataTypeHandler(
@@ -120,21 +171,26 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             Types1_21_5.ENTITY_DATA_TYPES.componentType,
             Types1_21_5.ENTITY_DATA_TYPES.optionalComponentType
         );
-        registerBlockStateHandler(EntityTypes1_21_4.ABSTRACT_MINECART, 11);
+        registerBlockStateHandler(EntityTypes1_21_5.ABSTRACT_MINECART, 11);
 
-        filter().type(EntityTypes1_21_4.MOOSHROOM).index(17).handler(((event, data) -> {
+        filter().type(EntityTypes1_21_5.MOOSHROOM).index(17).handler(((event, data) -> {
             final String typeName = data.value();
             final int typeId = typeName.equals("red") ? 0 : 1;
             data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.varIntType, typeId);
         }));
 
         // Removed saddles
-        filter().type(EntityTypes1_21_4.PIG).cancel(17);
-        filter().type(EntityTypes1_21_4.STRIDER).cancel(19);
+        filter().type(EntityTypes1_21_5.PIG).cancel(17);
+        filter().type(EntityTypes1_21_5.STRIDER).cancel(19);
+    }
+
+    @Override
+    public void onMappingDataLoaded() {
+        mapTypes();
     }
 
     @Override
     public EntityType typeFromId(final int type) {
-        return EntityTypes1_21_4.getTypeFromId(type);
+        return EntityTypes1_21_5.getTypeFromId(type);
     }
 }

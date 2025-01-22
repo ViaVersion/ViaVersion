@@ -497,7 +497,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag unbreakable = tag.getNumberTag("Unbreakable");
         if (unbreakable != null && unbreakable.asBoolean()) {
-            data.set(StructuredDataKey.UNBREAKABLE, new Unbreakable((hideFlagsValue & StructuredDataConverter.HIDE_UNBREAKABLE) == 0));
+            data.set(StructuredDataKey.UNBREAKABLE1_20_5, new Unbreakable((hideFlagsValue & StructuredDataConverter.HIDE_UNBREAKABLE) == 0));
         }
 
         final CompoundTag trimTag = tag.getCompoundTag("Trim");
@@ -564,8 +564,8 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
             updateItemList(connection, data, tag, "Items", StructuredDataKey.BUNDLE_CONTENTS1_20_5);
         }
 
-        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
-        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS, (hideFlagsValue & StructuredDataConverter.HIDE_ADDITIONAL) == 0);
+        updateEnchantments(data, tag, "Enchantments", StructuredDataKey.ENCHANTMENTS1_20_5, (hideFlagsValue & StructuredDataConverter.HIDE_ENCHANTMENTS) == 0);
+        updateEnchantments(data, tag, "StoredEnchantments", StructuredDataKey.STORED_ENCHANTMENTS1_20_5, (hideFlagsValue & StructuredDataConverter.HIDE_ADDITIONAL) == 0);
 
         final NumberTag mapId = tag.getNumberTag("map");
         if (mapId != null) {
@@ -586,12 +586,12 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final ListTag<StringTag> canPlaceOnTag = tag.getListTag("CanPlaceOn", StringTag.class);
         if (canPlaceOnTag != null) {
-            data.set(StructuredDataKey.CAN_PLACE_ON, updateBlockPredicates(canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
+            data.set(StructuredDataKey.CAN_PLACE_ON1_20_5, updateBlockPredicates(canPlaceOnTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_PLACE_ON) == 0));
         }
 
         final ListTag<StringTag> canDestroyTag = tag.getListTag("CanDestroy", StringTag.class);
         if (canDestroyTag != null) {
-            data.set(StructuredDataKey.CAN_BREAK, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
+            data.set(StructuredDataKey.CAN_BREAK1_20_5, updateBlockPredicates(canDestroyTag, (hideFlagsValue & StructuredDataConverter.HIDE_CAN_DESTROY) == 0));
         }
 
         final IntTag mapScaleDirectionTag = tag.getIntTag("map_scale_direction");
@@ -1420,7 +1420,7 @@ public final class BlockItemPacketRewriter1_20_5 extends ItemRewriter<Clientboun
 
         final NumberTag colorTag = displayTag.getNumberTag("color");
         if (colorTag != null) {
-            data.set(StructuredDataKey.DYED_COLOR, new DyedColor(colorTag.asInt(), (hideFlags & StructuredDataConverter.HIDE_DYE_COLOR) == 0));
+            data.set(StructuredDataKey.DYED_COLOR1_20_5, new DyedColor(colorTag.asInt(), (hideFlags & StructuredDataConverter.HIDE_DYE_COLOR) == 0));
         }
     }
 

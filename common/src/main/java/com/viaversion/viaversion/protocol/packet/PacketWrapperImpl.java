@@ -53,6 +53,10 @@ public class PacketWrapperImpl implements PacketWrapper {
      * Only non-null if specifically set and gotten before packet transformation
      */
     private PacketType packetType;
+    /**
+     * Makes passthrough act as a read, and write no-ops. Only use this if really necessary for avoiding large amounts of code duplication.
+     */
+    private boolean allActionsRead;
     private int id;
 
     public PacketWrapperImpl(int packetId, @Nullable ByteBuf inputBuffer, UserConnection userConnection) {
@@ -160,7 +164,7 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     @Override
     public <T> void write(Type<T> type, T value) {
-        packetValues.add(new PacketValue<>(type, value));
+        addPacketValue(new PacketValue<>(type, value));
     }
 
     /**
@@ -188,12 +192,18 @@ public class PacketWrapperImpl implements PacketWrapper {
     public <T> T passthrough(Type<T> type) throws InformativeException {
         if (readableObjects.isEmpty()) {
             T value = readFromBuffer(type);
-            packetValues.add(new PacketValue<>(type, value));
+            addPacketValue(new PacketValue<>(type, value));
             return value;
         } else {
             PacketValue<T> value = pollReadableObject(type);
-            packetValues.add(value);
+            addPacketValue(value);
             return value.value;
+        }
+    }
+
+    private void addPacketValue(final PacketValue<?> packetValue) {
+        if (!allActionsRead) {
+            packetValues.add(packetValue);
         }
     }
 
@@ -552,6 +562,10 @@ public class PacketWrapperImpl implements PacketWrapper {
 
     public @Nullable ByteBuf getInputBuffer() {
         return inputBuffer;
+    }
+
+    public void setAllActionsRead(final boolean allActionsRead) {
+        this.allActionsRead = allActionsRead;
     }
 
     @Override

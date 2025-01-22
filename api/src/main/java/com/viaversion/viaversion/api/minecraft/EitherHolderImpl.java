@@ -20,31 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.viaversion.viaversion.api.type.types.misc;
+package com.viaversion.viaversion.api.minecraft;
 
-import com.viaversion.viaversion.api.minecraft.SoundEvent;
-import com.viaversion.viaversion.api.type.Types;
-import io.netty.buffer.ByteBuf;
+import com.google.common.base.Preconditions;
+import com.viaversion.viaversion.util.EitherImpl;
 
-public final class SoundEventType extends HolderType<SoundEvent> {
+final class EitherHolderImpl<T> extends EitherImpl<Holder<T>, String> implements EitherHolder<T> {
 
-    @Override
-    public SoundEvent readDirect(final ByteBuf buffer) {
-        final String resourceLocation = Types.STRING.read(buffer);
-        final Float fixedRange = Types.OPTIONAL_FLOAT.read(buffer);
-        return new SoundEvent(resourceLocation, fixedRange);
+    EitherHolderImpl(final Holder<T> left, final String value) {
+        super(left, value);
     }
 
     @Override
-    public void writeDirect(final ByteBuf buffer, final SoundEvent value) {
-        Types.STRING.write(buffer, value.identifier());
-        Types.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
+    public boolean hasHolder() {
+        return isLeft();
     }
 
-    public static final class OptionalSoundEventType extends OptionalHolderType<SoundEvent> {
+    @Override
+    public boolean hasKey() {
+        return isRight();
+    }
 
-        public OptionalSoundEventType() {
-            super(Types.SOUND_EVENT);
-        }
+    @Override
+    public Holder<T> holder() {
+        Preconditions.checkArgument(hasHolder(), "Either does not have a holder");
+        return left();
+    }
+
+    @Override
+    public String key() {
+        Preconditions.checkArgument(hasKey(), "Either does not have a key");
+        return right();
     }
 }

@@ -31,7 +31,11 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean showInTooltip) implements Copyable {
 
-    public static final Type<AttributeModifiers1_21> TYPE = new Type<>(AttributeModifiers1_21.class) {
+    public AttributeModifiers1_21(final AttributeModifier[] modifiers) {
+        this(modifiers, true);
+    }
+
+    public static final Type<AttributeModifiers1_21> TYPE1_21 = new Type<>(AttributeModifiers1_21.class) {
         @Override
         public AttributeModifiers1_21 read(final ByteBuf buffer) {
             final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
@@ -43,6 +47,18 @@ public record AttributeModifiers1_21(AttributeModifier[] modifiers, boolean show
         public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
             AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
             buffer.writeBoolean(value.showInTooltip());
+        }
+    };
+    public static final Type<AttributeModifiers1_21> TYPE1_21_5 = new Type<>(AttributeModifiers1_21.class) {
+        @Override
+        public AttributeModifiers1_21 read(final ByteBuf buffer) {
+            final AttributeModifier[] modifiers = AttributeModifier.ARRAY_TYPE.read(buffer);
+            return new AttributeModifiers1_21(modifiers);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final AttributeModifiers1_21 value) {
+            AttributeModifier.ARRAY_TYPE.write(buffer, value.modifiers());
         }
     };
 

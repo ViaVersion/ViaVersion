@@ -99,7 +99,7 @@ public final class StructuredDataConverter {
             // Handled manually
         });
         register(StructuredDataKey.DAMAGE, (data, tag) -> tag.putInt("Damage", data));
-        register(StructuredDataKey.UNBREAKABLE, (data, tag) -> {
+        register(StructuredDataKey.UNBREAKABLE1_20_5, (data, tag) -> {
             tag.putBoolean("Unbreakable", true);
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_UNBREAKABLE);
@@ -123,8 +123,8 @@ public final class StructuredDataConverter {
             }
             getDisplayTag(tag).put("Lore", lore);
         });
-        register(StructuredDataKey.ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, false));
-        register(StructuredDataKey.STORED_ENCHANTMENTS, (data, tag) -> convertEnchantments(data, tag, true));
+        register(StructuredDataKey.ENCHANTMENTS1_20_5, (data, tag) -> convertEnchantments(data, tag, false));
+        register(StructuredDataKey.STORED_ENCHANTMENTS1_20_5, (data, tag) -> convertEnchantments(data, tag, true));
         register(StructuredDataKey.ATTRIBUTE_MODIFIERS1_20_5, (data, tag) -> {
             final ListTag<CompoundTag> modifiers = new ListTag<>(CompoundTag.class);
             for (int i = 0; i < data.modifiers().length; i++) {
@@ -154,7 +154,7 @@ public final class StructuredDataConverter {
         register(StructuredDataKey.CUSTOM_MODEL_DATA1_20_5, (data, tag) -> tag.putInt("CustomModelData", data));
         register(StructuredDataKey.HIDE_ADDITIONAL_TOOLTIP, (data, tag) -> putHideFlag(tag, 0x20));
         register(StructuredDataKey.REPAIR_COST, (data, tag) -> tag.putInt("RepairCost", data));
-        register(StructuredDataKey.DYED_COLOR, (data, tag) -> {
+        register(StructuredDataKey.DYED_COLOR1_20_5, (data, tag) -> {
             getDisplayTag(tag).putInt("color", data.rgb());
             if (!data.showInTooltip()) {
                 putHideFlag(tag, HIDE_DYE_COLOR);
@@ -501,8 +501,8 @@ public final class StructuredDataConverter {
             getBlockEntityTag(tag, "banner").put("Patterns", patternsTag);
         });
         register(StructuredDataKey.CONTAINER1_20_5, (connection, data, tag) -> convertItemList(connection, data, getBlockEntityTag(tag), "Items"));
-        register(StructuredDataKey.CAN_PLACE_ON, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
-        register(StructuredDataKey.CAN_BREAK, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
+        register(StructuredDataKey.CAN_PLACE_ON1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanPlaceOn", HIDE_CAN_PLACE_ON));
+        register(StructuredDataKey.CAN_BREAK1_20_5, (data, tag) -> convertBlockPredicates(tag, data, "CanDestroy", HIDE_CAN_DESTROY));
         register(StructuredDataKey.MAP_POST_PROCESSING, (data, tag) -> {
             if (data == null) {
                 return;

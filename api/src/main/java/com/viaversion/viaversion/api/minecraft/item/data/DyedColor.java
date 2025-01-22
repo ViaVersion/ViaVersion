@@ -27,7 +27,11 @@ import io.netty.buffer.ByteBuf;
 
 public record DyedColor(int rgb, boolean showInTooltip) {
 
-    public static final Type<DyedColor> TYPE = new Type<>(DyedColor.class) {
+    public DyedColor(final int rgb) {
+        this(rgb, true);
+    }
+
+    public static final Type<DyedColor> TYPE1_20_5 = new Type<>(DyedColor.class) {
         @Override
         public DyedColor read(final ByteBuf buffer) {
             final int rgb = buffer.readInt();
@@ -41,5 +45,16 @@ public record DyedColor(int rgb, boolean showInTooltip) {
             buffer.writeBoolean(value.showInTooltip);
         }
     };
+    public static final Type<DyedColor> TYPE1_21_5 = new Type<>(DyedColor.class) {
+        @Override
+        public DyedColor read(final ByteBuf buffer) {
+            final int rgb = buffer.readInt();
+            return new DyedColor(rgb);
+        }
 
+        @Override
+        public void write(final ByteBuf buffer, final DyedColor value) {
+            buffer.writeInt(value.rgb);
+        }
+    };
 }

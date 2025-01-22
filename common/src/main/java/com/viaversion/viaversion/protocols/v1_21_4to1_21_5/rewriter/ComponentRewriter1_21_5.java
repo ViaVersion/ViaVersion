@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.protocols.v1_21_4to1_21_5.Protocol1_21_4To1_21_5;
 import com.viaversion.viaversion.protocols.v1_21to1_21_2.packet.ClientboundPacket1_21_2;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
@@ -31,6 +32,10 @@ import com.viaversion.viaversion.util.TagUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static com.viaversion.viaversion.util.TagUtil.getNamespacedCompoundTag;
+import static com.viaversion.viaversion.util.TagUtil.removeNamespaced;
 
 public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<ClientboundPacket1_21_2> {
 
@@ -54,6 +59,58 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
             }
 
             tag.put("click_event", clickEvent);
+        }
+    }
+
+    @Override
+    protected void handleShowItem(final UserConnection connection, final CompoundTag itemTag, final @Nullable CompoundTag componentsTag) {
+        super.handleShowItem(connection, itemTag, componentsTag);
+        if (componentsTag == null) {
+            return;
+        }
+
+        // Some of the tooltip hiding handling
+        // TODO
+        final CompoundTag tooltipDisplay = new CompoundTag();
+        if (removeNamespaced(componentsTag, "hide_tooltip")) {
+            tooltipDisplay.putBoolean("hide_tooltip", true);
+        }
+        if (removeNamespaced(componentsTag, "hide_additional_tooltip")) {
+            final ListTag<StringTag> hiddenComponents = new ListTag<>(StringTag.class);
+            for (final StructuredDataKey<?> key : BlockItemPacketRewriter1_21_5.HIDE_ADDITIONAL_KEYS) {
+                hiddenComponents.add(new StringTag(key.identifier()));
+            }
+            tooltipDisplay.put("hidden_components", hiddenComponents);
+        }
+
+        final CompoundTag attributeModifiers = getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
+        if (attributeModifiers != null) {
+            removeNamespaced(componentsTag, "attribute_modifiers");
+            componentsTag.put("attribute_modifiers", attributeModifiers.get("modifiers"));
+        }
+
+        final CompoundTag dyedColor = getNamespacedCompoundTag(componentsTag, "dyed_color");
+        if (dyedColor != null) {
+            removeNamespaced(componentsTag, "dyed_color");
+            componentsTag.put("dyed_color", dyedColor.get("rgb"));
+        }
+
+        handleEnchantments(componentsTag, "enchantments");
+        handleEnchantments(componentsTag, "stored_enchantments");
+        removeNamespaced(componentsTag, "instrument");
+        removeNamespaced(componentsTag, "jukebox_playable");
+
+        if (!tooltipDisplay.isEmpty()) {
+            componentsTag.put("tooltip_display", tooltipDisplay);
+        }
+    }
+
+    private void handleEnchantments(final CompoundTag componentsTag, final String key) {
+        final CompoundTag enchantments = getNamespacedCompoundTag(componentsTag, key);
+        if (enchantments != null) {
+            if (enchantments.remove("levels") instanceof final CompoundTag levels) {
+                enchantments.putAll(levels);
+            }
         }
     }
 

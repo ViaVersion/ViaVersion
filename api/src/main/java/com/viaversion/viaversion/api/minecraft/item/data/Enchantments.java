@@ -31,7 +31,11 @@ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) implements Copyable {
 
-    public static final Type<Enchantments> TYPE = new Type<>(Enchantments.class) {
+    public Enchantments(final Int2IntMap enchantments) {
+        this(enchantments, true);
+    }
+
+    public static final Type<Enchantments> TYPE1_20_5 = new Type<>(Enchantments.class) {
         @Override
         public Enchantments read(final ByteBuf buffer) {
             final Int2IntMap enchantments = new Int2IntOpenHashMap();
@@ -53,6 +57,29 @@ public record Enchantments(Int2IntMap enchantments, boolean showInTooltip) imple
                 Types.VAR_INT.writePrimitive(buffer, entry.getIntValue());
             }
             buffer.writeBoolean(value.showInTooltip());
+        }
+    };
+    public static final Type<Enchantments> TYPE1_21_5 = new Type<>(Enchantments.class) {
+        @Override
+        public Enchantments read(final ByteBuf buffer) {
+            final Int2IntMap enchantments = new Int2IntOpenHashMap();
+            final int size = Types.VAR_INT.readPrimitive(buffer);
+            for (int i = 0; i < size; i++) {
+                final int id = Types.VAR_INT.readPrimitive(buffer);
+                final int level = Types.VAR_INT.readPrimitive(buffer);
+                enchantments.put(id, level);
+            }
+
+            return new Enchantments(enchantments);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final Enchantments value) {
+            Types.VAR_INT.writePrimitive(buffer, value.enchantments.size());
+            for (final Int2IntMap.Entry entry : value.enchantments.int2IntEntrySet()) {
+                Types.VAR_INT.writePrimitive(buffer, entry.getIntKey());
+                Types.VAR_INT.writePrimitive(buffer, entry.getIntValue());
+            }
         }
     };
 

@@ -22,29 +22,43 @@
  */
 package com.viaversion.viaversion.api.type.types.misc;
 
-import com.viaversion.viaversion.api.minecraft.SoundEvent;
+import com.viaversion.viaversion.api.minecraft.EitherHolder;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
-public final class SoundEventType extends HolderType<SoundEvent> {
+public final class EitherHolderType<T> extends Type<EitherHolder<T>> {
+    private final HolderType<T> holderType;
 
-    @Override
-    public SoundEvent readDirect(final ByteBuf buffer) {
-        final String resourceLocation = Types.STRING.read(buffer);
-        final Float fixedRange = Types.OPTIONAL_FLOAT.read(buffer);
-        return new SoundEvent(resourceLocation, fixedRange);
+    public EitherHolderType(final HolderType<T> holderType) {
+        super(EitherHolder.class);
+        this.holderType = holderType;
     }
 
     @Override
-    public void writeDirect(final ByteBuf buffer, final SoundEvent value) {
-        Types.STRING.write(buffer, value.identifier());
-        Types.OPTIONAL_FLOAT.write(buffer, value.fixedRange());
+    public EitherHolder<T> read(final ByteBuf buffer) {
+        return read(buffer, this.holderType);
     }
 
-    public static final class OptionalSoundEventType extends OptionalHolderType<SoundEvent> {
+    @Override
+    public void write(final ByteBuf buffer, final EitherHolder<T> object) {
+        write(buffer, object, this.holderType);
+    }
 
-        public OptionalSoundEventType() {
-            super(Types.SOUND_EVENT);
+    public static <T> EitherHolder<T> read(final ByteBuf buffer, final HolderType<T> holderType) {
+        if (buffer.readBoolean()) {
+            return EitherHolder.of(holderType.read(buffer));
+        }
+        return EitherHolder.of(Types.STRING.read(buffer));
+    }
+
+    public static <T> void write(final ByteBuf buffer, final EitherHolder<T> object, final HolderType<T> holderType) {
+        if (object.hasHolder()) {
+            buffer.writeBoolean(true);
+            holderType.write(buffer, object.holder());
+        } else {
+            buffer.writeBoolean(false);
+            Types.STRING.write(buffer, object.key());
         }
     }
 }

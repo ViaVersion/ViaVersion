@@ -22,24 +22,35 @@
  */
 package com.viaversion.viaversion.api.minecraft.item.data;
 
+import com.viaversion.viaversion.api.minecraft.EitherHolder;
+import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.misc.EitherHolderType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
-public record Weapon(int itemDamagePerAttack, float disableBlockingForSeconds) {
+public record ProvidesTrimMaterial(EitherHolder<ArmorTrimMaterial> material) {
 
-    public static final Type<Weapon> TYPE = new Type<>(Weapon.class) {
+    public static final Type<ProvidesTrimMaterial> TYPE = new Type<>(ProvidesTrimMaterial.class) {
+
         @Override
-        public Weapon read(final ByteBuf buffer) {
-            final int damagePerAttack = Types.VAR_INT.readPrimitive(buffer);
-            final float disableBlockingForSeconds = buffer.readFloat();
-            return new Weapon(damagePerAttack, disableBlockingForSeconds);
+        public ProvidesTrimMaterial read(final ByteBuf buffer) {
+            final EitherHolder<ArmorTrimMaterial> position = EitherHolderType.read(buffer, ArmorTrimMaterial.TYPE1_21_5);
+            return new ProvidesTrimMaterial(position);
         }
 
         @Override
-        public void write(final ByteBuf buffer, final Weapon value) {
-            Types.VAR_INT.writePrimitive(buffer, value.itemDamagePerAttack());
-            buffer.writeFloat(value.disableBlockingForSeconds());
+        public void write(final ByteBuf buffer, final ProvidesTrimMaterial value) {
+            EitherHolderType.write(buffer, value.material, ArmorTrimMaterial.TYPE1_21_5);
         }
     };
+
+    public ProvidesTrimMaterial rewrite(final Int2IntFunction itemIdRewriter) {
+        if (material.hasKey() || material.holder().hasId()) {
+            return this;
+        }
+
+        final ArmorTrimMaterial trimMaterial = material.holder().value();
+        return new ProvidesTrimMaterial(EitherHolder.of(Holder.of(trimMaterial.rewrite(itemIdRewriter))));
+    }
 }

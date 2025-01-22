@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.minecraft.entitydata.types;
 
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.PigVariant;
 import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -57,9 +56,9 @@ public final class EntityDataTypes1_21_5 extends AbstractEntityDataTypes {
     public final EntityDataType optionalVarIntType = add(20, Types.OPTIONAL_VAR_INT);
     public final EntityDataType poseType = add(21, Types.VAR_INT);
     public final EntityDataType catVariantType = add(22, Types.VAR_INT);
-    public final EntityDataType wolfVariantType = add(23, WolfVariant.TYPE);
+    public final EntityDataType wolfVariantType = add(23, Types.VAR_INT);
     public final EntityDataType frogVariantType = add(24, Types.VAR_INT);
-    public final EntityDataType pigVariantType = add(25, PigVariant.TYPE);
+    public final EntityDataType pigVariantType = add(25, Types.VAR_INT);
     public final EntityDataType optionalGlobalPosition = add(26, Types.OPTIONAL_GLOBAL_POSITION);
     public final EntityDataType paintingVariantType = add(27, PaintingVariant.TYPE1_21_2);
     public final EntityDataType snifferState = add(28, Types.VAR_INT);

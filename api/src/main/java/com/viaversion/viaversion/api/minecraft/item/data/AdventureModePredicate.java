@@ -29,7 +29,11 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record AdventureModePredicate(BlockPredicate[] predicates, boolean showInTooltip) implements Copyable {
 
-    public static final Type<AdventureModePredicate> TYPE = new Type<>(AdventureModePredicate.class) {
+    public AdventureModePredicate(final BlockPredicate[] predicates) {
+        this(predicates, true);
+    }
+
+    public static final Type<AdventureModePredicate> TYPE1_20_5 = new Type<>(AdventureModePredicate.class) {
         @Override
         public AdventureModePredicate read(final ByteBuf buffer) {
             final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
@@ -41,6 +45,18 @@ public record AdventureModePredicate(BlockPredicate[] predicates, boolean showIn
         public void write(final ByteBuf buffer, final AdventureModePredicate value) {
             BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
             buffer.writeBoolean(value.showInTooltip);
+        }
+    };
+    public static final Type<AdventureModePredicate> TYPE1_21_5 = new Type<>(AdventureModePredicate.class) {
+        @Override
+        public AdventureModePredicate read(final ByteBuf buffer) {
+            final BlockPredicate[] predicates = BlockPredicate.ARRAY_TYPE.read(buffer);
+            return new AdventureModePredicate(predicates);
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final AdventureModePredicate value) {
+            BlockPredicate.ARRAY_TYPE.write(buffer, value.predicates);
         }
     };
 
