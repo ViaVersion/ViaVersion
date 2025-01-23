@@ -52,6 +52,8 @@ import com.viaversion.viaversion.util.Unit;
 import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import java.util.List;
+import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_5, Protocol1_21_4To1_21_5> {
 
@@ -197,7 +199,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             hiddenComponents.add(enchantmentsData.id());
         }
 
-        final StructuredData<Enchantments> storedEnchantmentsData = dataContainer.getNonEmptyData(StructuredDataKey.STORED_ENCHANTMENTS1_21_5);
+        final StructuredData<Enchantments> storedEnchantmentsData = dataContainer.getNonEmptyData(StructuredDataKey.STORED_ENCHANTMENTS1_20_5);
         if (storedEnchantmentsData != null && !storedEnchantmentsData.value().showInTooltip()) {
             hiddenComponents.add(storedEnchantmentsData.id());
         }
@@ -213,8 +215,8 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         dataContainer.replace(StructuredDataKey.UNBREAKABLE1_20_5, StructuredDataKey.UNBREAKABLE1_21_5, unbreakable -> Unit.INSTANCE);
         dataContainer.replaceKey(StructuredDataKey.CAN_PLACE_ON1_20_5, StructuredDataKey.CAN_PLACE_ON1_21_5);
-        dataContainer.replaceKey(StructuredDataKey.JUKEBOX_PLAYABLE1_21, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5);
         dataContainer.replaceKey(StructuredDataKey.CAN_BREAK1_20_5, StructuredDataKey.CAN_BREAK1_21_5);
+        dataContainer.replaceKey(StructuredDataKey.JUKEBOX_PLAYABLE1_21, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5);
         dataContainer.replaceKey(StructuredDataKey.DYED_COLOR1_20_5, StructuredDataKey.DYED_COLOR1_21_5);
         dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5);
         dataContainer.replaceKey(StructuredDataKey.TRIM1_21_4, StructuredDataKey.TRIM1_21_5);
@@ -233,25 +235,24 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
 
         dataContainer.replaceKey(StructuredDataKey.TOOL1_21_5, StructuredDataKey.TOOL1_20_5);
         dataContainer.replaceKey(StructuredDataKey.EQUIPPABLE1_21_5, StructuredDataKey.EQUIPPABLE1_21_2);
-        dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> {
-            if (instrument.hasKey()) {
-                return Holder.of(0);
-            }
-            return instrument.holder();
-        });
+        dataContainer.replace(StructuredDataKey.INSTRUMENT1_21_5, StructuredDataKey.INSTRUMENT1_21_2, instrument -> instrument.hasHolder() ? instrument.holder() : null);
 
-        // TODO
-        dataContainer.replace(StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.UNBREAKABLE1_20_5, unbreakable -> new Unbreakable(true));
-        dataContainer.replaceKey(StructuredDataKey.TRIM1_21_5, StructuredDataKey.TRIM1_21_4);
-        dataContainer.replaceKey(StructuredDataKey.CAN_PLACE_ON1_21_5, StructuredDataKey.CAN_PLACE_ON1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21);
-        dataContainer.replaceKey(StructuredDataKey.CAN_BREAK1_21_5, StructuredDataKey.CAN_BREAK1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.DYED_COLOR1_21_5, StructuredDataKey.DYED_COLOR1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21);
-        dataContainer.replaceKey(StructuredDataKey.ENCHANTMENTS1_21_5, StructuredDataKey.ENCHANTMENTS1_20_5);
-        dataContainer.replaceKey(StructuredDataKey.STORED_ENCHANTMENTS1_21_5, StructuredDataKey.STORED_ENCHANTMENTS1_20_5);
+        final TooltipDisplay tooltipDisplay = dataContainer.get(StructuredDataKey.TOOLTIP_DISPLAY);
+        if (tooltipDisplay != null && tooltipDisplay.hideTooltip()) {
+            dataContainer.set(StructuredDataKey.HIDE_TOOLTIP);
+        }
+
+        dataContainer.replace(StructuredDataKey.UNBREAKABLE1_21_5, StructuredDataKey.UNBREAKABLE1_20_5, unbreakable -> new Unbreakable(shouldShowToServer(tooltipDisplay, StructuredDataKey.UNBREAKABLE1_20_5)));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.DYED_COLOR1_21_5, StructuredDataKey.DYED_COLOR1_20_5, dyedColor -> new DyedColor(dyedColor.rgb(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21_5, StructuredDataKey.ATTRIBUTE_MODIFIERS1_21, attributeModifiers -> new AttributeModifiers1_21(attributeModifiers.modifiers(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.TRIM1_21_5, StructuredDataKey.TRIM1_21_4, trim -> new ArmorTrim(trim.material(), trim.pattern(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.ENCHANTMENTS1_21_5, StructuredDataKey.ENCHANTMENTS1_20_5, enchantments -> new Enchantments(enchantments.enchantments(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.STORED_ENCHANTMENTS1_21_5, StructuredDataKey.STORED_ENCHANTMENTS1_20_5, enchantments -> new Enchantments(enchantments.enchantments(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.CAN_PLACE_ON1_21_5, StructuredDataKey.CAN_PLACE_ON1_20_5, canPlaceOn -> new AdventureModePredicate(canPlaceOn.predicates(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.CAN_BREAK1_21_5, StructuredDataKey.CAN_BREAK1_20_5, canBreak -> new AdventureModePredicate(canBreak.predicates(), false));
+        updateShowInTooltip(dataContainer, tooltipDisplay, StructuredDataKey.JUKEBOX_PLAYABLE1_21_5, StructuredDataKey.JUKEBOX_PLAYABLE1_21, playable -> new JukeboxPlayable(playable.song(), false));
+
         dataContainer.remove(StructuredDataKey.TOOLTIP_DISPLAY);
-
         dataContainer.remove(StructuredDataKey.POTION_DURATION_SCALE);
         dataContainer.remove(StructuredDataKey.WEAPON);
         dataContainer.remove(StructuredDataKey.VILLAGER_VARIANT);
@@ -278,5 +279,22 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.BLOCKS_ATTACKS);
         dataContainer.remove(StructuredDataKey.PROVIDES_TRIM_MATERIAL);
         dataContainer.remove(StructuredDataKey.BREAK_SOUND);
+    }
+
+    private static <T> void updateShowInTooltip(final StructuredDataContainer container, @Nullable final TooltipDisplay display, final StructuredDataKey<T> key, final StructuredDataKey<T> mappedKey, final Function<T, T> function) {
+        if (shouldShowToServer(display, key)) {
+            container.replaceKey(key, mappedKey);
+        } else {
+            container.replace(key, mappedKey, function);
+        }
+    }
+
+    private static boolean shouldShowToServer(@Nullable final TooltipDisplay display, final StructuredDataKey<?> key) {
+        if (display == null) {
+            return true;
+        }
+
+        final int unmappedId = Protocol1_21_4To1_21_5.MAPPINGS.getDataComponentSerializerMappings().id(key.identifier());
+        return !display.hiddenComponents().contains(unmappedId);
     }
 }
