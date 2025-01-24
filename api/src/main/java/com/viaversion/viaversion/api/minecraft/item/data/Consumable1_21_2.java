@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.ArrayType;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 
 public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<SoundEvent> sound,
                                boolean hasConsumeParticles, ConsumeEffect<?>[] consumeEffects) {
@@ -107,5 +108,10 @@ public record Consumable1_21_2(float consumeSeconds, int animationType, Holder<S
                 buffer.writeFloat(value.probability);
             }
         };
+    }
+
+    public Consumable1_21_2 rewrite(final Int2IntFunction soundIdRewriteFunction) {
+        final Holder<SoundEvent> soundHolder = this.sound.updateId(soundIdRewriteFunction);
+        return soundHolder == this.sound ? this : new Consumable1_21_2(consumeSeconds, animationType, soundHolder, hasConsumeParticles, consumeEffects);
     }
 }
