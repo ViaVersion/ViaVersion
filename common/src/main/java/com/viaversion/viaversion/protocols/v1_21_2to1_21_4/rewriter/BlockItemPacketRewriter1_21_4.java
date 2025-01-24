@@ -26,6 +26,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Holder;
+import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataContainer;
 import com.viaversion.viaversion.api.minecraft.data.StructuredDataKey;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -176,7 +177,13 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
                 // Make sword "eatable" to enable clientside instant blocking on 1.8. Set consume animation to block,
                 // and consume time really high, so the eating animation doesn't play
                 item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2,
-                    new Consumable1_21_2(3600, 3, Holder.of(0), false, new Consumable1_21_2.ConsumeEffect[0]));
+                    new Consumable1_21_2(
+                        3600, 
+                        3,
+                        Holder.of(new SoundEvent("minecraft:intentionally_empty", null)),
+                        false,
+                        new Consumable1_21_2.ConsumeEffect[0])
+                );
             }
         }
     }
