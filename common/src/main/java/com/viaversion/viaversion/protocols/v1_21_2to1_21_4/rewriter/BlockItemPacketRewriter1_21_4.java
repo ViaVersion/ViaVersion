@@ -176,7 +176,7 @@ public final class BlockItemPacketRewriter1_21_4 extends StructuredItemRewriter<
                 // Make sword "eatable" to enable clientside instant blocking on 1.8. Set consume animation to block,
                 // and consume time really high, so the eating animation doesn't play
                 item.dataContainer().set(StructuredDataKey.CONSUMABLE1_21_2,
-                    new Consumable1_21_2(3600, 3, Holder.of(0), false, new Consumable1_21_2.ConsumeEffect[0]));
+                    new Consumable1_21_2(3600, 3, Holder.of(964), false, new Consumable1_21_2.ConsumeEffect[0]));
             }
         }
     }
