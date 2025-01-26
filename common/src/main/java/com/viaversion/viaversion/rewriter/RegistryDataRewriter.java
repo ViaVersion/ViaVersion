@@ -35,8 +35,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class RegistryDataRewriter {
@@ -65,11 +67,26 @@ public class RegistryDataRewriter {
 
         final List<RegistryEntry> toAdd = this.toAdd.get(key);
         if (toAdd != null) {
-            final int length = entries.length;
-            final int toAddLength = toAdd.size();
-            entries = Arrays.copyOf(entries, length + toAddLength);
-            for (int i = 0; i < toAddLength; i++) {
-                entries[length + i] = toAdd.get(i).copy();
+            final Set<String> existingKeys = new HashSet<>();
+
+            final RegistryEntry[] updatedEntries = new RegistryEntry[entries.length + toAdd.size()];
+            int index = 0;
+            for (final RegistryEntry entry : entries) {
+                updatedEntries[index++] = entry;
+                existingKeys.add(entry.key());
+            }
+            for (final RegistryEntry entry : toAdd) {
+                if (existingKeys.contains(entry.key())) {
+                    continue;
+                }
+
+                updatedEntries[index++] = entry.copy();
+            }
+
+            if (index < updatedEntries.length) {
+                entries = Arrays.copyOf(updatedEntries, index);
+            } else {
+                entries = updatedEntries;
             }
         }
 
