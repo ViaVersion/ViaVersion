@@ -79,6 +79,7 @@ public class RegistryDataRewriter {
                 if (existingKeys.contains(entry.key())) {
                     continue;
                 }
+
                 updatedEntries[index++] = entry.copy();
             }
 
