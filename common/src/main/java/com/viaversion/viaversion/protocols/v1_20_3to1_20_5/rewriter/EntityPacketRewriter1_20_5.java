@@ -163,14 +163,16 @@ public final class EntityPacketRewriter1_20_5 extends EntityRewriter<Clientbound
 
                 final String strippedKey = Key.stripMinecraftNamespace(type);
                 if (strippedKey.equals("damage_type")) {
-                    // Add spit damage type
-                    highestId++;
-                    registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
-                    final CompoundTag spitData = new CompoundTag();
-                    spitData.putString("scaling", "when_caused_by_living_non_player");
-                    spitData.putString("message_id", "mob");
-                    spitData.putFloat("exhaustion", 0.1F);
-                    registryEntries[highestId] = new RegistryEntry("minecraft:spit", spitData);
+                    // Add spit damage type if not already present
+                    if (Arrays.stream(registryEntries).noneMatch(e -> Key.namespaced(e.key()).equals("minecraft:spit"))) {
+                        highestId++;
+                        registryEntries = Arrays.copyOf(registryEntries, highestId + 1);
+                        final CompoundTag spitData = new CompoundTag();
+                        spitData.putString("scaling", "when_caused_by_living_non_player");
+                        spitData.putString("message_id", "mob");
+                        spitData.putFloat("exhaustion", 0.1F);
+                        registryEntries[highestId] = new RegistryEntry("minecraft:spit", spitData);
+                    }
 
                     // Fill in missing damage types with 1.20.3/4 defaults
                     final Set<String> registryEntryKeys = Arrays.stream(registryEntries).map(e -> Key.stripMinecraftNamespace(e.key())).collect(Collectors.toSet());
