@@ -17,19 +17,19 @@
  */
 package com.viaversion.viaversion.protocols.v1_12_2to1_13.task;
 
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocol.ProtocolRunnable;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.storage.TabCompleteTracker;
 
-public class TabCompleteTask implements Runnable {
+public final class TabCompleteTask extends ProtocolRunnable {
+
+    public TabCompleteTask() {
+        super(Protocol1_12_2To1_13.class);
+    }
+
     @Override
-    public void run() {
-        for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
-            if (info.getProtocolInfo() == null) continue;
-            if (info.getProtocolInfo().getPipeline().contains(Protocol1_12_2To1_13.class) && info.getChannel().isOpen()) {
-                info.get(TabCompleteTracker.class).sendPacketToServer(info);
-            }
-        }
+    public void run(final UserConnection connection) {
+        connection.get(TabCompleteTracker.class).sendPacketToServer(connection);
     }
 }
