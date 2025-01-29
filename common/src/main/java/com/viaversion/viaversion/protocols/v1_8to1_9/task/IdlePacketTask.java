@@ -18,27 +18,28 @@
 package com.viaversion.viaversion.protocols.v1_8to1_9.task;
 
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.protocol.ProtocolRunnable;
 import com.viaversion.viaversion.protocols.v1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.MovementTransmitterProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.storage.MovementTracker;
 
-public class IdlePacketTask implements Runnable {
+public final class IdlePacketTask extends ProtocolRunnable {
+
+    public IdlePacketTask() {
+        super(Protocol1_8To1_9.class);
+    }
 
     @Override
-    public void run() {
-        for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
-            ProtocolInfo protocolInfo = info.getProtocolInfo();
-            if (protocolInfo == null || !protocolInfo.getPipeline().contains(Protocol1_8To1_9.class)) continue;
+    public void run(final UserConnection connection) {
+        final MovementTracker movementTracker = connection.get(MovementTracker.class);
+        if (movementTracker == null) {
+            return;
+        }
 
-            MovementTracker movementTracker = info.get(MovementTracker.class);
-            if (movementTracker == null) continue;
-
-            long nextIdleUpdate = movementTracker.getNextIdlePacket();
-            if (nextIdleUpdate <= System.currentTimeMillis() && info.getChannel().isOpen()) {
-                Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(info);
-            }
+        final long nextIdleUpdate = movementTracker.getNextIdlePacket();
+        if (nextIdleUpdate <= System.currentTimeMillis()) {
+            Via.getManager().getProviders().get(MovementTransmitterProvider.class).sendPlayer(connection);
         }
     }
 }
