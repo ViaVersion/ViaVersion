@@ -24,6 +24,7 @@ package com.viaversion.viaversion.api.protocol.packet.provider;
 
 import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.Collection;
 import java.util.HashMap;
@@ -65,11 +66,25 @@ public interface PacketTypeMap<P extends PacketType> {
         return of(byName, types);
     }
 
-    static <T extends PacketType> PacketTypeMap<T> of(final Map<String, T> packetsByName, final Int2ObjectMap<T> packetsById) {
-        return new PacketTypeMapMap<>(packetsByName, packetsById);
+    static <T extends PacketType, E extends T> PacketTypeMap<T> ofUnsequenced(final Class<E> enumClass) {
+        final T[] types = enumClass.getEnumConstants();
+        Preconditions.checkArgument(types != null, "%s is not an enum", enumClass);
+        final Map<String, T> byName = new HashMap<>(types.length);
+        for (final T type : types) {
+            byName.put(type.getName(), type);
+        }
+        final Int2ObjectMap<T> byId = new Int2ObjectArrayMap<>();
+        for (T type : types) {
+            byId.put(type.getId(), type);
+        }
+        return of(byName, byId);
     }
 
     static <T extends PacketType> PacketTypeMap<T> of(final Map<String, T> packetsByName, final T[] packets) {
         return new PacketTypeArrayMap<>(packetsByName, packets);
+    }
+
+    static <T extends PacketType> PacketTypeMap<T> of(final Map<String, T> packetsByName, final Int2ObjectMap<T> packetsById) {
+        return new PacketTypeMapMap<>(packetsByName, packetsById);
     }
 }
