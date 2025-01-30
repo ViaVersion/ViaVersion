@@ -32,7 +32,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 public record ArmorTrimPattern(String assetName, int itemId, Tag description, boolean decal) implements Copyable {
 
     public ArmorTrimPattern(final String assetName, final Tag description, final boolean decal) {
-        this(assetName, -1, description, decal);
+        this(assetName, 0, description, decal);
     }
 
     public static final HolderType<ArmorTrimPattern> TYPE1_20_5 = new HolderType<>() {

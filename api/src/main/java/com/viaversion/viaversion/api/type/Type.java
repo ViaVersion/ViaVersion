@@ -61,7 +61,7 @@ public abstract class Type<T> implements ByteBufReader<T>, ByteBufWriter<T> {
      * @return type name
      */
     public String getTypeName() {
-        return typeName != null ? typeName : this.getClass().getSimpleName();
+        return typeName != null && !typeName.isEmpty() ? typeName : this.getClass().getSimpleName();
     }
 
     /**

@@ -65,18 +65,28 @@ public abstract class HolderType<T> extends Type<Holder<T>> {
         }
 
         @Override
+        public Holder<T> read(final ByteBuf buffer) {
+            return buffer.readBoolean() ? super.read(buffer) : null;
+        }
+
+        @Override
+        public void write(final ByteBuf buffer, final Holder<T> object) {
+            if (object != null) {
+                buffer.writeBoolean(true);
+                super.write(buffer, object);
+            } else {
+                buffer.writeBoolean(false);
+            }
+        }
+
+        @Override
         public @Nullable T readDirect(ByteBuf buffer) {
-            return buffer.readBoolean() ? this.type.readDirect(buffer) : null;
+            return this.type.readDirect(buffer);
         }
 
         @Override
         public void writeDirect(final ByteBuf buffer, @Nullable final T value) {
-            if (value == null) {
-                buffer.writeBoolean(false);
-            } else {
-                buffer.writeBoolean(true);
-                this.type.writeDirect(buffer, value);
-            }
+            this.type.writeDirect(buffer, value);
         }
     }
 }

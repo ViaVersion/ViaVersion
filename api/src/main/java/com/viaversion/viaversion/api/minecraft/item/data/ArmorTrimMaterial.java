@@ -39,7 +39,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
     }
 
     public ArmorTrimMaterial(final String assetName, final Map<String, String> overrideArmorMaterials, final Tag description) {
-        this(assetName, -1, 0F, overrideArmorMaterials, description);
+        this(assetName, 0, 0F, overrideArmorMaterials, description);
     }
 
     public static final HolderType<ArmorTrimMaterial> TYPE1_20_5 = new HolderType<>() {
@@ -150,7 +150,7 @@ public record ArmorTrimMaterial(String assetName, int itemId, float itemModelInd
             final String assetName = Types.STRING.read(buffer);
 
             final int overrideArmorMaterialsSize = Types.VAR_INT.readPrimitive(buffer);
-            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>(overrideArmorMaterialsSize);
+            final Map<String, String> overrideArmorMaterials = new Object2ObjectArrayMap<>();
             for (int i = 0; i < overrideArmorMaterialsSize; i++) {
                 final String key = Types.STRING.read(buffer);
                 final String value = Types.STRING.read(buffer);
