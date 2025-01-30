@@ -35,11 +35,11 @@ public final class BasePacketTypesProvider implements PacketTypesProvider<BaseCl
     private final Map<State, PacketTypeMap<BaseServerboundPacket>> serverboundPacketTypes = new EnumMap<>(State.class);
 
     private BasePacketTypesProvider() {
-        clientboundPacketTypes.put(State.STATUS, PacketTypeMap.createArrayMap(ClientboundStatusPackets.class));
-        clientboundPacketTypes.put(State.LOGIN, PacketTypeMap.createArrayMap(ClientboundLoginPackets.class));
-        serverboundPacketTypes.put(State.STATUS, PacketTypeMap.createArrayMap(ServerboundStatusPackets.class));
-        serverboundPacketTypes.put(State.HANDSHAKE, PacketTypeMap.createArrayMap(ServerboundHandshakePackets.class));
-        serverboundPacketTypes.put(State.LOGIN, PacketTypeMap.createArrayMap(ServerboundLoginPackets.class));
+        clientboundPacketTypes.put(State.STATUS, PacketTypeMap.of(ClientboundStatusPackets.class));
+        clientboundPacketTypes.put(State.LOGIN, PacketTypeMap.of(ClientboundLoginPackets.class));
+        serverboundPacketTypes.put(State.STATUS, PacketTypeMap.of(ServerboundStatusPackets.class));
+        serverboundPacketTypes.put(State.HANDSHAKE, PacketTypeMap.of(ServerboundHandshakePackets.class));
+        serverboundPacketTypes.put(State.LOGIN, PacketTypeMap.of(ServerboundLoginPackets.class));
     }
 
     @Override

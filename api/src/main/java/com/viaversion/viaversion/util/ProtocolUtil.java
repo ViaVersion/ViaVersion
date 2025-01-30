@@ -56,7 +56,7 @@ public final class ProtocolUtil {
             Preconditions.checkArgument(types != null, "%s not an enum", packetTypeClass);
             Preconditions.checkArgument(types.length > 0, "Enum %s has no types", packetTypeClass);
             final State state = types[0].state();
-            map.put(state, PacketTypeMap.createArrayMap(packetTypeClass));
+            map.put(state, PacketTypeMap.of(packetTypeClass));
         }
         return map;
     }

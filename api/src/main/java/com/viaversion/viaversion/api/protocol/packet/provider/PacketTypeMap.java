@@ -56,7 +56,7 @@ public interface PacketTypeMap<P extends PacketType> {
      */
     Collection<P> types();
 
-    static <T extends PacketType, E extends T> PacketTypeMap<T> createArrayMap(final Class<E> enumClass) {
+    static <T extends PacketType, E extends T> PacketTypeMap<T> of(final Class<E> enumClass) {
         final T[] types = enumClass.getEnumConstants();
         Preconditions.checkArgument(types != null, "%s is not an enum", enumClass);
         final Map<String, T> byName = new HashMap<>(types.length);
@@ -66,7 +66,7 @@ public interface PacketTypeMap<P extends PacketType> {
         return of(byName, types);
     }
 
-    static <T extends PacketType, E extends T> PacketTypeMap<T> createMapMap(final Class<E> enumClass) {
+    static <T extends PacketType, E extends T> PacketTypeMap<T> ofUnsequenced(final Class<E> enumClass) {
         final T[] types = enumClass.getEnumConstants();
         Preconditions.checkArgument(types != null, "%s is not an enum", enumClass);
         final Map<String, T> byName = new HashMap<>(types.length);
