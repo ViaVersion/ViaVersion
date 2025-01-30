@@ -45,12 +45,7 @@ final class PacketTypeMapMap<P extends PacketType> implements PacketTypeMap<P> {
 
     @Override
     public @Nullable P typeById(int packetTypeId) {
-        for (final P packet : packetsById.values()) {
-            if (packet.getId() == packetTypeId) {
-                return packet;
-            }
-        }
-        return null;
+        return packetsById.get(packetTypeId);
     }
 
     @Override
