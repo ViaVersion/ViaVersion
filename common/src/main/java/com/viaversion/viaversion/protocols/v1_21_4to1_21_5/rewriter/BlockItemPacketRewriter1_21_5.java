@@ -209,7 +209,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
             hiddenComponents.add(jukeboxPlayable.id());
         }
 
-        if (hideTooltip || !hiddenComponents.isEmpty()) {
+        if ((hideTooltip || !hiddenComponents.isEmpty()) && !dataContainer.has(StructuredDataKey.TOOLTIP_DISPLAY)) {
             dataContainer.set(StructuredDataKey.TOOLTIP_DISPLAY, new TooltipDisplay(hideTooltip, hiddenComponents));
         }
 
@@ -266,6 +266,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.TROPICAL_FISH_PATTERN_COLOR);
         dataContainer.remove(StructuredDataKey.MOOSHROOM_VARIANT);
         dataContainer.remove(StructuredDataKey.RABBIT_VARIANT);
+        dataContainer.remove(StructuredDataKey.COW_VARIANT);
         dataContainer.remove(StructuredDataKey.PIG_VARIANT);
         dataContainer.remove(StructuredDataKey.FROG_VARIANT);
         dataContainer.remove(StructuredDataKey.HORSE_VARIANT);

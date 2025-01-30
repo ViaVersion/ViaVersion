@@ -36,6 +36,7 @@ public record BlocksAttacks(
     float disableCooldownScale,
     DamageReduction[] damageReductions,
     ItemDamageFunction itemDamage,
+    @Nullable String bypassedByTag,
     @Nullable Holder<SoundEvent> blockSound,
     @Nullable Holder<SoundEvent> disableSound
 ) {
@@ -48,9 +49,10 @@ public record BlocksAttacks(
             final float disableCooldownScale = buffer.readFloat();
             final DamageReduction[] damageReductions = DamageReduction.ARRAY_TYPE.read(buffer);
             final ItemDamageFunction itemDamage = ItemDamageFunction.TYPE.read(buffer);
+            final String bypassedByTag = Types.OPTIONAL_STRING.read(buffer);
             final Holder<SoundEvent> blockSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
             final Holder<SoundEvent> disableSound = Types.OPTIONAL_SOUND_EVENT.read(buffer);
-            return new BlocksAttacks(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage, blockSound, disableSound);
+            return new BlocksAttacks(blockDelaySeconds, disableCooldownScale, damageReductions, itemDamage, bypassedByTag, blockSound, disableSound);
         }
 
         @Override
@@ -59,25 +61,28 @@ public record BlocksAttacks(
             buffer.writeFloat(value.disableCooldownScale());
             DamageReduction.ARRAY_TYPE.write(buffer, value.damageReductions());
             ItemDamageFunction.TYPE.write(buffer, value.itemDamage());
+            Types.OPTIONAL_STRING.write(buffer, value.bypassedByTag());
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.blockSound());
             Types.OPTIONAL_SOUND_EVENT.write(buffer, value.disableSound());
         }
     };
 
-    public record DamageReduction(@Nullable HolderSet type, float base, float factor) {
+    public record DamageReduction(float horizontalBlockingAngle, @Nullable HolderSet type, float base, float factor) {
 
         public static final Type<DamageReduction> TYPE = new Type<>(DamageReduction.class) {
 
             @Override
             public DamageReduction read(final ByteBuf buffer) {
+                final float horizontalBlockingAngle = buffer.readFloat();
                 final HolderSet type = Types.OPTIONAL_HOLDER_SET.read(buffer);
                 final float base = buffer.readFloat();
                 final float factor = buffer.readFloat();
-                return new DamageReduction(type, base, factor);
+                return new DamageReduction(horizontalBlockingAngle, type, base, factor);
             }
 
             @Override
             public void write(final ByteBuf buffer, final DamageReduction value) {
+                buffer.writeFloat(value.horizontalBlockingAngle());
                 Types.OPTIONAL_HOLDER_SET.write(buffer, value.type());
                 buffer.writeFloat(value.base());
                 buffer.writeFloat(value.factor());

@@ -91,13 +91,13 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         };
         protocol.registerClientbound(ClientboundConfigurationPackets1_21.REGISTRY_DATA, registryDataRewriter::handle);
 
-        // Send pig, frog and cat variant
         protocol.registerFinishConfiguration(ClientboundConfigurationPackets1_21.FINISH_CONFIGURATION, wrapper -> {
             // Old registries, but now also modifiable
             sendEntityVariants(wrapper.user(), "minecraft:frog_variant", "frog", true, "temperate", "warm", "cold");
             sendEntityVariants(wrapper.user(), "minecraft:cat_variant", "cat", false, "tabby", "black", "red", "siamese", "british_shorthair", "calico", "persian", "ragdoll", "white", "jellie", "all_black");
             // New variants
-            sendEntityVariants(wrapper.user(), "minecraft:pig_variant", "pig", false, "pig"); // temperate
+            sendEntityVariants(wrapper.user(), "minecraft:pig_variant", "pig", true, "temperate");
+            sendEntityVariants(wrapper.user(), "minecraft:cow_variant", "cow", true, "temperate");
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
@@ -123,6 +123,44 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             final String world = wrapper.passthrough(Types.STRING);
             trackWorldDataByKey1_20_5(wrapper.user(), dimensionId, world);
         });
+
+        protocol.registerClientbound(ClientboundPackets1_21_2.SET_PLAYER_TEAM, wrapper -> {
+            wrapper.passthrough(Types.STRING); // Team Name
+            final byte action = wrapper.passthrough(Types.BYTE); // Mode
+            if (action == 0 || action == 2) {
+                wrapper.passthrough(Types.TAG); // Display Name
+                wrapper.passthrough(Types.BYTE); // Flags
+
+                final String nametagVisibility = wrapper.read(Types.STRING);
+                final String collisionRule = wrapper.read(Types.STRING);
+                wrapper.write(Types.VAR_INT, visibilityId(nametagVisibility));
+                wrapper.write(Types.VAR_INT, collisionId(collisionRule));
+
+                wrapper.passthrough(Types.VAR_INT); // Color
+                wrapper.passthrough(Types.TAG); // Prefix
+                wrapper.passthrough(Types.TAG); // Suffix
+            }
+        });
+    }
+
+    private int collisionId(final String collisionRule) {
+        return switch (collisionRule) {
+            case "always" -> 0;
+            case "never" -> 1;
+            case "pushOtherTeams" -> 2;
+            case "pushOwnTeam" -> 3;
+            default -> 0;
+        };
+    }
+
+    private int visibilityId(final String visibilityRule) {
+        return switch (visibilityRule) {
+            case "always" -> 0;
+            case "never" -> 1;
+            case "hideForOtherTeams" -> 2;
+            case "hideForOwnTeam" -> 3;
+            default -> 0;
+        };
     }
 
     private void sendEntityVariants(final UserConnection connection, final String key, final String entityName, final boolean suffixedWithOwnName, final String... entryKeys) {
@@ -156,7 +194,10 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             }
 
             int mappedId = id;
-            if (id >= 25) { // Pig variant
+            if (mappedId >= 23) { // Cow variant
+                mappedId++;
+            }
+            if (mappedId >= 26) { // Pig variant
                 mappedId++;
             }
             data.setDataType(Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId));

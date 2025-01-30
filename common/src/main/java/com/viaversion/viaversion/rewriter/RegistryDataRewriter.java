@@ -162,6 +162,10 @@ public class RegistryDataRewriter {
             }
 
             final StringTag ingredientTag = ((CompoundTag) entry.tag()).getStringTag("ingredient");
+            if (ingredientTag == null) {
+                return;
+            }
+
             updateItem(ingredientTag);
         }
     }
