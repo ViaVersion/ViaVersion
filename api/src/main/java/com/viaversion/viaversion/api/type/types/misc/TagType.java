@@ -25,6 +25,7 @@ package com.viaversion.viaversion.api.type.types.misc;
 import com.viaversion.nbt.io.TagRegistry;
 import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.nbt.tag.Tag;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.type.OptionalType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
@@ -49,7 +50,11 @@ public class TagType extends Type<Tag> {
         try {
             return TagRegistry.read(id, new ByteBufInputStream(buffer), tagLimiter, 0);
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            if (Via.getManager().isDebug()) {
+                throw new RuntimeException(e);
+            } else {
+                throw new RuntimeException("Error reading tag :" + e.getMessage());
+            }
         }
     }
 
