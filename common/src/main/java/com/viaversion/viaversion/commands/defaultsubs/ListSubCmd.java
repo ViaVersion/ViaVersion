@@ -52,6 +52,11 @@ public class ListSubCmd implements ViaSubCommand {
             playerVersions.computeIfAbsent(version, s -> new HashSet<>()).add(p.getProtocolInfo().getUsername());
         }
 
+        if (playerVersions.isEmpty()) {
+            sendMessage(sender, "&cNo players found!");
+            return true;
+        }
+
         for (Map.Entry<ProtocolVersion, Set<String>> entry : playerVersions.entrySet()) {
             sendMessage(sender, "&8[&6%s&8] (&7%d&8): &b%s", entry.getKey().getName(), entry.getValue().size(), entry.getValue());
         }
