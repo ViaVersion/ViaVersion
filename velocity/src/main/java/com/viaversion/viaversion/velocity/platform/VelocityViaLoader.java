@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.VersionProvider;
 import com.viaversion.viaversion.protocols.v1_8to1_9.provider.BossBarProvider;
+import com.viaversion.viaversion.velocity.listeners.ConnectionDetailsListener;
 import com.viaversion.viaversion.velocity.listeners.UpdateListener;
 import com.viaversion.viaversion.velocity.providers.VelocityBossBarProvider;
 import com.viaversion.viaversion.velocity.providers.VelocityVersionProvider;
@@ -48,6 +49,7 @@ public class VelocityViaLoader implements ViaPlatformLoader {
         // We don't need main hand patch because Join Game packet makes client send hand data again
 
         VelocityPlugin.PROXY.getEventManager().register(plugin, new UpdateListener());
+        VelocityPlugin.PROXY.getEventManager().register(plugin, new ConnectionDetailsListener());
 
         int pingInterval = ((VelocityViaConfig) Via.getPlatform().getConf()).getVelocityPingInterval();
         if (pingInterval > 0) {

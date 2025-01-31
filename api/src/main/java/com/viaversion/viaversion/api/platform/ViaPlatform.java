@@ -145,6 +145,16 @@ public interface ViaPlatform<T> {
     boolean kickPlayer(UUID uuid, String message);
 
     /**
+     * Send a custom payload to a player.
+     *
+     * @param uuid    The player's UUID
+     * @param channel The channel to send the payload on
+     * @param message The data to send
+     */
+    default void sendCustomPayload(UUID uuid, String channel, String message) {
+    }
+
+    /**
      * Disconnects an UserConnection for a reason
      *
      * @param connection The UserConnection
