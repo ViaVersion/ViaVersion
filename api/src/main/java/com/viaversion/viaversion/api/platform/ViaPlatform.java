@@ -125,6 +125,7 @@ public interface ViaPlatform<T> {
      *
      * @return Array of ViaCommandSender
      */
+    @Deprecated(forRemoval = true)
     default ViaCommandSender[] getOnlinePlayers() {
         return new ViaCommandSender[0];
     }
