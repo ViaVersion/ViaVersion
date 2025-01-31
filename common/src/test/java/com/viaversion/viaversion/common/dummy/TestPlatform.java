@@ -20,14 +20,12 @@ package com.viaversion.viaversion.common.dummy;
 import com.google.gson.JsonObject;
 import com.viaversion.viaversion.ViaAPIBase;
 import com.viaversion.viaversion.api.ViaAPI;
-import com.viaversion.viaversion.api.command.ViaCommandSender;
 import com.viaversion.viaversion.api.configuration.ViaVersionConfig;
 import com.viaversion.viaversion.api.platform.PlatformTask;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import io.netty.buffer.ByteBuf;
 import java.io.File;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public final class TestPlatform implements ViaPlatform {
@@ -78,20 +76,6 @@ public final class TestPlatform implements ViaPlatform {
     @Override
     public PlatformTask runRepeatingSync(Runnable runnable, long period) {
         return null;
-    }
-
-    @Override
-    public ViaCommandSender[] getOnlinePlayers() {
-        return new ViaCommandSender[0];
-    }
-
-    @Override
-    public void sendMessage(UUID uuid, String message) {
-    }
-
-    @Override
-    public boolean kickPlayer(UUID uuid, String message) {
-        return false;
     }
 
     @Override
