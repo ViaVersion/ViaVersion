@@ -98,6 +98,7 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             // New variants
             sendEntityVariants(wrapper.user(), "minecraft:pig_variant", "pig", true, "temperate");
             sendEntityVariants(wrapper.user(), "minecraft:cow_variant", "cow", true, "temperate");
+            sendEntityVariants(wrapper.user(), "minecraft:chicken_variant", "chicken", true, "temperate");
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
@@ -194,10 +195,13 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             }
 
             int mappedId = id;
-            if (mappedId >= 23) { // Cow variant
+            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.chickenVariantType.typeId()) {
                 mappedId++;
             }
-            if (mappedId >= 26) { // Pig variant
+            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.cowVariantType.typeId()) {
+                mappedId++;
+            }
+            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.pigVariantType.typeId()) {
                 mappedId++;
             }
             data.setDataType(Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId));

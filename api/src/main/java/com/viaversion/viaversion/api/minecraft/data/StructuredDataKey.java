@@ -24,13 +24,12 @@ package com.viaversion.viaversion.api.minecraft.data;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.Tag;
-import com.viaversion.viaversion.api.minecraft.CowVariant;
+import com.viaversion.viaversion.api.minecraft.AnimalVariant;
 import com.viaversion.viaversion.api.minecraft.EitherHolder;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.Holder;
 import com.viaversion.viaversion.api.minecraft.HolderSet;
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
-import com.viaversion.viaversion.api.minecraft.PigVariant;
 import com.viaversion.viaversion.api.minecraft.SoundEvent;
 import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -199,8 +198,9 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Integer> TROPICAL_FISH_PATTERN_COLOR = new StructuredDataKey<>("tropical_fish/pattern_color", Types.VAR_INT);
     public static final StructuredDataKey<Integer> MOOSHROOM_VARIANT = new StructuredDataKey<>("mooshroom/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> RABBIT_VARIANT = new StructuredDataKey<>("rabbit/variant", Types.VAR_INT);
-    public static final StructuredDataKey<Holder<PigVariant>> PIG_VARIANT = new StructuredDataKey<>("pig/variant", PigVariant.TYPE);
-    public static final StructuredDataKey<Holder<CowVariant>> COW_VARIANT = new StructuredDataKey<>("cow/variant", CowVariant.TYPE);
+    public static final StructuredDataKey<Holder<AnimalVariant>> PIG_VARIANT = new StructuredDataKey<>("pig/variant", AnimalVariant.TYPE);
+    public static final StructuredDataKey<Holder<AnimalVariant>> COW_VARIANT = new StructuredDataKey<>("cow/variant", AnimalVariant.TYPE);
+    public static final StructuredDataKey<Holder<AnimalVariant>> CHICKEN_VARIANT = new StructuredDataKey<>("chicken/variant", AnimalVariant.TYPE);
     public static final StructuredDataKey<Integer> FROG_VARIANT = new StructuredDataKey<>("frog/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> HORSE_VARIANT = new StructuredDataKey<>("horse/variant", Types.VAR_INT);
     public static final StructuredDataKey<Holder<PaintingVariant>> PAINTING_VARIANT = new StructuredDataKey<>("painting/variant", PaintingVariant.TYPE1_21_2);

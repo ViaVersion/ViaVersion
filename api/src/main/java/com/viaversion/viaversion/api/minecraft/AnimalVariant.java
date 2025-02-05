@@ -27,19 +27,26 @@ import com.viaversion.viaversion.api.type.types.misc.HolderType;
 import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public record CowVariant(int modelType, String texture, @Nullable HolderSet biomes) {
+/**
+ * Represents an animal variant (e.g. for cows, pigs, chickens).
+ *
+ * @param modelType model type id
+ * @param texture texture path
+ * @param biomes biomes this variant can spawn in, if limited to specific biomes
+ */
+public record AnimalVariant(int modelType, String texture, @Nullable HolderSet biomes) {
 
-    public static HolderType<CowVariant> TYPE = new HolderType<>() {
+    public static HolderType<AnimalVariant> TYPE = new HolderType<>() {
         @Override
-        public CowVariant readDirect(final ByteBuf buffer) {
+        public AnimalVariant readDirect(final ByteBuf buffer) {
             final int modelType = Types.VAR_INT.readPrimitive(buffer);
             final String texture = Types.STRING.read(buffer);
             final HolderSet biomes = Types.OPTIONAL_HOLDER_SET.read(buffer);
-            return new CowVariant(modelType, texture, biomes);
+            return new AnimalVariant(modelType, texture, biomes);
         }
 
         @Override
-        public void writeDirect(final ByteBuf buffer, final CowVariant variant) {
+        public void writeDirect(final ByteBuf buffer, final AnimalVariant variant) {
             Types.VAR_INT.writePrimitive(buffer, variant.modelType());
             Types.STRING.write(buffer, variant.texture());
             Types.OPTIONAL_HOLDER_SET.write(buffer, variant.biomes());

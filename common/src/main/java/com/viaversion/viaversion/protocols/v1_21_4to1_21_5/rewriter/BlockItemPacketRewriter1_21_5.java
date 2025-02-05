@@ -268,6 +268,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.RABBIT_VARIANT);
         dataContainer.remove(StructuredDataKey.COW_VARIANT);
         dataContainer.remove(StructuredDataKey.PIG_VARIANT);
+        dataContainer.remove(StructuredDataKey.CHICKEN_VARIANT);
         dataContainer.remove(StructuredDataKey.FROG_VARIANT);
         dataContainer.remove(StructuredDataKey.HORSE_VARIANT);
         dataContainer.remove(StructuredDataKey.PAINTING_VARIANT);
