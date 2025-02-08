@@ -18,17 +18,33 @@
 package com.viaversion.viaversion.velocity.listeners;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.ConnectionDetails;
 
 public class ConnectionDetailsListener {
+    private static final MinecraftChannelIdentifier CHANNEL = MinecraftChannelIdentifier.from(ConnectionDetails.CHANNEL);
 
     @Subscribe
-    public void onPostServerJoin(ServerPostConnectEvent e) {
-        final UserConnection connection = Via.getAPI().getConnection(e.getPlayer().getUniqueId());
+    public void onPostServerJoin(final ServerPostConnectEvent event) {
+        final UserConnection connection = Via.getAPI().getConnection(event.getPlayer().getUniqueId());
         ConnectionDetails.sendConnectionDetails(connection);
     }
 
+    @Subscribe
+    public void onProxyInitialize(final ProxyInitializeEvent event) {
+        VelocityPlugin.PROXY.getChannelRegistrar().register(CHANNEL);
+    }
+
+    @Subscribe
+    public void onPluginMessage(final PluginMessageEvent event) {
+        if (CHANNEL.equals(event.getIdentifier())) {
+            event.setResult(PluginMessageEvent.ForwardResult.handled());
+        }
+    }
 }

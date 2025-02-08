@@ -152,6 +152,7 @@ public interface ViaPlatform<T> {
      * @param message The data to send
      */
     default void sendCustomPayload(UUID uuid, String channel, String message) {
+        throw new UnsupportedOperationException("Not implemented on this platform");
     }
 
     /**
