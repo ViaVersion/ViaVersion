@@ -18,7 +18,7 @@ Supported Versions:
 
 ![Table (https://i.imgur.com/zrQTcf0.png)](https://i.imgur.com/zrQTcf0.png)
 
-**User Docs:** https://docs.viaversion.com/display/VIAVERSION/
+**User Docs:** https://docs.viaversion.com
 
 Snapshot support
 --------
