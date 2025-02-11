@@ -189,11 +189,6 @@ public class VelocityPlugin implements ViaServerProxyPlatform<Player> {
     }
 
     @Override
-    public boolean isPluginEnabled() {
-        return true;
-    }
-
-    @Override
     public File getDataFolder() {
         return configDir.toFile();
     }
