@@ -196,34 +196,40 @@ public class BlockRewriter<C extends ClientboundPacketType> {
     public PacketHandler chunkHandler1_19(ChunkTypeSupplier chunkTypeSupplier, @Nullable BiConsumer<UserConnection, BlockEntity> blockEntityHandler) {
         return wrapper -> {
             final Chunk chunk = handleChunk1_19(wrapper, chunkTypeSupplier);
-            final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
-            if (blockEntityMappings != null || blockEntityHandler != null) {
-                final List<BlockEntity> blockEntities = chunk.blockEntities();
-                final IntList toRemove = new IntArrayList();
-                for (int i = 0; i < blockEntities.size(); i++) {
-                    final BlockEntity blockEntity = blockEntities.get(i);
-                    if (blockEntityMappings != null) {
-                        final int id = blockEntity.typeId();
-                        final int mappedId = blockEntityMappings.getNewId(id);
-                        if (id == mappedId) {
-                            continue;
-                        }
-                        if (mappedId == -1) {
-                            toRemove.add(i);
-                            continue;
-                        }
+            handleBlockEntities(blockEntityHandler, chunk, wrapper.user());
+        };
+    }
 
-                        blockEntities.set(i, blockEntity.withTypeId(mappedId));
-                    }
+    public void handleBlockEntities(BiConsumer<UserConnection, BlockEntity> blockEntityHandler, Chunk chunk, UserConnection connection) {
+        final Mappings blockEntityMappings = protocol.getMappingData().getBlockEntityMappings();
+        if (blockEntityMappings == null && blockEntityHandler == null) {
+            return;
+        }
 
-                    if (blockEntityHandler != null && blockEntity.tag() != null) {
-                        blockEntityHandler.accept(wrapper.user(), blockEntity);
-                    }
+        final List<BlockEntity> blockEntities = chunk.blockEntities();
+        final IntList toRemove = new IntArrayList();
+        for (int i = 0; i < blockEntities.size(); i++) {
+            final BlockEntity blockEntity = blockEntities.get(i);
+            if (blockEntityMappings != null) {
+                final int id = blockEntity.typeId();
+                final int mappedId = blockEntityMappings.getNewId(id);
+                if (id == mappedId) {
+                    continue;
+                }
+                if (mappedId == -1) {
+                    toRemove.add(i);
+                    continue;
                 }
 
-                toRemove.forEach(blockEntities::remove);
+                blockEntities.set(i, blockEntity.withTypeId(mappedId));
             }
-        };
+
+            if (blockEntityHandler != null && blockEntity.tag() != null) {
+                blockEntityHandler.accept(connection, blockEntity);
+            }
+        }
+
+        toRemove.forEach(blockEntities::remove);
     }
 
     public Chunk handleChunk1_19(PacketWrapper wrapper, ChunkTypeSupplier chunkTypeSupplier) {

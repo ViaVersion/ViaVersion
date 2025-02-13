@@ -48,7 +48,7 @@ public class PaletteType1_18 extends PaletteTypeBase {
             // Single value storage
             palette = new DataPaletteImpl(type.size(), 1);
             palette.addId(Types.VAR_INT.readPrimitive(buffer));
-            Types.LONG_ARRAY_PRIMITIVE.read(buffer); // Just eat it if not empty - thanks, Hypixel
+            readValues(buffer, 0, palette); // Just eat it if not empty - thanks, Hypixel
             return palette;
         }
 

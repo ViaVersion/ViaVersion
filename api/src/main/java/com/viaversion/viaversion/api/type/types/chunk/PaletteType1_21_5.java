@@ -38,6 +38,10 @@ public final class PaletteType1_21_5 extends PaletteType1_18 {
 
     @Override
     protected void readValues(final ByteBuf buffer, final int bitsPerValue, final DataPaletteImpl palette) {
+        if (bitsPerValue == 0) {
+            return;
+        }
+
         final int valuesPerLong = (char) (64 / bitsPerValue);
         final int expectedLength = (type.size() + valuesPerLong - 1) / valuesPerLong;
         final long[] values = LongArrayType.readFixedLength(buffer, expectedLength);
