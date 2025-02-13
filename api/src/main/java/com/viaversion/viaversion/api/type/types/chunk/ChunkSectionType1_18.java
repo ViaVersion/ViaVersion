@@ -25,19 +25,26 @@ package com.viaversion.viaversion.api.type.types.chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public final class ChunkSectionType1_18 extends Type<ChunkSection> {
+public class ChunkSectionType1_18 extends Type<ChunkSection> {
 
-    private final PaletteType1_18 blockPaletteType;
-    private final PaletteType1_18 biomePaletteType;
+    private final PaletteTypeBase blockPaletteType;
+    private final PaletteTypeBase biomePaletteType;
 
     public ChunkSectionType1_18(final int globalPaletteBlockBits, final int globalPaletteBiomeBits) {
         super(ChunkSection.class);
         this.blockPaletteType = new PaletteType1_18(PaletteType.BLOCKS, globalPaletteBlockBits);
         this.biomePaletteType = new PaletteType1_18(PaletteType.BIOMES, globalPaletteBiomeBits);
+    }
+
+    protected ChunkSectionType1_18(final PaletteTypeBase blockPaletteType, PaletteTypeBase biomePaletteType) {
+        super(ChunkSection.class);
+        this.blockPaletteType = blockPaletteType;
+        this.biomePaletteType = biomePaletteType;
     }
 
     @Override

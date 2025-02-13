@@ -79,7 +79,8 @@ public interface Chunk {
      * @return chunk section bit mask, only non-null for 1.17+ chunks
      * @see #getBitmask()
      */
-    @Nullable BitSet getChunkMask();
+    @Nullable
+    BitSet getChunkMask();
 
     void setChunkMask(BitSet chunkSectionMask);
 
@@ -88,7 +89,8 @@ public interface Chunk {
      *
      * @return array of nullable chunk sections
      */
-    @Nullable ChunkSection[] getSections();
+    @Nullable
+    ChunkSection[] getSections();
 
     void setSections(ChunkSection[] sections);
 
@@ -106,9 +108,14 @@ public interface Chunk {
      *
      * @return compoundtag containing heightmaps if present
      */
-    @Nullable CompoundTag getHeightMap();
+    @Nullable
+    CompoundTag getHeightMap();
 
     void setHeightMap(@Nullable CompoundTag heightMap);
+
+    Heightmap[] heightmaps();
+
+    void setHeightmaps(Heightmap[] heightmaps);
 
     /**
      * Returns a list of block entities.

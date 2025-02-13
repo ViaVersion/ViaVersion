@@ -92,7 +92,6 @@ final class EntityPacketRewriter1_99 extends EntityRewriter<ClientboundPacket1_2
             Types1_21_4.ENTITY_DATA_TYPES.componentType,
             Types1_21_4.ENTITY_DATA_TYPES.optionalComponentType
         );
-        registerBlockStateHandler(EntityTypes1_21_4.ABSTRACT_MINECART, 11);
     }
 
     @Override

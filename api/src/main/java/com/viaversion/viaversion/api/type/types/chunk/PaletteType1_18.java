@@ -25,19 +25,17 @@ package com.viaversion.viaversion.api.type.types.chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPaletteImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.VarIntType;
 import com.viaversion.viaversion.util.CompactArrayUtil;
 import com.viaversion.viaversion.util.MathUtil;
 import io.netty.buffer.ByteBuf;
 
-public final class PaletteType1_18 extends Type<DataPalette> {
-    private final int globalPaletteBits;
-    private final PaletteType type;
+public class PaletteType1_18 extends PaletteTypeBase {
+    protected final int globalPaletteBits;
+    protected final PaletteType type;
 
     public PaletteType1_18(final PaletteType type, final int globalPaletteBits) {
-        super(DataPalette.class);
         this.globalPaletteBits = globalPaletteBits;
         this.type = type;
     }
@@ -72,6 +70,11 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         }
 
         // Read values
+        readValues(buffer, bitsPerValue, palette);
+        return palette;
+    }
+
+    protected void readValues(final ByteBuf buffer, final int bitsPerValue, final DataPaletteImpl palette) {
         final long[] values = Types.LONG_ARRAY_PRIMITIVE.read(buffer);
         if (values.length > 0) {
             final int valuesPerLong = (char) (64 / bitsPerValue);
@@ -81,7 +84,6 @@ public final class PaletteType1_18 extends Type<DataPalette> {
                     bitsPerValue == globalPaletteBits ? palette::setIdAt : palette::setPaletteIndexAt);
             }
         }
-        return palette;
     }
 
     @Override
@@ -91,7 +93,7 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             // Single value palette
             buffer.writeByte(0); // 0 bit storage
             Types.VAR_INT.writePrimitive(buffer, palette.idByIndex(0));
-            Types.VAR_INT.writePrimitive(buffer, 0); // Empty values length
+            writeValues(buffer, palette, 0);
             return;
         }
 
@@ -106,7 +108,22 @@ public final class PaletteType1_18 extends Type<DataPalette> {
             }
         }
 
-        Types.LONG_ARRAY_PRIMITIVE.write(buffer, CompactArrayUtil.createCompactArrayWithPadding(bitsPerValue, type.size(), bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt));
+        writeValues(buffer, palette, bitsPerValue);
+    }
+
+    protected void writeValues(final ByteBuf buffer, final DataPalette palette, final int bitsPerValue) {
+        if (bitsPerValue == 0) {
+            // Single value storage with the first palette entry
+            Types.VAR_INT.writePrimitive(buffer, 0);
+            return;
+        }
+
+        final long[] values = CompactArrayUtil.createCompactArrayWithPadding(
+            bitsPerValue,
+            type.size(),
+            bitsPerValue == globalPaletteBits ? palette::idAt : palette::paletteIndexAt
+        );
+        Types.LONG_ARRAY_PRIMITIVE.write(buffer, values);
     }
 
     private int bitsPerValue(final int size) {
@@ -119,15 +136,17 @@ public final class PaletteType1_18 extends Type<DataPalette> {
         return bitsPerValue;
     }
 
+    @Override
     public int serializedSize(final DataPalette palette) {
         // This is a bit of extra work, but worth it to avoid otherwise having to allocate and write to an extra buffer.
         // On top of saving memory, it provides small but measurable speedup compared to writing to a separate buffer and then back
         final int size = palette.size();
         final int bitsPerValue = bitsPerValue(size);
+        final int serializedValuesSize;
         int serializedTypesSize = 0;
-        int serializedValuesSize = 1; // At least one byte for 0 length
         if (size == 1) {
             serializedTypesSize = VarIntType.varIntLength(palette.idByIndex(0));
+            serializedValuesSize = serializedValuesSize(0);
         } else {
             if (bitsPerValue != globalPaletteBits) {
                 serializedTypesSize = VarIntType.varIntLength(size);
@@ -138,9 +157,13 @@ public final class PaletteType1_18 extends Type<DataPalette> {
 
             final int valuesPerLong = 64 / bitsPerValue;
             final int values = (type.size() + valuesPerLong - 1) / valuesPerLong;
-            serializedValuesSize = VarIntType.varIntLength(values) + (Long.BYTES * values);
+            serializedValuesSize = serializedValuesSize(values);
         }
 
         return Byte.BYTES + serializedTypesSize + serializedValuesSize;
+    }
+
+    protected int serializedValuesSize(final int values) {
+        return VarIntType.varIntLength(values) + (Long.BYTES * values);
     }
 }

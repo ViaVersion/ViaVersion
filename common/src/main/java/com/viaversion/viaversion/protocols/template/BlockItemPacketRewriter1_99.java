@@ -17,7 +17,7 @@
  */
 package com.viaversion.viaversion.protocols.template;
 
-import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_20_2;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_21_5;
 import com.viaversion.viaversion.api.type.types.version.Types1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPacket1_21_4;
 import com.viaversion.viaversion.protocols.v1_21_2to1_21_4.packet.ServerboundPackets1_21_4;
@@ -29,7 +29,7 @@ import com.viaversion.viaversion.rewriter.RecipeDisplayRewriter;
 import com.viaversion.viaversion.rewriter.StructuredItemRewriter;
 
 // To replace if needed:
-//   ChunkType1_20_2
+//   ChunkType1_21_5
 //   RecipeDisplayRewriter
 //   Types1_21_4, Types1_OLD
 final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<ClientboundPacket1_21_2, ServerboundPacket1_21_4, Protocol1_99To_98> {
@@ -52,7 +52,7 @@ final class BlockItemPacketRewriter1_99 extends StructuredItemRewriter<Clientbou
         blockRewriter.registerBlockUpdate(ClientboundPackets1_21_2.BLOCK_UPDATE);
         blockRewriter.registerSectionBlocksUpdate1_20(ClientboundPackets1_21_2.SECTION_BLOCKS_UPDATE);
         blockRewriter.registerLevelEvent1_21(ClientboundPackets1_21_2.LEVEL_EVENT, 2001);
-        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_20_2::new);
+        blockRewriter.registerLevelChunk1_19(ClientboundPackets1_21_2.LEVEL_CHUNK_WITH_LIGHT, ChunkType1_21_5::new);
         blockRewriter.registerBlockEntityData(ClientboundPackets1_21_2.BLOCK_ENTITY_DATA);
 
         // Registers item id changes

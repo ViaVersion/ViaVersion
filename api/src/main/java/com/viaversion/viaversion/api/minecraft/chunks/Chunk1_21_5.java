@@ -28,18 +28,18 @@ import java.util.BitSet;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class Chunk1_18 implements Chunk {
+public class Chunk1_21_5 implements Chunk {
     protected final int x;
     protected final int z;
     protected ChunkSection[] sections;
-    protected CompoundTag heightMap;
+    protected Heightmap[] heightmaps;
     protected final List<BlockEntity> blockEntities;
 
-    public Chunk1_18(int x, int z, ChunkSection[] sections, CompoundTag heightMap, List<BlockEntity> blockEntities) {
+    public Chunk1_21_5(int x, int z, ChunkSection[] sections, Heightmap[] heightmaps, List<BlockEntity> blockEntities) {
         this.x = x;
         this.z = z;
         this.sections = sections;
-        this.heightMap = heightMap;
+        this.heightmaps = heightmaps;
         this.blockEntities = blockEntities;
     }
 
@@ -115,22 +115,22 @@ public class Chunk1_18 implements Chunk {
 
     @Override
     public @Nullable CompoundTag getHeightMap() {
-        return heightMap;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setHeightMap(final CompoundTag heightMap) {
-        this.heightMap = heightMap;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Heightmap[] heightmaps() {
-        throw new UnsupportedOperationException();
+        return heightmaps;
     }
 
     @Override
     public void setHeightmaps(final Heightmap[] heightmaps) {
-        throw new UnsupportedOperationException();
+        this.heightmaps = heightmaps;
     }
 
     @Override

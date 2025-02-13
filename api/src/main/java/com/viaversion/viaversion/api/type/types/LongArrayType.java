@@ -22,30 +22,51 @@
  */
 package com.viaversion.viaversion.api.type.types;
 
+import com.google.common.base.Preconditions;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 
 public class LongArrayType extends Type<long[]> {
 
-    public LongArrayType() {
+    private final int length;
+
+    public LongArrayType(final int length) {
         super(long[].class);
+        this.length = length;
+    }
+
+    public LongArrayType() {
+        this(-1);
     }
 
     @Override
-    public long[] read(ByteBuf buffer) {
-        int length = Types.VAR_INT.readPrimitive(buffer);
-        long[] array = new long[length];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = buffer.readLong();
+    public long[] read(final ByteBuf buffer) {
+        final int length = this.length == -1 ? Types.VAR_INT.readPrimitive(buffer) : this.length;
+        Preconditions.checkArgument(buffer.isReadable(length), "Length is fewer than readable bytes");
+        return readFixedLength(buffer, length);
+    }
+
+    public static long[] readFixedLength(final ByteBuf buffer, final int expectedLength) {
+        final long[] value = new long[expectedLength];
+        for (int i = 0; i < expectedLength; i++) {
+            value[i] = buffer.readLong();
         }
-        return array;
+        return value;
     }
 
     @Override
-    public void write(ByteBuf buffer, long[] object) {
-        Types.VAR_INT.writePrimitive(buffer, object.length);
-        for (long l : object) {
+    public void write(final ByteBuf buffer, final long[] object) {
+        if (this.length != -1) {
+            Preconditions.checkArgument(length == object.length, "Length does not match expected length");
+        } else {
+            Types.VAR_INT.writePrimitive(buffer, object.length);
+        }
+        writeFixedLength(buffer, object);
+    }
+
+    public static void writeFixedLength(final ByteBuf buffer, final long[] object) {
+        for (final long l : object) {
             buffer.writeLong(l);
         }
     }

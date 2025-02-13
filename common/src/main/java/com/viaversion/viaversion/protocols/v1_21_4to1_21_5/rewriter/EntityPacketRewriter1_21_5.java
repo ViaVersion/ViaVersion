@@ -216,7 +216,19 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             Types1_21_5.ENTITY_DATA_TYPES.componentType,
             Types1_21_5.ENTITY_DATA_TYPES.optionalComponentType
         );
-        registerBlockStateHandler(EntityTypes1_21_5.ABSTRACT_MINECART, 11);
+
+        // Minecarts finally have the block state data type
+        filter().type(EntityTypes1_21_5.ABSTRACT_MINECART).index(11).handler((event, data) -> {
+            final int state = (int) data.getValue();
+            final int mappedBlockState = protocol.getMappingData().getNewBlockStateId(state);
+            if (mappedBlockState == 0) {
+                event.cancel();
+                return;
+            }
+
+            data.setTypeAndValue(Types1_21_5.ENTITY_DATA_TYPES.optionalBlockStateType, mappedBlockState);
+        });
+        filter().type(EntityTypes1_21_5.ABSTRACT_MINECART).removeIndex(13); // Custom display
 
         filter().type(EntityTypes1_21_5.MOOSHROOM).index(17).handler(((event, data) -> {
             final String typeName = data.value();
@@ -227,6 +239,15 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         // Removed saddles
         filter().type(EntityTypes1_21_5.PIG).cancel(17);
         filter().type(EntityTypes1_21_5.STRIDER).cancel(19);
+
+        filter().type(EntityTypes1_21_5.DOLPHIN).removeIndex(17); // Treasure pos
+
+        filter().type(EntityTypes1_21_5.TURTLE).cancel(22); // Travelling
+        filter().type(EntityTypes1_21_5.TURTLE).cancel(21); // Going home
+        filter().type(EntityTypes1_21_5.TURTLE).cancel(20); // Travel pos
+        filter().type(EntityTypes1_21_5.TURTLE).removeIndex(17); // Home pos
+
+        filter().type(EntityTypes1_21_5.FROG).cancel(17); // Variant
     }
 
     @Override

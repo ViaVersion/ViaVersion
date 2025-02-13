@@ -144,6 +144,16 @@ public class BaseChunk implements Chunk {
     }
 
     @Override
+    public Heightmap[] heightmaps() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setHeightmaps(final Heightmap[] heightmaps) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<CompoundTag> getBlockEntities() {
         return blockEntities;
     }
