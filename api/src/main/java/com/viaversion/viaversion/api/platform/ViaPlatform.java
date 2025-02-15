@@ -137,6 +137,7 @@ public interface ViaPlatform<T> {
      * @param message The message to send
      */
     default void sendMessage(UUID uuid, String message) {
+        throw new UnsupportedOperationException("ViaPlatform#sendMessage is not implemented on this platform.");
     }
 
     /**
@@ -147,7 +148,7 @@ public interface ViaPlatform<T> {
      * @return True if it was successful
      */
     default boolean kickPlayer(UUID uuid, String message) {
-        return false;
+        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
     }
 
     /**
