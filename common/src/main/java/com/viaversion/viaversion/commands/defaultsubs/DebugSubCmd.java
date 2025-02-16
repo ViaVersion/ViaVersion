@@ -49,6 +49,10 @@ public class DebugSubCmd implements ViaSubCommand {
                 debug.clearPacketTypesToLog();
                 sendMessage(sender, "&6Cleared packet types to log");
                 return true;
+            } else if (args[0].equalsIgnoreCase("logpretransform")) {
+                debug.setLogPrePacketTransform(!debug.logPrePacketTransform());
+                sendMessage(sender, "&6Pre transform packet logging is now %s", (debug.logPrePacketTransform() ? "&aenabled" : "&cdisabled"));
+                return true;
             } else if (args[0].equalsIgnoreCase("logposttransform")) {
                 debug.setLogPostPacketTransform(!debug.logPostPacketTransform());
                 sendMessage(sender, "&6Post transform packet logging is now %s", (debug.logPostPacketTransform() ? "&aenabled" : "&cdisabled"));

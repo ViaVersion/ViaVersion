@@ -114,8 +114,8 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
 
         DebugHandler debugHandler = Via.getManager().debugHandler();
         boolean debug = debugHandler.enabled();
-        if (debug && !debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
-            logPacket(direction, state, packetWrapper, originalID);
+        if (debug && debugHandler.logPrePacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
+            logPacket(direction, state, packetWrapper, originalID, false);
         }
 
         // Apply protocols
@@ -123,7 +123,7 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         super.transform(direction, state, packetWrapper);
 
         if (debug && debugHandler.logPostPacketTransform() && debugHandler.shouldLog(packetWrapper, direction)) {
-            logPacket(direction, state, packetWrapper, originalID);
+            logPacket(direction, state, packetWrapper, originalID, true);
         }
     }
 
@@ -131,12 +131,13 @@ public class ProtocolPipelineImpl extends AbstractSimpleProtocol implements Prot
         return direction == Direction.SERVERBOUND ? protocolList : reversedProtocolList;
     }
 
-    private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID) {
+    private void logPacket(Direction direction, State state, PacketWrapper packetWrapper, int originalID, boolean post) {
         ProtocolInfo protocolInfo = userConnection.getProtocolInfo();
         String actualUsername = protocolInfo.getUsername();
         String username = actualUsername != null ? actualUsername + " " : "";
-        Via.getPlatform().getLogger().log(Level.INFO, "{0}{1} {2}: {3} ({4}) -> {5} ({6}) [{7}] {8}",
+        Via.getPlatform().getLogger().log(Level.INFO, "{0}: {1}{2} {3}: {4} ({5}) -> {6} ({7}) [{8}] {9}",
             new Object[]{
+                post ? "Post" : "Pre",
                 username,
                 direction,
                 state,
