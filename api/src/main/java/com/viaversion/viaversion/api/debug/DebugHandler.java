@@ -72,6 +72,16 @@ public interface DebugHandler {
     void clearPacketTypesToLog();
 
     /**
+     * Sets whether packets should be logged before and after being transformed.
+     *
+     * @param logPacketTransform whether packets should be logged
+     */
+    default void setLogPacketTransform(boolean logPacketTransform) {
+        setLogPrePacketTransform(logPacketTransform);
+        setLogPostPacketTransform(logPacketTransform);
+    }
+
+    /**
      * Returns whether packets should be logged before being transformed.
      * Set to true by default.
      *
