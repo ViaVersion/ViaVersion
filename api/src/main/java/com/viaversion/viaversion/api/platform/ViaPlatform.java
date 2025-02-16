@@ -125,7 +125,10 @@ public interface ViaPlatform<T> {
      *
      * @return Array of ViaCommandSender
      */
-    ViaCommandSender[] getOnlinePlayers();
+    @Deprecated(forRemoval = true)
+    default ViaCommandSender[] getOnlinePlayers() {
+        return new ViaCommandSender[0];
+    }
 
     /**
      * Send a message to a player
@@ -133,7 +136,9 @@ public interface ViaPlatform<T> {
      * @param uuid    The player's UUID
      * @param message The message to send
      */
-    void sendMessage(UUID uuid, String message);
+    default void sendMessage(UUID uuid, String message) {
+        throw new UnsupportedOperationException("ViaPlatform#sendMessage is not implemented on this platform.");
+    }
 
     /**
      * Kick a player for a reason
@@ -142,7 +147,9 @@ public interface ViaPlatform<T> {
      * @param message The message to kick them with
      * @return True if it was successful
      */
-    boolean kickPlayer(UUID uuid, String message);
+    default boolean kickPlayer(UUID uuid, String message) {
+        throw new UnsupportedOperationException("ViaPlatform#kickPlayer is not implemented on this platform.");
+    }
 
     /**
      * Disconnects an UserConnection for a reason
