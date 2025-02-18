@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.ViaPlatform;
+import com.viaversion.viaversion.api.platform.ViaServerProxyPlatform;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ public final class ConnectionDetails {
         final JsonObject payload = new JsonObject();
         payload.addProperty("platformName", platformName);
         payload.addProperty("platformVersion", platformVersion);
+        payload.addProperty("fromProxy", Via.getPlatform() instanceof ViaServerProxyPlatform<?>);
         payload.addProperty("version", nativeVersion.getOriginalVersion());
         payload.addProperty("versionName", nativeVersion.getName());
 
