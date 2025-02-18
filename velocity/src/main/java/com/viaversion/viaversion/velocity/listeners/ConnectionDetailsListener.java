@@ -17,6 +17,7 @@
  */
 package com.viaversion.viaversion.velocity.listeners;
 
+import com.google.gson.JsonObject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
@@ -26,6 +27,7 @@ import com.viaversion.viaversion.VelocityPlugin;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.ConnectionDetails;
+import com.viaversion.viaversion.util.GsonUtil;
 
 public class ConnectionDetailsListener {
     private static final MinecraftChannelIdentifier CHANNEL = MinecraftChannelIdentifier.from(ConnectionDetails.CHANNEL);
@@ -43,8 +45,18 @@ public class ConnectionDetailsListener {
 
     @Subscribe
     public void onPluginMessage(final PluginMessageEvent event) {
-        if (CHANNEL.equals(event.getIdentifier())) {
-            event.setResult(PluginMessageEvent.ForwardResult.handled());
+        if (!CHANNEL.equals(event.getIdentifier())) {
+            return;
+        }
+
+        try {
+            final JsonObject payload = GsonUtil.getGson().fromJson(new String(event.getData()), JsonObject.class);
+            final String platformName = payload.get("platformName").getAsString();
+            if (Via.getPlatform().getPlatformName().equals(platformName)) {
+                event.setResult(PluginMessageEvent.ForwardResult.handled());
+            }
+        } catch (final Exception e) {
+            Via.getPlatform().getLogger().warning("Failed to handle connection details payload: " + e.getMessage());
         }
     }
 }
