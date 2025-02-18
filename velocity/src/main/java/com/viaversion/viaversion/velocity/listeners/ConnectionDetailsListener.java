@@ -51,8 +51,8 @@ public class ConnectionDetailsListener {
 
         try {
             final JsonObject payload = GsonUtil.getGson().fromJson(new String(event.getData()), JsonObject.class);
-            final String platformName = payload.get("platformName").getAsString();
-            if (Via.getPlatform().getPlatformName().equals(platformName)) {
+            final boolean fromProxy = payload.get("fromProxy").getAsBoolean();
+            if (fromProxy) {
                 event.setResult(PluginMessageEvent.ForwardResult.handled());
             }
         } catch (final Exception e) {
