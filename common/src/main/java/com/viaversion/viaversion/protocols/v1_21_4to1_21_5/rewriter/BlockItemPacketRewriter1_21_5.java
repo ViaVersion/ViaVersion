@@ -331,6 +331,7 @@ public final class BlockItemPacketRewriter1_21_5 extends StructuredItemRewriter<
         dataContainer.remove(StructuredDataKey.BLOCKS_ATTACKS);
         dataContainer.remove(StructuredDataKey.PROVIDES_TRIM_MATERIAL);
         dataContainer.remove(StructuredDataKey.BREAK_SOUND);
+        dataContainer.remove(StructuredDataKey.WOLF_SOUND_VARIANT);
     }
 
     private static <T> void updateShowInTooltip(final StructuredDataContainer container, @Nullable final TooltipDisplay display, final StructuredDataKey<T> key, final StructuredDataKey<T> mappedKey, final Function<T, T> function) {

@@ -99,6 +99,12 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             sendEntityVariants(wrapper.user(), "minecraft:pig_variant", "pig", true, "temperate");
             sendEntityVariants(wrapper.user(), "minecraft:cow_variant", "cow", true, "temperate");
             sendEntityVariants(wrapper.user(), "minecraft:chicken_variant", "chicken", true, "temperate");
+
+            // Wolf sound variants
+            final PacketWrapper wolfSoundVariantsPacket = PacketWrapper.create(ClientboundConfigurationPackets1_21.REGISTRY_DATA, wrapper.user());
+            wolfSoundVariantsPacket.write(Types.STRING, "minecraft:wolf_sound_variant");
+            wolfSoundVariantsPacket.write(Types.REGISTRY_ENTRY_ARRAY, new RegistryEntry[]{wolfSoundVariant()});
+            wolfSoundVariantsPacket.send(Protocol1_21_4To1_21_5.class);
         });
 
         protocol.registerClientbound(ClientboundPackets1_21_2.LOGIN, wrapper -> {
@@ -142,6 +148,17 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
                 wrapper.passthrough(Types.TAG); // Suffix
             }
         });
+    }
+
+    private RegistryEntry wolfSoundVariant() {
+        final CompoundTag classicWolfSoundVariant = new CompoundTag();
+        classicWolfSoundVariant.putString("ambient_sound", "entity.wolf.ambient");
+        classicWolfSoundVariant.putString("death_sound", "entity.wolf.death");
+        classicWolfSoundVariant.putString("growl_sound", "entity.wolf.growl");
+        classicWolfSoundVariant.putString("hurt_sound", "entity.wolf.hurt");
+        classicWolfSoundVariant.putString("pant_sound", "entity.wolf.pant");
+        classicWolfSoundVariant.putString("whine_sound", "entity.wolf.whine");
+        return new RegistryEntry("classic", classicWolfSoundVariant);
     }
 
     private int collisionId(final String collisionRule) {
@@ -195,13 +212,16 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
             }
 
             int mappedId = id;
-            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.chickenVariantType.typeId()) {
-                mappedId++;
-            }
             if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.cowVariantType.typeId()) {
                 mappedId++;
             }
+            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.wolfSoundVariantType.typeId()) {
+                mappedId++;
+            }
             if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.pigVariantType.typeId()) {
+                mappedId++;
+            }
+            if (mappedId >= Types1_21_5.ENTITY_DATA_TYPES.chickenVariantType.typeId()) {
                 mappedId++;
             }
             data.setDataType(Types1_21_5.ENTITY_DATA_TYPES.byId(mappedId));
@@ -246,8 +266,6 @@ public final class EntityPacketRewriter1_21_5 extends EntityRewriter<Clientbound
         filter().type(EntityTypes1_21_5.TURTLE).cancel(21); // Going home
         filter().type(EntityTypes1_21_5.TURTLE).cancel(20); // Travel pos
         filter().type(EntityTypes1_21_5.TURTLE).removeIndex(17); // Home pos
-
-        filter().type(EntityTypes1_21_5.FROG).cancel(17); // Variant
     }
 
     @Override

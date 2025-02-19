@@ -24,7 +24,6 @@ package com.viaversion.viaversion.api.minecraft.entitydata.types;
 
 import com.viaversion.viaversion.api.minecraft.PaintingVariant;
 import com.viaversion.viaversion.api.minecraft.Particle;
-import com.viaversion.viaversion.api.minecraft.WolfVariant;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
@@ -56,20 +55,21 @@ public final class EntityDataTypes1_21_5 extends AbstractEntityDataTypes {
     public final EntityDataType optionalVarIntType = add(20, Types.OPTIONAL_VAR_INT);
     public final EntityDataType poseType = add(21, Types.VAR_INT);
     public final EntityDataType catVariantType = add(22, Types.VAR_INT);
-    public final EntityDataType chickenVariantType = add(23, Types.VAR_INT);
-    public final EntityDataType cowVariantType = add(24, Types.VAR_INT);
-    public final EntityDataType wolfVariantType = add(25, Types.VAR_INT);
+    public final EntityDataType cowVariantType = add(23, Types.VAR_INT);
+    public final EntityDataType wolfVariantType = add(24, Types.VAR_INT);
+    public final EntityDataType wolfSoundVariantType = add(25, Types.VAR_INT);
     public final EntityDataType frogVariantType = add(26, Types.VAR_INT);
     public final EntityDataType pigVariantType = add(27, Types.VAR_INT);
-    public final EntityDataType optionalGlobalPosition = add(28, Types.OPTIONAL_GLOBAL_POSITION);
-    public final EntityDataType paintingVariantType = add(29, PaintingVariant.TYPE1_21_2);
-    public final EntityDataType snifferState = add(30, Types.VAR_INT);
-    public final EntityDataType armadilloState = add(31, Types.VAR_INT);
-    public final EntityDataType vector3FType = add(32, Types.VECTOR3F);
-    public final EntityDataType quaternionType = add(33, Types.QUATERNION);
+    public final EntityDataType chickenVariantType = add(28, Types.VAR_INT);
+    public final EntityDataType optionalGlobalPosition = add(29, Types.OPTIONAL_GLOBAL_POSITION);
+    public final EntityDataType paintingVariantType = add(30, PaintingVariant.TYPE1_21_2);
+    public final EntityDataType snifferState = add(31, Types.VAR_INT);
+    public final EntityDataType armadilloState = add(32, Types.VAR_INT);
+    public final EntityDataType vector3FType = add(33, Types.VECTOR3F);
+    public final EntityDataType quaternionType = add(34, Types.QUATERNION);
 
     public EntityDataTypes1_21_5(final Type<Item> itemType, final ParticleType particleType, final Type<Particle[]> particlesType) {
-        super(34);
+        super(35);
         this.itemType = add(7, itemType);
         this.particleType = add(17, particleType);
         this.particlesType = add(18, particlesType);

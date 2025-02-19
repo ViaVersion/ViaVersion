@@ -189,6 +189,7 @@ public record StructuredDataKey<T>(String identifier, Type<T> type) {
     public static final StructuredDataKey<Holder<SoundEvent>> BREAK_SOUND = new StructuredDataKey<>("break_sound", Types.SOUND_EVENT);
     public static final StructuredDataKey<Integer> VILLAGER_VARIANT = new StructuredDataKey<>("villager/variant", Types.VAR_INT);
     public static final StructuredDataKey<Holder<WolfVariant>> WOLF_VARIANT = new StructuredDataKey<>("wolf/variant", WolfVariant.TYPE);
+    public static final StructuredDataKey<Integer> WOLF_SOUND_VARIANT = new StructuredDataKey<>("wolf/sound_variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> WOLF_COLLAR = new StructuredDataKey<>("wolf/collar", Types.VAR_INT);
     public static final StructuredDataKey<Integer> FOX_VARIANT = new StructuredDataKey<>("fox/variant", Types.VAR_INT);
     public static final StructuredDataKey<Integer> SALMON_SIZE = new StructuredDataKey<>("salmon/size", Types.VAR_INT);

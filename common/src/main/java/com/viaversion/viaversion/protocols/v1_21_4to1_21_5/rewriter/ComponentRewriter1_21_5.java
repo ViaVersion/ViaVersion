@@ -85,20 +85,19 @@ public final class ComponentRewriter1_21_5 extends JsonNBTComponentRewriter<Clie
 
         final CompoundTag attributeModifiers = getNamespacedCompoundTag(componentsTag, "attribute_modifiers");
         if (attributeModifiers != null) {
-            removeNamespaced(componentsTag, "attribute_modifiers");
+            removeDataComponents(componentsTag, "attribute_modifiers");
             componentsTag.put("attribute_modifiers", attributeModifiers.get("modifiers"));
         }
 
         final CompoundTag dyedColor = getNamespacedCompoundTag(componentsTag, "dyed_color");
         if (dyedColor != null) {
-            removeNamespaced(componentsTag, "dyed_color");
+            removeDataComponents(componentsTag, "dyed_color");
             componentsTag.put("dyed_color", dyedColor.get("rgb"));
         }
 
         handleEnchantments(componentsTag, "enchantments");
         handleEnchantments(componentsTag, "stored_enchantments");
-        removeNamespaced(componentsTag, "instrument");
-        removeNamespaced(componentsTag, "jukebox_playable");
+        removeDataComponents(componentsTag, "instrument", "jukebox_playable", "hide_tooltip", "hide_additional_tooltip");
 
         if (!tooltipDisplay.isEmpty()) {
             componentsTag.put("tooltip_display", tooltipDisplay);
