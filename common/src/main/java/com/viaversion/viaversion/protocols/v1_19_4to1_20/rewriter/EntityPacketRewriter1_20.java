@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_20;
 import com.viaversion.viaversion.protocols.v1_19_3to1_19_4.packet.ClientboundPackets1_19_4;
 import com.viaversion.viaversion.protocols.v1_19_4to1_20.Protocol1_19_4To1_20;
 import com.viaversion.viaversion.rewriter.EntityRewriter;
+import com.viaversion.viaversion.util.Key;
 import com.viaversion.viaversion.util.TagUtil;
 
 public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPackets1_19_4, Protocol1_19_4To1_20> {
@@ -78,31 +79,43 @@ public final class EntityPacketRewriter1_20 extends EntityRewriter<ClientboundPa
                     final CompoundTag registry = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
                     final ListTag<CompoundTag> damageTypes = TagUtil.getRegistryEntries(registry, "damage_type");
                     int highestId = -1;
+                    boolean hasOutsideBorder = false;
+                    boolean hasGenericKill = false;
                     for (final CompoundTag damageType : damageTypes) {
                         final int id = damageType.getInt("id");
                         highestId = Math.max(highestId, id);
+                        final String name = Key.namespaced(damageType.getString("name"));
+                        if (name.equals("minecraft:outside_border")) {
+                            hasOutsideBorder = true;
+                        } else if (name.equals("minecraft:generic_kill")) {
+                            hasGenericKill = true;
+                        }
                     }
 
                     // AaaaAAAaa
-                    final CompoundTag outsideBorderReason = new CompoundTag();
-                    final CompoundTag outsideBorderElement = new CompoundTag();
-                    outsideBorderElement.put("scaling", new StringTag("always"));
-                    outsideBorderElement.put("exhaustion", new FloatTag(0F));
-                    outsideBorderElement.put("message_id", new StringTag("badRespawnPoint"));
-                    outsideBorderReason.put("id", new IntTag(highestId + 1));
-                    outsideBorderReason.put("name", new StringTag("minecraft:outside_border"));
-                    outsideBorderReason.put("element", outsideBorderElement);
-                    damageTypes.add(outsideBorderReason);
+                    if (!hasOutsideBorder) {
+                        final CompoundTag outsideBorderReason = new CompoundTag();
+                        final CompoundTag outsideBorderElement = new CompoundTag();
+                        outsideBorderElement.put("scaling", new StringTag("always"));
+                        outsideBorderElement.put("exhaustion", new FloatTag(0F));
+                        outsideBorderElement.put("message_id", new StringTag("badRespawnPoint"));
+                        outsideBorderReason.put("id", new IntTag(highestId + 1));
+                        outsideBorderReason.put("name", new StringTag("minecraft:outside_border"));
+                        outsideBorderReason.put("element", outsideBorderElement);
+                        damageTypes.add(outsideBorderReason);
+                    }
 
-                    final CompoundTag genericKillReason = new CompoundTag();
-                    final CompoundTag genericKillElement = new CompoundTag();
-                    genericKillElement.put("scaling", new StringTag("always"));
-                    genericKillElement.put("exhaustion", new FloatTag(0F));
-                    genericKillElement.put("message_id", new StringTag("badRespawnPoint"));
-                    genericKillReason.put("id", new IntTag(highestId + 2));
-                    genericKillReason.put("name", new StringTag("minecraft:generic_kill"));
-                    genericKillReason.put("element", genericKillElement);
-                    damageTypes.add(genericKillReason);
+                    if (!hasGenericKill) {
+                        final CompoundTag genericKillReason = new CompoundTag();
+                        final CompoundTag genericKillElement = new CompoundTag();
+                        genericKillElement.put("scaling", new StringTag("always"));
+                        genericKillElement.put("exhaustion", new FloatTag(0F));
+                        genericKillElement.put("message_id", new StringTag("badRespawnPoint"));
+                        genericKillReason.put("id", new IntTag(highestId + 2));
+                        genericKillReason.put("name", new StringTag("minecraft:generic_kill"));
+                        genericKillReason.put("element", genericKillElement);
+                        damageTypes.add(genericKillReason);
+                    }
                 });
             }
         });
