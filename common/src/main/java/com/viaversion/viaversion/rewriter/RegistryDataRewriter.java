@@ -162,8 +162,7 @@ public class RegistryDataRewriter {
             }
 
             final StringTag ingredientTag = ((CompoundTag) entry.tag()).getStringTag("ingredient");
-            final String mappedIngredient = protocol.getMappingData().getFullItemMappings().mappedIdentifier(ingredientTag.getValue());
-            ingredientTag.setValue(mappedIngredient);
+            updateItem(ingredientTag);
         }
     }
 
