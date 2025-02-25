@@ -152,6 +152,17 @@ public interface ViaPlatform<T> {
     }
 
     /**
+     * Send a custom payload to a player.
+     *
+     * @param uuid    The player's UUID
+     * @param channel The channel to send the payload on
+     * @param message The data to send
+     */
+    default void sendCustomPayload(UUID uuid, String channel, String message) {
+        throw new UnsupportedOperationException("ViaPlatform#sendCustomPayload is not implemented on this platform.");
+    }
+
+    /**
      * Disconnects an UserConnection for a reason
      *
      * @param connection The UserConnection
